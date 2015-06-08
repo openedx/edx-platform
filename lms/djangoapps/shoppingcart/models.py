@@ -15,17 +15,17 @@ import StringIO
 import csv
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.dispatch import receiver
-from django.db import models
+from django.db import models, IntegrityError
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.db import transaction
-from django.db.models import Sum
-from django.db.models.signals import post_save, post_delete
-
+from django.db.models import Sum, Max
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_noop
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
 from django.core.mail.message import EmailMessage
@@ -48,7 +48,8 @@ from .exceptions import (
     MultipleCouponsNotAllowedException,
     InvalidStatusToRetire,
     UnexpectedOrderItemStatus,
-    ItemNotFoundInCartException
+    ItemNotFoundInCartException,
+    OrderDoesNotExistException,
 )
 from microsite_configuration import microsite
 from shoppingcart.pdf import PDFInvoice
@@ -2080,3 +2081,355 @@ class Donation(OrderItem):
             How to display this item on a PDF printed receipt file.
         """
         return self._line_item_description(course_id=self.course_id)
+
+
+TRANSACTION_TYPE_PURCHASE = 'p'
+TRANSACTION_TYPE_REFUND = 'r'
+
+
+class PaymentTransaction(TimeStampedModel):
+    """
+    This model will act as a copy of all transaction information that is stored on any Payment Processor. We
+    have a syncronization management command to extract all of the daily reports and store
+    locally in our database
+    """
+
+    # The primary identifier for any transaction as stored in
+    # the payment processor.
+    remote_transaction_id = models.CharField(max_length=64, db_index=True, unique=True)
+
+    # any 'account identified' (aka Merchant Account) associated with this transaction
+    # note, this is an optional field
+    account_id = models.CharField(max_length=32, null=True)
+
+    # The timestamp associated with when the payment processing
+    # occured
+    processed_at = models.DateTimeField(db_index=True)
+
+    # the Order model that this processing is associated with
+    order = models.ForeignKey(Order, db_index=True)
+
+    currency = models.CharField(max_length=16)
+    amount = models.DecimalField(decimal_places=2, max_digits=30)
+
+    # transaction_type in Payment Processing report is
+    # whether it is a purchase or a refund: 'purchase' or 'refund'
+    TRANSACTION_TYPE_CHOICES = (
+        (TRANSACTION_TYPE_PURCHASE, ugettext_noop('Purchase')),
+        (TRANSACTION_TYPE_REFUND, ugettext_noop('Refund'))
+    )
+    transaction_type = models.CharField(max_length=6, db_index=True, choices=TRANSACTION_TYPE_CHOICES)
+
+    def __eq__(self, other):
+        """
+        Equality operator
+        """
+
+        return (
+            unicode(self.remote_transaction_id) == unicode(other.remote_transaction_id) and
+            unicode(self.account_id) == unicode(other.account_id) and
+            self.processed_at == other.processed_at and
+            self.order.id == other.order.id and  # pylint: disable=no-member
+            unicode(self.currency) == unicode(other.currency) and
+            self.amount == other.amount and
+            self.transaction_type == other.transaction_type
+        )
+
+    @classmethod
+    def create(cls, remote_transaction_id, account_id, processed_at, order_id, currency, amount, transaction_type):
+        """
+        This classmethod will create a new entry in the PaymentTransaction table
+        It will use a get_or_create() at the ORM level.
+        We enforce that a Transaction is immutable and we therefore will
+        not support update cases
+        """
+
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            msg = (
+                'Transaction {transaction_id} refers to order_id {order_id} '
+                'but it cannot be found!'
+            ).format(
+                transaction_id=remote_transaction_id,
+                order_id=order_id,
+            )
+            raise OrderDoesNotExistException(msg)
+
+        cc_transaction = PaymentTransaction(
+            remote_transaction_id=remote_transaction_id,
+            account_id=account_id,
+            processed_at=processed_at,
+            order=order,
+            currency=currency,
+            amount=amount,
+            transaction_type=transaction_type
+        )
+
+        # Do a quick check to see if it exists
+        exists = PaymentTransaction.objects.filter(remote_transaction_id=remote_transaction_id).exists()
+
+        if exists:
+            # see if an already existing row is *exactly* the same
+            existing = cls.get_by_remote_transaction_id(remote_transaction_id)
+
+            if cc_transaction != existing:
+                msg = (
+                    "Attempting to change an existing transaction ({transaction_id}). "
+                    "This is not allowed!"
+                ).format(
+                    transaction_id=remote_transaction_id,
+                )
+                raise IntegrityError(msg)
+
+            # if transactions have same data, then we just do nothing
+        else:
+            # this is a new row, so we save
+            cc_transaction.save()
+
+        return cc_transaction
+
+    @classmethod
+    def get_by_remote_transaction_id(cls, remote_transaction_id):
+        """
+        This will return a PaymentTransaction by the remote_transaction_id
+        """
+        return PaymentTransaction.objects.get(remote_transaction_id=remote_transaction_id)
+
+    @classmethod
+    def get_transactions_for_course(cls, course_key, transaction_type=None, start=None, end=None):
+        """
+        Returns a queryset for all transactions recorded for a given course
+        """
+
+        query = PaymentTransactionCourseMap.objects.filter(
+            course_id=course_key
+        ).select_related()
+
+        if transaction_type:
+            query = query.filter(transaction__transaction_type=transaction_type)
+
+        # apply time filtering, if requested by caller
+        if start and end:
+            query = query.filter(transaction__processed_at__gte=start, transaction__processed_at__lte=end)
+
+        return query
+
+    @classmethod
+    def get_transaction_totals_for_course(cls, course_key, start=None, end=None):
+        """
+        Returns aggregates sums for a course grouped by transaction_type.
+        The caller can specify an optional start/end date to get
+        time slices of the data
+
+        The result set will look like:
+
+        {
+            'purchased': xx.xx,
+            'refunded': yyy.yy
+        }
+        """
+
+        results = {
+            'purchased': 0.0,
+            'refunded': 0.0
+        }
+
+        query = PaymentTransactionCourseMap.objects.filter(
+            course_id=course_key
+        ).select_related()
+
+        # apply time filtering, if requested by caller
+        if start and end:
+            query = query.filter(transaction__processed_at__gte=start, transaction__processed_at__lte=end)
+
+        query = query.values('transaction__transaction_type').order_by().annotate(total=Sum('amount'))
+
+        # translate the aggregated query into something more readible for the callers
+        for item in query:
+            total = item['total']
+            if item['transaction__transaction_type'] == TRANSACTION_TYPE_PURCHASE:
+                results['purchased'] = total
+            else:
+                results['refunded'] = total
+
+        return results
+
+    def validate(self):
+        """
+        Perform some validation regarding the transaction and how it matches our internal
+        database state
+        """
+
+        # 1: We should only have a transaction for a Order that has a status='purchased'
+        if self.order.status != 'purchased':  # pylint: disable=no-member
+            msg = (
+                'remote_transaction_id {tid} was received for order {oid} '
+                'but it does not have a purchased status'
+            ).format(
+                tid=self.remote_transaction_id,
+                oid=self.order.id,  # pylint: disable=no-member
+            )  # pylint: disable=no-member
+            raise ValidationError(msg)
+
+        # 2: The transaction amount should be exactly the same as all OrderItems on the Order
+        # As we don't support partial payments or refunds
+        total = sum(i.line_cost for i in self.order.orderitem_set.all())  # pylint: disable=no-member
+
+        if self.transaction_type == TRANSACTION_TYPE_PURCHASE:
+            if self.amount != total:
+                msg = (
+                    'remote_transaction_id {tid} has purchase amount of {amount} '
+                    'but Order {oid} has a sum of {total}'
+                ).format(
+                    tid=self.remote_transaction_id,
+                    amount=self.amount,
+                    oid=self.order.id,  # pylint: disable=no-member
+                    total=total,
+                )
+                raise ValidationError(msg)
+        elif self.transaction_type == TRANSACTION_TYPE_REFUND:
+            if self.amount != -total:
+                msg = (
+                    'remote_transaction_id {tid} has refund amount of {amount} '
+                    'but Order {oid} has a sum of {total}'
+                ).format(
+                    tid=self.remote_transaction_id,
+                    amount=self.amount,
+                    oid=self.order.id,  # pylint: disable=no-member
+                    total=total,
+                )
+                raise ValidationError(msg)
+        else:
+            raise ValidationError('Unknown transaction_type = {}'.format(self.transaction_type))
+
+    @classmethod
+    def get_last_processed_date(cls):
+        """
+        This method will return the highest processed date
+        """
+        obj = cls.objects.all().order_by('processed_at').values('processed_at').annotate(last=Max('processed_at'))
+
+        return obj[0]['last'] if obj else None
+
+
+@receiver(pre_save, sender=PaymentTransaction)
+def pre_transaction_save(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Do some assumption validation regarding transactions
+    """
+    cc_transaction = kwargs['instance']
+    cc_transaction.validate()
+
+
+@receiver(post_save, sender=PaymentTransaction)
+def post_transaction_save(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Whenever we save a new PaymentTransaction, we should generate the mappings into
+    the PaymentTransactionCourseMap
+    """
+
+    if kwargs['created']:
+        cc_transaction = kwargs['instance']
+
+        # go through all OrderItems and get all subclasses
+        order_items = OrderItem.objects.filter(order=cc_transaction.order).select_subclasses()
+
+        for item in order_items:
+            if hasattr(item, 'course_id'):
+                # we can assume that the sum of all line items matches
+                # the amount in the transaction as we
+                # assert against that fact in the pre-save validation
+                if cc_transaction.transaction_type == TRANSACTION_TYPE_PURCHASE:
+                    amount = item.line_cost
+                else:
+                    amount = -item.line_cost
+
+                course_map = PaymentTransactionCourseMap(
+                    transaction=cc_transaction,
+                    course_id=getattr(item, 'course_id'),
+                    order_item=item,
+                    amount=amount,
+                    currency=cc_transaction.currency
+                )
+                course_map.save()
+
+
+class PaymentTransactionCourseMap(models.Model):
+    """
+    This table is to facilitate quick querying for financial reporting.
+    While this table does not expose any new information, it is non-performant to
+    map Payment Processor transactions to CourseId's via the existing Order and OrderItem subclasses.
+    These are computed during synchronization-time to allow for quicker querying and report
+    generation
+    """
+
+    transaction = models.ForeignKey(PaymentTransaction, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    order_item = models.ForeignKey(OrderItem, db_index=True)
+    currency = models.CharField(max_length=16)
+    amount = models.DecimalField(decimal_places=2, max_digits=30)
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        unique_together = (('transaction', 'course_id', 'order_item'),)
+
+
+class PaymentTransactionSync(TimeStampedModel):
+    """
+    This model will store all synchronization activities when synchronizing the internal database
+    with Payment Processor reporting. This table is managed by the synchronization management
+    command
+    """
+
+    # start date of extract
+    date_range_start = models.DateTimeField(db_index=True)
+
+    # end date of extract
+    date_range_end = models.DateTimeField(db_index=True)
+
+    # how many rows were successfully synced
+    rows_processed = models.IntegerField()
+
+    # how many rows could not be processed due to errors
+    # there should be a corresponding entry in the PaymentTransactionSyncError table
+    rows_in_error = models.IntegerField()
+
+    sync_started_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    sync_ended_at = models.DateTimeField(null=True)
+
+    @classmethod
+    def get_last_sync_date(cls):
+        """
+        Returns the last known sync end-date or None if this has not been done before
+        """
+        last_sync_query = cls.objects.all().order_by('date_range_end').reverse()[:1]
+        if last_sync_query:
+            return last_sync_query[0].date_range_end
+        else:
+            return None
+
+
+class PaymentTransactionSyncError(TimeStampedModel):
+    """
+    This class records any exceptions/errors encountered while trying to synchronize the transactions
+    """
+    # The primary identifier for any transaction as stored in
+    # the payment processor.
+    remote_transaction_id = models.CharField(max_length=64, db_index=True, unique=True)
+
+    raw_data = models.TextField()
+
+    err_msg = models.TextField()
+
+    @classmethod
+    def create_and_save(cls, remote_transaction_id, raw_data, err_msg):
+        """
+        Create and save a new Sync error
+        """
+
+        err_obj, __ = PaymentTransactionSyncError.objects.get_or_create(remote_transaction_id=remote_transaction_id)
+        err_obj.raw_data = raw_data
+        err_obj.err_msg = err_msg
+        err_obj.save()
+
+        return err_obj

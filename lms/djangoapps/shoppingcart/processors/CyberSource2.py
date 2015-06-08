@@ -26,15 +26,25 @@ import re
 import json
 import uuid
 import logging
+import requests
+import csv
+import StringIO
+import pytz
 from textwrap import dedent
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import OrderedDict, defaultdict
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string
-from shoppingcart.models import Order
+from shoppingcart.models import (
+    Order,
+    PaymentTransaction,
+    TRANSACTION_TYPE_PURCHASE,
+    TRANSACTION_TYPE_REFUND,
+    PaymentTransactionSyncError
+)
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
 from microsite_configuration import microsite
@@ -663,3 +673,212 @@ REASONCODE_MAP.update(
             """)),
     }
 )
+
+
+def synchronize_transactions(start_date, end_date):
+    """
+    Concrete implementation of the API. This will call out to CyberSource Secure Acceptance
+    Batch Processing Detail Report which can be provided on a daily basis
+    """
+
+    # truncate the date ranges to midnight
+    start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_date.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    cur_date = start_date
+    num_fetched = 0
+    num_processed = 0
+    num_in_err = 0
+    errs = []
+
+    log.info('Starting transaction synchronization from {start} to {end}'.format(
+        start=start_date, end=end_date,
+    ))
+
+    # CyberSource only supports getting a report for a single day
+    while cur_date < end_date:
+        log.info('\nSynchronizing transaction report data for day: {0}'.format(cur_date))
+        daily_report = get_report_data(cur_date)
+        num_fetched = num_fetched + len(daily_report)
+        log.info('Got {num} records'.format(num=num_fetched))
+
+        _num_processed, _num_in_err, _errs = process_report_data(daily_report)
+        log.info('{success_num} records successfully processed, {err_num} records failed'.format(
+            success_num=_num_processed, err_num=_num_in_err,
+        ))
+        num_processed = num_processed + _num_processed
+        num_in_err = num_in_err + _num_in_err
+        errs.extend(_errs)
+
+        # go to next day
+        cur_date = cur_date + timedelta(1)
+
+    return num_processed, num_in_err, errs
+
+
+RECEIVED_REPORT_FIELD_NAMES = [
+    'batch_id',
+    'merchant_id',
+    'batch_date',
+    'request_id',
+    'merchant_ref_number',
+    'trans_ref_no',
+    'payment_method',
+    'currency',
+    'amount',
+    'transaction_type',
+]
+
+
+def get_report_data_for_account(account_name, config, date):
+    """
+    This gets the report data (PaymentBatchDetailReport) for a specified account configuration
+    """
+
+    url = "{base_hostname}/DownloadReport/{date_str}/{acct_name}/PaymentBatchDetailReport.csv".format(
+        base_hostname=config['REPORTING_BASE_ENDPOINT'],
+        date_str=date.strftime('%Y/%m/%d'),
+        acct_name=account_name
+    )
+
+    log.info('Fetching CyberSource transaction data via: {}'.format(url))
+
+    response = requests.get(url, auth=(config['REPORTING_AUTH_USERNAME'], config['REPORTING_AUTH_PASSWORD']))
+    if response.status_code == 400:
+        # CyberSource will return 400's if a date is requested that it can't fulfill
+
+        now = datetime.now(pytz.UTC)
+        now.replace(hour=0, minute=0, second=0, microsecond=0)  # pylint: disable=maybe-no-member
+
+        # CyberSource will not support downloading of data more than 180 days old
+        if now - date >= timedelta(179):
+            log.info(
+                'CyberSource does not support getting transaction dumps more than '
+                '180 days old. Returning empty set.'
+            )
+            return []
+
+        # Can't ask for things in the future or even today's report
+        if date >= now - timedelta(1):
+            log.info('Requested date in the future. Returning empty set.')
+            return []
+    if response.status_code == 403:
+        raise CCProcessorFailedSyncronization('HTTP Auth Credentials for Report Services failed or were locked out!')
+    elif response.status_code != 200:
+        msg = 'PaymentBatchDetailReport failed with status code of {status_code}!'.format(
+            status_code=response.status_code
+        )
+        raise CCProcessorFailedSyncronization(msg)
+
+    # Parse the CSV
+    csv_buffer = StringIO.StringIO(response.content)
+
+    reader = csv.DictReader(csv_buffer, fieldnames=RECEIVED_REPORT_FIELD_NAMES)
+
+    # Filter out the keys we aren't including in the output
+    # Remove the first two rows, which are just header info
+    data = [
+        {
+            key: val
+            for key, val in row.iteritems()
+        }
+        for row in reader
+    ][2:]
+
+    return data
+
+
+def get_report_data(date):
+    """
+    Internal method to make the remote call to CyberSource Reporting Services to get all transactions for all of
+    the CyberSource accounts that are defined in configuration.
+
+    The method returns an arrary of dicts containing all transaction data from CyberSource on that day
+    """
+
+    # get the 'root' account information
+    account_name = settings.CC_PROCESSOR['CyberSource2'].get('REPORTING_ACCOUNT_NAME')
+    if account_name:
+        data = get_report_data_for_account(
+            account_name,
+            settings.CC_PROCESSOR['CyberSource2'],
+            date
+        )
+
+    # keep track of which accounts we've processed
+    processed_accounts = [account_name]
+
+    # now go through all of the various microsites, but don't redo overlapping
+    # accounts since multiple microsites might use the same CyberSource account
+    for microsite_key in settings.CC_PROCESSOR['CyberSource2'].get('microsites', {}):
+        config = settings.CC_PROCESSOR['CyberSource2']['microsites'][microsite_key]
+        account_name = config.get('REPORTING_ACCOUNT_NAME')
+
+        if not account_name:
+            continue
+
+        if account_name not in processed_accounts:
+            _data = get_report_data_for_account(account_name, config, date)
+            data.extend(_data)
+            processed_accounts.append(account_name)
+
+    return data
+
+
+def process_report_data(data):
+    """
+    This function will convert a CyberSource PaymentBatchDetailReport report into our own internal
+    ProcessorTransaction tables, as well as note any errors that occured during this processes
+    """
+
+    rows_processed = 0
+    rows_in_error = 0
+    errors = []
+    for row in data:
+        remote_transaction_id = row['trans_ref_no']
+        try:
+            account_id = row['merchant_id']
+            try:
+                processed_at = datetime.strptime(row['batch_date'], '%m/%d/%y')
+            except ValueError:
+                processed_at = datetime.strptime(row['batch_date'], '%Y-%m-%d')
+
+            processed_at = processed_at.replace(tzinfo=pytz.UTC)
+            order_id = int(row['merchant_ref_number'])
+            currency = row['currency']
+            amount = float(row['amount'])
+            _type = row['transaction_type']
+
+            if _type == 'ics_bill':
+                transaction_type = TRANSACTION_TYPE_PURCHASE
+            elif _type == 'ics_credit':
+                transaction_type = TRANSACTION_TYPE_REFUND
+            else:
+                raise Exception('Unknown transaction_type received: {transaction_type}'.format(transaction_type=_type))
+
+            PaymentTransaction.create(
+                remote_transaction_id,
+                account_id,
+                processed_at,
+                order_id,
+                currency,
+                amount,
+                transaction_type
+            )
+            rows_processed = rows_processed + 1
+        except Exception, ex:  # pylint: disable=broad-except
+            rows_in_error = rows_in_error + 1
+            err = {
+                'remote_transaction_id': remote_transaction_id,
+                'raw_data': row,
+                'err_msg': repr(ex)
+            }
+            log.error('Failed to process record: {err}'.format(err=err))
+            PaymentTransactionSyncError.create_and_save(
+                err['remote_transaction_id'],
+                err['raw_data'],
+                err['err_msg']
+            )
+            errors.append(err)
+
+    return rows_processed, rows_in_error, errors

@@ -60,3 +60,7 @@ class UnexpectedOrderItemStatus(Exception):
 
 class ItemNotFoundInCartException(Exception):
     pass
+
+
+class OrderDoesNotExistException(Exception):
+    pass

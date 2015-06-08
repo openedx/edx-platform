@@ -1,6 +1,7 @@
 """
 Tests for the CyberSource processor handler
 """
+import datetime
 from collections import OrderedDict
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -25,6 +26,7 @@ from shoppingcart.processors.CyberSource import (
     get_processor_decline_html,
     get_processor_exception_html,
     payment_accepted,
+    sychronize_transactions
 )
 from mock import patch, Mock
 
@@ -351,3 +353,11 @@ class CyberSourceTests(TestCase):
         self.assertEqual(result['order'], order1)
         self.assertEqual(order1.status, 'cart')
         self.assertIn(REASONCODE_MAP['207'], result['error_html'])
+
+    def test_sychronize_transactions(self):
+        """
+        Verify that we get an exception on the sychronize_transactions method because it is not supported
+        """
+
+        with self.assertRaises(Exception):
+            sychronize_transactions(datetime.datetime.now(), datetime.datetime.now())
