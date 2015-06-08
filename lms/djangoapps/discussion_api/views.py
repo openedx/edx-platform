@@ -15,6 +15,7 @@ from discussion_api.api import (
     create_comment,
     create_thread,
     delete_thread,
+    delete_comment,
     get_comment_list,
     get_course_topics,
     get_thread_list,
@@ -163,7 +164,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
     **DELETE response values:
 
-        No content is returned for a DELETE request
+        * No content is returned for a DELETE request
 
     """
     lookup_field = "thread_id"
@@ -213,7 +214,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
     """
     **Use Cases**
 
-        Retrieve the list of comments in a thread.
+        Retrieve the list of comments in a thread, or create or delete a
+        comment.
 
     **Example Requests**:
 
@@ -227,6 +229,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         PATCH /api/discussion/v1/comments/comment_id
         {"raw_body": "Edited text"}
+
+        DELETE /api/discussion/v1/comments/comment_id
 
     **GET Parameters**:
 
@@ -305,6 +309,11 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * vote_count: The number of votes for the comment
 
         * children: The list of child comments (with the same format)
+
+    **DELETE Response Value**
+
+        * No content is returned for a DELETE request
+
     """
     lookup_field = "comment_id"
 
@@ -333,9 +342,18 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         """
         return Response(create_comment(request, request.DATA))
 
+    def destroy(self, request, comment_id):
+        """
+        Implements the DELETE method for the instance endpoint as described in
+        the class docstring
+        """
+        delete_comment(request, comment_id)
+        return Response(status=204)
+
     def partial_update(self, request, comment_id):
         """
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
         return Response(update_comment(request, comment_id, request.DATA))
+

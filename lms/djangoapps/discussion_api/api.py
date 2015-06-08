@@ -504,6 +504,29 @@ def update_comment(request, comment_id, update_data):
     return serializer.data
 
 
+def delete_comment(request, comment_id):
+    """
+    Delete a comment.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        comment_id: The id of the comment to delete
+
+    Raises:
+
+        PermissionDenied: if user does not have permission to delete thread
+
+    """
+    cc_comment, context = _get_comment_and_context(request, comment_id)
+    if _is_user_author_or_privileged(cc_comment, context):
+        cc_comment.delete()
+    else:
+        raise PermissionDenied
+
+
 def delete_thread(request, thread_id):
     """
     Delete a thread.
