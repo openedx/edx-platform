@@ -16,7 +16,7 @@ class Migration(DataMigration):
             conf.mode = mode
             file_name = mode + '.png'
             conf.icon.save(
-                file_name,
+                'badges/{}'.format(file_name),
                 File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name))
             )
             conf.save()
