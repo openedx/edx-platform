@@ -1,7 +1,7 @@
 /**
  * Provides helper methods for invoking Validation modal in Jasmine tests.
  */
-define(['jquery', 'js/spec_helpers/modal_helpers', 'js/common_helpers/template_helpers'],
+define(['jquery', 'js/spec_helpers/modal_helpers', 'common/js/spec_helpers/template_helpers'],
     function($, ModalHelpers, TemplateHelpers) {
         var installValidationTemplates, checkErrorContents, undoChanges;
 

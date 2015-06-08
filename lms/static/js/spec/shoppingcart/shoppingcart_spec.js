@@ -1,4 +1,4 @@
-define(['js/common_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
+define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
     function(AjaxHelpers) {
         'use strict';
 

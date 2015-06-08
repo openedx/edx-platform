@@ -50,7 +50,7 @@ from django_comment_client.permissions import has_permission
 
 % for template_name in ['thread-show']:
 <script aria-hidden="true" type="text/template" id="${template_name}-template">
-    <%static:include path="js/discussion/${template_name}.underscore" />
+    <%static:include path="common/templates/discussion/${template_name}.underscore" />
 </script>
 % endfor
 

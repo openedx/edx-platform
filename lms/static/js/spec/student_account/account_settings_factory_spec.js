@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
+define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
         'js/spec/views/fields_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_account/account_settings_fields_helpers',

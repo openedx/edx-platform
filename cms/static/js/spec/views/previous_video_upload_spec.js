@@ -1,5 +1,5 @@
 define(
-    ["jquery", "backbone", "js/views/previous_video_upload", "js/common_helpers/template_helpers"],
+    ["jquery", "backbone", "js/views/previous_video_upload", "common/js/spec_helpers/template_helpers"],
     function($, Backbone, PreviousVideoUploadView, TemplateHelpers) {
         "use strict";
         describe("PreviousVideoUploadView", function() {

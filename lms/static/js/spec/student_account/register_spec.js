@@ -1,8 +1,8 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
-    'js/common_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers',
+    'common/js/spec_helpers/ajax_helpers',
     'js/student_account/models/RegisterModel',
     'js/student_account/views/RegisterView'
 ], function($, _, TemplateHelpers, AjaxHelpers, RegisterModel, RegisterView) {

@@ -1,4 +1,4 @@
-define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
+define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
     function( AjaxHelpers, EnrollmentInterface ) {
         'use strict';
 

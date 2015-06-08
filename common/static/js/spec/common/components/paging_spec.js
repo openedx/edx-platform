@@ -1,4 +1,4 @@
-define([ "jquery", "js/common_helpers/ajax_helpers", "URI",
+define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
     "js/views/paging", "js/views/paging_header", "js/views/paging_footer",
     "js/models/asset", "js/collections/asset" ],
     function ($, AjaxHelpers, URI, PagingView, PagingHeader, PagingFooter, AssetModel, AssetCollection) {
@@ -204,8 +204,6 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI",
                 var pagingHeader;
 
                 beforeEach(function () {
-                    var pagingHeaderTpl = readFixtures('paging-header.underscore');
-                    appendSetFixtures($("<script>", { id: "paging-header-tpl", type: "text/template" }).text(pagingHeaderTpl));
                     pagingHeader = new PagingHeader({view: pagingView});
                 });
 
@@ -395,8 +393,6 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI",
                 var pagingFooter;
 
                 beforeEach(function () {
-                    var pagingFooterTpl = readFixtures('paging-footer.underscore');
-                    appendSetFixtures($("<script>", { id: "paging-footer-tpl", type: "text/template" }).text(pagingFooterTpl));
                     pagingFooter = new PagingFooter({view: pagingView});
                 });
 
