@@ -282,3 +282,8 @@ class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase)
         )
         SignatureValidator.verify = MagicMock(return_value=True)
         return self.client.post(lti_launch_url, data=LTI_DEFAULT_PARAMS)
+
+    def test_unenrolled_student(self):
+        self.setup_course()
+        self.setup_user(admin=False, enroll=False, login=True)
+        self.verify_response()

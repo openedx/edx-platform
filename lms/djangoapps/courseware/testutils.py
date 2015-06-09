@@ -155,7 +155,7 @@ class RenderXBlockTestMixin(object):
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response(expected_response_code=302)
 
-    def test_fail_unenrolled_student(self):
+    def test_unenrolled_student(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=False, login=True)
         self.verify_response(expected_response_code=302)
