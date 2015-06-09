@@ -1,5 +1,6 @@
 """Tests for the resubmit_error_certificates management command. """
 import ddt
+from contextlib import contextmanager
 from django.core.management.base import CommandError
 from nose.plugins.attrib import attr
 from django.test.utils import override_settings
@@ -10,7 +11,7 @@ from certificates.tests.factories import BadgeAssertionFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from certificates.management.commands import resubmit_error_certificates, regenerate_user
+from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
 from certificates.models import GeneratedCertificate, CertificateStatuses, BadgeAssertion
 
 
@@ -157,7 +158,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course = self.courses[0]
 
     @override_settings(CERT_QUEUE='test-queue')
-    @patch('certificates.management.commands.regenerate_user.XQueueCertInterface', spec=True)
+    @patch('certificates.api.XQueueCertInterface', spec=True)
     def test_clear_badge(self, xqueue):
         """
         Given that I have a user with a badge
@@ -174,6 +175,72 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             grade_value=None
         )
         xqueue.return_value.regen_cert.assert_called_with(
-            self.user, key, course=self.course, forced_grade=None, template_file=None
+            self.user, key, self.course, None, None, True
         )
         self.assertFalse(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+
+    @override_settings(CERT_QUEUE='test-queue')
+    @patch('capa.xqueue_interface.XQueueInterface.send_to_queue', spec=True)
+    def test_regenerating_certificate(self, mock_send_to_queue):
+        """
+        Given that I have a user who has not passed course
+        If I run regeneration for that user
+        Then certificate generation will be not be requested
+        """
+        key = self.course.location.course_key
+        self._create_cert(key, self.user, CertificateStatuses.downloadable)
+        self._run_command(
+            username=self.user.email, course=unicode(key), noop=False, insecure=True, template_file=None,
+            grade_value=None
+        )
+        certificate = GeneratedCertificate.objects.get(
+            user=self.user,
+            course_id=key
+        )
+        self.assertEqual(certificate.status, CertificateStatuses.notpassing)
+        self.assertFalse(mock_send_to_queue.called)
+
+
+@attr('shard_1')
+class UngenerateCertificatesTest(CertificateManagementTest):
+    """
+    Tests for generating certificates.
+    """
+    command = ungenerated_certs
+
+    def setUp(self):
+        """
+        We just need one course here.
+        """
+        super(UngenerateCertificatesTest, self).setUp()
+        self.course = self.courses[0]
+
+    @override_settings(CERT_QUEUE='test-queue')
+    @patch('capa.xqueue_interface.XQueueInterface.send_to_queue', spec=True)
+    def test_ungenerated_certificate(self, mock_send_to_queue):
+        """
+        Given that I have ended course
+        If I run ungenerated certs command
+        Then certificates should be generated for all users who passed course
+        """
+        mock_send_to_queue.return_value = (0, "Successfully queued")
+        key = self.course.location.course_key
+        self._create_cert(key, self.user, CertificateStatuses.unavailable)
+        with self._mock_passing_grade():
+            self._run_command(
+                course=unicode(key), noop=False, insecure=True, force=False
+            )
+        self.assertTrue(mock_send_to_queue.called)
+        certificate = GeneratedCertificate.objects.get(
+            user=self.user,
+            course_id=key
+        )
+        self.assertEqual(certificate.status, CertificateStatuses.generating)
+
+    @contextmanager
+    def _mock_passing_grade(self):
+        """Mock the grading function to always return a passing grade. """
+        symbol = 'courseware.grades.grade'
+        with patch(symbol) as mock_grade:
+            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
+            yield

@@ -6,7 +6,10 @@ rather than importing Django models directly.
 """
 import logging
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
+
+from xmodule.modulestore.django import modulestore
 
 from certificates.models import (
     CertificateStatuses as cert_status,
@@ -21,7 +24,7 @@ from certificates.queue import XQueueCertInterface
 log = logging.getLogger("edx.certificate")
 
 
-def generate_user_certificates(student, course_key, course=None):
+def generate_user_certificates(student, course_key, course=None, insecure=False):
     """
     It will add the add-cert request into the xqueue.
 
@@ -36,9 +39,41 @@ def generate_user_certificates(student, course_key, course=None):
     Keyword Arguments:
         course (Course): Optionally provide the course object; if not provided
             it will be loaded.
+        insecure - (Boolean)
     """
     xqueue = XQueueCertInterface()
-    xqueue.add_cert(student, course_key, course=course)
+    if insecure:
+        xqueue.use_https = False
+    generate_pdf = not has_html_certificates_enabled(course_key, course)
+    return xqueue.add_cert(student, course_key, course=course, generate_pdf=generate_pdf)
+
+
+def regenerate_user_certificates(student, course_key, course=None,
+                                 forced_grade=None, template_file=None, insecure=False):
+    """
+    It will add the regen-cert request into the xqueue.
+
+    A new record will be created to track the certificate
+    generation task.  If an error occurs while adding the certificate
+    to the queue, the task will have status 'error'.
+
+    Args:
+        student (User)
+        course_key (CourseKey)
+
+    Keyword Arguments:
+        course (Course): Optionally provide the course object; if not provided
+            it will be loaded.
+        grade_value - The grade string, such as "Distinction"
+        template_file - The template file used to render this certificate
+        insecure - (Boolean)
+    """
+    xqueue = XQueueCertInterface()
+    if insecure:
+        xqueue.use_https = False
+
+    generate_pdf = not has_html_certificates_enabled(course_key, course)
+    return xqueue.regen_cert(student, course_key, course, forced_grade, template_file, generate_pdf)
 
 
 def certificate_downloadable_status(student, course_key):
@@ -154,6 +189,18 @@ def generate_example_certificates(course_key):
     xqueue = XQueueCertInterface()
     for cert in ExampleCertificateSet.create_example_set(course_key):
         xqueue.add_example_cert(cert)
+
+
+def has_html_certificates_enabled(course_key, course=None):
+    """
+    It determines if course has html certificates enabled
+    """
+    html_certificates_enabled = False
+    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        course = course if course else modulestore().get_course(course_key, depth=0)
+        if get_active_web_certificate(course) is not None:
+            html_certificates_enabled = True
+    return html_certificates_enabled
 
 
 def example_certificates_status(course_key):

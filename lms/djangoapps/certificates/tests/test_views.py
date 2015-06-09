@@ -4,6 +4,7 @@ import json
 import ddt
 from uuid import uuid4
 from nose.plugins.attrib import attr
+from mock import patch
 
 from django.conf import settings
 from django.core.cache import cache
@@ -14,13 +15,20 @@ from django.test.utils import override_settings
 
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from certificates.api import get_certificate_url
-from certificates.models import ExampleCertificateSet, ExampleCertificate, GeneratedCertificate, BadgeAssertion
+from certificates.models import (
+    ExampleCertificateSet,
+    ExampleCertificate,
+    GeneratedCertificate,
+    BadgeAssertion,
+    CertificateStatuses
+)
+
 from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     LinkedInAddToProfileConfigurationFactory,
@@ -209,6 +217,10 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             status='generated',
             mode='honor',
             name=self.user.profile.name,
+        )
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=self.course_id
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
@@ -453,6 +465,31 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             },
             self.get_event()
         )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
+    def test_request_certificate_without_passing(self):
+        self.cert.status = CertificateStatuses.unavailable
+        self.cert.save()
+        request_certificate_url = reverse('certificates.views.request_certificate')
+        response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
+        self.assertEqual(response.status_code, 200)
+        response_json = json.loads(response.content)
+        self.assertEqual(CertificateStatuses.notpassing, response_json['add_status'])
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
+    @override_settings(CERT_QUEUE='test-queue')
+    def test_request_certificate_after_passing(self):
+        self.cert.status = CertificateStatuses.unavailable
+        self.cert.save()
+        request_certificate_url = reverse('certificates.views.request_certificate')
+        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+            mock_queue.return_value = (0, "Successfully queued")
+            with patch('courseware.grades.grade') as mock_grade:
+                mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
+                response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
+                self.assertEqual(response.status_code, 200)
+                response_json = json.loads(response.content)
+                self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
 
 class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
