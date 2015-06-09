@@ -45,13 +45,13 @@ var edx = edx || {};
 
         _getPaymentButtonText: function(processorName) {
             if (processorName.toLowerCase().substr(0, 11)=='cybersource') {
-                return gettext('Pay with Credit Card');
+                return gettext('Checkout');
             } else if (processorName.toLowerCase()=='paypal') {
-                return gettext('Pay with PayPal');
+                return gettext('Checkout with PayPal');
             } else {
                 // This is mainly for testing as no other processors are supported right now.
                 // Translators: 'processor' is the name of a third-party payment processing vendor (example: "PayPal")
-                return interpolate_text(gettext('Pay with {processor}'), {processor: processorName});
+                return interpolate_text(gettext('Checkout with {processor}'), {processor: processorName});
             }
         },
 
@@ -134,6 +134,8 @@ var edx = edx || {};
             // Disable the payment button to prevent multiple submissions
             this.setPaymentEnabled( false );
 
+            $( event.target ).toggleClass( 'is-selected' );
+
             // Create the order for the amount
             $.ajax({
                 url: '/verify_student/create_order/',
@@ -194,6 +196,8 @@ var edx = edx || {};
 
             // Re-enable the button so the user can re-try
             this.setPaymentEnabled( true );
+
+            $( '.payment-button' ).toggleClass( 'is-selected', false );
         },
 
         getPaymentAmount: function() {

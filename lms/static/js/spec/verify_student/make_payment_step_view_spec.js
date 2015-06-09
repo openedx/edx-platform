@@ -103,11 +103,15 @@ define([
                 expect($el.length).toEqual(_.size(buttons));
                 _.each(buttons, function( expectedText, expectedId ) {
                     var buttonEl = $( '#' + expectedId );
+
                     buttonEl.removeAttr('disabled');
                     expect( buttonEl.length ).toEqual( 1 );
                     expect( buttonEl[0] ).toHaveClass( 'payment-button' );
                     expect( buttonEl[0] ).toHaveText( expectedText );
+
                     buttonEl[0].click();
+                    expect( buttonEl[0] ).toHaveClass( 'is-selected' );
+                    expectPaymentButtonEnabled( false );
                     expect(requests[requests.length - 1].requestBody.split('&')).toContain('processor=' + expectedId);
                 });
             };
@@ -136,15 +140,15 @@ define([
 
             it( 'provides working payment buttons for a single processor', function() {
                 createView({processors: ['cybersource']});
-                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Pay with Credit Card"});
+                checkPaymentButtons( AjaxHelpers.requests(this), {cybersource: "Checkout"});
             });
 
             it( 'provides working payment buttons for multiple processors', function() {
                 createView({processors: ['cybersource', 'paypal', 'other']});
                 checkPaymentButtons( AjaxHelpers.requests(this), {
-                    cybersource: "Pay with Credit Card",
-                    paypal: "Pay with PayPal",
-                    other: "Pay with other"
+                    cybersource: "Checkout",
+                    paypal: "Checkout with PayPal",
+                    other: "Checkout with other"
                 });
             });
 
