@@ -94,7 +94,32 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     return save_to_store(filedata, filename, 'application/json', item.location)
 
 
-def get_transcripts_from_youtube(youtube_id, settings, i18n):
+def youtube_video_transcript_name(youtube_text_api):
+    """
+    Get the transcript name from available transcripts of video
+    with respect to language from youtube server
+    """
+    # pylint: disable=no-member
+    utf8_parser = etree.XMLParser(encoding='utf-8')
+
+    transcripts_param = {'type': 'list', 'v': youtube_text_api['params']['v']}
+    lang = youtube_text_api['params']['lang']
+    # get list of transcripts of specific video
+    # url-form
+    # http://video.google.com/timedtext?type=list&v={VideoId}
+    youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
+    if youtube_response.status_code == 200 and youtube_response.text:
+        # pylint: disable=no-member
+        youtube_data = etree.fromstring(youtube_response.content, parser=utf8_parser)
+        # iterate all transcripts information from youtube server
+        for element in youtube_data:
+            # search specific language code such as 'en' in transcripts info list
+            if element.tag == 'track' and element.get('lang_code', '') == lang:
+                return element.get('name')
+    return None
+
+
+def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -109,6 +134,12 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n):
 
     youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
     youtube_text_api['params']['v'] = youtube_id
+    # if the transcript name is not empty on youtube server we have to pass
+    # name param in url in order to get transcript
+    # example http://video.google.com/timedtext?lang=en&v={VideoId}&name={transcript_name}
+    youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
+    if youtube_transcript_name:
+        youtube_text_api['params']['name'] = youtube_transcript_name
     data = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
     if data.status_code != 200 or not data.text:
