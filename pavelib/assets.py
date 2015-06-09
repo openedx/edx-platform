@@ -32,8 +32,8 @@ if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
     COFFEE_DIRS.append(theme_root)
     SASS_DIRS[theme_root / "static" / "sass"] = None
 
-if edxapp_env.env_tokens.get("THEME_DIR", False):
-    theme_dir = path(edxapp_env.env_tokens["THEME_DIR"])
+if edxapp_env.env_tokens.get("COMP_THEME_DIR", False):
+    theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
     lms_sass = theme_dir / "lms" / "static" / "sass"
     lms_css = theme_dir / "lms" / "static" / "css"
     if lms_sass.isdir():

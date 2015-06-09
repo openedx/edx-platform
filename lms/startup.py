@@ -29,8 +29,8 @@ def run():
 
     add_mimetypes()
 
-    if getattr(settings, "THEME_DIR", None):
-        enable_theme()
+    if getattr(settings, "COMP_THEME_DIR", None):
+        enable_comprehensive_theme()
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_stanford_theme()
@@ -136,12 +136,12 @@ def enable_microsites():
         settings.STATICFILES_DIRS.insert(0, microsites_root)
 
 
-def enable_theme():
+def enable_comprehensive_theme():
     """
     Add directories to relevant paths for comprehensive theming.
     """
-    assert getattr(settings, "THEME_DIR", None), "settings.THEME_DIR is not defined"
-    theme_dir = settings.THEME_DIR
+    assert getattr(settings, "COMP_THEME_DIR", None), "settings.COMP_THEME_DIR is not defined"
+    theme_dir = settings.COMP_THEME_DIR
 
     templates_dir = theme_dir / "lms" / "templates"
     if templates_dir.isdir():
