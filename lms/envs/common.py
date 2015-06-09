@@ -1369,7 +1369,7 @@ PIPELINE_CSS = {
     },
     'style-course-rtl': {
         'source_filenames': [
-            'sass/lms-course-rtl.css',
+            'css/lms-course-rtl.css',
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course-rtl.css',
@@ -1399,38 +1399,38 @@ PIPELINE_CSS = {
     },
     FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
-            'sass/lms-footer.css',
+            'css/lms-footer.css',
         ],
         'output_filename': 'css/lms-footer.css',
     },
     FOOTER_CSS['openedx']['rtl']: {
         'source_filenames': [
-            'sass/lms-footer-rtl.css',
+            'css/lms-footer-rtl.css',
         ],
         'output_filename': 'css/lms-footer-rtl.css'
     },
     FOOTER_CSS['edx']['ltr']: {
         'source_filenames': [
-            'sass/lms-footer-edx.css',
+            'css/lms-footer-edx.css',
         ],
         'output_filename': 'css/lms-footer-edx.css'
     },
     FOOTER_CSS['edx']['rtl']: {
         'source_filenames': [
-            'sass/lms-footer-edx-rtl.css',
+            'css/lms-footer-edx-rtl.css',
         ],
         'output_filename': 'css/lms-footer-edx-rtl.css'
     },
     'style-certificates': {
         'source_filenames': [
-            'certificates/sass/main-ltr.css',
+            'certificates/css/main-ltr.css',
             'css/vendor/font-awesome.css',
         ],
         'output_filename': 'css/certificates-style.css'
     },
     'style-certificates-rtl': {
         'source_filenames': [
-            'certificates/sass/main-rtl.css',
+            'certificates/css/main-rtl.css',
             'css/vendor/font-awesome.css',
         ],
         'output_filename': 'css/certificates-style-rtl.css'
