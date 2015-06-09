@@ -330,18 +330,18 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
         yield
 
     call_count = sum(mock.call_count for mock in mocks.values())
-    calls = pprint.pformat({
-        method_name: mock.call_args_list
-        for method_name, mock in mocks.items()
-    })
 
     # Assertion errors don't handle multi-line values, so pretty-print to std-out instead
     if not minimum_calls <= call_count <= maximum_calls:
+        calls = {
+            method_name: mock.call_args_list
+            for method_name, mock in mocks.items()
+        }
         print "Expected between {} and {} calls, {} were made. Calls: {}".format(
             minimum_calls,
             maximum_calls,
             call_count,
-            calls,
+            pprint.pformat(calls),
         )
 
     # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
