@@ -73,6 +73,6 @@ def get_logo_url():
             static_url=settings.STATIC_URL, uni=university
         )
     else:
-        return '{static_url}images/default-theme/logo.png'.format(
+        return '{static_url}images/logo.png'.format(
             static_url=settings.STATIC_URL
         )
