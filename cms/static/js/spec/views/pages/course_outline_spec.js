@@ -17,7 +17,7 @@ define(["jquery", "sinon", "js/common_helpers/ajax_helpers", "js/views/utils/vie
                     id: 'mock-course',
                     display_name: 'Mock Course',
                     category: 'course',
-                    is_exams_proctored: true,
+                    enable_proctored_exams: true,
                     studio_url: '/course/slashes:MockCourse',
                     is_container: true,
                     has_changes: false,
