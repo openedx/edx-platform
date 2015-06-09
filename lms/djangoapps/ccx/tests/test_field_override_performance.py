@@ -17,10 +17,11 @@ from pytz import UTC
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory  # pylint: disable=import-error
+from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
     TEST_DATA_SPLIT_MODULESTORE, TEST_DATA_MONGO_MODULESTORE
-from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory
+from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 
 
@@ -115,7 +116,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             student_id=self.student.id
         )
 
-    def instrument_course_progress_render(self, dataset_index, queries, reads):
+    def instrument_course_progress_render(self, dataset_index, queries, reads, xblocks):
         """
         Renders the progress page, instrumenting Mongo reads and SQL queries.
         """
@@ -136,7 +137,8 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
 
             with self.assertNumQueries(queries):
                 with check_mongo_calls(reads):
-                    self.grade_course(self.course)
+                    with check_sum_of_calls(XBlock, ['__init__'], xblocks):
+                        self.grade_course(self.course)
 
     @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(3)))
     @ddt.unpack
@@ -152,8 +154,8 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             'ccx': ('ccx.overrides.CustomCoursesForEdxOverrideProvider',)
         }
         with self.settings(FIELD_OVERRIDE_PROVIDERS=providers[overrides]):
-            queries, reads = self.TEST_DATA[overrides][dataset_index]
-            self.instrument_course_progress_render(dataset_index, queries, reads)
+            queries, reads, xblocks = self.TEST_DATA[overrides][dataset_index]
+            self.instrument_course_progress_render(dataset_index, queries, reads, xblocks)
 
 
 class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
@@ -165,10 +167,10 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         'no_overrides': [
-            (26, 7), (132, 7), (592, 7)
+            (26, 7, 19), (132, 7, 131), (592, 7, 537)
         ],
         'ccx': [
-            (24, 35), (132, 331), (592, 1507)
+            (24, 35, 47), (132, 331, 455), (592, 1507, 2037)
         ],
     }
 
@@ -182,9 +184,9 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         'no_overrides': [
-            (24, 4), (132, 19), (592, 84)
+            (24, 4, 9), (132, 19, 54), (592, 84, 215)
         ],
         'ccx': [
-            (24, 4), (132, 19), (592, 84)
+            (24, 4, 9), (132, 19, 54), (592, 84, 215)
         ]
     }
