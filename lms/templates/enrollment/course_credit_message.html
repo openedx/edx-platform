@@ -1,0 +1,23 @@
+<%! from django.utils.translation import ugettext as _ %>
+% for course_msg in course_credit_messages:
+    <div class="wrapper-msg urgency-high">
+        <div class="msg has-actions">
+            <div class="msg-content donate-content">
+                <h2 class="sr">${_("Earn Credit")}</h2>
+                <div class="copy">
+                    <p>${_("You are eligible for credit in course {enrolled_course}.").format(enrolled_course=course_msg["course_name"])}</p>
+                    % for provider in course_msg["providers"]:
+                        <p>${ provider["display_name"] }</p>
+                    % endfor
+
+                </div>
+            </div>
+            <!--% if course_msg["allow_donation"]:-->
+                <!--<div class="nav-actions donate-actions">-->
+                    <!--<h3 class="sr">${_('Donation Actions')}</h3>-->
+                    <!--<div class="donate-container" data-course="${ course_msg['course_id'] }"></div>-->
+                <!--</div>-->
+            <!--% endif-->
+        </div>
+    </div>
+% endfor

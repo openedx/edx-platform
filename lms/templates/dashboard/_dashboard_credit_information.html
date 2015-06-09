@@ -1,0 +1,24 @@
+<%page args="credit_message, course" />
+
+<%!
+from django.utils.translation import ugettext as _
+from course_modes.models import CourseMode
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<div class="message message-status is-shown">
+    <p>
+        ${_("You have meet credit eligibility for {course} from following credit provider.").format(course=credit_message["course_name"])}
+        <ul>
+            % for provider in credit_message["providers"]:
+            <li>
+                ${provider["display_name"]}
+            </li>
+            % endfor
+        </ul>
+        <a class="btn" href="" target="_blank">Learn More</a>
+    </p>
+
+
+</div>
+

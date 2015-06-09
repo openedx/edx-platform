@@ -1,7 +1,7 @@
 """ Contains the APIs for course credit requirements """
 
 from .exceptions import InvalidCreditRequirements
-from .models import CreditCourse, CreditRequirement
+from .models import CreditCourse, CreditRequirement, CreditEligibility
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditCourse
 
 
@@ -164,3 +164,37 @@ def _validate_requirements(requirements):
                 )
             )
     return invalid_requirements
+
+
+def get_credit_eligibility(username):
+    eligibilities = CreditEligibility.get_user_eligibility(username)
+    user_eligibilities = {}
+    for eligibility in eligibilities:
+        user_eligibilities[unicode(eligibility.course.course_key)] = {
+            "is_eligible": True,
+            "created_at": eligibility.created,
+            "providers": [
+                {
+                    "id": provider.provider_id,
+                    "display_name": provider.display_name
+                }
+                for provider in eligibility.course.providers.all()
+            ]
+        }
+
+    return user_eligibilities
+
+
+def get_purchased_credit_courses(username):
+    """
+    Returns the purchased credit courses.
+
+    Args:
+        username(str): Username of the student
+
+    Returns:
+        A dict of courses user has purchased from the credit provider after completion
+
+    """
+    # TODO: How to track the purchased courses. It requires Will's work for credit provider integration
+    return {}
