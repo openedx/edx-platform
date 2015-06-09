@@ -1,6 +1,7 @@
 import os
 from uuid import uuid4
 from datetime import datetime
+from nose.plugins.attrib import attr
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -117,6 +118,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
+@attr('shard_4')
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -332,6 +334,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
             self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
+@attr('shard_4')
 class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
     Tests for Notes page.
@@ -1001,6 +1004,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertFalse(note.is_visible)
 
 
+@attr('shard_4')
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
     Tests for toggling single annotation.
@@ -1069,6 +1073,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         self.assertTrue(note_2.is_visible)
 
 
+@attr('shard_4')
 class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """
     Tests for toggling visibility of all notes.
