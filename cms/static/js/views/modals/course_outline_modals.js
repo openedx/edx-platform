@@ -261,9 +261,15 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-timed-examination',
 
         events : {
-            'change #id_timed_examination': 'timedExamination'
+            'change #id_timed_examination': 'timedExamination',
+            'focusout #id_time_limit': 'timeLimitFocusout'
         },
-
+        timeLimitFocusout: function(event) {
+            var selectedTimeLimit = $(event.currentTarget).val();
+            if (!this.isValidTimeLimit(selectedTimeLimit)) {
+                $(event.currentTarget).val("00:00");
+            }
+        },
         timedExamination: function (event) {
             event.preventDefault();
             if (!$(event.currentTarget).is(':checked')) {
@@ -296,7 +302,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         setExamTmePreference: function (value) {
             this.$('#id_timed_examination').prop('checked', value);
         },
-        isExamTimeEnable: function () {
+        isExamTimeEnabled: function () {
             return this.$('#id_timed_examination').is(':checked');
         },
         isValidTimeLimit: function(time_limit) {
@@ -323,17 +329,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
         getRequestData: function () {
             var time_limit = this.getExamTimeLimit();
-            if (this.isValidTimeLimit(time_limit)) {
-                return {
-                    metadata: {
-                        'is_time_limited': this.isExamTimeEnable(),
-                        'is_proctored_enabled': this.isExamProctoringEnable(),
-                        'default_time_limit_mins': this.convertTimeLimitToMinutes(time_limit)
-                    }
-                };
-            }
-
-
+            return {
+                metadata: {
+                    'is_time_limited': this.isExamTimeEnabled(),
+                    'is_proctored_enabled': this.isExamProctoringEnable(),
+                    'default_time_limit_mins': this.convertTimeLimitToMinutes(time_limit)
+                }
+            };
         }
     });
     GradingEditor = AbstractEditor.extend({
@@ -437,7 +439,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
                 editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor];
-                if (options.is_exams_proctored) {
+                if (options.enable_proctored_exams) {
                     editors.push(TimedExaminationPreferenceEditor);
                 }
             } else if (xblockInfo.isVertical()) {

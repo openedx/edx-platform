@@ -742,6 +742,22 @@ define(["jquery", "sinon", "js/common_helpers/ajax_helpers", "js/views/utils/vie
                     expect($("#id_time_limit").val()).toBe("02:30");
                 });
 
+                it('can be edited and enable/disable proctoring fields, when time_limit checkbox value changes', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setModalTimedExaminationPreferenceValues(true, "02:30", true);
+                    var target = $('#id_timed_examination');
+                    target.attr("checked","checked");
+                    target.click();
+                    expect($('#id_exam_proctoring')).toHaveAttr('disabled','disabled');
+                    expect($('#id_time_limit')).toHaveAttr('disabled','disabled');
+                    target.removeAttr("checked");
+                    target.click();
+                    expect($('#id_exam_proctoring')).not.toHaveAttr('disabled','disabled');
+                    expect($('#id_time_limit')).not.toHaveAttr('disabled','disabled');
+                });
+
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
