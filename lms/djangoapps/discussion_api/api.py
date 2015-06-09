@@ -480,6 +480,17 @@ def update_comment(request, comment_id, update_data):
 
         The updated comment; see discussion_api.views.CommentViewSet for more
         detail.
+
+    Raises:
+
+        Http404: if the comment does not exist or is not accessible to the
+          requesting user
+
+        PermissionDenied: if the comment is accessible to but not editable by
+          the requesting user
+
+        ValidationError: if there is an error applying the update (e.g. raw_body
+          is empty or thread_id is included)
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
     if not _is_user_author_or_privileged(cc_comment, context):

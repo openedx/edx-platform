@@ -639,15 +639,15 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response_data, expected_response_data)
 
 
-@httpretty.activate
 class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet partial_update"""
     def setUp(self):
         super(CommentViewSetPartialUpdateTest, self).setUp()
-        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
-
-    def test_basic(self):
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
         self.register_get_user_response(self.user)
+        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
             "course_id": unicode(self.course.id),
@@ -665,11 +665,13 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         })
         self.register_get_comment_response(cs_comment)
         self.register_put_comment_response(cs_comment)
+
+    def test_basic(self):
         request_data = {"raw_body": "Edited body"}
         expected_response_data = {
             "id": "test_comment",
             "thread_id": "test_thread",
-            "parent_id": None,  # TODO: we can't get this without retrieving from the thread :-(
+            "parent_id": None,
             "author": self.user.username,
             "author_label": None,
             "created_at": "2015-06-03T00:00:00Z",
@@ -705,18 +707,6 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         )
 
     def test_error(self):
-        self.register_get_user_response(self.user)
-        cs_thread = make_minimal_cs_thread({
-            "id": "test_thread",
-            "course_id": unicode(self.course.id),
-        })
-        self.register_get_thread_response(cs_thread)
-        cs_comment = make_minimal_cs_comment({
-            "id": "test_comment",
-            "thread_id": cs_thread["id"],
-            "user_id": str(self.user.id),
-        })
-        self.register_get_comment_response(cs_comment)
         request_data = {"raw_body": ""}
         response = self.client.patch(  # pylint: disable=no-member
             self.url,

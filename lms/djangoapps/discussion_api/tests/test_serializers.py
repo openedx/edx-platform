@@ -700,14 +700,15 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             {"raw_body": ["This field is required."]}
         )
 
-    def test_update_thread_id(self):
+    @ddt.data("thread_id", "parent_id")
+    def test_update_non_updatable(self, field):
         serializer = CommentSerializer(
             self.existing_comment,
-            data={"thread_id": "different_thread"},
+            data={field: "different_value"},
             partial=True,
             context=get_context(self.course, self.request)
         )
         self.assertEqual(
             serializer.errors,
-            {"thread_id": ["This field is not allowed in an update."]}
+            {field: ["This field is not allowed in an update."]}
         )

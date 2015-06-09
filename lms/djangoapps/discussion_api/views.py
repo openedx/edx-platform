@@ -225,6 +225,9 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             "raw_body": "Body text"
         }
 
+        PATCH /api/discussion/v1/comments/comment_id
+        {"raw_body": "Edited text"}
+
     **GET Parameters**:
 
         * thread_id (required): The thread to retrieve comments for
@@ -246,6 +249,10 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * raw_body: The comment's raw body text
 
+    **PATCH Parameters**:
+
+        raw_body is accepted with the same meaning as in a POST request
+
     **GET Response Values**:
 
         * results: The list of comments; each item in the list has the same
@@ -255,7 +262,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * previous: The URL of the previous page (or null if last page)
 
-    **POST Response Values**:
+    **POST/PATCH Response Values**:
 
         * id: The id of the comment
 
