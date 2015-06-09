@@ -18,14 +18,14 @@
                 <li class="field field-text field-time-limit field-release-time">
                     <label for="id_time_limit" class="label"><%= gettext('Time Limit:') %></label>
                     <input type="text" id="id_time_limit" name="time_limit"
-                      value=""
+                      value="" disabled='disabled'
                       placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
                 </li>
             </ul>
         </div>
         <ul class="list-fields list-input">
             <li class="field field-checkbox checkbox-cosmetic">
-                <input type="checkbox" id="id_exam_proctoring" name="exam_proctoring" class="input input-checkbox" />
+                <input type="checkbox" id="id_exam_proctoring" disabled='disabled' name="exam_proctoring" class="input input-checkbox" />
                 <label for="id_exam_proctoring" class="label">
                     <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
                       <i class="icon fa fa-square-o input-checkbox-unchecked"></i>

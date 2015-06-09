@@ -906,7 +906,7 @@ class CourseFields(object):
         help=_(
             "Set this to true if your course would like to support timed proctored exams."
         ),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
 

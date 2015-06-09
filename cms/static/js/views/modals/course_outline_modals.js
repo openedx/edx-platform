@@ -13,7 +13,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor, TimedExaminationPreference;
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor, TimedExaminationPreferenceEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events : {
@@ -256,8 +256,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
-    TimedExaminationPreference = AbstractEditor.extend({
-        templateName: 'timed-examination-preference',
+    TimedExaminationPreferenceEditor = AbstractEditor.extend({
+        templateName: 'timed-examination-preference-editor',
         className: 'edit-settings-timed-examination',
 
         events : {
@@ -266,13 +266,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         timedExamination: function (event) {
             event.preventDefault();
-            if ($(event.currentTarget).is(':checked')) {
+            if (!$(event.currentTarget).is(':checked')) {
                 this.$('#id_exam_proctoring').attr('disabled','disabled');
-                this.$('#id_time_limit').attr('readonly', true);
+                this.$('#id_time_limit').attr('disabled', 'disabled');
             }
             else {
                 this.$('#id_exam_proctoring').removeAttr('disabled');
-                this.$('#id_time_limit').removeAttr('readonly');
+                this.$('#id_time_limit').removeAttr('disabled');
             }
             return true;
         },
@@ -419,7 +419,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             } else if (xblockInfo.isSequential()) {
                 editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor];
                 if (options.is_exams_proctored) {
-                    editors.push(TimedExaminationPreference);
+                    editors.push(TimedExaminationPreferenceEditor);
                 }
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
