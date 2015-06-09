@@ -1423,14 +1423,14 @@ PIPELINE_CSS = {
     },
     'style-certificates': {
         'source_filenames': [
-            'certificates/sass/main-ltr.css',
+            'certificates/css/main-ltr.css',
             'css/vendor/font-awesome.css',
         ],
         'output_filename': 'css/certificates-style.css'
     },
     'style-certificates-rtl': {
         'source_filenames': [
-            'certificates/sass/main-rtl.css',
+            'certificates/css/main-rtl.css',
             'css/vendor/font-awesome.css',
         ],
         'output_filename': 'css/certificates-style-rtl.css'
