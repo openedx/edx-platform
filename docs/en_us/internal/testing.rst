@@ -120,6 +120,10 @@ You can run all of the unit-level tests using the command
 This includes python, javascript, and documentation tests. It does not,
 however, run any acceptance tests.
 
+Note - 
+`paver` is a scripting tool. To get information about various options, you can run the following command -
+::
+	paver -h
 Running Python Unit tests
 -------------------------
 
