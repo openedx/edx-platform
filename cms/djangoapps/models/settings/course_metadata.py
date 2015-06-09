@@ -44,7 +44,10 @@ class CourseMetadata(object):
         'is_entrance_exam',
         'in_entrance_exam',
         'language',
-        'certificates'
+        'certificates',
+        'default_time_limit_mins',
+        'is_proctored_enabled',
+        'is_time_limited',
     ]
 
     @classmethod

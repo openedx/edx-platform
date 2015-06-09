@@ -202,8 +202,5 @@ class AdvancedSettingsPage(CoursePage):
             'teams_configuration',
             'minimum_grade_credit',
             'video_bumper',
-            'default_time_limit_mins',
-            'is_proctored_enabled',
-            'is_time_limited',
             'enable_proctored_exams',
         ]
