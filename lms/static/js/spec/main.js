@@ -90,6 +90,7 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
+            'js/student_account/views/HintedLoginView': 'js/student_account/views/HintedLoginView',
             'js/student_profile/profile': 'js/student_profile/profile',
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
@@ -448,6 +449,15 @@
                     'js/student_account/views/FormView'
                 ]
             },
+            'js/student_account/views/HintedLoginView': {
+                exports: 'edx.student.account.HintedLoginView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext'
+                ]
+            },
             'js/student_account/views/AccessView': {
                 exports: 'edx.student.account.AccessView',
                 deps: [
@@ -622,6 +632,7 @@
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/finish_auth_spec.js',
+        'lms/include/js/spec/student_account/hinted_login_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
         'lms/include/js/spec/student_account/institution_login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',

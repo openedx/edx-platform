@@ -281,6 +281,8 @@ class CombinedLoginAndRegisterPage(PageObject):
             return "login"
         elif self.q(css=".js-reset").visible:
             return "password-reset"
+        elif self.q(css=".proceed-button").visible:
+            return "hinted-login"
 
     @property
     def email_value(self):
@@ -335,3 +337,9 @@ class CombinedLoginAndRegisterPage(PageObject):
                     return (True, msg_element.text[0])
             return (False, None)
         return Promise(_check_func, "Result of third party auth is visible").fulfill()
+
+    @property
+    def hinted_login_prompt(self):
+        """Get the message displayed to the user on the hinted-login form"""
+        if self.q(css=".wrapper-other-login .instructions").visible:
+            return self.q(css=".wrapper-other-login .instructions").text[0]
