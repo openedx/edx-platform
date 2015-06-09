@@ -26,6 +26,7 @@ Supported APIs
     mobile/index
     profile_images/index
     user/index
+    bookmarks/index
 
 ******************
 Experimental APIs
