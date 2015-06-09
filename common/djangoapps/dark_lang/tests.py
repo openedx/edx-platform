@@ -155,13 +155,14 @@ class DarkLangMiddlewareTests(TestCase):
         )
 
     def test_preview_lang_with_released_language(self):
+        # Preview lang should always override selection.
         self.assertSessionLangEquals(
-            UNSET,
+            'rel',
             self.process_request(preview_lang='rel')
         )
 
         self.assertSessionLangEquals(
-            'notrel',
+            'rel',
             self.process_request(preview_lang='rel', django_language='notrel')
         )
 
