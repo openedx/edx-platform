@@ -1223,12 +1223,11 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.register_post_comment_response(
             {
                 "id": "test_comment",
-                "thread_id": "test_thread",
                 "username": self.user.username,
                 "created_at": "2015-05-27T00:00:00Z",
                 "updated_at": "2015-05-27T00:00:00Z",
             },
-            thread_id=(None if parent_id else "test_thread"),
+            thread_id="test_thread",
             parent_id=parent_id
         )
         data = self.minimal_data.copy()

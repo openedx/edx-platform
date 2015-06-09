@@ -354,10 +354,17 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "children": [
                 self.make_cs_content({
                     "id": "test_child_1",
+                    "parent_id": "test_root",
                 }),
                 self.make_cs_content({
                     "id": "test_child_2",
-                    "children": [self.make_cs_content({"id": "test_grandchild"})],
+                    "parent_id": "test_root",
+                    "children": [
+                        self.make_cs_content({
+                            "id": "test_grandchild",
+                            "parent_id": "test_child_2"
+                        })
+                    ],
                 }),
             ],
         })
@@ -547,7 +554,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             "raw_body": "Test body",
         }
 
-    def save_and_reserialize(self, data, parent_id=None):
+    def save_and_reserialize(self, data):
         """
         Create a serializer with the given data, ensure that it is valid, save
         the result, and return the full comment data from the serializer.
@@ -555,8 +562,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
         context = get_context(
             self.course,
             self.request,
-            make_minimal_cs_thread({"course_id": unicode(self.course.id)}),
-            parent_id
+            make_minimal_cs_thread({"course_id": unicode(self.course.id)})
         )
         serializer = CommentSerializer(data=data, context=context)
         self.assertTrue(serializer.is_valid())
@@ -565,14 +571,16 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
 
     @ddt.data(None, "test_parent")
     def test_success(self, parent_id):
+        data = self.minimal_data.copy()
         if parent_id:
+            data["parent_id"] = parent_id
             self.register_get_comment_response({"thread_id": "test_thread", "id": parent_id})
         self.register_post_comment_response(
             {"id": "test_comment"},
-            thread_id=(None if parent_id else "test_thread"),
+            thread_id="test_thread",
             parent_id=parent_id
         )
-        saved = self.save_and_reserialize(self.minimal_data, parent_id=parent_id)
+        saved = self.save_and_reserialize(data)
         expected_url = (
             "/api/v1/comments/{}".format(parent_id) if parent_id else
             "/api/v1/threads/test_thread/comments"
@@ -591,8 +599,10 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
 
     def test_parent_id_nonexistent(self):
         self.register_get_comment_error_response("bad_parent", 404)
-        context = get_context(self.course, self.request, make_minimal_cs_thread(), "bad_parent")
-        serializer = CommentSerializer(data=self.minimal_data, context=context)
+        data = self.minimal_data.copy()
+        data["parent_id"] = "bad_parent"
+        context = get_context(self.course, self.request, make_minimal_cs_thread())
+        serializer = CommentSerializer(data=data, context=context)
         self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,
@@ -605,8 +615,10 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
 
     def test_parent_id_wrong_thread(self):
         self.register_get_comment_response({"thread_id": "different_thread", "id": "test_parent"})
-        context = get_context(self.course, self.request, make_minimal_cs_thread(), "test_parent")
-        serializer = CommentSerializer(data=self.minimal_data, context=context)
+        data = self.minimal_data.copy()
+        data["parent_id"] = "test_parent"
+        context = get_context(self.course, self.request, make_minimal_cs_thread())
+        serializer = CommentSerializer(data=data, context=context)
         self.assertFalse(serializer.is_valid())
         self.assertEqual(
             serializer.errors,

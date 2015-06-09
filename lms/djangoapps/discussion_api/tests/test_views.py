@@ -572,7 +572,6 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_post_comment_response(
             {
                 "id": "test_comment",
-                "thread_id": "test_thread",
                 "username": self.user.username,
                 "created_at": "2015-05-27T00:00:00Z",
                 "updated_at": "2015-05-27T00:00:00Z",
