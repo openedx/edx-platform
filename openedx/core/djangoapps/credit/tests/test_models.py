@@ -1,23 +1,24 @@
+# -*- coding: utf-8 -*-
 """
 Tests for credit course models.
 """
 
 import ddt
+from django.test import TestCase
 
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @ddt.ddt
-class ModelTestCases(ModuleStoreTestCase):
+class CreditEligibilityModelTests(TestCase):
     """
-    Tests for credit course models.
+    Tests for credit models used to track credit eligibility.
     """
 
     def setUp(self, **kwargs):
-        super(ModelTestCases, self).setUp()
+        super(CreditEligibilityModelTests, self).setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
 
     @ddt.data(False, True)

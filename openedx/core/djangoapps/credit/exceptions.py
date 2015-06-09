@@ -1,17 +1,43 @@
-"""
-This module contains the exceptions raised in credit course requirements.
-"""
+"""Exceptions raised by the credit API. """
 
 
 class InvalidCreditRequirements(Exception):
     """
-    The exception occurs when the requirement dictionary has invalid format.
+    The requirement dictionary provided has invalid format.
     """
     pass
 
 
 class InvalidCreditCourse(Exception):
     """
-    The exception occurs when the the course is not marked as a Credit Course.
+    The course is not configured for credit.
+    """
+    pass
+
+
+class UserIsNotEligible(Exception):
+    """
+    The user has not satisfied eligibility requirements for credit.
+    """
+    pass
+
+
+class RequestAlreadyCompleted(Exception):
+    """
+    The user has already submitted a request and received a response from the credit provider.
+    """
+    pass
+
+
+class CreditRequestNotFound(Exception):
+    """
+    The request does not exist.
+    """
+    pass
+
+
+class InvalidCreditStatus(Exception):
+    """
+    The status is not either "approved" or "rejected".
     """
     pass

@@ -680,6 +680,9 @@ INSTALLED_APPS = (
     'south',
     'method_override',
 
+    # History tables
+    'simple_history',
+
     # Database-backed configuration
     'config_models',
 

@@ -1711,6 +1711,9 @@ INSTALLED_APPS = (
     'djcelery',
     'south',
 
+    # History tables
+    'simple_history',
+
     # Database-backed configuration
     'config_models',
 
