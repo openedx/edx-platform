@@ -478,15 +478,16 @@ PIPELINE_CSS = {
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
     'style-main': {
+        # this is unnecessary and can be removed
         'source_filenames': [
-            'sass/studio-main.css',
-            'css/edx-cc.css',
+            'css/studio-main.css',
         ],
         'output_filename': 'css/studio-main.css',
     },
     'style-main-rtl': {
+        # this is unnecessary and can be removed
         'source_filenames': [
-            'sass/studio-main-rtl.css',
+            'css/studio-main-rtl.css',
         ],
         'output_filename': 'css/studio-main-rtl.css',
     },
