@@ -1,4 +1,5 @@
 """URL handlers related to certificate handling by LMS"""
+from microsite_configuration import microsite
 from datetime import datetime
 from uuid import uuid4
 from django.shortcuts import redirect, get_object_or_404
@@ -284,7 +285,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     """
     # Populate dynamic output values using the course/certificate data loaded above
     user_fullname = user.profile.name
-    platform_name = context.get('platform_name')
+    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     certificate_type = context.get('certificate_type')
 
     context['username'] = user.username
@@ -460,18 +461,24 @@ def render_html_view(request, user_id, course_id):
 
     # Create the initial view context, bootstrapping with Django settings and passed-in values
     context = {}
-    context['platform_name'] = settings.PLATFORM_NAME
+    context['platform_name'] = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     context['course_id'] = course_id
 
     # Update the view context with the default ConfigurationModel settings
     configuration = CertificateHtmlViewConfiguration.get_config()
-    context.update(configuration.get('default', {}))
+    # if we are in a microsite, then let's first see if there is an override
+    # section in our config
+    config_key = microsite.get_value('microsite_config_key', 'default')
+    # if there is no special microsite override, then let's use default
+    if config_key not in configuration:
+        config_key = 'default'
+    context.update(configuration.get(config_key, {}))
 
     # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
     reserved = _("All rights reserved")
     context['copyright_text'] = '&copy; {year} {platform_name}. {reserved}.'.format(
         year=settings.COPYRIGHT_YEAR,
-        platform_name=settings.PLATFORM_NAME,
+        platform_name=context.get('platform_name'),
         reserved=reserved
     )
 
@@ -487,7 +494,7 @@ def render_html_view(request, user_id, course_id):
 
     # Translators: This line appears as a byline to a header image and describes the purpose of the page
     context['logo_subtitle'] = _("Certificate Validation")
-    context['logo_alt'] = settings.PLATFORM_NAME
+    context['logo_alt'] = context.get('platform_name')
     invalid_template_path = 'certificates/invalid.html'
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
