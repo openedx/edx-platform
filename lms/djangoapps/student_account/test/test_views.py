@@ -329,6 +329,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ]
         self._assert_third_party_auth_data(response, current_backend, current_provider, expected_providers)
 
+    def test_hinted_login(self):
+        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        response = self.client.get(reverse('account_login'), params)
+        self.assertContains(response, "data-third-party-auth-hint='oa2-google-oauth2'")
+
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
         # Retrieve the login page from a microsite domain
