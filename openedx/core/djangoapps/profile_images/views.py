@@ -39,24 +39,33 @@ class ProfileImageUploadView(APIView):
     """
     **Use Cases**
 
-        Uploads an image to be used for the user's profile.
+        Upload an image to be used for the user's profile.
 
-    **Example Requests**:
+        The requesting user must be signed in. The signed in user can only
+        upload his or her own profile image.
+
+    **Example Requests**
 
         POST /api/profile_images/v1/{username}/upload
 
     **Response for POST**
 
-        Users can only upload their own profile image. If the requesting user does not have username
-        "username", this method will return with a status of 403 for staff access but a 404 for ordinary
-        users to avoid leaking the existence of the account.
+        If the requesting user tries to upload the image for a different user:
 
-        This method will also return a 404 if no user exists with username "username".
+        * If the requesting user has staff access, the request returns a 403
+          error.
 
-        If the upload could not be performed then this method returns a 400 with specific errors
-        in the returned JSON.
+        * If the requesting user does not have staff access, the request returns
+          a 404 error.
 
-        If the update is successful, a 204 status is returned with no additional content.
+        If no user matches the "username" parameter, the request returns a 404
+        error.
+
+        If the upload could not be performed, the request returns a 400 error is
+        with details.
+
+        If the upload is successful, the request returns a 204 status with no
+        additional content.
 
     """
     parser_classes = (MultiPartParser, FormParser,)
@@ -116,23 +125,32 @@ class ProfileImageRemoveView(APIView):
     """
     **Use Cases**
 
-        Removes all of the profile images associated with the user's account.
+        Remove all of the profile images associated with the user's account.
 
-    **Example Requests**:
+        The requesting user must be signed in.
+
+        Users with staff access can remove profile images for other user
+        accounts.
+
+        Users without staff access can only remove their own profile images.
+
+    **Example Requests**
 
         POST /api/profile_images/v1/{username}/remove
 
     **Response for POST**
 
-        Users are authorized to delete their own profile images, while staff can delete images for
-        any account. All other users will receive a 404 to avoid leaking the existence of the account.
+        Requesting users who do not have staff access and try to remove another
+        user's profile image receive a 404 error.
 
-        This method will also return a 404 if no user exists with username "username".
+        If no user matches the "username" parameter, the request returns a 404
+        error.
 
-        If the delete could not be performed then this method returns a 400 with specific errors
-        in the returned JSON.
+        If the request could not remove the image, the request returns a 400
+        error with details.
 
-        If the delete is successful, a 204 status is returned with no additional content.
+        If the request successfully removes the image, the request returns a 204
+        status with no additional content.
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)

@@ -5,7 +5,7 @@ User Accounts API
 ##################################################
 
 This page contains information on using the User Accounts API to
-complete these actions:
+complete the following actions.
 
 * `Get and Update the User's Account Information`_
 

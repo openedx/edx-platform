@@ -5,7 +5,7 @@ User Preferences API
 ##################################################
 
 This page contains information on using the User Preferences API to
-complete these actions:
+complete the following actions.
 
 * `Get and Update the User's Preferences Information`_
 * `Get, Update, or Delete a Specific Preference`_

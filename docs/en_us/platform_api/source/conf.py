@@ -182,7 +182,10 @@ MOCK_MODULES = [
     'get_account_settings',
     'update_account_settings',
     'serializers',
-    'PROFILE_IMAGE_KEY_PREFIX'
+    'profile_images.images',
+    'xmodule.course_module'
+
+
 ]
 
 for mod_name in MOCK_MODULES:
