@@ -1389,7 +1389,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
 
 
 @require_http_methods(["GET", "POST"])
-def render_xblock(request, usage_key_string):
+def render_xblock(request, usage_key_string, check_if_enrolled=True):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
@@ -1400,7 +1400,7 @@ def render_xblock(request, usage_key_string):
 
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
 
         # get the block, which verifies whether the user has access to the block.
         block, _ = get_module_by_usage_id(
