@@ -19,7 +19,8 @@ var edx = edx || {};
             login: {},
             register: {},
             passwordHelp: {},
-            institutionLogin: {}
+            institutionLogin: {},
+            hintedLogin: {}
         },
 
         nextUrl: '/dashboard',
@@ -43,6 +44,8 @@ var edx = edx || {};
                 providers: []
             };
 
+            this.thirdPartyAuthHint = obj.thirdPartyAuthHint || null;
+
             if (obj.nextUrl) {
                 // Ensure that the next URL is internal for security reasons
                 if ( ! window.isExternal( obj.nextUrl ) ) {
@@ -54,7 +57,8 @@ var edx = edx || {};
                 login: obj.loginFormDesc,
                 register: obj.registrationFormDesc,
                 reset: obj.passwordResetFormDesc,
-                institution_login: null
+                institution_login: null,
+                hinted_login: null
             };
 
             this.platformName = obj.platformName;
@@ -160,6 +164,16 @@ var edx = edx || {};
                 });
 
                 this.subview.institutionLogin.render();
+            },
+
+            hinted_login: function ( unused ) {
+                this.subview.hintedLogin =  new edx.student.account.HintedLoginView({
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    hintedProvider: this.thirdPartyAuthHint,
+                    platformName: this.platformName
+                });
+
+                this.subview.hintedLogin.render();
             }
         },
 

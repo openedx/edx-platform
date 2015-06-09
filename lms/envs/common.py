@@ -1272,6 +1272,7 @@ student_account_js = [
     'js/student_account/models/PasswordResetModel.js',
     'js/student_account/views/FormView.js',
     'js/student_account/views/LoginView.js',
+    'js/student_account/views/HintedLoginView.js',
     'js/student_account/views/RegisterView.js',
     'js/student_account/views/PasswordResetView.js',
     'js/student_account/views/AccessView.js',
