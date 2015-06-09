@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -11,7 +12,7 @@ class Migration(DataMigration):
         """
         Bootstraps the HTML view template with some default configuration parameters
         """
-        json_config = """{
+        config = {
             "default": {
                 "accomplishment_class_append": "accomplishment-certificate",
                 "platform_name": "edX",
@@ -47,9 +48,9 @@ class Migration(DataMigration):
                 "certificate_title": "Distinguished Certificate of Achievement",
                 "document_body_class_append": "is-distinguished"
             }
-        }"""
+        }
         orm.CertificateHtmlViewConfiguration.objects.create(
-            configuration=json_config,
+            configuration=json.dumps(config),
             enabled=False,
         )
 
