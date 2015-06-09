@@ -228,6 +228,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         Return an XModule instance for the specified location
         """
         assert isinstance(location, UsageKey)
+        if location.run is None:
+            location = location.replace(course_key=self.modulestore.fill_in_run(location.course_key))
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location, using_descriptor_system=self)
@@ -258,7 +260,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                         else ModuleStoreEnum.Branch.draft_preferred
                     )
                     if parent_url:
-                        parent = BlockUsageLocator.from_string(parent_url)
+                        parent = self._convert_reference_to_key(parent_url)
                 if not parent and category != 'course':
                     # try looking it up just-in-time (but not if we're working with a root node (course).
                     parent = self.modulestore.get_parent_location(
