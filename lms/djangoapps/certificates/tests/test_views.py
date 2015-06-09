@@ -329,7 +329,8 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
                 "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
                 "logo_src": "/static/certificates/images/logo-edx.svg",
-                "logo_url": "http://www.edx.org"
+                "logo_url": "http://www.edx.org",
+                "company_about_description": "This should not survive being overwritten by static content"
             },
             "honor": {
                 "certificate_type": "Honor Code",
@@ -347,6 +348,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('edX', response.content)
         self.assertNotIn('platform_microsite', response.content)
         self.assertNotIn('http://www.microsite.org', response.content)
+        self.assertNotIn('This should not survive being overwritten by static content', response.content)
 
 
 @attr('shard_1')
