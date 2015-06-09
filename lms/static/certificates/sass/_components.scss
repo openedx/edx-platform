@@ -270,13 +270,10 @@
 
     // organizations
     .accomplishment-orgs {
+        @extend %rendering-section;
 
         .list-orgs {
             @extend %list-unstyled;
-        }
-
-        .organization-logo {
-            @include filter(grayscale(100%));
         }
     }
 
@@ -454,7 +451,8 @@
     }
 }
 
-// certificate - base
+// certificate - base + honor
+.certificate-honor,
 .certificate-base {
 
     .introduction {
@@ -467,19 +465,20 @@
 
     .accomplishment-rendering {
 
+        .accomplishment-type {
+            margin-top: 0;
+        }
+
         // hide the fancy
         .accomplishment-signatories,
         .accomplishment-type-symbol {
             display: none;
         }
-
-        .organization-logo {
-            @include filter(grayscale(100%));
-        }
     }
 }
 
-// certificate - distinguished
+// certificate - distinguished + verified
+.certificate-verified,
 .certificate-distinguished {
 
     .introduction {
@@ -510,16 +509,6 @@
         .deco-corner-br {
             @include triangle(20px, $cert-distinguished-color, down-left);
         }
-
-        .organization-logo {
-            @include filter(grayscale(0%));
-        }
-    }
-
-    .accomplishment-type {
-        position: relative;
-        top: -(rem(50));
-        margin-bottom: 0;
     }
 
     .accomplishment-rendering {
