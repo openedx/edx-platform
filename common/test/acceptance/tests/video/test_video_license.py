@@ -12,7 +12,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...fixtures.course import XBlockFixtureDesc
 
 
-@attr('shard_1')
+@attr('shard_2')
 class VideoLicenseTest(StudioCourseTest):
     """
     Tests for video module-level licensing (that is, setting the license,
