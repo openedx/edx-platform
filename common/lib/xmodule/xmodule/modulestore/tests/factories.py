@@ -1,3 +1,8 @@
+"""
+Factories for use in tests of XBlocks.
+"""
+
+import inspect
 import pprint
 import threading
 from uuid import uuid4
@@ -321,12 +326,25 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
     Instruments the given methods on the given object to verify that the total sum of calls made to the
     methods falls between minumum_calls and maximum_calls.
     """
+
     mocks = {
         method: Mock(wraps=getattr(object_, method))
         for method in methods
     }
 
-    with patch.multiple(object_, **mocks):
+    if inspect.isclass(object_):
+        # If the object that we're intercepting methods on is a class, rather than a module,
+        # then we need to set the method to a real function, so that self gets passed to it,
+        # and then explicitly pass that self into the call to the mock
+        # pylint: disable=unnecessary-lambda,cell-var-from-loop
+        mock_kwargs = {
+            method: lambda self, *args, **kwargs: mocks[method](self, *args, **kwargs)
+            for method in methods
+        }
+    else:
+        mock_kwargs = mocks
+
+    with patch.multiple(object_, **mock_kwargs):
         yield
 
     call_count = sum(mock.call_count for mock in mocks.values())
