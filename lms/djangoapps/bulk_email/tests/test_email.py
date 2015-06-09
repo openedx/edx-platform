@@ -129,10 +129,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
-        self.assertEquals(
-            mail.outbox[0].subject,
-            '[' + self.course.display_name + ']' + ' test subject for myself'
-        )
+        self.assertEquals(mail.outbox[0].subject, 'test subject for myself')
 
     def test_send_to_staff(self):
         """
@@ -240,10 +237,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
-        self.assertEquals(
-            mail.outbox[0].subject,
-            '[' + self.course.display_name + '] ' + uni_subject
-        )
+        self.assertEquals(mail.outbox[0].subject, uni_subject)
 
     def test_unicode_students_send_to_all(self):
         """
