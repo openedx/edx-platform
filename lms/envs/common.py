@@ -1315,6 +1315,11 @@ ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
 
 discovery_js = ['js/discovery/main.js']
 
+certificates_web_view_js = [
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/src/logger.js',
+]
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1535,6 +1540,10 @@ PIPELINE_JS = {
     'discovery': {
         'source_filenames': discovery_js,
         'output_filename': 'js/discovery.js'
+    },
+    'certificates_wv': {
+        'source_filenames': certificates_web_view_js,
+        'output_filename': 'js/certificates/web_view.js'
     }
 }
 

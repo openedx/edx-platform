@@ -17,15 +17,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
-from certificates.api import get_active_web_certificate, get_certificate_url, generate_user_certificates
+from certificates.api import (
+    get_active_web_certificate,
+    get_certificate_url,
+    generate_user_certificates,
+    emit_certificate_event
+)
 from certificates.models import (
     certificate_status_for_student,
     CertificateStatuses,
     GeneratedCertificate,
     ExampleCertificate,
     CertificateHtmlViewConfiguration,
-    BadgeAssertion)
-from certificates.queue import XQueueCertInterface
+    CertificateSocialNetworks,
+    BadgeAssertion
+)
 from edxmako.shortcuts import render_to_response
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
@@ -587,6 +593,14 @@ def render_html_view(request, user_id, course_id):
     microsite_config_key = microsite.get_value('microsite_config_key')
     if microsite_config_key:
         context.update(configuration.get(microsite_config_key, {}))
+
+    # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
+    if request.user and request.user.id != user.id:
+        emit_certificate_event('evidence_visited', user, course_id, course, {
+            'certificate_id': user_certificate.verify_uuid,
+            'enrollment_mode': user_certificate.mode,
+            'social_network': CertificateSocialNetworks.linkedin
+        })
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)
