@@ -572,6 +572,23 @@ def render_html_view(request, user_id, course_id):
     # Append/Override the existing view context values with request-time values
     _update_certificate_context(context, course, user, user_certificate)
 
+    #
+    # Microsites will need to be able to override any hard coded
+    # content that was put into the context in the
+    # _update_certificate_context() call above. For example the
+    # 'company_about_description' talks about edX, which we most likely
+    # do not want to keep in a microsite
+    #
+    # So we need to re-apply any configuration/content that
+    # we are sourceing from the database. This is somewhat duplicative of
+    # the code at the beginning of this method, but we
+    # need the configuration at the top as some error code paths
+    # require that to be set up early on in the pipeline
+    #
+    microsite_config_key = microsite.get_value('microsite_config_key')
+    if microsite_config_key:
+        context.update(configuration.get(microsite_config_key, {}))
+
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)
 

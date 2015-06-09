@@ -294,7 +294,9 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 "company_verified_certificate_url": "http://www.microsite.org/verified-certificate",
                 "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
                 "logo_src": "/static/certificates/images/logo-microsite.svg",
-                "logo_url": "http://www.microsite.org"
+                "logo_url": "http://www.microsite.org",
+                "company_about_description": "This is special microsite aware company_about_description content",
+                "company_about_title": "Microsite title"
             },
             "honor": {
                 "certificate_type": "Honor Code",
@@ -312,6 +314,8 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         response = self.client.get(test_url)
         self.assertIn('platform_microsite', response.content)
         self.assertIn('http://www.microsite.org', response.content)
+        self.assertIn('This is special microsite aware company_about_description content', response.content)
+        self.assertIn('Microsite title', response.content)
 
     @patch("microsite_configuration.microsite.get_value", fakemicrosite)
     def test_html_view_microsite_configuration_missing(self):
