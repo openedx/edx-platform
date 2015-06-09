@@ -157,7 +157,7 @@ class BadgeHandler(object):
         Send an analytics event to record the creation of a badge assertion.
         """
         tracker.emit(
-            'edx.badges.assertion.created', {
+            'edx.badge.assertion.created', {
                 'user_id': user.id,
                 'course_id': unicode(self.course_key),
                 'enrollment_mode': assertion.mode,
