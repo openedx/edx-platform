@@ -36,7 +36,6 @@ from certificates.tests.factories import (
     BadgeAssertionFactory,
 )
 from lms import urls
-from mock import patch
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
