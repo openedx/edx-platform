@@ -31,8 +31,8 @@ Unit Tests
 
 -  As a rule of thumb, your unit tests should cover every code branch.
 
--  Mock or patch external dependencies. We use `voidspace
-   mock <http://www.voidspace.org.uk/python/mock/>`__.
+-  Mock or patch external dependencies. We use voidspace
+   `Mock Library <http://www.voidspace.org.uk/python/mock/>`__.
 
 -  We unit test Python code (using
    `unittest <http://docs.python.org/2/library/unittest.html>`__) and
