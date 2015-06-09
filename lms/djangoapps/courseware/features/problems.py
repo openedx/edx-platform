@@ -172,8 +172,10 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
     # At least one of the correct selectors should be present
     for sel in PROBLEM_DICT[problem_type][correctness]:
         if bool(isnt_marked):
+            world.wait_for(lambda _: world.is_css_not_present(sel))  # pylint: disable=cell-var-from-loop
             has_expected = world.is_css_not_present(sel)
         else:
+            world.css_find(sel)  # css_find includes a wait_for pattern
             has_expected = world.is_css_present(sel)
 
         # As soon as we find the selector, break out of the loop
