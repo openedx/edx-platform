@@ -280,10 +280,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             AbstractEditor.prototype.afterRender.call(this);
             this.$('input.time').timepicker({
                 'timeFormat' : 'H:i',
-                'forceRoundTime': true
+                'forceRoundTime': false
             });
+            this.setExamTime(this.model.get('default_time_limit_mins'));
+            this.setExamTmePreference(this.model.get('is_time_limited'));
+            this.setExamProctoring(this.model.get('is_proctored_enabled'));
         },
-
+        setExamProctoring: function(value) {
+            this.$('#id_exam_proctoring').prop('checked', value);
+        },
+        setExamTime: function(value) {
+            var time = this.convertTimeLimitMinutesToString(value);
+            this.$('#id_time_limit').val(time);
+        },
+        setExamTmePreference: function (value) {
+            this.$('#id_timed_examination').prop('checked', value);
+        },
         isExamTimeEnable: function () {
             return this.$('#id_timed_examination').is(':checked');
         },
@@ -293,6 +305,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
         getExamTimeLimit: function () {
             return this.$('#id_time_limit').val();
+        },
+        convertTimeLimitMinutesToString: function (timeLimitMinutes) {
+            var hoursStr = "" + Math.floor(timeLimitMinutes / 60);
+            var actualMinutesStr = "" + (timeLimitMinutes % 60);
+            hoursStr = "00".substring(0, 2 - hoursStr.length) + hoursStr;
+            actualMinutesStr = "00".substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
+            return hoursStr + ":" + actualMinutesStr;
         },
         convertTimeLimitToMinutes: function (time_limit) {
             var time = time_limit.split(':');
