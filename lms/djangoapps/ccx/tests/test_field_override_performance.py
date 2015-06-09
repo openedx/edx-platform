@@ -170,7 +170,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
             (26, 7, 19), (132, 7, 131), (592, 7, 537)
         ],
         'ccx': [
-            (24, 35, 47), (132, 331, 455), (592, 1507, 2037)
+            (24, 7, 47), (132, 7, 455), (592, 7, 2037)
         ],
     }
 
