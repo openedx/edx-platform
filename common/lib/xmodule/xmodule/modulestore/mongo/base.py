@@ -324,7 +324,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         Convert a single serialized UsageKey string in a ReferenceField into a UsageKey.
         """
-        key = Location.from_string(ref_string)
+        key = UsageKey.from_string(ref_string)
         return key.replace(run=self.modulestore.fill_in_run(key.course_key).run)
 
     def __setattr__(self, name, value):
