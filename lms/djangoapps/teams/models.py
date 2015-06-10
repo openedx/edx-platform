@@ -7,7 +7,8 @@ from django_countries.fields import CountryField
 
 from xmodule_django.models import CourseKeyField
 from util.model_utils import generate_unique_readable_id
-from student.models import LanguageField
+from student.models import LanguageField, CourseEnrollment
+from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 
 class CourseTeam(models.Model):
@@ -62,7 +63,11 @@ class CourseTeam(models.Model):
 
     def add_user(self, user):
         """Adds the given user to the CourseTeam."""
-        CourseTeamMembership.objects.get_or_create(
+        if not CourseEnrollment.is_enrolled(user, self.course_id):
+            raise NotEnrolledInCourseForTeam
+        if CourseTeamMembership.objects.filter(user=user, team__course_id=self.course_id).exists():
+            raise AlreadyOnTeamInCourse
+        return CourseTeamMembership.objects.create(
             user=user,
             team=self
         )
