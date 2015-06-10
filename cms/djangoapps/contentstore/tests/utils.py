@@ -3,6 +3,8 @@
 Utilities for contentstore tests
 '''
 import json
+import textwrap
+from mock import Mock
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -373,6 +375,35 @@ class CourseTestCase(ModuleStoreTestCase):
                 pass
             else:
                 self.assertEqual(value, course2_asset_attrs[key])
+
+
+def mock_requests_get(*args, **kwargs):
+    """
+    Returns mock responses for the youtube API.
+    """
+    # pylint: disable=unused-argument
+    response_transcript_list = """
+    <transcript_list>
+        <track id="1" name="Custom" lang_code="en" />
+        <track id="0" name="Custom1" lang_code="en-GB"/>
+    </transcript_list>
+    """
+    response_transcript = textwrap.dedent("""
+    <transcript>
+        <text start="100" dur="100">subs #1</text>
+        <text start="200" dur="40">subs #2</text>
+        <text start="240" dur="140">subs #3</text>
+    </transcript>
+    """)
+
+    if kwargs == {'params': {'lang': 'en', 'v': 'good_id_2'}}:
+        return Mock(status_code=200, text='')
+    elif kwargs == {'params': {'type': 'list', 'v': 'good_id_2'}}:
+        return Mock(status_code=200, text=response_transcript_list, content=response_transcript_list)
+    elif kwargs == {'params': {'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}}:
+        return Mock(status_code=200, text=response_transcript, content=response_transcript)
+
+    return Mock(status_code=404, text='')
 
 
 def get_url(handler_name, key_value, key_name='usage_key_string', kwargs=None):
