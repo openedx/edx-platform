@@ -179,6 +179,61 @@
       width: 100%;
     }
 
+    > .credit-eligibility{
+      border-top: 1px solid #e3e3e3;
+      margin-top: lh();
+      padding-left: 0;
+
+      > .credit-eligibility-container {
+          padding: lh();
+        > .credit-help {
+          background: #0078b0;
+          color: #fff;
+          width: 16px;
+          margin: 0;
+          padding: 0;
+          border-radius: 8px;
+          border-color: white;
+          text-shadow: None;
+        }
+        > .is-hidden {
+          display: none;
+        }
+        > .detail-collapse{
+          border: none;
+          box-shadow: none;
+          background: white;
+          padding: 0;
+          color: #0078b0;
+          > i {
+            padding: 4px;
+          }
+          > span{
+            color: inherit;
+          }
+        }
+        > .requirement-container{
+          padding: lh();
+          > .requirement{
+            border-bottom: 1px solid #e3e3e3;
+            padding: 10px;
+            > .requirement-name {
+              width: 30%;
+              display: inline-block;
+            }
+            > .requirement-status{
+              width: 70%;
+              float: right;
+              display: inline-block;
+              > .not-achieve{
+                color: #e3e3e3;
+              }
+            }
+          }
+        }
+      }
+    }
+
     > .chapters {
       border-top: 1px solid #e3e3e3;
       margin-top: lh();
