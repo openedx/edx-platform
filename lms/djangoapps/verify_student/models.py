@@ -33,7 +33,6 @@ from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from model_utils.models import StatusModel
 from model_utils import Choices
-from reverification.models import MidcourseReverificationWindow
 from verify_student.ssencrypt import (
     random_aes_key, encrypt_and_encode,
     generate_signed_message, rsa_encrypt
@@ -576,11 +575,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     3. The encrypted photos are base64 encoded and stored in an S3 bucket that
        edx-platform does not have read access to.
 
-    Note: this model handles both *inital* verifications (which you must perform
-    at the time you register for a verified cert), and *midcourse reverifications*.
-    To distinguish between the two, check the value of the property window:
-    intial verifications of a window of None, whereas midcourse reverifications
-    * must always be linked to a specific window*.
+    Note: this model handles *inital* verifications (which you must perform
+    at the time you register for a verified cert).
     """
     # This is a base64.urlsafe_encode(rsa_encrypt(photo_id_aes_key), ss_pub_key)
     # So first we generate a random AES-256 key to encrypt our photo ID with.
@@ -589,9 +585,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     photo_id_key = models.TextField(max_length=1024)
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
-
-    # This field has been deprecated and will be removed in a future release.
-    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True, null=True)   # TODO(ECOM-1494):Remove this.
 
     @classmethod
     def original_verification(cls, user):
