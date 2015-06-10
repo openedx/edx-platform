@@ -26,6 +26,7 @@ from discussion_api.api import (
     delete_comment,
     delete_thread,
     get_comment_list,
+    get_course,
     get_course_topics,
     get_thread_list,
     update_comment,
@@ -61,6 +62,72 @@ def _remove_discussion_tab(course, user_id):
     """
     course.tabs = [tab for tab in course.tabs if not tab.type == 'discussion']
     modulestore().update_item(course, user_id)
+
+
+@ddt.ddt
+class GetCourseTest(UrlResetMixin, ModuleStoreTestCase):
+    """Test for get_course"""
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(GetCourseTest, self).setUp()
+        self.course = CourseFactory.create(org="x", course="y", run="z")
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def test_nonexistent_course(self):
+        with self.assertRaises(Http404):
+            get_course(self.request, CourseLocator.from_string("non/existent/course"))
+
+    def test_not_enrolled(self):
+        unenrolled_user = UserFactory.create()
+        self.request.user = unenrolled_user
+        with self.assertRaises(Http404):
+            get_course(self.request, self.course.id)
+
+    def test_discussions_disabled(self):
+        _remove_discussion_tab(self.course, self.user.id)
+        with self.assertRaises(Http404):
+            get_course(self.request, self.course.id)
+
+    def test_basic(self):
+        self.assertEqual(
+            get_course(self.request, self.course.id),
+            {
+                "id": unicode(self.course.id),
+                "blackouts": [],
+                "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
+                "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
+            }
+        )
+
+    def test_blackout(self):
+        # A variety of formats is accepted
+        self.course.discussion_blackouts = [
+            ["2015-06-09T00:00:00Z", "6-10-15"],
+            [1433980800000, datetime(2015, 6, 12)],
+        ]
+        modulestore().update_item(self.course, self.user.id)
+        result = get_course(self.request, self.course.id)
+        self.assertEqual(
+            result["blackouts"],
+            [
+                {"start": "2015-06-09T00:00:00+00:00", "end": "2015-06-10T00:00:00+00:00"},
+                {"start": "2015-06-11T00:00:00+00:00", "end": "2015-06-12T00:00:00+00:00"},
+            ]
+        )
+
+    @ddt.data(None, "not a datetime", "2015", [])
+    def test_blackout_errors(self, bad_value):
+        self.course.discussion_blackouts = [
+            [bad_value, "2015-06-09T00:00:00Z"],
+            ["2015-06-10T00:00:00Z", "2015-06-11T00:00:00Z"],
+        ]
+        modulestore().update_item(self.course, self.user.id)
+        result = get_course(self.request, self.course.id)
+        self.assertEqual(result["blackouts"], [])
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
