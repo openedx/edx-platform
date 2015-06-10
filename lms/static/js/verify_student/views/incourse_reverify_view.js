@@ -70,7 +70,7 @@
 
         submitPhoto: function() {
             // disable the submit button to prevent multiple submissions.
-            this.setSubmitButtonEnabled(false)
+            this.setSubmitButtonEnabled(false);
             this.model.save();
         },
 
