@@ -50,8 +50,9 @@ var edx = edx || {};
             var self = this,
                 orderId = $.url('?basket_id') || $.url('?payment-order-num');
 
-            if (orderId) {
+            if (orderId && this.$el.data('is-payment-complete')==='True') {
                 // Get the order details
+                self.$el.removeClass('hidden');
                 self.getReceiptData(orderId).then(self.renderReceipt, self.renderError);
             } else {
                 self.renderError();
