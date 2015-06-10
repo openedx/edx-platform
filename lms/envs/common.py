@@ -592,6 +592,7 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 
@@ -1200,6 +1201,7 @@ courseware_js = (
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
     ['js/search/course/main.js'] +
+    ['js/bookmarks/main.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
@@ -1863,6 +1865,9 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    # Bookmarks
+    'bookmarks',
 )
 
 ######################### CSRF #########################################

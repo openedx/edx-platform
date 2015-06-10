@@ -244,6 +244,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'show_bookmark_button': False,
         }))
         return fragment
 
