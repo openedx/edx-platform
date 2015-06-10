@@ -1,14 +1,15 @@
 """HTTP endpoints for the Teams API."""
 
 from django.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access, has_access
 from django.http import Http404
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.views.generic.base import View
 
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from rest_framework.authentication import (
     SessionAuthentication,
@@ -45,6 +46,10 @@ from .serializers import CourseTeamSerializer, CourseTeamCreationSerializer, Top
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 
+# Constants
+TOPICS_PER_PAGE = 10
+
+
 class TeamsDashboardView(View):
     """
     View methods related to the teams dashboard.
@@ -67,7 +72,10 @@ class TeamsDashboardView(View):
                 not has_access(request.user, 'staff', course, course.id):
             raise Http404
 
-        context = {"course": course}
+        topics = get_ordered_topics(course, 'name')
+        page = Paginator(topics, TOPICS_PER_PAGE).page(1)
+        serializer = PaginationSerializer(instance=page)
+        context = {"course": course, "topics": serializer.data, "topics_url": reverse('topics_list', request=request)}
         return render_to_response("teams/teams.html", context)
 
 
@@ -479,7 +487,7 @@ class TopicListView(GenericAPIView):
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
-    paginate_by = 10
+    paginate_by = TOPICS_PER_PAGE
     paginate_by_param = 'page_size'
     pagination_serializer_class = PaginationSerializer
     serializer_class = TopicSerializer
@@ -510,11 +518,9 @@ class TopicListView(GenericAPIView):
         if not has_team_api_access(request.user, course_id):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        topics = course_module.teams_topics
-
         ordering = request.QUERY_PARAMS.get('order_by', 'name')
         if ordering == 'name':
-            topics = sorted(topics, key=lambda t: t['name'].lower())
+            topics = get_ordered_topics(course_module, ordering)
         else:
             return Response({
                 'developer_message': "unsupported order_by value {}".format(ordering),
@@ -524,6 +530,11 @@ class TopicListView(GenericAPIView):
         page = self.paginate_queryset(topics)
         serializer = self.get_pagination_serializer(page)
         return Response(serializer.data)  # pylint: disable=maybe-no-member
+
+
+def get_ordered_topics(course_module, ordering):
+    """Return """
+    return sorted(course_module.teams_topics, key=lambda t: t[ordering].lower())
 
 
 class TopicDetailView(APIView):
