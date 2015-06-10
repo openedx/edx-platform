@@ -6,12 +6,10 @@ from django.utils.translation import ugettext as _
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-requirements</%block>
 
-<%block name="pagetitle">
-  ${_("Re-Verify for {course_name}").format(course_name=course_name)}
-</%block>
+<%block name="pagetitle">${_("Re-Verification")}</%block>
 
 <%block name="header_extras">
-    % for template_name in ["incourse_reverify", "webcam_photo", "image_input", "error"]:
+    % for template_name in ["webcam_photo", "image_input", "error", "face_photo_step", "id_photo_step", "review_photos_step", "reverify_success_step"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="verify_student/${template_name}.underscore" />
         </script>
@@ -23,7 +21,7 @@ from django.utils.translation import ugettext as _
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
-  <%static:js group='incourse_reverify'/>
+  <%static:js group='reverify'/>
 </%block>
 
 <%block name="content">
@@ -38,11 +36,9 @@ from django.utils.translation import ugettext as _
   ## The server can pass information to the Backbone view
   ## by including the information as "data-*" attributes
   ## of this </div>.
-    <div id="incourse-reverify-container"
-    class="incourse-reverify"
-    data-course-key='${course_key}'
+  <div id="reverify-container" class="reverify"
+    data-full-name='${user_full_name}'
     data-platform-name='${platform_name}'
-    data-usage-id='${usage_id}'
     data-capture-sound='${capture_sound}'
   ></div>
   </section>

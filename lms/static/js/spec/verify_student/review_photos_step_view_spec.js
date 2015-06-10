@@ -21,7 +21,6 @@ define([
             var createView = function() {
                 return new ReviewPhotosStepView({
                     el: $( '#current-step-container' ),
-                    templateName: 'review_photos_step',
                     stepData: STEP_DATA,
                     model: new VerificationModel({
                         faceImage: FACE_IMAGE,

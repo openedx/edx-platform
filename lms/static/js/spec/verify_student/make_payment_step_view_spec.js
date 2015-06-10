@@ -29,7 +29,6 @@ define([
             var createView = function( stepDataOverrides ) {
                 var view = new MakePaymentStepView({
                     el: $( '#current-step-container' ),
-                    templateName: 'make_payment_step',
                     stepData: _.extend( _.clone( STEP_DATA ), stepDataOverrides ),
                     errorModel: new ( Backbone.Model.extend({}) )()
                 }).render();

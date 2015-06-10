@@ -1310,6 +1310,20 @@ reverify_js = [
     'js/verify_student/views/error_view.js',
     'js/verify_student/views/image_input_view.js',
     'js/verify_student/views/webcam_photo_view.js',
+    'js/verify_student/views/step_view.js',
+    'js/verify_student/views/face_photo_step_view.js',
+    'js/verify_student/views/id_photo_step_view.js',
+    'js/verify_student/views/review_photos_step_view.js',
+    'js/verify_student/views/reverify_success_step_view.js',
+    'js/verify_student/models/verification_model.js',
+    'js/verify_student/views/reverify_view.js',
+    'js/verify_student/reverify.js',
+]
+
+incourse_reverify_js = [
+    'js/verify_student/views/error_view.js',
+    'js/verify_student/views/image_input_view.js',
+    'js/verify_student/views/webcam_photo_view.js',
     'js/verify_student/models/reverification_model.js',
     'js/verify_student/views/incourse_reverify_view.js',
     'js/verify_student/incourse_reverify.js',
@@ -1540,6 +1554,10 @@ PIPELINE_JS = {
     'reverify': {
         'source_filenames': reverify_js,
         'output_filename': 'js/reverify.js'
+    },
+    'incourse_reverify': {
+        'source_filenames': incourse_reverify_js,
+        'output_filename': 'js/incourse_reverify.js'
     },
     'ccx': {
         'source_filenames': ccx_js,

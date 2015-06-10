@@ -61,7 +61,6 @@
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
             'js/mustache': 'js/mustache',
-            'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
 
@@ -284,9 +283,6 @@
                 exports: 'js/student_profile/profile',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
-            'js/verify_student/photocapture': {
-                exports: 'js/verify_student/photocapture'
-            },
             'js/staff_debug_actions': {
                 exports: 'js/staff_debug_actions',
                 deps: ['gettext']
@@ -501,6 +497,7 @@
                     'gettext',
                     'jquery.cookie',
                     'jquery.url',
+                    'string_utils',
                     'js/verify_student/views/step_view',
                 ]
             },
@@ -550,6 +547,13 @@
                     'js/verify_student/views/step_view',
                 ]
             },
+            'js/verify_student/views/reverify_success_step_view': {
+                exports: 'edx.verify_student.ReverifySuccessStepView',
+                deps: [
+                    'jquery',
+                    'js/verify_student/views/step_view',
+                ]
+            },
             'js/verify_student/views/pay_and_verify_view': {
                 exports: 'edx.verify_student.PayAndVerifyView',
                 deps: [
@@ -565,6 +569,20 @@
                     'js/verify_student/views/id_photo_step_view',
                     'js/verify_student/views/review_photos_step_view',
                     'js/verify_student/views/enrollment_confirmation_step_view'
+                ]
+            },
+            'js/verify_student/views/reverify_view': {
+                exports: 'edx.verify_student.ReverifyView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'js/verify_student/models/verification_model',
+                    'js/verify_student/views/face_photo_step_view',
+                    'js/verify_student/views/id_photo_step_view',
+                    'js/verify_student/views/enrollment_confirmation_step_view',
+                    'js/verify_student/views/reverify_success_step_view'
                 ]
             },
             // Student Notes
@@ -583,7 +601,6 @@
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
-        'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
@@ -610,6 +627,7 @@
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
+        'lms/include/js/spec/verify_student/reverify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/image_input_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',

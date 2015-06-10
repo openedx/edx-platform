@@ -2078,66 +2078,6 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         raise
 
 
-# TODO: DELETE AFTER NEW ACCOUNT PAGE DONE
-@ensure_csrf_cookie
-@require_POST
-def change_name_request(request):
-    """ Log a request for a new name. """
-    if not request.user.is_authenticated():
-        raise Http404
-
-    try:
-        pnc = PendingNameChange.objects.get(user=request.user.id)
-    except PendingNameChange.DoesNotExist:
-        pnc = PendingNameChange()
-    pnc.user = request.user
-    pnc.new_name = request.POST['new_name'].strip()
-    pnc.rationale = request.POST['rationale']
-    if len(pnc.new_name) < 2:
-        return JsonResponse({
-            "success": False,
-            "error": _('Name required'),
-        })  # TODO: this should be status code 400  # pylint: disable=fixme
-    pnc.save()
-
-    # The following automatically accepts name change requests. Remove this to
-    # go back to the old system where it gets queued up for admin approval.
-    accept_name_change_by_id(pnc.id)
-
-    return JsonResponse({"success": True})
-
-
-# TODO: DELETE AFTER NEW ACCOUNT PAGE DONE
-def accept_name_change_by_id(uid):
-    """
-    Accepts the pending name change request for the user represented
-    by user id `uid`.
-    """
-    try:
-        pnc = PendingNameChange.objects.get(id=uid)
-    except PendingNameChange.DoesNotExist:
-        return JsonResponse({
-            "success": False,
-            "error": _('Invalid ID'),
-        })  # TODO: this should be status code 400  # pylint: disable=fixme
-
-    user = pnc.user
-    u_prof = UserProfile.objects.get(user=user)
-
-    # Save old name
-    meta = u_prof.get_meta()
-    if 'old_names' not in meta:
-        meta['old_names'] = []
-    meta['old_names'].append([u_prof.name, pnc.rationale, datetime.datetime.now(UTC).isoformat()])
-    u_prof.set_meta(meta)
-
-    u_prof.name = pnc.new_name
-    u_prof.save()
-    pnc.delete()
-
-    return JsonResponse({"success": True})
-
-
 @require_POST
 @login_required
 @ensure_csrf_cookie
