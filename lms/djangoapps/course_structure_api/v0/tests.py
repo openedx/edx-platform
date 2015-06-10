@@ -9,7 +9,6 @@ from mock import patch, Mock
 from itertools import product
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
@@ -336,6 +335,7 @@ class CourseStructureTests(CourseDetailTestMixin, CourseViewTestsMixin, ModuleSt
             blocks[unicode(xblock.location)] = {
                 u'id': unicode(xblock.location),
                 u'type': xblock.category,
+                u'parent': None,
                 u'display_name': xblock.display_name,
                 u'format': xblock.format,
                 u'graded': xblock.graded,

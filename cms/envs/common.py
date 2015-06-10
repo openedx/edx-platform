@@ -1007,3 +1007,8 @@ CREDIT_TASK_MAX_RETRIES = 5
 # when a credit provider notifies us that a student has been approved
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
+
+
+################################ Deprecated Blocks Info ################################
+
+DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']

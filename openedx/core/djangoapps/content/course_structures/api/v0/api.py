@@ -5,11 +5,12 @@ Note: The course list and course detail functionality isn't currently supported 
 of the tricky interactions between DRF and the code.
 Most of that information is available by accessing the course objects directly.
 """
-
-from course_structure_api.v0 import serializers
-from course_structure_api.v0.errors import CourseNotFoundError, CourseStructureNotAvailableError
+from collections import OrderedDict
+from .serializers import GradingPolicySerializer, CourseStructureSerializer
+from .errors import CourseNotFoundError, CourseStructureNotAvailableError
 from openedx.core.djangoapps.content.course_structures import models, tasks
-from courseware import courses
+from util.cache import cache
+from xmodule.modulestore.django import modulestore
 
 
 def _retrieve_course(course_key):
@@ -23,18 +24,24 @@ def _retrieve_course(course_key):
         CourseNotFoundError
 
     """
-    try:
-        return courses.get_course(course_key)
-    except ValueError:
+    course = modulestore().get_course(course_key, depth=0)
+    if course is None:
         raise CourseNotFoundError
 
+    return course
 
-def course_structure(course_key):
+
+def course_structure(course_key, block_types=None):
     """
-    Retrieves the entire course structure, including information about all the blocks used in the course.
+    Retrieves the entire course structure, including information about all the blocks used in the
+    course if `block_types` is None else information about `block_types` will be returned only.
+    Final serialized information will be cached.
 
     Args:
         course_key: the CourseKey of the course we'd like to retrieve.
+        block_types: list of required block types. Possible values include sequential,
+                     vertical, html, problem, video, and discussion. The type can also be
+                     the name of a custom type of block used for the course.
     Returns:
         The serialized output of the course structure:
             * root: The ID of the root node of the course structure.
@@ -60,15 +67,41 @@ def course_structure(course_key):
                 blocks.
     Raises:
         CourseStructureNotAvailableError, CourseNotFoundError
+
     """
     course = _retrieve_course(course_key)
-    try:
-        requested_course_structure = models.CourseStructure.objects.get(course_id=course.id)
-        return serializers.CourseStructureSerializer(requested_course_structure.structure).data
-    except models.CourseStructure.DoesNotExist:
-        # If we don't have data stored, generate it and return an error.
-        tasks.update_course_structure.delay(unicode(course_key))
-        raise CourseStructureNotAvailableError
+
+    modified_timestamp = models.CourseStructure.objects.filter(course_id=course_key).values('modified')
+    if modified_timestamp.exists():
+        cache_key = 'openedx.content.course_structures.api.v0.api.course_structure.{}.{}.{}'.format(
+            course_key, modified_timestamp[0]['modified'], '_'.join(block_types or [])
+        )
+        data = cache.get(cache_key)  # pylint: disable=maybe-no-member
+        if data is not None:
+            return data
+
+        try:
+            requested_course_structure = models.CourseStructure.objects.get(course_id=course.id)
+        except models.CourseStructure.DoesNotExist:
+            pass
+        else:
+            structure = requested_course_structure.structure
+            if block_types is not None:
+                blocks = requested_course_structure.ordered_blocks
+                required_blocks = OrderedDict()
+                for usage_id, block_data in blocks.iteritems():
+                    if block_data['block_type'] in block_types:
+                        required_blocks[usage_id] = block_data
+
+                structure['blocks'] = required_blocks
+
+            data = CourseStructureSerializer(structure).data
+            cache.set(cache_key, data, None)  # pylint: disable=maybe-no-member
+            return data
+
+    # If we don't have data stored, generate it and return an error.
+    tasks.update_course_structure.delay(unicode(course_key))
+    raise CourseStructureNotAvailableError
 
 
 def course_grading_policy(course_key):
@@ -91,4 +124,4 @@ def course_grading_policy(course_key):
                 final grade.
     """
     course = _retrieve_course(course_key)
-    return serializers.GradingPolicySerializer(course.raw_grader).data
+    return GradingPolicySerializer(course.raw_grader).data

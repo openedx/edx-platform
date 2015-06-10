@@ -52,7 +52,3 @@ class CourseStructure(TimeStampedModel):
 
         for child_node in cur_block['children']:
             self._traverse_tree(child_node, unordered_structure, ordered_blocks, parent=block)
-
-# Signals must be imported in a file that is automatically loaded at app startup (e.g. models.py). We import them
-# at the end of this file to avoid circular dependencies.
-import signals  # pylint: disable=unused-import
