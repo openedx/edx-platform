@@ -1410,6 +1410,28 @@ class TestXBlockInfo(ItemTest):
         json_response = json.loads(resp.content)
         self.validate_course_xblock_info(json_response, course_outline=True)
 
+    def test_xblock_outline_handler_mongo_calls(self):
+        expected_calls = 5
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(
+                parent_location=course.location, category='chapter', display_name='Week 1'
+            )
+            outline_url = reverse_usage_url('xblock_outline_handler', chapter.location)
+            with check_mongo_calls(expected_calls):
+                self.client.get(outline_url, HTTP_ACCEPT='application/json')
+
+            sequential = ItemFactory.create(
+                parent_location=chapter.location, category='sequential', display_name='Sequential 1'
+            )
+
+            ItemFactory.create(
+                parent_location=sequential.location, category='vertical', display_name='Vertical 1'
+            )
+            # calls should be same after adding two new children.
+            with check_mongo_calls(expected_calls):
+                self.client.get(outline_url, HTTP_ACCEPT='application/json')
+
     def test_entrance_exam_chapter_xblock_info(self):
         chapter = ItemFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
