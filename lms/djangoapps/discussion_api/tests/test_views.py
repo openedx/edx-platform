@@ -573,7 +573,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         })
         self.register_get_thread_response(cs_thread)
         cs_comment = make_minimal_cs_comment({
-            "id": "test_comment",
+            "id": self.comment_id,
             "course_id": cs_thread["course_id"],
             "thread_id": cs_thread["id"],
             "username": self.user.username,

@@ -164,7 +164,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
     **DELETE response values:
 
-        * No content is returned for a DELETE request
+        No content is returned for a DELETE request
 
     """
     lookup_field = "thread_id"
@@ -312,7 +312,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
     **DELETE Response Value**
 
-        * No content is returned for a DELETE request
+        No content is returned for a DELETE request
 
     """
     lookup_field = "comment_id"
@@ -356,4 +356,3 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         the class docstring.
         """
         return Response(update_comment(request, comment_id, request.DATA))
-
