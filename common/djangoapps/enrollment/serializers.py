@@ -38,10 +38,10 @@ class CourseField(serializers.RelatedField):
 
     """
 
-    def to_native(self, course):
+    def to_native(self, course, **kwargs):
         course_id = unicode(course.id)
         course_modes = ModeSerializer(
-            CourseMode.modes_for_course(course.id, only_selectable=False)
+            CourseMode.modes_for_course(course.id, kwargs.get('include_expired', False), only_selectable=False)
         ).data  # pylint: disable=no-member
 
         return {
@@ -94,7 +94,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'

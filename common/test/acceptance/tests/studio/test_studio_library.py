@@ -4,6 +4,7 @@ Acceptance tests for Content Libraries in Studio
 from ddt import ddt, data
 from unittest import skip
 from nose.plugins.attrib import attr
+from flaky import flaky
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import XBlockFixtureDesc
@@ -129,6 +130,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
 
+    @flaky  # TODO fix this, see TNL-2322
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.

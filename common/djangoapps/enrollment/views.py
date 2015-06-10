@@ -163,11 +163,16 @@ class EnrollmentCourseDetailView(APIView):
 
             Get enrollment details for a course.
 
+            Response values include the course schedule and enrollment modes supported by the course.
+            Use the parameter include_expired=1 to include expired enrollment modes in the response.
+
             **Note:** Getting enrollment details for a course does not require authentication.
 
         **Example Requests**:
 
             GET /api/enrollment/v1/course/{course_id}
+
+            GET /api/v1/enrollment/course/{course_id}?include_expired=1
 
 
         **Response Values**
@@ -184,7 +189,10 @@ class EnrollmentCourseDetailView(APIView):
 
                 * course_end: The date and time at which the course closes.  If null, the course never ends.
 
-                * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
+                * course_modes: An array containing details about the enrollment modes supported for the course.
+                If the request uses the parameter include_expired=1, the array also includes expired enrollment modes.
+
+                  Each enrollment mode collection includes:
 
                         * slug: The short name for the enrollment mode.
                         * name: The full name of the enrollment mode.
@@ -217,7 +225,7 @@ class EnrollmentCourseDetailView(APIView):
 
         """
         try:
-            return Response(api.get_course_enrollment_details(course_id))
+            return Response(api.get_course_enrollment_details(course_id, bool(request.GET.get('include_expired', ''))))
         except CourseNotFoundError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,

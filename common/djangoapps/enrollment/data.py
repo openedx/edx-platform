@@ -142,13 +142,16 @@ def _update_enrollment(enrollment, is_active=None, mode=None):
     return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
 
 
-def get_course_enrollment_info(course_id):
+def get_course_enrollment_info(course_id, include_expired=False):
     """Returns all course enrollment information for the given course.
 
     Based on the course id, return all related course information..
 
     Args:
         course_id (str): The course to retrieve enrollment information for.
+
+        include_expired (bool): Boolean denoting whether expired course modes
+        should be included in the returned JSON data.
 
     Returns:
         A serializable dictionary representing the course's enrollment information.
@@ -163,4 +166,4 @@ def get_course_enrollment_info(course_id):
         msg = u"Requested enrollment information for unknown course {course}".format(course=course_id)
         log.warning(msg)
         raise CourseNotFoundError(msg)
-    return CourseField().to_native(course)
+    return CourseField().to_native(course, include_expired=include_expired)
