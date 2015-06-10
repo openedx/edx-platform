@@ -3,6 +3,8 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
+import logging
+
 from ipware.ip import get_ip
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
@@ -29,6 +31,9 @@ from enrollment.errors import (
     CourseModeNotFoundError, CourseEnrollmentExistsError
 )
 from student.models import User
+
+
+log = logging.getLogger(__name__)
 
 
 class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
@@ -429,7 +434,18 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 )
 
             enrollment = api.get_enrollment(username, unicode(course_id))
-            if has_api_key_permissions and enrollment and enrollment['mode'] != mode:
+            mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
+            active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
+            if has_api_key_permissions and (mode_changed or active_changed):
+                if mode_changed and active_changed and not is_active:
+                    # if the requester wanted to deactivate but specified the wrong mode, fail
+                    # the request (on the assumption that the requester had outdated information
+                    # about the currently active enrollment).
+                    msg = u"Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
+                        enrollment["mode"], mode
+                    )
+                    log.warning(msg)
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
                 response = api.update_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
             else:
                 # Will reactivate inactive enrollments.
