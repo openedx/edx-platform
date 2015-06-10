@@ -5,9 +5,10 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
+  import json
+  import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
-  import urllib
 %>
 
 <%block name="header_extras">
@@ -27,9 +28,10 @@ CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
   </script>
 </%block>
+
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory("${details_url}");
+        SettingsFactory("${details_url}", ${json.dumps(show_min_grade_warning)});
     });
 </%block>
 
@@ -116,8 +118,53 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           </div>
           % endif
         </section>
-
         <hr class="divide" />
+
+        % if credit_eligibility_enabled and is_credit_course:
+          <section class="group-settings basic">
+            <header>
+              <h2 class="title-2">${_("Credit Eligibility Requirements")}</h2>
+              <span class="tip">${_("Steps needed for credit eligibility")}</span>
+            </header>
+              % if credit_requirements:
+                <ol class="list-input">
+                  % if 'grade' in credit_requirements:
+                    <li class="field text is-not-editable" id="credit-minimum-passing-grade">
+                      <label for="minimum-passing-grade">${_("Minimum Passing Grade")}</label>
+                        % for requirement in credit_requirements['grade']:
+                          <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                              class="long" id="${requirement['name']}" value="${'{0:.0f}%'.format(float(requirement['criteria']['min_grade'] or 0)*100)}" readonly />
+                        % endfor
+                    </li>
+                  % endif
+
+                  % if 'proctored_exam' in credit_requirements:
+                    <li class="field text is-not-editable" id="credit-proctoring-requirements">
+                      <label for="proctoring-requirements">${_("Successful Proctored Exam")}</label>
+                        % for requirement in credit_requirements['proctored_exam']:
+                          <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                              class="long" id="${requirement['name']}" value="${requirement['display_name']}" readonly />
+                        % endfor
+                    </li>
+                  % endif
+
+                  % if 'reverification' in credit_requirements:
+                    <li class="field text is-not-editable" id="credit-reverification-requirements">
+                      <label for="reverification-requirements">${_("Successful In Course Reverification")}</label>
+                        % for requirement in credit_requirements['reverification']:
+                          ## Translators: 'Access to Assessment 1' means the access for a requirement with name 'Assessment 1'
+                          <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                              class="long" id="${requirement['name']}" value="${_('Access to {display_name}').format(display_name=requirement['display_name'])}" readonly />
+                        % endfor
+                    </li>
+                  % endif
+                </ol>
+              % else:
+                <p>No credit requirements found.</p>
+              % endif
+          </section>
+          <hr class="divide" />
+        % endif
 
         <section class="group-settings schedule">
           <header>

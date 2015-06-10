@@ -42,6 +42,7 @@ var GradingView = ValidatingView.extend({
         this.clearValidationErrors();
 
         this.renderGracePeriod();
+        this.renderMinimumGradeCredit();
 
         // Create and render the grading type subs
         var self = this;
@@ -86,7 +87,8 @@ var GradingView = ValidatingView.extend({
         this.model.get('graders').push({});
     },
     fieldToSelectorMap : {
-        'grace_period' : 'course-grading-graceperiod'
+        'grace_period' : 'course-grading-graceperiod',
+        'minimum_grade_credit' : 'course-minimum_grade_credit'
     },
     renderGracePeriod: function() {
         var format = function(time) {
@@ -97,10 +99,22 @@ var GradingView = ValidatingView.extend({
             format(grace_period.hours) + ':' + format(grace_period.minutes)
         );
     },
+    renderMinimumGradeCredit: function() {
+        var minimum_grade_credit = this.model.get('minimum_grade_credit');
+        this.$el.find('#course-minimum_grade_credit').val(
+            parseFloat(minimum_grade_credit) * 100 + '%'
+        );
+    },
     setGracePeriod : function(event) {
         this.clearValidationErrors();
         var newVal = this.model.parseGracePeriod($(event.currentTarget).val());
         this.model.set('grace_period', newVal, {validate: true});
+    },
+    setMinimumGradeCredit : function(event) {
+        this.clearValidationErrors();
+        // get field value in float
+        var newVal = this.model.parseMinimumGradeCredit($(event.currentTarget).val()) / 100;
+        this.model.set('minimum_grade_credit', newVal, {validate: true});
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -108,6 +122,10 @@ var GradingView = ValidatingView.extend({
         switch (this.selectorToField[event.currentTarget.id]) {
         case 'grace_period':
             this.setGracePeriod(event);
+            break;
+
+        case 'minimum_grade_credit':
+            this.setMinimumGradeCredit(event);
             break;
 
         default:

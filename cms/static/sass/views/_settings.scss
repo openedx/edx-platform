@@ -326,6 +326,24 @@
         width: flex-grid(5, 9);
       }
 
+      // Credit eligibility requirements
+      #credit-minimum-passing-grade {
+        float: left;
+        width: flex-grid(3, 9);
+        margin-right: flex-gutter();
+      }
+
+      #credit-proctoring-requirements {
+        float: left;
+        width: flex-grid(3, 9);
+        margin-right: flex-gutter();
+      }
+
+      #credit-reverification-requirements {
+        float: left;
+        width: flex-grid(3, 9);
+      }
+
       // course link note
       .note-promotion-courseURL {
         box-shadow: 0 2px 1px $shadow-l1;
@@ -731,6 +749,11 @@
       #field-course-grading-graceperiod {
         width: flex-grid(3, 9);
       }
+
+      #field-course-minimum_grade_credit {
+        width: flex-grid(4, 9);
+      }
+
     }
 
     &.assignment-types {

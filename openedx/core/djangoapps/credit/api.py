@@ -1,11 +1,16 @@
-""" Contains the APIs for course credit requirements """
+"""
+Contains the APIs for course credit requirements.
+"""
+
 import logging
 import uuid
 
 from django.db import transaction
 
-from student.models import User
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
+from student.models import User
 from .exceptions import (
     InvalidCreditRequirements,
     InvalidCreditCourse,
@@ -96,32 +101,33 @@ def get_credit_requirements(course_key, namespace=None):
 
     Example:
         >>> get_credit_requirements("course-v1-edX-DemoX-1T2015")
-                {
-                    requirements =
-                    [
-                        {
-                            "namespace": "reverification",
-                            "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                            "display_name": "Assessment 1",
-                            "criteria": {},
-                        },
-                        {
-                            "namespace": "proctored_exam",
-                            "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
-                            "display_name": "Final Exam",
-                            "criteria": {},
-                        },
-                        {
-                            "namespace": "grade",
-                            "name": "grade",
-                            "display_name": "Grade",
-                            "criteria": {"min_grade": 0.8},
-                        },
-                    ]
-                }
+            {
+                requirements =
+                [
+                    {
+                        "namespace": "reverification",
+                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                        "display_name": "Assessment 1",
+                        "criteria": {},
+                    },
+                    {
+                        "namespace": "proctored_exam",
+                        "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "display_name": "Final Exam",
+                        "criteria": {},
+                    },
+                    {
+                        "namespace": "grade",
+                        "name": "grade",
+                        "display_name": "Grade",
+                        "criteria": {"min_grade": 0.8},
+                    },
+                ]
+            }
 
     Returns:
         Dict of requirements in the given namespace
+
     """
 
     requirements = CreditRequirement.get_course_requirements(course_key, namespace)
@@ -455,3 +461,21 @@ def _validate_requirements(requirements):
                 )
             )
     return invalid_requirements
+
+
+def is_credit_course(course_key):
+    """API method to check if course is credit or not.
+
+    Args:
+        course_key(CourseKey): The course identifier string or CourseKey object
+
+    Returns:
+        Bool True if the course is marked credit else False
+
+    """
+    try:
+        course_key = CourseKey.from_string(unicode(course_key))
+    except InvalidKeyError:
+        return False
+
+    return CreditCourse.is_credit_course(course_key=course_key)

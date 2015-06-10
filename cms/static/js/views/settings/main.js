@@ -1,7 +1,8 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license", "jquery.timepicker", "date"],
+    "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license",
+    "js/views/feedback_notification", "jquery.timepicker", "date"],
     function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
-        FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel) {
+        FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, NotificationView) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -21,7 +22,8 @@ var DetailsView = ValidatingView.extend({
         'click .action-upload-image': "uploadImage"
     },
 
-    initialize : function() {
+    initialize : function(options) {
+        options = options || {};
         this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-language").val(this.model.get('language'));
@@ -49,6 +51,14 @@ var DetailsView = ValidatingView.extend({
             showPreview: true
         });
         this.listenTo(this.licenseModel, 'change', this.handleLicenseChange);
+
+        if (options.showMinGradeWarning || false) {
+            new NotificationView.Warning({
+                title: gettext("Credit Eligibility Requirements"),
+                message: gettext("Minimum passing grade for credit is not set."),
+                closeIcon: true
+            }).show();
+        }
     },
 
     render: function() {

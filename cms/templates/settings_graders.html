@@ -73,8 +73,25 @@
             </li>
           </ol>
         </section>
-
         <hr class="divide" />
+
+        % if settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course:
+          <section class="group-settings grade-rules">
+            <header>
+              <h2 class="title-2">${_("Credit Grade &amp; Eligibility")}</h2>
+              <span class="tip">${_("Settings for credit eligibility")}</span>
+            </header>
+
+            <ol class="list-input">
+              <li class="field text" id="field-course-minimum_grade_credit">
+                <label for="course-minimum_grade_credit">${_("Minimum Passing Grade to Earn Credit:")}</label>
+                <input type="text" class="short time" id="course-minimum_grade_credit" value="0" placeholder="80%" autocomplete="off" />
+                <span class="tip tip-inline">${_("Must be greater than or equal to passing grade")}</span>
+              </li>
+            </ol>
+          </section>
+          <hr class="divide" />
+        % endif
 
         <section class="group-settings grade-rules">
           <header>
@@ -90,7 +107,6 @@
             </li>
           </ol>
         </section>
-
         <hr class="divide" />
 
         <section class="group-settings assignment-types">
