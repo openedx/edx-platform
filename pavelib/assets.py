@@ -19,6 +19,7 @@ SASS_DIRS = {
     "lms/static/sass": "lms/static/css",
     "cms/static/sass": "cms/static/css",
     "common/static/sass": "common/static/css",
+    "lms/static/certificates/sass": "lms/static/certificates/css",
 }
 SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
 SASS_CACHE_PATH = '/tmp/sass-cache'

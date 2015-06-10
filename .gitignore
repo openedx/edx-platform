@@ -73,18 +73,16 @@ bin/
 ### Static assets pipeline artifacts
 *.scssc
 lms/static/css/
-lms/static/sass/*.css
-lms/static/sass/*.css.map
+lms/static/certificates/css/
+cms/static/css/
+
+### Styling generated from templates
 lms/static/sass/lms-main.scss
 lms/static/sass/lms-main-rtl.scss
 lms/static/sass/lms-course.scss
 lms/static/sass/lms-course-rtl.scss
 lms/static/sass/lms-footer.scss
 lms/static/sass/lms-footer-rtl.scss
-lms/static/certificates/sass/*.css
-cms/static/css/
-cms/static/sass/*.css
-cms/static/sass/*.css.map
 
 
 ### Logging artifacts
