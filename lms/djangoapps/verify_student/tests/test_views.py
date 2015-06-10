@@ -1054,8 +1054,6 @@ class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course enrollment process.
     """
-    # Minimum size valid image data
-    IMAGE_DATA = ','
 
     def setUp(self):
         super(TestCreateOrderView, self).setUp()
@@ -1082,24 +1080,9 @@ class TestCreateOrderView(ModuleStoreTestCase):
             course_mode_post_data
         )
 
-    def test_invalid_photos_data(self):
-        self._create_order(
-            50,
-            self.course_id,
-            face_image='',
-            photo_id_image='',
-            expect_success=False
-        )
-
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_amount(self):
-        response = self._create_order(
-            '1.a',
-            self.course_id,
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA,
-            expect_status_code=400
-        )
+        response = self._create_order('1.a', self.course_id, expect_status_code=400)
         self.assertIn('Selected price is not valid number.', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -1107,13 +1090,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         # Create a course that does not have a verified mode
         course_id = 'Fake/999/Test_Course'
         CourseFactory.create(org='Fake', number='999', display_name='Test Course')
-        response = self._create_order(
-            '50',
-            course_id,
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA,
-            expect_status_code=400
-        )
+        response = self._create_order('50', course_id, expect_status_code=400)
         self.assertIn('This course doesn\'t support paid certificates', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -1121,8 +1098,6 @@ class TestCreateOrderView(ModuleStoreTestCase):
         create_order_post_data = {
             'contribution': 50,
             'course_id': self.course_id,
-            'face_image': self.IMAGE_DATA,
-            'photo_id_image': self.IMAGE_DATA,
         }
 
         # Use the wrong HTTP method
@@ -1131,12 +1106,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_success(self):
-        response = self._create_order(
-            50,
-            self.course_id,
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA
-        )
+        response = self._create_order(50, self.course_id)
         json_response = json.loads(response.content)
         self.assertIsNotNone(json_response['payment_form_data'].get('orderNumber'))  # TODO not canonical
 
@@ -1148,13 +1118,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.assertEqual(item.course_id, self.course.id)
         self.assertEqual(item.mode, 'verified')
 
-    def _create_order(
-            self, contribution, course_id,
-            face_image=None,
-            photo_id_image=None,
-            expect_success=True,
-            expect_status_code=200
-    ):
+    def _create_order(self, contribution, course_id, expect_success=True, expect_status_code=200):
         """Create a new order.
 
         Arguments:
@@ -1162,8 +1126,6 @@ class TestCreateOrderView(ModuleStoreTestCase):
             course_id (CourseKey): The course to purchase.
 
         Keyword Arguments:
-            face_image (string): Base-64 encoded image data
-            photo_id_image (string): Base-64 encoded image data
             expect_success (bool): If True, verify that the response was successful.
             expect_status_code (int): The expected HTTP status code
 
@@ -1177,11 +1139,6 @@ class TestCreateOrderView(ModuleStoreTestCase):
             'course_id': course_id,
             'processor': None,
         }
-
-        if face_image is not None:
-            data['face_image'] = face_image
-        if photo_id_image is not None:
-            data['photo_id_image'] = photo_id_image
 
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, expect_status_code)

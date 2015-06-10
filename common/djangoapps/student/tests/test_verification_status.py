@@ -41,12 +41,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self.course = CourseFactory.create()
         success = self.client.login(username=self.user.username, password="edx")
         self.assertTrue(success, msg="Did not log in successfully")
-
-        # Use the URL with the querystring param to put the user
-        # in the experimental track.
-        # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
-        # completes, we can remove the querystring param.
-        self.dashboard_url = reverse('dashboard') + '?separate-verified=1'
+        self.dashboard_url = reverse('dashboard')
 
     def test_enrolled_as_non_verified(self):
         self._setup_mode_and_enrollment(None, "honor")
