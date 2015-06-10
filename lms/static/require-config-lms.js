@@ -49,6 +49,7 @@
             "text": 'js/vendor/requirejs/text',
             "backbone": "js/vendor/backbone-min",
             "backbone-super": "js/vendor/backbone-super",
+            "backbone.paginator": "js/vendor/backbone.paginator.min",
             "underscore.string": "js/vendor/underscore.string.min",
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
@@ -89,6 +90,10 @@
             "backbone": {
                 deps: ["underscore", "jquery"],
                 exports: "Backbone"
+            },
+            "backbone.paginator": {
+                deps: ["backbone"],
+                exports: "Backbone.Paginator"
             },
             "backbone-super": {
                 deps: ["backbone"]

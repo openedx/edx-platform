@@ -3,9 +3,25 @@ from rest_framework import pagination, serializers
 
 class PaginationSerializer(pagination.PaginationSerializer):
     """
-    Custom PaginationSerializer to include num_pages field
+    Custom PaginationSerializer for openedx.
+
+    Adds the following fields:
+        - num_pages: total number of pages
+        - current_page: the current page being returned
+        - start: the index of the first page item within the overall collection
     """
+    start_page = 1  # django Paginator.page objects have 1-based indexes
     num_pages = serializers.Field(source='paginator.num_pages')
+    current_page = serializers.SerializerMethodField('get_current_page')
+    start = serializers.SerializerMethodField('get_start')
+
+    def get_current_page(self, page):
+        """Get the current page"""
+        return page.number
+
+    def get_start(self, page):
+        """Get the index of the first page item within the overall collection"""
+        return (self.get_current_page(page) - self.start_page) * page.paginator.per_page
 
 
 class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):

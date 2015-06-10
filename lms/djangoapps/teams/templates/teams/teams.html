@@ -1,5 +1,7 @@
 ## mako
+<%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from openedx.core.lib.json_utils import EscapedEdxJSONEncoder %>
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
@@ -22,7 +24,7 @@
 <script type="text/javascript">
     (function (require) {
         require(['teams/js/teams_tab_factory'], function (TeamsTabFactory) {
-            var pageView = new TeamsTabFactory();
+            new TeamsTabFactory(${ json.dumps(topics, cls=EscapedEdxJSONEncoder) }, '${ topics_url }');
         });
     }).call(this, require || RequireJS.require);
 </script>
