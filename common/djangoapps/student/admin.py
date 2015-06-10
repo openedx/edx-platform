@@ -38,7 +38,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             try:
                 course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
-                raise forms.ValidationError(u"Cannot make a valid CourseKey from id {}!".format(course_id))
+                raise forms.ValidationError(u"Invalid CourseID. Please check the format and re-try.")
 
             if not modulestore().has_course(course_key):
                 raise forms.ValidationError(u"Cannot find course with id {} in the modulestore".format(course_id))
@@ -72,7 +72,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             user = User.objects.get(email=email)
         except Exception:
             raise forms.ValidationError(
-                u"Email not exists. Could not find user by email address {email}.".format(
+                u"Email does not exist. Could not find {email}. Please re-enter email address".format(
                     email=email
                 )
             )

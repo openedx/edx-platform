@@ -122,7 +122,7 @@ class AdminCourseRolesPageTest(ModuleStoreTestCase):
 
         self.assertContains(
             response,
-            "Email not exists. Could not find user by email address {}".format(
+            "Email does not exist. Could not find {}. Please re-enter email address".format(
                 email
             )
         )
