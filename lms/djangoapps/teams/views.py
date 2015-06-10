@@ -300,7 +300,7 @@ class TeamsListView(GenericAPIView):
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        data = request.DATA
+        data = request.DATA.copy()
         data['course_id'] = course_key
 
         serializer = CourseTeamCreationSerializer(data=data)
