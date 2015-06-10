@@ -6,8 +6,6 @@ var edx = edx || {};
     edx.ccx = edx.ccx || {};
     edx.ccx.schedule = edx.ccx.schedule || {};
 
-    var syncErrorMessage = gettext("The data could not be saved.");
-
     var self;
 
     edx.ccx.schedule.reloadPage = function() {
@@ -42,8 +40,8 @@ var edx = edx || {};
 	    this.schedule = {};
 	    this.schedule_collection.bind('reset', this.render);
 	    this.schedule_collection.fetch({reset: true});
-            this.chapter_select = $('form#add-unit select[name="chapter"]'),
-            this.sequential_select = $('form#add-unit select[name="sequential"]'),
+            this.chapter_select = $('form#add-unit select[name="chapter"]');
+            this.sequential_select = $('form#add-unit select[name="sequential"]');
             this.vertical_select = $('form#add-unit select[name="vertical"]');
             this.dirty = false;
 	    self = this;
@@ -56,7 +54,7 @@ var edx = edx || {};
 	    });
 
 	    // Add unit handlers
-	    this.chapter_select.on('change', function(event) {
+	    this.chapter_select.on('change', function() {
 	      var chapter_location = self.chapter_select.val();
 	      self.vertical_select.html('').prop('disabled', true);
 	      if (chapter_location !== 'none') {
@@ -74,7 +72,7 @@ var edx = edx || {};
 	      }
 	    });
 
-	    this.sequential_select.on('change', function(event) {
+	    this.sequential_select.on('change', function() {
 	      var sequential_location = self.sequential_select.val();
 	      if (sequential_location !== 'all') {
 		var chapter = self.chapter_select.val(),
@@ -91,7 +89,7 @@ var edx = edx || {};
 	      } 
 	    });
 	    
-	    this.vertical_select.on('change', function(event) {
+	    this.vertical_select.on('change', function() {
 	      var vertical_location = self.vertical_select.val();
 	      if (vertical_location !== 'all') {
 		var chapter = self.chapter_select.val(),
@@ -111,15 +109,15 @@ var edx = edx || {};
 		  vertical = self.vertical_select.val(),
 		  units = self.find_lineage(self.schedule,
 		    chapter,
-		    sequential == 'all' ? null : sequential,
-		    vertical == 'all' ? null: vertical),
+		    sequential === 'all' ? null : sequential,
+		    vertical === 'all' ? null: vertical),
 		  start = self.get_datetime('start'),
 		  due = self.get_datetime('due');
 	      units.map(self.show);
-	      var unit = units[units.length - 1]
+	      var unit = units[units.length - 1];
 	      self.schedule_apply([unit], self.show);      
-	      if (unit !== undefined && start) unit.start = start;
-	      if (unit !== undefined && due) unit.due = due;
+	      if (unit !== undefined && start) { unit.start = start; }
+	      if (unit !== undefined && due) { unit.due = due; }
 	      self.schedule_collection.set(self.schedule);
 	      self.dirty = true;
 	      self.render();
@@ -136,9 +134,9 @@ var edx = edx || {};
         render: function() {
 	    self.schedule = this.schedule_collection.toJSON();
             self.hidden = this.pruned(self.schedule, function(node) {
-              return node.hidden || node.category !== 'vertical'});
+              return node.hidden || node.category !== 'vertical';});
             this.showing = this.pruned(self.schedule, function(node) {
-              return !node.hidden});
+              return !node.hidden;});
             this.$el.html(schedule_template({chapters: this.showing}));
             $('table.ccx-schedule .sequential,.vertical').hide();
             $('table.ccx-schedule .toggle-collapse').on('click', this.toggle_collapse);
@@ -164,7 +162,7 @@ var edx = edx || {};
 	      self.render();
 	    });
 	    // Remove unit handler
-	    $('table.ccx-schedule a.remove-unit').on('click', function(event) {
+	    $('table.ccx-schedule a.remove-unit').on('click', function() {
 	      var row = $(this).closest('tr'),
 		  path = row.data('location').split(' '),
 		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]);
@@ -193,8 +191,8 @@ var edx = edx || {};
 	    }
 
 	    // Show or hide save button
-	    if (this.dirty) $('#dirty-schedule').show()
-	    else $('#dirty-schedule').hide();
+	    if (this.dirty) {$('#dirty-schedule').show();}
+	    else {$('#dirty-schedule').hide();}
 
 	    $('#ajax-error').hide();
 
@@ -211,7 +209,7 @@ var edx = edx || {};
 		type: 'POST',
 		contentType: 'application/json',
 		data: JSON.stringify(self.schedule),
-		success: function(data, textStatus, jqXHR) {
+		success: function(data) {
 		  self.dirty = false;
 		  self.render();
 		  button.prop('disabled', false).text(gettext("Save changes"));
@@ -220,7 +218,7 @@ var edx = edx || {};
 		  // may have changed.  
 		  $('#grading-policy').text(data.grading_policy);
 		},
-		error: function(jqXHR, textStatus, error) {
+		error: function(jqXHR) {
 		  console.log(jqXHR.responseText);
 		  $('#ajax-error').show();
 		  $('#dirty-schedule').hide();
@@ -245,8 +243,8 @@ var edx = edx || {};
 	get_datetime: function(which) {
 	    var date = $('form#add-unit input[name=' + which + '_date]').val();
 	    var time = $('form#add-unit input[name=' + which + '_time]').val();
-	    if (date && time)
-	      return date + ' ' + time;
+	    if (date && time) {
+	      return date + ' ' + time; }
 	    return null;
 	},
 
@@ -269,7 +267,7 @@ var edx = edx || {};
 	schedule_apply: function(nodes, f) {
 	    nodes.map(function(node) {
 	      f(node);
-	      if (node !== undefined && node.children !== undefined) self.schedule_apply(node.children, f);
+	      if (node !== undefined && node.children !== undefined) { self.schedule_apply(node.children, f); }
 	    });
 	},
 
@@ -278,7 +276,7 @@ var edx = edx || {};
 	      .map(function(node) {
 		var copy = {};
 		$.extend(copy, node);
-		if (node.children) copy.children = self.pruned(node.children, filter);
+		if (node.children) {copy.children = self.pruned(node.children, filter);}
 		return copy;
 	      })
 	      .filter(function(node) {
@@ -308,13 +306,13 @@ var edx = edx || {};
 	},
 
 	enterNewDate: function(what) {
-	    return function(event) {
+	    return function() {
 	      var row = $(this).closest('tr');
 	      var modal = $('#enter-date-modal')
 		.data('what', what)
 		.data('location', row.data('location'));
 	      modal.find('h2').text(
-		  what == 'due' ? gettext("Enter Due Date") : 
+		  what === 'due' ? gettext("Enter Due Date") : 
 		      gettext("Enter Start Date"));
 	      modal.find('label').text(row.find('td:first').text());
 
@@ -341,7 +339,7 @@ var edx = edx || {};
 		  alert('Please enter a valid time');
 		  return;
 		}
-		if (what == 'start') {
+		if (what === 'start') {
 		    unit.start = date + ' ' + time;
 		} else {
 		    unit.due = date + ' ' + time;
@@ -351,7 +349,7 @@ var edx = edx || {};
 		self.schedule_collection.set(self.schedule);
 		self.render();
 	      });
-	    }
+	    };
 	},
 
 	find_unit: function(tree, chapter, sequential, vertical) {
@@ -361,18 +359,18 @@ var edx = edx || {};
 
 	find_lineage: function(tree, chapter, sequential, vertical) {
 	    function find_in(seq, location) {
-	      for (var i = 0; i < seq.length; i++)
-		if (seq[i].location === location)
-		  return seq[i];
-	    }
+	      for (var i = 0; i < seq.length; i++) {
+		if (seq[i].location === location) {
+		  return seq[i];}
+	    }}
 
 	    var units = [],
 		unit = find_in(tree, chapter);
 	    units[units.length] = unit;
 	    if (sequential) {
 	      units[units.length] = unit = find_in(unit.children, sequential);
-	      if (vertical) 
-		units[units.length] = unit = find_in(unit.children, vertical);
+	      if (vertical) {
+		units[units.length] = unit = find_in(unit.children, vertical);}
 	    }
 
 	    return units;
