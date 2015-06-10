@@ -332,13 +332,14 @@ def xblock_outline_handler(request, usage_key_string):
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         store = modulestore()
-        root_xblock = store.get_item(usage_key)
-        return JsonResponse(create_xblock_info(
-            root_xblock,
-            include_child_info=True,
-            course_outline=True,
-            include_children_predicate=lambda xblock: not xblock.category == 'vertical'
-        ))
+        with store.bulk_operations(usage_key.course_key):
+            root_xblock = store.get_item(usage_key)
+            return JsonResponse(create_xblock_info(
+                root_xblock,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical'
+            ))
     else:
         return Http404
 
