@@ -9,8 +9,14 @@
     }
   }
 
+  p, span {
+    color: inherit;
+    font-weight: inherit;
+  }
+
   .icon {
     font-family: "FontAwesome";
+    color: inherit;
   }
 
   %button-reset {
@@ -82,7 +88,7 @@
     }
 
     .search-field {
-        transition: all .25s ease-in-out;
+        transition: all $tmg-f2 ease-in-out;
         border: 0;
         border-bottom: 2px solid transparent;
         padding: ($baseline/4) ($baseline/2);
@@ -105,6 +111,7 @@
           color: $gray-l3;
       }
 
+      // STATE: hover and focus
       &:hover,
       &:focus {
 
@@ -122,7 +129,7 @@
 
   .page-content-nav {
     margin-bottom: $baseline;
-    border-bottom: 2px solid $gray-l5;
+    border-bottom: 3px solid $gray-l5;
 
     .nav-item {
         display: inline-block;
@@ -136,6 +143,7 @@
             color: $gray-d2;
         }
 
+        // STATE: hover and focus
         &:hover,
         &:focus {
             border-bottom: 3px solid $link-color;
@@ -146,6 +154,196 @@
 
   .intro {
     @extend %t-weight4;
+  }
+
+  .listing-tools {
+    @extend %t-copy-sub1;
+    margin: ($baseline/10) $baseline;
+    color: $gray-l1;
+
+    label { // override
+      color: inherit;
+      font-size: inherit;
+    }
+
+    .listing-sort-select {
+      @extend %t-copy-sub1;
+      @extend %t-regular;
+      border: 0;
+    }
+  }
+
+  .card {
+    @include clearfix();
+    transition: all $tmg-f2 ease-in-out;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 30%; // TODO: susy grid
+    margin: ($baseline) 1.2%;
+    border: 1px solid $gray-l4;
+    border-bottom: 2px solid $gray-l3;
+    border-radius: 3px;
+    background-color: $white;
+    color: $black;
+
+    // STATE: hover, active, and focus
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: 0 0 5px 1px $m-blue-t1;
+
+      .card-description {
+        color: $base-font-color;
+      }
+    }
+
+    .wrapper-card-core {
+      @include clearfix();
+      padding: ($baseline);
+    }
+
+    .card-type {
+      @extend %t-copy-sub2;
+      text-transform: uppercase;
+      color: $gray;
+    }
+
+    .card-title {
+      @extend %t-title5;
+      @extend %t-strong;
+      margin-bottom: rem(.5);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-description {
+      @extend %t-copy-sub1;
+      color: $gray;
+    }
+
+    .card-actions {
+      @include clearfix();
+
+      .action-view {
+        @extend %btn-pl-default-base;
+        float: right;
+        margin: ($baseline/4) 0;
+      }
+    }
+
+    .wrapper-card-meta {
+      @include clearfix();
+      @extend %t-copy-sub1;
+      padding: ($baseline/2) $baseline;
+      background-color: $gray-l5;
+      color: $gray;
+
+      .meta-detail {
+        margin-top: ($baseline/4);
+        margin-right: ($baseline*.75);
+        color: $gray;
+
+        .icon {
+          margin-right: ($baseline/4);
+        }
+      }
+
+      .list-member-thumbs {
+        @extend %ui-no-list;
+        display: inline-block;
+        vertical-align: text-bottom;
+
+        .item-member-thumb {
+          display: inline-block;
+        }
+
+        img {
+          width: $baseline;
+          height: $baseline;
+          margin: 0 ($baseline/4);
+        }
+      }
+    }
+
+    &.square-card {
+
+      .card-description { // replace with js or char limit
+        height: 4rem;
+        overflow: hidden;
+      }
+
+      .wrapper-card-meta {
+
+        &.has-actions {
+          .card-meta,
+          .card-actions {
+            display: inline-block;
+            width: 48%; // TODO: susy grid
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+
+    &.list-card {
+      width: auto;
+      display: block;
+
+      .card-core {
+        display: inline-block;
+        vertical-align: middle;
+        width: 84%; // TODO: susy grid
+      }
+
+      .card-meta {
+        @include clearfix();
+      }
+
+      .meta-detail {
+        display: inline-block;
+      }
+
+      .team-activity {
+        float: right;
+      }
+
+      .card-actions {
+        display: inline-block;
+        vertical-align: middle;
+        width: 15%; // TODO: susy grid
+      }
+    }
+
+    &.has-pennant {
+
+      .wrapper-card-core {
+        padding-top: ($baseline*2);
+      }
+
+      .pennant {
+        @extend %t-copy-sub2;
+        @extend %t-strong;
+        display: block;
+        position: absolute;
+        top: ($baseline/2);
+        left: -($baseline/4);
+        box-shadow: 1px 1px 1px 0 $blue-d1;
+        background-color: $m-blue-l2;
+        padding: ($baseline/10) ($baseline*.75);
+        text-transform: uppercase;
+        color: $white;
+      }
+    }
+
+    &.is-unavailable {
+      background-color: $gray-l5;
+
+      .wrapper-card-meta {
+        background-color: $gray-l4;
+      }
+    }
   }
 
   .create-team {
@@ -181,7 +379,7 @@
 
         .input-text {
             @extend %t-copy-base;
-            @include transition(all $tmg-f2 ease-in-out 0s);
+            transition: all $tmg-f2 ease-in-out 0s;
             display: block;
             width: 90%;
             height: 100%;
@@ -251,6 +449,7 @@
       border: 1px solid transparent;
       color: $gray;
 
+      // STATE: hover and focus
       &:hover,
       &:focus {
           border: 1px solid $link-color;
@@ -261,13 +460,13 @@
     .required-wrapper {
       display: inline-block;
       vertical-align: top;
-      width: 60%;
+      width: 60%; // TODO: susy grid
     }
 
     .optional-wrapper {
       display: inline-block;
       vertical-align: top;
-      width: 35%;
+      width: 35%; // TODO: susy grid
       margin-left: 2%;
       border-left: 2px solid $gray-l4;
       padding-left: 2%;
