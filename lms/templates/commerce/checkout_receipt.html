@@ -6,9 +6,7 @@ from django.utils.translation import ugettext as _
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-requirements</%block>
 
-<%block name="pagetitle">
-${_("Receipt")}
-</%block>
+<%block name="pagetitle">${page_title}</%block>
 
 <%block name="header_extras">
 <script type="text/template" id="receipt-tpl">
@@ -33,11 +31,17 @@ ${_("Receipt")}
             <i class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></i>
             <div class="msg-content">
                 <h3 class="title">
-                    <span class="sr">${ _("Error:") }</span>
-                    ${ _("Error") }
+                    <span class="sr">${error_summary}</span>
+                    ${error_summary}
                 </h3>
+%if error_text:
                 <div class="copy">
-                    <p>${ _("Could not retrieve payment information") }</p>
+                    <p>${error_text}</p>
+                    <br/>
+                </div>
+%endif
+                <div class="msg">
+                    <p>${for_help_text}</p>
                 </div>
             </div>
         </div>
@@ -46,7 +50,7 @@ ${_("Receipt")}
 
 <div class="container">
     <section class="wrapper carousel">
-        <div id="receipt-container" class="pay-and-verify" data-platform-name='${platform_name}' data-verified='${verified}'>
+        <div id="receipt-container" class="pay-and-verify hidden" data-is-payment-complete='${is_payment_complete}' data-platform-name='${platform_name}' data-verified='${verified}'>
             <h1>${_("Loading Order Data...")}</h1>
             <span>${ _("Please wait while we retrieve your order details.") }</span>
         </div>
