@@ -171,6 +171,16 @@
   text-overflow: ellipsis;
 }
 
+%vertical-aligner {
+    &:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -0.25em; /* Adjusts for spacing */
+  }
+}
+
 // border control
 %no-border-top {
   border-top: none;

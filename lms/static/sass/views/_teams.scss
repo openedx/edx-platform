@@ -11,6 +11,7 @@
 
   .icon {
     font-family: "FontAwesome";
+    color: inherit;
   }
 
   %button-reset {
@@ -122,7 +123,7 @@
 
   .page-content-nav {
     margin-bottom: $baseline;
-    border-bottom: 2px solid $gray-l5;
+    border-bottom: 3px solid $gray-l5;
 
     .nav-item {
         display: inline-block;
@@ -146,6 +147,200 @@
 
   .intro {
     @extend %t-weight4;
+  }
+
+  .search-tools {
+    @extend %t-copy-sub1;
+    margin: ($baseline/10) $baseline;
+    color: $gray-l1;
+
+    p, span { // override
+      color: inherit;
+    }
+  }
+
+  .card {
+    @extend .clearfix;
+    position: relative;
+    display: inline-block;
+    width: 30%;
+    margin: ($baseline) 1.2%;
+    border: 1px solid $gray-l4;
+    border-bottom: 2px solid $gray-l3;
+    border-radius: 3px;
+    background-color: $gray-l5;
+    color: $black;
+
+    &:hover,
+    &:active,
+    &:focus {
+
+      .card-core-wrapper {
+        background-color: $white;
+      }
+
+      .card-meta-wrapper {
+        background-color: $gray-l5;
+      }
+    }
+
+    .card-core-wrapper {
+      @extend .clearfix;
+      transition: all .25s ease-in-out;
+      padding: ($baseline);
+    }
+
+    .card-title {
+      @extend %t-title5;
+      @extend %t-strong;
+      margin-bottom: .5em;
+    }
+
+    .card-description {
+      @extend %t-copy-sub1;
+      color: $gray;
+    }
+
+    .card-actions {
+
+      .action-view {
+        @extend %btn-pl-default-base;
+        float: right;
+        margin: ($baseline/4) 0;
+      }
+    }
+
+    .card-meta-wrapper {
+      @extend .clearfix;
+      @extend %t-copy-sub1;
+      transition: all .25s ease-in-out;
+      padding: ($baseline/2) $baseline;
+      background-color: $gray-l4;
+      color: $gray;
+
+      .meta-detail {
+        @extend %t-strong;
+        margin-top: ($baseline/4);
+        margin-right: ($baseline*.75);
+        color: $gray;
+
+        .icon {
+          margin-right: ($baseline/4);
+        }
+      }
+
+      p, span { // override
+        color: inherit;
+        font-weight: inherit;
+      }
+
+      .member-thumbs {
+        display: inline-block;
+        vertical-align: text-bottom;
+
+        img {
+          width: 20px;
+          height: 20px;
+          margin: 0 ($baseline/4);
+        }
+      }
+    }
+
+    &.square-card {
+
+      .card-description {
+        height: ($baseline*4);
+        overflow: hidden;
+      }
+
+      .card-meta-wrapper {
+
+        &.has-actions {
+          .card-meta-details,
+          .card-actions {
+            display: inline-block;
+            width: 48%;
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+
+    &.list-card {
+      width: auto;
+      display: block;
+      box-shadow: 0 2px 3px $shadow-l1;
+      background-color: $white;
+
+      .card-core-wrapper {
+        @extend %vertical-aligner;
+      }
+
+      .card-core {
+        display: inline-block;
+        vertical-align: middle;
+        width: 84%;
+      }
+
+      .card-meta-wrapper {
+        background-color: $m-blue;
+        color: $white;
+      }
+
+      .card-meta-details {
+        margin-bottom: ($baseline/2);
+      }
+
+      .meta-detail {
+        display: inline-block;
+        color: $white;
+      }
+
+      p, span { // override
+        color: inherit;
+        font-weight: inherit;
+      }
+
+      .team-activity {
+        float: right;
+      }
+
+      .card-actions {
+        display: inline-block;
+        vertical-align: middle;
+        width: 15%;
+      }
+
+      .action-view {
+        @extend %btn-pl-primary-base;
+        float: none;
+      }
+    }
+
+    &.has-pennant {
+
+      .card-core-wrapper {
+        padding-top: ($baseline*2);
+      }
+
+      .pennant {
+        @extend %t-copy-sub2;
+        @extend %t-strong;
+        display: block;
+        position: absolute;
+        top: ($baseline/2);
+        left: -($baseline/4);
+        box-shadow: 1px 1px 1px 0 $blue-d1;
+        background-color: $m-blue-l2;
+        padding: ($baseline/10) ($baseline*.75);
+        text-transform: uppercase;
+        color: $white;
+      }
+    }
+
+    &.is-unavailable {
+
+    }
   }
 
   .create-team {
