@@ -29,13 +29,6 @@ log = logging.getLogger("edx.footer")
 
 def is_enabled():
     """Check whether the branding API is enabled. """
-    # TODO (ECOM-1339): Remove this comment
-    # Currently, the branding API configuration controls two things:
-    # 1) whether we're using the new version of the footer
-    # 2) whether we're exposing footer information through the API.
-    #
-    # Once we've enabled the new footer, the feature flag will control
-    # only (2), but not (1).
     return BrandingApiConfig.current().enabled
 
 

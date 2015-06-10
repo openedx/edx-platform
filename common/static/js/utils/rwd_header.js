@@ -10,9 +10,6 @@
         var _fn = {
             header: 'header.global-new',
 
-            // TODO (ECOM-1339): Remove this once the V3 footer is enabled permanently
-            footer: '.edx-footer-new',
-
             resultsUrl: 'course-search',
 
             init: function() {
@@ -30,7 +27,6 @@
                 classes: function() {
                     // Add any RWD-specific classes
                     _fn.$header.addClass('rwd');
-                    _fn.$footer.addClass('rwd');  // TODO (ECOM-1339): remove once the V3 footer is enabled permanently
                 },
 
                 elements: function() {

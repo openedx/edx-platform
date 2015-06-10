@@ -43,10 +43,7 @@ class TestFooter(TestCase):
         with patch.dict('django.conf.settings.FEATURES', {"IS_EDX_DOMAIN": True}):
             resp = self.client.get('/')
             self.assertEqual(resp.status_code, 200)
-
-            # assert that footer template has been properly overridden on homepage
-            # test the top-level element class; which is less likely to change than copy.
-            self.assertContains(resp, 'edx-footer')
+            self.assertContains(resp, 'footer-edx-v3')
 
     def test_openedx_footer(self):
         """
@@ -56,10 +53,7 @@ class TestFooter(TestCase):
         with patch.dict('django.conf.settings.FEATURES', {"IS_EDX_DOMAIN": False}):
             resp = self.client.get('/')
             self.assertEqual(resp.status_code, 200)
-
-            # assert that footer template has been properly overridden on homepage
-            # test the top-level element class; which is less likely to change than copy.
-            self.assertContains(resp, 'wrapper-footer')
+            self.assertContains(resp, 'footer-openedx')
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
     @override_settings(

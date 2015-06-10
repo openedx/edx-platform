@@ -515,11 +515,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.open_source_footer_context_processor',
 
-    # TODO (ECOM-1339): Remove once the V3 version of the footer is enabled permanently
-    # This allows us to pass the appropriate feature flag to the main Django template
-    # that contains the footer.
-    'branding.context_processors.branding_context_processor',
-
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
 

@@ -149,12 +149,7 @@ from branding import api as branding_api
           % if theme_enabled() and not is_microsite():
             <%include file="theme-footer.html" />
           % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-            ## TODO (ECOM-1339): Remove this check to permanently enable the V3 footer.
-            % if branding_api.is_enabled():
               <%include file="footer-edx-v3.html" />
-            % else:
-              <%include file="footer-edx-v2.html" />
-            % endif
           % else:
             <%include file="${microsite.get_template_path('footer.html')}" />
           % endif
