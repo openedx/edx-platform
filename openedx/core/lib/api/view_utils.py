@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 
 from rest_framework import status, response
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
@@ -20,7 +21,7 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
-from openedx.core.lib.api.permissions import IsUserInUrl, IsAuthenticatedOrDebug
+from openedx.core.lib.api.permissions import IsUserInUrl
 from util.milestones_helpers import any_unfulfilled_milestones
 
 
@@ -131,7 +132,7 @@ def view_auth_classes(is_user=False):
             OAuth2AuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
-        func_or_class.permission_classes = (IsAuthenticatedOrDebug,)
+        func_or_class.permission_classes = (IsAuthenticated,)
         if is_user:
             func_or_class.permission_classes += (IsUserInUrl,)
         return func_or_class
