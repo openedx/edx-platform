@@ -1,6 +1,7 @@
 """ Contains the APIs for course credit requirements """
 import logging
 import uuid
+
 from django.db import transaction
 
 from student.models import User
@@ -9,6 +10,7 @@ from .exceptions import (
     InvalidCreditRequirements,
     InvalidCreditCourse,
     UserIsNotEligible,
+    CreditProviderNotConfigured,
     RequestAlreadyCompleted,
     CreditRequestNotFound,
     InvalidCreditStatus,
@@ -20,6 +22,7 @@ from .models import (
     CreditRequest,
     CreditEligibility,
 )
+from .signature import signature, get_shared_secret_key
 
 
 log = logging.getLogger(__name__)
@@ -143,6 +146,16 @@ def create_credit_request(course_key, provider_id, username):
 
     Only users who are eligible for credit (have satisfied all credit requirements) are allowed to make requests.
 
+    A provider can be configured either with *integration enabled* or not.
+    If automatic integration is disabled, this method will simply return
+    a URL to the credit provider and method set to "GET", so the student can
+    visit the URL and request credit directly.  No database record will be created
+    to track these requests.
+
+    If automatic integration *is* enabled, then this will also return the parameters
+    that the user's browser will need to POST to the credit provider.
+    These parameters will be digitally signed using a secret key shared with the credit provider.
+
     A database record will be created to track the request with a 32-character UUID.
     The returned dictionary can be used by the user's browser to send a POST request to the credit provider.
 
@@ -162,23 +175,29 @@ def create_credit_request(course_key, provider_id, username):
 
     Raises:
         UserIsNotEligible: The user has not satisfied eligibility requirements for credit.
+        CreditProviderNotConfigured: The credit provider has not been configured for this course.
         RequestAlreadyCompleted: The user has already submitted a request and received a response
             from the credit provider.
 
     Example Usage:
         >>> create_credit_request(course.id, "hogwarts", "ron")
         {
-            "uuid": "557168d0f7664fe59097106c67c3f847",
-            "timestamp": "2015-05-04T20:57:57.987119+00:00",
-            "course_org": "HogwartsX",
-            "course_num": "Potions101",
-            "course_run": "1T2015",
-            "final_grade": 0.95,
-            "user_username": "ron",
-            "user_email": "ron@example.com",
-            "user_full_name": "Ron Weasley",
-            "user_mailing_address": "",
-            "user_country": "US",
+            "url": "https://credit.example.com/request",
+            "method": "POST",
+            "parameters": {
+                "request_uuid": "557168d0f7664fe59097106c67c3f847",
+                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "course_org": "HogwartsX",
+                "course_num": "Potions101",
+                "course_run": "1T2015",
+                "final_grade": 0.95,
+                "user_username": "ron",
+                "user_email": "ron@example.com",
+                "user_full_name": "Ron Weasley",
+                "user_mailing_address": "",
+                "user_country": "US",
+                "signature": "cRCNjkE4IzY+erIjRwOQCpRILgOvXx4q2qvx141BCqI="
+            }
         }
 
     """
@@ -191,7 +210,32 @@ def create_credit_request(course_key, provider_id, username):
         credit_course = user_eligibility.course
         credit_provider = user_eligibility.provider
     except CreditEligibility.DoesNotExist:
+        log.warning(u'User tried to initiate a request for credit, but the user is not eligible for credit')
         raise UserIsNotEligible
+
+    # Check if we've enabled automatic integration with the credit
+    # provider.  If not, we'll show the user a link to a URL
+    # where the user can request credit directly from the provider.
+    # Note that we do NOT track these requests in our database,
+    # since the state would always be "pending" (we never hear back).
+    if not credit_provider.enable_integration:
+        return {
+            "url": credit_provider.provider_url,
+            "method": "GET",
+            "parameters": {}
+        }
+    else:
+        # If automatic credit integration is enabled, then try
+        # to retrieve the shared signature *before* creating the request.
+        # That way, if there's a misconfiguration, we won't have requests
+        # in our system that we know weren't sent to the provider.
+        shared_secret_key = get_shared_secret_key(credit_provider.provider_id)
+        if shared_secret_key is None:
+            msg = u'Credit provider with ID "{provider_id}" does not have a secret key configured.'.format(
+                provider_id=credit_provider.provider_id
+            )
+            log.error(msg)
+            raise CreditProviderNotConfigured(msg)
 
     # Initiate a new request if one has not already been created
     credit_request, created = CreditRequest.objects.get_or_create(
@@ -204,6 +248,12 @@ def create_credit_request(course_key, provider_id, username):
     # If so, we're not allowed to issue any further requests.
     # Skip checking the status if we know that we just created this record.
     if not created and credit_request.status != "pending":
+        log.warning(
+            (
+                u'Cannot initiate credit request because the request with UUID "%s" '
+                u'exists with status "%s"'
+            ), credit_request.uuid, credit_request.status
+        )
         raise RequestAlreadyCompleted
 
     if created:
@@ -229,7 +279,7 @@ def create_credit_request(course_key, provider_id, username):
         raise UserIsNotEligible
 
     parameters = {
-        "uuid": credit_request.uuid,
+        "request_uuid": credit_request.uuid,
         "timestamp": credit_request.timestamp.isoformat(),
         "course_org": course_key.org,
         "course_num": course_key.course,
@@ -253,10 +303,25 @@ def create_credit_request(course_key, provider_id, username):
     credit_request.parameters = parameters
     credit_request.save()
 
-    return parameters
+    if created:
+        log.info(u'Created new request for credit with UUID "%s"', credit_request.uuid)
+    else:
+        log.info(
+            u'Updated request for credit with UUID "%s" so the user can re-issue the request',
+            credit_request.uuid
+        )
+
+    # Sign the parameters using a secret key we share with the credit provider.
+    parameters["signature"] = signature(parameters, shared_secret_key)
+
+    return {
+        "url": credit_provider.provider_url,
+        "method": "POST",
+        "parameters": parameters
+    }
 
 
-def update_credit_request_status(request_uuid, status):
+def update_credit_request_status(request_uuid, provider_id, status):
     """
     Update the status of a credit request.
 
@@ -272,12 +337,13 @@ def update_credit_request_status(request_uuid, status):
 
     Arguments:
         request_uuid (str): The unique identifier for the credit request.
+        provider_id (str): Identifier for the credit provider.
         status (str): Either "approved" or "rejected"
 
     Returns: None
 
     Raises:
-        CreditRequestNotFound: The request does not exist.
+        CreditRequestNotFound: No request exists that is associated with the given provider.
         InvalidCreditStatus: The status is not either "approved" or "rejected".
 
     """
@@ -285,11 +351,23 @@ def update_credit_request_status(request_uuid, status):
         raise InvalidCreditStatus
 
     try:
-        request = CreditRequest.objects.get(uuid=request_uuid)
+        request = CreditRequest.objects.get(uuid=request_uuid, provider__provider_id=provider_id)
+        old_status = request.status
         request.status = status
         request.save()
+
+        log.info(
+            u'Updated request with UUID "%s" from status "%s" to "%s" for provider with ID "%s".',
+            request_uuid, old_status, status, provider_id
+        )
     except CreditRequest.DoesNotExist:
-        raise CreditRequestNotFound
+        msg = (
+            u'Credit provider with ID "{provider_id}" attempted to '
+            u'update request with UUID "{request_uuid}", but no request '
+            u'with this UUID is associated with the provider.'
+        ).format(provider_id=provider_id, request_uuid=request_uuid)
+        log.warning(msg)
+        raise CreditRequestNotFound(msg)
 
 
 def get_credit_requests_for_user(username):
