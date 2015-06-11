@@ -44,7 +44,13 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         pass
 
-    def __init__(self, user):
+    def __init__(self, user=None):
+        """
+        Arguments:
+            user (:class:`~User`): An already-loaded django user. If this user matches the username
+                supplied to `set_many`, then that will reduce the number of queries made to store
+                the user state.
+        """
         self.user = user
 
     @contract(
@@ -69,7 +75,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         Raises:
             DoesNotExist if no entry is found.
         """
-        assert self.user.username == username
         try:
             _usage_key, state = next(self.get_many(username, [block_key], scope, fields=fields))
         except StopIteration:
@@ -88,7 +93,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             state (dict): A dictionary mapping field names to values
             scope (Scope): The scope to load data from
         """
-        assert self.user.username == username
         self.set_many(username, {block_key: state}, scope)
 
     @contract(
@@ -107,7 +111,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             scope (Scope): The scope to delete data from
             fields: A list of fields to delete. If None, delete all stored fields.
         """
-        assert self.user.username == username
         return self.delete_many(username, [block_key], scope, fields=fields)
 
     @contract(
@@ -183,7 +186,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             (UsageKey, field_state) tuples for each specified UsageKey in block_keys.
             field_state is a dict mapping field names to values.
         """
-        assert self.user.username == username
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported, not {}".format(scope))
 
@@ -208,7 +210,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 :meth:`delete` or :meth:`delete_many`.
             scope (Scope): The scope to load data from
         """
-        assert self.user.username == username
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
@@ -216,7 +217,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # that were queried in get_many) so that if the score has
         # been changed by some other piece of the code, we don't overwrite
         # that score.
-        user = User.objects.get(username=username)
+        if self.user.username == username:
+            user = self.user
+        else:
+            user = User.objects.get(username=username)
+
         for usage_key, state in block_keys_to_state.items():
             student_module, created = StudentModule.objects.get_or_create(
                 student=user,
@@ -254,7 +259,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             scope (Scope): The scope to delete data from
             fields: A list of fields to delete. If None, delete all stored fields.
         """
-        assert self.user.username == username
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
@@ -293,7 +297,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         Yields: tuples of (block, field_name, modified_date) for each selected field.
         """
-        assert self.user.username == username
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
@@ -317,7 +320,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             scope (Scope): The scope to load data from
         """
 
-        assert self.user.username == username
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
         student_modules = list(
