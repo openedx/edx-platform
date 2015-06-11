@@ -112,7 +112,6 @@ class BasketsView(APIView):
             response_data = api.baskets.post({
                 'products': [{'sku': honor_mode.sku}],
                 'checkout': True,
-                'payment_processor_name': 'cybersource'
             })
 
             payment_data = response_data["payment_data"]
