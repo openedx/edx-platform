@@ -175,6 +175,9 @@ FEATURES = {
 
     # Enable credit eligibility feature
     'ENABLE_CREDIT_ELIGIBILITY': False,
+
+    # Can the visibility of the discussion tab be configured on a per-course basis?
+    'ALLOW_HIDING_DISCUSSION_TAB': False,
 }
 
 ENABLE_JASMINE = False
