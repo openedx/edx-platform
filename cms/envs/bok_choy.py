@@ -81,7 +81,7 @@ FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 FEATURES['ENTRANCE_EXAMS'] = True
 
 # Unfortunately, we need to use debug mode to serve staticfiles
-DEBUG = True
+# DEBUG = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
