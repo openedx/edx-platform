@@ -116,6 +116,12 @@ class CertificatesPage(CoursePage):
         """
         self.q(css=self.certficate_css + " .action-add").first.click()
 
+    def click_delete_confirmation_ok_button(self):
+        """
+        Clicks the 'Delete' button on the confirmation modal
+        """
+        self.q(css='a.button.action-primary').first.click()
+
     ################
     # Workflows
     ################
@@ -290,21 +296,11 @@ class Certificate(object):
         """
         self.find_css('a.detail-toggle').first.click()
 
-    ################
-    # Workflows
-    ################
-
-    def delete_certificate(self):
+    def click_certificate_delete_button(self):
         """
-        Delete the certificate
+        Click the Delete button (trash can icon) for the first certificate in the set
         """
-        self.wait_for_certificate_delete_button()
-
         self.find_css('.actions .delete').first.click()
-        self.page.wait_for_confirmation_prompt()
-        self.page.q(css='a.button.action-primary').first.click()
-        self.page.q(css='a.button.action-primary').first.click()
-        self.page.wait_for_ajax()
 
 
 class Signatory(object):

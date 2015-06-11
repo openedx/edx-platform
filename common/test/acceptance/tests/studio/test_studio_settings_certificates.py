@@ -122,13 +122,26 @@ class CertificatesTest(StudioCourseTest):
             [self.make_signatory_data('first'), self.make_signatory_data('second')]
         )
 
+        # Ensure the screen now displays the certificate details and delete button action
         certificate.wait_for_certificate_delete_button()
 
+        # There should be only one cetificate displayed
         self.assertEqual(len(self.certificates_page.certificates), 1)
 
-        # Delete certificate
-        certificate.delete_certificate()
+        # Click the delete button after it's been rendered
+        certificate.wait_for_certificate_delete_button()
+        certificate.click_certificate_delete_button()
 
+        # A delete confirmation modal should now appear
+        # Accessing this modal has been somewhat flaky/problematic due to the element being in a separate <div>
+        self.certificates_page.wait_for_confirmation_prompt()
+        self.certificates_page.click_delete_confirmation_ok_button()
+
+        # Wait for the callback to complete and confirm there are no more certificates displayed
+        self.certificates_page.wait_for_ajax()
+        self.assertEqual(len(self.certificates_page.certificates), 0)
+
+        # Refresh the page object and confirm there are no more certificates displayed
         self.certificates_page.visit()
         self.assertEqual(len(self.certificates_page.certificates), 0)
 
