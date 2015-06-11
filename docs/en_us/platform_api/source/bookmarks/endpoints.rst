@@ -15,12 +15,11 @@ The following tasks and endpoints are currently supported.
  
    * - To:
      - Use this endpoint:
-   * - :ref:`Get a list of bookmarks in reverse chronological order <Get a List of Bookmarks>`
-     - GET /api/bookmarks/v1/bookmarks/{course_id}
-   * - :ref:`Create a new bookmark <Create a New Bookmark>`
-     - POST /api/bookmarks/v1/bookmarks/{course_id}
-   * - :ref:`Retrieve a bookmark <Retrieve a Bookmark>`
+   * - :ref:`Get a list of bookmarks in reverse chronological order <Get List or Create Bookmarks>`
+     - GET /api/bookmarks/v0/bookmarks/{course_id}
+   * - :ref:`Create a new bookmark <Get List or Create Bookmarks>`
+     - POST /api/bookmarks/v0/bookmarks/{course_id}
+   * - :ref:`Retrieve a bookmark <Retrieve or Delete a Bookmark>`
      - GET /api/bookmarks/v0/bookmarks/{username},{usage_id}/
-   * - :ref:`Delete a bookmark <Delete a Bookmark>`
+   * - :ref:`Delete a bookmark <Retrieve or Delete a Bookmark>`
      - DELETE /api/bookmarks/v0/bookmarks/{username},{usage_id}/
-

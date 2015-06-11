@@ -68,31 +68,27 @@ class BookmarksViewMixin(object):
 
 class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     """
-    **Use Case**
+    **Use Cases**
 
         * Get a paginated list of bookmarks for a user.
 
-            The list can be filtered by passing parameter "course_id=<course_id>"
-            to only include bookmarks from a particular course.
-
             The bookmarks are always sorted in descending order by creation date.
 
-            Each page in the list contains 10 bookmarks by default. The page
-            size can be altered by passing parameter "page_size=<page_size>".
+            To include only bookmarks from a particular course, pass the 
+            "course_id=<course_id>" parameter. 
 
-            To include the optional fields pass the values in "fields" parameter
-            as a comma separated list. Possible values are:
+            Each page in the list contains 10 bookmarks by default. To change the page
+            size, pass the "page_size=<page_size>" parameter.
+
+            To include optional fields, pass the values in the "fields" parameter
+            as a comma-separated list. The following values are possible.
 
                 * "display_name"
                 * "path"
 
         * Create a new bookmark for a user.
 
-            The POST request only needs to contain one parameter "usage_id".
-
-            Http400 is returned if the format of the request is not correct,
-            the usage_id is invalid or a block corresponding to the usage_id
-            could not be found.
+            The POST request only needs to contain the "usage_id" parameter.
 
     **Example Requests**
 
@@ -103,29 +99,40 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
     **Response Values**
 
+        If the request for a list of bookmarks is sucessful, an HTTP 200 "OK" response
+        is returned.
+
+        If the bookmark is created successfully, an HTTP 201 "Created" response is returned.
+
+        If the format of the request is not correct, the usage_id is invalid, or a block 
+        corresponding to the usage_id could not be found, an HTTP 400 "Bad Request" response 
+        is returned.
+
+        The HTTP 200 or HTTP 201 response has the following values.
+
         * count: The number of bookmarks in a course.
 
         * next: The URI to the next page of bookmarks.
 
         * previous: The URI to the previous page of bookmarks.
 
-        * num_pages: The number of pages listing bookmarks.
+        * num_pages: The number of pages in the list of bookmarks.
 
         * results:  A list of bookmarks returned. Each collection in the list
-          contains these fields.
+          contains the following fields.
 
-            * id: String. The identifier string for the bookmark: {user_id},{usage_id}.
+            * id: String. The identifier string for the bookmark, formatted as {user_id},{usage_id}.
 
             * course_id: String. The identifier string of the bookmark's course.
 
             * usage_id: String. The identifier string of the bookmark's XBlock.
 
-            * display_name: String. (optional) Display name of the XBlock.
+            * display_name (optional): String. The display name of the bookmark's XBlock.
 
-            * path: List. (optional) List of dicts containing {"usage_id": <usage-id>, display_name:<display-name>}
-                for the XBlocks from the top of the course tree till the parent of the bookmarked XBlock.
+            * path (optional): List. List of dicts containing {"usage_id": <usage-id>, display_name:<display-name>}
+                for the XBlocks from the top of the course tree to the parent of the bookmarked XBlock.
 
-            * created: ISO 8601 String. The timestamp of bookmark's creation.
+            * created: ISO 8601 string. The timestamp of bookmark's creation.
 
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
@@ -227,7 +234,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
 
         Get or delete a specific bookmark for a user.
 
-    **Example Requests**:
+    **Example Requests**
 
         GET /api/bookmarks/v1/bookmarks/{username},{usage_id}/?fields=display_name,path
 
@@ -235,32 +242,34 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
 
     **Response for GET**
 
-        Users can only delete their own bookmarks. If the bookmark_id does not belong
-        to a requesting user's bookmark a Http404 is returned. Http404 will also be
-        returned if the bookmark does not exist.
+        Users can only request their own bookmarks. If the bookmark_id does not belong to a 
+        requesting user's bookmark or the bookmark does not exist, an HTTP 404 "Not Found" 
+        response is returned.
 
-        * id: String. The identifier string for the bookmark: {user_id},{usage_id}.
+        If the request is successful, an HTTP 200 "OK" response is returned with the following 
+        information.
+
+        * id: String. The identifier string for the bookmark, formatted as {user_id},{usage_id}.
 
         * course_id: String. The identifier string of the bookmark's course.
 
         * usage_id: String. The identifier string of the bookmark's XBlock.
 
-        * display_name: (optional) String. Display name of the XBlock.
+        * display_name (optional): String. The display name of the bookmark's XBlock.
 
-        * path: (optional) List of dicts containing {"usage_id": <usage-id>, display_name: <display-name>}
-            for the XBlocks from the top of the course tree till the parent of the bookmarked XBlock.
+        * path (optional): List of dicts containing {"usage_id": <usage-id>, display_name: <display-name>}
+            for the XBlocks from the top of the course tree to the parent of the bookmarked XBlock.
 
-        * created: ISO 8601 String. The timestamp of bookmark's creation.
+        * created: ISO 8601 string. The timestamp of bookmark's creation.
 
     **Response for DELETE**
 
-        Users can only delete their own bookmarks.
+        Users can only delete their own bookmarks. If the bookmark_id does not belong to a 
+        requesting user's bookmark or the bookmark does not exist, an HTTP 404 "Not Found" 
+        response is returned.
 
-        A successful delete returns a 204 and no content.
+        If the bookmark is successfully deleted, an HTTP 204 "No Content" response is returned.
 
-        Users can only delete their own bookmarks. If the bookmark_id does not belong
-        to a requesting user's bookmark a 404 is returned. 404 will also be returned
-        if the bookmark does not exist.
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
