@@ -7,7 +7,7 @@ from social.backends.oauth import BaseOAuth2
 from social.strategies.django_strategy import DjangoStrategy
 
 
-class SocialStrategy(DjangoStrategy):
+class ConfigurationModelStrategy(DjangoStrategy):
     """
     A DjangoStrategy customized to load settings from ConfigurationModels
     for upstream python-social-auth backends that we cannot otherwise modify.
@@ -31,4 +31,4 @@ class SocialStrategy(DjangoStrategy):
                 pass
         # At this point, we know 'name' is not set in a [OAuth2|SAML]ProviderConfig row.
         # It's probably a global Django setting like 'FIELDS_STORED_IN_SESSION':
-        return super(SocialStrategy, self).setting(name, default, backend)
+        return super(ConfigurationModelStrategy, self).setting(name, default, backend)
