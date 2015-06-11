@@ -214,6 +214,17 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_delete_comment_response(self, comment_id):
+        """
+        Register a mock response for DELETE on the CS comment instance endpoint
+        """
+        httpretty.register_uri(
+            httpretty.DELETE,
+            "http://localhost:4567/api/v1/comments/{id}".format(id=comment_id),
+            body=json.dumps({}),  # body is unused
+            status=200
+        )
+
     def assert_query_params_equal(self, httpretty_request, expected_params):
         """
         Assert that the given mock request had the expected query parameters

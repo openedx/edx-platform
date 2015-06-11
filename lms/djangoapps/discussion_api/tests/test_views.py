@@ -558,6 +558,46 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @httpretty.activate
+class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ThreadViewSet delete"""
+
+    def setUp(self):
+        super(CommentViewSetDeleteTest, self).setUp()
+        self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
+        self.comment_id = "test_comment"
+
+    def test_basic(self):
+        self.register_get_user_response(self.user)
+        cs_thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+        })
+        self.register_get_thread_response(cs_thread)
+        cs_comment = make_minimal_cs_comment({
+            "id": self.comment_id,
+            "course_id": cs_thread["course_id"],
+            "thread_id": cs_thread["id"],
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+        })
+        self.register_get_comment_response(cs_comment)
+        self.register_delete_comment_response(self.comment_id)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, "")
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/comments/{}".format(self.comment_id)
+        )
+        self.assertEqual(httpretty.last_request().method, "DELETE")
+
+    def test_delete_nonexistent_comment(self):
+        self.register_get_comment_error_response(self.comment_id, 404)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 404)
+
+
+@httpretty.activate
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
     def setUp(self):
