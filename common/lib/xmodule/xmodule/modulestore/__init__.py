@@ -225,7 +225,8 @@ class BulkOperationsMixin(object):
         """
         Clear the record for this course
         """
-        del self._active_bulk_ops.records[course_key.for_branch(None)]
+        if course_key.for_branch(None) in self._active_bulk_ops.records:
+            del self._active_bulk_ops.records[course_key.for_branch(None)]
 
     def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
         """
@@ -249,7 +250,7 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.is_root:
             self._start_outermost_bulk_operation(bulk_ops_record, course_key)
 
-    def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key, emit_signals=True):
+    def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key):
         """
         The outermost nested bulk_operation call: do the actual end of the bulk operation.
 
@@ -273,9 +274,13 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.active:
             return
 
-        self._end_outermost_bulk_operation(bulk_ops_record, structure_key, emit_signals)
+        dirty = self._end_outermost_bulk_operation(bulk_ops_record, structure_key)
 
         self._clear_bulk_ops_record(structure_key)
+
+        if emit_signals and dirty:
+            self.send_bulk_published_signal(bulk_ops_record, structure_key)
+            self.send_bulk_library_updated_signal(bulk_ops_record, structure_key)
 
     def _is_in_bulk_operation(self, course_key, ignore_case=False):
         """
