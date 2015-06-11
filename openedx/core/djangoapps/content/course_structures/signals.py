@@ -2,7 +2,6 @@ from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
 
-
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     # Import tasks here to avoid a circular import.
