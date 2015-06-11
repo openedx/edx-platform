@@ -7,6 +7,7 @@ import json
 import os
 
 from bok_choy.web_app_test import WebAppTest
+from ..helpers import remove_file
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.discovery import CourseDiscoveryPage
@@ -30,7 +31,7 @@ class CourseDiscoveryTest(WebAppTest):
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
 
-        self.addCleanup(os.remove, self.TEST_INDEX_FILENAME)
+        self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
 
         super(CourseDiscoveryTest, self).setUp()
         self.page = CourseDiscoveryPage(self.browser)
