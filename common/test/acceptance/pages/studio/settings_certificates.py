@@ -29,18 +29,12 @@ class CertificatesPage(CoursePage):
 
     def is_browser_on_page(self):
         """
-        Verify that the browser is on the page and it is not still loading.
+        Verify that the correct body element is displayed on the page and that the Backbone app is not still loading.
         """
-        EmptyPromise(
-            lambda: self.q(css='body.view-certificates').present,
-            'On the certificates page'
-        ).fulfill()
-
-        EmptyPromise(
-            lambda: not self.q(css='span.spin').visible,
-            'Certificates are finished loading'
-        ).fulfill()
-
+        if not self.q(css='body.view-certificates').present:
+            return False
+        if self.q(css='span.spin').visible:
+            return False
         return True
 
     ################
@@ -244,15 +238,21 @@ class Certificate(object):
 
     def wait_for_certificate_delete_button(self):
         """
-        Returns whether or not the certificate delete icon is present.
+        Promise to wait until certificate delete icon is available
         """
-        return self.find_css('.actions .delete').present
+        EmptyPromise(
+            lambda: self.page.q(css='.actions .delete').present,
+            'Certificate delete icon is displayed'
+        ).fulfill()
 
     def wait_for_hide_details_toggle(self):
         """
-        Certificate details are expanded.
+        Promise to wait until certificate details collapser is available
         """
-        return self.find_css('a.detail-toggle.hide-details').present
+        EmptyPromise(
+            lambda: self.page.q(css='a.detail-toggle.hide-details').present,
+            'Certificate "Hide Details" toggle is displayed'
+        ).fulfill()
 
     ################
     # Click Actions
