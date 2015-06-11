@@ -194,7 +194,12 @@ def modulestore():
         )
 
         if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
-            from ccx.modulestore import CCXModulestoreWrapper
+            # TODO: This import prevents a circular import issue, but is
+            # symptomatic of a lib having a dependency on code in lms.  This
+            # should be updated to have a setting that enumerates modulestore
+            # wrappers and then uses that setting to wrap the modulestore in
+            # appropriate wrappers depending on enabled features.
+            from ccx.modulestore import CCXModulestoreWrapper  # pylint: disable=import-error
             _MIXED_MODULESTORE = CCXModulestoreWrapper(_MIXED_MODULESTORE)
 
     return _MIXED_MODULESTORE

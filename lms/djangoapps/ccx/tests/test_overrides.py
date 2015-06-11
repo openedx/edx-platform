@@ -28,6 +28,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
     Make sure field overrides behave in the expected manner.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         """
         Set up tests

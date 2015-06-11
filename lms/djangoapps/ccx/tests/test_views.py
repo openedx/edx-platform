@@ -6,7 +6,6 @@ import json
 import re
 import pytz
 import ddt
-import unittest
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
@@ -27,7 +26,6 @@ from student.tests.factories import (  # pylint: disable=import-error
     UserFactory,
 )
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
@@ -36,7 +34,6 @@ from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
 )
-import xmodule.tabs as tabs
 from ccx_keys.locator import CCXLocator
 
 from ..models import (
@@ -83,6 +80,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Tests for Custom Courses views.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         """
         Set up tests
@@ -481,6 +479,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 category="sequential",
                 metadata={'graded': True, 'format': 'Homework'})
             for _ in xrange(4)]
+        # pylint: disable=unused-variable
         problems = [
             [
                 ItemFactory.create(

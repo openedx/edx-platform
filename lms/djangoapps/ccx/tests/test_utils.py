@@ -130,6 +130,7 @@ class TestGetEmailParams(ModuleStoreTestCase):
     """tests for ccx.utils.get_email_params
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         """
         Set up tests
@@ -188,6 +189,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
     """tests for the enroll_email function from ccx.utils
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super(TestEnrollEmail, self).setUp()
         # unbind the user created by the parent, so we can create our own when
@@ -369,6 +371,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
 class TestUnenrollEmail(ModuleStoreTestCase):
     """Tests for the unenroll_email function from ccx.utils"""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super(TestUnenrollEmail, self).setUp()
         # unbind the user created by the parent, so we can create our own when
@@ -512,3 +515,63 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.check_enrollment_state(before, True, self.user, True)
         # no email was sent to the student
         self.assertEqual(self.outbox, [])
+
+
+@attr('shard_1')
+class TestGetMembershipTriplets(ModuleStoreTestCase):
+    """Verify that get_ccx_membership_triplets functions properly"""
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        """Set up a course, coach, ccx and user"""
+        super(TestGetMembershipTriplets, self).setUp()
+        self.course = CourseFactory.create()
+        coach = AdminFactory.create()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(coach)
+        self.ccx = CcxFactory(course_id=self.course.id, coach=coach)
+
+    def make_ccx_membership(self, active=True):
+        """create registration of self.user in self.ccx
+
+        registration will be inactive
+        """
+        CcxMembershipFactory.create(ccx=self.ccx, student=self.user, active=active)
+
+    def call_fut(self, org_filter=None, org_filter_out=()):
+        """call the function under test in this test case"""
+        from ccx.utils import get_ccx_membership_triplets
+        return list(
+            get_ccx_membership_triplets(self.user, org_filter, org_filter_out)
+        )
+
+    def test_no_membership(self):
+        """verify that no triplets are returned if there are no memberships
+        """
+        triplets = self.call_fut()
+        self.assertEqual(len(triplets), 0)
+
+    def test_has_membership(self):
+        """verify that a triplet is returned when a membership exists
+        """
+        self.make_ccx_membership()
+        triplets = self.call_fut()
+        self.assertEqual(len(triplets), 1)
+        ccx, membership, course = triplets[0]
+        self.assertEqual(ccx.id, self.ccx.id)
+        self.assertEqual(unicode(course.id), unicode(self.course.id))
+        self.assertEqual(membership.student, self.user)
+
+    def test_has_membership_org_filtered(self):
+        """verify that microsite org filter prevents seeing microsite ccx"""
+        self.make_ccx_membership()
+        bad_org = self.course.location.org + 'foo'
+        triplets = self.call_fut(org_filter=bad_org)
+        self.assertEqual(len(triplets), 0)
+
+    def test_has_membership_org_filtered_out(self):
+        """verify that microsite ccxs not seen in non-microsite view"""
+        self.make_ccx_membership()
+        filter_list = [self.course.location.org]
+        triplets = self.call_fut(org_filter_out=filter_list)
+        self.assertEqual(len(triplets), 0)

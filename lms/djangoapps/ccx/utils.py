@@ -4,8 +4,6 @@ CCX Enrollment operations for use by Coach APIs.
 Does not include any access control, be sure to check access before calling.
 """
 import logging
-from courseware.courses import get_course_about_section  # pylint: disable=import-error
-from courseware.courses import get_course_by_id  # pylint: disable=import-error
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,7 +18,6 @@ from .models import (
     CcxMembership,
     CcxFutureMembership,
 )
-from .overrides import get_current_ccx
 
 
 log = logging.getLogger("edx.ccx")
@@ -154,7 +151,7 @@ def get_email_params(ccx, auto_enroll, secure=True):
         site=stripped_site_name,
         path=reverse(
             'course_root',
-            kwargs={'course_id':  CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
+            kwargs={'course_id': CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
         )
     )
 
@@ -165,7 +162,7 @@ def get_email_params(ccx, auto_enroll, secure=True):
             site=stripped_site_name,
             path=reverse(
                 'about_course',
-                kwargs={'course_id':  CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
+                kwargs={'course_id': CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
             )
         )
 
@@ -267,9 +264,9 @@ def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
                 # warning to the log so we can clean up.
                 if course.location.deprecated:
                     log.warning(
-                        "CCX {} exists for course {} with deprecated id".format(
-                            ccx, ccx.course_id
-                        )
+                        "CCX %s exists for course %s with deprecated id",
+                        ccx,
+                        ccx.course_id
                     )
                     continue
 

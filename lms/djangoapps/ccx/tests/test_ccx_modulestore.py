@@ -2,28 +2,18 @@
 Test the CCXModulestoreWrapper
 """
 from collections import deque
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
+from ccx_keys.locator import CCXLocator
 import datetime
-from itertools import izip_longest
+from itertools import izip_longest, chain
 import pytz
-from student.tests.factories import (  # pylint: disable=import-error
-    AdminFactory,
-    CourseEnrollmentFactory,
-    UserFactory,
-)
+from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE)
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import CustomCourseForEdX
-
-
-def flatten(seq):
-    """
-    For [[1, 2], [3, 4]] returns [1, 2, 3, 4].  Does not recurse.
-    """
-    return [x for sub in seq for x in sub]
 
 
 class TestCCXModulestoreWrapper(ModuleStoreTestCase):
@@ -36,7 +26,7 @@ class TestCCXModulestoreWrapper(ModuleStoreTestCase):
         Set up tests
         """
         super(TestCCXModulestoreWrapper, self).setUp()
-        course = CourseFactory.create()
+        self.course = course = CourseFactory.create()
 
         # Create instructor account
         coach = AdminFactory.create()
@@ -46,17 +36,18 @@ class TestCCXModulestoreWrapper(ModuleStoreTestCase):
             2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         self.mooc_due = due = datetime.datetime(
             2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
-        chapters = [ItemFactory.create(start=start, parent=course)
-                    for _ in xrange(2)]
-        sequentials = [
+        self.chapters = chapters = [
+            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+        ]
+        self.sequentials = sequentials = [
             ItemFactory.create(parent=c) for _ in xrange(2) for c in chapters
         ]
-        verticals = [
+        self.verticals = verticals = [
             ItemFactory.create(
                 due=due, parent=s, graded=True, format='Homework'
             ) for _ in xrange(2) for s in sequentials
         ]
-        blocks = [
+        self.blocks = [
             ItemFactory.create(parent=v) for _ in xrange(2) for v in verticals
         ]
 
@@ -67,9 +58,10 @@ class TestCCXModulestoreWrapper(ModuleStoreTestCase):
         )
         ccx.save()
 
-        self.ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)
+        self.ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
 
     def get_all_children_bf(self, block):
+        """traverse the children of block in a breadth-first order"""
         queue = deque([block])
         while queue:
             item = queue.popleft()
@@ -97,9 +89,10 @@ class TestCCXModulestoreWrapper(ModuleStoreTestCase):
         course_key = self.ccx_locator.to_course_locator()
         course = self.get_course(course_key)
         ccx = self.get_course(self.ccx_locator)
-        for expected, actual in izip_longest(
+        test_fodder = izip_longest(
             self.get_all_children_bf(course), self.get_all_children_bf(ccx)
-        ):
+        )
+        for expected, actual in test_fodder:
             if expected is None:
                 self.fail('course children exhausted before ccx children')
             if actual is None:
@@ -108,3 +101,36 @@ class TestCCXModulestoreWrapper(ModuleStoreTestCase):
             self.assertEqual(expected.location.course_key, course_key)
             self.assertEqual(actual.location.course_key, self.ccx_locator)
 
+    def test_has_item(self):
+        """can verify that a location exists, using ccx block usage key"""
+        for item in chain(self.chapters, self.sequentials, self.verticals, self.blocks):
+            block_key = self.ccx_locator.make_usage_key(
+                item.location.block_type, item.location.block_id
+            )
+            self.assertTrue(self.store.has_item(block_key))
+
+    def test_get_item(self):
+        """can retrieve an item by a location key, using a ccx block usage key
+
+        the retrieved item should be the same as the the one read without ccx
+        info
+        """
+        for expected in chain(self.chapters, self.sequentials, self.verticals, self.blocks):
+            block_key = self.ccx_locator.make_usage_key(
+                expected.location.block_type, expected.location.block_id
+            )
+            actual = self.store.get_item(block_key)
+            self.assertEqual(expected.display_name, actual.display_name)
+            self.assertEqual(expected.location, actual.location.to_block_locator())
+
+    def test_publication_api(self):
+        """verify that we can correctly discern a published item by ccx key"""
+        for expected in self.blocks:
+            block_key = self.ccx_locator.make_usage_key(
+                expected.location.block_type, expected.location.block_id
+            )
+            self.assertTrue(self.store.has_published_version(expected))
+            self.store.unpublish(block_key, self.user.id)
+            self.assertFalse(self.store.has_published_version(expected))
+            self.store.publish(block_key, self.user.id)
+            self.assertTrue(self.store.has_published_version(expected))

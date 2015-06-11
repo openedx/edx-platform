@@ -11,7 +11,7 @@ from courseware.field_overrides import FieldOverrideProvider  # pylint: disable=
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
-from .models import CcxMembership, CcxFieldOverride, CustomCourseForEdX
+from .models import CcxFieldOverride, CustomCourseForEdX
 
 
 log = logging.getLogger(__name__)
@@ -30,39 +30,38 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         # The incoming block might be a CourseKey instance of some type, a
         # UsageKey instance of some type, or it might be something that has a
         # location attribute.  That location attribute will be a UsageKey
-        ccx = course_id = None
+        ccx = course_key = None
         identifier = getattr(block, 'id', None)
         if isinstance(identifier, CourseKey):
-            course_id = block.id
+            course_key = block.id
         elif isinstance(identifier, UsageKey):
-            course_id = block.id.course_key
+            course_key = block.id.course_key
         elif hasattr(block, 'location'):
-            course_id = block.location.course_key
+            course_key = block.location.course_key
         else:
-            msg = "Unable to get course id when calculating ccx overide for block type {}"
-            log.error(msg.format(type(block)))
-        if course_id is not None:
-            ccx = get_current_ccx(course_id)
+            msg = "Unable to get course id when calculating ccx overide for block type %r"
+            log.error(msg, type(block))
+        if course_key is not None:
+            ccx = get_current_ccx(course_key)
         if ccx:
             return get_override_for_ccx(ccx, block, name, default)
         return default
 
 
-def get_current_ccx(course_id):
+def get_current_ccx(course_key):
     """
     Return the ccx that is active for this course.
-    """
-    # ensure that the ID passed in is a CourseKey instance of some type.
-    if isinstance(course_id, CourseKey):
-        course_key = course_id
-    else:
-        course_key = CourseKey.from_string(course_id)
 
-    ccx = None
-    if isinstance(course_key, CCXLocator):
-        ccx_id = course_key.ccx
-        ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
-    return ccx
+    course_key is expected to be an instance of an opaque CourseKey, a
+    ValueError is raised if this expectation is not met.
+    """
+    if not isinstance(course_key, CourseKey):
+        raise ValueError("get_current_ccx requires a CourseKey instance")
+
+    if not isinstance(course_key, CCXLocator):
+        return None
+
+    return CustomCourseForEdX.objects.get(pk=course_key.ccx)
 
 
 def get_override_for_ccx(ccx, block, name, default=None):

@@ -110,7 +110,10 @@ def dashboard(request, course, ccx=None):
     if ccx is None:
         ccx = get_ccx_for_coach(course, request.user)
         if ccx:
-            url = reverse('ccx_coach_dashboard', kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)})
+            url = reverse(
+                'ccx_coach_dashboard',
+                kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+            )
             return redirect(url)
 
     context = {
@@ -151,11 +154,10 @@ def create_ccx(request, course, ccx=None):
 
     # prevent CCX objects from being created for deprecated course ids.
     if course.id.deprecated:
-        messages.error(_(
+        messages.error(request, _(
             "You cannot create a CCX from a course using a deprecated id. "
             "Please create a rerun of this course in the studio to allow "
-            "this action.")
-        )
+            "this action."))
         url = reverse('ccx_coach_dashboard', kwargs={'course_id', course.id})
         return redirect(url)
 
@@ -179,7 +181,7 @@ def create_ccx(request, course, ccx=None):
             for vertical in sequential.get_children():
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
-    ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)
+    ccx_id = CCXLocator.from_course_locator(course.id, ccx.id)  # pylint: disable=no-member
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
 
@@ -369,7 +371,7 @@ def get_ccx_schedule(course, ccx):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_schedule(request, course, ccx=None):
+def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
     """
     get json representation of ccx schedule
     """
@@ -464,6 +466,8 @@ def ccx_student_management(request, course, ccx=None):
 
 @contextmanager
 def ccx_course(ccx_locator):
+    """Create a context in which the course identified by course_locator exists
+    """
     course = get_course_by_id(ccx_locator)
     yield course
 
