@@ -225,7 +225,8 @@ class BulkOperationsMixin(object):
         """
         Clear the record for this course
         """
-        del self._active_bulk_ops.records[course_key.for_branch(None)]
+        if course_key.for_branch(None) in self._active_bulk_ops.records:
+            del self._active_bulk_ops.records[course_key.for_branch(None)]
 
     def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
         """
@@ -272,6 +273,8 @@ class BulkOperationsMixin(object):
         # bulk operation.
         if bulk_ops_record.active:
             return
+
+        assert structure_key.for_branch(None) in self._active_bulk_ops.records
 
         self._end_outermost_bulk_operation(bulk_ops_record, structure_key, emit_signals)
 
