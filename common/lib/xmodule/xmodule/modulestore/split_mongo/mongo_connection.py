@@ -217,14 +217,14 @@ class CourseStructureCache(object):
     def __init__(self):
         self.cache = get_cache('course_structure_cache')
 
-    def get(self, structure_cache_key):
+    def get(self, key):
         """Pull the compressed, pickled struct data from cache and deserialize."""
-        compressed_pickled_data = self.cache.get(structure_cache_key)
+        compressed_pickled_data = self.cache.get(key)
         if compressed_pickled_data is None:
             return None
         return pickle.loads(zlib.decompress(compressed_pickled_data))
 
-    def set(self, structure_cache_key, structure):
+    def set(self, key, structure):
         """Given a structure, will pickle, compress, and write to cache."""
         pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
         # 1 = Fastest (slightly larger results)
@@ -234,10 +234,10 @@ class CourseStructureCache(object):
         dog_stats_api.histogram(
             'compressed_course_structure.size',
             len(compressed_pickled_data),
-            tags=[structure_cache_key]
+            tags=[key]
         )
         # Stuctures are immutable, so we set a timeout of "never"
-        self.cache.set(structure_cache_key, compressed_pickled_data, None)
+        self.cache.set(key, compressed_pickled_data, None)
 
 
 class MongoConnection(object):
@@ -298,7 +298,6 @@ class MongoConnection(object):
         This method will use a cached version of the structure if it is availble.
         """
         with TIMER.timer("get_structure", course_context) as tagger_get_structure:
-            structure_cache_key = "modulestore.split_mongo.mongo_connection.get_structure.{}".format(key)
             cache = CourseStructureCache()
 
             structure = cache.get(key)
