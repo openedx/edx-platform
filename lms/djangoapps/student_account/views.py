@@ -29,6 +29,7 @@ from external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
+from external_auth.models import ExternalAuthMap
 from student.models import UserProfile
 from student.views import (
     signin_user as old_login_view,
@@ -395,5 +396,11 @@ def account_settings_context(request):
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
         } for state in auth_states]
+
+    try:
+        external_auth_map = ExternalAuthMap.objects.get(user=user)
+    except:
+        external_auth_map = None
+    context['is_shib_auth'] = 'shib' in external_auth_map.external_domain if external_auth_map else False
 
     return context

@@ -37,12 +37,13 @@
     <script>
           (function (require) {
             require(['js/student_account/views/account_settings_factory'], function(setupAccountSettingsSection) {
-
                 var fieldsData = ${ json.dumps(fields) };
                 var authData = ${ json.dumps(auth) };
+                var isShibAuth = ${ json.dumps(is_shib_auth) };
 
                 setupAccountSettingsSection(
-                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id}
+                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id},
+                        isShibAuth
                 );
             });
           }).call(this, require || RequireJS.require);

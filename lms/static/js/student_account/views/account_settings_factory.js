@@ -10,7 +10,7 @@
     ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, isShibAuth) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
 
@@ -30,55 +30,6 @@
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
                                 helpMessage: gettext('The name that identifies you on this site. You cannot change your username.')
-                            })
-                        },
-                        {
-                            view: new FieldViews.TextFieldView({
-                                model: userAccountModel,
-                                title: gettext('Full Name'),
-                                valueAttribute: 'name',
-                                helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.')
-                            })
-                        },
-                        {
-                            view: new AccountSettingsFieldViews.EmailFieldView({
-                                model: userAccountModel,
-                                title: gettext('Email Address'),
-                                valueAttribute: 'email',
-                                helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
-                            })
-                        },
-                        {
-                            view: new AccountSettingsFieldViews.PasswordFieldView({
-                                model: userAccountModel,
-                                title: gettext('Password'),
-                                screenReaderTitle: gettext('Reset your Password'),
-                                valueAttribute: 'password',
-                                emailAttribute: 'email',
-                                linkTitle: gettext('Reset Password'),
-                                linkHref: fieldsData.password.url,
-                                helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
-                            })
-                        },
-                        {
-                            view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
-                                model: userPreferencesModel,
-                                title: gettext('Language'),
-                                valueAttribute: 'pref-lang',
-                                required: true,
-                                refreshPageOnSave: true,
-                                helpMessage:
-                                    gettext('The language used for this site. The site is currently available in a limited number of languages.'),
-                                options: fieldsData.language.options
-                            })
-                        },
-                        {
-                            view: new FieldViews.DropdownFieldView({
-                                model: userAccountModel,
-                                required: true,
-                                title: gettext('Country or Region'),
-                                valueAttribute: 'country',
-                                options: fieldsData['country']['options']
                             })
                         }
                     ]
@@ -121,6 +72,82 @@
                     ]
                 }
             ];
+
+            if (!isShibAuth) {
+                sectionsData[0].fields.push(
+                    {
+                        view: new FieldViews.TextFieldView({
+                            model: userAccountModel,
+                            title: gettext('Full Name'),
+                            valueAttribute: 'name',
+                            helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.')
+                        })
+                    },
+                    {
+                        view: new AccountSettingsFieldViews.EmailFieldView({
+                            model: userAccountModel,
+                            title: gettext('Email Address'),
+                            valueAttribute: 'email',
+                            helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
+                        })
+                    },
+                    {
+                        view: new AccountSettingsFieldViews.PasswordFieldView({
+                            model: userAccountModel,
+                            title: gettext('Password'),
+                            screenReaderTitle: gettext('Reset your Password'),
+                            valueAttribute: 'password',
+                            emailAttribute: 'email',
+                            linkTitle: gettext('Reset Password'),
+                            linkHref: fieldsData.password.url,
+                            helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
+                        })
+                    }
+                )
+            } else {
+                sectionsData[0].fields.push(
+                    {
+                        view: new FieldViews.ReadonlyFieldView({
+                            model: userAccountModel,
+                            title: gettext('Full Name'),
+                            valueAttribute: 'name',
+                            helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.')
+                        })
+                    },
+                    {
+                        view: new FieldViews.ReadonlyFieldView({
+                            model: userAccountModel,
+                            title: gettext('Email Address'),
+                            valueAttribute: 'email',
+                            helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
+                        })
+                    }
+                )
+            }
+
+            sectionsData[0].fields.push(
+                {
+                    view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
+                        model: userPreferencesModel,
+                        title: gettext('Language'),
+                        valueAttribute: 'pref-lang',
+                        required: true,
+                        refreshPageOnSave: true,
+                        helpMessage:
+                            gettext('The language used for this site. The site is currently available in a limited number of languages.'),
+                        options: fieldsData.language.options
+                    })
+                },
+                {
+                    view: new FieldViews.DropdownFieldView({
+                        model: userAccountModel,
+                        required: true,
+                        title: gettext('Country or Region'),
+                        valueAttribute: 'country',
+                        options: fieldsData['country']['options']
+                    })
+                }
+            )
 
             if (_.isArray(authData.providers)) {
                 var accountsSectionData = {
