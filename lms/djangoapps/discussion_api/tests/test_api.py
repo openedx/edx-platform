@@ -23,10 +23,12 @@ from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api.api import (
     create_comment,
     create_thread,
+    delete_comment,
     delete_thread,
     get_comment_list,
     get_course_topics,
     get_thread_list,
+    update_comment,
     update_thread,
 )
 from discussion_api.tests.utils import (
@@ -1638,6 +1640,173 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
 
 
 @ddt.ddt
+class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Tests for update_comment"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(UpdateCommentTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
+
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def register_comment(self, overrides=None, thread_overrides=None):
+        """
+        Make a comment with appropriate data overridden by the overrides
+        parameter and register mock responses for both GET and PUT on its
+        endpoint. Also mock GET for the related thread with thread_overrides.
+        """
+        cs_thread_data = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": unicode(self.course.id)
+        })
+        cs_thread_data.update(thread_overrides or {})
+        self.register_get_thread_response(cs_thread_data)
+        cs_comment_data = make_minimal_cs_comment({
+            "id": "test_comment",
+            "course_id": cs_thread_data["course_id"],
+            "thread_id": cs_thread_data["id"],
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "body": "Original body",
+        })
+        cs_comment_data.update(overrides or {})
+        self.register_get_comment_response(cs_comment_data)
+        self.register_put_comment_response(cs_comment_data)
+
+    def test_empty(self):
+        """Check that an empty update does not make any modifying requests."""
+        self.register_comment()
+        update_comment(self.request, "test_comment", {})
+        for request in httpretty.httpretty.latest_requests:
+            self.assertEqual(request.method, "GET")
+
+    def test_basic(self):
+        self.register_comment()
+        actual = update_comment(self.request, "test_comment", {"raw_body": "Edited body"})
+        expected = {
+            "id": "test_comment",
+            "thread_id": "test_thread",
+            "parent_id": None,  # TODO: we can't get this without retrieving from the thread :-(
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "raw_body": "Edited body",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "children": [],
+        }
+        self.assertEqual(actual, expected)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "body": ["Edited body"],
+                "course_id": [unicode(self.course.id)],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "endorsed": ["False"],
+            }
+        )
+
+    def test_nonexistent_comment(self):
+        self.register_get_comment_error_response("test_comment", 404)
+        with self.assertRaises(Http404):
+            update_comment(self.request, "test_comment", {})
+
+    def test_nonexistent_course(self):
+        self.register_comment(thread_overrides={"course_id": "non/existent/course"})
+        with self.assertRaises(Http404):
+            update_comment(self.request, "test_comment", {})
+
+    def test_unenrolled(self):
+        self.register_comment()
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            update_comment(self.request, "test_comment", {})
+
+    def test_discussions_disabled(self):
+        _remove_discussion_tab(self.course, self.user.id)
+        self.register_comment()
+        with self.assertRaises(Http404):
+            update_comment(self.request, "test_comment", {})
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        self.register_get_thread_response(make_minimal_cs_thread())
+        self.register_comment(
+            {"thread_id": "test_thread"},
+            thread_overrides={
+                "id": "test_thread",
+                "course_id": unicode(cohort_course.id),
+                "group_id": (
+                    None if thread_group_state == "no_group" else
+                    cohort.id if thread_group_state == "match_group" else
+                    cohort.id + 1
+                ),
+            }
+        )
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            update_comment(self.request, "test_comment", {})
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    def test_role_access(self, role_name):
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = [self.user]
+        self.register_comment({"user_id": str(self.user.id + 1)})
+        expected_error = role_name == FORUM_ROLE_STUDENT
+        try:
+            update_comment(self.request, "test_comment", {"raw_body": "edited"})
+            self.assertFalse(expected_error)
+        except PermissionDenied:
+            self.assertTrue(expected_error)
+
+
+@ddt.ddt
 class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
     """Tests for delete_thread"""
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1712,7 +1881,7 @@ class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
         self.register_thread({"user_id": str(self.user.id + 1)})
         expected_error = role_name == FORUM_ROLE_STUDENT
         try:
-            delete_thread(self.request, "test_thread")
+            delete_thread(self.request, self.thread_id)
             self.assertFalse(expected_error)
         except PermissionDenied:
             self.assertTrue(expected_error)
@@ -1758,7 +1927,150 @@ class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             thread_group_state == "different_group"
         )
         try:
-            delete_thread(self.request, "test_thread")
+            delete_thread(self.request, self.thread_id)
+            self.assertFalse(expected_error)
+        except Http404:
+            self.assertTrue(expected_error)
+
+
+@ddt.ddt
+class DeleteCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Tests for delete_comment"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(DeleteCommentTest, self).setUp()
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.disable)
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
+        self.request = RequestFactory().get("/test_path")
+        self.request.user = self.user
+        self.course = CourseFactory.create()
+        self.thread_id = "test_thread"
+        self.comment_id = "test_comment"
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def register_comment_and_thread(self, overrides=None, thread_overrides=None):
+        """
+        Make a comment with appropriate data overridden by the override
+        parameters and register mock responses for both GET and DELETE on its
+        endpoint. Also mock GET for the related thread with thread_overrides.
+        """
+        cs_thread_data = make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id)
+        })
+        cs_thread_data.update(thread_overrides or {})
+        self.register_get_thread_response(cs_thread_data)
+        cs_comment_data = make_minimal_cs_comment({
+            "id": self.comment_id,
+            "course_id": cs_thread_data["course_id"],
+            "thread_id": cs_thread_data["id"],
+            "username": self.user.username,
+            "user_id": str(self.user.id),
+        })
+        cs_comment_data.update(overrides or {})
+        self.register_get_comment_response(cs_comment_data)
+        self.register_delete_comment_response(self.comment_id)
+
+    def test_basic(self):
+        self.register_comment_and_thread()
+        self.assertIsNone(delete_comment(self.request, self.comment_id))
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/comments/{}".format(self.comment_id)
+        )
+        self.assertEqual(httpretty.last_request().method, "DELETE")
+
+    def test_comment_id_not_found(self):
+        self.register_get_comment_error_response("missing_comment", 404)
+        with self.assertRaises(Http404):
+            delete_comment(self.request, "missing_comment")
+
+    def test_nonexistent_course(self):
+        self.register_comment_and_thread(
+            thread_overrides={"course_id": "non/existent/course"}
+        )
+        with self.assertRaises(Http404):
+            delete_comment(self.request, self.comment_id)
+
+    def test_not_enrolled(self):
+        self.register_comment_and_thread()
+        self.request.user = UserFactory.create()
+        with self.assertRaises(Http404):
+            delete_comment(self.request, self.comment_id)
+
+    def test_discussions_disabled(self):
+        self.register_comment_and_thread()
+        _remove_discussion_tab(self.course, self.user.id)
+        with self.assertRaises(Http404):
+            delete_comment(self.request, self.comment_id)
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    def test_non_author_delete_allowed(self, role_name):
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = [self.user]
+        self.register_comment_and_thread(
+            overrides={"user_id": str(self.user.id + 1)}
+        )
+        expected_error = role_name == FORUM_ROLE_STUDENT
+        try:
+            delete_comment(self.request, self.comment_id)
+            self.assertFalse(expected_error)
+        except PermissionDenied:
+            self.assertTrue(expected_error)
+
+    @ddt.data(
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False],
+            ["no_group", "match_group", "different_group"],
+        )
+    )
+    @ddt.unpack
+    def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
+        """
+        Tests group access for deleting a comment
+
+        All privileged roles are able to delete a comment. A student role can
+        only delete a comment if,
+        the student role is the author and the comment is not in a cohort,
+        the student role is the author and the comment is in the author's cohort.
+        """
+        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
+        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+        role.users = [self.user]
+        self.register_comment_and_thread(
+            overrides={"thread_id": "test_thread"},
+            thread_overrides={
+                "course_id": unicode(cohort_course.id),
+                "group_id": (
+                    None if thread_group_state == "no_group" else
+                    cohort.id if thread_group_state == "match_group" else
+                    cohort.id + 1
+                ),
+            }
+        )
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            course_is_cohorted and
+            thread_group_state == "different_group"
+        )
+        try:
+            delete_comment(self.request, self.comment_id)
             self.assertFalse(expected_error)
         except Http404:
             self.assertTrue(expected_error)

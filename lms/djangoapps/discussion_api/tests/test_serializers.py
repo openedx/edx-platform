@@ -23,6 +23,7 @@ from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role,
 )
+from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
@@ -553,8 +554,15 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             "thread_id": "test_thread",
             "raw_body": "Test body",
         }
+        self.existing_comment = Comment(**make_minimal_cs_comment({
+            "id": "existing_comment",
+            "thread_id": "existing_thread",
+            "body": "Original body",
+            "user_id": str(self.user.id),
+            "course_id": unicode(self.course.id),
+        }))
 
-    def save_and_reserialize(self, data):
+    def save_and_reserialize(self, data, instance=None):
         """
         Create a serializer with the given data, ensure that it is valid, save
         the result, and return the full comment data from the serializer.
@@ -564,13 +572,18 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             self.request,
             make_minimal_cs_thread({"course_id": unicode(self.course.id)})
         )
-        serializer = CommentSerializer(data=data, context=context)
+        serializer = CommentSerializer(
+            instance,
+            data=data,
+            partial=(instance is not None),
+            context=context
+        )
         self.assertTrue(serializer.is_valid())
         serializer.save()
         return serializer.data
 
     @ddt.data(None, "test_parent")
-    def test_success(self, parent_id):
+    def test_create_success(self, parent_id):
         data = self.minimal_data.copy()
         if parent_id:
             data["parent_id"] = parent_id
@@ -597,7 +610,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
         self.assertEqual(saved["id"], "test_comment")
         self.assertEqual(saved["parent_id"], parent_id)
 
-    def test_parent_id_nonexistent(self):
+    def test_create_parent_id_nonexistent(self):
         self.register_get_comment_error_response("bad_parent", 404)
         data = self.minimal_data.copy()
         data["parent_id"] = "bad_parent"
@@ -613,7 +626,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             }
         )
 
-    def test_parent_id_wrong_thread(self):
+    def test_create_parent_id_wrong_thread(self):
         self.register_get_comment_response({"thread_id": "different_thread", "id": "test_parent"})
         data = self.minimal_data.copy()
         data["parent_id"] = "test_parent"
@@ -629,7 +642,7 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             }
         )
 
-    def test_missing_field(self):
+    def test_create_missing_field(self):
         for field in self.minimal_data:
             data = self.minimal_data.copy()
             data.pop(field)
@@ -642,3 +655,60 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
                 serializer.errors,
                 {field: ["This field is required."]}
             )
+
+    def test_update_empty(self):
+        self.register_put_comment_response(self.existing_comment.attributes)
+        self.save_and_reserialize({}, instance=self.existing_comment)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "body": ["Original body"],
+                "course_id": [unicode(self.course.id)],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "endorsed": ["False"],
+            }
+        )
+
+    def test_update_all(self):
+        self.register_put_comment_response(self.existing_comment.attributes)
+        data = {"raw_body": "Edited body"}
+        saved = self.save_and_reserialize(data, instance=self.existing_comment)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "body": ["Edited body"],
+                "course_id": [unicode(self.course.id)],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "endorsed": ["False"],
+            }
+        )
+        self.assertEqual(saved["raw_body"], data["raw_body"])
+
+    def test_update_empty_raw_body(self):
+        serializer = CommentSerializer(
+            self.existing_comment,
+            data={"raw_body": ""},
+            partial=True,
+            context=get_context(self.course, self.request)
+        )
+        self.assertEqual(
+            serializer.errors,
+            {"raw_body": ["This field is required."]}
+        )
+
+    @ddt.data("thread_id", "parent_id")
+    def test_update_non_updatable(self, field):
+        serializer = CommentSerializer(
+            self.existing_comment,
+            data={field: "different_value"},
+            partial=True,
+            context=get_context(self.course, self.request)
+        )
+        self.assertEqual(
+            serializer.errors,
+            {field: ["This field is not allowed in an update."]}
+        )
