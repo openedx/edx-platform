@@ -51,53 +51,50 @@ from django.utils.http import urlquote_plus
         <div class="wrapper-msg wrapper-auto-cert">
             <div id="errors-info" class="errors-info"></div>
 
-            <div class="auto-cert-message" id="course-success">
-                <div class="has-actions">
                 %if passed:
+                  <div class="auto-cert-message" id="course-success">
+                    <div class="has-actions">
+                        % if is_downloadable and download_url:
 
-                    % if is_downloadable and download_url:
-
-                    <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
-                    <div class="msg-content">
-                        <h2 class="title">${_("Your certificate is available")}</h2>
-                        %if show_cert_web_view:
-                        <p class="copy">${_("You can now view your certificate.")}</p>
+                        <div class="msg-content">
+                            <h2 class="title">${_("Your certificate is available")}</h2>
+                            %if show_cert_web_view:
+                            <p class="copy">${_("You can now view your certificate.")}</p>
+                            %else:
+                            <p class="copy">${_(
+                                "You can now download your certificate as a PDF. If you keep working and receive a higher grade, you can request an updated certificate.")}
+                            </p>
+                            %endif
+                        </div>
+                        <div class="msg-actions">
+                            %if show_cert_web_view:
+                            <a class="btn" href="${cert_web_view_url}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
+                                ${_("View Certificate")}
+                            </a>
+                            %else:
+                            <a class="btn" href="${download_url}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
+                                ${_("Download Your Certificate")}
+                            </a>
+                            %endif
+                        </div>
+                        %elif is_generating:
+                        <div class="msg-content">
+                            <h2 class="title">${_("We're working on it...")}</h2>
+                            <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
+                        </div>
+                        <div class="msg-actions"></div>
                         %else:
-                        <p class="copy">${_(
-                            "You can now download your certificate as a PDF. If you keep working and receive a higher grade,you can request an {link_start} updated certificate {link_end}.").format(
-                            link_start=u"<a class='generate_certs' href='#' data-endpoint={}>".format(post_url) ,link_end=u"</a>")}
-                        </p>
+                        <div class="msg-content">
+                            <h2 class="title">${_("Congratulations, you qualified for a certificate!")}</h2>
+                            <p class="copy">${_("You can keep working for a higher grade, or request your certificate now.")}</p>
+                        </div>
+                        <div class="msg-actions">
+                            <button class="btn generate_certs" data-endpoint="${reverse('generate_user_cert', args=[unicode(course.id)])}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                        </div>
                         %endif
                     </div>
-                    <div class="msg-actions">
-                        %if show_cert_web_view:
-                        <a class="btn" href="${cert_web_view_url}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
-                            ${_("View Certificate")}
-                        </a>
-                        %else:
-                        <a class="btn" href="${download_url}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
-                            ${_("Download Your Certificate")}
-                        </a>
-                        %endif
-                    </div>
-                    %elif is_generating:
-                    <div class="msg-content">
-                        <h2 class="title">${_("We're working on it...")}</h2>
-                        <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
-                    </div>
-                    <div class="msg-actions"></div>
-                    %else:
-                    <div class="msg-content">
-                        <h2 class="title">${_("Congratulations, you qualified for a certificate!")}</h2>
-                        <p class="copy">${_("You can keep working for a higher grade, or request your certificate now.")}</p>
-                    </div>
-                    <div class="msg-actions">
-                        <button class="btn generate_certs" data-endpoint="${reverse('generate_user_cert', args=[unicode(course.id)])}" id="btn_generate_cert">${_('Request Certificate')}</button>
-                    </div>
-                    %endif
-                </div>
+                  </div>
                 %endif
-            </div>
         </div>
         %endif
 
