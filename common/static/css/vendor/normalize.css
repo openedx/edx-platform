@@ -387,7 +387,7 @@ input::-moz-focus-inner {
  * 2. Improve readability and alignment in all browsers.
  * 3. Width (plus padding) results in the same widht as input fields.
  * 4. Same border and border-radius as input fields.
- * 5. Minimum height height to make the textarea more apparent.
+ * 5. Minimum height to make the textarea more apparent.
  */
 
 textarea {
