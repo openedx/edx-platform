@@ -94,11 +94,7 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
             coupon_codes = ", ".join(coupon_codes)
             registration_code_used = 'N/A'
 
-            if coupon_redemption.exists():
-                list_price = paid_course_reg_item.list_price
-            else:
-                list_price = paid_course_reg_item.unit_cost
-
+            list_price = paid_course_reg_item.get_list_price()
             payment_amount = paid_course_reg_item.unit_cost
             coupon_codes_used = coupon_codes
             payment_status = paid_course_reg_item.status
@@ -156,7 +152,7 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
         coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
         coupon_codes = ", ".join(coupon_codes)
 
-        list_price = order_item.list_price
+        list_price = order_item.get_list_price()
         payment_amount = order_item.unit_cost
         coupon_codes_used = coupon_codes
         payment_status = order_item.status

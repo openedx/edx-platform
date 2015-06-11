@@ -951,7 +951,6 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
         ('company_name', 'Company Name'),
         ('company_contact_name', 'Company Contact Name'),
         ('company_contact_email', 'Company Contact Email'),
-        ('total_amount', 'Total Amount'),
         ('logged_in_username', 'Login Username'),
         ('logged_in_email', 'Login User Email'),
         ('purchase_time', 'Date of Sale'),
@@ -967,8 +966,11 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
         ('order_type', 'Order Type'),
         ('status', 'Order Item Status'),
         ('coupon_code', 'Coupon Code'),
-        ('unit_cost', 'Unit Price'),
         ('list_price', 'List Price'),
+        ('unit_cost', 'Unit Price'),
+        ('quantity', 'Quantity'),
+        ('total_discount', 'Total Discount'),
+        ('total_amount', 'Total Amount Paid'),
     ]
 
     db_columns = [x[0] for x in query_features]
@@ -1198,11 +1200,22 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     coupons = Coupon.objects.filter(course_id=course_id)
 
     query_features = [
-        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date', 'is_active'
+        ('code', _('Coupon Code')),
+        ('course_id', _('Course Id')),
+        ('percentage_discount', _('% Discount')),
+        ('description', _('Description')),
+        ('expiration_date', _('Expiration Date')),
+        ('is_active', _('Is Active')),
+        ('code_redeemed_count', _('Code Redeemed Count')),
+        ('total_discounted_seats', _('Total Discounted Seats')),
+        ('total_discounted_amount', _('Total Discounted Amount')),
     ]
-    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, coupons)
-    header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
-    return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
+    db_columns = [x[0] for x in query_features]
+    csv_columns = [x[1] for x in query_features]
+
+    coupons_list = instructor_analytics.basic.coupon_codes_features(db_columns, coupons, course_id)
+    __, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, db_columns)
+    return instructor_analytics.csvs.create_csv_response('Coupons.csv', csv_columns, data_rows)
 
 
 @ensure_csrf_cookie

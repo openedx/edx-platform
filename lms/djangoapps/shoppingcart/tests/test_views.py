@@ -664,8 +664,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         for item in items:
             if item.id == reg_item.id:
                 self.assertEquals(item.unit_cost, self.get_discount(self.cost))
+                self.assertEquals(item.list_price, self.cost)
             elif item.id == cert_item.id:
-                self.assertEquals(item.list_price, None)
+                self.assertEquals(item.list_price, self.cost)
+                self.assertEquals(item.unit_cost, self.cost)
 
         # Delete the discounted item, corresponding coupon redemption should
         # be removed for that particular discounted item
