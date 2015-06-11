@@ -1,5 +1,5 @@
 var onVideoFail = function(e) {
-  if(e == 'NO_DEVICES_FOUND') {
+  if(e === 'NO_DEVICES_FOUND') {
       $('#no-webcam').show();
       $('#face_capture_button').hide();
       $('#photo_id_capture_button').hide();
@@ -15,7 +15,7 @@ function initVideoCapture() {
   window.URL = window.URL || window.webkitURL;
   navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                             navigator.mozGetUserMedia || navigator.msGetUserMedia;
-  return !(navigator.getUserMedia == undefined);
+  return !(navigator.getUserMedia === undefined);
 }
 
 var submitReverificationPhotos = function() {
@@ -33,7 +33,7 @@ var submitReverificationPhotos = function() {
 
     $("#reverify_form").submit();
 
-}
+};
 
 var submitMidcourseReverificationPhotos = function() {
   $('<input>').attr({
@@ -42,10 +42,10 @@ var submitMidcourseReverificationPhotos = function() {
       value: $("#face_image")[0].src,
   }).appendTo("#reverify_form");
   $("#reverify_form").submit();
-}
+};
 
 function showSubmissionError() {
-    if (xhr.status == 400) {
+    if (xhr.status === 400) {
         $('#order-error .copy p').html(xhr.responseText);
     }
     $('#order-error').show();
@@ -70,7 +70,7 @@ function refereshPageMessage() {
 
 var submitToPaymentProcessing = function() {
   $(".payment-button").addClass('is-disabled').attr('aria-disabled', true);
-  var contribution_input = $("input[name='contribution']:checked")
+  var contribution_input = $("input[name='contribution']:checked");
   var contribution = 0;
   if(contribution_input.attr('id') == 'contribution-other') {
       contribution = $("input[name='contribution-other-amt']").val();
@@ -95,12 +95,12 @@ var submitToPaymentProcessing = function() {
         refereshPageMessage();
       }
     },
-    error:function(xhr,status,error) {
+    error:function() {
       $(".payment-button").removeClass('is-disabled').attr('aria-disabled', false);
-      showSubmissionError()
+      showSubmissionError();
     }
   });
-}
+};
 
 function doResetButton(resetButton, captureButton, approveButton, nextButtonNav, nextLink) {
   approveButton.removeClass('approved');
@@ -135,11 +135,11 @@ function submitNameChange(event) {
       "new_name" : full_name,
       "rationale": "Want to match ID for ID Verified Certificates."
     },
-    function(data) {
+    function() {
         $('#full-name').html(full_name);
     }
   )
-  .fail(function(jqXhr,text_status, error_thrown) {
+  .fail(function(jqXhr) {
     $('.message-copy').html(jqXhr.responseText);
   });
 
@@ -207,7 +207,7 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
   }
 
   function approve() {
-    doApproveButton(approveButton, nextButtonNav, nextLink)
+    doApproveButton(approveButton, nextButtonNav, nextLink);
     return false;
   }
 
@@ -304,7 +304,7 @@ $(document).ready(function() {
   });
 
   // prevent browsers from keeping this button checked
-  $("#confirm_pics_good").prop("checked", false)
+  $("#confirm_pics_good").prop("checked", false);
   $("#confirm_pics_good").change(function() {
       $(".payment-button").toggleClass('disabled');
       $("#reverify_button").toggleClass('disabled');
@@ -317,13 +317,13 @@ $(document).ready(function() {
   $('#face_next_link').click(function(){
       analytics.pageview("Capture ID Photo");
       $('#photo-error').hide();
-      $('body').addClass('step-photos-id').removeClass('step-photos-cam')
-  })
+      $('body').addClass('step-photos-id').removeClass('step-photos-cam');
+  });
 
   $('#photo_id_next_link').click(function(){
       analytics.pageview("Review Photos");
-      $('body').addClass('step-review').removeClass('step-photos-id')
-  })
+      $('body').addClass('step-review').removeClass('step-photos-id');
+  });
 
   // set up edit information dialog
   $('#edit-name div[role="alert"]').hide();
