@@ -188,11 +188,6 @@
     margin-bottom: spacing-vertical(base);
     border-bottom: rem(2) solid palette(grayscale-cool, x-light);
     padding-bottom: spacing-vertical(base);
-
-    &:last-child {
-        border: none;
-        padding-bottom: 0;
-    }
 }
 
 %rendering-hd-section {
@@ -270,7 +265,7 @@
 
     // organizations
     .accomplishment-orgs {
-        @extend %rendering-section;
+        margin-bottom: spacing-vertical(base);
 
         .list-orgs {
             @extend %list-unstyled;
@@ -452,8 +447,8 @@
 }
 
 // certificate - base + honor
-.certificate-honor,
-.certificate-base {
+.layout-accomplishment.certificate-honor,
+.layout-accomplishment.certificate-base {
 
     .introduction {
         margin-bottom: 0;
@@ -470,7 +465,7 @@
         }
 
         // hide the fancy
-        .accomplishment-signatories,
+        .accomplishment-signatories .signatory-signature,
         .accomplishment-type-symbol {
             display: none;
         }
@@ -478,8 +473,8 @@
 }
 
 // certificate - distinguished + verified
-.certificate-verified,
-.certificate-distinguished {
+.layout-accomplishment.certificate-verified,
+.layout-accomplishment.certificate-distinguished {
 
     .introduction {
         margin-bottom: spacing-vertical(base);
