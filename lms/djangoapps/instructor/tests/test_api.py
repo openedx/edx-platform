@@ -75,7 +75,8 @@ EXPECTED_CSV_HEADER = (
     '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
     '"customer_reference_number","internal_reference"'
 )
-EXPECTED_COUPON_CSV_HEADER = '"code","course_id","percentage_discount","code_redeemed_count","description"'
+EXPECTED_COUPON_CSV_HEADER = '"Coupon Code","Course Id","% Discount","Description","Expiration Date",' \
+                             '"Is Active","Code Redeemed Count","Total Discounted Seats","Total Discounted Amount"'
 
 # ddt data for test cases involving reports
 REPORTS_DATA = (
@@ -4246,13 +4247,20 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         # filter all the coupons
         for coupon in Coupon.objects.all():
-            self.assertIn('"{code}","{course_id}","{discount}","0","{description}","{expiration_date}","True"'.format(
-                code=coupon.code,
-                course_id=coupon.course_id,
-                discount=coupon.percentage_discount,
-                description=coupon.description,
-                expiration_date=coupon.display_expiry_date
-            ), response.content)
+            self.assertIn(
+                '"{coupon_code}","{course_id}","{discount}","{description}","{expiration_date}","{is_active}",'
+                '"{code_redeemed_count}","{total_discounted_seats}","{total_discounted_amount}"'.format(
+                    coupon_code=coupon.code,
+                    course_id=coupon.course_id,
+                    discount=coupon.percentage_discount,
+                    description=coupon.description,
+                    expiration_date=coupon.display_expiry_date,
+                    is_active=coupon.is_active,
+                    code_redeemed_count="0",
+                    total_discounted_seats="0",
+                    total_discounted_amount="0",
+                ), response.content
+            )
 
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')

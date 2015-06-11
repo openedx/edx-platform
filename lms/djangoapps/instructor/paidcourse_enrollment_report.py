@@ -156,7 +156,8 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
         coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
         coupon_codes = ", ".join(coupon_codes)
 
-        list_price = order_item.list_price
+        # We store the list price only when a discount has been applied, otherwise, we just use the unit_cost.
+        list_price = order_item.list_price if order_item.list_price else order_item.unit_cost
         payment_amount = order_item.unit_cost
         coupon_codes_used = coupon_codes
         payment_status = order_item.status
