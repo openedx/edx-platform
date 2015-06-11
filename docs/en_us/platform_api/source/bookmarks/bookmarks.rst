@@ -6,21 +6,19 @@ Bookmarks API
 This page contains information about using the Bookmarks API to complete
 the following actions.
  
-* :ref:`Get a List of Bookmarks`
-* :ref:`Create a New Bookmark`
-* :ref:`Retrieve a Bookmark`
-* :ref:`Delete a Bookmark`
+* :ref:`Get List or Create Bookmarks`
+* :ref:`Retrieve or Delete a Bookmark`
 
    
-.. _Get a List of Bookmarks:
+.. _Get List or Create Bookmarks:
  
-***********************
-Get a List of Bookmarks
-***********************
+***************************************************
+Get a List of Bookmarks or Create a New Bookmark
+***************************************************
  
-.. autoclass:: folder_name.file_name.class_name
- 
-**Example response**
+.. autoclass:: bookmarks.views.BookmarksListView
+
+**Example response showing a paginated list of bookmarks**
  
 .. code-block:: json
  
@@ -50,19 +48,11 @@ Get a List of Bookmarks
 	        }
 	    ]
 	} 
- 
-.. _Create a New Bookmark:
- 
-**********************
+
 Create a New Bookmark
-**********************
- 
-.. autoclass:: folder_name.file_name.class_name
- 
-**Example response**
- 
+  
 .. code-block:: json
- 
+
 	// Request
 	{
 	    "usage_id": "i4x://RiceX/BIOC300.1x/openassessment/cf4c1de230af407fa214905b90aace57",
@@ -89,16 +79,19 @@ Create a New Bookmark
 	}
 
 
-.. _Retrieve a Bookmark:
+.. _Retrieve or Delete a Bookmark:
  
-***********************
+********************************
+Retrieve or Delete a Bookmark
+********************************
+ 
+.. autoclass:: bookmarks.views.BookmarksDetailView
+
+
+**Example response showing a user's bookmark**
+ 
 Retrieve a Bookmark
-***********************
- 
-.. autoclass:: folder_name.file_name.class_name
- 
-**Example response**
- 
+
 .. code-block:: json
 
 	200 OK
@@ -121,16 +114,7 @@ Retrieve a Bookmark
 	}
 
 
-
-.. _Delete a Bookmark:
- 
-***********************
 Delete a Bookmark
-***********************
- 
-.. autoclass:: folder_name.file_name.class_name
- 
-**Example response**
  
 .. code-block:: json
 
