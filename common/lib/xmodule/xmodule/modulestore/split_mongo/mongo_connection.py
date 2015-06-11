@@ -15,7 +15,7 @@ from time import time
 
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
-from django.core.cache import cache
+from django.core.cache import get_cache
 
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read, MongoProxy
@@ -267,6 +267,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("get_structure", course_context) as tagger_get_structure:
             structure_cache_key = "modulestore.split_mongo.mongo_connection.get_structure.{}".format(key)
+            cache = get_cache('course_structure_cache')
 
             def _fetch_from_cache():
                 """Pull the compressed, pickled struct data from cache and deserialize."""
