@@ -29,7 +29,7 @@
 <%block name="pagetitle">${_("Courses")}</%block>
 <%
   platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-
+  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
   if self.stanford_theme_enabled():
     course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
     logo_file = static.url('themes/stanford/images/seal.png')
@@ -66,6 +66,7 @@
 
   <section class="courses-container">
 
+    % if course_discovery_enabled:
     <div id="discovery-form" role="search" aria-label="course">
       <form>
         <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/><!-- removes spacing
@@ -83,8 +84,9 @@
 
     <div id="filter-bar" class="filters hide-phone">
     </div>
+    % endif
 
-    <section class="courses">
+    <section class="courses${'' if course_discovery_enabled else ' no-course-discovery'}">
       <ul class="courses-listing">
         %for course in courses:
         <li class="courses-listing-item">
@@ -95,8 +97,10 @@
     </section>
 
 
+    % if course_discovery_enabled:
     <aside aria-label="${_('Refine your search')}" class="search-facets phone-menu">
     </aside>
+    % endif
 
   </section>
 </section>

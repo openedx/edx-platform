@@ -94,6 +94,9 @@ FEATURES['MILESTONES_APP'] = True
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 
+# Enable Course Discovery
+FEATURES['ENABLE_COURSE_DISCOVERY'] = True
+
 # Enable student notes
 FEATURES['ENABLE_EDXNOTES'] = True
 

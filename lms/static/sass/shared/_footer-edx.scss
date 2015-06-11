@@ -80,12 +80,15 @@ footer#footer-edx-v3 {
     }
   }
 
-  .social-media-links,
   .mobile-app-links {
     @include clearfix();
+    position: relative;
+    width: 260px;
+    height: 42px;
   }
 
   .social-media-links {
+    @include clearfix();
     margin-bottom: 30px;
   }
 
@@ -119,17 +122,20 @@ footer#footer-edx-v3 {
   }
 
   .app-link {
-    @include float(left);
-    @include margin-right(10px);
-    position: relative;
-    display: inline-block;
+    position: absolute;
+    top: 0;
+
+    &:first-of-type {
+      @include left(0);
+    }
 
     &:last-of-type {
-      @include margin-right(0);
+      @include right(0);
     }
 
     img {
       height: 40px;
+      max-width: 200px;
     }
   }
 
