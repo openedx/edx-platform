@@ -320,8 +320,8 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
         (ModuleStoreEnum.Type.mongo, 1, 21, 15, 40, 27),
         (ModuleStoreEnum.Type.mongo, 50, 315, 15, 628, 27),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 2, 40, 27),
-        (ModuleStoreEnum.Type.split, 50, 3, 2, 628, 27),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 40, 27),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 628, 27),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
