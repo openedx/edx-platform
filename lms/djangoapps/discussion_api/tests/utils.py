@@ -30,6 +30,32 @@ def _get_thread_callback(thread_data):
     return callback
 
 
+def _get_comment_callback(comment_data, thread_id, parent_id):
+    """
+    Get a callback function that will return a comment containing the given data
+    plus necessary dummy data, overridden by the content of the POST/PUT
+    request.
+    """
+    def callback(request, _uri, headers):
+        """
+        Simulate the comment creation or update endpoint as described above.
+        """
+        response_data = make_minimal_cs_comment(comment_data)
+        # thread_id and parent_id are not included in request payload but
+        # are returned by the comments service
+        response_data["thread_id"] = thread_id
+        response_data["parent_id"] = parent_id
+        for key, val_list in request.parsed_body.items():
+            val = val_list[0]
+            if key in ["anonymous", "anonymous_to_peers", "endorsed"]:
+                response_data[key] = val == "True"
+            else:
+                response_data[key] = val
+        return (200, headers, json.dumps(response_data))
+
+    return callback
+
+
 class CommentsServiceMockMixin(object):
     """Mixin with utility methods for mocking the comments service"""
     def register_get_threads_response(self, threads, page, num_pages):
@@ -84,33 +110,35 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
-    def register_post_comment_response(self, response_overrides, thread_id, parent_id=None):
+    def register_post_comment_response(self, comment_data, thread_id, parent_id=None):
         """
         Register a mock response for POST on the CS comments endpoint for the
         given thread or parent; exactly one of thread_id and parent_id must be
         specified.
         """
-        def callback(request, _uri, headers):
-            """
-            Simulate the comment creation endpoint by returning the provided data
-            along with the data from response_overrides.
-            """
-            response_data = make_minimal_cs_comment(
-                {key: val[0] for key, val in request.parsed_body.items()}
-            )
-            response_data.update(response_overrides or {})
-            # thread_id and parent_id are not included in request payload but
-            # are returned by the comments service
-            response_data["thread_id"] = thread_id
-            response_data["parent_id"] = parent_id
-            return (200, headers, json.dumps(response_data))
-
         if parent_id:
             url = "http://localhost:4567/api/v1/comments/{}".format(parent_id)
         else:
             url = "http://localhost:4567/api/v1/threads/{}/comments".format(thread_id)
 
-        httpretty.register_uri(httpretty.POST, url, body=callback)
+        httpretty.register_uri(
+            httpretty.POST,
+            url,
+            body=_get_comment_callback(comment_data, thread_id, parent_id)
+        )
+
+    def register_put_comment_response(self, comment_data):
+        """
+        Register a mock response for PUT on the CS endpoint for the given
+        comment data (which must include the key "id").
+        """
+        thread_id = comment_data["thread_id"]
+        parent_id = comment_data.get("parent_id")
+        httpretty.register_uri(
+            httpretty.PUT,
+            "http://localhost:4567/api/v1/comments/{}".format(comment_data["id"]),
+            body=_get_comment_callback(comment_data, thread_id, parent_id)
+        )
 
     def register_get_comment_error_response(self, comment_id, status_code):
         """
