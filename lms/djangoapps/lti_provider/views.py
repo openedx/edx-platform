@@ -4,8 +4,6 @@ LTI Provider view functions
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -13,6 +11,7 @@ import logging
 from lti_provider.outcomes import store_outcome_parameters
 from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
+from lti_provider.users import authenticate_lti_user
 from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
@@ -24,7 +23,7 @@ log = logging.getLogger("edx.lti_provider")
 REQUIRED_PARAMETERS = [
     'roles', 'context_id', 'oauth_version', 'oauth_consumer_key',
     'oauth_signature', 'oauth_signature_method', 'oauth_timestamp',
-    'oauth_nonce'
+    'oauth_nonce', 'user_id'
 ]
 
 OPTIONAL_PARAMETERS = [
@@ -92,9 +91,17 @@ def lti_launch(request, course_id, usage_id):
     params['usage_key'] = usage_key
     request.session[LTI_SESSION_KEY] = params
 
-    if not request.user.is_authenticated():
-        run_url = reverse('lti_provider.views.lti_run')
-        return redirect_to_login(run_url, settings.LOGIN_URL)
+    try:
+        lti_consumer = LtiConsumer.get_or_supplement(
+            params.get('tool_consumer_instance_guid', None),
+            params['oauth_consumer_key']
+        )
+    except LtiConsumer.DoesNotExist:
+        return HttpResponseForbidden()
+
+    # Create an edX account if the user identifed by the LTI launch doesn't have
+    # one already, and log the edX account into the platform.
+    authenticate_lti_user(request, params['user_id'], lti_consumer)
 
     return lti_run(request)
 

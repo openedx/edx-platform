@@ -24,6 +24,7 @@ LTI_DEFAULT_PARAMS = {
     'oauth_signature_method': u'HMAC-SHA1',
     'oauth_timestamp': u'OAuth Timestamp',
     'oauth_nonce': u'OAuth Nonce',
+    'user_id': u'LTI_User',
 }
 
 LTI_OPTIONAL_PARAMS = {
@@ -89,7 +90,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     Tests for the lti_launch view
     """
     @patch('lti_provider.views.render_courseware')
-    def test_valid_launch(self, render):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_valid_launch(self, _authenticate, render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
         """
@@ -99,7 +101,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
 
     @patch('lti_provider.views.render_courseware')
     @patch('lti_provider.views.store_outcome_parameters')
-    def test_outcome_service_registered(self, store_params, _render):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_outcome_service_registered(self, _authenticate, store_params, _render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
         """
@@ -142,7 +145,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.assertEqual(response.status_code, 403)
 
     @patch('lti_provider.views.lti_run')
-    def test_session_contents_after_launch(self, _run):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_session_contents_after_launch(self, _authenticate, _run):
         """
         Verifies that the LTI parameters and the course and usage IDs are
         properly stored in the session
@@ -156,7 +160,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.assertEqual(session[key], request.POST[key], key + ' not set in the session')
 
     @patch('lti_provider.views.lti_run')
-    def test_optional_parameters_in_session(self, _run):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_optional_parameters_in_session(self, _authenticate, _run):
         """
         Verifies that the outcome-related optional LTI parameters are properly
         stored in the session
@@ -182,17 +187,6 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             'Consumer instance GUID not set in the session'
         )
 
-    def test_redirect_for_non_authenticated_user(self):
-        """
-        Verifies that if the lti_launch view is called by an unauthenticated
-        user, the response will redirect to the login page with the correct
-        URL
-        """
-        request = build_launch_request(False)
-        response = views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/accounts/login?next=/lti_provider/lti_run')
-
     def test_forbidden_if_signature_fails(self):
         """
         Verifies that the view returns Forbidden if the LTI OAuth signature is
@@ -203,6 +197,21 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         response = views.lti_launch(request, None, None)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.status_code, 403)
+
+    @patch('lti_provider.views.render_courseware')
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_user_authentication_called(self, authenticate, _render):
+        """
+        Verifies that the view returns Forbidden if the LTI OAuth signature is
+        incorrect.
+        """
+        request = build_launch_request()
+        views.lti_launch(
+            request,
+            unicode(COURSE_PARAMS['course_key']),
+            unicode(COURSE_PARAMS['usage_key'])
+        )
+        authenticate.assert_called_with(request, u'LTI_User', self.consumer)
 
 
 class LtiRunTest(LtiTestMixin, TestCase):
