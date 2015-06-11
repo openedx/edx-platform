@@ -7,6 +7,7 @@ from django.http import Http404
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
@@ -15,7 +16,6 @@ from course_structure_api.v0 import api, serializers
 from course_structure_api.v0.errors import CourseNotFoundError, CourseStructureNotAvailableError
 from courseware import courses
 from courseware.access import has_access
-from openedx.core.lib.api.permissions import IsAuthenticatedOrDebug
 from openedx.core.lib.api.serializers import PaginationSerializer
 from student.roles import CourseInstructorRole, CourseStaffRole
 
@@ -29,7 +29,7 @@ class CourseViewMixin(object):
     """
     lookup_field = 'course_id'
     authentication_classes = (OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticatedOrDebug,)
+    permission_classes = (IsAuthenticated,)
 
     def get_course_or_404(self):
         """

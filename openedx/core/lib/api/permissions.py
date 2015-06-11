@@ -35,19 +35,6 @@ class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.
         return api_permissions or is_authenticated_permissions
 
 
-class IsAuthenticatedOrDebug(permissions.BasePermission):
-    """
-    Allows access only to authenticated users, or anyone if debug mode is enabled.
-    """
-
-    def has_permission(self, request, view):
-        if settings.DEBUG:
-            return True
-
-        user = getattr(request, 'user', None)
-        return user and user.is_authenticated()
-
-
 class IsUserInUrl(permissions.BasePermission):
     """
     Permission that checks to see if the request user matches the user in the URL.

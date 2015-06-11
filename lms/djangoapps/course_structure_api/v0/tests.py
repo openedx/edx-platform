@@ -156,11 +156,7 @@ class CourseDetailMixin(object):
         return response
 
     def test_not_authenticated(self):
-        # If debug mode is enabled, the view should always return data.
-        with override_settings(DEBUG=True):
-            response = self.http_get(reverse(self.view, kwargs={'course_id': self.course_id}), HTTP_AUTHORIZATION=None)
-            self.assertEqual(response.status_code, 200)
-
+        """ The view should return HTTP status 401 if no user is authenticated. """
         # HTTP 401 should be returned if the user is not authenticated.
         response = self.http_get(reverse(self.view, kwargs={'course_id': self.course_id}), HTTP_AUTHORIZATION=None)
         self.assertEqual(response.status_code, 401)
@@ -169,12 +165,6 @@ class CourseDetailMixin(object):
         user = StaffFactory(course_key=self.course.id)
         access_token = AccessTokenFactory.create(user=user, client=self.oauth_client).token
         auth_header = 'Bearer ' + access_token
-
-        # If debug mode is enabled, the view should always return data.
-        with override_settings(DEBUG=True):
-            response = self.http_get(reverse(self.view, kwargs={'course_id': self.course_id}),
-                                     HTTP_AUTHORIZATION=auth_header)
-            self.assertEqual(response.status_code, 200)
 
         # Access should be granted if the proper access token is supplied.
         response = self.http_get(reverse(self.view, kwargs={'course_id': self.course_id}),
@@ -231,11 +221,6 @@ class CourseListTests(CourseViewTestsMixin, ModuleStoreTestCase):
         self.assertValidResponseCourse(courses[0], self.course)
 
     def test_not_authenticated(self):
-        # If debug mode is enabled, the view should always return data.
-        with override_settings(DEBUG=True):
-            response = self.http_get(reverse(self.view), HTTP_AUTHORIZATION=None)
-            self.assertEqual(response.status_code, 200)
-
         response = self.http_get(reverse(self.view), HTTP_AUTHORIZATION=None)
         self.assertEqual(response.status_code, 401)
 
@@ -246,11 +231,6 @@ class CourseListTests(CourseViewTestsMixin, ModuleStoreTestCase):
         user = StaffFactory(course_key=self.course.id)
         access_token = AccessTokenFactory.create(user=user, client=self.oauth_client).token
         auth_header = 'Bearer ' + access_token
-
-        # If debug mode is enabled, the view should always return data.
-        with override_settings(DEBUG=True):
-            response = self.http_get(reverse(self.view), HTTP_AUTHORIZATION=auth_header)
-            self.assertEqual(response.status_code, 200)
 
         # Data should be returned if the user is authorized.
         response = self.http_get(reverse(self.view), HTTP_AUTHORIZATION=auth_header)
