@@ -86,7 +86,7 @@
                                 required: true,
                                 title: gettext('Country or Region'),
                                 valueAttribute: 'country',
-                                options: fieldsData['country']['options'],
+                                options: fieldsData.country.options,
                                 persistChanges: true
                             })
                         }
@@ -118,7 +118,7 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData['year_of_birth']['options'],
+                                options: fieldsData.year_of_birth.options,
                                 persistChanges: true
                             })
                         },

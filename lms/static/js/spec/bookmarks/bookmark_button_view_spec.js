@@ -50,8 +50,22 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
             });
 
             it("bookmark/un-bookmark the block correctly", function () {
-                var addBookmarkedData = {bookmarked: true, handler: 'removeBookmark', event: 'bookmark:remove', method: 'DELETE', url: API_URL + 'bilbo,usage_1/', body: null};
-                var removeBookmarkData = {bookmarked: false, handler: 'addBookmark', event: 'bookmark:add', method: 'POST', url: API_URL, body: 'usage_id=usage_1'};
+                var addBookmarkedData = {
+                    bookmarked: true,
+                    handler: 'removeBookmark',
+                    event: 'bookmark:remove',
+                    method: 'DELETE',
+                    url: API_URL + 'bilbo,usage_1/',
+                    body: null
+                };
+                var removeBookmarkData = {
+                    bookmarked: false,
+                    handler: 'addBookmark',
+                    event: 'bookmark:add',
+                    method: 'POST',
+                    url: API_URL,
+                    body: 'usage_id=usage_1'
+                };
                 var requests = AjaxHelpers.requests(this);
 
                 _.each([[addBookmarkedData, removeBookmarkData], [removeBookmarkData, addBookmarkedData]], function(actionsData) {
@@ -66,7 +80,11 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                     bookmarkButtonView.$el.click();
 
-                    AjaxHelpers.expectRequest(requests, firstActionData.method, firstActionData.url, firstActionData.body);
+                    AjaxHelpers.expectRequest(
+                        requests, firstActionData.method,
+                        firstActionData.url,
+                        firstActionData.body
+                    );
 
                     expect(bookmarkButtonView[firstActionData.handler]).toHaveBeenCalled();
                     AjaxHelpers.respondWithJson(requests, {});
@@ -80,7 +98,12 @@ define(['backbone', 'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'j
 
                     bookmarkButtonView.$el.click();
 
-                    AjaxHelpers.expectRequest(requests, secondActionData.method, secondActionData.url, secondActionData.body);
+                    AjaxHelpers.expectRequest(
+                        requests,
+                        secondActionData.method,
+                        secondActionData.url,
+                        secondActionData.body
+                    );
 
                     expect(bookmarkButtonView[secondActionData.handler]).toHaveBeenCalled();
                     AjaxHelpers.respondWithJson(requests, {});
