@@ -44,9 +44,9 @@ class CourseTeamPageTest(StudioCourseTest):
         self.page.visit()
         self.page.wait_until_ready()
 
-    def _expect_refresh(self):
+    def _refresh_page(self):
         """
-        Wait for the page to reload.
+        Reload the page.
         """
         self.page = CourseTeamPage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
@@ -198,7 +198,7 @@ class CourseTeamPageTest(StudioCourseTest):
         other = self.page.get_user(self.other_user.get('email'))
         self._assert_is_staff(other)
         other.click_promote()
-        self._expect_refresh()
+        self._refresh_page()
         self._assert_is_admin(other)
 
         self.log_in(self.other_user)
@@ -227,7 +227,7 @@ class CourseTeamPageTest(StudioCourseTest):
         other = self.page.get_user(self.other_user.get('email'))
         self._assert_is_staff(other)
         other.click_promote()
-        self._expect_refresh()
+        self._refresh_page()
         other = self.page.get_user(self.other_user.get('email'))
         self._assert_is_admin(other)
 
@@ -242,7 +242,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self._go_to_course_team_page()
         other = self.page.get_user(self.other_user.get('email'))
         other.click_demote()
-        self._expect_refresh()
+        self._refresh_page()
         other = self.page.get_user(self.other_user.get('email'))
         self._assert_is_staff(other)
 
@@ -276,7 +276,7 @@ class CourseTeamPageTest(StudioCourseTest):
 
         other = self.page.get_user(self.other_user.get('email'))
         other.click_promote()
-        self._expect_refresh()
+        self._refresh_page()
         other = self.page.get_user(self.other_user.get('email'))
         self._assert_is_admin(other)
 
@@ -316,7 +316,7 @@ class CourseTeamPageTest(StudioCourseTest):
 
         other = self.page.get_user(self.other_user.get('email'))
         other.click_promote()
-        self._expect_refresh()
+        self._refresh_page()
 
         other = self.page.get_user(self.other_user.get('email'))
         self._assert_is_admin(other)
@@ -325,7 +325,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self.assertTrue(current.can_demote)
         self.assertTrue(current.can_delete)
         current.click_demote()
-        self._expect_refresh()
+        self._refresh_page()
         current = self.page.get_user(self.user.get('email'))
         self._assert_is_staff(current, can_manage=False)
         self._assert_can_not_manage_users()
@@ -336,7 +336,7 @@ class CourseTeamPageTest(StudioCourseTest):
 
         current = self.page.get_user(self.user.get('email'))
         current.click_delete()
-        self._expect_refresh()
+        self._refresh_page()
         self._assert_user_present(self.user, present=False)
 
         self.log_in(self.user)
