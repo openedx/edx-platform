@@ -1,10 +1,10 @@
 define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
-    "js/views/paging", "js/views/paging_header", "js/views/paging_footer",
-    "js/models/asset", "js/collections/asset" ],
-    function ($, AjaxHelpers, URI, PagingView, PagingHeader, PagingFooter, AssetModel, AssetCollection) {
+    "common/js/components/views/paging", "common/js/components/views/paging_header",
+    "common/js/components/views/paging_footer", "common/js/spec/components/paging_collection"],
+    function ($, AjaxHelpers, URI, PagingView, PagingHeader, PagingFooter, PagingCollection) {
 
-        var createMockAsset = function(index) {
-            var id = 'asset_' + index;
+        var createPageableItem = function(index) {
+            var id = 'item_' + index;
             return {
                 id: id,
                 display_name: id,
@@ -13,10 +13,10 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
         };
 
         var mockFirstPage = {
-            assets: [
-                createMockAsset(1),
-                createMockAsset(2),
-                createMockAsset(3)
+            items: [
+                createPageableItem(1),
+                createPageableItem(2),
+                createPageableItem(3)
             ],
             pageSize: 3,
             totalCount: 4,
@@ -25,8 +25,8 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
             end: 2
         };
         var mockSecondPage = {
-            assets: [
-                createMockAsset(4)
+            items: [
+                createPageableItem(4)
             ],
             pageSize: 3,
             totalCount: 4,
@@ -35,7 +35,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
             end: 4
         };
         var mockEmptyPage = {
-            assets: [],
+            items: [],
             pageSize: 3,
             totalCount: 0,
             page: 0,
@@ -43,7 +43,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
             end: 0
         };
 
-        var respondWithMockAssets = function(requests) {
+        var respondWithMockItems = function(requests) {
             var requestIndex = requests.length - 1;
             var request = requests[requestIndex];
             var url = new URI(request.url);
@@ -58,9 +58,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
             initialize : function() {
                 this.registerSortableColumn('name-col', 'Name', 'name', 'asc');
                 this.registerSortableColumn('date-col', 'Date', 'date', 'desc');
-                this.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 this.setInitialSortColumn('date-col');
-                this.setInitialFilterColumn('js-asset-type-col');
             }
         });
 
@@ -68,30 +66,25 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
             var pagingView;
 
             beforeEach(function () {
-                var assets = new AssetCollection();
-                assets.url = "assets_url";
-                var feedbackTpl = readFixtures('system-feedback.underscore');
-                setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTpl));
-                pagingView = new MockPagingView({collection: assets});
+                pagingView = new MockPagingView({collection: new PagingCollection()});
             });
-
 
             describe("PagingView", function () {
                 describe("setPage", function () {
                     it('can set the current page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(0);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(1);
                     });
 
                     it('should not change page after a server error', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.setPage(1);
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(0);
@@ -102,7 +95,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('does not move forward after a server error', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.nextPage();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(0);
@@ -111,16 +104,16 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('can move to the next page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.nextPage();
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(1);
                     });
 
                     it('can not move forward from the final page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.nextPage();
                         expect(requests.length).toBe(1);
                     });
@@ -131,16 +124,16 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('can move back a page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.previousPage();
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(0);
                     });
 
                     it('can not move back from the first page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.previousPage();
                         expect(requests.length).toBe(1);
                     });
@@ -148,7 +141,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('does not move back after a server error', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingView.previousPage();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(1);
@@ -161,21 +154,21 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                         var requests = AjaxHelpers.requests(this);
                         expect(pagingView.collection.sortDirection).toBe('desc');
                         pagingView.toggleSortOrder('date-col');
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.sortDirection).toBe('asc');
                         pagingView.toggleSortOrder('date-col');
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.sortDirection).toBe('desc');
                     });
 
                     it('sets the correct default sort direction for a column', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.toggleSortOrder('name-col');
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.sortDisplayName()).toBe('Name');
                         expect(pagingView.collection.sortDirection).toBe('asc');
                         pagingView.toggleSortOrder('date-col');
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.sortDisplayName()).toBe('Date');
                         expect(pagingView.collection.sortDirection).toBe('desc');
                     });
@@ -185,7 +178,6 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
 
                     it('returns the registered info for a column', function () {
                         pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
-                        pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                         var sortInfo = pagingView.sortableColumnInfo('test-col');
                         expect(sortInfo.displayName).toBe('Test Column');
                         expect(sortInfo.fieldName).toBe('testField');
@@ -217,7 +209,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('does not move forward if a server error occurs', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingHeader.$('.next-page-link').click();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(0);
@@ -226,23 +218,23 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('can move to the next page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingHeader.$('.next-page-link').click();
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(1);
                     });
 
                     it('should be enabled when there is at least one more page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.next-page-link')).not.toHaveClass('is-disabled');
                     });
 
                     it('should be disabled on the final page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.next-page-link')).toHaveClass('is-disabled');
                     });
 
@@ -264,7 +256,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('does not move back if a server error occurs', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingHeader.$('.previous-page-link').click();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(1);
@@ -273,23 +265,23 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('can go back a page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingHeader.$('.previous-page-link').click();
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(0);
                     });
 
                     it('should be disabled on the first page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.previous-page-link')).toHaveClass('is-disabled');
                     });
 
                     it('should be enabled on the second page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.previous-page-link')).not.toHaveClass('is-disabled');
                     });
 
@@ -306,7 +298,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                         var requests = AjaxHelpers.requests(this),
                             message;
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         message = pagingHeader.$('.meta').html().trim();
                         expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>' +
                             ' out of <span class="count-total">4 total</span>, ' +
@@ -318,7 +310,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                             message;
                         pagingView.setPage(0);
                         pagingView.toggleSortOrder('name-col');
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         message = pagingHeader.$('.meta').html().trim();
                         expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>' +
                             ' out of <span class="count-total">4 total</span>, ' +
@@ -326,18 +318,18 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     });
                 });
 
-                describe("Asset count label", function () {
+                describe("Item count label", function () {
                     it('should show correct count on first page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.count-current-shown')).toHaveHtml('1-3');
                     });
 
                     it('should show correct count on second page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.count-current-shown')).toHaveHtml('4-4');
                     });
 
@@ -349,18 +341,18 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     });
                 });
 
-                describe("Asset total label", function () {
+                describe("Item total label", function () {
                     it('should show correct total on the first page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.count-total')).toHaveText('4 total');
                     });
 
                     it('should show correct total on the second page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.count-total')).toHaveText('4 total');
                     });
 
@@ -376,14 +368,14 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('should show correct initial sort order', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.sort-order')).toHaveText('Date');
                     });
 
                     it('should show updated sort order', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.toggleSortOrder('name-col');
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingHeader.$('.sort-order')).toHaveText('Name');
                     });
                 });
@@ -406,7 +398,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('does not move forward if a server error occurs', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.next-page-link').click();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(0);
@@ -415,23 +407,23 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('can move to the next page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.next-page-link').click();
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(1);
                     });
 
                     it('should be enabled when there is at least one more page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.next-page-link')).not.toHaveClass('is-disabled');
                     });
 
                     it('should be disabled on the final page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.next-page-link')).toHaveClass('is-disabled');
                     });
 
@@ -453,7 +445,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('does not move back if a server error occurs', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.previous-page-link').click();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(1);
@@ -462,23 +454,23 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('can go back a page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.previous-page-link').click();
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingView.collection.currentPage).toBe(0);
                     });
 
                     it('should be disabled on the first page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.previous-page-link')).toHaveClass('is-disabled');
                     });
 
                     it('should be enabled on the second page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.previous-page-link')).not.toHaveClass('is-disabled');
                     });
 
@@ -494,14 +486,14 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('should show 1 on the first page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.current-page')).toHaveText('1');
                     });
 
                     it('should show 2 on the second page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.current-page')).toHaveText('2');
                     });
 
@@ -517,11 +509,11 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('should show the correct value with more than one page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.total-pages')).toHaveText('2');
                     });
 
-                    it('should show page 1 when there are no assets', function () {
+                    it('should show page 1 when there are no pageable items', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         AjaxHelpers.respondWithJson(requests, mockEmptyPage);
@@ -539,14 +531,14 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('should initially have a blank page input', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         expect(pagingFooter.$('.page-number-input')).toHaveValue('');
                     });
 
                     it('should handle invalid page requests', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.page-number-input').val('abc');
                         pagingFooter.$('.page-number-input').trigger('change');
                         expect(pagingView.collection.currentPage).toBe(0);
@@ -556,7 +548,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('should switch pages via the input field', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.page-number-input').val('2');
                         pagingFooter.$('.page-number-input').trigger('change');
                         AjaxHelpers.respondWithJson(requests, mockSecondPage);
@@ -567,7 +559,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI",
                     it('should handle AJAX failures when switching pages via the input field', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        respondWithMockAssets(requests);
+                        respondWithMockItems(requests);
                         pagingFooter.$('.page-number-input').val('2');
                         pagingFooter.$('.page-number-input').trigger('change');
                         requests[1].respond(500);
