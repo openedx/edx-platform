@@ -12,8 +12,6 @@ from django.test.utils import override_settings
 
 from django.conf import settings
 from django.db import connection, transaction
-from django.test import TestCase
-
 
 from opaque_keys.edx.keys import CourseKey
 

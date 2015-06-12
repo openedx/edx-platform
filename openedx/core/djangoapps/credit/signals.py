@@ -44,7 +44,7 @@ def send_credit_eligibility_email(sender, instance, created, **kwargs):  # pylin
         try:
             user = User.objects.get(username=instance.username)
         except User.DoesNotExist:
-            log.debug('No user with %s exist',instance.username)
+            log.debug('No user with %s exist', instance.username)
         account_settings = get_account_settings(user)
 
         context = {
@@ -59,4 +59,3 @@ def send_credit_eligibility_email(sender, instance, created, **kwargs):  # pylin
         to_address = account_settings['email']
 
         send_mail(subject, message, from_address, [to_address], fail_silently=False)
-
