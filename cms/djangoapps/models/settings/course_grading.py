@@ -14,6 +14,7 @@ class CourseGradingModel(object):
         ]  # weights transformed to ints [0..100]
         self.grade_cutoffs = course_descriptor.grade_cutoffs
         self.grace_period = CourseGradingModel.convert_set_grace_period(course_descriptor)
+        self.minimum_grade_credit = course_descriptor.minimum_grade_credit
 
     @classmethod
     def fetch(cls, course_key):
@@ -61,6 +62,8 @@ class CourseGradingModel(object):
         modulestore().update_item(descriptor, user.id)
 
         CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
+
+        CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
 
         return CourseGradingModel.fetch(course_key)
 
@@ -116,6 +119,25 @@ class CourseGradingModel(object):
             grace_timedelta = timedelta(**graceperiodjson)
             descriptor.graceperiod = grace_timedelta
 
+            modulestore().update_item(descriptor, user.id)
+
+    @staticmethod
+    def update_minimum_grade_credit_from_json(course_key, minimum_grade_credit, user):
+        """Update the course's default minimum grade requirement for credit.
+
+        Args:
+            course_key(CourseKey): The course identifier
+            minimum_grade_json(Float): Minimum grade value
+            user(User): The user object
+
+        """
+        descriptor = modulestore().get_course(course_key)
+
+        # 'minimum_grade_credit' cannot be set to None
+        if minimum_grade_credit is not None:
+            minimum_grade_credit = minimum_grade_credit
+
+            descriptor.minimum_grade_credit = minimum_grade_credit
             modulestore().update_item(descriptor, user.id)
 
     @staticmethod

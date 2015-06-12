@@ -44,7 +44,8 @@ class CourseMetadata(object):
         'is_entrance_exam',
         'in_entrance_exam',
         'language',
-        'certificates'
+        'certificates',
+        'minimum_grade_credit',
     ]
 
     @classmethod

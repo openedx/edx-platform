@@ -20,7 +20,7 @@ LOGGER = get_task_logger(__name__)
 
 # pylint: disable=not-callable
 @task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
-def update_course_requirements(course_id):
+def update_credit_course_requirements(course_id):   # pylint: disable=invalid-name
     """Updates course requirements table for a course.
 
      Args:
@@ -39,7 +39,7 @@ def update_course_requirements(course_id):
             set_credit_requirements(course_key, requirements)
     except (InvalidKeyError, ItemNotFoundError, InvalidCreditRequirements) as exc:
         LOGGER.error('Error on adding the requirements for course %s - %s', course_id, unicode(exc))
-        raise update_course_requirements.retry(args=[course_id], exc=exc)
+        raise update_credit_course_requirements.retry(args=[course_id], exc=exc)
     else:
         LOGGER.info('Requirements added for course %s', course_id)
 

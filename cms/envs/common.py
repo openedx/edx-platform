@@ -173,6 +173,8 @@ FEATURES = {
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
+    # Enable credit eligibility feature
+    'ENABLE_CREDIT_ELIGIBILITY': False,
 }
 
 ENABLE_JASMINE = False

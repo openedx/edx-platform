@@ -24,6 +24,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import CourseTab
 from openedx.core.lib.course_tabs import CourseTabPluginManager
+from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
+from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -842,6 +844,7 @@ def settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     prerequisite_course_enabled = settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False)
+    credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -867,6 +870,9 @@ def settings_handler(request, course_key_string):
                 'upload_asset_url': upload_asset_url,
                 'course_handler_url': reverse_course_url('course_handler', course_key),
                 'language_options': settings.ALL_LANGUAGES,
+                'credit_eligibility_enabled': credit_eligibility_enabled,
+                'is_credit_course': False,
+                'show_min_grade_warning': False,
             }
             if prerequisite_course_enabled:
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -875,6 +881,27 @@ def settings_handler(request, course_key_string):
                 if courses:
                     courses = _remove_in_process_courses(courses, in_process_course_actions)
                 settings_context.update({'possible_pre_requisite_courses': courses})
+
+            if credit_eligibility_enabled:
+                if is_credit_course(course_key):
+                    # get and all credit eligibility requirements
+                    credit_requirements = get_credit_requirements(course_key)
+                    # pair together requirements with same 'namespace' values
+                    paired_requirements = {}
+                    for requirement in credit_requirements:
+                        namespace = requirement.pop("namespace")
+                        paired_requirements.setdefault(namespace, []).append(requirement)
+
+                    # if 'minimum_grade_credit' of a course is not set or 0 then
+                    # show warning message to course author.
+                    show_min_grade_warning = False if course_module.minimum_grade_credit > 0 else True
+                    settings_context.update(
+                        {
+                            'is_credit_course': True,
+                            'credit_requirements': paired_requirements,
+                            'show_min_grade_warning': show_min_grade_warning,
+                        }
+                    )
 
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
@@ -961,6 +988,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 'course_locator': course_key,
                 'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
                 'grading_url': reverse_course_url('grading_handler', course_key),
+                'is_credit_course': is_credit_course(course_key),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -973,6 +1001,11 @@ def grading_handler(request, course_key_string, grader_index=None):
                 else:
                     return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
             elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+                # update credit course requirements if 'minimum_grade_credit'
+                # field value is changed
+                if 'minimum_grade_credit' in request.json:
+                    update_credit_course_requirements.delay(unicode(course_key))
+
                 # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
                 if grader_index is None:
                     return JsonResponse(
