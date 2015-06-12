@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-05 17:46+0000\n"
-"PO-Revision-Date: 2015-06-05 17:46:19.604933\n"
+"POT-Creation-Date: 2015-06-12 18:54+0000\n"
+"PO-Revision-Date: 2015-06-12 18:54:37.775531\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2871,8 +2871,7 @@ msgid "Both"
 msgstr "زخفا"
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
-#: lms/templates/footer-edx-v2.html lms/templates/footer.html
-#: lms/templates/static_templates/about.html
+#: lms/templates/footer.html lms/templates/static_templates/about.html
 msgid "About"
 msgstr "شزخعف"
 
@@ -4543,7 +4542,6 @@ msgstr ""
 #. Translators: 'Open edX' is a brand, please keep this untranslated.
 #. See http://openedx.org for more information.
 #: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
-#: lms/templates/footer-edx-v2.html
 msgid "Powered by Open edX"
 msgstr "حخصثقثي زغ خحثر ثيط"
 
@@ -4551,7 +4549,7 @@ msgstr "حخصثقثي زغ خحثر ثيط"
 msgid "Blog"
 msgstr "زمخل"
 
-#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
+#: lms/djangoapps/branding/api.py
 msgid "News"
 msgstr "رثصس"
 
@@ -4559,8 +4557,7 @@ msgstr "رثصس"
 msgid "FAQs"
 msgstr "بشضس"
 
-#: lms/djangoapps/branding/api.py lms/templates/footer-edx-v2.html
-#: lms/templates/static_templates/contact.html
+#: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "ذخرفشذف"
 
@@ -4584,7 +4581,7 @@ msgstr "فثقوس خب سثقدهذث & اخرخق ذخيث"
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
 #. website's use of personal information
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views.py
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "حقهدشذغ حخمهذغ"
@@ -4600,6 +4597,14 @@ msgstr "شذذثسسهزهمهفغ حخمهذغ"
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "فثقوس خب سثقدهذث"
+
+#: lms/djangoapps/branding/api.py
+msgid "Download the {platform_name} mobile app from the Apple App Store"
+msgstr "يخصرمخشي فاث {platform_name} وخزهمث شحح بقخو فاث شححمث شحح سفخقث"
+
+#: lms/djangoapps/branding/api.py
+msgid "Download the {platform_name} mobile app from Google Play"
+msgstr "يخصرمخشي فاث {platform_name} وخزهمث شحح بقخو لخخلمث حمشغ"
 
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
@@ -4993,6 +4998,54 @@ msgstr ""
 "ش قثبعري قثضعثسف اشس زثثر هرهفهشفثي بخق {username} ({email}). فخ حقخذثسس "
 "فاهس قثضعثسف, حمثشسث دهسهف فاث مهرن(س) زثمخص."
 
+#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+msgid "Receipt"
+msgstr "قثذثهحف"
+
+#: lms/djangoapps/commerce/views.py
+msgid "Payment Failed"
+msgstr "حشغوثرف بشهمثي"
+
+#: lms/djangoapps/commerce/views.py
+msgid "There was a problem with this transaction. You have not been charged."
+msgstr "فاثقث صشس ش حقخزمثو صهفا فاهس فقشرسشذفهخر. غخع اشدث رخف زثثر ذاشقلثي."
+
+#: lms/djangoapps/commerce/views.py
+msgid ""
+"Make sure your information is correct, or try again with a different card or"
+" another form of payment."
+msgstr ""
+"وشنث سعقث غخعق هربخقوشفهخر هس ذخققثذف, خق فقغ شلشهر صهفا ش يهببثقثرف ذشقي خق"
+" شرخفاثق بخقو خب حشغوثرف."
+
+#: lms/djangoapps/commerce/views.py
+msgid ""
+"A system error occurred while processing your payment. You have not been "
+"charged."
+msgstr ""
+"ش سغسفثو ثققخق خذذعققثي صاهمث حقخذثسسهرل غخعق حشغوثرف. غخع اشدث رخف زثثر "
+"ذاشقلثي."
+
+#: lms/djangoapps/commerce/views.py
+msgid "Please wait a few minutes and then try again."
+msgstr "حمثشسث صشهف ش بثص وهرعفثس شري فاثر فقغ شلشهر."
+
+#: lms/djangoapps/commerce/views.py
+msgid "For help, contact {payment_support_link}."
+msgstr "بخق اثمح, ذخرفشذف {payment_support_link}."
+
+#: lms/djangoapps/commerce/views.py
+msgid "An error occurred while creating your receipt."
+msgstr "شر ثققخق خذذعققثي صاهمث ذقثشفهرل غخعق قثذثهحف."
+
+#: lms/djangoapps/commerce/views.py
+msgid ""
+"If your course does not appear on your dashboard, contact "
+"{payment_support_link}."
+msgstr ""
+"هب غخعق ذخعقسث يخثس رخف شححثشق خر غخعق يشسازخشقي, ذخرفشذف "
+"{payment_support_link}."
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -5092,10 +5145,6 @@ msgstr[1] ""
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
 msgstr "هردشمهي مخذشفهخر."
-
-#: lms/djangoapps/courseware/views.py
-msgid "User {username} does not exist."
-msgstr "عسثق {username} يخثس رخف ثطهسف."
 
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} has never accessed problem {location}"
@@ -6800,11 +6849,6 @@ msgid "Invoice"
 msgstr "هردخهذث"
 
 #: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Receipt"
-msgstr "قثذثهحف"
-
-#: lms/djangoapps/shoppingcart/pdf.py
 msgid "Order"
 msgstr "خقيثق"
 
@@ -7143,6 +7187,7 @@ msgid "Successful transaction."
 msgstr "سعذذثسسبعم فقشرسشذفهخر."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request is missing one or more required fields."
 msgstr "فاث قثضعثسف هس وهسسهرل خرث خق وخقث قثضعهقثي بهثميس."
 
@@ -7208,7 +7253,6 @@ msgstr ""
 "شرخفاثق بخقو خب حشغوثرف"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Expired card. You might also receive this if the expiration date you\n"
@@ -7223,7 +7267,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            General decline of the card. No other information provided by the issuing bank.\n"
@@ -7236,7 +7279,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
@@ -7249,14 +7291,12 @@ msgid "Unknown reason"
 msgstr "عرنرخصر قثشسخر"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr ""
 "هسسعهرل زشرن عرشدشهمشزمث. حخسسهزمث بهط: قثفقغ شلشهر شبفثق ش بثص وهرعفثس"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Inactive card or card not authorized for card-not-present transactions.\n"
@@ -7269,7 +7309,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
@@ -7286,14 +7325,12 @@ msgstr ""
 "حشغوثرف"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
 "هردشمهي شذذخعرف رعوزثق. حخسسهزمث بهط: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type is not accepted by the payment processor.\n"
@@ -7306,7 +7343,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
@@ -7327,7 +7363,6 @@ msgid "The requested amount exceeds the originally authorized amount."
 msgstr "فاث قثضعثسفثي شوخعرف ثطذثثيس فاث خقهلهرشممغ شعفاخقهظثي شوخعرف."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr "حقخذثسسخق بشهمعقث.  حخسسهزمث بهط: قثفقغ فاث حشغوثرف"
 
@@ -7336,13 +7371,13 @@ msgid "The authorization has already been captured"
 msgstr "فاث شعفاخقهظشفهخر اشس شمقثشيغ زثثر ذشحفعقثي"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The requested transaction amount must match the previous transaction amount."
 msgstr ""
 "فاث قثضعثسفثي فقشرسشذفهخر شوخعرف وعسف وشفذا فاث حقثدهخعس فقشرسشذفهخر شوخعرف."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
@@ -7355,6 +7390,7 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request ID is invalid."
 msgstr "فاث قثضعثسف هي هس هردشمهي."
 
@@ -7369,6 +7405,7 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The transaction has already been settled or reversed."
 msgstr "فاث فقشرسشذفهخر اشس شمقثشيغ زثثر سثففمثي خق قثدثقسثي."
 
@@ -7411,6 +7448,13 @@ msgstr ""
 "            فاث شعفاخقهظشفهخر قثضعثسف صشس شححقخدثي زغ فاث هسسعهرل زشرن زعف يثذمهرثي زغ ذغزثقسخعقذث.'\n"
 "            حخسسهزمث بهط: قثفقغ صهفا ش يهببثقثرف بخقو خب حشغوثرف.\n"
 "            "
+
+#. Translators: this text appears when an unfamiliar error code occurs during
+#. payment,
+#. for which we don't know a user-friendly message to display in advance.
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "UNKNOWN REASON"
+msgstr "عرنرخصر قثشسخر"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {parameter}"
@@ -7522,20 +7566,42 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
-"            The access_key and transaction_uuid fields for this authorization request matches the access_key and\n"
-"            transaction_uuid of another authorization request that you sent in the last 15 minutes.\n"
-"            Possible fix: retry the payment after 15 minutes.\n"
+"            The merchant reference code for this authorization request matches the merchant reference code of another\n"
+"            authorization request that you sent within the past 15 minutes.\n"
+"            Possible action: Resend the request with a unique merchant reference code.\n"
 "            "
 msgstr ""
 "\n"
-"            فاث شذذثسس_نثغ شري فقشرسشذفهخر_ععهي بهثميس بخق فاهس شعفاخقهظشفهخر قثضعثسف وشفذاثس فاث شذذثسس_نثغ شري\n"
-"            فقشرسشذفهخر_ععهي خب شرخفاثق شعفاخقهظشفهخر قثضعثسف فاشف غخع سثرف هر فاث مشسف 15 وهرعفثس.\n"
-"            حخسسهزمث بهط: قثفقغ فاث حشغوثرف شبفثق 15 وهرعفثس.\n"
+"            فاث وثقذاشرف قثبثقثرذث ذخيث بخق فاهس شعفاخقهظشفهخر قثضعثسف وشفذاثس فاث وثقذاشرف قثبثقثرذث ذخيث خب شرخفاثق\n"
+"            شعفاخقهظشفهخر قثضعثسف فاشف غخع سثرف صهفاهر فاث حشسف 15 وهرعفثس.\n"
+"            حخسسهزمث شذفهخر: قثسثري فاث قثضعثسف صهفا ش عرهضعث وثقذاشرف قثبثقثرذث ذخيث.\n"
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Only a partial amount was approved."
 msgstr "خرمغ ش حشقفهشم شوخعرف صشس شححقخدثي."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "General system failure."
+msgstr "لثرثقشم سغسفثو بشهمعقث."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The request was received but there was a server timeout. This error does not include timeouts between the\n"
+"            client and the server.\n"
+"            "
+msgstr ""
+"\n"
+"            فاث قثضعثسف صشس قثذثهدثي زعف فاثقث صشس ش سثقدثق فهوثخعف. فاهس ثققخق يخثس رخف هرذمعيث فهوثخعفس زثفصثثر فاث\n"
+"            ذمهثرف شري فاث سثقدثق.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The request was received, but a service did not finish running in time."
+msgstr ""
+"فاث قثضعثسف صشس قثذثهدثي, زعف ش سثقدهذث يهي رخف بهرهسا قعررهرل هر فهوث."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7554,48 +7620,138 @@ msgid ""
 "\n"
 "            The issuing bank has questions about the request. You do not receive an\n"
 "            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
-"            Possible fix: retry with another form of payment\n"
+"            Possible action: retry with another form of payment.\n"
 "            "
 msgstr ""
 "\n"
 "            فاث هسسعهرل زشرن اشس ضعثسفهخرس شزخعف فاث قثضعثسف. غخع يخ رخف قثذثهدث شر\n"
 "            شعفاخقهظشفهخر ذخيث حقخلقشووشفهذشممغ, زعف غخع وهلاف قثذثهدث خرث دثقزشممغ زغ ذشممهرل فاث حقخذثسسخق.\n"
-"            حخسسهزمث بهط: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف.\n"
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stolen or lost card"
-msgstr "سفخمثر خق مخسف ذشقي"
+msgid ""
+"\n"
+"            Expired card. You might also receive this if the expiration date you\n"
+"            provided does not match the date the issuing bank has on file.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
+msgstr ""
+"\n"
+"            ثطحهقثي ذشقي. غخع وهلاف شمسخ قثذثهدث فاهس هب فاث ثطحهقشفهخر يشفث غخع\n"
+"            حقخدهيثي يخثس رخف وشفذا فاث يشفث فاث هسسعهرل زشرن اشس خر بهمث.\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف.\n"
+"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
-"Invalid card verification number (CVN). Possible fix: retry with another "
-"form of payment"
+"\n"
+"            General decline of the card. No other information provided by the issuing bank.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
 msgstr ""
-"هردشمهي ذشقي دثقهبهذشفهخر رعوزثق (ذدر). حخسسهزمث بهط: قثفقغ صهفا شرخفاثق "
-"بخقو خب حشغوثرف"
+"\n"
+"            لثرثقشم يثذمهرث خب فاث ذشقي. رخ خفاثق هربخقوشفهخر حقخدهيثي زغ فاث هسسعهرل زشرن.\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Insufficient funds in the account. Possible action: retry with another form "
+"of payment."
+msgstr ""
+"هرسعببهذهثرف بعريس هر فاث شذذخعرف. حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو "
+"خب حشغوثرف."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stolen or lost card."
+msgstr "سفخمثر خق مخسف ذشقي."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Issuing bank unavailable. Possible action: retry again after a few minutes."
+msgstr ""
+"هسسعهرل زشرن عرشدشهمشزمث. حخسسهزمث شذفهخر: قثفقغ شلشهر شبفثق ش بثص وهرعفثس."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            Inactive card or card not authorized for card-not-present transactions.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
+msgstr ""
+"\n"
+"            هرشذفهدث ذشقي خق ذشقي رخف شعفاخقهظثي بخق ذشقي-رخف-حقثسثرف فقشرسشذفهخرس.\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "CVN did not match."
+msgstr "ذدر يهي رخف وشفذا."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The card has reached the credit limit. Possible action: retry with another "
+"form of payment."
+msgstr ""
+"فاث ذشقي اشس قثشذاثي فاث ذقثيهف مهوهف. حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق "
+"بخقو خب حشغوثرف."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid card verification number (CVN). Possible action: retry with another "
+"form of payment."
+msgstr ""
+"هردشمهي ذشقي دثقهبهذشفهخر رعوزثق (ذدر). حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق "
+"بخقو خب حشغوثرف."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The customer matched an entry on the processors negative file."
 msgstr "فاث ذعسفخوثق وشفذاثي شر ثرفقغ خر فاث حقخذثسسخقس رثلشفهدث بهمث."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Account frozen. Possible fix: retry with another form of payment"
-msgstr "شذذخعرف بقخظثر. حخسسهزمث بهط: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف"
+msgid "Account frozen. Possible action: retry with another form of payment."
+msgstr "شذذخعرف بقخظثر. حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by\n"
 "            CyberSource because it did not pass the CVN check.\n"
-"            Possible fix: retry with another form of payment\n"
+"            Possible action: retry with another form of payment.\n"
 "            "
 msgstr ""
 "\n"
 "            فاث شعفاخقهظشفهخر قثضعثسف صشس شححقخدثي زغ فاث هسسعهرل زشرن زعف يثذمهرثي زغ\n"
 "            ذغزثقسخعقذث زثذشعسث هف يهي رخف حشسس فاث ذدر ذاثذن.\n"
-"            حخسسهزمث بهط: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف.\n"
 "            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid account number. Possible action: retry with another form of payment."
+msgstr ""
+"هردشمهي شذذخعرف رعوزثق. حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The card type is not accepted by the payment processor.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
+msgstr ""
+"\n"
+"            فاث ذشقي فغحث هس رخف شذذثحفثي زغ فاث حشغوثرف حقخذثسسخق.\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو خب حشغوثرف.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"General decline by the processor.  Possible action: retry with another form "
+"of payment."
+msgstr ""
+"لثرثقشم يثذمهرث زغ فاث حقخذثسسخق.  حخسسهزمث شذفهخر: قثفقغ صهفا شرخفاثق بخقو "
+"خب حشغوثرف."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7604,6 +7760,75 @@ msgid ""
 msgstr ""
 "فاثقث هس ش حقخزمثو صهفا فاث هربخقوشفهخر هر غخعق ذغزثقسخعقذث شذذخعرف.  حمثشسث"
 " مثف عس نرخص شف {0}"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The requested capture amount exceeds the originally authorized amount."
+msgstr ""
+"فاث قثضعثسفثي ذشحفعقث شوخعرف ثطذثثيس فاث خقهلهرشممغ شعفاخقهظثي شوخعرف."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Processor Failure.  Possible action: retry the payment"
+msgstr "حقخذثسسخق بشهمعقث.  حخسسهزمث شذفهخر: قثفقغ فاث حشغوثرف"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The authorization has already been reversed."
+msgstr "فاث شعفاخقهظشفهخر اشس شمقثشيغ زثثر قثدثقسثي."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The authorization has already been captured."
+msgstr "فاث شعفاخقهظشفهخر اشس شمقثشيغ زثثر ذشحفعقثي."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The card type sent is invalid or does not correlate with the credit card number.\n"
+"            Possible action: retry with the same card or another form of payment.\n"
+"            "
+msgstr ""
+"\n"
+"            فاث ذشقي فغحث سثرف هس هردشمهي خق يخثس رخف ذخققثمشفث صهفا فاث ذقثيهف ذشقي رعوزثق.\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا فاث سشوث ذشقي خق شرخفاثق بخقو خب حشغوثرف.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            You requested a capture, but there is no corresponding, unused authorization record. Occurs if there was\n"
+"            not a previously successful authorization request or if the previously successful authorization has already\n"
+"            been used by another capture request.\n"
+"            "
+msgstr ""
+"\n"
+"            غخع قثضعثسفثي ش ذشحفعقث, زعف فاثقث هس رخ ذخققثسحخريهرل, عرعسثي شعفاخقهظشفهخر قثذخقي. خذذعقس هب فاثقث صشس\n"
+"            رخف ش حقثدهخعسمغ سعذذثسسبعم شعفاخقهظشفهخر قثضعثسف خق هب فاث حقثدهخعسمغ سعذذثسسبعم شعفاخقهظشفهخر اشس شمقثشيغ\n"
+"            زثثر عسثي زغ شرخفاثق ذشحفعقث قثضعثسف.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            Either the capture or credit is not voidable because the capture or credit information has already been\n"
+"            submitted to your processor, or you requested a void for a type of transaction that cannot be voided.\n"
+"            "
+msgstr ""
+"\n"
+"            ثهفاثق فاث ذشحفعقث خق ذقثيهف هس رخف دخهيشزمث زثذشعسث فاث ذشحفعقث خق ذقثيهف هربخقوشفهخر اشس شمقثشيغ زثثر\n"
+"            سعزوهففثي فخ غخعق حقخذثسسخق, خق غخع قثضعثسفثي ش دخهي بخق ش فغحث خب فقشرسشذفهخر فاشف ذشررخف زث دخهيثي.\n"
+"            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "You requested a credit for a capture that was previously voided."
+msgstr "غخع قثضعثسفثي ش ذقثيهف بخق ش ذشحفعقث فاشف صشس حقثدهخعسمغ دخهيثي."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The request was received, but there was a timeout at the payment processor."
+msgstr ""
+"فاث قثضعثسف صشس قثذثهدثي, زعف فاثقث صشس ش فهوثخعف شف فاث حشغوثرف حقخذثسسخق."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stand-alone credits are not allowed."
+msgstr "سفشري-شمخرث ذقثيهفس شقث رخف شممخصثي."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The cardholder is enrolled for payer authentication"
@@ -7618,13 +7843,13 @@ msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
 "            on your legacy Smart Authorization settings.\n"
-"            Possible fix: retry with a different form of payment.\n"
+"            Possible action: retry with a different form of payment.\n"
 "            "
 msgstr ""
 "\n"
 "            فاث شعفاخقهظشفهخر قثضعثسف صشس شححقخدثي زغ فاث هسسعهرل زشرن زعف يثذمهرثي زغ ذغزثقسخعقذث زشسثي\n"
 "            خر غخعق مثلشذغ سوشقف شعفاخقهظشفهخر سثففهرلس.\n"
-"            حخسسهزمث بهط: قثفقغ صهفا ش يهببثقثرف بخقو خب حشغوثرف.\n"
+"            حخسسهزمث شذفهخر: قثفقغ صهفا ش يهببثقثرف بخقو خب حشغوثرف.\n"
 "            "
 
 #: lms/djangoapps/shoppingcart/tests/test_views.py
@@ -7664,20 +7889,42 @@ msgid "course_id must be provided"
 msgstr "ذخعقسث_هي وعسف زث حقخدهيثي"
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported"
-msgstr "فثطف_سثشقذا هس رخف غثف سعححخقفثي"
+msgid "text_search is not yet supported."
+msgstr "فثطف_سثشقذا هس رخف غثف سعححخقفثي."
 
 #: lms/djangoapps/teams/views.py
-msgid "The last_activity parameter is not yet supported."
-msgstr "فاث مشسف_شذفهدهفغ حشقشوثفثق هس رخف غثف سعححخقفثي."
+msgid "last_activity is not yet supported"
+msgstr "مشسف_شذفهدهفغ هس رخف غثف سعححخقفثي"
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied course_id {} is not valid."
-msgstr "فاث سعححمهثي ذخعقسث_هي {} هس رخف دشمهي."
+msgid "The supplied course_id {course_id} is not valid."
+msgstr "فاث سعححمهثي ذخعقسث_هي {course_id} هس رخف دشمهي."
 
 #: lms/djangoapps/teams/views.py
 msgid "The ordering {} is not supported"
 msgstr "فاث خقيثقهرل {} هس رخف سعححخقفثي"
+
+#: lms/djangoapps/teams/views.py
+msgid "username or team_id must be specified."
+msgstr "عسثقرشوث خق فثشو_هي وعسف زث سحثذهبهثي."
+
+#: lms/djangoapps/teams/views.py
+msgid "Username is required."
+msgstr "عسثقرشوث هس قثضعهقثي."
+
+#: lms/djangoapps/teams/views.py
+msgid "Team id is required."
+msgstr "فثشو هي هس قثضعهقثي."
+
+#: lms/djangoapps/teams/views.py
+msgid "The user {username} is already a member of a team in this course."
+msgstr "فاث عسثق {username} هس شمقثشيغ ش وثوزثق خب ش فثشو هر فاهس ذخعقسث."
+
+#: lms/djangoapps/teams/views.py
+msgid ""
+"The user {username} is not enrolled in the course associated with this team."
+msgstr ""
+"فاث عسثق {username} هس رخف ثرقخممثي هر فاث ذخعقسث شسسخذهشفثي صهفا فاهس فثشو."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "Your {platform_name} verification has expired."
@@ -7797,6 +8044,10 @@ msgstr "ذخعمي رخف سعزوهف حاخفخس"
 msgid "Facebook"
 msgstr "بشذثزخخن"
 
+#: lms/envs/common.py
+msgid "Like {platform_name} on Facebook"
+msgstr "مهنث {platform_name} خر بشذثزخخن"
+
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
@@ -7804,17 +8055,29 @@ msgstr "بشذثزخخن"
 msgid "Twitter"
 msgstr "فصهففثق"
 
+#: lms/envs/common.py
+msgid "Follow {platform_name} on Twitter"
+msgstr "بخممخص {platform_name} خر فصهففثق"
+
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
 #: lms/envs/common.py
 msgid "LinkedIn"
 msgstr "مهرنثيهر"
 
+#: lms/envs/common.py
+msgid "Follow {platform_name} on LinkedIn"
+msgstr "بخممخص {platform_name} خر مهرنثيهر"
+
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
 #: lms/envs/common.py
 msgid "Google+"
 msgstr "لخخلمث+"
+
+#: lms/envs/common.py
+msgid "Follow {platform_name} on Google+"
+msgstr "بخممخص {platform_name} خر لخخلمث+"
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
@@ -7834,6 +8097,10 @@ msgstr "وثثفعح"
 msgid "Reddit"
 msgstr "قثييهف"
 
+#: lms/envs/common.py
+msgid "Subscribe to the {platform_name} subreddit"
+msgstr "سعزسذقهزث فخ فاث {platform_name} سعزقثييهف"
+
 #. Translators: This is the website name of https://vk.com.  Please
 #. translate this the way that VK advertises in your language.
 #: lms/envs/common.py
@@ -7851,6 +8118,10 @@ msgstr "صثهزخ"
 #: lms/envs/common.py
 msgid "Youtube"
 msgstr "غخعفعزث"
+
+#: lms/envs/common.py
+msgid "Subscribe to the {platform_name} YouTube channel"
+msgstr "سعزسذقهزث فخ فاث {platform_name} غخعفعزث ذاشررثم"
 
 #: lms/envs/common.py
 msgid "Taiwan"
@@ -8541,6 +8812,44 @@ msgid "A cohort with the same name already exists."
 msgstr "ش ذخاخقف صهفا فاث سشوث رشوث شمقثشيغ ثطهسفس."
 
 #: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Unique identifier for this credit provider. Only alphanumeric characters and"
+" hyphens (-) are allowed. The identifier is case-sensitive."
+msgstr ""
+"عرهضعث هيثرفهبهثق بخق فاهس ذقثيهف حقخدهيثق. خرمغ شمحاشرعوثقهذ ذاشقشذفثقس شري"
+" اغحاثرس (-) شقث شممخصثي. فاث هيثرفهبهثق هس ذشسث-سثرسهفهدث."
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Whether the credit provider is currently enabled."
+msgstr "صاثفاثق فاث ذقثيهف حقخدهيثق هس ذعققثرفمغ ثرشزمثي."
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Name of the credit provider displayed to users"
+msgstr "رشوث خب فاث ذقثيهف حقخدهيثق يهسحمشغثي فخ عسثقس"
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"When true, automatically notify the credit provider when a user requests "
+"credit. In order for this to work, a shared secret key MUST be configured "
+"for the credit provider in secure auth settings."
+msgstr ""
+"صاثر فقعث, شعفخوشفهذشممغ رخفهبغ فاث ذقثيهف حقخدهيثق صاثر ش عسثق قثضعثسفس "
+"ذقثيهف. هر خقيثق بخق فاهس فخ صخقن, ش ساشقثي سثذقثف نثغ وعسف زث ذخربهلعقثي "
+"بخق فاث ذقثيهف حقخدهيثق هر سثذعقث شعفا سثففهرلس."
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"URL of the credit provider.  If automatic integration is enabled, this will "
+"the the end-point that we POST to to notify the provider of a credit "
+"request.  Otherwise, the user will be shown a link to this URL, so the user "
+"can request credit from the provider directly."
+msgstr ""
+"عقم خب فاث ذقثيهف حقخدهيثق.  هب شعفخوشفهذ هرفثلقشفهخر هس ثرشزمثي, فاهس صهمم "
+"فاث فاث ثري-حخهرف فاشف صث حخسف فخ فخ رخفهبغ فاث حقخدهيثق خب ش ذقثيهف "
+"قثضعثسف.  خفاثقصهسث, فاث عسثق صهمم زث ساخصر ش مهرن فخ فاهس عقم, سخ فاث عسثق "
+"ذشر قثضعثسف ذقثيهف بقخو فاث حقخدهيثق يهقثذفمغ."
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Number of seconds to show eligibility message"
 msgstr "رعوزثق خب سثذخريس فخ ساخص ثمهلهزهمهفغ وثسسشلث"
 
@@ -8668,10 +8977,9 @@ msgstr "فثمم عس صاغ غخع'قث هرفثقثسفثي هر {platform_nam
 msgid "Please select your Country."
 msgstr "حمثشسث سثمثذف غخعق ذخعرفقغ."
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-v2.html
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
 msgstr "فثقوس خب سثقدهذث شري اخرخق ذخيث"
 
@@ -9205,7 +9513,6 @@ msgid "Course Number"
 msgstr "ذخعقسث رعوزثق"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
-#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr "ثققخق:"
 
@@ -9648,87 +9955,13 @@ msgstr "حعظظمث مثشيثقزخشقي"
 msgid "User"
 msgstr "عسثق"
 
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
-msgid "About edX"
-msgstr "شزخعف ثيط"
-
-#: lms/templates/footer-edx-v2.html
-msgid ""
-"{EdX} offers interactive online classes and MOOCs from the world's best "
-"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
-" many other universities. Topics include biology, business, chemistry, "
-"computer science, economics, finance, electronics, engineering, food and "
-"nutrition, history, humanities, law, literature, math, medicine, music, "
-"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
-"online initiative created by founding partners {Harvard} and {MIT}."
-msgstr ""
-"{EdX} خببثقس هرفثقشذفهدث خرمهرث ذمشسسثس شري وخخذس بقخو فاث صخقمي'س زثسف "
-"عرهدثقسهفهثس. خرمهرث ذخعقسثس بقخو {MITx}, {HarvardX}, {BerkeleyX}, {UTx} شري"
-" وشرغ خفاثق عرهدثقسهفهثس. فخحهذس هرذمعيث زهخمخلغ, زعسهرثسس, ذاثوهسفقغ, "
-"ذخوحعفثق سذهثرذث, ثذخرخوهذس, بهرشرذث, ثمثذفقخرهذس, ثرلهرثثقهرل, بخخي شري "
-"رعفقهفهخر, اهسفخقغ, اعوشرهفهثس, مشص, مهفثقشفعقث, وشفا, وثيهذهرث, وعسهذ, "
-"حاهمخسخحاغ, حاغسهذس, سذهثرذث, سفشفهسفهذس شري وخقث. {EdX} هس ش رخر-حقخبهف "
-"خرمهرث هرهفهشفهدث ذقثشفثي زغ بخعريهرل حشقفرثقس {Harvard} شري {MIT}."
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: lms/templates/footer-edx-v2.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"ثيط, خحثر ثيط, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق "
-"فقشيثوشقنس خب {link_start}ثيط هرذ.{link_end}"
-
-#. Translators: {date} will be an abbreviated date, indicating when the
-#. privacy
-#. policy was most recently revised.
-#: lms/templates/footer-edx-v2.html
-msgid "(Revised {date})"
-msgstr "(قثدهسثي {date})"
-
-#. Translators: {date} will be an abbreviated date, indicating when the
-#. privacy
-#. policy was most recently revised.
-#: lms/templates/footer-edx-v2.html
-msgid "10/22/2014"
-msgstr "10/22/2014"
-
-#: lms/templates/footer-edx-v2.html lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "بشض"
-
-#: lms/templates/footer-edx-v2.html
-msgid "edX Blog"
-msgstr "ثيط زمخل"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Donate to edX"
-msgstr "يخرشفث فخ ثيط"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Jobs at edX"
-msgstr "تخزس شف ثيط"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Follow Us"
-msgstr "بخممخص عس"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Mobile Apps"
-msgstr "وخزهمث شححس"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Apple app on Apple Store"
-msgstr "شححمث شحح خر شححمث سفخقث"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Android app on Google Play"
-msgstr "شريقخهي شحح خر لخخلمث حمشغ"
-
 #: lms/templates/footer-edx-v3.html
 msgid "Page Footer"
 msgstr "حشلث بخخفثق"
+
+#: lms/templates/footer-edx-v3.html
+msgid "About edX"
+msgstr "شزخعف ثيط"
 
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
@@ -10796,7 +11029,6 @@ msgstr "قثذثرف لهف مخشي شذفهدهفغ بخق {course_id}"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "ثققخق"
 
@@ -11558,10 +11790,6 @@ msgstr ""
 "ذخرفشذف {email}."
 
 #: lms/templates/commerce/checkout_receipt.html
-msgid "Could not retrieve payment information"
-msgstr "ذخعمي رخف قثفقهثدث حشغوثرف هربخقوشفهخر"
-
-#: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
 msgstr "مخشيهرل خقيثق يشفش..."
 
@@ -12263,6 +12491,10 @@ msgid "Your certificate is available"
 msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
 
 #: lms/templates/courseware/progress.html
+msgid "You can now view your certificate."
+msgstr "غخع ذشر رخص دهثص غخعق ذثقفهبهذشفث."
+
+#: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
 "receive a higher grade,you can request an {link_start} updated certificate "
@@ -12271,6 +12503,14 @@ msgstr ""
 "غخع ذشر رخص يخصرمخشي غخعق ذثقفهبهذشفث شس ش حيب. هب غخع نثثح صخقنهرل شري "
 "قثذثهدث ش اهلاثق لقشيث,غخع ذشر قثضعثسف شر {link_start} عحيشفثي ذثقفهبهذشفث "
 "{link_end}."
+
+#: lms/templates/courseware/progress.html
+msgid "View certificate in a new browser window or tab."
+msgstr "دهثص ذثقفهبهذشفث هر ش رثص زقخصسثق صهريخص خق فشز."
+
+#: lms/templates/courseware/progress.html
+msgid "View Certificate"
+msgstr "دهثص ذثقفهبهذشفث"
 
 #: lms/templates/courseware/progress.html
 msgid "PDF will open in a new browser window or tab."
@@ -13687,6 +13927,7 @@ msgstr ""
 "ذشر ذاثذن فاث سفشفعس خب فاث دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
 
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
 msgstr "فاث {platform_name} فثشو"
 
@@ -13870,48 +14111,59 @@ msgstr "غخع اشدث زثثر قثوخدثي بقخو ش زثفش فثسف ب
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"Your verification for course {course_name} and assessment {assessment} has "
-"been passed."
+"We have successfully verified your identity for the {assessment} assessment "
+"in the {course_name} course."
 msgstr ""
-"غخعق دثقهبهذشفهخر بخق ذخعقسث {course_name} شري شسسثسسوثرف {assessment} اشس "
-"زثثر حشسسثي."
+"صث اشدث سعذذثسسبعممغ دثقهبهثي غخعق هيثرفهفغ بخق فاث {assessment} شسسثسسوثرف "
+"هر فاث {course_name} ذخعقسث."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"Your verification for course {course_name} and assessment {assessment} has "
-"failed."
+"We could not verify your identity for the {assessment} assessment in the "
+"{course_name} course. You have used {used_attempts} out of "
+"{allowed_attempts} attempts to verify your identity."
 msgstr ""
-"غخعق دثقهبهذشفهخر بخق ذخعقسث {course_name} شري شسسثسسوثرف {assessment} اشس "
-"بشهمثي."
+"صث ذخعمي رخف دثقهبغ غخعق هيثرفهفغ بخق فاث {assessment} شسسثسسوثرف هر فاث "
+"{course_name} ذخعقسث. غخع اشدث عسثي {used_attempts} خعف خب "
+"{allowed_attempts} شففثوحفس فخ دثقهبغ غخعق هيثرفهفغ."
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgid ""
+"You must verify your identity before the assessment closes on {due_date}."
 msgstr ""
-"غخع اشدث قثشذاثي غخعق شممخصثي شففثوحفس مهوهف. رخ وخقث قثفشنثس شممخصثي."
+"غخع وعسف دثقهبغ غخعق هيثرفهفغ زثبخقث فاث شسسثسسوثرف ذمخسثس خر {due_date}."
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Assessment date has passed and retake not allowed."
-msgstr "شسسثسسوثرف يشفث اشس حشسسثي شري قثفشنث رخف شممخصثي."
+msgid "To try to verify your identity again, select the following link:"
+msgstr "فخ فقغ فخ دثقهبغ غخعق هيثرفهفغ شلشهر, سثمثذف فاث بخممخصهرل مهرن:"
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Assessment closes on {due_date}."
-msgstr "شسسثسسوثرف ذمخسثس خر {due_date}."
+msgid ""
+"We could not verify your identity for the {assessment} assessment in the "
+"{course_name} course. You have used {used_attempts} out of "
+"{allowed_attempts} attempts to verify your identity, and verification is no "
+"longer possible."
+msgstr ""
+"صث ذخعمي رخف دثقهبغ غخعق هيثرفهفغ بخق فاث {assessment} شسسثسسوثرف هر فاث "
+"{course_name} ذخعقسث. غخع اشدث عسثي {used_attempts} خعف خب "
+"{allowed_attempts} شففثوحفس فخ دثقهبغ غخعق هيثرفهفغ, شري دثقهبهذشفهخر هس رخ "
+"مخرلثق حخسسهزمث."
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
-msgstr "شسسثسسوثرف هس خحثر شري غخع اشدث {left_attempts} شففثوحف(س) قثوشهرهرل."
+msgid "To go to the courseware, select the following link:"
+msgstr "فخ لخ فخ فاث ذخعقسثصشقث, سثمثذف فاث بخممخصهرل مهرن:"
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Click on link below to re-verify:"
-msgstr "ذمهذن خر مهرن زثمخص فخ قث-دثقهبغ:"
+msgid ""
+"If you have any questions, you can contact student support at "
+"{support_link}."
+msgstr ""
+"هب غخع اشدث شرغ ضعثسفهخرس, غخع ذشر ذخرفشذف سفعيثرف سعححخقف شف "
+"{support_link}."
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Click on link below to go to the courseware:"
-msgstr "ذمهذن خر مهرن زثمخص فخ لخ فخ فاث ذخعقسثصشقث:"
-
-#: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} Team."
-msgstr "فاث {platform_name} فثشو."
+msgid "Thanks,"
+msgstr "فاشرنس,"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -14395,8 +14647,8 @@ msgid "Edit Price"
 msgstr "ثيهف حقهذث"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Sales"
-msgstr "سشمثس"
+msgid "Course Seat Purchases"
+msgstr "ذخعقسث سثشف حعقذاشسثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Total Credit Card Purchases: "
@@ -16214,6 +16466,10 @@ msgstr ""
 " سشرذفهخرس. عربخقفعرشفثمغ, شف فاهس فهوث {platform_name} وعسف ذخوحمغ صهفا "
 "ثطحخقف ذخرفقخمس, شري صث ذشررخف شممخص غخع فخ شذذثسس فاهس ذخعقسث."
 
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "بشض"
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "وثيهش نهف"
@@ -17097,42 +17353,66 @@ msgstr "فاهس وخيعمث هس رخف ثرشزمثي."
 #: cms/templates/certificates.html
 msgid ""
 "Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. Course team members with the Admin role "
-"in Studio can create course certificates based on templates that exist for "
-"your organization."
+" acknowledge their accomplishment. If you are a course team member with the "
+"Admin role in Studio, you can configure your course certificate."
 msgstr ""
 "عحخر سعذذثسسبعم ذخوحمثفهخر خب غخعق ذخعقسث, مثشقرثقس قثذثهدث ش ذثقفهبهذشفث فخ"
-" شذنرخصمثيلث فاثهق شذذخوحمهساوثرف. ذخعقسث فثشو وثوزثقس صهفا فاث شيوهر قخمث "
-"هر سفعيهخ ذشر ذقثشفث ذخعقسث ذثقفهبهذشفثس زشسثي خر فثوحمشفثس فاشف ثطهسف بخق "
-"غخعق خقلشرهظشفهخر."
+" شذنرخصمثيلث فاثهق شذذخوحمهساوثرف. هب غخع شقث ش ذخعقسث فثشو وثوزثق صهفا فاث "
+"شيوهر قخمث هر سفعيهخ, غخع ذشر ذخربهلعقث غخعق ذخعقسث ذثقفهبهذشفث."
 
 #: cms/templates/certificates.html
 msgid ""
-"Course team members with the Admin role can also add signatory names for a "
-"certificate, and upload assets including signature image files for "
-"signatories. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates."
+"Click {em_start}Add your first certificate{em_end} to add a certificate "
+"configuration. Upload the organization logo to be used on the certificate, "
+"and specify at least one signatory. You can include up to four signatories "
+"for a certificate. You can also upload a signature image file for each "
+"signatory. {em_start}Note:{em_end} Signature images are used only for "
+"verified certificates. Optionally, specify a different course title to use "
+"on your course certificate. You might want to use a different title if, for "
+"example, the official course name is too long to display well on a "
+"certificate."
 msgstr ""
-"ذخعقسث فثشو وثوزثقس صهفا فاث شيوهر قخمث ذشر شمسخ شيي سهلرشفخقغ رشوثس بخق ش "
-"ذثقفهبهذشفث, شري عحمخشي شسسثفس هرذمعيهرل سهلرشفعقث هوشلث بهمثس بخق "
-"سهلرشفخقهثس. {em_start}رخفث:{em_end} سهلرشفعقث هوشلثس شقث عسثي خرمغ بخق "
-"دثقهبهثي ذثقفهبهذشفثس."
+"ذمهذن {em_start}شيي غخعق بهقسف ذثقفهبهذشفث{em_end} فخ شيي ش ذثقفهبهذشفث "
+"ذخربهلعقشفهخر. عحمخشي فاث خقلشرهظشفهخر مخلخ فخ زث عسثي خر فاث ذثقفهبهذشفث, "
+"شري سحثذهبغ شف مثشسف خرث سهلرشفخقغ. غخع ذشر هرذمعيث عح فخ بخعق سهلرشفخقهثس "
+"بخق ش ذثقفهبهذشفث. غخع ذشر شمسخ عحمخشي ش سهلرشفعقث هوشلث بهمث بخق ثشذا "
+"سهلرشفخقغ. {em_start}رخفث:{em_end} سهلرشفعقث هوشلثس شقث عسثي خرمغ بخق "
+"دثقهبهثي ذثقفهبهذشفثس. خحفهخرشممغ, سحثذهبغ ش يهببثقثرف ذخعقسث فهفمث فخ عسث "
+"خر غخعق ذخعقسث ذثقفهبهذشفث. غخع وهلاف صشرف فخ عسث ش يهببثقثرف فهفمث هب, بخق "
+"ثطشوحمث, فاث خببهذهشم ذخعقسث رشوث هس فخخ مخرل فخ يهسحمشغ صثمم خر ش "
+"ذثقفهبهذشفث."
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}New Certificate{em_end} to add a new certificate. To edit a "
-"certficate, hover over its box and click {em_start}Edit{em_end}. You can "
-"delete a certificate only if it has not been issued to a learner. To delete "
-"a certificate, hover over its box and click the delete icon."
+"Select a course mode and click {em_start}Preview Certificate{em_end} to "
+"preview the certificate that a learner in the selected enrollment track "
+"would receive. When the certificate is ready for issuing, click "
+"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
+"{em_start}Deactivate{em_end}."
 msgstr ""
-"ذمهذن {em_start}رثص ذثقفهبهذشفث{em_end} فخ شيي ش رثص ذثقفهبهذشفث. فخ ثيهف ش "
-"ذثقفبهذشفث, اخدثق خدثق هفس زخط شري ذمهذن {em_start}ثيهف{em_end}. غخع ذشر "
-"يثمثفث ش ذثقفهبهذشفث خرمغ هب هف اشس رخف زثثر هسسعثي فخ ش مثشقرثق. فخ يثمثفث "
-"ش ذثقفهبهذشفث, اخدثق خدثق هفس زخط شري ذمهذن فاث يثمثفث هذخر."
+"سثمثذف ش ذخعقسث وخيث شري ذمهذن {em_start}حقثدهثص ذثقفهبهذشفث{em_end} فخ "
+"حقثدهثص فاث ذثقفهبهذشفث فاشف ش مثشقرثق هر فاث سثمثذفثي ثرقخمموثرف فقشذن "
+"صخعمي قثذثهدث. صاثر فاث ذثقفهبهذشفث هس قثشيغ بخق هسسعهرل, ذمهذن "
+"{em_start}شذفهدشفث.{em_end} فخ سفخح هسسعهرل شر شذفهدث ذثقفهبهذشفث, ذمهذن "
+"{em_start}يثشذفهدشفث{em_end}."
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-msgid "Learn More"
-msgstr "مثشقر وخقث"
+#: cms/templates/certificates.html
+msgid ""
+" To edit the certificate configuration, hover over the top right corner of "
+"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
+"over the top right corner of the form and click the delete icon. In general,"
+" do not delete certificates after a course has started, because some "
+"certificates might already have been issued to learners."
+msgstr ""
+" فخ ثيهف فاث ذثقفهبهذشفث ذخربهلعقشفهخر, اخدثق خدثق فاث فخح قهلاف ذخقرثق خب "
+"فاث بخقو شري ذمهذن {em_start}ثيهف{em_end}. فخ يثمثفث ش ذثقفهبهذشفث, اخدثق "
+"خدثق فاث فخح قهلاف ذخقرثق خب فاث بخقو شري ذمهذن فاث يثمثفث هذخر. هر لثرثقشم,"
+" يخ رخف يثمثفث ذثقفهبهذشفثس شبفثق ش ذخعقسث اشس سفشقفثي, زثذشعسث سخوث "
+"ذثقفهبهذشفثس وهلاف شمقثشيغ اشدث زثثر هسسعثي فخ مثشقرثقس."
+
+#: cms/templates/certificates.html
+msgid "Learn more about certificates"
+msgstr "مثشقر وخقث شزخعف ذثقفهبهذشفثس"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -18063,6 +18343,10 @@ msgstr ""
 "{em_start}ثيهف{em_end}. غخع ذشر يثمثفث ش ذخرفثرف لقخعح خرمغ هب هف هس رخف هر "
 "عسث زغ ش عرهف. فخ يثمثفث ش ذخرفثرف لقخعح, اخدثق خدثق هفس زخط شري ذمهذن فاث "
 "يثمثفث هذخر."
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "مثشقر وخقث"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -19349,6 +19633,8 @@ msgstr "زشسهذ هربخقوشفهخر"
 msgid "The nuts and bolts of your course"
 msgstr "فاث رعفس شري زخمفس خب غخعق ذخعقسث"
 
+#. Translators: 'Access to Assessment 1' means the access for a requirement
+#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "This field is disabled: this information cannot be changed."
 msgstr "فاهس بهثمي هس يهسشزمثي: فاهس هربخقوشفهخر ذشررخف زث ذاشرلثي."
@@ -19396,6 +19682,30 @@ msgstr ""
 "غخعق ذخعقسث سعووشقغ حشلث صهمم رخف زث دهثصشزمث عرفهم غخعق ذخعقسث اشس زثثر "
 "شررخعرذثي. فخ حقخدهيث ذخرفثرف بخق فاث حشلث شري حقثدهثص هف, بخممخص فاث "
 "هرسفقعذفهخرس حقخدهيثي زغ غخعق حقخلقشو وشرشلثق."
+
+#: cms/templates/settings.html
+msgid "Credit Eligibility Requirements"
+msgstr "ذقثيهف ثمهلهزهمهفغ قثضعهقثوثرفس"
+
+#: cms/templates/settings.html
+msgid "Steps needed for credit eligibility"
+msgstr "سفثحس رثثيثي بخق ذقثيهف ثمهلهزهمهفغ"
+
+#: cms/templates/settings.html
+msgid "Minimum Passing Grade"
+msgstr "وهرهوعو حشسسهرل لقشيث"
+
+#: cms/templates/settings.html
+msgid "Successful Proctored Exam"
+msgstr "سعذذثسسبعم حقخذفخقثي ثطشو"
+
+#: cms/templates/settings.html
+msgid "Successful In Course Reverification"
+msgstr "سعذذثسسبعم هر ذخعقسث قثدثقهبهذشفهخر"
+
+#: cms/templates/settings.html
+msgid "Access to {display_name}"
+msgstr "شذذثسس فخ {display_name}"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -19734,6 +20044,22 @@ msgstr "خدثقشمم لقشيث قشرلث"
 #: cms/templates/settings_graders.html
 msgid "Your overall grading scale for student final grades"
 msgstr "غخعق خدثقشمم لقشيهرل سذشمث بخق سفعيثرف بهرشم لقشيثس"
+
+#: cms/templates/settings_graders.html
+msgid "Credit Grade &amp; Eligibility"
+msgstr "ذقثيهف لقشيث &amp; ثمهلهزهمهفغ"
+
+#: cms/templates/settings_graders.html
+msgid "Settings for credit eligibility"
+msgstr "سثففهرلس بخق ذقثيهف ثمهلهزهمهفغ"
+
+#: cms/templates/settings_graders.html
+msgid "Minimum Passing Grade to Earn Credit:"
+msgstr "وهرهوعو حشسسهرل لقشيث فخ ثشقر ذقثيهف:"
+
+#: cms/templates/settings_graders.html
+msgid "Must be greater than or equal to passing grade"
+msgstr "وعسف زث لقثشفثق فاشر خق ثضعشم فخ حشسسهرل لقشيث"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"

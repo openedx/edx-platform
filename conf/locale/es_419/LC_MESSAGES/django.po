@@ -168,7 +168,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-05 17:36+0000\n"
+"POT-Creation-Date: 2015-06-12 18:44+0000\n"
 "PO-Revision-Date: 2015-05-28 20:00+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -3091,8 +3091,7 @@ msgid "Both"
 msgstr "Ambos"
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
-#: lms/templates/footer-edx-v2.html lms/templates/footer.html
-#: lms/templates/static_templates/about.html
+#: lms/templates/footer.html lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Acerca de"
 
@@ -4809,23 +4808,25 @@ msgid ""
 "Inc."
 msgstr ""
 
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Open edX' is a brand, please keep this untranslated.
+#. See http://openedx.org for more information.
+#: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
 msgid "Powered by Open edX"
-msgstr "Con la tecnología de Open edX"
+msgstr ""
 
 #: lms/templates/static_templates/blog.html
 msgid "Blog"
 msgstr "Blog"
 
-#: lms/templates/footer-edx-v2.html
+#: lms/djangoapps/branding/api.py
 msgid "News"
-msgstr "Noticias"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "FAQs"
 msgstr ""
 
-#: lms/templates/footer-edx-v2.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "Contacto"
@@ -4850,7 +4851,7 @@ msgstr ""
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
 #. website's use of personal information
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views.py
-#: cms/templates/widgets/footer.html lms/templates/footer-edx-v2.html
+#: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Política de privacidad"
@@ -4871,6 +4872,14 @@ msgstr ""
 "Términos de Servicio\n"
 "#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "Términos del servicio"
+
+#: lms/djangoapps/branding/api.py
+msgid "Download the {platform_name} mobile app from the Apple App Store"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Download the {platform_name} mobile app from Google Play"
+msgstr ""
 
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
@@ -5258,6 +5267,48 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr ""
 
+#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+msgid "Receipt"
+msgstr "Recibo"
+
+#: lms/djangoapps/commerce/views.py
+msgid "Payment Failed"
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid "There was a problem with this transaction. You have not been charged."
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid ""
+"Make sure your information is correct, or try again with a different card or"
+" another form of payment."
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid ""
+"A system error occurred while processing your payment. You have not been "
+"charged."
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid "Please wait a few minutes and then try again."
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid "For help, contact {payment_support_link}."
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid "An error occurred while creating your receipt."
+msgstr ""
+
+#: lms/djangoapps/commerce/views.py
+msgid ""
+"If your course does not appear on your dashboard, contact "
+"{payment_support_link}."
+msgstr ""
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -5350,10 +5401,6 @@ msgstr[1] ""
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
 msgstr "Localizacion invalida"
-
-#: lms/djangoapps/courseware/views.py
-msgid "User {username} does not exist."
-msgstr "El usuario {username} no existe."
 
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} has never accessed problem {location}"
@@ -7099,11 +7146,6 @@ msgid "Invoice"
 msgstr "Factura"
 
 #: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Receipt"
-msgstr "Recibo"
-
-#: lms/djangoapps/shoppingcart/pdf.py
 msgid "Order"
 msgstr "Orden"
 
@@ -7451,6 +7493,7 @@ msgid "Successful transaction."
 msgstr "Transacción existosa."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request is missing one or more required fields."
 msgstr "La solicitud no tiene uno o más campos requeridos."
 
@@ -7515,7 +7558,6 @@ msgstr ""
 "intente con otra forma de pago."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Expired card. You might also receive this if the expiration date you\n"
@@ -7529,7 +7571,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            General decline of the card. No other information provided by the issuing bank.\n"
@@ -7542,7 +7583,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
@@ -7555,7 +7595,6 @@ msgid "Unknown reason"
 msgstr "Razón desconocida"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr ""
@@ -7563,7 +7602,6 @@ msgstr ""
 "dentro de algunos minutos"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Inactive card or card not authorized for card-not-present transactions.\n"
@@ -7576,7 +7614,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
@@ -7593,14 +7630,12 @@ msgstr ""
 " pago"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
 "Número de cuenta inválido. Posible solución: Intente con otra forma de pago"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type is not accepted by the payment processor.\n"
@@ -7613,7 +7648,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
@@ -7632,7 +7666,6 @@ msgid "The requested amount exceeds the originally authorized amount."
 msgstr "La cantidad solicitada excede el valor autorizado."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr "Fallo en el procesamiento. Posible solución: Intente nuevamente"
 
@@ -7641,6 +7674,7 @@ msgid "The authorization has already been captured"
 msgstr "La autorización ya ha sido recibida"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The requested transaction amount must match the previous transaction amount."
 msgstr ""
@@ -7648,7 +7682,6 @@ msgstr ""
 " de la transacción previa"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
@@ -7661,6 +7694,7 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request ID is invalid."
 msgstr "El ID de la solicitud es inválido"
 
@@ -7675,6 +7709,7 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The transaction has already been settled or reversed."
 msgstr "La transacción ya ha sido aceptada o reversada"
 
@@ -7717,6 +7752,13 @@ msgstr ""
 "            La solicitud de autorización fue aprobada por el banco emisor, pero declinada por CyberSource.\n"
 "            Posible solución: Volver a intentar con otro medio de pago.\n"
 "            "
+
+#. Translators: this text appears when an unfamiliar error code occurs during
+#. payment,
+#. for which we don't know a user-friendly message to display in advance.
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "UNKNOWN REASON"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {parameter}"
@@ -7833,19 +7875,32 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
-"            The access_key and transaction_uuid fields for this authorization request matches the access_key and\n"
-"            transaction_uuid of another authorization request that you sent in the last 15 minutes.\n"
-"            Possible fix: retry the payment after 15 minutes.\n"
+"            The merchant reference code for this authorization request matches the merchant reference code of another\n"
+"            authorization request that you sent within the past 15 minutes.\n"
+"            Possible action: Resend the request with a unique merchant reference code.\n"
 "            "
 msgstr ""
-"\n"
-"            Los campos access_key y transaction_uuid para esta solicitud de autorización coinciden con los campos access_key y transaction_uuid de otra solicitud enviada por usted en los últimos 15 minutos.\n"
-"            Posible solución: intente nuevamente el pago despues de 15 minutos.\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Only a partial amount was approved."
 msgstr "Solo ha sido aprobada una cantidad parcial."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "General system failure."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The request was received but there was a server timeout. This error does not include timeouts between the\n"
+"            client and the server.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The request was received, but a service did not finish running in time."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7863,25 +7918,65 @@ msgid ""
 "\n"
 "            The issuing bank has questions about the request. You do not receive an\n"
 "            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
-"            Possible fix: retry with another form of payment\n"
+"            Possible action: retry with another form of payment.\n"
 "            "
 msgstr ""
-"\n"
-"            El banco emisor tiene preguntas sobre la solicitud. Usted no ha recibido un código de autorización automáticamente, pero puede recibir uno verbalmente llamando a la entidad que procesa la solicitud.\n"
-"            Posible solución: Intente nuevamente con otra forma de pago \n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stolen or lost card"
-msgstr "Tarjeta reportada como perdida o robada"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
-"Invalid card verification number (CVN). Possible fix: retry with another "
-"form of payment"
+"\n"
+"            Expired card. You might also receive this if the expiration date you\n"
+"            provided does not match the date the issuing bank has on file.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
 msgstr ""
-"Número de verificación (CVN) inválido. Posible solución: intente nuevamente "
-"con otra forma de pago."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            General decline of the card. No other information provided by the issuing bank.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Insufficient funds in the account. Possible action: retry with another form "
+"of payment."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stolen or lost card."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Issuing bank unavailable. Possible action: retry again after a few minutes."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            Inactive card or card not authorized for card-not-present transactions.\n"
+"            Possible action: retry with another form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "CVN did not match."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The card has reached the credit limit. Possible action: retry with another "
+"form of payment."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid card verification number (CVN). Possible action: retry with another "
+"form of payment."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The customer matched an entry on the processors negative file."
@@ -7889,23 +7984,36 @@ msgstr ""
 "El cliente coincide con un registro en el archivo negativo de procesamiento."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Account frozen. Possible fix: retry with another form of payment"
+msgid "Account frozen. Possible action: retry with another form of payment."
 msgstr ""
-"Cuenta congelada. Posible solución: Intente nuevamente con otra forma de "
-"pago."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by\n"
 "            CyberSource because it did not pass the CVN check.\n"
-"            Possible fix: retry with another form of payment\n"
+"            Possible action: retry with another form of payment.\n"
 "            "
 msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid account number. Possible action: retry with another form of payment."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "\n"
-"            La solicitud de autorización fue aprobada por el banco emisor, pero rechazada por CyberSource\n"
-"            La razón del rechazo está relacionada con el número de verificación CVN.  Posible solución: Intente nuevamente con otra forma de pago.\n"
+"            The card type is not accepted by the payment processor.\n"
+"            Possible action: retry with another form of payment.\n"
 "            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"General decline by the processor.  Possible action: retry with another form "
+"of payment."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7914,6 +8022,60 @@ msgid ""
 msgstr ""
 "Hay un problema con la información en su cuenta de CyberSource.  Por favor "
 "envíenos un mensaje a {0}"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The requested capture amount exceeds the originally authorized amount."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Processor Failure.  Possible action: retry the payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The authorization has already been reversed."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The authorization has already been captured."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The card type sent is invalid or does not correlate with the credit card number.\n"
+"            Possible action: retry with the same card or another form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            You requested a capture, but there is no corresponding, unused authorization record. Occurs if there was\n"
+"            not a previously successful authorization request or if the previously successful authorization has already\n"
+"            been used by another capture request.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            Either the capture or credit is not voidable because the capture or credit information has already been\n"
+"            submitted to your processor, or you requested a void for a type of transaction that cannot be voided.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "You requested a credit for a capture that was previously voided."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The request was received, but there was a timeout at the payment processor."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stand-alone credits are not allowed."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The cardholder is enrolled for payer authentication"
@@ -7928,14 +8090,9 @@ msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
 "            on your legacy Smart Authorization settings.\n"
-"            Possible fix: retry with a different form of payment.\n"
+"            Possible action: retry with a different form of payment.\n"
 "            "
 msgstr ""
-"\n"
-"          La solicitud de autorización fue aprobada por el banco emisor, pero rechazada por CyberSource\n"
-"            La razón del rechazo está relacionada con la configuración del sistema de autorización inteligente.\n"
-"Posible solución: intente nuevamente con otra forma de pago.\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 #: lms/templates/shoppingcart/download_report.html
@@ -7976,19 +8133,40 @@ msgid "course_id must be provided"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported"
+msgid "text_search is not yet supported."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "The last_activity parameter is not yet supported."
+msgid "last_activity is not yet supported"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied course_id {} is not valid."
+msgid "The supplied course_id {course_id} is not valid."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "The ordering {} is not supported"
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "username or team_id must be specified."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "Username is required."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "Team id is required."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "The user {username} is already a member of a team in this course."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid ""
+"The user {username} is not enrolled in the course associated with this team."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
@@ -8114,6 +8292,10 @@ msgstr "No se publicaron las fotos"
 msgid "Facebook"
 msgstr "Facebook"
 
+#: lms/envs/common.py
+msgid "Like {platform_name} on Facebook"
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
@@ -8121,17 +8303,29 @@ msgstr "Facebook"
 msgid "Twitter"
 msgstr "Twitter"
 
+#: lms/envs/common.py
+msgid "Follow {platform_name} on Twitter"
+msgstr ""
+
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
 #: lms/envs/common.py
 msgid "LinkedIn"
 msgstr "LinkedIn"
 
+#: lms/envs/common.py
+msgid "Follow {platform_name} on LinkedIn"
+msgstr ""
+
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
 #: lms/envs/common.py
 msgid "Google+"
 msgstr "Google+"
+
+#: lms/envs/common.py
+msgid "Follow {platform_name} on Google+"
+msgstr ""
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
@@ -8151,6 +8345,10 @@ msgstr "Meetup"
 msgid "Reddit"
 msgstr "Reddit"
 
+#: lms/envs/common.py
+msgid "Subscribe to the {platform_name} subreddit"
+msgstr ""
+
 #. Translators: This is the website name of https://vk.com.  Please
 #. translate this the way that VK advertises in your language.
 #: lms/envs/common.py
@@ -8168,6 +8366,10 @@ msgstr "Weibo"
 #: lms/envs/common.py
 msgid "Youtube"
 msgstr "Youtube"
+
+#: lms/envs/common.py
+msgid "Subscribe to the {platform_name} YouTube channel"
+msgstr ""
 
 #: lms/envs/common.py
 msgid "Taiwan"
@@ -8859,6 +9061,35 @@ msgid "A cohort with the same name already exists."
 msgstr "Ya existe una cohorte con ese nombre."
 
 #: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Unique identifier for this credit provider. Only alphanumeric characters and"
+" hyphens (-) are allowed. The identifier is case-sensitive."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Whether the credit provider is currently enabled."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Name of the credit provider displayed to users"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"When true, automatically notify the credit provider when a user requests "
+"credit. In order for this to work, a shared secret key MUST be configured "
+"for the credit provider in secure auth settings."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"URL of the credit provider.  If automatic integration is enabled, this will "
+"the the end-point that we POST to to notify the provider of a credit "
+"request.  Otherwise, the user will be shown a link to this URL, so the user "
+"can request credit from the provider directly."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Number of seconds to show eligibility message"
 msgstr ""
 
@@ -8988,17 +9219,11 @@ msgstr "Cuéntenos por qué está interesado en {platform_name}"
 msgid "Please select your Country."
 msgstr "Por favor seleccione su país."
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/footer-edx-v2.html
-#, fuzzy
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Términos del servicio y código de honor\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Términos del Servicio y Código de Honor"
+msgstr "Términos del servicio y código de honor"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
@@ -9542,7 +9767,6 @@ msgid "Course Number"
 msgstr "Código del curso"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
-#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr "Error:"
 
@@ -9989,88 +10213,13 @@ msgstr "Tablero de puntuación para acertijos"
 msgid "User"
 msgstr "Usuario"
 
-#: lms/templates/footer-edx-v2.html lms/templates/footer-edx-v3.html
-msgid "About edX"
-msgstr "Acerca de edX"
-
-#: lms/templates/footer-edx-v2.html
-msgid ""
-"{EdX} offers interactive online classes and MOOCs from the world's best "
-"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
-" many other universities. Topics include biology, business, chemistry, "
-"computer science, economics, finance, electronics, engineering, food and "
-"nutrition, history, humanities, law, literature, math, medicine, music, "
-"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
-"online initiative created by founding partners {Harvard} and {MIT}."
-msgstr ""
-"{EdX} ofrece clases y MOOCs interactivos en línea de las mejores "
-"universidades del mundo como {MITx}, {HarvardX}, {BerkeleyX}, {UTx} y muchas"
-" otras. Los temas incluyen la biología, negocios, química, ciencias de la "
-"computación, economía, finanzas, electrónica, ingeniería, alimentación y "
-"nutrición, historia, humanidades, derecho, literatura, matemáticas, "
-"medicina, música, filosofía, física, ciencia, estadísticas y mucho más. "
-"{EdX} es una iniciativa en línea sin fines de lucro creado por los socios "
-"fundadores {Harvard} y {MIT}."
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: lms/templates/footer-edx-v2.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"EdX, Open edX, y los logos de edX y Open edX son marcas registradas de "
-"{link_start}edX Inc.{link_end}"
-
-#. Translators: {date} will be an abbreviated date, indicating when the
-#. privacy
-#. policy was most recently revised.
-#: lms/templates/footer-edx-v2.html
-msgid "(Revised {date})"
-msgstr "(Revisado {date})"
-
-#. Translators: {date} will be an abbreviated date, indicating when the
-#. privacy
-#. policy was most recently revised.
-#: lms/templates/footer-edx-v2.html
-msgid "10/22/2014"
-msgstr "10/22/2014"
-
-#: lms/templates/footer-edx-v2.html lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "Preguntas Frecuentes"
-
-#: lms/templates/footer-edx-v2.html
-msgid "edX Blog"
-msgstr "Blog edX"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Donate to edX"
-msgstr "Donar a edX"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Jobs at edX"
-msgstr "Trabajos en edX"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Follow Us"
-msgstr "Síguenos"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Mobile Apps"
-msgstr "Apps móviles"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Apple app on Apple Store"
-msgstr "app en la tienda Apple"
-
-#: lms/templates/footer-edx-v2.html
-msgid "Android app on Google Play"
-msgstr "App de Android en Google Play"
-
 #: lms/templates/footer-edx-v3.html
 msgid "Page Footer"
 msgstr "Pie de Página"
+
+#: lms/templates/footer-edx-v3.html
+msgid "About edX"
+msgstr "Acerca de edX"
 
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
@@ -11163,7 +11312,6 @@ msgstr "Actividad de carga de git reciente para {course_id}"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "Error"
 
@@ -11936,10 +12084,6 @@ msgstr ""
 "contacte a {email}."
 
 #: lms/templates/commerce/checkout_receipt.html
-msgid "Could not retrieve payment information"
-msgstr "No se pudo conseguir la información del pago"
-
-#: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
 msgstr "Cargando datos solicitados"
 
@@ -12642,6 +12786,10 @@ msgid "Your certificate is available"
 msgstr "Su certificado está disponible"
 
 #: lms/templates/courseware/progress.html
+msgid "You can now view your certificate."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
 "receive a higher grade,you can request an {link_start} updated certificate "
@@ -12650,6 +12798,14 @@ msgstr ""
 "Ahora puede descargar su certificado en formato PDF. Si continúa trabajando "
 "y recibe un mayor grado puede solicitar un {link_start}certificado "
 "actualizado{link_end}."
+
+#: lms/templates/courseware/progress.html
+msgid "View certificate in a new browser window or tab."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "View Certificate"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "PDF will open in a new browser window or tab."
@@ -13135,7 +13291,7 @@ msgstr "Sin leer"
 #. for abuse
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Flagged"
-msgstr "Marcado"
+msgstr "Reportado"
 
 #. Translators: This labels a cohort menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -14095,6 +14251,7 @@ msgstr ""
 "control."
 
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
 msgstr "El equipo de {platform_name}"
 
@@ -14269,49 +14426,47 @@ msgstr "Usted ha sido eliminado de la prueba beta para el curso {course_name}"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"Your verification for course {course_name} and assessment {assessment} has "
-"been passed."
+"We have successfully verified your identity for the {assessment} assessment "
+"in the {course_name} course."
 msgstr ""
-"La verificación del curso {course_name} y la evaluación {assessment} ha sido"
-" aprobada."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"Your verification for course {course_name} and assessment {assessment} has "
-"failed."
+"We could not verify your identity for the {assessment} assessment in the "
+"{course_name} course. You have used {used_attempts} out of "
+"{allowed_attempts} attempts to verify your identity."
 msgstr ""
-"La verificación para el curso {course_name} y la evaluación {assessment} han"
-" fallado"
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgid ""
+"You must verify your identity before the assessment closes on {due_date}."
 msgstr ""
-"Ha alcanzado el número máximos de intentos. No puede volver a intentar."
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Assessment date has passed and retake not allowed."
-msgstr "Ha finalizado la fecha de evaluación y no puede retomarla."
-
-#: lms/templates/emails/reverification_processed.txt
-msgid "Assessment closes on {due_date}."
-msgstr "El fecha de evaluación finaliza el {due_date}."
-
-#: lms/templates/emails/reverification_processed.txt
-msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgid "To try to verify your identity again, select the following link:"
 msgstr ""
-"La evaluación está abierta y tiene {left_attempts} intento(s) restantes."
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Click on link below to re-verify:"
-msgstr "Haga clic en el siguiente link para volver a verificar:"
+msgid ""
+"We could not verify your identity for the {assessment} assessment in the "
+"{course_name} course. You have used {used_attempts} out of "
+"{allowed_attempts} attempts to verify your identity, and verification is no "
+"longer possible."
+msgstr ""
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "Click on link below to go to the courseware:"
-msgstr "Haga clic en el siguiente link para ir al curso:"
+msgid "To go to the courseware, select the following link:"
+msgstr ""
 
 #: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} Team."
-msgstr "El Equipo de {platform_name}."
+msgid ""
+"If you have any questions, you can contact student support at "
+"{support_link}."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Thanks,"
+msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -14810,8 +14965,8 @@ msgid "Edit Price"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Sales"
-msgstr "Ventas"
+msgid "Course Seat Purchases"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Total Credit Card Purchases: "
@@ -16651,6 +16806,10 @@ msgstr ""
 "{platform_name} debe cumplir con los controles de exportaciones y no puede "
 "permitirle acceder a este curso en particular."
 
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "Preguntas Frecuentes"
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "Kit Multimedia"
@@ -17561,30 +17720,44 @@ msgstr ""
 #: cms/templates/certificates.html
 msgid ""
 "Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. Course team members with the Admin role "
-"in Studio can create course certificates based on templates that exist for "
-"your organization."
+" acknowledge their accomplishment. If you are a course team member with the "
+"Admin role in Studio, you can configure your course certificate."
 msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"Course team members with the Admin role can also add signatory names for a "
-"certificate, and upload assets including signature image files for "
-"signatories. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates."
+"Click {em_start}Add your first certificate{em_end} to add a certificate "
+"configuration. Upload the organization logo to be used on the certificate, "
+"and specify at least one signatory. You can include up to four signatories "
+"for a certificate. You can also upload a signature image file for each "
+"signatory. {em_start}Note:{em_end} Signature images are used only for "
+"verified certificates. Optionally, specify a different course title to use "
+"on your course certificate. You might want to use a different title if, for "
+"example, the official course name is too long to display well on a "
+"certificate."
 msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}New Certificate{em_end} to add a new certificate. To edit a "
-"certficate, hover over its box and click {em_start}Edit{em_end}. You can "
-"delete a certificate only if it has not been issued to a learner. To delete "
-"a certificate, hover over its box and click the delete icon."
+"Select a course mode and click {em_start}Preview Certificate{em_end} to "
+"preview the certificate that a learner in the selected enrollment track "
+"would receive. When the certificate is ready for issuing, click "
+"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
+"{em_start}Deactivate{em_end}."
 msgstr ""
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-msgid "Learn More"
-msgstr "Aprender más"
+#: cms/templates/certificates.html
+msgid ""
+" To edit the certificate configuration, hover over the top right corner of "
+"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
+"over the top right corner of the form and click the delete icon. In general,"
+" do not delete certificates after a course has started, because some "
+"certificates might already have been issued to learners."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid "Learn more about certificates"
+msgstr ""
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -18536,6 +18709,10 @@ msgstr ""
 "eliminar un grupo de contenido sólo si no está en uso por una unidad. Para "
 "eliminar un grupo de contenido, pase el ratón sobre su cuadro y haga clic en"
 " el icono de borrar."
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "Aprender más"
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -19856,6 +20033,8 @@ msgstr "Información básica"
 msgid "The nuts and bolts of your course"
 msgstr "Las herramientas para la construcción de su curso"
 
+#. Translators: 'Access to Assessment 1' means the access for a requirement
+#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "This field is disabled: this information cannot be changed."
 msgstr "Este campo está deshabilitado; no puede modificar su valor."
@@ -19903,6 +20082,30 @@ msgstr ""
 "La página de resumen de su curso no será visible hasta que el curso haya "
 "sido anunciado. Para ingresar el contenido de dicha página y "
 "previsualizarla, siga las instrucciones entregadas por su administrador."
+
+#: cms/templates/settings.html
+msgid "Credit Eligibility Requirements"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Steps needed for credit eligibility"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Minimum Passing Grade"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Successful Proctored Exam"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Successful In Course Reverification"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Access to {display_name}"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -20250,6 +20453,22 @@ msgid "Your overall grading scale for student final grades"
 msgstr ""
 "Su escala de calificación general para las notas definitivas de los "
 "estudiantes"
+
+#: cms/templates/settings_graders.html
+msgid "Credit Grade &amp; Eligibility"
+msgstr ""
+
+#: cms/templates/settings_graders.html
+msgid "Settings for credit eligibility"
+msgstr ""
+
+#: cms/templates/settings_graders.html
+msgid "Minimum Passing Grade to Earn Credit:"
+msgstr ""
+
+#: cms/templates/settings_graders.html
+msgid "Must be greater than or equal to passing grade"
+msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"

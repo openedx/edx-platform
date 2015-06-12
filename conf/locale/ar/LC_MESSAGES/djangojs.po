@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-05 17:34+0000\n"
+"POT-Creation-Date: 2015-06-12 18:41+0000\n"
 "PO-Revision-Date: 2015-06-05 17:38+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -2436,6 +2436,14 @@ msgstr ""
 msgid "Teams"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "My Teams"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Browse"
+msgstr ""
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "فتح الآلة الحاسبة "
@@ -3266,11 +3274,6 @@ msgstr "جرى بنجاح إعادة تقييم المسألة للمستخدم 
 msgid "Failed to rescore problem."
 msgstr "نأسف لتعذّر إجراء عملية إعادة تقييم المسألة."
 
-#: lms/static/js/ccx/schedule.js lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
-msgid "The data could not be saved."
-msgstr "تعذّر حفظ البيانات."
-
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr ""
@@ -3566,6 +3569,11 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
 
 #: lms/static/js/student_account/account.js
+#: lms/static/js/student_profile/profile.js
+msgid "The data could not be saved."
+msgstr "تعذّر حفظ البيانات."
+
+#: lms/static/js/student_account/account.js
 msgid "Please enter a valid email address"
 msgstr "يُرجى إدخال عنوان صحيح للبريد الإلكتروني."
 
@@ -3822,17 +3830,17 @@ msgid "Verified Certificate"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with Credit Card"
+msgid "Checkout"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with PayPal"
+msgid "Checkout with PayPal"
 msgstr ""
 
 #. Translators: 'processor' is the name of a third-party payment processing
 #. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with {processor}"
+msgid "Checkout with {processor}"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
@@ -4376,6 +4384,10 @@ msgstr "لا يمكن إسقاط <% attrs.types %> أكثر مما سيجري ت
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
 msgstr "يجب تحديد فترة السماح بصيغة HH:MM."
+
+#: cms/static/js/models/settings/course_grading_policy.js
+msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
+msgstr ""
 
 #: cms/static/js/spec/views/assets_spec.js
 #: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
@@ -4974,6 +4986,14 @@ msgid ""
 msgstr ""
 "يُرجى ملاحظة أنّ عملية التحقّق من صحّة أزواج المفتاح والقيمة للسياسة الخاصة "
 "بك غير مطبّقة بعد. وفي حال كنت تواجه أي مشاكل، يُرجى مراجعة أزواج سياستك. . "
+
+#: cms/static/js/views/settings/main.js
+msgid "Credit Eligibility Requirements"
+msgstr ""
+
+#: cms/static/js/views/settings/main.js
+msgid "Minimum passing grade for credit is not set."
+msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "%(hours)s:%(minutes)s (current UTC time)"
