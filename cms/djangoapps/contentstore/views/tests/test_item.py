@@ -1384,6 +1384,7 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(template_display_names, ['Annotation', 'Open Response Assessment', 'Peer Grading Interface'])
 
 
+@ddt.ddt
 class TestXBlockInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
@@ -1410,15 +1411,19 @@ class TestXBlockInfo(ItemTest):
         json_response = json.loads(resp.content)
         self.validate_course_xblock_info(json_response, course_outline=True)
 
-    def test_xblock_outline_handler_mongo_calls(self):
-        expected_calls = 5
-        with self.store.default_store(ModuleStoreEnum.Type.split):
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 5, 5),
+        (ModuleStoreEnum.Type.mongo, 4, 6),
+    )
+    @ddt.unpack
+    def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):
+        with self.store.default_store(store_type):
             course = CourseFactory.create()
             chapter = ItemFactory.create(
                 parent_location=course.location, category='chapter', display_name='Week 1'
             )
             outline_url = reverse_usage_url('xblock_outline_handler', chapter.location)
-            with check_mongo_calls(expected_calls):
+            with check_mongo_calls(chapter_queries):
                 self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
             sequential = ItemFactory.create(
@@ -1428,8 +1433,8 @@ class TestXBlockInfo(ItemTest):
             ItemFactory.create(
                 parent_location=sequential.location, category='vertical', display_name='Vertical 1'
             )
-            # calls should be same after adding two new children.
-            with check_mongo_calls(expected_calls):
+            # calls should be same after adding two new children for split only.
+            with check_mongo_calls(chapter_queries_1):
                 self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
     def test_entrance_exam_chapter_xblock_info(self):
