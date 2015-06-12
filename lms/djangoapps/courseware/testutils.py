@@ -150,7 +150,7 @@ class RenderXBlockTestMixin(object):
         self.setup_user(admin=False, enroll=True, login=True)
         self.verify_response()
 
-    def test_fail_unauthenticated(self):
+    def test_unauthenticated(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response(expected_response_code=302)
