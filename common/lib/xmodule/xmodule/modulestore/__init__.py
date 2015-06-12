@@ -7,13 +7,11 @@ import logging
 import re
 import json
 import datetime
-from uuid import uuid4
 
 from pytz import UTC
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 import collections
 from contextlib import contextmanager
-import functools
 import threading
 from operator import itemgetter
 from sortedcontainers import SortedListWithKey
@@ -27,8 +25,6 @@ from xmodule.errortracker import make_error_tracker
 from xmodule.assetstore import AssetMetadata
 from opaque_keys.edx.keys import CourseKey, UsageKey, AssetKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
 
@@ -1194,41 +1190,6 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         if self.get_modulestore_type(None) != store_type:
             raise ValueError(u"Cannot set default store to type {}".format(store_type))
         yield
-
-    @staticmethod
-    def memoize_request_cache(func):
-        """
-        Memoize a function call results on the request_cache if there's one. Creates the cache key by
-        joining the unicode of all the args with &; so, if your arg may use the default &, it may
-        have false hits
-        """
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            """
-            Wraps a method to memoize results.
-            """
-            if self.request_cache:
-                cache_key = '&'.join([hashvalue(arg) for arg in args])
-                if cache_key in self.request_cache.data.setdefault(func.__name__, {}):
-                    return self.request_cache.data[func.__name__][cache_key]
-
-                result = func(self, *args, **kwargs)
-
-                self.request_cache.data[func.__name__][cache_key] = result
-                return result
-            else:
-                return func(self, *args, **kwargs)
-        return wrapper
-
-
-def hashvalue(arg):
-    """
-    If arg is an xblock, use its location. otherwise just turn it into a string
-    """
-    if isinstance(arg, XBlock):
-        return unicode(arg.location)
-    else:
-        return unicode(arg)
 
 
 # pylint: disable=abstract-method

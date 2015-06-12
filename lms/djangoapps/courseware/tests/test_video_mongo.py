@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
+import ddt
+import itertools
 import json
 from collections import OrderedDict
 
@@ -13,7 +15,7 @@ from django.test.utils import override_settings
 
 from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.x_module import STUDENT_VIEW
-from xmodule.tests.test_video import VideoDescriptorTestBase
+from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.tests.test_import import DummySystem
 
 from edxval.api import (
@@ -859,6 +861,119 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_descriptor.download_video)
+
+
+@ddt.ddt
+class TestVideoDescriptorStudentViewJson(TestCase):
+    """
+    Tests for the student_view_json method on VideoDescriptor.
+    """
+    TEST_DURATION = 111.0
+    TEST_PROFILE = "mobile"
+    TEST_SOURCE_URL = "http://www.example.com/source.mp4"
+    TEST_LANGUAGE = "ge"
+    TEST_ENCODED_VIDEO = {
+        'profile': TEST_PROFILE,
+        'bitrate': 333,
+        'url': 'http://example.com/video',
+        'file_size': 222,
+    }
+    TEST_EDX_VIDEO_ID = 'test_edx_video_id'
+
+    def setUp(self):
+        super(TestVideoDescriptorStudentViewJson, self).setUp()
+        sample_xml = (
+            "<video display_name='Test Video'> " +
+            "<source src='" + self.TEST_SOURCE_URL + "'/> " +
+            "<transcript language='" + self.TEST_LANGUAGE + "' src='german_translation.srt' /> " +
+            "</video>"
+        )
+        self.transcript_url = "transcript_url"
+        self.video = instantiate_descriptor(data=sample_xml)
+        self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
+
+    def setup_val_video(self, associate_course_in_val=False):
+        """
+        Creates a video entry in VAL.
+        Arguments:
+            associate_course - If True, associates the test course with the video in VAL.
+        """
+        create_profile('mobile')
+        create_video({
+            'edx_video_id': self.TEST_EDX_VIDEO_ID,
+            'client_video_id': 'test_client_video_id',
+            'duration': self.TEST_DURATION,
+            'status': 'dummy',
+            'encoded_videos': [self.TEST_ENCODED_VIDEO],
+            'courses': [self.video.location.course_key] if associate_course_in_val else [],
+        })
+        self.val_video = get_video_info(self.TEST_EDX_VIDEO_ID)  # pylint: disable=attribute-defined-outside-init
+
+    def get_result(self, allow_cache_miss=True):
+        """
+        Returns the result from calling the video's student_view_json method.
+        Arguments:
+            allow_cache_miss is passed in the context to the student_view_json method.
+        """
+        context = {
+            "profiles": [self.TEST_PROFILE],
+            "allow_cache_miss": "True" if allow_cache_miss else "False"
+        }
+        return self.video.student_view_json(context)
+
+    def verify_result_with_fallback_url(self, result):
+        """
+        Verifies the result is as expected when returning "fallback" video data (not from VAL).
+        """
+        self.assertDictEqual(
+            result,
+            {
+                "only_on_web": False,
+                "duration": None,
+                "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+                "encoded_videos": {"fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0}},
+            }
+        )
+
+    def verify_result_with_val_profile(self, result):
+        """
+        Verifies the result is as expected when returning video data from VAL.
+        """
+        self.assertDictContainsSubset(
+            result.pop("encoded_videos")[self.TEST_PROFILE],
+            self.TEST_ENCODED_VIDEO,
+        )
+        self.assertDictEqual(
+            result,
+            {
+                "only_on_web": False,
+                "duration": self.TEST_DURATION,
+                "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+            }
+        )
+
+    def test_only_on_web(self):
+        self.video.only_on_web = True
+        result = self.get_result()
+        self.assertDictEqual(result, {"only_on_web": True})
+
+    def test_no_edx_video_id(self):
+        result = self.get_result()
+        self.verify_result_with_fallback_url(result)
+
+    @ddt.data(
+        *itertools.product([True, False], [True, False], [True, False])
+    )
+    @ddt.unpack
+    def test_with_edx_video_id(self, allow_cache_miss, video_exists_in_val, associate_course_in_val):
+        self.video.edx_video_id = self.TEST_EDX_VIDEO_ID
+        if video_exists_in_val:
+            self.setup_val_video(associate_course_in_val)
+        result = self.get_result(allow_cache_miss)
+        if video_exists_in_val and (associate_course_in_val or allow_cache_miss):
+            self.verify_result_with_val_profile(result)
+        else:
+            self.verify_result_with_fallback_url(result)
 
 
 @attr('shard_1')

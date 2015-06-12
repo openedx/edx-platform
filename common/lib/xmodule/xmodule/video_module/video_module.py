@@ -20,12 +20,12 @@ import logging
 import random
 from collections import OrderedDict
 from operator import itemgetter
-
 from lxml import etree
 from pkg_resources import resource_string
 
 from django.conf import settings
 
+from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -329,6 +329,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return self.system.render_template('video.html', context)
 
 
+@XBlock.wants("request_cache")
 @XBlock.wants("settings")
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
                       TabsEditingDescriptor, EmptyDataRawDescriptor):
@@ -722,7 +723,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         if self.sub:
             _update_transcript_for_index()
 
-        # check to see if there are transcripts in other languages besides default transcript
+        # Check to see if there are transcripts in other languages besides default transcript
         if self.transcripts:
             for language in self.transcripts.keys():
                 _update_transcript_for_index(language)
@@ -734,3 +735,79 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         xblock_body["content_type"] = "Video"
 
         return xblock_body
+
+    @property
+    def request_cache(self):
+        """
+        Returns the request_cache from the runtime.
+        """
+        return self.runtime.service(self, "request_cache")
+
+    @memoize_in_request_cache('request_cache')
+    def get_cached_val_data_for_course(self, video_profile_names, course_id):
+        """
+        Returns the VAL data for the requested video profiles for the given course.
+        """
+        return edxval_api.get_video_info_for_course_and_profiles(unicode(course_id), video_profile_names)
+
+    def student_view_json(self, context):
+        """
+        Returns a JSON representation of the student_view of this XModule.
+        The contract of the JSON content is between the caller and the particular XModule.
+        """
+        # If the "only_on_web" field is set on this video, do not return the rest of the video's data
+        # in this json view, since this video is to be accessed only through its web view."
+        if self.only_on_web:
+            return {"only_on_web": True}
+
+        encoded_videos = {}
+        val_video_data = {}
+
+        # Check in VAL data first if edx_video_id exists
+        if self.edx_video_id:
+            video_profile_names = context.get("profiles", [])
+
+            # get and cache bulk VAL data for course
+            val_course_data = self.get_cached_val_data_for_course(video_profile_names, self.location.course_key)
+            val_video_data = val_course_data.get(self.edx_video_id, {})
+
+            # Get the encoded videos if data from VAL is found
+            if val_video_data:
+                encoded_videos = val_video_data.get('profiles', {})
+
+            # If information for this edx_video_id is not found in the bulk course data, make a
+            # separate request for this individual edx_video_id, unless cache misses are disabled.
+            # This is useful/required for videos that don't have a course designated, such as the introductory video
+            # that is shared across many courses.  However, this results in a separate database request so watch
+            # out for any performance hit if many such videos exist in a course.  Set the 'allow_cache_miss' parameter
+            # to False to disable this fall back.
+            elif context.get("allow_cache_miss", "True").lower() == "true":
+                try:
+                    val_video_data = edxval_api.get_video_info(self.edx_video_id)
+                    # Unfortunately, the VAL API is inconsistent in how it returns the encodings, so remap here.
+                    for enc_vid in val_video_data.pop('encoded_videos'):
+                        encoded_videos[enc_vid['profile']] = {key: enc_vid[key] for key in ["url", "file_size"]}
+                except edxval_api.ValVideoNotFoundError:
+                    pass
+
+        # Fall back to other video URLs in the video module if not found in VAL
+        if not encoded_videos:
+            video_url = self.html5_sources[0] if self.html5_sources else self.source
+            if video_url:
+                encoded_videos["fallback"] = {
+                    "url": video_url,
+                    "file_size": 0,  # File size is unknown for fallback URLs
+                }
+
+        transcripts_info = self.get_transcripts_info()
+        transcripts = {
+            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
+            for lang in self.available_translations(transcripts_info, verify_assets=False)
+        }
+
+        return {
+            "only_on_web": self.only_on_web,
+            "duration": val_video_data.get('duration', None),
+            "transcripts": transcripts,
+            "encoded_videos": encoded_videos,
+        }

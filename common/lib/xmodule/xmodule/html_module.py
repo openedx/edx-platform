@@ -95,6 +95,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: d
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
+    has_responsive_ui = True
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"

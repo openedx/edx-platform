@@ -138,6 +138,11 @@ class LoncapaResponse(object):
     allowed_inputfields = []
     required_attributes = []
 
+    # Overridable field that specifies whether this capa response type has support for
+    # responsive UI, for rendering on devices of different sizes and shapes.
+    # By default, we set this to False, allowing subclasses to override as appropriate.
+    has_responsive_ui = False
+
     def __init__(self, xml, inputfields, context, system):
         """
         Init is passed the following arguments:
@@ -692,6 +697,7 @@ class ChoiceResponse(LoncapaResponse):
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
     correct_choices = None
+    has_responsive_ui = True
 
     def setup_response(self):
 
@@ -763,6 +769,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
     correct_choices = None
+    has_responsive_ui = True
 
     def setup_response(self):
         # call secondary setup for MultipleChoice questions, to set name
@@ -1084,6 +1091,7 @@ class OptionResponse(LoncapaResponse):
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
     answer_fields = None
+    has_responsive_ui = True
 
     def setup_response(self):
         self.answer_fields = self.inputfields
@@ -1136,6 +1144,7 @@ class NumericalResponse(LoncapaResponse):
     allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer']
     max_inputfields = 1
+    has_responsive_ui = True
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
@@ -1338,6 +1347,7 @@ class StringResponse(LoncapaResponse):
     required_attributes = ['answer']
     max_inputfields = 1
     correct_answer = []
+    has_responsive_ui = True
 
     def setup_response_backward(self):
         self.correct_answer = [
