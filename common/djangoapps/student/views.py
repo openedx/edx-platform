@@ -360,6 +360,12 @@ def signin_user(request):
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
+    third_party_auth_error = None
+    for msg in messages.get_messages(request):
+        if msg.extra_tags.split()[0] == "social-auth":
+            third_party_auth_error = unicode(msg)
+            break
+
     course_id = request.GET.get('course_id')
     email_opt_in = request.GET.get('email_opt_in')
     context = {
@@ -375,6 +381,7 @@ def signin_user(request):
             'platform_name',
             settings.PLATFORM_NAME
         ),
+        'third_party_auth_error': third_party_auth_error
     }
 
     return render_to_response('login.html', context)
@@ -422,7 +429,7 @@ def register_user(request, extra_context=None):
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
         overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
         overrides['running_pipeline'] = running_pipeline
-        overrides['selected_provider'] = current_provider.NAME
+        overrides['selected_provider'] = current_provider.name
         context.update(overrides)
 
     return render_to_response('register.html', context)
@@ -955,12 +962,12 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                     username=username, backend_name=backend_name))
             return HttpResponse(
                 _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
-                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
+                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
+                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
@@ -1504,7 +1511,7 @@ def create_account_with_params(request, params):
         if third_party_auth.is_enabled() and pipeline.running(request):
             running_pipeline = pipeline.get(request)
             current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-            provider_name = current_provider.NAME
+            provider_name = current_provider.name
 
         analytics.track(
             user.id,

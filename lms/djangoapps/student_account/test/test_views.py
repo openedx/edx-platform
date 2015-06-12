@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.accounts.api import activate_account, crea
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from student.tests.factories import CourseModeFactory, UserFactory
 from student_account.views import account_settings_context
-from third_party_auth.tests.testutil import simulate_running_pipeline
+from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -204,7 +204,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
 
 @ddt.ddt
-class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase):
+class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = "bob"
@@ -214,6 +214,9 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
+        # For these tests, two third party auth providers are enabled by default:
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
     @ddt.data(
         ("account_login", "login"),
@@ -299,12 +302,14 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url("facebook", "login"),
                 "registerUrl": self._third_party_login_url("facebook", "register")
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url("google-oauth2", "login"),
@@ -332,6 +337,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         )
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
@@ -346,6 +352,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
                 )
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
@@ -380,6 +387,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         shoppingcart_url = reverse("shoppingcart.views.show_cart")
         expected_providers = [
             {
+                "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
@@ -394,6 +402,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
                 )
             },
             {
+                "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
@@ -426,6 +435,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
             # the ?next param sends users to the blocked message.
             expected_providers = [
                 {
+                    "id": "oa2-facebook",
                     "name": "Facebook",
                     "iconClass": "fa-facebook",
                     "loginUrl": self._third_party_login_url(
@@ -440,6 +450,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
                     )
                 },
                 {
+                    "id": "oa2-google-oauth2",
                     "name": "Google",
                     "iconClass": "fa-google-plus",
                     "loginUrl": self._third_party_login_url(
@@ -482,7 +493,8 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         auth_info = markupsafe.escape(
             json.dumps({
                 "currentProvider": current_provider,
-                "providers": providers
+                "providers": providers,
+                "errorMessage": None,
             })
         )
 
@@ -505,7 +517,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         )
 
 
-class AccountSettingsViewTest(TestCase):
+class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
     """ Tests for the account settings view. """
 
     USERNAME = 'student'
@@ -528,6 +540,10 @@ class AccountSettingsViewTest(TestCase):
 
         self.request = RequestFactory()
         self.request.user = self.user
+
+        # For these tests, two third party auth providers are enabled by default:
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
         # Python-social saves auth failure notifcations in Django messages.
         # See pipeline.get_duplicate_provider() for details.

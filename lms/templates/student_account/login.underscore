@@ -20,6 +20,13 @@
     <ul class="message-copy"></ul>
 </div>
 
+<% if (context.errorMessage) { %>
+    <div class="status submission-error">
+        <h4 class="message-title"><%- gettext("We're sorry, that didn't work.") %></h4>
+        <ul class="message-copy"><%- context.errorMessage %></ul>
+    </div>
+<% } %>
+
 <form id="login" class="login-form" tabindex="-1">
 
     <div class="section-title lines">
@@ -42,7 +49,7 @@
 
         <% _.each( context.providers, function( provider ) {
             if ( provider.loginUrl ) { %>
-                <button type="button" class="button button-primary button-<%- provider.name %> login-provider login-<%- provider.name %>" data-provider-url="<%- provider.loginUrl %>">
+                <button type="button" class="button button-primary button-<%- provider.id %> login-provider login-<%- provider.id %>" data-provider-url="<%- provider.loginUrl %>">
                     <div class="icon fa <%- provider.iconClass %>" aria-hidden="true"></div>
                     <%- provider.name %>
                 </button>
