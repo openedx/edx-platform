@@ -4,8 +4,6 @@ CCX Enrollment operations for use by Coach APIs.
 Does not include any access control, be sure to check access before calling.
 """
 import logging
-from courseware.courses import get_course_about_section  # pylint: disable=import-error
-from courseware.courses import get_course_by_id  # pylint: disable=import-error
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -14,12 +12,12 @@ from edxmako.shortcuts import render_to_string  # pylint: disable=import-error
 from microsite_configuration import microsite  # pylint: disable=import-error
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
+from ccx_keys.locator import CCXLocator
 
 from .models import (
     CcxMembership,
     CcxFutureMembership,
 )
-from .overrides import get_current_ccx
 
 
 log = logging.getLogger("edx.ccx")
@@ -138,7 +136,6 @@ def get_email_params(ccx, auto_enroll, secure=True):
     get parameters for enrollment emails
     """
     protocol = 'https' if secure else 'http'
-    course_id = ccx.course_id
 
     stripped_site_name = microsite.get_value(
         'SITE_NAME',
@@ -154,7 +151,7 @@ def get_email_params(ccx, auto_enroll, secure=True):
         site=stripped_site_name,
         path=reverse(
             'course_root',
-            kwargs={'course_id': course_id.to_deprecated_string()}
+            kwargs={'course_id': CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
         )
     )
 
@@ -165,7 +162,7 @@ def get_email_params(ccx, auto_enroll, secure=True):
             site=stripped_site_name,
             path=reverse(
                 'about_course',
-                kwargs={'course_id': course_id.to_deprecated_string()}
+                kwargs={'course_id': CCXLocator.from_course_locator(ccx.course_id, ccx.id)}
             )
         )
 
@@ -241,44 +238,6 @@ def send_mail_to_student(student, param_dict):
         )
 
 
-def get_all_ccx_for_user(user):
-    """return all CCXS to which the user is registered
-
-    Returns a list of dicts: {
-        ccx_name: <formatted title of CCX course>
-        ccx_url: <url to view this CCX>
-        ccx_active: True if this ccx is currently the 'active' one
-        mooc_name: <formatted title of the MOOC course for this CCX>
-        mooc_url: <url to view this MOOC>
-    }
-    """
-    if user.is_anonymous():
-        return []
-    current_active_ccx = get_current_ccx()
-    memberships = []
-    for membership in CcxMembership.memberships_for_user(user):
-        course = get_course_by_id(membership.ccx.course_id)
-        ccx = membership.ccx
-        ccx_title = ccx.display_name
-        mooc_title = get_course_about_section(course, 'title')
-        url = reverse(
-            'switch_active_ccx',
-            args=[course.id.to_deprecated_string(), membership.ccx.id]
-        )
-        mooc_url = reverse(
-            'switch_active_ccx',
-            args=[course.id.to_deprecated_string(), ]
-        )
-        memberships.append({
-            'ccx_name': ccx_title,
-            'ccx_url': url,
-            'active': membership.ccx == current_active_ccx,
-            'mooc_name': mooc_title,
-            'mooc_url': mooc_url,
-        })
-    return memberships
-
-
 def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
     """
     Get the relevant set of (CustomCourseForEdX, CcxMembership, Course)
@@ -298,6 +257,17 @@ def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
                 # Conversely, if we are not in a Microsite, then let's filter out any enrollments
                 # with courses attributed (by ORG) to Microsites
                 elif course.location.org in org_filter_out_set:
+                    continue
+
+                # If, somehow, we've got a ccx that has been created for a
+                # course with a deprecated ID, we must filter it out. Emit a
+                # warning to the log so we can clean up.
+                if course.location.deprecated:
+                    log.warning(
+                        "CCX %s exists for course %s with deprecated id",
+                        ccx,
+                        ccx.course_id
+                    )
                     continue
 
                 yield (ccx, membership, course)

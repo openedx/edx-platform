@@ -22,6 +22,18 @@ from django.core.urlresolvers import reverse
     <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content">
       <h1>${_("CCX Coach Dashboard")}</h1>
 
+      % if messages:
+      <ul class="messages">
+        % for message in messages:
+          % if message.tags:
+          <li class="${message.tags}">${message}</li>
+          % else:
+          <li>${message}</li>
+          % endif
+        % endfor
+        </ul>
+      % endif
+
       %if not ccx:
       <section>
         <form action="${create_ccx_url}" method="POST">

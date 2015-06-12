@@ -41,7 +41,6 @@ from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -60,8 +59,9 @@ class SysadminDashboardView(TemplateView):
         """
 
         self.def_ms = modulestore()
+
         self.is_using_mongo = True
-        if isinstance(self.def_ms, XMLModuleStore):
+        if self.def_ms.get_modulestore_type(None) == 'xml':
             self.is_using_mongo = False
         self.msg = u''
         self.datatable = []

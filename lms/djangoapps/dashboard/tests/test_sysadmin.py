@@ -32,7 +32,6 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.xml import XMLModuleStore
 
 
 TEST_MONGODB_LOG = {
@@ -316,7 +315,8 @@ class TestSysadmin(SysadminBaseTestCase):
         response = self._add_edx4edx()
 
         def_ms = modulestore()
-        self.assertIn('xml', str(def_ms.__class__))
+
+        self.assertEqual('xml', def_ms.get_modulestore_type(None))
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNotNone(course)
@@ -460,7 +460,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
 
         def_ms = modulestore()
-        self.assertFalse(isinstance(def_ms, XMLModuleStore))
+        self.assertFalse('xml' == def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
         course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))

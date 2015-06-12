@@ -307,7 +307,6 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS += ('ccx',)
-    MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)
     FIELD_OVERRIDE_PROVIDERS += (
         'ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )

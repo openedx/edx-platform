@@ -9,7 +9,9 @@ from nose.plugins.attrib import attr
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from django.test.utils import override_settings
 from student.tests.factories import AdminFactory  # pylint: disable=import-error
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import CustomCourseForEdX
@@ -25,6 +27,8 @@ class TestFieldOverrides(ModuleStoreTestCase):
     """
     Make sure field overrides behave in the expected manner.
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         """
         Set up tests
@@ -64,7 +68,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         # sure if there's a way to poke the test harness to do so.  So, we'll
         # just inject the override field storage in this brute force manner.
         OverrideFieldData.provider_classes = None
-        for block in iter_blocks(course):
+        for block in iter_blocks(ccx.course):
             block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
                 AdminFactory.create(), block._field_data)   # pylint: disable=protected-access
 
@@ -81,7 +85,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         Test that overriding start date on a chapter works.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.course.get_children()[0]
+        chapter = self.ccx.course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         self.assertEquals(chapter.start, ccx_start)
 
@@ -90,7 +94,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         Test that overriding and accessing a field produce same number of queries.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.course.get_children()[0]
+        chapter = self.ccx.course.get_children()[0]
         with self.assertNumQueries(4):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
             dummy = chapter.start
@@ -100,7 +104,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         Test no extra queries when accessing an overriden field more than once.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.course.get_children()[0]
+        chapter = self.ccx.course.get_children()[0]
         with self.assertNumQueries(4):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
             dummy1 = chapter.start
@@ -112,7 +116,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         Test that sequentials inherit overridden start date from chapter.
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.course.get_children()[0]
+        chapter = self.ccx.course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         self.assertEquals(chapter.get_children()[0].start, ccx_start)
         self.assertEquals(chapter.get_children()[1].start, ccx_start)
@@ -124,7 +128,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         the mooc.
         """
         ccx_due = datetime.datetime(2015, 1, 1, 00, 00, tzinfo=pytz.UTC)
-        chapter = self.course.get_children()[0]
+        chapter = self.ccx.course.get_children()[0]
         chapter.display_name = 'itsme!'
         override_field_for_ccx(self.ccx, chapter, 'due', ccx_due)
         vertical = chapter.get_children()[0].get_children()[0]

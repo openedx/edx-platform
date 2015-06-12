@@ -4,9 +4,10 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
+from ccx_keys.locator import CCXLocator
 %>
 <%
-  ccx_switch_target = reverse('switch_active_ccx', args=[course.id.to_deprecated_string(), ccx.id])
+  ccx_target = reverse('info', args=[CCXLocator.from_course_locator(course.id, ccx.id)])
 %>
 <li class="course-item">
   <article class="course">
@@ -14,7 +15,7 @@ from courseware.courses import course_image_url, get_course_about_section
       <div class="wrapper-course-image" aria-hidden="true">
         % if show_courseware_link:
           % if not is_course_blocked:
-              <a href="${ccx_switch_target}" class="cover">
+              <a href="${ccx_target}" class="cover">
                 <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
               </a>
           % else:
@@ -32,7 +33,7 @@ from courseware.courses import course_image_url, get_course_about_section
         <h3 class="course-title">
           % if show_courseware_link:
             % if not is_course_blocked:
-              <a href="${ccx_switch_target}">${ccx.display_name}</a>
+              <a href="${ccx_target}">${ccx.display_name}</a>
             % else:
               <a class="disable-look">${ccx.display_name}</a>
             % endif
@@ -58,13 +59,13 @@ from courseware.courses import course_image_url, get_course_about_section
             <div class="course-actions">
               % if ccx.has_ended():
                 % if not is_course_blocked:
-                  <a href="${ccx_switch_target}" class="enter-course archived">${_('View Archived Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
+                  <a href="${ccx_target}" class="enter-course archived">${_('View Archived Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
                 % else:
                   <a class="enter-course-blocked archived">${_('View Archived Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
                 % endif
               % else:
                 % if not is_course_blocked:
-                  <a href="${ccx_switch_target}" class="enter-course">${_('View Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
+                  <a href="${ccx_target}" class="enter-course">${_('View Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
                 % else:
                   <a class="enter-course-blocked">${_('View Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
                 % endif

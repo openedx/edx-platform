@@ -72,6 +72,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         )
         self.modulestore = modulestore
         self.course_entry = course_entry
+        # set course_id attribute to avoid problems with subsystems that expect
+        # it here. (grading, for example)
+        self.course_id = course_entry.course_key
         self.lazy = lazy
         self.module_data = module_data
         self.default_class = default_class

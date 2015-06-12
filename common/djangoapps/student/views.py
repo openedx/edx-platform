@@ -618,14 +618,10 @@ def dashboard(request):
 
     ccx_membership_triplets = []
     if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-        from ccx import ACTIVE_CCX_KEY
         from ccx.utils import get_ccx_membership_triplets
         ccx_membership_triplets = get_ccx_membership_triplets(
             user, course_org_filter, org_filter_out_set
         )
-        # should we deselect any active CCX at this time so that we don't have
-        # to change the URL for viewing a course?  I think so.
-        request.session[ACTIVE_CCX_KEY] = None
 
     context = {
         'enrollment_message': enrollment_message,

@@ -16,11 +16,12 @@ from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
 from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
     UserFactory,
-    CourseEnrollmentFactory,
-    AnonymousUserFactory,
 )
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory
+from ccx_keys.locator import CCXLocator
 
 
 @attr('shard_1')
@@ -68,9 +69,9 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
         """verify behavior for non-user email address
         """
         ee_state = self.create_one(email='nobody@nowhere.com')
-        for attr in ['user', 'member', 'full_name', 'in_ccx']:
-            value = getattr(ee_state, attr, 'missing attribute')
-            self.assertFalse(value, "{}: {}".format(value, attr))
+        for attribute in ['user', 'member', 'full_name', 'in_ccx']:
+            value = getattr(ee_state, attribute, 'missing attribute')
+            self.assertFalse(value, "{}: {}".format(value, attribute))
 
     def test_enrollment_state_for_non_member_user(self):
         """verify behavior for email address of user who is not a ccx memeber
@@ -88,10 +89,10 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
         self.create_user()
         self.register_user_in_ccx()
         ee_state = self.create_one()
-        for attr in ['user', 'in_ccx']:
+        for attribute in ['user', 'in_ccx']:
             self.assertTrue(
-                getattr(ee_state, attr, False),
-                "attribute {} is missing or False".format(attr)
+                getattr(ee_state, attribute, False),
+                "attribute {} is missing or False".format(attribute)
             )
         self.assertEqual(ee_state.member, self.user)
         self.assertEqual(ee_state.full_name, self.user.profile.name)
@@ -128,6 +129,8 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
 class TestGetEmailParams(ModuleStoreTestCase):
     """tests for ccx.utils.get_email_params
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         """
         Set up tests
@@ -157,7 +160,7 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertFalse(set(params.keys()) - set(self.all_keys))
 
     def test_ccx_id_in_params(self):
-        expected_course_id = self.ccx.course_id.to_deprecated_string()
+        expected_course_id = unicode(CCXLocator.from_course_locator(self.ccx.course_id, self.ccx.id))
         params = self.call_fut()
         self.assertEqual(params['course'], self.ccx)
         for url_key in self.url_keys:
@@ -185,6 +188,8 @@ class TestGetEmailParams(ModuleStoreTestCase):
 class TestEnrollEmail(ModuleStoreTestCase):
     """tests for the enroll_email function from ccx.utils
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super(TestEnrollEmail, self).setUp()
         # unbind the user created by the parent, so we can create our own when
@@ -365,6 +370,8 @@ class TestEnrollEmail(ModuleStoreTestCase):
 # TODO: deal with changes in behavior for auto_enroll
 class TestUnenrollEmail(ModuleStoreTestCase):
     """Tests for the unenroll_email function from ccx.utils"""
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super(TestUnenrollEmail, self).setUp()
         # unbind the user created by the parent, so we can create our own when
@@ -511,67 +518,60 @@ class TestUnenrollEmail(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TestUserCCXList(ModuleStoreTestCase):
-    """Unit tests for ccx.utils.get_all_ccx_for_user"""
+class TestGetMembershipTriplets(ModuleStoreTestCase):
+    """Verify that get_ccx_membership_triplets functions properly"""
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        """Create required infrastructure for tests"""
-        super(TestUserCCXList, self).setUp()
+        """Set up a course, coach, ccx and user"""
+        super(TestGetMembershipTriplets, self).setUp()
         self.course = CourseFactory.create()
         coach = AdminFactory.create()
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(coach)
         self.ccx = CcxFactory(course_id=self.course.id, coach=coach)
-        enrollment = CourseEnrollmentFactory.create(course_id=self.course.id)
-        self.user = enrollment.user
-        self.anonymous = AnonymousUserFactory.create()
 
-    def register_user_in_ccx(self, active=False):
+    def make_ccx_membership(self, active=True):
         """create registration of self.user in self.ccx
 
-        registration will be inactive unless active=True
+        registration will be inactive
         """
-        CcxMembershipFactory(ccx=self.ccx, student=self.user, active=active)
+        CcxMembershipFactory.create(ccx=self.ccx, student=self.user, active=active)
 
-    def get_course_title(self):
-        """Get course title"""
-        from courseware.courses import get_course_about_section  # pylint: disable=import-error
-        return get_course_about_section(self.course, 'title')
+    def call_fut(self, org_filter=None, org_filter_out=()):
+        """call the function under test in this test case"""
+        from ccx.utils import get_ccx_membership_triplets
+        return list(
+            get_ccx_membership_triplets(self.user, org_filter, org_filter_out)
+        )
 
-    def call_fut(self, user):
-        """Call function under test"""
-        from ccx.utils import get_all_ccx_for_user  # pylint: disable=import-error
-        return get_all_ccx_for_user(user)
+    def test_no_membership(self):
+        """verify that no triplets are returned if there are no memberships
+        """
+        triplets = self.call_fut()
+        self.assertEqual(len(triplets), 0)
 
-    def test_anonymous_sees_no_ccx(self):
-        memberships = self.call_fut(self.anonymous)
-        self.assertEqual(memberships, [])
+    def test_has_membership(self):
+        """verify that a triplet is returned when a membership exists
+        """
+        self.make_ccx_membership()
+        triplets = self.call_fut()
+        self.assertEqual(len(triplets), 1)
+        ccx, membership, course = triplets[0]
+        self.assertEqual(ccx.id, self.ccx.id)
+        self.assertEqual(unicode(course.id), unicode(self.course.id))
+        self.assertEqual(membership.student, self.user)
 
-    def test_unenrolled_sees_no_ccx(self):
-        memberships = self.call_fut(self.user)
-        self.assertEqual(memberships, [])
+    def test_has_membership_org_filtered(self):
+        """verify that microsite org filter prevents seeing microsite ccx"""
+        self.make_ccx_membership()
+        bad_org = self.course.location.org + 'foo'
+        triplets = self.call_fut(org_filter=bad_org)
+        self.assertEqual(len(triplets), 0)
 
-    def test_enrolled_inactive_sees_no_ccx(self):
-        self.register_user_in_ccx()
-        memberships = self.call_fut(self.user)
-        self.assertEqual(memberships, [])
-
-    def test_enrolled_sees_a_ccx(self):
-        self.register_user_in_ccx(active=True)
-        memberships = self.call_fut(self.user)
-        self.assertEqual(len(memberships), 1)
-
-    def test_data_structure(self):
-        self.register_user_in_ccx(active=True)
-        memberships = self.call_fut(self.user)
-        this_membership = memberships[0]
-        self.assertTrue(this_membership)
-        # structure contains the expected keys
-        for key in ['ccx_name', 'ccx_url']:
-            self.assertTrue(key in this_membership.keys())
-        url_parts = [self.course.id.to_deprecated_string(), str(self.ccx.id)]
-        # all parts of the ccx url are present
-        for part in url_parts:
-            self.assertTrue(part in this_membership['ccx_url'])
-        actual_name = self.ccx.display_name
-        self.assertEqual(actual_name, this_membership['ccx_name'])
+    def test_has_membership_org_filtered_out(self):
+        """verify that microsite ccxs not seen in non-microsite view"""
+        self.make_ccx_membership()
+        filter_list = [self.course.location.org]
+        triplets = self.call_fut(org_filter_out=filter_list)
+        self.assertEqual(len(triplets), 0)
