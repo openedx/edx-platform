@@ -91,7 +91,7 @@ class AcceptanceTestSuite(TestSuite):
 
     def __enter__(self):
         super(AcceptanceTestSuite, self).__enter__()
-        if not self.skip_clean:
+        if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
         if not self.fasttest:

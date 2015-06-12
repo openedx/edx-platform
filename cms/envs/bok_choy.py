@@ -1,5 +1,13 @@
 """
-Settings for bok choy tests
+Settings for Bok Choy tests that are used for running CMS and LMS.
+
+Bok Choy uses two different settings files:
+1. test_static_optimized is used when invoking collectstatic
+2. bok_choy is used when running CMS and LMS
+
+Note: it isn't possible to have a single settings file, because Django doesn't
+support both generating static assets to a directory and also serving static
+from the same directory.
 """
 
 import os
@@ -44,8 +52,20 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
-# Enable django-pipeline and staticfiles
-STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
+############################ STATIC FILES #############################
+
+# Enable debug so that static assets are served by Django
+DEBUG = True
+
+# Serve static files at /static directly from the staticfiles directory under test root
+# Note: optimized files for testing are generated with settings from test_static_optimized
+STATIC_URL = "/static/"
+STATICFILES_FINDERS = (
+    'staticfiles.finders.FileSystemFinder',
+)
+STATICFILES_DIRS = (
+    (TEST_ROOT / "staticfiles").abspath(),
+)
 
 # Silence noisy logs
 import logging
@@ -79,9 +99,6 @@ FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
-
-# Unfortunately, we need to use debug mode to serve staticfiles
-DEBUG = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
