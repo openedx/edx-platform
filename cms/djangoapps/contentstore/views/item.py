@@ -333,7 +333,7 @@ def xblock_outline_handler(request, usage_key_string):
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         store = modulestore()
         with store.bulk_operations(usage_key.course_key):
-            root_xblock = store.get_item(usage_key)
+            root_xblock = store.get_item(usage_key, depth=None)
             return JsonResponse(create_xblock_info(
                 root_xblock,
                 include_child_info=True,
