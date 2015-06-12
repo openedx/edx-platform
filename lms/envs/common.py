@@ -1914,25 +1914,29 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.facebook.com.  Please
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
-        "icon": "fa-facebook-square"
+        "icon": "fa-facebook-square",
+        "action": _("Like {platform_name} on Facebook")
     },
     "twitter": {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
-        "icon": "fa-twitter"
+        "icon": "fa-twitter",
+        "action": _("Follow {platform_name} on Twitter")
     },
     "linkedin": {
         # Translators: This is the website name of www.linkedin.com.  Please
         # translate this the way that LinkedIn advertises in your language.
         "title": _("LinkedIn"),
-        "icon": "fa-linkedin-square"
+        "icon": "fa-linkedin-square",
+        "action": _("Follow {platform_name} on LinkedIn")
     },
     "google_plus": {
         # Translators: This is the website name of plus.google.com.  Please
         # translate this the way that Google+ advertises in your language.
         "title": _("Google+"),
-        "icon": "fa-google-plus-square"
+        "icon": "fa-google-plus-square",
+        "action": _("Follow {platform_name} on Google+")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -1950,7 +1954,8 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.reddit.com.  Please
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
-        "icon": "fa-reddit"
+        "icon": "fa-reddit",
+        "action": _("Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -1968,7 +1973,8 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.youtube.com.  Please
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
-        "icon": "fa-youtube"
+        "icon": "fa-youtube",
+        "action": _("Subscribe to the {platform_name} YouTube channel")
     }
 }
 

@@ -51,6 +51,7 @@
           % for link in footer['social_links']:
           <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
             <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
+            <span class="sr">${link['action']}</span>
           </a>
           % endfor
         </div>

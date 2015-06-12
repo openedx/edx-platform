@@ -206,7 +206,8 @@ def footer(request):
                     "url": "http://example.com/social",
                     "name": "facebook",
                     "icon-class": "fa-facebook-square",
-                    "title": "Facebook"
+                    "title": "Facebook",
+                    "action": "Sign up on Facebook!"
                 },
                 # ...
             ],

@@ -55,7 +55,8 @@ def get_footer(is_secure=True):
                 "name": "facebook",
                 "title": "Facebook",
                 "url": "http://www.facebook.com/example",
-                "icon-class": "fa-facebook-square"
+                "icon-class": "fa-facebook-square",
+                "action": "Sign up on Facebook!"
             },
             ...
         ],
@@ -71,7 +72,7 @@ def get_footer(is_secure=True):
             {
                 "name": "apple",
                 "title": "Apple",
-                "url": "http://store.apple.com/example_app"
+                "url": "http://store.apple.com/example_app",
                 "image": "http://example.com/static/apple_logo.png"
             },
             ...
@@ -148,14 +149,18 @@ def _footer_social_links():
     Returns: list
 
     """
+    platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
     links = []
+
     for social_name in settings.SOCIAL_MEDIA_FOOTER_NAMES:
+        display = settings.SOCIAL_MEDIA_FOOTER_DISPLAY.get(social_name, {})
         links.append(
             {
                 "name": social_name,
-                "title": unicode(settings.SOCIAL_MEDIA_FOOTER_DISPLAY.get(social_name, {}).get("title", "")),
+                "title": unicode(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
-                "icon-class": settings.SOCIAL_MEDIA_FOOTER_DISPLAY.get(social_name, {}).get("icon", ""),
+                "icon-class": display.get("icon", ""),
+                "action": unicode(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -221,20 +226,26 @@ def _footer_mobile_links(is_secure):
     Returns: list
 
     """
+    platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+
     mobile_links = []
     if settings.FEATURES.get('ENABLE_FOOTER_MOBILE_APP_LINKS'):
         mobile_links = [
             {
                 "name": "apple",
-                "title": "Apple",
+                "title": _(
+                    "Download the {platform_name} mobile app from the Apple App Store"
+                ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
-                "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg')
+                "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
             },
             {
                 "name": "google",
-                "title": "Google",
+                "title": _(
+                    "Download the {platform_name} mobile app from Google Play"
+                ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('google', '#'),
-                "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png')
+                "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
             }
         ]
     return mobile_links
