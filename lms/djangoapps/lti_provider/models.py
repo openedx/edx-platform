@@ -118,21 +118,3 @@ class GradedAssignment(models.Model):
         Uniqueness constraints.
         """
         unique_together = ('outcome_service', 'lis_result_sourcedid')
-
-
-class LtiUser(models.Model):
-    """
-    Model mapping the identity of an LTI user to an account on the edX platform.
-    The LTI user_id field is guaranteed to be unique per LTI consumer (per
-    to the LTI spec), so we guarantee a unique mapping from LTI to edX account
-    by using the lti_consumer/lti_user_id tuple.
-    """
-    lti_consumer = models.ForeignKey(LtiConsumer)
-    lti_user_id = models.CharField(max_length=255)
-    edx_user = models.ForeignKey(User, unique=True)
-
-    class Meta(object):
-        """
-        Uniqueness constraints.
-        """
-        unique_together = ('lti_consumer', 'lti_user_id')
