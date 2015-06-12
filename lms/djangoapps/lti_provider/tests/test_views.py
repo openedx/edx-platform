@@ -24,6 +24,7 @@ LTI_DEFAULT_PARAMS = {
     'oauth_signature_method': u'HMAC-SHA1',
     'oauth_timestamp': u'OAuth Timestamp',
     'oauth_nonce': u'OAuth Nonce',
+    'user_id': u'LTI_User',
 }
 
 LTI_OPTIONAL_PARAMS = {
@@ -89,17 +90,19 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     Tests for the lti_launch view
     """
     @patch('lti_provider.views.render_courseware')
-    def test_valid_launch(self, render):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_valid_launch(self, _authenticate, render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
         views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
-        render.assert_called_with(request, ALL_PARAMS['usage_key'])
+        render.assert_called_with(request, USAGE_KEY)
 
     @patch('lti_provider.views.render_courseware')
     @patch('lti_provider.views.store_outcome_parameters')
-    def test_outcome_service_registered(self, store_params, _render):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_outcome_service_registered(self, _authenticate, store_params, _render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
         """
@@ -142,7 +145,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.assertEqual(response.status_code, 403)
 
     @patch('lti_provider.views.lti_run')
-    def test_session_contents_after_launch(self, _run):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_session_contents_after_launch(self, _authenticate, _run):
         """
         Verifies that the LTI parameters and the course and usage IDs are
         properly stored in the session
@@ -156,7 +160,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.assertEqual(session[key], request.POST[key], key + ' not set in the session')
 
     @patch('lti_provider.views.lti_run')
-    def test_optional_parameters_in_session(self, _run):
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_optional_parameters_in_session(self, _authenticate, _run):
         """
         Verifies that the outcome-related optional LTI parameters are properly
         stored in the session
@@ -181,17 +186,6 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             session['tool_consumer_instance_guid'], u'consumer instance guid',
             'Consumer instance GUID not set in the session'
         )
-
-    def test_redirect_for_non_authenticated_user(self):
-        """
-        Verifies that if the lti_launch view is called by an unauthenticated
-        user, the response will redirect to the login page with the correct
-        URL
-        """
-        request = build_launch_request(False)
-        response = views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], '/accounts/login?next=/lti_provider/lti_run')
 
     def test_forbidden_if_signature_fails(self):
         """
@@ -278,7 +272,10 @@ class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase)
         """
         lti_launch_url = reverse(
             'lti_provider_launch',
-            kwargs={'course_id': unicode(self.course.id), 'usage_id': unicode(self.html_block.location)}
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'usage_id': unicode(self.html_block.location)
+            }
         )
         SignatureValidator.verify = MagicMock(return_value=True)
         return self.client.post(lti_launch_url, data=LTI_DEFAULT_PARAMS)
@@ -286,4 +283,9 @@ class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase)
     def test_unenrolled_student(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=False, login=True)
+        self.verify_response()
+
+    def test_unauthenticated(self):
+        self.setup_course()
+        self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()

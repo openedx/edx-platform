@@ -13,6 +13,7 @@ import logging
 from lti_provider.outcomes import store_outcome_parameters
 from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
+from lti_provider.users import authenticate_lti_user
 from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
@@ -24,7 +25,7 @@ log = logging.getLogger("edx.lti_provider")
 REQUIRED_PARAMETERS = [
     'roles', 'context_id', 'oauth_version', 'oauth_consumer_key',
     'oauth_signature', 'oauth_signature_method', 'oauth_timestamp',
-    'oauth_nonce'
+    'oauth_nonce', 'user_id'
 ]
 
 OPTIONAL_PARAMETERS = [
@@ -60,6 +61,7 @@ def lti_launch(request, course_id, usage_id):
     the lti_run view. If the user is already logged in, we just call that view
     directly.
     """
+
     if not settings.FEATURES['ENABLE_LTI_PROVIDER']:
         return HttpResponseForbidden()
 
@@ -90,11 +92,20 @@ def lti_launch(request, course_id, usage_id):
         raise Http404()
     params['course_key'] = course_key
     params['usage_key'] = usage_key
-    request.session[LTI_SESSION_KEY] = params
 
-    if not request.user.is_authenticated():
-        run_url = reverse('lti_provider.views.lti_run')
-        return redirect_to_login(run_url, settings.LOGIN_URL)
+    try:
+        lti_consumer = LtiConsumer.get_or_supplement(
+            params.get('tool_consumer_instance_guid', None),
+            params['oauth_consumer_key']
+        )
+    except LtiConsumer.DoesNotExist:
+        return HttpResponseForbidden()
+
+    # Create an edX account if the user identifed by the LTI launch doesn't have
+    # one already, and log the edX account into the platform.
+    authenticate_lti_user(request, params['user_id'], lti_consumer)
+
+    request.session[LTI_SESSION_KEY] = params
 
     return lti_run(request)
 
