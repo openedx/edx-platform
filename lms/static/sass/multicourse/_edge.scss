@@ -175,7 +175,7 @@ $paleYellow: #fffcf1;
     width: 263px;
     height: 72px;
     margin: 150px auto 50px;
-    background: url(../images/edx-theme/edx-edge-logo-large.png) no-repeat;
+    background: url($static-path + '/images/edx-theme/edx-edge-logo-large.png') no-repeat;
     text-indent: -9999px;
     overflow: hidden;
   }
