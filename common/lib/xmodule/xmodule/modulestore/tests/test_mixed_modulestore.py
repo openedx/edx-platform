@@ -1990,6 +1990,49 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_bulk_operations_signal_firing(self, default):
+        """ Signals should be fired right before bulk_operations() exits. """
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
+
+                    # Course creation and publication should fire the signal
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+                    receiver.reset_mock()
+
+                    course_key = course.id
+
+                    def _clear_bulk_ops_record(course_key):  # pylint: disable=unused-argument
+                        """ Check if the signal has been fired. """
+                        self.assertEqual(receiver.call_count, 0)
+
+                    with patch.object(
+                        self.store.thread_cache.default_store, '_clear_bulk_ops_record', wraps=_clear_bulk_ops_record
+                    ) as mock_clear_bulk_ops_record:
+
+                        with self.store.bulk_operations(course_key):
+                            categories = DIRECT_ONLY_CATEGORIES
+                            for block_type in categories:
+                                self.store.create_item(self.user_id, course_key, block_type)
+                                self.assertEqual(receiver.call_count, 0)
+
+                        self.assertEqual(mock_clear_bulk_ops_record.call_count, 1)
+
+                    self.assertEqual(receiver.call_count, 1)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_course_publish_signal_direct_firing(self, default):
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(

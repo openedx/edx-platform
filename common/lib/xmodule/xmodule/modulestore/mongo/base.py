@@ -476,19 +476,17 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
         # ensure it starts clean
         bulk_ops_record.dirty = False
 
-    def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key, emit_signals=True):
+    def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key):
         """
         Restart updating the meta-data inheritance cache for the given course or library.
         Refresh the meta-data inheritance cache now since it was temporarily disabled.
         """
+        dirty = False
         if bulk_ops_record.dirty:
             self.refresh_cached_metadata_inheritance_tree(structure_key)
-
-            if emit_signals:
-                self.send_bulk_published_signal(bulk_ops_record, structure_key)
-                self.send_bulk_library_updated_signal(bulk_ops_record, structure_key)
-
+            dirty = True
             bulk_ops_record.dirty = False  # brand spanking clean now
+        return dirty
 
     def _is_in_bulk_operation(self, course_id, ignore_case=False):
         """
