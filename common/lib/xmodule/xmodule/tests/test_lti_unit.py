@@ -375,13 +375,17 @@ class LTIModuleTest(LogicTest):
         """
         Oauth signing verify fail.
         """
-        request = self.get_signed_grade_mock_request_with_correct_signature()
-        self.xmodule.verify_oauth_body_sign(request)
-        # we should verify against get_outcome_service_url not
-        # request url proxy and load balancer along the way may
-        # change url presented to the method
-        request.url = 'http://testurl/'
-        self.xmodule.verify_oauth_body_sign(request)
+        try:
+            request = self.get_signed_grade_mock_request_with_correct_signature()
+            self.xmodule.verify_oauth_body_sign(request)
+            # we should verify against get_outcome_service_url not
+            # request url proxy and load balancer along the way may
+            # change url presented to the method
+            request.url = 'http://testurl/'
+            self.xmodule.verify_oauth_body_sign(request)
+        except LTIError as err:
+            self.fail("verify_oauth_body_sign() raised LTIError: " + err.message)
+            pass
 
     def get_signed_grade_mock_request_with_correct_signature(self):
         """
