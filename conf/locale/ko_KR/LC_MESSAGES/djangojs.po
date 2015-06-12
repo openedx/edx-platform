@@ -47,7 +47,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-05 17:34+0000\n"
+"POT-Creation-Date: 2015-06-12 18:41+0000\n"
 "PO-Revision-Date: 2015-06-05 17:38+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
@@ -2214,6 +2214,14 @@ msgstr ""
 msgid "Teams"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "My Teams"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Browse"
+msgstr ""
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr ""
@@ -2973,11 +2981,6 @@ msgstr ""
 msgid "Failed to rescore problem."
 msgstr ""
 
-#: lms/static/js/ccx/schedule.js lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
-msgid "The data could not be saved."
-msgstr ""
-
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr ""
@@ -3241,6 +3244,11 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
 
 #: lms/static/js/student_account/account.js
+#: lms/static/js/student_profile/profile.js
+msgid "The data could not be saved."
+msgstr ""
+
+#: lms/static/js/student_account/account.js
 msgid "Please enter a valid email address"
 msgstr ""
 
@@ -3496,17 +3504,17 @@ msgid "Verified Certificate"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with Credit Card"
+msgid "Checkout"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with PayPal"
+msgid "Checkout with PayPal"
 msgstr ""
 
 #. Translators: 'processor' is the name of a third-party payment processing
 #. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with {processor}"
+msgid "Checkout with {processor}"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
@@ -4020,6 +4028,10 @@ msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
+msgstr ""
+
+#: cms/static/js/models/settings/course_grading_policy.js
+msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 
 #: cms/static/js/spec/views/assets_spec.js
@@ -4564,6 +4576,14 @@ msgid ""
 "Please note that validation of your policy key and value pairs is not "
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
+msgstr ""
+
+#: cms/static/js/views/settings/main.js
+msgid "Credit Eligibility Requirements"
+msgstr ""
+
+#: cms/static/js/views/settings/main.js
+msgid "Minimum passing grade for credit is not set."
 msgstr ""
 
 #: cms/static/js/views/settings/main.js

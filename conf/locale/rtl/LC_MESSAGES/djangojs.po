@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-05 17:44+0000\n"
-"PO-Revision-Date: 2015-06-05 17:46:20.007078\n"
+"POT-Creation-Date: 2015-06-12 18:53+0000\n"
+"PO-Revision-Date: 2015-06-12 18:54:38.109866\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2301,6 +2301,14 @@ msgstr ""
 msgid "Teams"
 msgstr "فثشوس"
 
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "My Teams"
+msgstr "وغ فثشوس"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Browse"
+msgstr "زقخصسث"
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "خحثر ذشمذعمشفخق"
@@ -3135,11 +3143,6 @@ msgstr "سعذذثسسبعممغ قثسذخقثي حقخزمثو بخق عسثق
 msgid "Failed to rescore problem."
 msgstr "بشهمثي فخ قثسذخقث حقخزمثو."
 
-#: lms/static/js/ccx/schedule.js lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
-msgid "The data could not be saved."
-msgstr "فاث يشفش ذخعمي رخف زث سشدثي."
-
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr "شمم سعزسثذفهخرس"
@@ -3415,6 +3418,11 @@ msgstr "ثققخق يثمثفهرل ثرفقشرذث ثطشو سفشفث بخق 
 #: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr "ثققخق لثففهرل ثرفقشرذث ثطشو فشسن اهسفخقغ بخق سفعيثرف '{student_id}'. "
+
+#: lms/static/js/student_account/account.js
+#: lms/static/js/student_profile/profile.js
+msgid "The data could not be saved."
+msgstr "فاث يشفش ذخعمي رخف زث سشدثي."
 
 #: lms/static/js/student_account/account.js
 msgid "Please enter a valid email address"
@@ -3694,18 +3702,18 @@ msgid "Verified Certificate"
 msgstr "دثقهبهثي ذثقفهبهذشفث"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with Credit Card"
-msgstr "حشغ صهفا ذقثيهف ذشقي"
+msgid "Checkout"
+msgstr "ذاثذنخعف"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with PayPal"
-msgstr "حشغ صهفا حشغحشم"
+msgid "Checkout with PayPal"
+msgstr "ذاثذنخعف صهفا حشغحشم"
 
 #. Translators: 'processor' is the name of a third-party payment processing
 #. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Pay with {processor}"
-msgstr "حشغ صهفا {processor}"
+msgid "Checkout with {processor}"
+msgstr "ذاثذنخعف صهفا {processor}"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "An error has occurred. Please try again."
@@ -4250,6 +4258,10 @@ msgstr "ذشررخف يقخح وخقث <% attrs.types %> فاشر صهمم شس�
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
 msgstr "لقشذث حثقهخي وعسف زث سحثذهبهثي هر اا:وو بخقوشف."
+
+#: cms/static/js/models/settings/course_grading_policy.js
+msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
+msgstr "رخف شزمث فخ سثف حشسسهرل لقشيث فخ مثسس فاشر %(minimum_grade_cutoff)s%."
 
 #: cms/static/js/spec/views/assets_spec.js
 #: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
@@ -4842,6 +4854,14 @@ msgstr ""
 "حمثشسث رخفث فاشف دشمهيشفهخر خب غخعق حخمهذغ نثغ شري دشمعث حشهقس هس رخف "
 "ذعققثرفمغ هر حمشذث غثف. هب غخع شقث اشدهرل يهببهذعمفهثس, حمثشسث قثدهثص غخعق "
 "حخمهذغ حشهقس."
+
+#: cms/static/js/views/settings/main.js
+msgid "Credit Eligibility Requirements"
+msgstr "ذقثيهف ثمهلهزهمهفغ قثضعهقثوثرفس"
+
+#: cms/static/js/views/settings/main.js
+msgid "Minimum passing grade for credit is not set."
+msgstr "وهرهوعو حشسسهرل لقشيث بخق ذقثيهف هس رخف سثف."
 
 #: cms/static/js/views/settings/main.js
 msgid "%(hours)s:%(minutes)s (current UTC time)"
