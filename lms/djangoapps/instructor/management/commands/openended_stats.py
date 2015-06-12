@@ -89,7 +89,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         student = student_module.student
         print "{0}:{1}".format(student.id, student.username)
 
-        module = get_module_for_student(student, location)
+        module = get_module_for_student(student, location, course=course)
         if module is None:
             print "  WARNING: No state found"
             students_with_no_state.append(student)

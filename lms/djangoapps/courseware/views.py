@@ -253,7 +253,7 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
-def save_positions_recursively_up(user, request, field_data_cache, xmodule):
+def save_positions_recursively_up(user, request, field_data_cache, xmodule, course=None):
     """
     Recurses up the course tree starting from a leaf
     Saving the position property based on the previous node as it goes
@@ -265,7 +265,14 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule):
         parent = None
         if parent_location:
             parent_descriptor = modulestore().get_item(parent_location)
-            parent = get_module_for_descriptor(user, request, parent_descriptor, field_data_cache, current_module.location.course_key)
+            parent = get_module_for_descriptor(
+                user,
+                request,
+                parent_descriptor,
+                field_data_cache,
+                current_module.location.course_key,
+                course=course
+            )
 
         if parent and hasattr(parent, 'position'):
             save_child_position(parent, current_module.location.name)
@@ -412,7 +419,9 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course_key)
+        course_module = get_module_for_descriptor(
+            user, request, course, field_data_cache, course_key, course=course
+        )
         if course_module is None:
             log.warning(u'If you see this, something went wrong: if we got this'
                         u' far, should have gotten a course module for this user')
@@ -532,7 +541,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 section_descriptor,
                 field_data_cache,
                 course_key,
-                position
+                position,
+                course=course
             )
 
             if section_module is None:
@@ -1180,7 +1190,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
     logging.debug('course_module = {0}'.format(tab_module))
@@ -1238,7 +1248,8 @@ def get_course_lti_endpoints(request, course_id):
                 anonymous_user,
                 descriptor
             ),
-            course_key
+            course_key,
+            course=course
         )
         for descriptor in lti_descriptors
     ]
@@ -1409,7 +1420,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         # get the block, which verifies whether the user has access to the block.
         block, _ = get_module_by_usage_id(
-            request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True
+            request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True, course=course
         )
 
         context = {

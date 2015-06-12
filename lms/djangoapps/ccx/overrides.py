@@ -47,6 +47,14 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
             return get_override_for_ccx(ccx, block, name, default)
         return default
 
+    @classmethod
+    def enabled_for(cls, course):
+        """CCX field overrides are enabled per-course
+
+        protect against missing attributes
+        """
+        return getattr(course, 'enable_ccx', False)
+
 
 def get_current_ccx(course_key):
     """
