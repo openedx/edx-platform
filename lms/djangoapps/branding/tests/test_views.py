@@ -77,6 +77,7 @@ class TestFooter(TestCase):
             self.assertIn("title", link)
             self.assertIn("url", link)
             self.assertIn("icon-class", link)
+            self.assertIn("action", link)
 
         # Mobile links
         self.assertIn("mobile_links", json_data)
