@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.django import contentstore
 from xmodule.video_module import transcripts_utils
+from contentstore.tests.utils import mock_requests_get
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -321,36 +322,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
 
-    def mocked_requests_get(*args, **kwargs):
-        """
-        This method will be used by the mock to replace requests.get
-        """
-        # pylint: disable=no-method-argument
-        response_transcript_list = """
-        <transcript_list>
-            <track id="1" name="Custom" lang_code="en" />
-            <track id="0" name="Custom1" lang_code="en-GB"/>
-        </transcript_list>
-        """
-        response_transcript = textwrap.dedent("""
-        <transcript>
-            <text start="0" dur="0.27"></text>
-            <text start="0.27" dur="2.45">Test text 1.</text>
-            <text start="2.72">Test text 2.</text>
-            <text start="5.43" dur="1.73">Test text 3.</text>
-        </transcript>
-        """)
-
-        if kwargs == {'params': {'lang': 'en', 'v': 'good_id_2'}}:
-            return Mock(status_code=200, text='')
-        elif kwargs == {'params': {'type': 'list', 'v': 'good_id_2'}}:
-            return Mock(status_code=200, text=response_transcript_list, content=response_transcript_list)
-        elif kwargs == {'params': {'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}}:
-            return Mock(status_code=200, text=response_transcript, content=response_transcript)
-
-        return Mock(status_code=404, text='')
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mocked_requests_get)
+    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
     def test_downloading_subs_using_transcript_name(self, mock_get):
         """
         Download transcript using transcript name in url
