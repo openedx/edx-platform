@@ -30,7 +30,11 @@ if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
     parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
     theme_root = parent_dir / "themes" / theme_name
     COFFEE_DIRS.append(theme_root)
-    SASS_DIRS[theme_root / "static" / "sass"] = None
+    sass_dir = theme_root / "static" / "sass"
+    css_dir = theme_root / "static" / "css"
+    if sass_dir.isdir():
+        css_dir.mkdir_p()
+        SASS_DIRS[sass_dir] = css_dir
 
 if edxapp_env.env_tokens.get("COMP_THEME_DIR", False):
     theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
