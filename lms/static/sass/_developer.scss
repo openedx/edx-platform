@@ -67,6 +67,10 @@
   .payment-button {
     float: right;
     @include margin-left( ($baseline/2) );
+    
+    &.is-selected {
+      background: $m-blue-d3 !important;
+    }
   }
 }
 
