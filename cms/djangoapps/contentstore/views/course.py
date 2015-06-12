@@ -1032,7 +1032,6 @@ def _refresh_course_tabs(request, course_module):
         """
         tab_panel = {
             "type": tab_type.type,
-            "name": tab_type.title,
         }
         has_tab = tab_panel in tabs
         if tab_enabled and not has_tab:
