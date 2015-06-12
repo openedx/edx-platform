@@ -1819,3 +1819,23 @@ class LanguageProficiency(models.Model):
         choices=settings.ALL_LANGUAGES,
         help_text=_("The ISO 639-1 language code for this language.")
     )
+
+
+class CourseEnrollmentAttribute(models.Model):
+    """Represents Student's enrollment record for Credit Course.
+
+    This is populated when the user's order for a credit seat is fulfilled.
+    """
+    enrollment = models.ForeignKey(CourseEnrollment)
+    namespace = models.CharField(
+        max_length=255,
+        help_text=_("Namespace of enrollment attribute e.g. credit")
+    )
+    name = models.CharField(
+        max_length=255,
+        help_text=_("Name of the enrollment attribute e.g. provider_id")
+    )
+    value = models.CharField(
+        max_length=255,
+        help_text=_("Value of the enrollment attribute e.g. ASU")
+    )
