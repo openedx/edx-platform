@@ -1434,15 +1434,11 @@ def get_analytics_answer_dist(request):
     course_key = SlashSeparatedCourseKey.from_string(all_data['course_id'])
 
     # Construct an error message
-    if getattr(settings, 'ZENDESK_URL'):
-        link_start = "<a href=\"" + getattr(settings, 'ZENDESK_URL') + "/hc/en-us/requests/new\">"
-        link_text = _('here')
-        link_end = "</a>"
-        error_message = _("A problem has occurred retrieving the data, to report the problem click {link_start}{link_text}{link_end}").format(
-            link_start=link_start,
-            link_text=link_text,
-            link_end=link_end,
-        )
+    zendesk_url = getattr(settings, 'ZENDESK_URL')
+    if zendesk_url:
+        zendesk_url = '<a href=\"' + zendesk_url + '/hc/en-us/requests/new\">'
+        error_message = _("A problem has occurred retrieving the data, to report the problem click "
+                          "{zendesk_url}here{tag}").format(zendesk_url=zendesk_url, tag='</a>')
     else:
         error_message = _('A problem has occurred retrieving the data.')
 
@@ -1487,7 +1483,9 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
     Returns:
         A json payload of:
           - data by part: an array of dicts of {value_id, correct, count} for each part_id
-          - count by part: an array of dicts of {totalAttemptCount, totalCorrectCount, TotalIncorrectCount} for each part_id
+          - count by part: an array of dicts of {totalAttemptCount,
+                                                 totalCorrectCount,
+                                                 totalIncorrectCount} for each part_id
           - last updated: string
      """
 
@@ -1539,7 +1537,7 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
 
         data_by_part[part_id] = data_by_part.get(part_id, []) + [part_dict]
 
-    # Determine the last updated date, convert to client TZ and format
+    # Determine the last updated date, convert to tz from settings and format
     created_date = data[0]['created']
     obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H%M%S')
     obj_date = timezone('UTC').localize(obj_date)
@@ -1573,17 +1571,23 @@ def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num
     """
     # Check variant (randomization) and if set, generate an error message
     if item['variant']:
-        message_by_part[part_id] = "The analytics cannot be displayed for this question as randomization was set at one time."
+        message = _('The analytics cannot be displayed for this question as randomization was set at one time.')
+        message_by_part[part_id] = message
         return True
 
     # Check number of rows returned for radio question is consistent with definition
     if question_types_by_part[part_id] == 'radio' and num_rows_by_part[part_id] > num_options_by_part[part_id]:
-        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        message = _('The analytics cannot be displayed for this question as the number of rows returned did not match '
+                    'the question definition.')
+        message_by_part[part_id] = message
         return True
 
     # Check number of rows returned for checkbox question is consistent with definition
-    if question_types_by_part[part_id] == 'checkbox' and num_rows_by_part[part_id] > pow(2, num_options_by_part[part_id]):
-        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+    if question_types_by_part[part_id] == 'checkbox' and num_rows_by_part[part_id] > pow(2,
+                                                                                         num_options_by_part[part_id]):
+        message = _('The analytics cannot be displayed for this question as the number of rows returned did not match '
+                    'the question definition.')
+        message_by_part[part_id] = message
         return True
 
     return False

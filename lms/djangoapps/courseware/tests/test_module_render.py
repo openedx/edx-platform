@@ -33,7 +33,13 @@ from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
 from courseware.module_render import hash_resource, get_module_for_descriptor
 from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory, StaffFactory, InstructorFactory
+from courseware.tests.factories import (
+    StudentModuleFactory,
+    UserFactory,
+    GlobalStaffFactory,
+    StaffFactory,
+    InstructorFactory
+)
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -1784,7 +1790,8 @@ class TestInlineAnalytics(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Analytics Info', result_fragment.content)
-        self.assertIn('The analytics cannot be displayed for this question as it uses randomization.', result_fragment.content)
+        self.assertIn('The analytics cannot be displayed for this question as it uses randomization.',
+                      result_fragment.content)
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
     def test_no_problems(self):

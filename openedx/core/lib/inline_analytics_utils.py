@@ -7,6 +7,7 @@ import cgi
 from collections import namedtuple
 
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.capa_module import CapaModule
 
@@ -87,23 +88,26 @@ def get_responses_data(block):
 
                 if valid_responses[part_id].response_type == 'other':
                     # Response type is not supported by the analytics api
+                    message = _('The analytics cannot be displayed for this type of question.')
                     responses_data.append(AnalyticsContextResponse(part_id,
                                                                    None,
                                                                    None,
-                                                                   'The analytics cannot be displayed for this type of question.',
+                                                                   message,
                                                                    None))
                 elif rerandomize:
                     # Response, actually the problem, has rerandomize != 'never'
+                    message = _('The analytics cannot be displayed for this question as it uses randomization.')
                     responses_data.append(AnalyticsContextResponse(part_id,
                                                                    valid_responses[part_id].correct_response,
                                                                    valid_responses[part_id].response_type,
-                                                                   'The analytics cannot be displayed for this question as it uses randomization.',
+                                                                   message,
                                                                    None))
                 else:
                     # Response is supported by the analytics api and rerandomize == 'never'
+                    return_data = cgi.escape(json.dumps(valid_responses[part_id].choice_name_list), quote=True)
                     responses_data.append(AnalyticsContextResponse(part_id,
                                                                    valid_responses[part_id].correct_response,
                                                                    valid_responses[part_id].response_type,
                                                                    None,
-                                                                   cgi.escape(json.dumps(valid_responses[part_id].choice_name_list), quote=True)))
+                                                                   return_data))
     return responses_data
