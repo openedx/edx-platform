@@ -188,7 +188,7 @@
     .post-error {
       padding: ($baseline/2) $baseline 12px 45px;
       border-bottom: 1px solid $red;
-      background: url(../images/white-error-icon.png) no-repeat 15px 14px;
+      background: url($static-path + '/images/white-error-icon.png') no-repeat 15px 14px;
 
       &:last-child {
         border-bottom: none;

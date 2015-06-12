@@ -280,7 +280,7 @@ div.video {
         a.ui-slider-handle {
           @extend %ui-fake-link;
           @include transform(scale(.7, 1.3) translate3d(-80%, -15%, 0));
-          background: $pink url(../images/slider-handle.png) center center no-repeat;
+          background: $pink url($static-path + '/images/slider-handle.png') center center no-repeat;
           background-size: 50%;
           border: 1px solid darken($pink, 20%);
           border-radius: 50%;
@@ -314,7 +314,7 @@ div.video {
         .video_control {
           @extend %video-button;
           float: left;
-          background-image: url('../images/vcr.png');
+          background-image: url($static-path + '/images/vcr.png');
           background-position: 15px 15px ;
           background-repeat: no-repeat;
           border-left: none;
@@ -445,7 +445,7 @@ div.video {
         div.speeds {
           &.is-opened {
             .speed-button {
-              background-image: url('../images/open-arrow.png');
+              background-image: url($static-path + '/images/open-arrow.png');
             }
           }
 
@@ -460,7 +460,7 @@ div.video {
           .speed-button {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/closed-arrow.png');
+            background-image: url($static-path + '/images/closed-arrow.png');
             background-position: 10px center;
             background-repeat: no-repeat;
             min-width: 116px;
@@ -515,14 +515,14 @@ div.video {
 
           &.is-muted {
             & > a {
-              background-image: url('../images/mute.png');
+              background-image: url($static-path + '/images/mute.png');
             }
           }
 
           & > a {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/volume.png');
+            background-image: url($static-path + '/images/volume.png');
             background-position: 10px center;
             background-repeat: no-repeat;
             width: 30px;
@@ -559,7 +559,7 @@ div.video {
               a.ui-slider-handle {
                 @extend %ui-fake-link;
                 @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
-                background: $pink url(../images/slider-handle.png) center center no-repeat;
+                background: $pink url($static-path + '/images/slider-handle.png') center center no-repeat;
                 background-size: 50%;
                 border: 1px solid darken($pink, 20%);
                 border-radius: 15px;
@@ -578,7 +578,7 @@ div.video {
 
         a.add-fullscreen {
           @extend %video-button;
-          background: url(../images/fullscreen.png) center no-repeat;
+          background: url($static-path + '/images/fullscreen.png') center no-repeat;
           border-left: none;
           float: left;
           padding: 0 11px;
@@ -588,7 +588,7 @@ div.video {
 
         a.quality-control {
           @extend %video-button;
-          background: url(../images/hd.png) center no-repeat;
+          background: url($static-path + '/images/hd.png') center no-repeat;
           border-left: none;
           float: left;
           padding: 0 11px;
@@ -610,7 +610,7 @@ div.video {
             @extend %video-button;
             @include transition(none);
             box-shadow: inset 1px 0 0 #555;
-            background: url('../images/cc.png') center no-repeat;
+            background: url($static-path + '/images/cc.png') center no-repeat;
             border-left: none;
             border-right: none;
             padding: 0 11px;

@@ -91,7 +91,7 @@ html.video-fullscreen{
   }
 }
 
-// TO-DO should this be content wrapper? 
+// TO-DO should this be content wrapper?
 div.course-wrapper {
   position: relative;
 
@@ -306,7 +306,7 @@ div.course-wrapper {
 
       header#open_close_accordion {
         a {
-          background-image: url('../images/slide-right-icon.png');
+          background-image: url($static-path + '/images/slide-right-icon.png');
         }
       }
 
