@@ -8,6 +8,7 @@ import mock
 
 from courseware.views import progress  # pylint: disable=import-error
 from datetime import datetime
+from django.conf import settings
 from django.core.cache import get_cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -121,10 +122,9 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
 
         # Switch to published-only mode to simulate the LMS
         with self.settings(MODULESTORE_BRANCH='published-only'):
-            # Clear the cache before measuring
-            # We clear the mongo_metadata_inheritance cache so that we can refill it
-            # with published-only contents.
-            get_cache('mongo_metadata_inheritance').clear()
+            # Clear all caches before measuring
+            for cache in settings.CACHES:
+                get_cache(cache).clear()
 
             # Refill the metadata inheritance cache
             modulestore().get_course(self.course.id, depth=None)
