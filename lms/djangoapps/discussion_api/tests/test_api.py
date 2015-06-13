@@ -1689,13 +1689,14 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         for request in httpretty.httpretty.latest_requests:
             self.assertEqual(request.method, "GET")
 
-    def test_basic(self):
-        self.register_comment()
+    @ddt.data(None, "test_parent")
+    def test_basic(self, parent_id):
+        self.register_comment({"parent_id": parent_id})
         actual = update_comment(self.request, "test_comment", {"raw_body": "Edited body"})
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
-            "parent_id": None,  # TODO: we can't get this without retrieving from the thread :-(
+            "parent_id": parent_id,
             "author": self.user.username,
             "author_label": None,
             "created_at": "2015-06-03T00:00:00Z",
