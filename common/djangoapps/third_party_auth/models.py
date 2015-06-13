@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 import json
 import logging
 from social.backends.base import BaseAuth
@@ -53,7 +54,7 @@ class AuthNotConfigured(SocialAuthBaseException):
         self.provider_name = provider_name
 
     def __str__(self):
-        return 'Authentication with {} is currently unavailable.'.format(
+        return _('Authentication with {} is currently unavailable.').format(
             self.provider_name
         )
 
@@ -313,10 +314,20 @@ class SAMLConfiguration(ConfigurationModel):
         self.org_info_str = clean_json(self.org_info_str, dict)
         self.other_config_str = clean_json(self.other_config_str, dict)
 
-        self.private_key = self.private_key.replace("-----BEGIN PRIVATE KEY-----", "").strip()
-        self.private_key = self.private_key.replace("-----END PRIVATE KEY-----", "").strip()
-        self.public_key = self.public_key.replace("-----BEGIN CERTIFICATE-----", "").strip()
-        self.public_key = self.public_key.replace("-----END CERTIFICATE-----", "").strip()
+        self.private_key = (
+            self.private_key
+            .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END RSA PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .strip()
+        )
+        self.public_key = (
+            self.public_key
+            .replace("-----BEGIN CERTIFICATE-----", "")
+            .replace("-----END CERTIFICATE-----", "")
+            .strip()
+        )
 
     def get_setting(self, name):
         """ Get the value of a setting, or raise KeyError """

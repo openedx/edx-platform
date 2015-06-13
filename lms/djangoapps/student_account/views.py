@@ -198,7 +198,7 @@ def _third_party_auth_context(request, redirect_to):
         for msg in messages.get_messages(request):
             if msg.extra_tags.split()[0] == "social-auth":
                 # msg may or may not be translated. Try translating [again] in case we are able to:
-                context['errorMessage'] = _(msg)  # pylint: disable=translation-of-non-string
+                context['errorMessage'] = _(unicode(msg))  # pylint: disable=translation-of-non-string
                 break
 
     return context
