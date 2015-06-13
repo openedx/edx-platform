@@ -368,7 +368,7 @@ def signin_user(request):
     for msg in messages.get_messages(request):
         if msg.extra_tags.split()[0] == "social-auth":
             # msg may or may not be translated. Try translating [again] in case we are able to:
-            third_party_auth_error = _(msg)  # pylint: disable=translation-of-non-string
+            third_party_auth_error = _(unicode(msg))  # pylint: disable=translation-of-non-string
             break
 
     context = {

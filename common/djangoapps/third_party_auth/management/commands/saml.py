@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 self.stdout.write("\n→ Fetching {}\n".format(url))
                 if not url.lower().startswith('https'):
                     self.stdout.write("→ WARNING: This URL is not secure! It should use HTTPS.\n")
-                response = requests.get(url, verify=True)  # May raise HTTPError or SSLError
+                response = requests.get(url, verify=True)  # May raise HTTPError or SSLError or ConnectionError
                 response.raise_for_status()  # May raise an HTTPError
 
                 try:
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                     public_key, sso_url, expires_at = self._parse_metadata_xml(xml, entity_id)
                     self._update_data(entity_id, public_key, sso_url, expires_at)
             except Exception as err:  # pylint: disable=broad-except
-                self.stderr.write("→ ERROR: {}\n\n".format(err.message))
+                self.stderr.write(u"→ ERROR: {}\n\n".format(err.message))
 
     @classmethod
     def _parse_metadata_xml(cls, xml, entity_id):
