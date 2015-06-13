@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from django.conf import settings
 import django.test
 import mock
+import os.path
 
 from third_party_auth.models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, cache as config_cache
 
@@ -85,6 +86,33 @@ class ThirdPartyAuthTestMixin(object):
 class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
     """Base class for auth test cases."""
     pass
+
+
+class SAMLTestCase(TestCase):
+    """
+    Base class for SAML-related third_party_auth tests
+    """
+
+    def setUp(self):
+        super(SAMLTestCase, self).setUp()
+        self.client.defaults['SERVER_NAME'] = 'example.none'  # The SAML lib we use doesn't like testserver' as a domain
+        self.url_prefix = 'http://example.none'
+
+    @classmethod
+    def _get_public_key(cls, key_name='saml_key'):
+        """ Get a public key for use in the test. """
+        return cls._read_data_file('{}.pub'.format(key_name))
+
+    @classmethod
+    def _get_private_key(cls, key_name='saml_key'):
+        """ Get a private key for use in the test. """
+        return cls._read_data_file('{}.key'.format(key_name))
+
+    @staticmethod
+    def _read_data_file(filename):
+        """ Read the contents of a file in the data folder """
+        with open(os.path.join(os.path.dirname(__file__), 'data', filename)) as f:
+            return f.read()
 
 
 @contextmanager
