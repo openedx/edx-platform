@@ -9,6 +9,8 @@ import unittest
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 from nose.plugins.attrib import attr
 
+from bs4 import BeautifulSoup
+
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
@@ -28,6 +30,7 @@ from dashboard.git_import import GitImportError
 from datetime import datetime
 from external_auth.models import ExternalAuthMap
 from student.roles import CourseStaffRole, GlobalStaff
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -398,11 +401,40 @@ class TestSysadmin(SysadminBaseTestCase):
         Adds a course and makes sure that it shows up on the staffing and
         enrollment page
         """
-
         self._setstaff_login()
         self._add_edx4edx()
         response = self.client.get(reverse('sysadmin_staffing'))
         self.assertIn('edx4edx', response.content)
+        self._rm_edx4edx()
+
+    def test_enrollment_page_count_does_not_include_inactive(self):
+        """ 
+           Make sure enrollment counts are accurate and exclude inactive
+           (unenrolled) students.  This test may fail if the template HTML
+           changes much.
+        """
+
+        def _get_edx4edx_enrollment(content):
+            soup = BeautifulSoup(content)
+            enrollment_table = soup.find( "table", {"class":"stat_table"} )
+            edx4edx_row = enrollment_table.findAll("tr")[-1]
+            enrollment = edx4edx_row.findAll("td")[2].getText().strip()
+            return enrollment
+            
+        self._setstaff_login()
+        self._add_edx4edx()
+        course_key = SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx')
+        # enroll a user in the test course
+        CourseEnrollment.enroll(self.user, course_key, 'honor')
+        response = self.client.get(reverse('sysadmin_staffing'))
+        enrolled = _get_edx4edx_enrollment(response.content)
+        self.assertEquals('1', enrolled )
+
+        #unenroll the user and make sure they aren't counted 
+        CourseEnrollment.unenroll(self.user, course_key, True)
+        response = self.client.get(reverse('sysadmin_staffing'))
+        enrolled = _get_edx4edx_enrollment(response.content)
+        self.assertEquals('0', enrolled )
         self._rm_edx4edx()
 
 

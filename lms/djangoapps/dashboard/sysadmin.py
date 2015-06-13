@@ -622,7 +622,8 @@ class Staffing(SysadminDashboardView):
         for course in self.get_courses():
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
-                course_id=course.id).count()]
+                course_id=course.id,
+                is_active=1).count()]
             datum += [CourseStaffRole(course.id).users_with_role().count()]
             datum += [','.join([x.username for x in CourseInstructorRole(
                 course.id).users_with_role()])]
