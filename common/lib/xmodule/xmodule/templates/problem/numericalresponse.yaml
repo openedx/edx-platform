@@ -9,7 +9,6 @@ metadata:
         When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
 
         You can use the following example problems as models.
-        _____________________________________________________________________________
 
         >>How many miles away from Earth is the sun? Use scientific notation to answer.<<
 
@@ -42,21 +41,15 @@ data: |
     to specify a <strong>Display Name</strong> and other values that apply.</p>
 
     <p>You can use the following example problems as models.</p>
-    <p>_____________________________________________________________________________</p>
-
-    <fieldset>
-      <legend>How many miles away from Earth is the sun? Use scientific notation to answer.</legend>
+      <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
       <numericalresponse answer="9.3*10^7">
         <formulaequationinput label="How many million miles are between Earth and the sun? Use scientific notation to answer." />
       </numericalresponse>
-    </fieldset>
 
-    <fieldset>
-      <legend>The square of what number is -100?</legend>
+      <p>The square of what number is -100?</p>
       <numericalresponse answer="10*i">
         <formulaequationinput label="The square of what number is -100?" />
       </numericalresponse>
-    </fieldset>
     <solution>
       <div class="detailed-solution">
         <p>Explanation</p>
