@@ -58,6 +58,7 @@ class DiscussionTab(EnrolledTab):
     title = _('Discussion')
     priority = None
     view_name = 'django_comment_client.forum.views.forum_form_discussion'
+    is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
 
     @classmethod
     def is_enabled(cls, course, user=None):
