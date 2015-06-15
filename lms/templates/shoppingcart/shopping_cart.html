@@ -78,7 +78,7 @@ from django.utils.translation import ungettext
           <hr>
           <div class="three-col">
               <div class="col-1">
-                  % if item.list_price != None:
+                  % if item.list_price != None and item.list_price != item.unit_cost:  # Catering for the older Orders where list_price would be None.
                     <% discount_applied = True %>
                     <div class="price">${_('Price per student:')}
                       <span class="line-through">

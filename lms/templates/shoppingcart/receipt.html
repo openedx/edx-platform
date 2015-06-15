@@ -320,7 +320,7 @@ from microsite_configuration import microsite
             <div class="three-col">
               % if item.status == "purchased":
                 <div class="col-1">
-                  % if item.list_price != None:
+                  % if item.list_price != None and item.list_price != item.unit_cost:  # Catering for the older Orders where list_price would be None.
                     <div class="price">${_('Price per student:')} <span class="line-through">  ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
                     <div class="price green">${_('Discount Applied:')} <span>   ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)} </span></div>
@@ -338,7 +338,7 @@ from microsite_configuration import microsite
                 </div>
               % elif item.status == "refunded":
                 <div class="col-1">
-                  % if item.list_price != None:
+                  % if item.list_price != None and item.list_price != item.unit_cost:  # Catering for the older Orders where list_price would be None.
                     <div class="price">${_('Price per student:')} <span class="line-through">   ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
                     <div class="price green">${_('Discount Applied:')} <span><del>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}
