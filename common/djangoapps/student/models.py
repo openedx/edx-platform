@@ -1308,6 +1308,14 @@ class CourseEnrollment(models.Model):
     def course(self):
         return modulestore().get_course(self.course_id)
 
+    @property
+    def course_overview(self):
+        """
+        Return a CourseOverview of this enrollment's course.
+        """
+        from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+        return CourseOverview.get_from_id(self.course_id)
+
     def is_verified_enrollment(self):
         """
         Check the course enrollment mode is verified or not

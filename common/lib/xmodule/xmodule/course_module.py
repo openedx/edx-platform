@@ -10,7 +10,6 @@ import requests
 from datetime import datetime
 import dateutil.parser
 from lazy import lazy
-from base64 import b32encode
 
 from xmodule.exceptions import UndefinedContext
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
@@ -23,13 +22,13 @@ from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
 
+from xmodule import course_metadata_utils
+DEFAULT_START_DATE = course_metadata_utils.DEFAULT_START_DATE
 
 log = logging.getLogger(__name__)
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
-
-DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
@@ -1089,20 +1088,20 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
         Returns True if the current time is after the specified course end date.
         Returns False if there is no end date specified.
         """
-        if self.end is None:
-            return False
-
-        return datetime.now(UTC()) > self.end
+        return course_metadata_utils.has_course_ended(self.end)
 
     def may_certify(self):
         """
-        Return True if it is acceptable to show the student a certificate download link
+        Return whether it is acceptable to show the student a certificate download link.
         """
-        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
-        return show_early or self.has_ended()
+        return course_metadata_utils.may_certify_for_course(
+            self.certificates_display_behavior,
+            self.certificates_show_before_end,
+            self.has_ended()
+        )
 
     def has_started(self):
-        return datetime.now(UTC()) > self.start
+        return course_metadata_utils.has_course_started(self.start)
 
     @property
     def grader(self):
@@ -1361,36 +1360,13 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
         then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
-        _ = i18n.ugettext
-        strftime = i18n.strftime
-
-        def try_parse_iso_8601(text):
-            try:
-                result = Date().from_json(text)
-                if result is None:
-                    result = text.title()
-                else:
-                    result = strftime(result, format_string)
-                    if format_string == "DATE_TIME":
-                        result = self._add_timezone_string(result)
-            except ValueError:
-                result = text.title()
-
-            return result
-
-        if isinstance(self.advertised_start, basestring):
-            return try_parse_iso_8601(self.advertised_start)
-        elif self.start_date_is_still_default:
-            # Translators: TBD stands for 'To Be Determined' and is used when a course
-            # does not yet have an announced start date.
-            return _('TBD')
-        else:
-            when = self.advertised_start or self.start
-
-            if format_string == "DATE_TIME":
-                return self._add_timezone_string(strftime(when, format_string))
-
-            return strftime(when, format_string)
+        return course_metadata_utils.course_start_datetime_text(
+            self.start,
+            self.advertised_start,
+            format_string,
+            i18n.ugettext,
+            i18n.strftime
+        )
 
     @property
     def start_date_is_still_default(self):
@@ -1398,26 +1374,20 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
         Checks if the start date set for the course is still default, i.e. .start has not been modified,
         and .advertised_start has not been set.
         """
-        return self.advertised_start is None and self.start == CourseFields.start.default
+        return course_metadata_utils.course_start_date_is_default(
+            self.start,
+            self.advertised_start
+        )
 
     def end_datetime_text(self, format_string="SHORT_DATE"):
         """
         Returns the end date or date_time for the course formatted as a string.
-
-        If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        if self.end is None:
-            return ''
-        else:
-            strftime = self.runtime.service(self, "i18n").strftime
-            date_time = strftime(self.end, format_string)
-            return date_time if format_string == "SHORT_DATE" else self._add_timezone_string(date_time)
-
-    def _add_timezone_string(self, date_time):
-        """
-        Adds 'UTC' string to the end of start/end date and time texts.
-        """
-        return date_time + u" UTC"
+        return course_metadata_utils.course_end_datetime_text(
+            self.end,
+            format_string,
+            self.runtime.service(self, "i18n").strftime
+        )
 
     @property
     def forum_posts_allowed(self):
@@ -1438,7 +1408,7 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
 
     @property
     def number(self):
-        return self.location.course
+        return course_metadata_utils.number_for_course_location(self.location)
 
     @property
     def display_number_with_default(self):
@@ -1479,9 +1449,7 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
         Returns a unique deterministic base32-encoded ID for the course.
         The optional padding_char parameter allows you to override the "=" character used for padding.
         """
-        return "course_{}".format(
-            b32encode(unicode(self.location.course_key)).replace('=', padding_char)
-        )
+        return course_metadata_utils.clean_course_key(self.location.course_key, padding_char)
 
     @property
     def teams_enabled(self):
