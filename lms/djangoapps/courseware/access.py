@@ -646,17 +646,19 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
-def is_mobile_available_for_user(user, course):
+def is_mobile_available_for_user(user, descriptor):
     """
     Returns whether the given course is mobile_available for the given user.
     Checks:
         mobile_available flag on the course
         Beta User and staff access overrides the mobile_available flag
+    Arguments:
+        descriptor (CourseDescriptor|CourseOverview): course or overview of course in question
     """
     return (
-        course.mobile_available or
-        auth.has_access(user, CourseBetaTesterRole(course.id)) or
-        _has_staff_access_to_descriptor(user, course, course.id)
+        descriptor.mobile_available or
+        auth.has_access(user, CourseBetaTesterRole(descriptor.id)) or
+        _has_staff_access_to_descriptor(user, descriptor, descriptor.id)
     )
 
 

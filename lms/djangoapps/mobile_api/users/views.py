@@ -237,7 +237,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created').reverse()
         return [
             enrollment for enrollment in enrollments
-            if enrollment.course and is_mobile_available_for_user(self.request.user, enrollment.course)
+            if enrollment.course_overview and
+            is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         ]
 
 
