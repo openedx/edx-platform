@@ -1156,7 +1156,9 @@ MIDDLEWARE_CLASSES = (
     'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
-    'django.middleware.locale.LocaleMiddleware',
+    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
+    # 'django.middleware.locale.LocaleMiddleware',
+    'django_locale.middleware.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
