@@ -763,8 +763,14 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         for split courses if course_image is empty then course_image_url will be blank
         """
         self.course = CourseFactory.create(default_store=store)
-        self.course.course_image = ''
 
+        # when course_image is empty string
+        self.course.course_image = ''
+        url = course_image_url(self.course)
+        self.assertEqual('', url)
+
+        # when course_image is None
+        self.course.course_image = None
         url = course_image_url(self.course)
         self.assertEqual('', url)
 
