@@ -7,6 +7,7 @@ import itertools
 import mock
 
 from courseware.views import progress  # pylint: disable=import-error
+from courseware.field_overrides import OverrideFieldData
 from datetime import datetime
 from django.conf import settings
 from django.core.cache import get_cache
@@ -56,7 +57,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
 
         MakoMiddleware().process_request(self.request)
 
-    def setup_course(self, size):
+    def setup_course(self, size, enable_ccx):
         """
         Build a gradable course where each node has `size` children.
         """
@@ -98,7 +99,8 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         self.course = CourseFactory.create(
             graded=True,
             start=datetime.now(UTC),
-            grading_policy=grading_policy
+            grading_policy=grading_policy,
+            enable_ccx=enable_ccx,
         )
         self.populate_course(size)
 
@@ -117,11 +119,11 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             student_id=self.student.id
         )
 
-    def instrument_course_progress_render(self, dataset_index, queries, reads, xblocks):
+    def instrument_course_progress_render(self, course_width, enable_ccx, queries, reads, xblocks):
         """
         Renders the progress page, instrumenting Mongo reads and SQL queries.
         """
-        self.setup_course(dataset_index + 1)
+        self.setup_course(course_width, enable_ccx)
 
         # Switch to published-only mode to simulate the LMS
         with self.settings(MODULESTORE_BRANCH='published-only'):
@@ -135,17 +137,21 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             # We clear the request cache to simulate a new request in the LMS.
             RequestCache.clear_request_cache()
 
+            # Reset the list of provider classes, so that our django settings changes
+            # can actually take affect.
+            OverrideFieldData.provider_classes = None
+
             with self.assertNumQueries(queries):
                 with check_mongo_calls(reads):
                     with check_sum_of_calls(XBlock, ['__init__'], xblocks):
                         self.grade_course(self.course)
 
-    @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(3)))
+    @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(1, 4), (True, False)))
     @ddt.unpack
     @override_settings(
         FIELD_OVERRIDE_PROVIDERS=(),
     )
-    def test_field_overrides(self, overrides, dataset_index):
+    def test_field_overrides(self, overrides, course_width, enable_ccx):
         """
         Test without any field overrides.
         """
@@ -154,8 +160,8 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             'ccx': ('ccx.overrides.CustomCoursesForEdxOverrideProvider',)
         }
         with self.settings(FIELD_OVERRIDE_PROVIDERS=providers[overrides]):
-            queries, reads, xblocks = self.TEST_DATA[overrides][dataset_index]
-            self.instrument_course_progress_render(dataset_index, queries, reads, xblocks)
+            queries, reads, xblocks = self.TEST_DATA[(overrides, course_width, enable_ccx)]
+            self.instrument_course_progress_render(course_width, enable_ccx, queries, reads, xblocks)
 
 
 class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
@@ -166,12 +172,19 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        'no_overrides': [
-            (27, 7, 19), (135, 7, 131), (595, 7, 537)
-        ],
-        'ccx': [
-            (27, 7, 47), (135, 7, 455), (595, 7, 2037)
-        ],
+        # (providers, course_width, enable_ccx): # of sql queries, # of mongo queries, # of xblocks
+        ('no_overrides', 1, True): (27, 7, 19),
+        ('no_overrides', 2, True): (135, 7, 131),
+        ('no_overrides', 3, True): (595, 7, 537),
+        ('ccx', 1, True): (27, 7, 47),
+        ('ccx', 2, True): (135, 7, 455),
+        ('ccx', 3, True): (595, 7, 2037),
+        ('no_overrides', 1, False): (27, 7, 19),
+        ('no_overrides', 2, False): (135, 7, 131),
+        ('no_overrides', 3, False): (595, 7, 537),
+        ('ccx', 1, False): (27, 7, 19),
+        ('ccx', 2, False): (135, 7, 131),
+        ('ccx', 3, False): (595, 7, 537),
     }
 
 
@@ -183,10 +196,16 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        'no_overrides': [
-            (27, 4, 9), (135, 19, 54), (595, 84, 215)
-        ],
-        'ccx': [
-            (27, 4, 9), (135, 19, 54), (595, 84, 215)
-        ]
+        ('no_overrides', 1, True): (27, 4, 9),
+        ('no_overrides', 2, True): (135, 19, 54),
+        ('no_overrides', 3, True): (595, 84, 215),
+        ('ccx', 1, True): (27, 4, 9),
+        ('ccx', 2, True): (135, 19, 54),
+        ('ccx', 3, True): (595, 84, 215),
+        ('no_overrides', 1, False): (27, 4, 9),
+        ('no_overrides', 2, False): (135, 19, 54),
+        ('no_overrides', 3, False): (595, 84, 215),
+        ('ccx', 1, False): (27, 4, 9),
+        ('ccx', 2, False): (135, 19, 54),
+        ('ccx', 3, False): (595, 84, 215),
     }
