@@ -142,24 +142,56 @@ def enable_comprehensive_theme():
     Add directories to relevant paths for comprehensive theming.
     """
     assert getattr(settings, "COMP_THEME_DIR", None), "settings.COMP_THEME_DIR is not defined"
-    theme_dir = settings.COMP_THEME_DIR
+
+    changes = comprehensive_theme_changes(settings.COMP_THEME_DIR)
+
+    # Use the changes
+    for name, value in changes['settings'].iteritems():
+        setattr(settings, name, value)
+    for template_dir in changes['mako_paths']:
+        edxmako.paths.add_lookup('main', template_dir, prepend=True)
+
+
+def comprehensive_theme_changes(theme_dir):
+    """
+    Calculate the set of changes needed to enable a comprehensive theme.
+
+    Arguments:
+        theme_dir (path.path): the full path to the theming directory to use.
+
+    Returns:
+        A dict indicating the changes to make:
+
+            * 'settings': a dictionary of settings names and their new values.
+
+            * 'mako_paths': a list of directories to prepend to the edxmako
+                template lookup path.
+
+    """
+
+    changes = {
+        'settings': {},
+        'mako_paths': [],
+    }
 
     templates_dir = theme_dir / "lms" / "templates"
     if templates_dir.isdir():
-        settings.TEMPLATE_DIRS.insert(0, templates_dir)
-        edxmako.paths.add_lookup('main', templates_dir, prepend=True)
+        changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.TEMPLATE_DIRS
+        changes['mako_paths'].append(templates_dir)
 
     staticfiles_dir = theme_dir / "lms" / "static"
     if staticfiles_dir.isdir():
-        settings.STATICFILES_DIRS.insert(0, staticfiles_dir)
+        changes['settings']['STATICFILES_DIRS'] = [staticfiles_dir] + settings.STATICFILES_DIRS
 
     locale_dir = theme_dir / "lms" / "conf" / "locale"
     if locale_dir.isdir():
-        settings.LOCALE_PATHS.insert(0, locale_dir)
+        changes['settings']['LOCALE_PATHS'] = [locale_dir] + settings.LOCALE_PATHS
 
     favicon = theme_dir / "lms" / "static" / "images" / "favicon.ico"
     if favicon.isfile():
-        settings.FAVICON_PATH = str(favicon)
+        changes['settings']['FAVICON_PATH'] = str(favicon)
+
+    return changes
 
 
 def enable_third_party_auth():

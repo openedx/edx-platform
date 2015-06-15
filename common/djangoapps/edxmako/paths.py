@@ -1,6 +1,8 @@
 """
 Set up lookup paths for mako templates.
 """
+
+import contextlib
 import os
 import pkg_resources
 
@@ -60,3 +62,19 @@ def lookup_template(namespace, name):
     Look up a Mako template by namespace and name.
     """
     return LOOKUP[namespace].get_template(name)
+
+
+@contextlib.contextmanager
+def save_lookups():
+    """
+    A context manager to save and restore the Mako template lookup path.
+
+    Useful for testing.
+
+    """
+    lookup = dict(LOOKUP)
+    try:
+        yield
+    finally:
+        LOOKUP.clear()
+        LOOKUP.update(lookup)
