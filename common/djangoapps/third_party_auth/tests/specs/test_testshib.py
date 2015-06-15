@@ -1,12 +1,11 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
-from django.core.management import call_command
 from django.core.urlresolvers import reverse
 import httpretty
 from mock import patch
-import StringIO
 from student.tests.factories import UserFactory
+from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
 import unittest
 
@@ -209,15 +208,11 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         self.configure_saml_provider(**kwargs)
 
         if fetch_metadata:
-            stdout = StringIO.StringIO()
-            stderr = StringIO.StringIO()
             self.assertTrue(httpretty.is_enabled())
-            call_command('saml', 'pull', stdout=stdout, stderr=stderr)
-            stdout = stdout.getvalue().decode('utf-8')
-            stderr = stderr.getvalue().decode('utf-8')
-            self.assertEqual(stderr, '')
-            self.assertIn(u'Fetching {}'.format(TESTSHIB_METADATA_URL), stdout)
-            self.assertIn(u'Created new record for SAMLProviderData', stdout)
+            num_changed, num_failed, num_total = fetch_saml_metadata()
+            self.assertEqual(num_failed, 0)
+            self.assertEqual(num_changed, 1)
+            self.assertEqual(num_total, 1)
 
     def _fake_testshib_login_and_return(self):
         """ Mocked: the user logs in to TestShib and then gets redirected back """
