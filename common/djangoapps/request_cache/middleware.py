@@ -18,7 +18,8 @@ class RequestCache(object):
         """
         return _request_cache_threadlocal.request
 
-    def clear_request_cache(self):
+    @classmethod
+    def clear_request_cache(cls):
         _request_cache_threadlocal.data = {}
         _request_cache_threadlocal.request = None
 
