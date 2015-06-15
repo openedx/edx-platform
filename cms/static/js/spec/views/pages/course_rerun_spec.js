@@ -1,4 +1,4 @@
-define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helpers", "js/views/course_rerun",
+define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/view_helpers", "js/views/course_rerun",
         "js/views/utils/create_course_utils", "js/views/utils/view_utils", "jquery.simulate"],
     function ($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
         describe("Create course rerun page", function () {

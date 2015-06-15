@@ -82,4 +82,4 @@ spec_paths:
 fixture_paths:
     - js/fixtures
     - js/capa/fixtures
-    - templates/discussion
+    - common/templates

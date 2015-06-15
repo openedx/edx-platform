@@ -1,7 +1,7 @@
 define([
     'jquery', 'underscore', 'js/views/pages/group_configurations',
     'js/models/group_configuration', 'js/collections/group_configuration',
-    'js/common_helpers/template_helpers'
+    'common/js/spec_helpers/template_helpers'
 ], function ($, _, GroupConfigurationsPage, GroupConfigurationModel, GroupConfigurationCollection, TemplateHelpers) {
     'use strict';
     describe('GroupConfigurationsPage', function() {

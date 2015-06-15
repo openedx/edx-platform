@@ -1,4 +1,4 @@
-define(["js/views/license", "js/models/license", "js/common_helpers/template_helpers"],
+define(["js/views/license", "js/models/license", "common/js/spec_helpers/template_helpers"],
              function(LicenseView, LicenseModel, TemplateHelpers) {
     describe("License view", function() {
 

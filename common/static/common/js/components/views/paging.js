@@ -1,7 +1,7 @@
-define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext", "js/views/paging_mixin"],
-    function(_, BaseView, AlertView, gettext, PagingMixin) {
+define(["underscore", "backbone", "gettext", "common/js/components/views/paging_mixin"],
+    function(_, Backbone, gettext, PagingMixin) {
 
-        var PagingView = BaseView.extend(PagingMixin).extend({
+        var PagingView = Backbone.View.extend(PagingMixin).extend({
             // takes a Backbone Paginator as a model
 
             sortableColumns: {},
@@ -11,7 +11,7 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext",
             filterColumn: '',
 
             initialize: function() {
-                BaseView.prototype.initialize.call(this);
+                Backbone.View.prototype.initialize.call(this);
                 var collection = this.collection;
                 collection.bind('add', _.bind(this.onPageRefresh, this));
                 collection.bind('remove', _.bind(this.onPageRefresh, this));

@@ -498,6 +498,7 @@ TEMPLATE_DIRS = [
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    COMMON_ROOT / 'static',  # required to statically include common Underscore templates
 ]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -1571,7 +1572,7 @@ STATICFILES_IGNORE_PATTERNS = (
 
     # Symlinks used by js-test-tool
     "xmodule_js",
-    "common_static",
+    "common",
 )
 
 PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'

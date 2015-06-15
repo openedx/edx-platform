@@ -70,14 +70,15 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process.js
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js
     - xmodule_js/common_static/js/vendor/mock-ajax.js
+    - xmodule_js/common_static/js/vendor/requirejs/text.js
 
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
     - js
-    - js/common_helpers
-    - js/factories
     - js/certificates
+    - js/factories
+    - common/js
 
 # Paths to spec (test) JavaScript files
 # We should define the custom path mapping in /coffee/spec/main.coffee as well e.g. certificates etc.
@@ -98,6 +99,8 @@ spec_paths:
 #
 fixture_paths:
     - coffee/fixtures
+    - templates
+    - common/templates
 
 requirejs:
   paths:
