@@ -58,9 +58,9 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
 
-CONTAINER_TEMPATES = [
+CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
-    "editor-mode-button", "upload-dialog", "image-modal",
+    "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
     "unit-outline", "container-message", "license-selector",
@@ -217,7 +217,7 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPATES
+                'templates': CONTAINER_TEMPLATES
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")

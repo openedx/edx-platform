@@ -22,7 +22,7 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="header_extras">
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
-    <%static:include path="js/${template_name}.underscore" />
+    <%static:include path="common/templates/${template_name}.underscore" />
 </script>
 % endfor
 <%

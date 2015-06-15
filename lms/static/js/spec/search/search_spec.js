@@ -3,7 +3,7 @@ define([
     'sinon',
     'backbone',
     'logger',
-    'js/common_helpers/template_helpers',
+    'common/js/spec_helpers/template_helpers',
     'js/search/base/models/search_result',
     'js/search/base/collections/search_collection',
     'js/search/base/routers/search_router',

@@ -1,4 +1,4 @@
-define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "js/views/assets",
+define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset", "js/views/assets",
     "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers"],
     function ($, AjaxHelpers, URI, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
 
@@ -8,15 +8,11 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
 
             assetLibraryTpl = readFixtures('asset-library.underscore');
             assetTpl = readFixtures('asset.underscore');
-            pagingHeaderTpl = readFixtures('paging-header.underscore');
-            pagingFooterTpl = readFixtures('paging-footer.underscore');
             uploadModalTpl = readFixtures('asset-upload-modal.underscore');
 
             beforeEach(function () {
                 setFixtures($("<script>", { id: "asset-library-tpl", type: "text/template" }).text(assetLibraryTpl));
                 appendSetFixtures($("<script>", { id: "asset-tpl", type: "text/template" }).text(assetTpl));
-                appendSetFixtures($("<script>", { id: "paging-header-tpl", type: "text/template" }).text(pagingHeaderTpl));
-                appendSetFixtures($("<script>", { id: "paging-footer-tpl", type: "text/template" }).text(pagingFooterTpl));
                 appendSetFixtures(uploadModalTpl);
                 appendSetFixtures(sandbox({ id: "asset_table_body" }));
 
@@ -139,7 +135,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 var setup;
                 setup = function(responseData) {
                     var requests = AjaxHelpers.requests(this);
-                    assetsView.setPage(0);
+                    assetsView.pagingView.setPage(0);
                     if (!responseData){
                         AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
                     }
@@ -188,8 +184,8 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                     expect(assetsView).toBeDefined();
                     spyOn(assetsView, "addAsset").andCallFake(function () {
                         assetsView.collection.add(mockAssetUploadResponse.asset);
-                        assetsView.renderPageItems();
-                        assetsView.setPage(0);
+                        assetsView.pagingView.renderPageItems();
+                        assetsView.pagingView.setPage(0);
                     });
 
                     $('a:contains("Upload your first asset")').click();
@@ -248,9 +244,9 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 });
 
                 it('returns the registered info for a filter column', function () {
-                    assetsView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
-                    assetsView.registerFilterableColumn('js-asset-type-col', 'Type', 'asset_type');
-                    var filterInfo = assetsView.filterableColumnInfo('js-asset-type-col');
+                    assetsView.pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
+                    assetsView.pagingView.registerFilterableColumn('js-asset-type-col', 'Type', 'asset_type');
+                    var filterInfo = assetsView.pagingView.filterableColumnInfo('js-asset-type-col');
                     expect(filterInfo.displayName).toBe('Type');
                     expect(filterInfo.fieldName).toBe('asset_type');
                 });
@@ -265,16 +261,16 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 it('make sure selectFilter sets collection filter if undefined', function () {
                     expect(assetsView).toBeDefined();
                     assetsView.collection.filterField = '';
-                    assetsView.selectFilter('js-asset-type-col');
+                    assetsView.pagingView.selectFilter('js-asset-type-col');
                     expect(assetsView.collection.filterField).toEqual('asset_type');
                 });
 
                 it('make sure _toggleFilterColumn filters asset list', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
                         var $typeColumn = $('#' + columnID);
-                        assetsView.setPage(0);
+                        assetsView.pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         var assetsNumber = assetsView.collection.length;
                         assetsView._toggleFilterColumn('Images', 'Images');
@@ -288,7 +284,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 it('opens and closes select type menu', function () {
                     expect(assetsView).toBeDefined();
                     setup.call(this, mockExampleAssetsResponse);
-                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
                         var $typeColumn = $('#' + columnID);
                         expect($typeColumn).toBeVisible();
                         var assetsNumber = $('#asset-table-body .type-col').length;
@@ -304,12 +300,12 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 it('check filtering works with sorting by column on', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    assetsView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
-                    assetsView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
-                    assetsView.setInitialSortColumn('name-col');
-                    assetsView.setPage(0);
+                    assetsView.pagingView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
+                    assetsView.pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
+                    assetsView.pagingView.setInitialSortColumn('name-col');
+                    assetsView.pagingView.setPage(0);
                     respondWithMockAssets(requests);
-                    var sortInfo = assetsView.sortableColumnInfo('name-col');
+                    var sortInfo = assetsView.pagingView.sortableColumnInfo('name-col');
                     expect(sortInfo.defaultSortDirection).toBe('asc');
                     var $firstFilter = $($('#js-asset-type-col').find('li.nav-item a')[1]);
                     $firstFilter.trigger('click');
@@ -322,8 +318,8 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 it('shows type select menu, selects type, and filters results', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    $.each(assetsView.filterableColumns, function(columnID, columnData) {
-                        assetsView.setPage(0);
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
+                        assetsView.pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         var $typeColumn = $('#' + columnID);
                         expect($typeColumn).toBeVisible();

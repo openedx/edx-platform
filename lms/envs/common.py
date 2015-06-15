@@ -498,6 +498,7 @@ TEMPLATE_DIRS = [
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    COMMON_ROOT / 'static',  # required to statically include common Underscore templates
 ]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -1156,7 +1157,9 @@ MIDDLEWARE_CLASSES = (
     'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
-    'django.middleware.locale.LocaleMiddleware',
+    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
+    # 'django.middleware.locale.LocaleMiddleware',
+    'django_locale.middleware.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -1569,7 +1572,7 @@ STATICFILES_IGNORE_PATTERNS = (
 
     # Symlinks used by js-test-tool
     "xmodule_js",
-    "common_static",
+    "common",
 )
 
 PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
@@ -2358,8 +2361,6 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
-#date format the api will be formatting the datetime values
-API_DATE_FORMAT = '%Y-%m-%d'
 
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60

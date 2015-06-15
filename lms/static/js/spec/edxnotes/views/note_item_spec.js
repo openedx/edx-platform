@@ -1,6 +1,6 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/ajax_helpers',
-    'js/common_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
+    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
     'js/edxnotes/models/note', 'js/edxnotes/views/note_item',
     'js/spec/edxnotes/custom_matchers'
 ], function(

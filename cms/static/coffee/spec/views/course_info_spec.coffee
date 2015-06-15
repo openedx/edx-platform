@@ -1,4 +1,4 @@
-define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "js/common_helpers/ajax_helpers"],
+define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "common/js/spec_helpers/ajax_helpers"],
 (CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, AjaxHelpers) ->
 
     describe "Course Updates and Handouts", ->

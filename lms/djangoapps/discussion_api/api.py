@@ -85,11 +85,7 @@ def _get_comment_and_context(request, comment_id):
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
-        _, context = _get_thread_and_context(
-            request,
-            cc_comment["thread_id"],
-            cc_comment["parent_id"]
-        )
+        _, context = _get_thread_and_context(request, cc_comment["thread_id"])
         return cc_comment, context
     except CommentClientRequestError:
         raise Http404

@@ -1,7 +1,7 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/utils/view_utils",
-    "js/common_helpers/ajax_helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
+    "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 

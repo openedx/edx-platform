@@ -1,5 +1,5 @@
 define([
-    'jquery', 'js/common_helpers/template_helpers', 'js/edxnotes/collections/tabs',
+    'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
     'js/edxnotes/views/tabs_list', 'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function($, TemplateHelpers, TabsCollection, TabsListView, customMatchers) {
     'use strict';

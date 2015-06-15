@@ -64,7 +64,7 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - js
-    - js/common_helpers
+    - common/js
     - teams/js
 
 # Paths to spec (test) JavaScript files
@@ -97,6 +97,7 @@ fixture_paths:
     - js/fixtures/search
     - templates/search
     - templates/discovery
+    - common/templates
 
 requirejs:
   paths:
