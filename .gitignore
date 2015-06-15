@@ -91,6 +91,9 @@ logs
 chromedriver.log
 ghostdriver.log
 
+### Celery artifacts ###
+celerybeat-schedule
+
 ### Unknown artifacts
 database.sqlite
 courseware/static/js/mathjax/*
