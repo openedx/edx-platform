@@ -75,11 +75,11 @@ class SignalHandler(object):
 
     1. We receive using the Django Signals mechanism.
     2. The sender is going to be the class of the modulestore sending it.
-    3. Always have **kwargs in your signal handler, as new things may be added.
-    4. The thing that listens for the signal lives in process, but should do
+    3. The names of your handler function's parameters *must* be "sender" and "course_key".
+    4. Always have **kwargs in your signal handler, as new things may be added.
+    5. The thing that listens for the signal lives in process, but should do
        almost no work. Its main job is to kick off the celery task that will
        do the actual work.
-
     """
     course_published = django.dispatch.Signal(providing_args=["course_key"])
     library_updated = django.dispatch.Signal(providing_args=["library_key"])

@@ -393,18 +393,18 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
     :param min_sends: If non-none, make sure number of send calls are >=min_sends
     """
     with check_sum_of_calls(
-            pymongo.message,
-            ['query', 'get_more'],
-            max_finds,
-            min_finds,
+        pymongo.message,
+        ['query', 'get_more'],
+        max_finds,
+        min_finds,
     ):
         if max_sends is not None or min_sends is not None:
             with check_sum_of_calls(
-                    pymongo.message,
-                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
-                    max_sends if max_sends is not None else float("inf"),
-                    min_sends if min_sends is not None else 0,
+                pymongo.message,
+                # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
+                max_sends if max_sends is not None else float("inf"),
+                min_sends if min_sends is not None else 0,
             ):
                 yield
         else:
