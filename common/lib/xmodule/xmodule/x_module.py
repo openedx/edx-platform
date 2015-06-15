@@ -26,10 +26,11 @@ from xblock.fields import (
 )
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
+from xmodule import course_metadata_utils
 from xmodule.fields import RelativeTime
-
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
 from xmodule.exceptions import UndefinedContext
@@ -335,7 +336,7 @@ class XModuleMixin(XModuleFields, XBlockMixin):
 
     @property
     def url_name(self):
-        return self.location.name
+        return course_metadata_utils.url_name_for_course_location(self.location)
 
     @property
     def display_name_with_default(self):
@@ -343,10 +344,7 @@ class XModuleMixin(XModuleFields, XBlockMixin):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         """
-        name = self.display_name
-        if name is None:
-            name = self.url_name.replace('_', ' ')
-        return name.replace('<', '&lt;').replace('>', '&gt;')
+        return course_metadata_utils.display_name_with_default(self)
 
     @property
     def xblock_kvs(self):
