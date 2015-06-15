@@ -182,6 +182,7 @@ ENABLE_JASMINE = False
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+OPEN_EDX_ROOT = REPO_ROOT / "openedx"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 
@@ -203,6 +204,7 @@ MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
+    OPEN_EDX_ROOT / 'core' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
