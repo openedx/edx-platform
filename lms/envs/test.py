@@ -89,9 +89,11 @@ _REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
 _REPORT_DIR.makedirs_p()
 
 NOSE_ARGS = [
-    '--id-file', REPO_ROOT / '.testids' / _SYSTEM / 'noseids',
     '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
+NOSEID_FILE = REPO_ROOT / '.testids' / _SYSTEM / 'noseids'
+if NOSEID_FILE.isfile():
+    NOSE_ARGS.extend(['--id-file', NOSEID_FILE])
 
 # Local Directories
 TEST_ROOT = path("test_root")
