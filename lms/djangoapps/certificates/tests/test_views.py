@@ -27,7 +27,8 @@ from certificates.models import (
     GeneratedCertificate,
     BadgeAssertion,
     CertificateStatuses,
-    CertificateHtmlViewConfiguration
+    CertificateHtmlViewConfiguration,
+    CertificateSocialNetworks,
 )
 
 from certificates.tests.factories import (
@@ -593,10 +594,35 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_invalid_certificate_configuration(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)  # pylint: disable=no-member
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
         self.assertIn("Invalid Certificate", response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_certificate_evidence_event_emitted(self):
+        self.client.logout()
+        self._add_course_certificates(count=1, signatory_count=2)
+        self.recreate_tracker()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        actual_event = self.get_event()
+        self.assertEqual(actual_event['name'], 'edx.certificate.evidence_visited')
+        assert_event_matches(
+            {
+                'user_id': self.user.id,
+                'certificate_id': unicode(self.cert.verify_uuid),
+                'enrollment_mode': self.cert.mode,
+                'certificate_url': test_url,
+                'course_id': unicode(self.course.id),
+                'social_network': CertificateSocialNetworks.linkedin
+            },
+            actual_event['data']
+        )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_evidence_event_sent(self):

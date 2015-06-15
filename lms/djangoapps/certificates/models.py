@@ -81,6 +81,15 @@ class CertificateStatuses(object):
     unavailable = 'unavailable'
 
 
+class CertificateSocialNetworks(object):
+    """
+    Enum for certificate social networks
+    """
+    linkedin = 'LinkedIn'
+    facebook = 'Facebook'
+    twitter = 'Twitter'
+
+
 class CertificateWhitelist(models.Model):
     """
     Tracks students who are whitelisted, all users
@@ -139,10 +148,11 @@ class GeneratedCertificate(models.Model):
 def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
     """
     Handles post_save signal of GeneratedCertificate, and mark user collected
-    course milestone entry if user has passed the course
-    or certificate status is 'generating'.
+    course milestone entry if user has passed the course.
+    User is assumed to have passed the course if certificate status is either 'generating' or 'downloadable'.
     """
-    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status == CertificateStatuses.generating:
+    allowed_cert_states = [CertificateStatuses.generating, CertificateStatuses.downloadable]
+    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status in allowed_cert_states:
         fulfill_course_milestone(instance.course_id, instance.user)
 
 

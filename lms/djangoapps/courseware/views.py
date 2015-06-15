@@ -1337,7 +1337,7 @@ def generate_user_cert(request, course_id):
         # mark the certificate with "error" status, so it can be re-run
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
-        certs_api.generate_user_certificates(student, course.id)
+        certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse()
 
