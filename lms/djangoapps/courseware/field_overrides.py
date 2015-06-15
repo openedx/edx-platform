@@ -138,6 +138,9 @@ class OverrideFieldData(FieldData):
         self.fallback.delete(block, name)
 
     def has(self, block, name):
+        if not self.providers:
+            return self.fallback.has(block, name)
+
         has = self.get_override(block, name)
         if has is NOTSET:
             # If this is an inheritable field and an override is set above,
@@ -157,7 +160,7 @@ class OverrideFieldData(FieldData):
     def default(self, block, name):
         # The `default` method is overloaded by the field storage system to
         # also handle inheritance.
-        if not overrides_disabled():
+        if self.providers and not overrides_disabled():
             inheritable = InheritanceMixin.fields.keys()
             if name in inheritable:
                 for ancestor in _lineage(block):
