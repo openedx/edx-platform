@@ -420,6 +420,20 @@ def _get_thread_editable_fields(cc_thread, context):
         return _THREAD_EDITABLE_BY_ANY
 
 
+def _check_editable_fields(editable_fields, update_data):
+    """
+    Raise ValidationError if the given update data contains a field that is not
+    in editable_fields.
+    """
+    non_editable_errors = {
+        field: ["This field is not editable."]
+        for field in update_data.keys()
+        if field not in editable_fields
+    }
+    if non_editable_errors:
+        raise ValidationError(non_editable_errors)
+
+
 def update_thread(request, thread_id, update_data):
     """
     Update a thread.
@@ -440,13 +454,7 @@ def update_thread(request, thread_id, update_data):
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
     editable_fields = _get_thread_editable_fields(cc_thread, context)
-    non_editable_errors = {
-        field: ["This field is not editable."]
-        for field in update_data.keys()
-        if field not in editable_fields
-    }
-    if non_editable_errors:
-        raise ValidationError(non_editable_errors)
+    _check_editable_fields(editable_fields, update_data)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
@@ -457,6 +465,22 @@ def update_thread(request, thread_id, update_data):
     api_thread = serializer.data
     _do_extra_thread_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
+
+
+_COMMENT_EDITABLE_BY_AUTHOR = {"raw_body"}
+_COMMENT_EDITABLE_BY_THREAD_AUTHOR = {"endorsed"}
+
+
+def _get_comment_editable_fields(cc_comment, context):
+    """
+    Get the list of editable fields for the given comment in the given context
+    """
+    ret = set()
+    if _is_user_author_or_privileged(cc_comment, context):
+        ret |= _COMMENT_EDITABLE_BY_AUTHOR
+    if _is_user_author_or_privileged(context["thread"], context):
+        ret |= _COMMENT_EDITABLE_BY_THREAD_AUTHOR
+    return ret
 
 
 def update_comment(request, comment_id, update_data):
@@ -489,8 +513,8 @@ def update_comment(request, comment_id, update_data):
           is empty or thread_id is included)
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    if not _is_user_author_or_privileged(cc_comment, context):
-        raise PermissionDenied()
+    editable_fields = _get_comment_editable_fields(cc_comment, context)
+    _check_editable_fields(editable_fields, update_data)
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
     if not serializer.is_valid():
         raise ValidationError(serializer.errors)

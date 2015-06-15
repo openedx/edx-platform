@@ -231,7 +231,7 @@ class CommentSerializer(_ContentSerializer):
     """
     thread_id = serializers.CharField()
     parent_id = serializers.CharField(required=False)
-    endorsed = serializers.BooleanField(read_only=True)
+    endorsed = serializers.BooleanField(required=False)
     endorsed_by = serializers.SerializerMethodField("get_endorsed_by")
     endorsed_by_label = serializers.SerializerMethodField("get_endorsed_by_label")
     endorsed_at = serializers.SerializerMethodField("get_endorsed_at")
@@ -300,6 +300,11 @@ class CommentSerializer(_ContentSerializer):
         if instance:
             for key, val in attrs.items():
                 instance[key] = val
+                # TODO: The comments service doesn't populate the endorsement
+                # field on comment creation, so we only provide
+                # endorsement_user_id on update
+                if key == "endorsed":
+                    instance["endorsement_user_id"] = self.context["cc_requester"]["id"]
             return instance
         return Comment(
             course_id=self.context["thread"]["course_id"],
