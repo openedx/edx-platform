@@ -130,7 +130,7 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
                 expected_calls = self._build_calls(self.first_lib, self.second_lib)
-                self.assertEqual(patched_index.mock_calls, expected_calls)
+                self.assertItemsEqual(patched_index.mock_calls, expected_calls)
 
     def test_given_all_key_prompts_and_reindexes_all_libraries_cancelled(self):
         """ Test that does not reindex anything when --all key is given and cancelled """
