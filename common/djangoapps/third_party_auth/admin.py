@@ -7,6 +7,7 @@ from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from .models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, SAMLProviderData
+from .tasks import fetch_saml_metadata
 
 admin.site.register(OAuth2ProviderConfig, KeyedConfigurationModelAdmin)
 
@@ -28,6 +29,17 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         return bool(data and data.is_valid())
     has_data.short_description = u'Metadata Ready'
     has_data.boolean = True
+
+    def save_model(self, request, obj, form, change):
+        """
+        Post save: Queue an asynchronous metadata fetch to update SAMLProviderData.
+        We only want to do this for manual edits done using the admin interface.
+
+        Note: This only works if the celery worker and the app worker are using the
+        same 'configuration' cache.
+        """
+        super(SAMLProviderConfigAdmin, self).save_model(request, obj, form, change)
+        fetch_saml_metadata.apply_async((), countdown=2)
 
 admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)
 
@@ -54,7 +66,7 @@ admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
 
 
 class SAMLProviderDataAdmin(admin.ModelAdmin):
-    """ Django Admin class for SAMLProviderData """
+    """ Django Admin class for SAMLProviderData (Read Only) """
     list_display = ('entity_id', 'is_valid', 'fetched_at', 'expires_at', 'sso_url')
     readonly_fields = ('is_valid', )
 

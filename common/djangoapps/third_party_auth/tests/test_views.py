@@ -8,7 +8,7 @@ import unittest
 from .testutil import AUTH_FEATURE_ENABLED, SAMLTestCase
 
 # Define some XML namespaces:
-SAML_XML_NS = 'urn:oasis:names:tc:SAML:2.0:metadata'
+from third_party_auth.tasks import SAML_XML_NS
 XMLDSIG_XML_NS = 'http://www.w3.org/2000/09/xmldsig#'
 
 
