@@ -133,7 +133,7 @@ class BookmarksTest(BookmarksTestMixin):
         for index in range(num_units):
             self._bookmark_unit(xblocks[index].locator)
 
-    def _breadcrumb(self, num_units):
+    def _breadcrumb(self, num_units, modified_name=None):
         """
         Creates breadcrumbs for the first `num_units`
 
@@ -149,7 +149,7 @@ class BookmarksTest(BookmarksTestMixin):
                 [
                     'TestSection{}'.format(index),
                     'TestSubsection{}'.format(index),
-                    'TestVertical{}'.format(index)
+                    modified_name if modified_name else 'TestVertical{}'.format(index)
                 ]
             )
         return breadcrumbs
@@ -206,6 +206,49 @@ class BookmarksTest(BookmarksTestMixin):
         self.assertEqual(self.bookmarks_page.is_next_page_button_enabled(), next_button_enabled)
         self.assertEqual(self.bookmarks_page.get_current_page_number(), current_page_number)
         self.assertEqual(self.bookmarks_page.get_total_pages, total_pages)
+
+    def _navigate_and_verify_bookmarks_list(self, bookmarks_count):
+        """
+        Navigates and verifies the bookmarks list page.
+        """
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
+        self.assertEqual(self.bookmarks_page.count(), bookmarks_count)
+
+    def _verify_breadcrumbs(self, num_units, modified_name=None):
+        """
+        Verifies the breadcrumb trail.
+        """
+        bookmarked_breadcrumbs = self.bookmarks_page.breadcrumbs()
+
+        # Verify bookmarked breadcrumbs.
+        breadcrumbs = self._breadcrumb(num_units=num_units, modified_name=modified_name)
+        breadcrumbs.reverse()
+        self.assertEqual(bookmarked_breadcrumbs, breadcrumbs)
+
+    def update_and_publish_block_display_name(self, modified_name):
+        """
+        Update and publish the block/unit display name.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.wait_for_page()
+
+        self.course_outline_page.expand_all_subsections()
+        section = self.course_outline_page.section_at(0)
+        container_page = section.subsection_at(0).unit_at(0).go_to()
+
+        self.course_fixture._update_xblock(container_page.locator, {  # pylint: disable=protected-access
+            "metadata": {
+                "display_name": modified_name
+            }
+        })
+
+        container_page.visit()
+        container_page.wait_for_page()
+
+        self.assertEqual(container_page.name, modified_name)
+        container_page.publish_action.click()
 
     def test_bookmark_button(self):
         """
@@ -267,11 +310,6 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup()
         self._bookmark_units(2)
 
-        self.bookmarks_page.click_bookmarks_button()
-        self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
-        self.assertEqual(self.bookmarks_page.count(), 2)
-
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
             header_text='Showing 1-2 out of 2 total',
@@ -281,9 +319,8 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=1
         )
 
-        bookmarked_breadcrumbs = self.bookmarks_page.breadcrumbs()
-        breadcrumbs = self._breadcrumb(2)
-        self.assertItemsEqual(bookmarked_breadcrumbs, breadcrumbs)
+        self._navigate_and_verify_bookmarks_list(bookmarks_count=2)
+        self._verify_breadcrumbs(num_units=2)
 
         # get usage ids for units
         xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
@@ -295,6 +332,47 @@ class BookmarksTest(BookmarksTestMixin):
             self.assertTrue(self.courseware_page.active_usage_id() in xblock_usage_ids)
             self.courseware_page.visit().wait_for_page()
             self.bookmarks_page.click_bookmarks_button()
+
+    def test_bookmark_shows_updated_breadcrumb_after_publish(self):
+        """
+        Scenario: A bookmark breadcrumb trail is updated after publishing the changed display name.
+
+        Given that I am a registered user
+        And I visit my courseware page
+        And I can see bookmarked unit
+        Then I visit unit page in studio
+        Then I change unit display_name
+        And I publish the changes
+        Then I visit my courseware page
+        And I visit bookmarks list page
+        When I see the bookmark
+        Then I can see the breadcrumb trail
+        with updated display_name.
+        """
+        self._test_setup(num_chapters=1)
+        self._bookmark_units(num_units=1)
+
+        self._navigate_and_verify_bookmarks_list(bookmarks_count=1)
+        self._verify_breadcrumbs(num_units=1)
+
+        LogoutPage(self.browser).visit()
+        AutoAuthPage(
+            self.browser,
+            username=self.USERNAME,
+            email=self.EMAIL,
+            course_id=self.course_id,
+            staff=True
+        ).visit()
+
+        modified_name = "Updated name"
+        self.update_and_publish_block_display_name(modified_name)
+
+        LogoutPage(self.browser).visit()
+        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        self.courseware_page.visit()
+
+        self._navigate_and_verify_bookmarks_list(bookmarks_count=1)
+        self._verify_breadcrumbs(num_units=1, modified_name=modified_name)
 
     def test_unreachable_bookmark(self):
         """
@@ -313,9 +391,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._bookmark_units(2)
         self._delete_section(0)
 
-        self.bookmarks_page.click_bookmarks_button()
-        self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.count(), 2)
+        self._navigate_and_verify_bookmarks_list(bookmarks_count=2)
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
@@ -342,10 +418,7 @@ class BookmarksTest(BookmarksTestMixin):
         """
         self._test_setup(11)
         self._bookmark_units(11)
-
-        self.bookmarks_page.click_bookmarks_button()
-        self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.count(), 10)
+        self._navigate_and_verify_bookmarks_list(bookmarks_count=11)
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=10,
