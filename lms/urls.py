@@ -75,9 +75,6 @@ urlpatterns = (
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('enrollment.urls')),
 
-    # CourseInfo API RESTful endpoints
-    url(r'^api/course/details/v0/', include('course_about.urls')),
-
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
 
