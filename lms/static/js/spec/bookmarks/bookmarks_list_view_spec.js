@@ -1,5 +1,5 @@
-define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_helpers',
-        'js/common_helpers/template_helpers', 'js/bookmarks/views/bookmarks_list_button'
+define(['backbone', 'jquery', 'underscore', 'logger', 'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers', 'js/bookmarks/views/bookmarks_list_button'
        ],
     function (Backbone, $, _, Logger, AjaxHelpers, TemplateHelpers, BookmarksListButtonView) {
         'use strict';
