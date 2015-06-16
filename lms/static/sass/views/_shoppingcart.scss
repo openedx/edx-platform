@@ -1075,7 +1075,7 @@ $light-border: 1px solid $gray-l5;
     content: none !important;
   }
 
-  ol.steps, a.blue.pull-right, .bordered-bar span.pull-right, .left.nav-global.authenticated {
+  .steps, .blue.pull-right, .bordered-bar .pull-right, .left.nav-global.authenticated {
     display: none;
   }
 
