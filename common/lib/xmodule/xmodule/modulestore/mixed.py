@@ -586,7 +586,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         # first make sure an existing course doesn't already exist in the mapping
         course_key = self.make_course_key(org, course, run)
-        if course_key in self.mappings:
+        if course_key in self.mappings and self.mappings[course_key].has_course(course_key):
             raise DuplicateCourseError(course_key, course_key)
 
         # create the course
