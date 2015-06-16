@@ -38,6 +38,11 @@ from courseware.courses import (
     sort_by_start_date,
 )
 from courseware.masquerade import setup_masquerade
+from openedx.core.djangoapps.credit.api import (
+    get_credit_requirement_status,
+    is_user_eligible_for_credit,
+    is_credit_course
+)
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 from .entrance_exams import (
@@ -1050,6 +1055,21 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
+    if is_credit_course(course_key):
+        requirement_statuses = get_credit_requirement_status(course_key, student.username)
+        if any(requirement['status'] == 'failed' for requirement in requirement_statuses):
+            eligibility_status = "not_eligible"
+        elif is_user_eligible_for_credit(student.username, course_key):
+            eligibility_status = "eligible"
+        else:
+            eligibility_status = "partial_eligible"
+        credit_course = {
+            'eligibility_status': eligibility_status,
+            'requirements': requirement_statuses
+        }
+    else:
+        credit_course = None
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -1058,7 +1078,8 @@ def _progress(request, course_key, student_id):
         'staff_access': staff_access,
         'student': student,
         'passed': is_course_passed(course, grade_summary),
-        'show_generate_cert_btn': show_generate_cert_btn
+        'show_generate_cert_btn': show_generate_cert_btn,
+        'credit_course': credit_course
     }
 
     if show_generate_cert_btn:

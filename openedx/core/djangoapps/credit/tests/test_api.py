@@ -204,6 +204,17 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(len(grade_req), 1)
         self.assertEqual(grade_req[0].active, False)
 
+    def test_is_user_eligible_for_credit(self):
+        credit_course = self.add_credit_course()
+        CreditEligibility.objects.create(
+            course=credit_course, username="staff", provider=CreditProvider.objects.get(provider_id=self.PROVIDER_ID)
+        )
+        is_eligible = api.is_user_eligible_for_credit('staff', credit_course.course_key)
+        self.assertTrue(is_eligible)
+
+        is_eligible = api.is_user_eligible_for_credit('abc', credit_course.course_key)
+        self.assertFalse(is_eligible)
+
 
 @ddt.ddt
 class CreditProviderIntegrationApiTests(CreditApiTestBase):
