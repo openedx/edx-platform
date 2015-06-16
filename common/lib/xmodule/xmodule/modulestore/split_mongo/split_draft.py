@@ -211,7 +211,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
-                SplitMongoModuleStore.delete_item(self, branched_location, user_id)
+                try:
+                    SplitMongoModuleStore.delete_item(self, branched_location, user_id)
+                except ValueError as e:
+                    if revision != ModuleStoreEnum.RevisionOption.all:
+                        raise e
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
                 if (
                         branch == ModuleStoreEnum.BranchName.draft and
