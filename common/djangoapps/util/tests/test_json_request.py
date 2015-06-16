@@ -18,20 +18,20 @@ class JsonResponseTestCase(unittest.TestCase):
         self.assertIsInstance(resp, HttpResponse)
         self.assertEqual(resp.content, "")
         self.assertEqual(resp.status_code, 204)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_empty_string(self):
         resp = JsonResponse("")
         self.assertIsInstance(resp, HttpResponse)
         self.assertEqual(resp.content, "")
         self.assertEqual(resp.status_code, 204)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_string(self):
         resp = JsonResponse("foo")
         self.assertEqual(resp.content, '"foo"')
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_dict(self):
         obj = {"foo": "bar"}
@@ -39,7 +39,7 @@ class JsonResponseTestCase(unittest.TestCase):
         compare = json.loads(resp.content)
         self.assertEqual(obj, compare)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_set_status_kwarg(self):
         obj = {"error": "resource not found"}
@@ -47,7 +47,7 @@ class JsonResponseTestCase(unittest.TestCase):
         compare = json.loads(resp.content)
         self.assertEqual(obj, compare)
         self.assertEqual(resp.status_code, 404)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_set_status_arg(self):
         obj = {"error": "resource not found"}
@@ -55,7 +55,7 @@ class JsonResponseTestCase(unittest.TestCase):
         compare = json.loads(resp.content)
         self.assertEqual(obj, compare)
         self.assertEqual(resp.status_code, 404)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_encoder(self):
         obj = [1, 2, 3]
@@ -80,14 +80,14 @@ class JsonResponseBadRequestTestCase(unittest.TestCase):
         self.assertIsInstance(resp, HttpResponseBadRequest)
         self.assertEqual(resp.content, "")
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_empty_string(self):
         resp = JsonResponseBadRequest("")
         self.assertIsInstance(resp, HttpResponse)
         self.assertEqual(resp.content, "")
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_dict(self):
         obj = {"foo": "bar"}
@@ -95,7 +95,7 @@ class JsonResponseBadRequestTestCase(unittest.TestCase):
         compare = json.loads(resp.content)
         self.assertEqual(obj, compare)
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_set_status_kwarg(self):
         obj = {"error": "resource not found"}
@@ -103,7 +103,7 @@ class JsonResponseBadRequestTestCase(unittest.TestCase):
         compare = json.loads(resp.content)
         self.assertEqual(obj, compare)
         self.assertEqual(resp.status_code, 404)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_set_status_arg(self):
         obj = {"error": "resource not found"}
@@ -111,7 +111,7 @@ class JsonResponseBadRequestTestCase(unittest.TestCase):
         compare = json.loads(resp.content)
         self.assertEqual(obj, compare)
         self.assertEqual(resp.status_code, 404)
-        self.assertEqual(resp["content-type"], "application/json")
+        self.assertEqual(resp["content-type"], "application/json; charset=utf-8")
 
     def test_encoder(self):
         obj = [1, 2, 3]

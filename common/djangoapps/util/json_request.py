@@ -67,7 +67,7 @@ class JsonResponse(HttpResponse):
             content = serialize('json', resp_obj)
         else:
             content = json.dumps(resp_obj, cls=encoder, indent=2, ensure_ascii=True)
-        kwargs.setdefault("content_type", "application/json")
+        kwargs.setdefault("content_type", "application/json; charset=utf-8")
         if status:
             kwargs["status"] = status
         super(JsonResponse, self).__init__(content, *args, **kwargs)
@@ -88,6 +88,6 @@ class JsonResponseBadRequest(HttpResponseBadRequest):
             content = ""
         else:
             content = json.dumps(obj, cls=encoder, indent=2, ensure_ascii=False)
-        kwargs.setdefault("content_type", "application/json")
+        kwargs.setdefault("content_type", "application/json; charset=utf-8")
         kwargs["status"] = status
         super(JsonResponseBadRequest, self).__init__(content, *args, **kwargs)
