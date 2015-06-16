@@ -1419,21 +1419,41 @@ class CourseDescriptor(CourseFields, LicenseMixin, SequenceDescriptor):
         """
         return date_time + u" UTC"
 
-    @property
-    def forum_posts_allowed(self):
+    def get_discussion_blackout_datetimes(self):
+        """
+        Get a list of dicts with start and end fields with datetime values from
+        the discussion_blackouts setting
+        """
         date_proxy = Date()
         try:
-            blackout_periods = [(date_proxy.from_json(start),
-                                 date_proxy.from_json(end))
-                                for start, end
-                                in filter(None, self.discussion_blackouts)]
-            now = datetime.now(UTC())
-            for start, end in blackout_periods:
-                if start <= now <= end:
-                    return False
-        except:
-            log.exception("Error parsing discussion_blackouts %s for course %s", self.discussion_blackouts, self.id)
+            ret = [
+                {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
+                for start, end
+                in filter(None, self.discussion_blackouts)
+            ]
+            for blackout in ret:
+                if not blackout["start"] or not blackout["end"]:
+                    raise ValueError
+            return ret
+        except (TypeError, ValueError):
+            log.exception(
+                "Error parsing discussion_blackouts %s for course %s",
+                self.discussion_blackouts,
+                self.id
+            )
+            return []
 
+    @property
+    def forum_posts_allowed(self):
+        """
+        Return whether forum posts are allowed by the discussion_blackouts
+        setting
+        """
+        blackouts = self.get_discussion_blackout_datetimes()
+        now = datetime.now(UTC())
+        for blackout in blackouts:
+            if blackout["start"] <= now <= blackout["end"]:
+                return False
         return True
 
     @property

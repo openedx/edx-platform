@@ -104,13 +104,51 @@ def _is_user_author_or_privileged(cc_content, context):
     )
 
 
-def get_thread_list_url(request, course_key, topic_id_list):
+def get_thread_list_url(request, course_key, topic_id_list=None):
     """
     Returns the URL for the thread_list_url field, given a list of topic_ids
     """
     path = reverse("thread-list")
-    query_list = [("course_id", unicode(course_key))] + [("topic_id", topic_id) for topic_id in topic_id_list]
+    query_list = (
+        [("course_id", unicode(course_key))] +
+        [("topic_id", topic_id) for topic_id in topic_id_list or []]
+    )
     return request.build_absolute_uri(urlunparse(("", "", path, "", urlencode(query_list), "")))
+
+
+def get_course(request, course_key):
+    """
+    Return general discussion information for the course.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        course_key: The key of the course to get information for
+
+    Returns:
+
+        The course information; see discussion_api.views.CourseView for more
+        detail.
+
+    Raises:
+
+        Http404: if the course does not exist or is not accessible to the
+          requesting user
+    """
+    course = _get_course_or_404(course_key, request.user)
+    return {
+        "id": unicode(course_key),
+        "blackouts": [
+            {"start": blackout["start"].isoformat(), "end": blackout["end"].isoformat()}
+            for blackout in course.get_discussion_blackout_datetimes()
+        ],
+        "thread_list_url": get_thread_list_url(request, course_key, topic_id_list=[]),
+        "topics_url": request.build_absolute_uri(
+            reverse("course_topics", kwargs={"course_id": course_key})
+        )
+    }
 
 
 def get_course_topics(request, course_key):

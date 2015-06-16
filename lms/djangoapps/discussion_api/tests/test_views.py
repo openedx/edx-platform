@@ -67,6 +67,36 @@ class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         )
 
 
+class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for CourseView"""
+    def setUp(self):
+        super(CourseViewTest, self).setUp()
+        self.url = reverse("discussion_course", kwargs={"course_id": unicode(self.course.id)})
+
+    def test_404(self):
+        response = self.client.get(
+            reverse("course_topics", kwargs={"course_id": "non/existent/course"})
+        )
+        self.assert_response_correct(
+            response,
+            404,
+            {"developer_message": "Not found."}
+        )
+
+    def test_get_success(self):
+        response = self.client.get(self.url)
+        self.assert_response_correct(
+            response,
+            200,
+            {
+                "id": unicode(self.course.id),
+                "blackouts": [],
+                "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
+                "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
+            }
+        )
+
+
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseTopicsView"""
     def setUp(self):
