@@ -9,6 +9,7 @@ successful completion of a course on EdX
 import logging
 
 from django.db import models
+from django.db import transaction
 from django.core.validators import RegexValidator
 from simple_history.models import HistoricalRecords
 
@@ -208,6 +209,26 @@ class CreditRequirement(TimeStampedModel):
         """
         cls.objects.filter(id__in=requirement_ids).update(active=False)
 
+    @classmethod
+    def get_course_requirement(cls, course_key, namespace, name):
+        """Get credit requirement of a given course.
+
+        Args:
+            course_key(CourseKey): The identifier for a course
+            namespace(str): Namespace of credit course requirements
+            name(str): Name of credit course requirement
+
+        Returns:
+            CreditRequirement object if exists
+
+        """
+        try:
+            return cls.objects.get(
+                course__course_key=course_key, active=True, namespace=namespace, name=name
+            )
+        except cls.DoesNotExist:
+            return None
+
 
 class CreditRequirementStatus(TimeStampedModel):
     """
@@ -257,13 +278,34 @@ class CreditRequirementStatus(TimeStampedModel):
         """
         return cls.objects.filter(requirement__in=requirements, username=username)
 
+    @classmethod
+    @transaction.commit_on_success
+    def add_or_update_requirement_status(cls, username, requirement, status="satisfied", reason=None):
+        """Add credit requirement status for given username.
+
+        Args:
+            username(str): Username of the user
+            requirement(CreditRequirement): 'CreditRequirement' object
+            status(str): Status of the requirement
+            reason(dict): Reason of the status
+
+        """
+        requirement_status, created = cls.objects.get_or_create(
+            username=username,
+            requirement=requirement,
+            defaults={"reason": reason, "status": status}
+        )
+        if not created:
+            requirement_status.status = status
+            requirement_status.reason = reason if reason else {}
+            requirement_status.save()
+
 
 class CreditEligibility(TimeStampedModel):
     """
     A record of a user's eligibility for credit from a specific credit
     provider for a specific course.
     """
-
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities")
     provider = models.ForeignKey(CreditProvider, related_name="eligibilities")

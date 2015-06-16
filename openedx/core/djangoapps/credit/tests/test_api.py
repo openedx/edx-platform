@@ -27,7 +27,12 @@ from openedx.core.djangoapps.credit.models import (
     CreditProvider,
     CreditRequirement,
     CreditRequirementStatus,
-    CreditEligibility,
+    CreditEligibility
+)
+from openedx.core.djangoapps.credit.api import (
+    set_credit_requirements,
+    set_credit_requirement_status,
+    get_credit_requirement
 )
 
 
@@ -214,6 +219,74 @@ class CreditRequirementApiTests(CreditApiTestBase):
 
         is_eligible = api.is_user_eligible_for_credit('abc', credit_course.course_key)
         self.assertFalse(is_eligible)
+
+    def test_get_credit_requirement(self):
+        self.add_credit_course()
+        requirements = [
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": 0.8
+                }
+            }
+        ]
+        requirement = get_credit_requirement(self.course_key, "grade", "grade")
+        self.assertIsNone(requirement)
+
+        expected_requirement = {
+            "course_key": self.course_key,
+            "namespace": "grade",
+            "name": "grade",
+            "display_name": "Grade",
+            "criteria": {
+                "min_grade": 0.8
+            }
+        }
+        set_credit_requirements(self.course_key, requirements)
+        requirement = get_credit_requirement(self.course_key, "grade", "grade")
+        self.assertIsNotNone(requirement)
+        self.assertEqual(requirement, expected_requirement)
+
+    def test_set_credit_requirement_status(self):
+        self.add_credit_course()
+        requirements = [
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": 0.8
+                }
+            },
+            {
+                "namespace": "reverification",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
+                "criteria": {}
+            }
+        ]
+
+        set_credit_requirements(self.course_key, requirements)
+        course_requirements = CreditRequirement.get_course_requirements(self.course_key)
+        self.assertEqual(len(course_requirements), 2)
+
+        requirement = get_credit_requirement(self.course_key, "grade", "grade")
+        set_credit_requirement_status("staff", requirement, 'satisfied', {})
+        course_requirement = CreditRequirement.get_course_requirement(
+            requirement['course_key'], requirement['namespace'], requirement['name']
+        )
+        status = CreditRequirementStatus.objects.get(username="staff", requirement=course_requirement)
+        self.assertEqual(status.requirement.namespace, requirement['namespace'])
+        self.assertEqual(status.status, "satisfied")
+
+        set_credit_requirement_status(
+            "staff", requirement, 'failed', {'failure_reason': "requirements not satisfied"}
+        )
+        status = CreditRequirementStatus.objects.get(username="staff", requirement=course_requirement)
+        self.assertEqual(status.requirement.namespace, requirement['namespace'])
+        self.assertEqual(status.status, "failed")
 
 
 @ddt.ddt
@@ -425,6 +498,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(requests, [])
 
     def _configure_credit(self):
+
         """
         Configure a credit course and its requirements.
 
