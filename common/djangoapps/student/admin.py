@@ -30,11 +30,16 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
 
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'name', 'gender', 'allow_certificate')
+    search_fields = ['user__username', 'user__email', 'cedula']
+
+class EnrollmentAdmin(admin.ModelAdmin):
+    search_fields = ['user__email', 'course_id']
+
 admin.site.register(UserProfile, UserProfileAdmin)
 
 admin.site.register(UserTestGroup)
 
-admin.site.register(CourseEnrollment)
+admin.site.register(CourseEnrollment, EnrollmentAdmin)
 
 admin.site.register(CourseEnrollmentAllowed)
 
