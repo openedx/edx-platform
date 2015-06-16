@@ -225,7 +225,7 @@ $light-border: 1px solid $gray-l5;
     color: $dark-gray1;
   }
 
-  ol.steps {
+  .steps {
     @extend %ui-no-list;
     border-top: $steps-border;
     border-bottom: $steps-border;
@@ -309,6 +309,13 @@ $light-border: 1px solid $gray-l5;
         color: $light-gray2;
       }
 
+      .course-display-name,
+      .course-display-dates {
+        @extend %t-title4;
+        display: block;
+        color: $dark-gray2;
+      }
+
       .course-registration-title,
       .course-dates-title {
         @extend %t-title6;
@@ -318,11 +325,8 @@ $light-border: 1px solid $gray-l5;
         color: $light-gray2;
       }
 
-      .course-display-name,
       .course-display-dates {
-        @extend %t-title4;
-        display: block;
-        color: $dark-gray2;
+        @include clearfix();
       }
 
       .course-title-info {
