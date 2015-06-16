@@ -35,6 +35,7 @@ class MineducMixin(RateLimitModelBackend):
         request = kwargs.pop('request', None)
         username = kwargs[self.username_key]
         if request is not None:
+            username = request.POST.get('email') and request.POST.get('email') or request.POST.get('username')
             counts = self.get_counters(request)
             if sum(counts.values()) >= self.requests:
                 logger.warning(
@@ -47,7 +48,6 @@ class MineducMixin(RateLimitModelBackend):
             warnings.warn(u"No request passed to the backend, unable to "
                           u"rate-limit. Username was '%s'" % username,
                           stacklevel=2)
-        username = request.POST.get('email') and request.POST.get('email') or request.POST.get('username')
         user = self.mineduc_authenticate(username, kwargs['password'])
         if user is None and request is not None:
             logger.info(
