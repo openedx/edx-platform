@@ -78,7 +78,7 @@
     </div>
     % endif
 
-    <section class="courses ${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
+    <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
       <ul class="courses-listing">
         %for course in courses:
         <li class="courses-listing-item">
@@ -86,7 +86,7 @@
         </li>
         %endfor
       </ul>
-    </section>
+    </div>
 
 
     % if course_discovery_enabled:
