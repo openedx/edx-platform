@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
     <form action="${action}" method="post">
         % for pk, pv in params.iteritems():
-            <input type="hidden" name="${pk}" value="${pv}" aria-hidden="true" />
+            <input type="hidden" name="${pk}" value="${pv}" />
         % endfor
 
         <button type="submit">${_('Payment')}<i class="icon fa fa-caret-right" aria-hidden="true"></i></button>
