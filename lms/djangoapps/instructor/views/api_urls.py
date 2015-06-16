@@ -132,4 +132,8 @@ urlpatterns = patterns(
     url(r'^enable_certificate_generation$',
         'instructor.views.api.enable_certificate_generation',
         name='enable_certificate_generation'),
+
+    url(r'^start_certificate_generation',
+        'instructor.views.api.start_certificate_generation',
+        name='start_certificate_generation'),
 )

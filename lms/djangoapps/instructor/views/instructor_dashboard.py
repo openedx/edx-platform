@@ -259,7 +259,15 @@ def _section_certificates(course):
             'enable_certificate_generation': reverse(
                 'enable_certificate_generation',
                 kwargs={'course_id': course.id}
-            )
+            ),
+            'start_certificate_generation': reverse(
+                'start_certificate_generation',
+                kwargs={'course_id': course.id}
+            ),
+            'list_instructor_tasks_url': reverse(
+                'list_instructor_tasks',
+                kwargs={'course_id': course.id}
+            ),
         }
     }
 

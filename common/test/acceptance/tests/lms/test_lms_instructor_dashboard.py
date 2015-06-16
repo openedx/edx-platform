@@ -4,6 +4,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 """
 
 from nose.plugins.attrib import attr
+from bok_choy.promise import EmptyPromise
 
 from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from ...pages.common.logout import LogoutPage
@@ -396,3 +397,46 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)
+
+
+@attr('shard_5')
+class CertificatesTest(BaseInstructorDashboardTest):
+    """
+    Tests for Certificates functionality on instructor dashboard.
+    """
+
+    def setUp(self):
+        super(CertificatesTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.certificates_section = instructor_dashboard_page.select_certificates()
+
+    def test_generate_certificates_buttons_is_visible(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Generate Certificates button is visible.
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            Then I see 'Generate Certificates' button
+            And when I click on 'Generate Certificates' button
+            Then I should see a status message and 'Generate Certificates' button should be disabled.
+        """
+        self.assertTrue(self.certificates_section.generate_certificates_button.visible)
+        self.certificates_section.generate_certificates_button.click()
+        alert = get_modal_alert(self.certificates_section.browser)
+        alert.accept()
+
+        self.certificates_section.wait_for_ajax()
+        EmptyPromise(
+            lambda: self.certificates_section.certificate_generation_status.visible,
+            'Certificate generation status shown'
+        ).fulfill()
+        disabled = self.certificates_section.generate_certificates_button.attrs('disabled')
+        self.assertEqual(disabled[0], 'true')
+
+    def test_pending_tasks_section_is_visible(self):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Pending Instructor Tasks section is visible.
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            Then I see 'Pending Instructor Tasks' section
+        """
+        self.assertTrue(self.certificates_section.pending_tasks_section.visible)
