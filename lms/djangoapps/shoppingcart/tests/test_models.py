@@ -19,6 +19,7 @@ from django.conf import settings
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -28,8 +29,8 @@ from shoppingcart.models import (
     InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
     Donation, OrderItemSubclassPK,
     Invoice, CourseRegistrationCodeInvoiceItem, InvoiceTransaction, InvoiceHistory,
-    RegistrationCodeRedemption
-)
+    RegistrationCodeRedemption,
+    Coupon, CouponRedemption)
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
@@ -465,11 +466,17 @@ class OrderItemTest(TestCase):
         self.assertEqual(item.get_list_price(), item.list_price)
 
 
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
+    """
+    Paid Course Registration Tests.
+    """
     def setUp(self):
         super(PaidCourseRegistrationTest, self).setUp()
 
         self.user = UserFactory.create()
+        self.user.set_password('password')
+        self.user.save()
         self.cost = 40
         self.course = CourseFactory.create()
         self.course_key = self.course.id
@@ -478,7 +485,19 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
                                       mode_display_name="honor cert",
                                       min_price=self.cost)
         self.course_mode.save()
+        self.percentage_discount = 20.0
         self.cart = Order.get_cart_for_user(self.user)
+
+    def test_get_total_amount_of_purchased_items(self):
+        """
+        Test to check the total amount of the
+        purchased items.
+        """
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.cart.purchase()
+
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key=self.course_key)
+        self.assertEqual(total_amount, 40.00)
 
     def test_add_to_order(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -496,6 +515,109 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         self.assertEqual(self.cart.total_cost, self.cost)
 
+    def test_order_generated_registration_codes(self):
+        """
+        Test to check for the order generated registration
+        codes.
+        """
+        self.cart.order_type = 'business'
+        self.cart.save()
+        item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        self.cart.purchase()
+        registration_codes = CourseRegistrationCode.order_generated_registration_codes(self.course_key)
+        self.assertEqual(registration_codes.count(), item.qty)
+
+    def add_coupon(self, course_key, is_active, code):
+        """
+        add dummy coupon into models
+        """
+        Coupon.objects.create(
+            code=code,
+            description='testing code',
+            course_id=course_key,
+            percentage_discount=self.percentage_discount,
+            created_by=self.user,
+            is_active=is_active
+        )
+
+    def login_user(self, username):
+        """
+        login the user to the platform.
+        """
+        self.client.login(username=username, password="password")
+
+    def test_get_top_discount_codes_used(self):
+        """
+        Test to check for the top coupon codes used.
+        """
+        self.login_user(self.user.username)
+        self.add_coupon(self.course_key, True, 'Ad123asd')
+        self.add_coupon(self.course_key, True, '32213asd')
+        self.purchases_using_coupon_codes()
+        top_discounted_codes = CouponRedemption.get_top_discount_codes_used(self.course_key)
+        self.assertTrue(top_discounted_codes[0]['coupon__code'], 'Ad123asd')
+        self.assertTrue(top_discounted_codes[0]['coupon__used_count'], 1)
+        self.assertTrue(top_discounted_codes[1]['coupon__code'], '32213asd')
+        self.assertTrue(top_discounted_codes[1]['coupon__used_count'], 2)
+
+    def test_get_total_coupon_code_purchases(self):
+        """
+        Test to assert the number of coupon code purchases.
+        """
+        self.login_user(self.user.username)
+        self.add_coupon(self.course_key, True, 'Ad123asd')
+        self.add_coupon(self.course_key, True, '32213asd')
+        self.purchases_using_coupon_codes()
+
+        total_coupon_code_purchases = CouponRedemption.get_total_coupon_code_purchases(self.course_key)
+        self.assertTrue(total_coupon_code_purchases['coupon__count'], 3)
+
+    def test_get_self_purchased_seat_count(self):
+        """
+        Test to assert the number of seats
+        purchased using individual purchases.
+        """
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.cart.purchase()
+
+        test_student = UserFactory.create()
+        test_student.set_password('password')
+        test_student.save()
+
+        self.cart = Order.get_cart_for_user(test_student)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.cart.purchase()
+
+        total_seats_count = PaidCourseRegistration.get_self_purchased_seat_count(course_key=self.course_key)
+        self.assertTrue(total_seats_count, 2)
+
+    def purchases_using_coupon_codes(self):
+        """
+        helper method that uses coupon codes when purchasing courses.
+        """
+        self.cart.order_type = 'business'
+        self.cart.save()
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'Ad123asd'})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase()
+
+        self.cart.clear()
+        self.cart = Order.get_cart_for_user(self.user)
+        self.cart.order_type = 'business'
+        self.cart.save()
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'Ad123asd'})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase()
+
+        self.cart.clear()
+        self.cart = Order.get_cart_for_user(self.user)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': '32213asd'})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase()
+
     def test_cart_type_business(self):
         self.cart.order_type = 'business'
         self.cart.save()
@@ -503,7 +625,8 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.cart.purchase()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
         # check that the registration codes are generated against the order
-        self.assertEqual(len(CourseRegistrationCode.objects.filter(order=self.cart)), item.qty)
+        registration_codes = CourseRegistrationCode.order_generated_registration_codes(self.course_key)
+        self.assertEqual(registration_codes.count(), item.qty)
 
     def test_regcode_redemptions(self):
         """
@@ -514,7 +637,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
         self.cart.purchase()
 
-        reg_code = CourseRegistrationCode.objects.filter(order=self.cart)[0]
+        reg_code = CourseRegistrationCode.order_generated_registration_codes(self.course_key)[0]
 
         enrollment = CourseEnrollment.enroll(self.user, self.course_key)
 
@@ -539,7 +662,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
         self.cart.purchase()
 
-        reg_codes = CourseRegistrationCode.objects.filter(order=self.cart)
+        reg_codes = CourseRegistrationCode.order_generated_registration_codes(self.course_key)
 
         self.assertEqual(len(reg_codes), 2)
 
@@ -1018,9 +1141,33 @@ class InvoiceHistoryTest(TestCase):
         super(InvoiceHistoryTest, self).setUp()
         invoice_data = copy.copy(self.INVOICE_INFO)
         invoice_data.update(self.CONTACT_INFO)
-        self.invoice = Invoice.objects.create(total_amount="123.45", **invoice_data)
         self.course_key = CourseLocator('edX', 'DemoX', 'Demo_Course')
+        self.invoice = Invoice.objects.create(total_amount="123.45", course_id=self.course_key, **invoice_data)
         self.user = UserFactory.create()
+
+    def test_get_invoice_total_amount(self):
+        """
+        test to check the total amount
+        of the invoices for the course.
+        """
+        total_amount = Invoice.get_invoice_total_amount_for_course(self.course_key)
+        self.assertEqual(total_amount, 123.45)
+
+    def test_get_total_amount_of_paid_invoices(self):
+        """
+        Test to check the Invoice Transactions amount.
+        """
+        InvoiceTransaction.objects.create(
+            invoice=self.invoice,
+            amount='123.45',
+            currency='usd',
+            comments='test comments',
+            status='completed',
+            created_by=self.user,
+            last_modified_by=self.user
+        )
+        total_amount_paid = InvoiceTransaction.get_total_amount_of_paid_course_invoices(self.course_key)
+        self.assertEqual(float(total_amount_paid), 123.45)
 
     def test_invoice_contact_info_history(self):
         self._assert_history_invoice_info(
@@ -1031,6 +1178,30 @@ class InvoiceHistoryTest(TestCase):
         self._assert_history_contact_info(**self.CONTACT_INFO)
         self._assert_history_items([])
         self._assert_history_transactions([])
+
+    def test_invoice_generated_registration_codes(self):
+        """
+        test filter out the registration codes
+        that were generated via Invoice.
+        """
+        invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.invoice,
+            qty=5,
+            unit_price='123.45',
+            course_id=self.course_key
+        )
+        for i in range(5):
+            CourseRegistrationCode.objects.create(
+                code='testcode{counter}'.format(counter=i),
+                course_id=self.course_key,
+                created_by=self.user,
+                invoice=self.invoice,
+                invoice_item=invoice_item,
+                mode_slug='honor'
+            )
+
+        registration_codes = CourseRegistrationCode.invoice_generated_registration_codes(self.course_key)
+        self.assertEqual(registration_codes.count(), 5)
 
     def test_invoice_history_items(self):
         # Create an invoice item

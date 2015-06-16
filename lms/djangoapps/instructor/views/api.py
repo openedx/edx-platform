@@ -1241,6 +1241,31 @@ def get_enrollment_report(request, course_id):
         })
 
 
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_finance_admin
+def get_exec_summary_report(request, course_id):
+    """
+    get the executive summary report for the particular course.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_executive_summary_report(request, course_key)
+        status_response = _("Your executive summary report is being created. "
+                            "To view the status of the report, see the 'Pending Instructor Tasks' section.")
+    except AlreadyRunningError:
+        status_response = _(
+            "An executive summary report is currently in progress. "
+            "To view the status of the report, see the 'Pending Instructor Tasks' section. "
+            "When completed, the report will be available for download in the table below. "
+            "You will be able to download the report when it is complete."
+        )
+    return JsonResponse({
+        "status": status_response
+    })
+
+
 def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table

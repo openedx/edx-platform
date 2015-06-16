@@ -36,22 +36,39 @@ var edx = edx || {};
             minDate: 0
         });
         var view = new edx.instructor_dashboard.ecommerce.ExpiryCouponView();
-        var request_response = $('.reports .request-response');
-        var request_response_error = $('.reports .request-response-error');
         $('input[name="user-enrollment-report"]').click(function(){
             var url = $(this).data('endpoint');
             $.ajax({
              dataType: "json",
              url: url,
              success: function (data) {
-                request_response.text(data['status']);
-                return $(".reports .msg-confirm").css({
+                $('#enrollment-report-request-response').text(data['status']);
+                return $("#enrollment-report-request-response").css({
                   "display": "block"
                 });
              },
              error: function(std_ajax_err) {
-                request_response_error.text(gettext('Error generating grades. Please try again.'));
-                return $(".reports .msg-error").css({
+                $('#enrollment-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
+                return $("#enrollment-report-request-response-error").css({
+                  "display": "block"
+                });
+             }
+           });
+        });
+        $('input[name="exec-summary-report"]').click(function(){
+            var url = $(this).data('endpoint');
+            $.ajax({
+             dataType: "json",
+             url: url,
+             success: function (data) {
+                $("#exec-summary-report-request-response").text(data['status']);
+                return $("#exec-summary-report-request-response").css({
+                  "display": "block"
+                });
+               },
+             error: function(std_ajax_err) {
+                $('#exec-summary-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
+                return $("#exec-summary-report-request-response-error").css({
                   "display": "block"
                 });
              }
