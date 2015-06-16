@@ -309,11 +309,16 @@ $light-border: 1px solid $gray-l5;
         color: $light-gray2;
       }
 
-      .course-display-name,
-      .course-display-dates {
-        @extend %t-title4;
-        display: block;
-        color: $dark-gray2;
+      .course-title-info {
+        display: inline-block;
+        width: 60%;
+      }
+
+      .course-meta-info {
+        @include float(right);
+        @include text-align(right);
+        display: inline-block;
+        width: 35%;
       }
 
       .course-registration-title,
@@ -325,20 +330,15 @@ $light-border: 1px solid $gray-l5;
         color: $light-gray2;
       }
 
+      .course-display-name,
+      .course-display-dates {
+        @extend %t-title4;
+        display: block;
+        color: $dark-gray2;
+      }
+
       .course-display-dates {
         @include clearfix();
-      }
-
-      .course-title-info {
-        display: inline-block;
-        width: 60%;
-      }
-
-      .course-meta-info {
-        @include float(right);
-        @include text-align(right);
-        display: inline-block;
-        width: 35%;
       }
 
       h1 {
@@ -907,6 +907,7 @@ $light-border: 1px solid $gray-l5;
       span {
         @include padding-left($baseline*3);
         text-transform: capitalize;
+        letter-spacing: 0;
 
         .blue-link {
           @extend %t-copy-sub1;
@@ -928,7 +929,7 @@ $light-border: 1px solid $gray-l5;
     color: $dark-gray1;
 
     h2 {
-      font-family: $sans-serif;
+      @extend %t-title5;
     }
   }
 
@@ -1033,7 +1034,7 @@ $light-border: 1px solid $gray-l5;
 
   h2 {
     @include text-align(center);
-    @extend %t-title4;
+    @extend %t-title5;
     @extend %t-strong;
     margin-top: $baseline;
     margin-bottom: ($baseline/4);
