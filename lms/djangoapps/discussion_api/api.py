@@ -185,7 +185,7 @@ def get_course_topics(request, course_key):
     }
 
 
-def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
+def get_thread_list(request, course_key, page, page_size, topic_id_list=None, text_search=None):
     """
     Return the list of all discussion threads pertaining to the given course
 
@@ -196,16 +196,30 @@ def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
     page: The page number (1-indexed) to retrieve
     page_size: The number of threads to retrieve per page
     topic_id_list: The list of topic_ids to get the discussion threads for
+    text_search A text search query string to match
+
+    Note that topic_id_list and text_search are mutually exclusive.
 
     Returns:
 
     A paginated result containing a list of threads; see
     discussion_api.views.ThreadViewSet for more detail.
+
+    Raises:
+
+    ValueError: if more than one of the mutually exclusive parameters is
+      provided
+    Http404: if the requesting user does not have access to the requested course
+      or a page beyond the last is requested
     """
+    exclusive_param_count = sum(1 for param in [topic_id_list, text_search] if param)
+    if exclusive_param_count > 1:  # pragma: no cover
+        raise ValueError("More than one mutually exclusive param passed to get_thread_list")
+
     course = _get_course_or_404(course_key, request.user)
     context = get_context(course, request)
     topic_ids_csv = ",".join(topic_id_list) if topic_id_list else None
-    threads, result_page, num_pages, _ = Thread.search({
+    threads, result_page, num_pages, text_search_rewrite = Thread.search({
         "course_id": unicode(course.id),
         "group_id": (
             None if context["is_requester_privileged"] else
@@ -216,6 +230,7 @@ def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
         "page": page,
         "per_page": page_size,
         "commentable_ids": topic_ids_csv,
+        "text": text_search,
     })
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
@@ -224,7 +239,9 @@ def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
         raise Http404
 
     results = [ThreadSerializer(thread, context=context).data for thread in threads]
-    return get_paginated_data(request, results, page, num_pages)
+    ret = get_paginated_data(request, results, page, num_pages)
+    ret["text_search_rewrite"] = text_search_rewrite
+    return ret
 
 
 def get_comment_list(request, thread_id, endorsed, page, page_size):

@@ -104,6 +104,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             multiple topic_id queries to retrieve threads from multiple topics
             at once.
 
+        * text_search: A search string to match. Any thread whose content
+            (including the bodies of comments in the thread) matches the search
+            string will be returned.
+
     **POST Parameters**:
 
         * course_id (required): The course to create the thread in
@@ -132,6 +136,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * next: The URL of the next page (or null if first page)
 
         * previous: The URL of the previous page (or null if last page)
+
+        * text_search_rewrite: The search string to which the text_search
+            parameter was rewritten in order to match threads (e.g. for spelling
+            correction)
 
     **POST/PATCH response values**:
 
@@ -184,6 +192,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["page"],
                 form.cleaned_data["page_size"],
                 form.cleaned_data["topic_id"],
+                form.cleaned_data["text_search"],
             )
         )
 

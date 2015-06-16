@@ -71,6 +71,20 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_get_threads_search_response(self, threads, rewrite):
+        """Register a mock response for GET on the CS thread search endpoint"""
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/search/threads",
+            body=json.dumps({
+                "collection": threads,
+                "page": 1,
+                "num_pages": 1,
+                "corrected_text": rewrite,
+            }),
+            status=200
+        )
+
     def register_post_thread_response(self, thread_data):
         """Register a mock response for POST on the CS commentable endpoint"""
         httpretty.register_uri(

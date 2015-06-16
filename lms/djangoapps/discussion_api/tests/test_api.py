@@ -404,7 +404,15 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.author = UserFactory.create()
         self.cohort = CohortFactory.create(course_id=self.course.id)
 
-    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None, topic_id_list=None):
+    def get_thread_list(
+            self,
+            threads,
+            page=1,
+            page_size=1,
+            num_pages=1,
+            course=None,
+            topic_id_list=None,
+    ):
         """
         Register the appropriate comments service response, then call
         get_thread_list and return the result.
@@ -435,6 +443,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": None,
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
 
@@ -569,6 +578,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": expected_threads,
                 "next": None,
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
 
@@ -603,6 +613,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": "http://testserver/test_path?page=2",
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
         self.assertEqual(
@@ -611,6 +622,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": "http://testserver/test_path?page=3",
                 "previous": "http://testserver/test_path?page=1",
+                "text_search_rewrite": None,
             }
         )
         self.assertEqual(
@@ -619,6 +631,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": None,
                 "previous": "http://testserver/test_path?page=2",
+                "text_search_rewrite": None,
             }
         )
 
@@ -626,6 +639,34 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.register_get_threads_response([], page=3, num_pages=3)
         with self.assertRaises(Http404):
             get_thread_list(self.request, self.course.id, page=4, page_size=10)
+
+    @ddt.data(None, "rewritten search string")
+    def test_text_search(self, text_search_rewrite):
+        self.register_get_threads_search_response([], text_search_rewrite)
+        self.assertEqual(
+            get_thread_list(
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=10,
+                text_search="test search string"
+            ),
+            {
+                "results": [],
+                "next": None,
+                "previous": None,
+                "text_search_rewrite": text_search_rewrite,
+            }
+        )
+        self.assert_last_query_params({
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "recursive": ["False"],
+            "text": ["test search string"],
+        })
 
 
 @ddt.ddt

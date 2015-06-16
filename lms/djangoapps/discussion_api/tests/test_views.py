@@ -182,6 +182,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "results": expected_threads,
                 "next": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
         self.assert_last_query_params({
@@ -212,6 +213,28 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "page": ["18"],
             "per_page": ["4"],
             "recursive": ["False"],
+        })
+
+    def test_text_search(self):
+        self.register_get_user_response(self.user)
+        self.register_get_threads_search_response([], None)
+        response = self.client.get(
+            self.url,
+            {"course_id": unicode(self.course.id), "text_search": "test search string"}
+        )
+        self.assert_response_correct(
+            response,
+            200,
+            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+        )
+        self.assert_last_query_params({
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "recursive": ["False"],
+            "text": ["test search string"],
         })
 
 
