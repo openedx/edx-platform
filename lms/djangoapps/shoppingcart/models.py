@@ -220,9 +220,8 @@ class Order(models.Model):
         Reset the items price state in the user cart
         """
         for item in self.orderitem_set.all():  # pylint: disable=no-member
-            if item.list_price:
+            if item.is_discounted:
                 item.unit_cost = item.list_price
-                item.list_price = None
                 item.save()
 
     def clear(self):
@@ -300,19 +299,12 @@ class Order(models.Model):
         """
         items_data = []
         for item in order_items:
-            if item.list_price is not None:
-                discount_price = item.list_price - item.unit_cost
-                price = item.list_price
-            else:
-                discount_price = 0
-                price = item.unit_cost
-
             item_total = item.qty * item.unit_cost
             items_data.append({
                 'item_description': item.pdf_receipt_display_name,
                 'quantity': item.qty,
-                'list_price': price,
-                'discount': discount_price,
+                'list_price': item.get_list_price(),
+                'discount': item.get_list_price() - item.unit_cost,
                 'item_total': item_total
             })
         pdf_buffer = BytesIO()
@@ -717,6 +709,23 @@ class OrderItem(TimeStampedModel):
         a pk of a subclass (inclusive) of OrderItem
         """
         return OrderItemSubclassPK(type(self), self.pk)
+
+    @property
+    def is_discounted(self):
+        """
+        Returns True if the item a discount coupon has been applied to the OrderItem and False otherwise.
+        Earlier, the OrderItems were stored with an empty list_price if a discount had not been applied.
+        Now we consider the item to be non discounted if list_price is None or list_price == unit_cost. In
+        these lines, an item is discounted if it's non-None and list_price and unit_cost mismatch.
+        This should work with both new and old records.
+        """
+        return self.list_price and self.list_price != self.unit_cost
+
+    def get_list_price(self):
+        """
+        Returns the unit_cost if no discount has been applied, or the list_price if it is defined.
+        """
+        return self.list_price if self.list_price else self.unit_cost
 
     @property
     def single_item_receipt_template(self):
@@ -1449,6 +1458,7 @@ class PaidCourseRegistration(OrderItem):
         item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
+        item.list_price = cost
         item.line_desc = _(u'Registration for Course: {course_name}').format(
             course_name=course.display_name_with_default)
         item.currency = currency
@@ -1602,6 +1612,7 @@ class CourseRegCodeItem(OrderItem):
         item.status = order.status
         item.mode = course_mode.slug
         item.unit_cost = cost
+        item.list_price = cost
         item.qty = qty
         item.line_desc = _(u'Enrollment codes for Course: {course_name}').format(
             course_name=course.display_name_with_default)
@@ -1803,6 +1814,7 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
+        item.list_price = cost
         course_name = modulestore().get_course(course_id).display_name
         # Translators: In this particular case, mode_name refers to a
         # particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)

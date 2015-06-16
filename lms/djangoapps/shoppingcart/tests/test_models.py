@@ -430,6 +430,40 @@ class OrderItemTest(TestCase):
         self.assertDictEqual({item.pk_with_subclass: set([])}, inst_dict)
         self.assertEquals(set([]), inst_set)
 
+    def test_is_discounted(self):
+        """
+        This tests the is_discounted property of the OrderItem
+        """
+        cart = Order.get_cart_for_user(self.user)
+        item = OrderItem(user=self.user, order=cart)
+
+        item.list_price = None
+        item.unit_cost = 100
+        self.assertFalse(item.is_discounted)
+
+        item.list_price = 100
+        item.unit_cost = 100
+        self.assertFalse(item.is_discounted)
+
+        item.list_price = 100
+        item.unit_cost = 90
+        self.assertTrue(item.is_discounted)
+
+    def test_get_list_price(self):
+        """
+        This tests the get_list_price() method of the OrderItem
+        """
+        cart = Order.get_cart_for_user(self.user)
+        item = OrderItem(user=self.user, order=cart)
+
+        item.list_price = None
+        item.unit_cost = 100
+        self.assertEqual(item.get_list_price(), item.unit_cost)
+
+        item.list_price = 200
+        item.unit_cost = 100
+        self.assertEqual(item.get_list_price(), item.list_price)
+
 
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def setUp(self):
