@@ -973,6 +973,24 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertNotIn(peer_grading_tab, course.tabs)
         self.assertNotIn(notes_tab, course.tabs)
 
+    def mark_wiki_as_hidden(self, tabs):
+        """ Mark the wiki tab as hidden. """
+        for tab in tabs:
+            if tab.type == 'wiki':
+                tab['is_hidden'] = True
+        return tabs
+
+    def test_advanced_components_munge_tabs_hidden_tabs(self):
+        updated_tabs = self.mark_wiki_as_hidden(self.course.tabs)
+        self.course.tabs = updated_tabs
+        modulestore().update_item(self.course, self.user.id)
+        self.client.ajax_post(self.course_setting_url, {
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+        })
+        course = modulestore().get_course(self.course.id)
+        notes_tab = {"type": "notes", "name": "My Notes"}
+        self.assertIn(notes_tab, course.tabs)
+
 
 class CourseGraderUpdatesTest(CourseTestCase):
     """

@@ -138,10 +138,8 @@ class CourseTab(object):
         # allow tabs without names; if a name is required, its presence was checked in the validator.
         name_is_eq = (other.get('name') is None or self.name == other['name'])
 
-        is_hidden_eq = self.is_hidden == other.get('is_hidden', False)
-
         # only compare the persisted/serialized members: 'type' and 'name'
-        return self.type == other.get('type') and name_is_eq and is_hidden_eq
+        return self.type == other.get('type') and name_is_eq
 
     def __ne__(self, other):
         """
