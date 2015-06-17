@@ -381,6 +381,37 @@ def mongo_uses_error_check(store):
 
 
 @contextmanager
+def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None, min_sends=None):
+    """
+    Instruments the given store to count the number of calls to find (incl find_one) and the number
+    of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
+    end of the with statement, it compares the counts to the bounds provided in the arguments.
+
+    :param max_finds: the maximum number of find calls expected
+    :param min_finds: the minimum number of find calls expected
+    :param max_sends: If non-none, make sure number of send calls are <=max_sends
+    :param min_sends: If non-none, make sure number of send calls are >=min_sends
+    """
+    with check_sum_of_calls(
+            pymongo.message,
+            ['query', 'get_more'],
+            max_finds,
+            min_finds,
+    ):
+        if max_sends is not None or min_sends is not None:
+            with check_sum_of_calls(
+                    pymongo.message,
+                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
+                    max_sends if max_sends is not None else float("inf"),
+                    min_sends if min_sends is not None else 0,
+            ):
+                yield
+        else:
+            yield
+
+
+@contextmanager
 def check_mongo_calls(num_finds=0, num_sends=None):
     """
     Instruments the given store to count the number of calls to find (incl find_one) and the number
@@ -391,24 +422,8 @@ def check_mongo_calls(num_finds=0, num_sends=None):
     :param num_sends: If none, don't instrument the send calls. If non-none, count and compare to
         the given int value.
     """
-    with check_sum_of_calls(
-            pymongo.message,
-            ['query', 'get_more'],
-            num_finds,
-            num_finds
-    ):
-        if num_sends is not None:
-            with check_sum_of_calls(
-                    pymongo.message,
-                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
-                    num_sends,
-                    num_sends
-            ):
-                yield
-        else:
-            yield
-
+    with check_mongo_calls_range(num_finds, num_finds, num_sends, num_sends):
+        yield
 
 # This dict represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
