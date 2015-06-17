@@ -1042,8 +1042,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
     def test_user_with_passing_existing_downloadable_cert(self):
-        # If user has already downloadable certificate then he can again re-generate the
-        # the cert.
+        # If user has already downloadable certificate
+        # then json will return cert generating message with bad request code
+
         GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
@@ -1051,30 +1052,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mode='verified'
         )
 
-        analytics_patcher = patch('courseware.views.analytics')
-        mock_tracker = analytics_patcher.start()
-        self.addCleanup(analytics_patcher.stop)
-
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
-            mock_send_to_queue.return_value = (0, "Successfully queued")
-            resp = self.client.post(self.url)
-            self.assertEqual(resp.status_code, 200)
-
-            #Verify Google Analytics event fired after generating certificate
-            mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
-                self.student.id,  # pylint: disable=no-member
-                'edx.bi.user.certificate.generate',
-                {
-                    'category': 'certificates',
-                    'label': unicode(self.course.id)
-                },
-
-                context={
-                    'Google Analytics':
-                    {'clientId': None}
-                }
-            )
-            mock_tracker.reset_mock()
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Certificate has already been created.", resp.content)
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return

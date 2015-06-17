@@ -262,16 +262,7 @@ class XQueueCertInterface(object):
             if forced_grade:
                 grade['grade'] = forced_grade
 
-            cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
-
-            if not created:
-                LOGGER.info(
-                    u"Regenerate certificate for user %s in course %s "
-                    u"with status %s, download_uuid %s, "
-                    u"and download_url %s",
-                    cert.user.id, unicode(cert.course_id),
-                    cert.status, cert.download_uuid, cert.download_url
-                )
+            cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
             cert.mode = cert_mode
             cert.user = student
