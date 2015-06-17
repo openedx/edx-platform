@@ -1,0 +1,3 @@
+<div>
+You're taking <a href="#"> <%= exam_display_name %> </a> exam as a proctored exam. Good Luck! <span id="time_remaining_id" class="pull-right">Time Remaining: <b></b></span>
+</div>
