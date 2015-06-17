@@ -1,9 +1,14 @@
 """
 URLs for the credit app.
 """
+from django.conf import settings
 from django.conf.urls import patterns, url
 
 from .views import create_credit_request, credit_provider_callback
+
+from openedx.core.djangoapps.credit.tests.fake_update_min_grade import(
+    UpdateMinGradeRequirementFakeView
+)
 
 urlpatterns = patterns(
     '',
@@ -20,3 +25,10 @@ urlpatterns = patterns(
         name="provider_callback"
     ),
 )
+
+if settings.FEATURES.get('ENABLE_MIN_GRADE_STATUS_UPDATE'):
+    urlpatterns += (url(
+        r'^check_grade',
+        UpdateMinGradeRequirementFakeView.as_view(),
+        name='UpdateMinRequirementFakeView'
+    ),)
