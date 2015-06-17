@@ -25,13 +25,13 @@ ${page_title_breadcrumbs(course_name())}
     <%static:include path="common/templates/${template_name}.underscore" />
 </script>
 % endfor
-
-% for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="search/${template_name}.underscore" />
-</script>
+% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="search/${template_name}.underscore" />
+    </script>
 % endfor
-
+% endif
 </%block>
 
 <%block name="headextra">
@@ -65,6 +65,9 @@ ${page_title_breadcrumbs(course_name())}
 
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
+  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    <%static:js group='courseware_search'/>
+  % endif
 
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:

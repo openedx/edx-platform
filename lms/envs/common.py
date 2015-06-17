@@ -1202,9 +1202,10 @@ courseware_js = (
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
-    ['js/search/course/main.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
+
+courseware_search_js = ['js/search/course/main.js']
 
 
 # Before a student accesses courseware, we do not
@@ -1235,9 +1236,9 @@ main_vendor_js = base_vendor_js + [
 ]
 
 dashboard_js = (
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js')) +
-    ['js/search/dashboard/main.js']
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
+dashboard_search_js = ['js/search/dashboard/main.js']
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 rwd_header_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/utils/rwd_header.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
@@ -1472,6 +1473,10 @@ PIPELINE_JS = {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
     },
+    'courseware_search': {
+        'source_filenames': courseware_search_js,
+        'output_filename': 'js/lms-courseware-search.js',
+    },
     'base_vendor': {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/lms-base-vendor.js',
@@ -1511,6 +1516,10 @@ PIPELINE_JS = {
     'dashboard': {
         'source_filenames': dashboard_js,
         'output_filename': 'js/dashboard.js'
+    },
+    'dashboard_search': {
+        'source_filenames': dashboard_search_js,
+        'output_filename': 'js/dashboard-search.js',
     },
     'rwd_header': {
         'source_filenames': rwd_header_js,
