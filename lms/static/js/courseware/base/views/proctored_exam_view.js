@@ -22,40 +22,20 @@ define([
             var html = this.template(this.model.toJSON());
             this.$el.html(html);
             this.$el.show();
+            this.updateRemainingTime(this);
             this.timerId = setInterval(this.updateRemainingTime, 1000, this);
             return this;
         },
+
         updateRemainingTime: function(self) {
-            //var remainingSeconds = self.model.get('time_remaining_seconds') - 1;
-            //self.model.set('time_remaining_seconds', remainingSeconds);
-            //var date = new Date();
-            //var hours = date.getHours();
-            //if (hours < 10) hours = '0'+hours;
-            //
-            //
-            //var minutes = date.getMinutes();
-            //if (minutes < 10) minutes = '0'+minutes;
-            //
-            //var seconds = date.getSeconds();
-            //if (seconds < 10) seconds = '0'+seconds;
-
-            var state = self.model.getRemainingTimeState(); // normal=blue/low=orange/critically_low=red.
-            switch (state) {
-                case 'normal':
-                    // make blue
-                    break;
-                case 'low':
-                    // make orange;
-                    break;
-                case 'criticallyLow':
-                    // make red;
-                    break;
-            }
+            self.$el.find('div.exam-timer').removeClass("low-time warning critical");
+            self.$el.find('div.exam-timer').addClass(self.model.getRemainingTimeState());
             self.$el.find('span#time_remaining_id b').html(self.model.getFormattedRemainingTime());
+            if (self.model.getRemainingSeconds()<=0) {
+                clearInterval(this.timerId); // stop the timer once the time finishes.
+            }
         }
-
     });
-
 });
 
 
