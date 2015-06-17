@@ -500,7 +500,6 @@ def render_html_view(request, user_id, course_id):
 
     # Translators: This line appears as a byline to a header image and describes the purpose of the page
     context['logo_subtitle'] = _("Certificate Validation")
-    context['logo_alt'] = context.get('platform_name')
     invalid_template_path = 'certificates/invalid.html'
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
