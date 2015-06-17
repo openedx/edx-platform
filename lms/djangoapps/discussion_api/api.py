@@ -368,6 +368,11 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                     context["cc_requester"].follow(cc_content)
                 else:
                     context["cc_requester"].unfollow(cc_content)
+            elif field == "abuse_flagged":
+                if form_value:
+                    cc_content.flagAbuse(context["cc_requester"], cc_content)
+                else:
+                    cc_content.unFlagAbuse(context["cc_requester"], cc_content, removeAll=False)
             else:
                 assert field == "voted"
                 if form_value:

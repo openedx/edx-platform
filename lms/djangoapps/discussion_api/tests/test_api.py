@@ -611,7 +611,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
                 "endorsed_comment_list_url": None,
                 "non_endorsed_comment_list_url": None,
-                "editable_fields": ["following", "voted"],
+                "editable_fields": ["abuse_flagged", "following", "voted"],
             },
             {
                 "id": "test_thread_id_1",
@@ -642,7 +642,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
-                "editable_fields": ["following", "voted"],
+                "editable_fields": ["abuse_flagged", "following", "voted"],
             },
         ]
         self.assertEqual(
@@ -970,7 +970,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 4,
                 "children": [],
-                "editable_fields": ["voted"],
+                "editable_fields": ["abuse_flagged", "voted"],
             },
             {
                 "id": "test_comment_2",
@@ -990,7 +990,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 7,
                 "children": [],
-                "editable_fields": ["voted"],
+                "editable_fields": ["abuse_flagged", "voted"],
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1210,7 +1210,7 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1277,6 +1277,18 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             cs_request.parsed_body,
             {"user_id": [str(self.user.id)], "value": ["up"]}
         )
+
+    def test_abuse_flagged(self):
+        self.register_post_thread_response({"id": "test_id"})
+        self.register_thread_flag_response("test_id")
+        data = self.minimal_data.copy()
+        data["abuse_flagged"] = "True"
+        result = create_thread(self.request, data)
+        self.assertEqual(result["abuse_flagged"], True)
+        cs_request = httpretty.last_request()
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/threads/test_id/abuse_flag")
+        self.assertEqual(cs_request.method, "PUT")
+        self.assertEqual(cs_request.parsed_body, {"user_id": [str(self.user.id)]})
 
     def test_course_id_missing(self):
         with self.assertRaises(ValidationError) as assertion:
@@ -1376,7 +1388,7 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["raw_body", "voted"]
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         expected_url = (
@@ -1430,6 +1442,18 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             cs_request.parsed_body,
             {"user_id": [str(self.user.id)], "value": ["up"]}
         )
+
+    def test_abuse_flagged(self):
+        self.register_post_comment_response({"id": "test_comment"}, "test_thread")
+        self.register_comment_flag_response("test_comment")
+        data = self.minimal_data.copy()
+        data["abuse_flagged"] = "True"
+        result = create_comment(self.request, data)
+        self.assertEqual(result["abuse_flagged"], True)
+        cs_request = httpretty.last_request()
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/abuse_flag")
+        self.assertEqual(cs_request.method, "PUT")
+        self.assertEqual(cs_request.parsed_body, {"user_id": [str(self.user.id)]})
 
     def test_thread_id_missing(self):
         with self.assertRaises(ValidationError) as assertion:
@@ -1590,7 +1614,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1770,6 +1794,41 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
 
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    def test_abuse_flagged(self, old_flagged, new_flagged):
+        """
+        Test attempts to edit the "abuse_flagged" field.
+
+        old_flagged indicates whether the thread should be flagged at the start
+        of the test. new_flagged indicates the value for the "abuse_flagged"
+        field in the update. If old_flagged and new_flagged are the same, no
+        update should be made. Otherwise, a PUT should be made to the flag or
+        or unflag endpoint according to the new_flagged value.
+        """
+        self.register_get_user_response(self.user)
+        self.register_thread_flag_response("test_thread")
+        self.register_thread({"abuse_flaggers": [str(self.user.id)] if old_flagged else []})
+        data = {"abuse_flagged": new_flagged}
+        result = update_thread(self.request, "test_thread", data)
+        self.assertEqual(result["abuse_flagged"], new_flagged)
+        last_request_path = urlparse(httpretty.last_request().path).path
+        flag_url = "/api/v1/threads/test_thread/abuse_flag"
+        unflag_url = "/api/v1/threads/test_thread/abuse_unflag"
+        if old_flagged == new_flagged:
+            self.assertNotEqual(last_request_path, flag_url)
+            self.assertNotEqual(last_request_path, unflag_url)
+        else:
+            self.assertEqual(
+                last_request_path,
+                flag_url if new_flagged else unflag_url
+            )
+            self.assertEqual(httpretty.last_request().method, "PUT")
+            self.assertEqual(
+                httpretty.last_request().parsed_body,
+                {"user_id": [str(self.user.id)]}
+            )
+
     def test_invalid_field(self):
         self.register_thread()
         with self.assertRaises(ValidationError) as assertion:
@@ -1852,7 +1911,7 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["raw_body", "voted"]
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -2037,6 +2096,41 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             if new_voted:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    def test_abuse_flagged(self, old_flagged, new_flagged):
+        """
+        Test attempts to edit the "abuse_flagged" field.
+
+        old_flagged indicates whether the comment should be flagged at the start
+        of the test. new_flagged indicates the value for the "abuse_flagged"
+        field in the update. If old_flagged and new_flagged are the same, no
+        update should be made. Otherwise, a PUT should be made to the flag or
+        or unflag endpoint according to the new_flagged value.
+        """
+        self.register_get_user_response(self.user)
+        self.register_comment_flag_response("test_comment")
+        self.register_comment({"abuse_flaggers": [str(self.user.id)] if old_flagged else []})
+        data = {"abuse_flagged": new_flagged}
+        result = update_comment(self.request, "test_comment", data)
+        self.assertEqual(result["abuse_flagged"], new_flagged)
+        last_request_path = urlparse(httpretty.last_request().path).path
+        flag_url = "/api/v1/comments/test_comment/abuse_flag"
+        unflag_url = "/api/v1/comments/test_comment/abuse_unflag"
+        if old_flagged == new_flagged:
+            self.assertNotEqual(last_request_path, flag_url)
+            self.assertNotEqual(last_request_path, unflag_url)
+        else:
+            self.assertEqual(
+                last_request_path,
+                flag_url if new_flagged else unflag_url
+            )
+            self.assertEqual(httpretty.last_request().method, "PUT")
+            self.assertEqual(
+                httpretty.last_request().parsed_body,
+                {"user_id": [str(self.user.id)]}
+            )
 
 
 @ddt.ddt
