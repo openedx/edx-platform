@@ -142,8 +142,11 @@
          * - "closure": Uses Google's Closure Compiler in simple optimization
          * mode to minify the code. Only available if REQUIRE_ENVIRONMENT is "rhino" (the default).
          * - "none": No minification will be done.
+         *
+         * Note: the Studio pipeline now uses UglifyJS2 for all JavaScript files,
+         * so it is no longer necessary to do it here as well.
          */
-        optimize: 'uglify2',
+        optimize: 'none',
         /**
          * Sets the logging level. It is a number:
          * TRACE: 0,

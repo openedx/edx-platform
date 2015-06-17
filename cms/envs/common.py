@@ -537,23 +537,23 @@ PIPELINE_COMPILERS = (
 )
 
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
+
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
-    "*.pyc"
-    # it would be nice if we could do, for example, "**/*.scss",
-    # but these strings get passed down to the `fnmatch` module,
-    # which doesn't support that. :(
-    # http://docs.python.org/2/library/fnmatch.html
-    "sass/*.scss",
-    "sass/*/*.scss",
-    "sass/*/*/*.scss",
-    "sass/*/*/*/*.scss",
-    "coffee/*.coffee",
-    "coffee/*/*.coffee",
-    "coffee/*/*/*.coffee",
-    "coffee/*/*/*/*.coffee",
+    "*.pyc",
+    "*.scss",
+    "*.coffee",
+
+    # Filter out templates
+    "templates",
+    "*.underscore",
+
+    # Filter out tests
+    "spec",
+    "fixtures",
 
     # Symlinks used by js-test-tool
     "xmodule_js",
