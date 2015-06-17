@@ -231,9 +231,9 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             course_overview_2 = CourseOverview.get_from_id(course.id)
             self.assertFalse(course_overview_2.mobile_available)
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 1), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1), (ModuleStoreEnum.Type.split, 3))
     @ddt.unpack
-    def test_course_overview_caching(self, modulestore_type, min_mongo_calls, max_mongo_calls):
+    def test_course_overview_caching(self, modulestore_type, expected_num_mongo_calls):
         """
         Tests that CourseOverview structures are actually getting cached.
         """
@@ -247,7 +247,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
         # The first time we load a CourseOverview, it will be a cache miss, so
         # we expect the modulestore to be queried.
-        with check_mongo_calls_range(max_finds=max_mongo_calls, min_finds=min_mongo_calls):
+        with check_mongo_calls_range(expected_num_mongo_calls):
             _course_overview_1 = CourseOverview.get_from_id(course.id)
 
         # The second time we load a CourseOverview, it will be a cache hit, so
