@@ -151,6 +151,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
 
     def test_basic(self):
         thread = {
+            "type": "thread",
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
@@ -196,6 +197,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "voted"],
         }
         self.assertEqual(self.serialize(thread), expected)
 
@@ -259,6 +261,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         comment = {
+            "type": "comment",
             "id": "test_comment",
             "thread_id": "test_thread",
             "user_id": str(self.author.id),
@@ -291,6 +294,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 4,
             "children": [],
+            "editable_fields": ["voted"],
         }
         self.assertEqual(self.serialize(comment), expected)
 

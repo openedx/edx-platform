@@ -273,6 +273,7 @@ def make_minimal_cs_thread(overrides=None):
     comments service with dummy data and optional overrides
     """
     ret = {
+        "type": "thread",
         "id": "dummy",
         "course_id": "dummy/dummy/dummy",
         "commentable_id": "dummy",
@@ -305,6 +306,7 @@ def make_minimal_cs_comment(overrides=None):
     comments service with dummy data and optional overrides
     """
     ret = {
+        "type": "comment",
         "id": "dummy",
         "thread_id": "dummy",
         "parent_id": None,

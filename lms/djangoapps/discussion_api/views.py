@@ -203,6 +203,9 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             that were created or updated since the last time the user read
             the thread
 
+        * editable_fields: The fields that the requesting user is allowed to
+            modify with a PATCH request
+
     **DELETE response values:
 
         No content is returned for a DELETE request
@@ -351,6 +354,9 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * vote_count: The number of votes for the comment
 
         * children: The list of child comments (with the same format)
+
+        * editable_fields: The fields that the requesting user is allowed to
+            modify with a PATCH request
 
     **DELETE Response Value**
 

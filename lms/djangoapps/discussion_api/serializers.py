@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 
 from rest_framework import serializers
 
+from discussion_api.permissions import get_editable_fields
 from discussion_api.render import render_body
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -70,6 +71,7 @@ class _ContentSerializer(serializers.Serializer):
     abuse_flagged = serializers.SerializerMethodField("get_abuse_flagged")
     voted = serializers.SerializerMethodField("get_voted")
     vote_count = serializers.SerializerMethodField("get_vote_count")
+    editable_fields = serializers.SerializerMethodField("get_editable_fields")
 
     non_updatable_fields = ()
 
@@ -145,6 +147,10 @@ class _ContentSerializer(serializers.Serializer):
     def get_vote_count(self, obj):
         """Returns the number of votes for the content."""
         return obj["votes"]["up_count"]
+
+    def get_editable_fields(self, obj):
+        """Return the list of the fields the requester can edit"""
+        return sorted(get_editable_fields(obj, self.context))
 
 
 class ThreadSerializer(_ContentSerializer):

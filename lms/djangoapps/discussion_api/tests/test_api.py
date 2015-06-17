@@ -541,6 +541,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
     def test_thread_content(self):
         source_threads = [
             {
+                "type": "thread",
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
@@ -562,6 +563,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "unread_comments_count": 3,
             },
             {
+                "type": "thread",
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_y",
@@ -609,6 +611,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
                 "endorsed_comment_list_url": None,
                 "non_endorsed_comment_list_url": None,
+                "editable_fields": ["following", "voted"],
             },
             {
                 "id": "test_thread_id_1",
@@ -639,6 +642,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
+                "editable_fields": ["following", "voted"],
             },
         ]
         self.assertEqual(
@@ -915,6 +919,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     def test_discussion_content(self):
         source_comments = [
             {
+                "type": "comment",
                 "id": "test_comment_1",
                 "thread_id": "test_thread",
                 "user_id": str(self.author.id),
@@ -930,6 +935,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "children": [],
             },
             {
+                "type": "comment",
                 "id": "test_comment_2",
                 "thread_id": "test_thread",
                 "user_id": str(self.author.id),
@@ -964,6 +970,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 4,
                 "children": [],
+                "editable_fields": ["voted"],
             },
             {
                 "id": "test_comment_2",
@@ -983,6 +990,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 7,
                 "children": [],
+                "editable_fields": ["voted"],
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1202,6 +1210,7 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1367,6 +1376,7 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "voted": False,
             "vote_count": 0,
             "children": [],
+            "editable_fields": ["raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         expected_url = (
@@ -1535,7 +1545,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "user_id": str(self.user.id),
             "created_at": "2015-05-29T00:00:00Z",
             "updated_at": "2015-05-29T00:00:00Z",
-            "type": "discussion",
+            "thread_type": "discussion",
             "title": "Original Title",
             "body": "Original body",
         })
@@ -1580,6 +1590,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1841,6 +1852,7 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "voted": False,
             "vote_count": 0,
             "children": [],
+            "editable_fields": ["raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1959,19 +1971,24 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             FORUM_ROLE_STUDENT,
         ],
         [True, False],
+        ["question", "discussion"],
         [True, False],
     ))
     @ddt.unpack
-    def test_endorsed_access(self, role_name, is_thread_author, is_comment_author):
+    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
         role.users = [self.user]
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
             thread_overrides={
-                "user_id": str(self.user.id if is_thread_author else (self.user.id + 1))
+                "thread_type": thread_type,
+                "user_id": str(self.user.id if is_thread_author else (self.user.id + 1)),
             }
         )
-        expected_error = role_name == FORUM_ROLE_STUDENT and not is_thread_author
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            (thread_type == "discussion" or not is_thread_author)
+        )
         try:
             update_comment(self.request, "test_comment", {"endorsed": True})
             self.assertFalse(expected_error)
