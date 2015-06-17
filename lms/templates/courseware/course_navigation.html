@@ -1,4 +1,5 @@
 ## mako
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from courseware.tabs import get_course_tab_list
@@ -30,6 +31,11 @@ staff_selected = selected(not masquerade or masquerade.role != "student")
 specific_student_selected = selected(not staff_selected and masquerade.user_name)
 student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
 %>
+% for template_name in ["proctored_exams_status"]:
+  <script type="text/template" id="${template_name}-tpl">
+      <%static:include path="courseware/${template_name}.underscore" />
+  </script>
+% endfor
 <div class="proctored_exam_status"></div>
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
