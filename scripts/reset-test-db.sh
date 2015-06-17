@@ -39,6 +39,7 @@ if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_data.jso
 
     # Re-run migrations to ensure we are up-to-date
     ./manage.py lms --settings bok_choy migrate --traceback --noinput
+    ./manage.py cms --settings bok_choy migrate --traceback --noinput
 
 # Otherwise, update the test database and update the cache
 else
@@ -48,7 +49,9 @@ else
 
     # Re-run migrations on the test database
     ./manage.py lms --settings bok_choy syncdb --traceback --noinput
+    ./manage.py cms --settings bok_choy syncdb --traceback --noinput
     ./manage.py lms --settings bok_choy migrate --traceback --noinput
+    ./manage.py cms --settings bok_choy migrate --traceback --noinput
 
     # Dump the schema and data to the cache
     ./manage.py lms --settings bok_choy dumpdata > $DB_CACHE_DIR/bok_choy_data.json

@@ -13,6 +13,7 @@ class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
+        super(TestAnalyticsDistributions, self).setUp()
         self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
 
         self.users = [UserFactory(
@@ -75,6 +76,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
+        super(TestAnalyticsDistributionsNoData, self).setUp()
         self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
 
         self.users = [UserFactory(

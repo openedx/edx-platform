@@ -4,30 +4,24 @@ Additionally tests that bulk email is always disabled for
 non-Mongo backed courses, regardless of email feature flag, and
 that the view is conditionally available when Course Auth is turned on.
 """
-
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
-
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
-
 from mock import patch
-
-from bulk_email.models import CourseAuthorization
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from bulk_email.models import CourseAuthorization
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
+from student.tests.factories import AdminFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+
 class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
     for Mongo-backed courses
     """
     def setUp(self):
+        super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()
         self.course = CourseFactory.create()
 
         # Create instructor account
@@ -38,12 +32,6 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # URL for email view
         self.email_link = '<a href="#" class="instructor-dashboard-link" data-section="send_email">Email</a>'
-
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
 
     # In order for bulk email to work, we must have both the ENABLE_INSTRUCTOR_EMAIL_FLAG
     # set to True and for the course to be Mongo-backed.
@@ -110,12 +98,15 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.assertFalse(self.email_link in response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
     """
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
+        super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # Create instructor account

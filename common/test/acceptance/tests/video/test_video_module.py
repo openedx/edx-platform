@@ -14,6 +14,8 @@ from ...pages.lms.course_info import CourseInfoPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import skip_if_browser
 
+from flaky import flaky
+
 
 VIDEO_SOURCE_PORT = 8777
 
@@ -232,13 +234,13 @@ class YouTubeVideoTest(VideoBaseTest):
         Then I see the correct english text in the captions
         """
         self._install_course_fixture()
-        self.course_fixture.add_asset(['subs_OEoXaMPEzfM.srt.sjson'])
+        self.course_fixture.add_asset(['subs_3_yD_cEKoCk.srt.sjson'])
         self.course_fixture._upload_assets()
         self._navigate_to_courseware_video_and_render()
         self.video.show_captions()
 
-        # Verify that we see "Hi, welcome to Edx." text in the captions
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        # Verify that we see "Welcome to edX." text in the captions
+        self.assertIn('Welcome to edX.', self.video.captions_text)
 
     def test_cc_button_hidden_no_translations(self):
         """
@@ -294,18 +296,18 @@ class YouTubeVideoTest(VideoBaseTest):
         And I see the correct non-english text in the captions
         And the non-english transcript downloads correctly
         """
-        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
-        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': 'OEoXaMPEzfM'}
+        self.assets.extend(['chinese_transcripts.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
+        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': '3_yD_cEKoCk'}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
         # go to video
         self.navigate_to_video()
 
-        # check if "Hi, welcome to Edx." text in the captions
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        # check if "Welcome to edX." text in the captions
+        self.assertIn('Welcome to edX.', self.video.captions_text)
 
-        # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
-        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
+        # check if we can download transcript in "srt" format that has text "Welcome to edX."
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Welcome to edX.'))
 
         # select language with code "zh"
         self.assertTrue(self.video.select_language('zh'))
@@ -328,8 +330,8 @@ class YouTubeVideoTest(VideoBaseTest):
         Then the video with the transcript enabled is aligned correctly
         And the video with the transcript hidden is aligned correctly
         """
-        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
-        data = {'sub': 'OEoXaMPEzfM'}
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+        data = {'sub': '3_yD_cEKoCk'}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
         # go to video
@@ -411,9 +413,9 @@ class YouTubeVideoTest(VideoBaseTest):
         And the Download Transcript menu does not exist for Video C
         """
 
-        data_a = {'sub': 'OEoXaMPEzfM', 'download_track': True}
+        data_a = {'sub': '3_yD_cEKoCk', 'download_track': True}
         youtube_a_metadata = self.metadata_for_mode('youtube', additional_data=data_a)
-        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
 
         data_b = {'youtube_id_1_0': 'b7xgknqkQk8', 'sub': 'b7xgknqkQk8', 'download_track': True}
         youtube_b_metadata = self.metadata_for_mode('youtube', additional_data=data_b)
@@ -431,14 +433,14 @@ class YouTubeVideoTest(VideoBaseTest):
         # open the section with videos (open video "A")
         self.navigate_to_video()
 
-        # check if we can download transcript in "srt" format that has text "00:00:00,270"
-        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', '00:00:00,270'))
+        # check if we can download transcript in "srt" format that has text "00:00:00,260"
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', '00:00:00,260'))
 
         # select the transcript format "txt"
         self.assertTrue(self.video.select_transcript_format('txt'))
 
-        # check if we can download transcript in "txt" format that has text "Hi, welcome to Edx."
-        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Hi, welcome to Edx.'))
+        # check if we can download transcript in "txt" format that has text "Welcome to edX."
+        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Welcome to edX.'))
 
         # open video "B"
         self.course_nav.go_to_sequential('B')
@@ -469,10 +471,10 @@ class YouTubeVideoTest(VideoBaseTest):
         And I select language with code "zh"
         Then I see "好 各位同学" text in the captions
         And I select language with code "en"
-        Then I see "Hi, welcome to Edx." text in the captions
+        Then I see "Welcome to edX." text in the captions
         """
-        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
-        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': 'OEoXaMPEzfM'}
+        self.assets.extend(['chinese_transcripts.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
+        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': '3_yD_cEKoCk'}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
         # go to video
@@ -489,7 +491,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self._verify_caption_text(unicode_text)
 
         self.video.select_language('en')
-        self._verify_caption_text('Hi, welcome to Edx.')
+        self._verify_caption_text('Welcome to edX.')
 
     def test_multiple_videos_in_sequentials_load_and_work(self):
         """
@@ -592,15 +594,15 @@ class YouTubeVideoTest(VideoBaseTest):
         Given it has a video in "Youtube" mode
         And I have uploaded multiple transcripts
         And I make sure captions are opened
-        Then I see "Hi, welcome to Edx." text in the captions
+        Then I see "Welcome to edX." text in the captions
         And I select the "1.50" speed
         And I reload the page with video
-        Then I see "Hi, welcome to Edx." text in the captions
+        Then I see "Welcome to edX." text in the captions
         And I see duration "1:56"
 
         """
-        self.assets.extend(['subs_OEoXaMPEzfM.srt.sjson', 'subs_b7xgknqkQk8.srt.sjson'])
-        data = {'sub': 'OEoXaMPEzfM', 'youtube_id_1_5': 'b7xgknqkQk8'}
+        self.assets.extend(['subs_3_yD_cEKoCk.srt.sjson', 'subs_b7xgknqkQk8.srt.sjson'])
+        data = {'sub': '3_yD_cEKoCk', 'youtube_id_1_5': 'b7xgknqkQk8'}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
         # go to video
@@ -608,13 +610,13 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.video.show_captions()
 
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        self.assertIn('Welcome to edX.', self.video.captions_text)
 
         self.video.speed = '1.50'
 
         self.video.reload_page()
 
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        self.assertIn('Welcome to edX.', self.video.captions_text)
 
         self.assertTrue(self.video.duration, '1.56')
 
@@ -677,6 +679,36 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertGreaterEqual(self.video.seconds, 10)
 
+    def test_simplified_and_traditional_chinese_transcripts(self):
+        """
+        Scenario: Simplified and Traditional Chinese transcripts work as expected in Youtube mode
+
+        Given the course has a Video component in "Youtube" mode
+        And I have defined a Simplified Chinese transcript for the video
+        And I have defined a Traditional Chinese transcript for the video
+        Then I see the correct subtitle language options in cc menu
+        Then I see the correct text in the captions for Simplified and Traditional Chinese transcripts
+        And I can download the transcripts for Simplified and Traditional Chinese
+        And video subtitle menu has 'zh_HANS', 'zh_HANT' translations for 'Simplified Chinese'
+        and 'Traditional Chinese' respectively
+        """
+        data = {
+            'download_track': True,
+            'transcripts': {'zh_HANS': 'simplified_chinese.srt', 'zh_HANT': 'traditional_chinese.srt'}
+        }
+        self.metadata = self.metadata_for_mode('youtube', data)
+        self.assets.extend(['simplified_chinese.srt', 'traditional_chinese.srt'])
+        self.navigate_to_video()
+
+        langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
+        for lang_code, text in langs.items():
+            self.assertTrue(self.video.select_language(lang_code))
+            unicode_text = text.decode('utf-8')
+            self.assertIn(unicode_text, self.video.captions_text)
+            self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
+
+        self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
+
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
@@ -684,6 +716,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
     def setUp(self):
         super(YouTubeHtml5VideoTest, self).setUp()
 
+    @flaky  # TODO fix this, see TNL-1642
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode
@@ -773,18 +806,18 @@ class Html5VideoTest(VideoBaseTest):
         And I see the correct non-english text in the captions
         And the non-english transcript downloads correctly
         """
-        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
-        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': 'OEoXaMPEzfM'}
+        self.assets.extend(['chinese_transcripts.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
+        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': '3_yD_cEKoCk'}
         self.metadata = self.metadata_for_mode('html5', additional_data=data)
 
         # go to video
         self.navigate_to_video()
 
-        # check if "Hi, welcome to Edx." text in the captions
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+        # check if "Welcome to edX." text in the captions
+        self.assertIn('Welcome to edX.', self.video.captions_text)
 
-        # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
-        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Hi, welcome to Edx.'))
+        # check if we can download transcript in "srt" format that has text "Welcome to edX."
+        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Welcome to edX.'))
 
         # select language with code "zh"
         self.assertTrue(self.video.select_language('zh'))
@@ -808,8 +841,8 @@ class Html5VideoTest(VideoBaseTest):
         And I view the video at fullscreen
         Then the video with the transcript enabled is aligned correctly
         """
-        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
-        data = {'sub': 'OEoXaMPEzfM'}
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+        data = {'sub': '3_yD_cEKoCk'}
         self.metadata = self.metadata_for_mode('html5', additional_data=data)
 
         # go to video
@@ -832,8 +865,8 @@ class Html5VideoTest(VideoBaseTest):
         And I have uploaded an english transcript file to assets
         Then I see the correct text in the captions
         """
-        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
-        data = {'sub': 'OEoXaMPEzfM'}
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+        data = {'sub': '3_yD_cEKoCk'}
         self.metadata = self.metadata_for_mode('html5', additional_data=data)
 
         # go to video
@@ -842,8 +875,8 @@ class Html5VideoTest(VideoBaseTest):
         # make sure captions are opened
         self.video.show_captions()
 
-        # check if we see "Hi, welcome to Edx." text in the captions
-        self.assertIn("Hi, welcome to Edx.", self.video.captions_text)
+        # check if we see "Welcome to edX." text in the captions
+        self.assertIn("Welcome to edX.", self.video.captions_text)
 
     def test_cc_button_wo_english_transcript(self):
         """

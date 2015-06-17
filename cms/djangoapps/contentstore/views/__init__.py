@@ -1,4 +1,4 @@
-# pylint: disable=W0401, W0511
+# pylint: disable=wildcard-import, fixme
 
 "All view functions for contentstore, broken out into submodules"
 
@@ -11,15 +11,18 @@ from .utilities.captions import *
 from .utilities.bulksettings import *
 from .component import *
 from .course import *
+from .entrance_exam import *
 from .error import *
 from .helpers import *
 from .item import *
 from .import_export import *
+from .library import *
 from .preview import *
 from .public import *
 from .export_git import *
 from .user import *
 from .tabs import *
+from .videos import *
 from .transcripts_ajax import *
 try:
     from .dev import *

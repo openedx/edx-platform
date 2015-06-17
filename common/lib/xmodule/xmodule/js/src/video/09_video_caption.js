@@ -107,8 +107,8 @@ function (Sjson, AsyncProcess) {
 
             if (this.showLanguageMenu) {
                 this.container.on({
-                    mouseenter: this.onContainerMouseEnter,
-                    mouseleave: this.onContainerMouseLeave
+                    mouseenter: this.onContainerMouseEnter.bind(this),
+                    mouseleave: this.onContainerMouseLeave.bind(this)
                 });
             }
 
@@ -130,6 +130,7 @@ function (Sjson, AsyncProcess) {
             }
         },
 
+
         /**
         * @desc Opens language menu.
         *
@@ -137,7 +138,7 @@ function (Sjson, AsyncProcess) {
         */
         onContainerMouseEnter: function (event) {
             event.preventDefault();
-
+            this.state.videoPlayer.log('video_show_cc_menu', {});
             $(event.currentTarget).addClass('is-opened');
         },
 
@@ -148,7 +149,7 @@ function (Sjson, AsyncProcess) {
         */
         onContainerMouseLeave: function (event) {
             event.preventDefault();
-
+            this.state.videoPlayer.log('video_hide_cc_menu', {});
             $(event.currentTarget).removeClass('is-opened');
         },
 

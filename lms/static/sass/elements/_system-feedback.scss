@@ -52,7 +52,8 @@
       width: flex-grid(10,12);
     }
 
-    .nav-actions {
+    .nav-actions,
+    .msg-actions {
       width: flex-grid(2,12);
       display: inline-block;
       vertical-align: middle;
@@ -118,6 +119,10 @@
 
   &.alert {
     border-top: 3px solid $alert-color;
+  }
+
+  &.error {
+    border-top: 3px solid $error-color;
   }
 
   &.warning {

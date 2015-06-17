@@ -14,22 +14,26 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from util.testing import UrlResetMixin
 
 from student.models import Registration, UserProfile
 from cme_registration.models import CmeUserProfile
 from student.tests.factories import UserFactory
 from cme_registration.views import DENIED_COUNTRIES, validate_export_controls, setup_sub_affiliation_field
+
 TEST_FEATURES = settings.FEATURES.copy()
 TEST_FEATURES['USE_CME_REGISTRATION'] = True
 
 
 @override_settings(FEATURES=TEST_FEATURES)
-class TestCmeRegistration(TestCase):
+class TestCmeRegistration(UrlResetMixin, TestCase):
     """
     Check registration using CME registration functionality
     """
 
     def setUp(self):
+        TEST_FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = False
+        super(TestCmeRegistration, self).setUp('lms.urls')
 
         self.post_vars = {'username': 'testuser',
                           'email': 'test@email.com',

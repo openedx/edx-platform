@@ -11,10 +11,8 @@ from django.utils.translation import ugettext as _
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
-from xmodule.modulestore.django import ModuleI18nService
 
 from courseware.access import has_access
-from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 
@@ -57,15 +55,25 @@ class MockStaffGradingService(object):
 
     def get_problem_list(self, course_id, grader_id):
         self.cnt += 1
-        return {'success': True,
-                 'problem_list': [
-                     json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
-                                 'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
-                                 'min_for_ml': 10}),
-                     json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-                                 'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
-                                 'min_for_ml': 10})
-                 ]}
+        return {
+            'success': True,
+            'problem_list': [
+                json.dumps({
+                    'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
+                    'problem_name': "Problem 1",
+                    'num_graded': 3,
+                    'num_pending': 5,
+                    'min_for_ml': 10,
+                }),
+                json.dumps({
+                    'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
+                    'problem_name': "Problem 2",
+                    'num_graded': 1,
+                    'num_pending': 5,
+                    'min_for_ml': 10,
+                }),
+            ],
+        }
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
@@ -80,17 +88,7 @@ class StaffGradingService(GradingService):
     METRIC_NAME = 'edxapp.open_ended_grading.staff_grading_service'
 
     def __init__(self, config):
-        config['system'] = LmsModuleSystem(
-            static_url='/static',
-            track_function=None,
-            get_module=None,
-            render_template=render_to_string,
-            replace_urls=None,
-            descriptor_runtime=None,
-            services={
-                'i18n': ModuleI18nService(),
-            },
-        )
+        config['render_template'] = render_to_string
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
         self.login_url = self.url + '/login/'

@@ -16,7 +16,7 @@ div.syllabus {
     table-layout: auto;
     text-align: left;
 
-    margin: 10px 0;
+    margin: ($baseline/2) 0;
 
     thead {
       font-weight: bold;
@@ -52,7 +52,7 @@ div.syllabus {
         padding: 0px !important;
         
         hr {
-          margin: 10px;
+          margin: ($baseline/2);
         }
       }
     }

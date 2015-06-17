@@ -16,13 +16,14 @@ import re
 import logging
 
 from django.http import HttpResponseBadRequest
-import django.utils
 from django.utils.translation import ugettext as _
-from lxml import html, etree
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.html_module import CourseInfoModule
+
+from xmodule_modifiers import get_course_update_items
+from cms.djangoapps.contentstore.push_notification import enqueue_push_course_update
 
 # # This should be in a class which inherits from XmlDescriptor
 log = logging.getLogger(__name__)
@@ -38,15 +39,19 @@ def get_course_updates(location, provided_id, user_id):
     except ItemNotFoundError:
         course_updates = modulestore().create_item(user_id, location.course_key, location.block_type, location.block_id)
 
-    course_update_items = get_course_update_items(course_updates, provided_id)
+    course_update_items = get_course_update_items(course_updates, _get_index(provided_id))
     return _get_visible_update(course_update_items)
 
 
 def update_course_updates(location, update, passed_id=None, user=None):
     """
-    Either add or update the given course update. It will add it if the passed_id is absent or None. It will update it if
-    it has an passed_id which has a valid value. Until updates have distinct values, the passed_id is the location url + an index
-    into the html structure.
+    Either add or update the given course update.
+    Add:
+        If the passed_id is absent or None, the course update is added.
+        If push_notification_selected is set in the update, a celery task for the push notification is created.
+    Update:
+        It will update it if it has a passed_id which has a valid value.
+        Until updates have distinct values, the passed_id is the location url + an index into the html structure.
     """
     try:
         course_updates = modulestore().get_item(location)
@@ -73,6 +78,7 @@ def update_course_updates(location, update, passed_id=None, user=None):
             "status": CourseInfoModule.STATUS_VISIBLE
         }
         course_update_items.append(course_update_dict)
+        enqueue_push_course_update(update, location.course_key)
 
     # update db record
     save_course_update_items(location, course_updates, course_update_items, user)
@@ -80,19 +86,6 @@ def update_course_updates(location, update, passed_id=None, user=None):
     if "status" in course_update_dict:
         del course_update_dict["status"]
     return course_update_dict
-
-
-def _course_info_content(html_parsed):
-    """
-    Constructs the HTML for the course info update, not including the header.
-    """
-    if len(html_parsed) == 1:
-        # could enforce that update[0].tag == 'h2'
-        content = html_parsed[0].tail
-    else:
-        content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
-        content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
-    return content
 
 
 def _make_update_dict(update):
@@ -165,55 +158,6 @@ def _get_index(passed_id=None):
 
     # return 0 if no index found
     return 0
-
-
-def get_course_update_items(course_updates, provided_id=None):
-    """
-    Returns list of course_updates data dictionaries either from new format if available or
-    from old. This function don't modify old data to new data (in db), instead returns data
-    in common old dictionary format.
-    New Format: {"items" : [{"id": computed_id, "date": date, "content": html-string}],
-                 "data": "<ol>[<li><h2>date</h2>content</li>]</ol>"}
-    Old Format: {"data": "<ol>[<li><h2>date</h2>content</li>]</ol>"}
-    """
-    if course_updates and getattr(course_updates, "items", None):
-        provided_id = _get_index(provided_id)
-        if provided_id and 0 < provided_id <= len(course_updates.items):
-            return course_updates.items[provided_id - 1]
-
-        # return list in reversed order (old format: [4,3,2,1]) for compatibility
-        return list(reversed(course_updates.items))
-    else:
-        # old method to get course updates
-        # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
-        try:
-            course_html_parsed = html.fromstring(course_updates.data)
-        except (etree.XMLSyntaxError, etree.ParserError):
-            log.error("Cannot parse: " + course_updates.data)
-            escaped = django.utils.html.escape(course_updates.data)
-            course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
-
-        # confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
-        course_update_items = []
-        provided_id = _get_index(provided_id)
-        if course_html_parsed.tag == 'ol':
-            # 0 is the newest
-            for index, update in enumerate(course_html_parsed):
-                if len(update) > 0:
-                    content = _course_info_content(update)
-                    # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
-                    computed_id = len(course_html_parsed) - index
-                    payload = {
-                        "id": computed_id,
-                        "date": update.findtext("h2"),
-                        "content": content
-                    }
-                    if provided_id == 0:
-                        course_update_items.append(payload)
-                    elif provided_id == computed_id:
-                        return payload
-
-        return course_update_items
 
 
 def _get_html(course_updates_items):

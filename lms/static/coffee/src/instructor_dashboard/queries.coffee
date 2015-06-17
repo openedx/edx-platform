@@ -304,10 +304,10 @@ class EmailWidget
     $('.emailWidget.queryTableBody tr').remove()
 
   rename_button_click:(event) ->
-    $saveCancelEditButton = $ _.template('<div class="emailWidget saveEditName"><i class="icon-save"></i>
-          <%= labelSave %></div> <div class="emailWidget cancelEditName"><i class="icon-remove-sign">
+    $saveCancelEditButton = $ _.template('<div class="emailWidget saveEditName"><i class="icon fa fa-floppy-o"></i>
+          <%= labelSave %></div> <div class="emailWidget cancelEditName"><i class="icon fa fa-times-circle">
           </i> <%= labelCancel %></div>', {labelSave: 'Save' ,labelCancel: 'Cancel' })
-    $renameBtn = $ _.template('<div class="emailWidget editName"><i class="icon-pencil">
+    $renameBtn = $ _.template('<div class="emailWidget editName"><i class="icon fa fa-pencil">
       </i> <%= label %></div>', {label: 'Rename'})
     targ = event.target
     while (!targ.classList.contains('editName'))
@@ -367,7 +367,7 @@ class EmailWidget
     rows = table[0].children
     row = table[0].insertRow(rows)
     row.setAttribute('groupQuery', id)
-    $renameBtn = $ _.template('<div class="emailWidget editName"><i class="icon-pencil">
+    $renameBtn = $ _.template('<div class="emailWidget editName"><i class="icon fa fa-pencil">
       </i> <%= label %></div>', {label: 'Rename'})
     for num in [0..1]
       cell = row.insertCell(num)
@@ -381,7 +381,7 @@ class EmailWidget
     $renameBtn.click (event) =>
       @rename_button_click(event)
 
-    $loadBtn = $ _.template('<div class="loadQuery"><i class="icon-upload">
+    $loadBtn = $ _.template('<div class="loadQuery"><i class="icon fa fa-upload">
       </i> <%= label %></div>', {label: 'Load'})
     $loadBtn.click (event) =>
       @delete_temporary()
@@ -422,7 +422,7 @@ class EmailWidget
     $td.append($loadBtn)
     row.appendChild($td[0])
     $deleteBtn = $(_.template('<div class="deleteSaved">
-      <i class="icon-remove-sign"></i> <%= label %></div>', {label: 'Delete'}))
+      <i class="icon fa fa-times-circle"></i> <%= label %></div>', {label: 'Delete'}))
 
     $deleteBtn.click (event) =>
       targ = event.target
@@ -470,7 +470,7 @@ class EmailWidget
     @get_students (error, students) =>
       if error
         $broken_icon = $ _.template('<div class="done">
-          <i class="icon-warning-sign"></i> <%= label %></div>',
+          <i class="icon fa fa-exclamation-triangle"></i> <%= label %></div>',
           {label: gettext("Sorry, we're having a problem with this query.
             Please delete this row and try again.")})
         tr.children()[4].innerHTML = $broken_icon[0].outerHTML
@@ -546,12 +546,12 @@ class EmailWidget
         cell.id = item['id']
     progressCell = row.insertCell(4)
     $progress_icon = $ _.template('<div class="Working">
-      <i class="icon-spinner icon-spin"></i><%= label %></div>',
+      <i class="fa fa-spinner fa-pulse"></i><%= label %></div>',
       {label: 'Working'})
-    $done_icon = $ _.template('<div class="done"><i class="icon-check">
+    $done_icon = $ _.template('<div class="done"><i class="icon fa fa-check">
       </i> <%= label %></div>', {label: 'Done'})
     $broken_icon = $ _.template('<div class="done">
-      <i class="icon-warning-sign"></i> <%= label %></div>',
+      <i class="icon fa fa-exclamation-triangle"></i> <%= label %></div>',
       {label: gettext("Sorry, we're having a problem with this query.
         Please delete this row and try again.")})
     if arr.length == 4
@@ -564,7 +564,7 @@ class EmailWidget
         row.classList.remove('working')
       else
         progressCell.innerHTML = $progress_icon[0].outerHTML
-    $removeBtn = $(_.template('<div class="remove"><i class="icon-remove-sign">
+    $removeBtn = $(_.template('<div class="remove"><i class="icon fa fa-times-circle">
       </i> <%= label %></div>', {label: 'Remove'}))
     $removeBtn.click (event) =>
       targ = event.target

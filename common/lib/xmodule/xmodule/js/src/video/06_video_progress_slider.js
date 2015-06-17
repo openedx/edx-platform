@@ -164,7 +164,11 @@ function () {
 
     function onSlide(event, ui) {
         var time = ui.value,
-            duration = this.videoPlayer.duration();
+            endTime = this.videoPlayer.duration();
+
+        if (this.config.endTime) {
+            endTime = Math.min(this.config.endTime, endTime);
+        }
 
         if (this.config.endTime !== null) {
             duration = Math.min(this.config.endTime, duration);
@@ -180,7 +184,7 @@ function () {
             'videoControl.updateVcrVidTime',
             {
                 time: time,
-                duration: duration
+                duration: endTime
             }
         );
 
@@ -226,10 +230,17 @@ function () {
         // params.duration could accidentally be construed as a floating
         // point double. Since we're displaying this number, round down
         // to nearest second
-        var duration = Math.floor(params.duration);
+        // TODO:FUNK <<<<<<< HEAD
+        // var duration = Math.floor(params.duration);
+        //
+        // if (this.config.endTime !== null) {
+        //     duration = Math.min(this.config.endTime, duration);
+        // TODO:FUNK =======
+        var endTime = Math.floor(params.duration);
 
         if (this.config.endTime !== null) {
-            duration = Math.min(this.config.endTime, duration);
+            endTime = Math.min(this.config.endTime, endTime);
+        // TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         }
 
         if (
@@ -237,13 +248,13 @@ function () {
             !this.videoProgressSlider.frozen
         ) {
             this.videoProgressSlider.slider
-                .slider('option', 'max', duration)
+                .slider('option', 'max', endTime)
                 .slider('option', 'value', time);
         }
 
         // Update aria values.
         this.videoProgressSlider.handle.attr({
-            'aria-valuemax': duration,
+            'aria-valuemax': endTime,
             'aria-valuenow': time
         });
     }

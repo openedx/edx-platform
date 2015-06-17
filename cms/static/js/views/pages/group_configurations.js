@@ -1,21 +1,31 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
-    'js/views/group_configurations_list'
+    'js/views/group_configurations_list', 'js/views/content_group_list'
 ],
-function ($, _, gettext, BasePage, GroupConfigurationsList) {
+function ($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListView) {
     'use strict';
     var GroupConfigurationsPage = BasePage.extend({
-        initialize: function() {
+        initialize: function(options) {
             BasePage.prototype.initialize.call(this);
-            this.listView = new GroupConfigurationsList({
-                collection: this.collection
+            this.experimentsEnabled = options.experimentsEnabled;
+            if (this.experimentsEnabled) {
+                this.experimentGroupConfigurations = options.experimentGroupConfigurations;
+                this.experimentGroupsListView = new GroupConfigurationsListView({
+                    collection: this.experimentGroupConfigurations
+                });
+            }
+            this.contentGroupConfiguration = options.contentGroupConfiguration;
+            this.cohortGroupsListView = new ContentGroupListView({
+                collection: this.contentGroupConfiguration.get('groups')
             });
         },
 
         renderPage: function() {
             var hash = this.getLocationHash();
-            this.$('.content-primary').append(this.listView.render().el);
-            this.addButtonActions();
+            if (this.experimentsEnabled) {
+                this.$('.wrapper-groups.experiment-groups').append(this.experimentGroupsListView.render().el);
+            }
+            this.$('.wrapper-groups.content-groups').append(this.cohortGroupsListView.render().el);
             this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match
@@ -24,22 +34,17 @@ function ($, _, gettext, BasePage, GroupConfigurationsList) {
             return $.Deferred().resolve().promise();
         },
 
-        addButtonActions: function () {
-            this.$('.nav-actions .new-button').click(function (event) {
-                this.listView.addOne(event);
-            }.bind(this));
-        },
-
         addWindowActions: function () {
             $(window).on('beforeunload', this.onBeforeUnload.bind(this));
         },
 
         onBeforeUnload: function () {
-            var dirty = this.collection.find(function(configuration) {
-                return configuration.isDirty();
-            });
+            var dirty = this.contentGroupConfiguration.isDirty() ||
+                (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
+                    return configuration.isDirty();
+                }));
 
-            if(dirty) {
+            if (dirty) {
                 return gettext('You have unsaved changes. Do you really want to leave this page?');
             }
         },
@@ -57,7 +62,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsList) {
          * @param {String|Number} Id of the group configuration.
          */
         expandConfiguration: function (id) {
-            var groupConfig = this.collection.findWhere({
+            var groupConfig = this.experimentsEnabled && this.experimentGroupConfigurations.findWhere({
                 id: parseInt(id)
             });
 

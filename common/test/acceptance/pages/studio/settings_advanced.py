@@ -13,6 +13,7 @@ MANUAL_BUTTON_SELECTOR = ".action-item .action-cancel"
 MODAL_SELECTOR = ".validation-error-modal-content"
 ERROR_ITEM_NAME_SELECTOR = ".error-item-title strong"
 ERROR_ITEM_CONTENT_SELECTOR = ".error-item-message"
+SETTINGS_NAME_SELECTOR = ".is-not-editable"
 
 
 class AdvancedSettingsPage(CoursePage):
@@ -126,3 +127,74 @@ class AdvancedSettingsPage(CoursePage):
             result_map[key] = val
 
         return result_map
+
+    @property
+    def displayed_settings_names(self):
+        """
+        Returns all settings displayed on the advanced settings page/screen/modal/whatever
+        We call it 'name', but it's really whatever is embedded in the 'id' element for each field
+        """
+        query = self.q(css=SETTINGS_NAME_SELECTOR)
+        return query.attrs('id')
+
+    @property
+    def expected_settings_names(self):
+        """
+        Returns a list of settings expected to be displayed on the Advanced Settings screen
+        Should match the list of settings found in cms/djangoapps/models/settings/course_metadata.py
+        If a new setting is added to the metadata list, this test will fail and you must update it.
+        Basically this guards against accidental exposure of a field on the Advanced Settings screen
+        """
+        return [
+            'advanced_modules',
+            'allow_anonymous',
+            'allow_anonymous_to_peers',
+            'allow_public_wiki_access',
+            'cert_html_view_overrides',
+            'cert_name_long',
+            'cert_name_short',
+            'certificates_display_behavior',
+            'course_image',
+            'cosmetic_display_price',
+            'advertised_start',
+            'announcement',
+            'display_name',
+            'info_sidebar_name',
+            'is_new',
+            'ispublic',
+            'max_student_enrollments_allowed',
+            'no_grade',
+            'display_coursenumber',
+            'display_organization',
+            'end_of_course_survey_url',
+            'catalog_visibility',
+            'chrome',
+            'days_early_for_beta',
+            'default_tab',
+            'disable_progress_graph',
+            'discussion_blackouts',
+            'discussion_sort_alpha',
+            'discussion_topics',
+            'due',
+            'due_date_display_format',
+            'use_latex_compiler',
+            'video_speed_optimizations',
+            'enrollment_domain',
+            'html_textbooks',
+            'invitation_only',
+            'lti_passports',
+            'matlab_api_key',
+            'max_attempts',
+            'mobile_available',
+            'rerandomize',
+            'remote_gradebook',
+            'annotation_token_secret',
+            'showanswer',
+            'show_calculator',
+            'show_chat',
+            'show_reset_button',
+            'static_asset_path',
+            'text_customization',
+            'annotation_storage_url',
+            'social_sharing_url',
+        ]

@@ -25,7 +25,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         (COURSE_ID_SPLIT, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_SPLIT)),
         (COURSE_ID_MONGO, CourseLocator.from_string(COURSE_ID_MONGO)),
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
-        )
+    )
 
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
@@ -43,7 +43,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         """
         self._auto_auth()
         self.assertEqual(User.objects.count(), 1)
-        self.assertTrue(User.objects.all()[0].is_active)
+        user = User.objects.all()[0]
+        self.assertTrue(user.is_active)
+        self.assertFalse(user.profile.requires_parental_consent())
 
     def test_create_same_user(self):
         self._auto_auth(username='test')
@@ -163,8 +165,8 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
-            self.assertIn(cookie, response.cookies)  # pylint: disable=E1103
-            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=E1103
+            self.assertIn(cookie, response.cookies)  # pylint: disable=maybe-no-member
+            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
 
 
 class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):

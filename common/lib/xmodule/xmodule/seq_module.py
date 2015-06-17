@@ -4,7 +4,7 @@ import warnings
 
 from lxml import etree
 
-from xblock.fields import Integer, Scope
+from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
 
@@ -36,13 +36,15 @@ class SequenceFields(object):
         help=_("Enter the date by which problems are due."),
         scope=Scope.settings,
     )
-    extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
-             "can be set by an instructor, and will override the global due "
-             "date if it is set to a date that is later than the global due "
-             "date.",
-        default=None,
-        scope=Scope.user_state,
+
+    # Entrance Exam flag -- see cms/contentstore/views/entrance_exam.py for usage
+    is_entrance_exam = Boolean(
+        display_name=_("Is Entrance Exam"),
+        help=_(
+            "Tag this course module as an Entrance Exam. "
+            "Note, you must enable Entrance Exams for this course setting to take effect."
+        ),
+        scope=Scope.content,
     )
 
 
@@ -88,7 +90,13 @@ class SequenceModule(SequenceFields, XModule):
     def handle_ajax(self, dispatch, data):  # TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
-            self.position = int(data['position'])
+            # set position to default value if either 'position' argument not
+            # found in request or it is a non-positive integer
+            position = data.get('position', u'1')
+            if position.isdigit() and int(position) > 0:
+                self.position = int(position)
+            else:
+                self.position = 1
             return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
 
@@ -172,3 +180,22 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        # return key/value fields in a Python dict object
+        # values may be numeric / string or dict
+        # default implementation is an empty dict
+        xblock_body = super(SequenceDescriptor, self).index_dictionary()
+        html_body = {
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(html_body)
+        else:
+            xblock_body["content"] = html_body
+        xblock_body["content_type"] = "Sequence"
+
+        return xblock_body

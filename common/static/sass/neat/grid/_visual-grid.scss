@@ -27,7 +27,7 @@
     }
 
     @else if $visual-grid-index == front {
-      z-index: 9999;
+      z-index: 9999; 
     }
 
     @each $breakpoint in $visual-grid-breakpoints {

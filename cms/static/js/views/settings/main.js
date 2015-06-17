@@ -10,6 +10,7 @@ var DetailsView = ValidatingView.extend({
         // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
+        "change select" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
         'focus #course-about-sidebar-html' : "codeMirrorize",
@@ -28,7 +29,7 @@ var DetailsView = ValidatingView.extend({
     },
 
     initialize : function() {
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon-file"></i><%= filename %></a>');
+        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-organization").val(this.model.get('org'));
         this.$el.find("#course-number").val(this.model.get('course_id'));
@@ -111,6 +112,20 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
 
+        var pre_requisite_courses = this.model.get('pre_requisite_courses');
+        pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
+        this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
+
+        if (this.model.get('entrance_exam_enabled') == 'true') {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
+            this.$('.div-grade-requirements').show();
+        }
+        else {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
+            this.$('.div-grade-requirements').hide();
+        }
+        this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
+
         return this;
     },
     fieldToSelectorMap : {
@@ -129,7 +144,10 @@ var DetailsView = ValidatingView.extend({
         'enable_enrollment_email': 'enable-enrollment-email',
         'pre_enrollment_email_subject' :'pre-enrollment-email-subject',
         'post_enrollment_email_subject':'post-enrollment-email-subject',
-        'enable_default_enrollment_email':'enable-default-enrollment-email'
+        'enable_default_enrollment_email':'enable-default-enrollment-email',
+        'pre_requisite_courses': 'pre-requisite-course',
+        'entrance_exam_enabled': 'entrance-exam-enabled',
+        'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
     },
 
     updateTime : function(e) {
@@ -211,8 +229,30 @@ var DetailsView = ValidatingView.extend({
         case 'post-enrollment-email-subject':
             this.setField(event);
             break;
+        case 'entrance-exam-enabled':
+            if($(event.currentTarget).is(":checked")){
+                this.$('.div-grade-requirements').show();
+            }else{
+                this.$('.div-grade-requirements').hide();
+            }
+            this.setField(event);
+            break;
+        case 'entrance-exam-minimum-score-pct':
+            // If the val is an empty string then update model with default value.
+            if ($(event.currentTarget).val() === '') {
+                this.model.set('entrance_exam_minimum_score_pct', this.model.defaults.entrance_exam_minimum_score_pct);
+            }
+            else {
+                this.setField(event);
+            }
+            break;
         case 'course-short-description':
             this.setField(event);
+            break;
+        case 'pre-requisite-course':
+            var value = $(event.currentTarget).val();
+            value = value == "" ? [] : [value];
+            this.model.set('pre_requisite_courses', value);
             break;
         // Don't make the user reload the page to check the Youtube ID.
         // Wait for a second to load the video, avoiding egregious AJAX calls.

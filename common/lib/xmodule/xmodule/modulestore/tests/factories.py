@@ -1,24 +1,64 @@
 import pprint
+import threading
+from uuid import uuid4
+from decorator import contextmanager
 import pymongo.message
 
-from factory import Factory, lazy_attribute_sequence, lazy_attribute
+from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
-from uuid import uuid4
+from mock import Mock, patch
+from nose.tools import assert_less_equal, assert_greater_equal
+import dogstats_wrapper as dog_stats_api
 
-from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
-from decorator import contextmanager
-from mock import Mock, patch
-from nose.tools import assert_less_equal, assert_greater_equal
-import factory
-import threading
+from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 
 class Dummy(object):
     pass
+
+
+class XModuleFactoryLock(threading.local):
+    """
+    This class exists to store whether XModuleFactory can be accessed in a safe
+    way (meaning, in a context where the data it creates will be cleaned up).
+
+    Users of XModuleFactory (or its subclasses) should only call XModuleFactoryLock.enable
+    after ensuring that a) the modulestore will be cleaned up, and b) that XModuleFactoryLock.disable
+    will be called.
+    """
+    def __init__(self):
+        super(XModuleFactoryLock, self).__init__()
+        self._enabled = False
+
+    def enable(self):
+        """
+        Enable XModuleFactories. This should only be turned in a context
+        where the modulestore will be reset at the end of the test (such
+        as inside ModuleStoreTestCase).
+        """
+        self._enabled = True
+
+    def disable(self):
+        """
+        Disable XModuleFactories. This should be called once the data
+        from the factory has been cleaned up.
+        """
+        self._enabled = False
+
+    def is_enabled(self):
+        """
+        Return whether XModuleFactories are enabled.
+        """
+        return self._enabled
+
+
+XMODULE_FACTORY_LOCK = XModuleFactoryLock()
 
 
 class XModuleFactory(Factory):
@@ -33,6 +73,9 @@ class XModuleFactory(Factory):
 
     @lazy_attribute
     def modulestore(self):
+        msg = "XMODULE_FACTORY_LOCK not enabled. Please use ModuleStoreTestCase as your test baseclass."
+        assert XMODULE_FACTORY_LOCK.is_enabled(), msg
+
         from xmodule.modulestore.django import modulestore
         return modulestore()
 
@@ -44,9 +87,9 @@ class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-    org = factory.Sequence(lambda n: 'org.%d' % n)
-    number = factory.Sequence(lambda n: 'course_%d' % n)
-    display_name = factory.Sequence(lambda n: 'Run %d' % n)
+    org = Sequence('org.{}'.format)
+    number = Sequence('course_{}'.format)
+    display_name = Sequence('Run {}'.format)
 
     # pylint: disable=unused-argument
     @classmethod
@@ -60,7 +103,7 @@ class CourseFactory(XModuleFactory):
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
         name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
-        run = kwargs.get('run', name)
+        run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
         # Pass the metadata just as field=value pairs
@@ -76,6 +119,36 @@ class CourseFactory(XModuleFactory):
 
             last_course.loc = new_course.location
             return new_course
+
+
+class LibraryFactory(XModuleFactory):
+    """
+    Factory for creating a content library
+    """
+    org = Sequence('org{}'.format)
+    library = Sequence('lib{}'.format)
+    display_name = Sequence('Test Library {}'.format)
+
+    # pylint: disable=unused-argument
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create a library with a unique name and key.
+        All class attributes (from this class and base classes) are automagically
+        passed in via **kwargs.
+        """
+        # some of the kwargst actual field values, so pop those off for use separately:
+        org = kwargs.pop('org')
+        library = kwargs.pop('library')
+        store = kwargs.pop('modulestore')
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
+
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', ModuleStoreEnum.Type.split)
+        with store.default_store(default_store_override):
+            new_library = store.create_library(org, library, user_id, fields=kwargs)
+            return new_library
 
 
 class ItemFactory(XModuleFactory):
@@ -179,30 +252,30 @@ class ItemFactory(XModuleFactory):
             # replace the display name with an optional parameter passed in from the caller
             if display_name is not None:
                 metadata['display_name'] = display_name
-            runtime = parent.runtime if parent else None
-            store.create_item(
+
+            module = store.create_child(
                 user_id,
-                location.course_key,
+                parent.location,
                 location.block_type,
                 block_id=location.block_id,
                 metadata=metadata,
                 definition_data=data,
-                runtime=runtime
+                runtime=parent.runtime,
+                fields=kwargs,
             )
-
-            module = store.get_item(location)
-
-            for attr, val in kwargs.items():
-                setattr(module, attr, val)
-            # Save the attributes we just set
-            module.save()
-
-            store.update_item(module, user_id)
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':
+                dog_stats_api.increment(
+                    DEPRECATION_VSCOMPAT_EVENT,
+                    tags=(
+                        "location:itemfactory_create_static_tab",
+                        u"block:{}".format(location.block_type),
+                    )
+                )
+
                 course = store.get_course(location.course_key)
                 course.tabs.append(
                     StaticTab(
@@ -217,12 +290,15 @@ class ItemFactory(XModuleFactory):
                 parent.children.append(location)
                 store.update_item(parent, user_id)
                 if publish_item:
-                    store.publish(parent.location, user_id)
+                    published_parent = store.publish(parent.location, user_id)
+                    # module is last child of parent
+                    return published_parent.get_children()[-1]
+                else:
+                    return store.get_item(location)
             elif publish_item:
-                store.publish(location, user_id)
-
-        # return the published item
-        return store.get_item(location)
+                return store.publish(location, user_id)
+            else:
+                return module
 
 
 @contextmanager
@@ -302,19 +378,55 @@ def check_mongo_calls(num_finds=0, num_sends=None):
         the given int value.
     """
     with check_sum_of_calls(
-        pymongo.message,
-        ['query', 'get_more'],
-        num_finds,
-        num_finds
+            pymongo.message,
+            ['query', 'get_more'],
+            num_finds,
+            num_finds
     ):
         if num_sends is not None:
             with check_sum_of_calls(
-                pymongo.message,
-                # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
-                num_sends,
-                num_sends
+                    pymongo.message,
+                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
+                    num_sends,
+                    num_sends
             ):
                 yield
         else:
             yield
+
+
+# This dict represents the attribute keys for a course's 'about' info.
+# Note: The 'video' attribute is intentionally excluded as it must be
+# handled separately; its value maps to an alternate key name.
+# Reference : cms/djangoapps/models/settings/course_details.py
+
+ABOUT_ATTRIBUTES = {
+    'effort': "Testing effort",
+}
+
+
+class CourseAboutFactory(XModuleFactory):
+    """
+    Factory for XModule course about.
+    """
+
+    @classmethod
+    def _create(cls, target_class, **kwargs):  # pylint: disable=unused-argument
+        """
+        Uses **kwargs:
+
+        effort:  effor information
+
+        video : video link
+        """
+        user_id = kwargs.pop('user_id', None)
+        course_id, course_runtime = kwargs.pop("course_id"), kwargs.pop("course_runtime")
+        store = modulestore()
+        for about_key in ABOUT_ATTRIBUTES:
+            about_item = store.create_xblock(course_runtime, course_id, 'about', about_key)
+            about_item.data = ABOUT_ATTRIBUTES[about_key]
+            store.update_item(about_item, user_id, allow_not_found=True)
+        about_item = store.create_xblock(course_runtime, course_id, 'about', 'video')
+        about_item.data = "www.youtube.com/embed/testing-video-link"
+        store.update_item(about_item, user_id, allow_not_found=True)

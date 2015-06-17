@@ -1,43 +1,29 @@
-.. _edX Platform API Overview:
-
 ################################################
-edX Platform API Overview
+Overview of the edX Platform APIs
 ################################################
 
-The edX Platform API enables you to build applications for students to view
-course information and videos for courses on your instance of Open edX.
+The edX Platform APIs are a rapidly growing and evolving set of capabilities
+that enable you to build web, desktop, and mobile applications that work with
+your Open edX instance.
 
-The edX Platform API uses Representational State Transfer (REST) design
-principles and supports JavaScript Object Notation (JSON) data-interchange
-format. Our REST API is simple, lightweight and optimized.
+The edX Platform APIs use REST design principles and support the JSON data-
+interchange format.
 
-You can use the edX Platform API for web, desktop, and mobile applications. 
+**********************************************
+Supported edX Platform API Modules
+**********************************************
+
+The following edX Platform APIs are currently supported: 
+
+* :ref:`edX Platform Enrollment API Version 1.0`
+* :ref:`edX Platform Mobile API Version 0.5`
 
 
-*************************************
-edX Platform API Version 0.5, Alpha
-*************************************
+**********************************************
+Experimental edX Platform API Modules
+**********************************************
 
-The edX Platform API is currently at version 0.5 and is an Alpha release. We
-plan on making significant enhancements and changes to the API. 
+The following edX Platform APIs are currently experimental: 
 
-.. caution::
- As this is a new and rapidly evolving API, at this time edX does not guarantee
- forward compatibility. We encourage you to use and experiment with the API,
- while keeping in mind that endpoints may change.
-
-******************************
-edX Platform API Capabilities
-******************************
-
-With the edX Platform API, you can:
-
-* Get :ref:`user details<Get User Details>` and :ref:`course enrollments<Get a
-  User's Course Enrollments>` for a user.
-
-* Get :ref:`course information<Get the Course About Page>`, :ref:`updates<Get
-  Course Updates>`, and :ref:`handouts<Get Course Handouts>` for courses the
-  user is enrolled in.
-
-* Get :ref:`videos<Get the Video List>` and :ref:`transcripts<Get a Video
-  Transcript>` for courses the user is enrolled in.
+* :ref:`EdX Platform Course Structure API Version 0`
+* :ref:`edX Platform User API Version 0`

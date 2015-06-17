@@ -1,5 +1,6 @@
 // forums - main app styling
 // ====================
+
 body.discussion {
 
   .course-tabs .right {
@@ -11,7 +12,6 @@ body.discussion {
     }
 
     .new-post-icon {
-      margin-top: 8px;
       @include margin-right(7px);
       font-size: 16px;
       vertical-align: middle;
@@ -20,7 +20,7 @@ body.discussion {
   }
 
   .edit-post-form {
-    @include clearfix;
+    @include clearfix();
     margin-bottom: ($baseline*2);
     width: 100%;
     @include box-sizing(border-box);
@@ -36,7 +36,7 @@ body.discussion {
     .post-cancel {
       @include white-button;
       float: left;
-      margin: ($baseline/2) 0 0 ($baseline*.75);
+      margin: ($baseline/2) 0 0 ($baseline*0.75);
     }
 
     .post-update {
@@ -72,7 +72,7 @@ body.discussion {
   .thread-title {
     display: block;
     margin-bottom: $baseline;
-    color: #333;
+    color: $gray-d3;
     font-weight: 700;
     font-size: 21px;
   }
@@ -120,11 +120,11 @@ body.discussion {
   }
 
   .wmd-input {
-    border: 1px solid #c8c8c8;
+    border: 1px solid $gray-l3;
     border-radius: 3px 3px 0 0;
     width: 100%;
     height: 150px;
-    background-color: #e9e9e9;
+    background-color: $gray-l4;
     font-style: normal;
     font-size: 0.8em;
     font-family: Monaco, 'Lucida Console', monospace;
@@ -210,7 +210,7 @@ body.discussion {
 
     > form > input[type="text"] {
       border-radius: 3px;
-      color: #333;
+      color: $gray-d3;
     }
 
     > form > input[type="button"] {
@@ -226,7 +226,7 @@ body.discussion {
 }
 
 .container .discussion-body {
-  @include clearfix;
+  @include clearfix();
   display: block;
   border: none;
   background: transparent;
@@ -237,7 +237,7 @@ body.discussion {
     padding: 30px;
     font-size: 20px;
     font-weight: 700;
-    color: #ccc;
+    color: $gray-l3;
     text-align: center;
   }
 
@@ -258,7 +258,7 @@ body.discussion {
     padding: 40px 40px 10px;
 
     section {
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid $gray-l3;
     }
 
     .label {
@@ -269,6 +269,7 @@ body.discussion {
     .label-settings {
       padding-top: $baseline;
       padding-bottom: $baseline/2;
+      text-transform: uppercase;
     }
 
     .home-header {
@@ -278,7 +279,7 @@ body.discussion {
     .home-title {
       font-size: 18px;
       color: $black;
-      margin-bottom: 5px;
+      margin-bottom: ($baseline/4);
     }
     .home-description {
       font-size: 12px;
@@ -327,13 +328,13 @@ body.discussion {
     .home-helpgrid {
       border-bottom: none;
       border-radius: 3px;
-      border: 1px solid #b2b2b2;
+      border: 1px solid $gray-l2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
     }
   }
 
   .helpgrid-row {
-      border-bottom: 1px solid #b2b2b2;
+      border-bottom: 1px solid $gray-l2;
 
       .row-title {
         padding: 30px $baseline;
@@ -354,7 +355,7 @@ body.discussion {
           display: table-cell;
         }
 
-        .icon-stack i {
+        .fa-stack .icon {
           padding: 0 $baseline/2;
         }
 
@@ -397,20 +398,20 @@ body.discussion {
     }
 
   .helpgrid-row-navigation {
-    .icon-reorder {color: $light-gray;}
-    .icon-search {color: $light-gray;}
-    .icon-sort {color: $light-gray;}
+    .fa-bars {color: $light-gray;}
+    .fa-search {color: $light-gray;}
+    .fa-sort {color: $light-gray;}
   }
 
   .helpgrid-row-participation {
-    .icon-plus {color: $green;}
-    .icon-flag {color: $pink;}
-    .icon-star {color: $blue;}
+    .fa-plus {color: $green;}
+    .fa-flag {color: $pink;}
+    .fa-star {color: $blue;}
   }
 
   .helpgrid-row-notification {
-    .icon-sign-blank {color: $green;}
-    .icon-envelope {color: $light-gray;}
+    .fa-square {color: $green;}
+    .fa-envelope {color: $light-gray;}
   }
 
   .discussion-article {
@@ -432,7 +433,7 @@ body.discussion {
 
     .posted-details {
       font-size: 12px;
-      color: #888;
+      color: $gray-l1;
 
       .username {
         font-weight: 700;
@@ -446,7 +447,10 @@ body.discussion {
     .post-context{
       margin-top: $baseline;
       font-size: 12px;
-      color: #888;
+      color: $gray-d1;
+      padding: ($baseline*0.75);
+      background-color: $gray-l6;
+      border-radius: 3px;
     }
 
     p + p {
@@ -471,8 +475,8 @@ body.discussion {
     > li {
       @include animation(fadeIn .3s);
       position: relative;
-      margin: 0 -10px 30px;
-      border: 1px solid #b2b2b2;
+      margin: 0 -($baseline/2) ($baseline*1.5);
+      border: 1px solid $gray-l2;
       border-radius: 3px;
       box-shadow: 0 0 1px $shadow;
 
@@ -492,7 +496,7 @@ body.discussion {
         left: 0;
         width: 100%;
         height: 14px;
-        padding: 1px 5px;
+        padding: 1px ($baseline/4);
         @include box-sizing(border-box);
         border-radius: 2px 2px 0 0;
         background: #009fe2;
@@ -508,7 +512,7 @@ body.discussion {
         left: 0;
         width: 100%;
         height: 14px;
-        padding: 1px 5px;
+        padding: 1px ($baseline/4);
         @include box-sizing(border-box);
         border-radius: 2px 2px 0 0;
         background: $forum-color-community-ta;
@@ -551,16 +555,16 @@ body.discussion {
 
     .add-response-btn {
       @include white-button;
-      @include linear-gradient(top, $white 35%, #ebebeb);
+      @include linear-gradient(top, $white 35%, $gray-l4);
       position: relative;
-      border: 1px solid #b2b2b2;
+      border: 1px solid $gray-l2;
       padding: 0 18px;
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
       @include text-align(left);
       font-size: 13px;
 
-      .icon-reply:before { // flip the icon for RTL
+      .fa-reply:before { // flip the icon for RTL
         @include ltr {
           content: "\f112"; // FA icon arrow to the left
         }
@@ -604,7 +608,7 @@ body.discussion {
     height: 31px;
     padding: 0 ($baseline/2);
     @include box-sizing(border-box);
-    border: 1px solid #b2b2b2;
+    border: 1px solid $gray-l2;
     border-radius: 3px;
     box-shadow: 0 1px 3px $shadow-l1 inset;
     @include transition(border-color .1s linear 0s);
@@ -621,7 +625,7 @@ body.discussion {
 
   .discussion-reply-new {
     padding: $baseline ($baseline*1.5);
-    @include clearfix;
+    @include clearfix();
     @include transition(opacity .2s linear 0s);
 
     h4 {
@@ -687,14 +691,14 @@ body.discussion {
 
     button.add-response-btn {
       @include white-button;
-      @include linear-gradient(top, $white 35%, #ebebeb);
+      @include linear-gradient(top, $white 35%, $gray-l4);
       position: relative;
       padding-left: ($baseline*1.5);
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
       @include text-align(left);
 
-      .icon-reply:before {
+      .fa-reply:before {
         @include ltr {
           content: "\f112"; // FA icon arrow to the left
         }
@@ -715,7 +719,7 @@ body.discussion {
   }
 
   .loading-animation {
-    background-image: url(../images/spinner-on-grey.gif);
+    background-image: url(../images/spinner.gif);
   }
 
   .discussion-show {
@@ -785,18 +789,18 @@ body.discussion {
           }
 
           .discussion-post {
-            @include clearfix;
+            @include clearfix();
 
             .inline-comment-count {
+              @extend %ui-depth2;
               position: relative;
-              z-index: 100;
               float: right;
               display: block;
               height: 27px;
               margin-top: 6px;
               margin-right: 8px;
               padding: 0 8px;
-              border-radius: 5px;
+              border-radius: ($baseline/4);
               font-size: 12px;
               font-weight: 400;
               line-height: 25px;
@@ -805,7 +809,7 @@ body.discussion {
 
             header {
               padding-bottom: 0;
-              margin-bottom: ($baseline*.75);
+              margin-bottom: ($baseline*0.75);
 
               .posted-details {
                 margin-top: ($baseline/5);
@@ -837,11 +841,11 @@ body.discussion {
           .responses {
             header {
               padding-bottom: 0;
-              margin-bottom: 15px;
+              margin-bottom: ($baseline*0.75);
 
               .posted-by {
                 float: left;
-                margin-right: 5px;
+                margin-right: ($baseline/4);
                 font-size: 16px;
               }
             }
@@ -866,7 +870,7 @@ body.discussion {
 
         .post-tools {
           box-shadow: 0 1px 1px $shadow inset;
-          background: #f6f6f6;
+          background: $gray-l6;
 
           &:hover {
             background: #fcfcfc;
@@ -906,7 +910,7 @@ body.discussion {
       display: block;
       margin-bottom: $baseline;
       font-size: 21px;
-      color: #333;
+      color: $gray-d3;
       font-weight: 700;
     }
   }
@@ -932,7 +936,7 @@ body.discussion {
   }
 
   section.pagination {
-    margin-top: 30px;
+    margin-top: ($baseline*1.5);
 
     nav.discussion-paginator {
       float: right;
@@ -948,13 +952,13 @@ body.discussion {
           &.current-page span {
             display: inline-block;
             height: 35px;
-            padding: 0 15px;
-            border: 1px solid #ccc;
+            padding: 0 ($baseline*0.75);
+            border: 1px solid $gray-l3;
             border-radius: 3px;
             font-size: 13px;
             font-weight: 700;
             line-height: 32px;
-            color: #333;
+            color: $gray-d3;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
           }
         }
@@ -965,7 +969,7 @@ body.discussion {
   .edit-post-form {
     width: 100%;
     margin-bottom: $baseline;
-    @include clearfix;
+    @include clearfix();
     @include box-sizing(border-box);
 
     .form-row {
@@ -975,14 +979,14 @@ body.discussion {
     .post-cancel {
       @include white-button;
       float: left;
-      margin: $baseline/2 0 0 15px;
+      margin: ($baseline/2) 0 0 ($baseline*0.75);
     }
 
     .post-update {
       @include blue-button;
       float: left;
       height: 37px;
-      margin-top: $baseline/2;
+      margin-top: ($baseline/2);
       padding-bottom: 2px;
 
       &:hover, &:focus {
@@ -993,13 +997,13 @@ body.discussion {
     .edit-post-title {
       width: 100%;
       height: 40px;
-      padding: 0 $baseline/2;
+      padding: 0 ($baseline/2);
       @include box-sizing(border-box);
       border-radius: 3px;
       border: 1px solid #aaa;
       font-size: 16px;
       font-family: $sans-serif;
-      color: #333;
+      color: $gray-d3;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
   }
@@ -1042,17 +1046,17 @@ body.discussion {
 
   .load-response-button {
     @include white-button;
-    @include linear-gradient(top, $white 35%, #ebebeb);
+    @include linear-gradient(top, $white 35%, $gray-l4);
     position: relative;
     margin: ($baseline/2) 0;
-    border: 1px solid #b2b2b2;
+    border: 1px solid $gray-l2;
     width: 100%;
     box-shadow: 0 1px 1px $shadow-l1;
     text-align: left;
     font-weight: normal;
 
     span.add-response-btn-text {
-      padding-left: 4px;
+      padding-left: ($baseline/5);
     }
   }
 }
@@ -1062,7 +1066,7 @@ body.discussion {
 // post metadata - cohorts
 .group-visibility-label {
     font-size: 12px;
-    color:#000;
+    color:$black;
     font-style: italic;
     background-color: $white;
   }

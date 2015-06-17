@@ -1,27 +1,22 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 import json
-import unittest
 from collections import OrderedDict
-from mock import patch, PropertyMock, MagicMock
+
+from lxml import etree
+from mock import patch, MagicMock, Mock
 
 from django.conf import settings
-
-from xblock.fields import ScopeIds
-from xblock.field_data import DictFieldData
+from django.test import TestCase
 
 from xmodule.video_module import create_youtube_string, VideoDescriptor
 from xmodule.x_module import STUDENT_VIEW
-from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.test_video import VideoDescriptorTestBase
+from xmodule.tests.test_import import DummySystem
 
 from edxval.api import (
-    ValVideoNotFoundError,
-    get_video_info,
-    create_profile,
-    create_video
+    create_profile, create_video, get_video_info, ValCannotCreateError, ValVideoNotFoundError
 )
-import mock
 
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -39,6 +34,9 @@ class TestVideoYouTube(TestVideo):
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'branding_info': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': u'A Name',
             'end': 3610.0,
@@ -102,6 +100,9 @@ class TestVideoNonYouTube(TestVideo):
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+            'branding_info': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -116,7 +117,7 @@ class TestVideoNonYouTube(TestVideo):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -148,6 +149,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
+        super(TestGetHtmlMethod, self).setUp()
         self.setup_course()
 
     def test_get_html_track(self):
@@ -204,6 +206,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
+            'branding_info': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -218,7 +223,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'speed': 'null',
             'general_speed': 1.0,
             'track': u'http://www.example.com/track',
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -320,6 +325,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         ]
 
         initial_context = {
+            'branding_info': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -334,7 +342,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -412,7 +420,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # it'll just fall back to the values in the VideoDescriptor.
         self.assertIn("example_source.mp4", self.item_descriptor.render(STUDENT_VIEW).content)
 
-    @mock.patch('edxval.api.get_video_info')
+    @patch('edxval.api.get_video_info')
     def test_get_html_with_mocked_edx_video_id(self, mock_get_video_info):
         mock_get_video_info.return_value = {
             'url': '/edxval/video/example',
@@ -459,6 +467,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         # Video found for edx_video_id
         initial_context = {
+            'branding_info': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -473,7 +484,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -515,15 +526,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # create test profiles and their encodings
         encoded_videos = []
         for profile, extension in [("desktop_webm", "webm"), ("desktop_mp4", "mp4")]:
-            result = create_profile(
-                dict(
-                    profile_name=profile,
-                    extension=extension,
-                    width=200,
-                    height=2001
-                )
-            )
-            self.assertEqual(result, profile)
+            create_profile(profile)
             encoded_videos.append(
                 dict(
                     url=u"http://fake-video.edx.org/thundercats.{}".format(extension),
@@ -538,6 +541,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 client_video_id="Thunder Cats",
                 duration=111,
                 edx_video_id="thundercats",
+                status='test',
                 encoded_videos=encoded_videos
             )
         )
@@ -575,6 +579,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         # Video found for edx_video_id
         initial_context = {
+            'branding_info': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -589,7 +596,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -627,11 +634,22 @@ class TestGetHtmlMethod(BaseTestXmodule):
             self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
         )
 
+    # pylint: disable=invalid-name
+    @patch('xmodule.video_module.video_module.BrandingInfoConfig')
     @patch('xmodule.video_module.video_module.get_video_from_cdn')
-    def test_get_html_cdn_source(self, mocked_get_video):
+    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
         Test if sources got from CDN.
         """
+
+        mock_BrandingInfoConfig.get_config.return_value = {
+            "CN": {
+                'url': 'http://www.xuetangx.com',
+                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
+                'logo_tag': 'Video hosted by XuetangX.com'
+            }
+        }
+
         def side_effect(*args, **kwargs):
             cdn = {
                 'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
@@ -678,6 +696,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
         ]
 
         initial_context = {
+            'branding_info': {
+                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
+                'logo_tag': 'Video hosted by XuetangX.com',
+                'url': 'http://www.xuetangx.com'
+            },
+            'cdn_eval': False,
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -692,7 +717,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -743,12 +768,13 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
+        super(TestVideoDescriptorInitialization, self).setUp()
         self.setup_course()
 
     def test_source_not_in_html5sources(self):
         metadata = {
             'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
         }
 
         self.initialize_module(metadata=metadata)
@@ -773,86 +799,27 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.source_visible)
 
     def test_download_video_is_explicitly_set(self):
-        with patch(
-            'xmodule.editing_module.TabsEditingDescriptor.editable_metadata_fields',
-            new_callable=PropertyMock,
-            return_value={
-                'download_video': {
-                    'default_value': False,
-                    'explicitly_set': True,
-                    'display_name': 'Video Download Allowed',
-                    'help': 'Show a link beneath the video to allow students to download the video.',
-                    'type': 'Boolean',
-                    'value': False,
-                    'field_name': 'download_video',
-                    'options': [
-                        {'display_name': "True", "value": True},
-                        {'display_name': "False", "value": False}
-                    ],
-                },
-                'html5_sources': {
-                    'default_value': [],
-                    'explicitly_set': False,
-                    'display_name': 'Video Sources',
-                    'help': 'A list of filenames to be used with HTML5 video.',
-                    'type': 'List',
-                    'value': [u'http://youtu.be/OEoXaMPEzfM.mp4'],
-                    'field_name': 'html5_sources',
-                    'options': [],
-                },
-                'source': {
-                    'default_value': '',
-                    'explicitly_set': False,
-                    'display_name': 'Download Video',
-                    'help': 'The external URL to download the video.',
-                    'type': 'Generic',
-                    'value': u'http://example.org/video.mp4',
-                    'field_name': 'source',
-                    'options': [],
-                },
-                'track': {
-                    'default_value': '',
-                    'explicitly_set': False,
-                    'display_name': 'Download Transcript',
-                    'help': 'The external URL to download the timed transcript track.',
-                    'type': 'Generic',
-                    'value': u'http://some_track.srt',
-                    'field_name': 'track',
-                    'options': [],
-                },
-                'download_track': {
-                    'default_value': False,
-                    'explicitly_set': False,
-                    'display_name': 'Transcript Download Allowed',
-                    'help': 'Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.',
-                    'type': 'Generic',
-                    'value': False,
-                    'field_name': 'download_track',
-                    'options': [],
-                },
-                'transcripts': {},
-                'handout': {},
-            }
-        ):
-            metadata = {
-                'track': u'http://some_track.srt',
-                'source': 'http://example.org/video.mp4',
-                'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
-            }
+        metadata = {
+            'track': u'http://some_track.srt',
+            'source': 'http://example.org/video.mp4',
+            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
+            'download_video': False,
+        }
 
-            self.initialize_module(metadata=metadata)
+        self.initialize_module(metadata=metadata)
 
-            fields = self.item_descriptor.editable_metadata_fields
-            self.assertIn('source', fields)
+        fields = self.item_descriptor.editable_metadata_fields
+        self.assertIn('source', fields)
+        self.assertIn('download_video', fields)
 
-            self.assertFalse(self.item_descriptor.download_video)
-            self.assertTrue(self.item_descriptor.source_visible)
-            self.assertTrue(self.item_descriptor.download_track)
+        self.assertFalse(self.item_descriptor.download_video)
+        self.assertTrue(self.item_descriptor.source_visible)
+        self.assertTrue(self.item_descriptor.download_track)
 
     def test_source_is_empty(self):
         metadata = {
             'source': '',
-            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
         }
 
         self.initialize_module(metadata=metadata)
@@ -862,7 +829,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.download_video)
 
 
-class VideoDescriptorTest(VideoDescriptorTestBase):
+class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.
     """
@@ -890,3 +857,81 @@ class VideoDescriptorTest(VideoDescriptorTestBase):
         ]
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], correct_tabs)
+
+    def test_export_val_data(self):
+        self.descriptor.edx_video_id = 'test_edx_video_id'
+        create_profile('mobile')
+        create_video({
+            'edx_video_id': self.descriptor.edx_video_id,
+            'client_video_id': 'test_client_video_id',
+            'duration': 111,
+            'status': 'dummy',
+            'encoded_videos': [{
+                'profile': 'mobile',
+                'url': 'http://example.com/video',
+                'file_size': 222,
+                'bitrate': 333,
+            }],
+        })
+
+        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        expected_str = """
+            <video download_video="false" url_name="SampleProblem">
+                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                    <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
+                </video_asset>
+            </video>
+        """
+        parser = etree.XMLParser(remove_blank_text=True)
+        expected = etree.XML(expected_str, parser=parser)
+        self.assertXmlEqual(expected, actual)
+
+    def test_export_val_data_not_found(self):
+        self.descriptor.edx_video_id = 'nonexistent'
+        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        expected_str = """<video download_video="false" url_name="SampleProblem"/>"""
+        parser = etree.XMLParser(remove_blank_text=True)
+        expected = etree.XML(expected_str, parser=parser)
+        self.assertXmlEqual(expected, actual)
+
+    def test_import_val_data(self):
+        create_profile('mobile')
+        module_system = DummySystem(load_error_modules=True)
+
+        xml_data = """
+            <video edx_video_id="test_edx_video_id">
+                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                    <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
+                </video_asset>
+            </video>
+        """
+        id_generator = Mock()
+        id_generator.target_course_id = "test_course_id"
+        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
+        self.assertEqual(video.edx_video_id, 'test_edx_video_id')
+        video_data = get_video_info(video.edx_video_id)
+        self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
+        self.assertEqual(video_data['duration'], 111)
+        self.assertEqual(video_data['status'], 'imported')
+        self.assertEqual(video_data['courses'], [id_generator.target_course_id])
+        self.assertEqual(video_data['encoded_videos'][0]['profile'], 'mobile')
+        self.assertEqual(video_data['encoded_videos'][0]['url'], 'http://example.com/video')
+        self.assertEqual(video_data['encoded_videos'][0]['file_size'], 222)
+        self.assertEqual(video_data['encoded_videos'][0]['bitrate'], 333)
+
+    def test_import_val_data_invalid(self):
+        create_profile('mobile')
+        module_system = DummySystem(load_error_modules=True)
+
+        # Negative file_size is invalid
+        xml_data = """
+            <video edx_video_id="test_edx_video_id">
+                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                    <encoded_video profile="mobile" url="http://example.com/video" file_size="-222" bitrate="333"/>
+                </video_asset>
+            </video>
+        """
+        with self.assertRaises(ValCannotCreateError):
+            VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+        with self.assertRaises(ValVideoNotFoundError):
+            get_video_info("test_edx_video_id")

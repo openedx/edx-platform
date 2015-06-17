@@ -1,0 +1,15 @@
+[
+  {
+    "pk": 1,
+    "model": "oauth2.client",
+    "fields": {
+      "name": "edx-notes",
+      "url": "http://example.com/",
+      "client_type": 1,
+      "redirect_uri": "http://example.com/welcome",
+      "user": null,
+      "client_id": "22a9e15e3d3b115e4d43",
+      "client_secret": "7969f769a1fe21ecd6cf8a1c105f250f70a27131"
+    }
+  }
+]

@@ -1,0 +1,53 @@
+<div class="wrapper-content-main enrollment-confirmation-step">
+  <article class="content-main">
+    <h3 class="title"><%- _.sprintf( gettext( "Congratulations! You are now verified on %(platformName)s!" ), { platformName: platformName } ) %></h3>
+    <div class="instruction">
+      <p><%- gettext( "You are now enrolled as a verified student for:" ) %></p>
+    </div>
+
+    <ul class="list-info">
+      <li class="info-item course-info">
+        <div class="wrapper-report">
+          <table class="report report-course">
+            <caption class="sr"><%- gettext( "A list of courses you have just enrolled in as a verified student" ) %></caption>
+            <thead>
+              <tr>
+                <th scope="col" ><%- gettext( "Course" ) %></th>
+                <th scope="col" ><%- gettext( "Status" ) %></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td><%- courseName %></td>
+                <td>
+                   <%- _.sprintf( gettext( "Starts: %(start)s" ), { start: courseStartDate } ) %>
+                </td>
+              </tr>
+            </tbody>
+
+            <tfoot>
+              <tr class="course-actions">
+                <td>
+                  <% if ( coursewareUrl ) { %>
+                    <a class="action action-course" href="<%- coursewareUrl %>"><%- gettext( "Explore your course!" ) %></a>
+                  <% } %>
+                </td>
+                <td>
+                  <a class="action action-primary" href="/dashboard"><%- gettext("Go to your Dashboard") %></a>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </li>
+    </ul>
+
+    <div class="enrollment-status-footer">
+      <h4 class="title"><%- gettext( "Verified Status" ) %></h4>
+      <p class="verify-pending-msg">
+        <%- _.sprintf( gettext( "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again." ), { platformName: platformName } ) %></p>
+    </div>
+  </article>
+</div>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for instructor.enrollment methods.
 """
@@ -8,10 +9,10 @@ from abc import ABCMeta
 from courseware.models import StudentModule
 from django.conf import settings
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.utils.translation import get_language
+from django.utils.translation import override as override_language
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.enrollment import (
@@ -20,7 +21,8 @@ from instructor.enrollment import (
     get_email_params,
     reset_student_attempts,
     send_beta_role_email,
-    unenroll_email
+    unenroll_email,
+    render_message_to_string,
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -32,6 +34,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
+        super(TestSettableEnrollmentState, self).setUp()
         self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def test_mes_create(self):
@@ -62,6 +65,7 @@ class TestEnrollmentChangeBase(TestCase):
     __metaclass__ = ABCMeta
 
     def setUp(self):
+        super(TestEnrollmentChangeBase, self).setUp()
         self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
@@ -286,10 +290,10 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorEnrollmentStudentModule(TestCase):
     """ Test student module manipulations. """
     def setUp(self):
+        super(TestInstructorEnrollmentStudentModule, self).setUp()
         self.course_key = SlashSeparatedCourseKey('fake', 'course', 'id')
 
     def test_reset_student_attempts(self):
@@ -371,7 +375,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
         a call to create_user will make objects which
         correspond to the state represented in the SettableEnrollmentState.
     """
-    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=W0231
+    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=super-init-not-called
         self.user = user
         self.enrollment = enrollment
         self.allowed = allowed
@@ -421,6 +425,7 @@ class TestSendBetaRoleEmail(TestCase):
     """
 
     def setUp(self):
+        super(TestSendBetaRoleEmail, self).setUp()
         self.user = UserFactory.create()
         self.email_params = {'course': 'Robot Super Course'}
 
@@ -431,13 +436,14 @@ class TestSendBetaRoleEmail(TestCase):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGetEmailParams(ModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
     production-like conditions.
     """
     def setUp(self):
+        super(TestGetEmailParams, self).setUp()
+
         self.course = CourseFactory.create()
 
         # Explicitly construct what we expect the course URLs to be
@@ -472,3 +478,51 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertEqual(result['course_about_url'], None)
         self.assertEqual(result['registration_url'], self.registration_url)
         self.assertEqual(result['course_url'], self.course_url)
+
+
+class TestRenderMessageToString(ModuleStoreTestCase):
+    """
+    Test that email templates can be rendered in a language chosen manually.
+    """
+
+    def setUp(self):
+        super(TestRenderMessageToString, self).setUp()
+        self.subject_template = 'emails/enroll_email_allowedsubject.txt'
+        self.message_template = 'emails/enroll_email_allowedmessage.txt'
+        self.course = CourseFactory.create()
+
+    def get_email_params(self):
+        """
+        Returns a dictionary of parameters used to render an email.
+        """
+        email_params = get_email_params(self.course, True)
+        email_params["email_address"] = "user@example.com"
+        email_params["full_name"] = "Jean Reno"
+
+        return email_params
+
+    def get_subject_and_message(self, language):
+        """
+        Returns the subject and message rendered in the specified language.
+        """
+        return render_message_to_string(
+            self.subject_template,
+            self.message_template,
+            self.get_email_params(),
+            language=language
+        )
+
+    def test_subject_and_message_translation(self):
+        subject, message = self.get_subject_and_message('fr')
+        language_after_rendering = get_language()
+
+        you_have_been_invited_in_french = u"Vous avez été invité"
+        self.assertIn(you_have_been_invited_in_french, subject)
+        self.assertIn(you_have_been_invited_in_french, message)
+        self.assertEqual(settings.LANGUAGE_CODE, language_after_rendering)
+
+    def test_platform_language_is_used_for_logged_in_user(self):
+        with override_language('zh_CN'):    # simulate a user login
+            subject, message = self.get_subject_and_message(None)
+            self.assertIn("You have been", subject)
+            self.assertIn("You have been", message)

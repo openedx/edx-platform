@@ -100,7 +100,7 @@ Coffee watches both directories and files, so you will need to set this fairly h
 
 ## Running Tests
 
-See `testing.md` for instructions on running the test suite.
+See `testing.rst` for instructions on running the test suite.
 
 ## Content development
 

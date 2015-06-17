@@ -1,8 +1,8 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from nose.tools import assert_equals, assert_greater  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_greater  # pylint: disable=no-name-in-module
 
 
 @step(u'I should see the following links and ids')

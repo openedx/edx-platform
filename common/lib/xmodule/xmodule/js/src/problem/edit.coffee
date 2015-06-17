@@ -1,12 +1,12 @@
 class @MarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
-  @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
-  @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
-  @stringInputTemplate: "= answer\n"
-  @numberInputTemplate: "= answer +- 0.001%\n"
-  @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
-  @headerTemplate: "Header\n=====\n"
-  @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
+  @multipleChoiceTemplate : "( ) #{gettext 'incorrect'}\n( ) #{gettext 'incorrect'}\n(x) #{gettext 'correct'}\n"
+  @checkboxChoiceTemplate: "[x] #{gettext 'correct'}\n[ ] incorrect\n[x] correct\n"
+  @stringInputTemplate: "= #{gettext 'answer'}\n"
+  @numberInputTemplate: "= #{gettext 'answer'} +- 0.001%\n"
+  @selectTemplate: "[[#{gettext 'incorrect'}, (#{gettext 'correct'}), #{gettext 'incorrect'}]]\n"
+  @headerTemplate: "#{gettext 'Header'}\n=====\n"
+  @explanationTemplate: "[explanation]\n#{gettext 'Short explanation'}\n[explanation]\n"
 
   constructor: (element) ->
     @element = element
@@ -41,6 +41,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     if text
       @xml_editor.setValue(text)
     @setCurrentEditor(@xml_editor)
+    $(@xml_editor.getWrapperElement()).toggleClass("CodeMirror-advanced");
+    # Need to refresh to get line numbers to display properly.
+    @xml_editor.refresh()
 
   ###
   User has clicked to show the XML editor. Before XML editor is swapped in,
@@ -53,9 +56,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @toggleCheatsheetVisibility()
     if @confirmConversionToXml()
       @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
-      # Need to refresh to get line numbers to display properly (and put cursor position to 0)
+      # Put cursor position to 0.
       @xml_editor.setCursor(0)
-      @xml_editor.refresh()
       # Hide markdown-specific toolbar buttons
       $(@element.find('.editor-bar')).hide()
 
@@ -65,7 +67,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   confirmConversionToXml: ->
     # TODO: use something besides a JavaScript confirm dialog?
-    return confirm("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?")
+    return confirm(gettext "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?")
 
   ###
   Event listener for toolbar buttons (only possible when markdown editor is visible).

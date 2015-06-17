@@ -3,14 +3,13 @@ E-commerce Tab Instructor Dashboard Coupons Operations views
 """
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from util.json_request import JsonResponse
-from django.http import HttpResponse, HttpResponseNotFound
 from shoppingcart.models import Coupon, CourseRegistrationCode
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
+import datetime
+import pytz
 import logging
 
 log = logging.getLogger(__name__)
@@ -18,7 +17,7 @@ log = logging.getLogger(__name__)
 
 @require_POST
 @login_required
-def remove_coupon(request, course_id):  # pylint: disable=W0613
+def remove_coupon(request, course_id):  # pylint: disable=unused-argument
     """
     remove the coupon against the coupon id
     set the coupon is_active flag to false
@@ -48,7 +47,7 @@ def remove_coupon(request, course_id):  # pylint: disable=W0613
 
 @require_POST
 @login_required
-def add_coupon(request, course_id):  # pylint: disable=W0613
+def add_coupon(request, course_id):  # pylint: disable=unused-argument
     """
     add coupon in the Coupons Table
     """
@@ -79,9 +78,22 @@ def add_coupon(request, course_id):  # pylint: disable=W0613
             return JsonResponse({
                 'message': _("Please Enter the Coupon Discount Value Less than or Equal to 100")
             }, status=400)  # status code 400: Bad Request
+        expiration_date = None
+        if request.POST.get('expiration_date'):
+            expiration_date = request.POST.get('expiration_date')
+            try:
+                expiration_date = datetime.datetime.strptime(expiration_date, "%m/%d/%Y").replace(tzinfo=pytz.UTC) + datetime.timedelta(days=1)
+            except ValueError:
+                return JsonResponse({
+                    'message': _("Please enter the date in this format i-e month/day/year")
+                }, status=400)  # status code 400: Bad Request
+
         coupon = Coupon(
-            code=code, description=description, course_id=course_id,
-            percentage_discount=discount, created_by_id=request.user.id
+            code=code, description=description,
+            course_id=course_id,
+            percentage_discount=discount,
+            created_by_id=request.user.id,
+            expiration_date=expiration_date
         )
         coupon.save()
         return JsonResponse(
@@ -96,7 +108,7 @@ def add_coupon(request, course_id):  # pylint: disable=W0613
 
 @require_POST
 @login_required
-def update_coupon(request, course_id):  # pylint: disable=W0613
+def update_coupon(request, course_id):  # pylint: disable=unused-argument
     """
     update the coupon object in the database
     """
@@ -121,7 +133,7 @@ def update_coupon(request, course_id):  # pylint: disable=W0613
 
 @require_POST
 @login_required
-def get_coupon_info(request, course_id):  # pylint: disable=W0613
+def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
     """
     get the coupon information to display in the pop up form
     """
@@ -143,10 +155,12 @@ def get_coupon_info(request, course_id):  # pylint: disable=W0613
             'message': _("coupon with the coupon id ({coupon_id}) is already inactive").format(coupon_id=coupon_id)
         }, status=400)  # status code 400: Bad Request
 
+    expiry_date = coupon.display_expiry_date
     return JsonResponse({
         'coupon_code': coupon.code,
         'coupon_description': coupon.description,
         'coupon_course_id': coupon.course_id.to_deprecated_string(),
         'coupon_discount': coupon.percentage_discount,
+        'expiry_date': expiry_date,
         'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)
     })  # status code 200: OK by default

@@ -22,6 +22,8 @@ log = logging.getLogger(__name__)
 class FolditTestCase(TestCase):
     """Tests for various responses of the FoldIt module"""
     def setUp(self):
+        super(FolditTestCase, self).setUp()
+
         self.factory = RequestFactory()
         self.url = reverse('foldit_ops')
 
@@ -49,9 +51,9 @@ class FolditTestCase(TestCase):
         Given lists of puzzle_ids and best_scores (must have same length), make a
         SetPlayerPuzzleScores request and return the response.
         """
-        if not(type(best_scores) == list):
+        if not isinstance(best_scores, list):
             best_scores = [best_scores]
-        if not(type(puzzle_ids) == list):
+        if not isinstance(puzzle_ids, list):
             puzzle_ids = [puzzle_ids]
         user = self.user if not user else user
 

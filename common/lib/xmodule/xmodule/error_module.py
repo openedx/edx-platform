@@ -108,7 +108,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             cls,
             # The error module doesn't use scoped data, and thus doesn't need
             # real scope keys
-            ScopeIds('error', None, location, location),
+            ScopeIds(None, 'error', location, location),
             field_data,
         )
 
@@ -120,9 +120,14 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
     @classmethod
     def from_json(cls, json_data, system, location, error_msg='Error not available'):
+        try:
+            json_string = json.dumps(json_data, skipkeys=False, indent=4, cls=EdxJSONEncoder)
+        except:  # pylint: disable=bare-except
+            json_string = repr(json_data)
+
         return cls._construct(
             system,
-            json.dumps(json_data, skipkeys=False, indent=4, cls=EdxJSONEncoder),
+            json_string,
             error_msg,
             location=location
         )

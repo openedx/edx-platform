@@ -1,0 +1,19 @@
+// ------------------------------
+// Open edX Certificates: Main Style Compile (RTL)
+
+// About: Sass compile for Open edX certificates. This does not contain styles for other Open edX products/experiences (e.g. account/onboarding).
+
+// ------------------------------
+// #VENDOR
+// ------------------------------
+@import '../vendor/bourbon/bourbon';
+@import '../vendor/neat/neat';
+@import '../vendor/bi-app/bi-app-rtl';   // RTL support
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import 'utilities/variables';
+@import 'utilities/variables-rtl';
+
+@import 'build';

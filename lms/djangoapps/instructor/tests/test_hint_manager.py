@@ -1,21 +1,18 @@
 import json
 
 from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from mock import patch, MagicMock
 
 from courseware.models import XModuleUserStateSummaryField
 from courseware.tests.factories import UserStateSummaryFactory
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
@@ -23,6 +20,8 @@ class HintManagerTest(ModuleStoreTestCase):
         Makes a course, which will be the same for all tests.
         Set up mako middleware, which is necessary for template rendering to happen.
         """
+        super(HintManagerTest, self).setUp()
+
         self.course = CourseFactory.create(org='Me', number='19.002', display_name='test_course')
         self.url = '/courses/Me/19.002/test_course/hint_manager'
         self.user = UserFactory.create(username='robot', email='robot@edx.org', password='test', is_staff=True)

@@ -1,9 +1,15 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @jtauber - to check licensing
+#   * @mollydb - to check licensing
 #   * One of @e0d, @jarv, or @feanil - to check system requirements
 
 # Numpy and scipy can't be installed in the same pip run.
 # Install numpy before other things to help resolve the problem.
 numpy==1.6.2
+
+# Needed to make sure that options in base.txt are allowed
+pip==6.0.8
+
+# Needed for meliae
+Cython==0.21.2

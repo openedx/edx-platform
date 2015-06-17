@@ -1,25 +1,25 @@
 # pylint: disable=missing-docstring
 from django.core.cache import cache
 from django.test.utils import override_settings
-
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from lang_pref import LANGUAGE_KEY
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Will also run default tests for IDTokens and UserInfo
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class BaseTestMixin(ModuleStoreTestCase):
     profile = None
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(BaseTestMixin, self).setUp()
@@ -68,7 +68,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
     def test_user_with_locale_claim(self):
         language = 'en'
-        UserPreference.set_preference(self.user, LANGUAGE_KEY, language)
+        set_user_preference(self.user, LANGUAGE_KEY, language)
         scopes, claims = self.get_id_token_values('openid profile')
 
         self.assertIn('profile', scopes)
@@ -98,7 +98,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         scopes, claims = self.get_id_token_values('openid course_instructor')
 
         self.assertIn('course_instructor', scopes)
-        self.assertNotIn('instructor_courses', claims)   # should not return courses in id_token
+        self.assertNotIn('instructor_courses', claims)  # should not return courses in id_token
 
     def test_course_staff_courses_with_claims(self):
         CourseStaffRole(self.course_key).add_users(self.user)
@@ -120,6 +120,16 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         self.assertEqual(len(claims['staff_courses']), 1)
         self.assertIn(course_id, claims['staff_courses'])
         self.assertNotIn(nonexistent_course_id, claims['staff_courses'])
+
+    def test_permissions_scope(self):
+        scopes, claims = self.get_id_token_values('openid profile permissions')
+        self.assertIn('permissions', scopes)
+        self.assertFalse(claims['administrator'])
+
+        self.user.is_staff = True
+        self.user.save()
+        _scopes, claims = self.get_id_token_values('openid profile permissions')
+        self.assertTrue(claims['administrator'])
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):
@@ -185,3 +195,13 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         courses = claims['instructor_courses']
         self.assertIn(self.course_id, courses)
         self.assertEqual(len(courses), 1)
+
+    def test_permissions_scope(self):
+        claims = self.get_with_scope('permissions')
+        self.assertIn('administrator', claims)
+        self.assertFalse(claims['administrator'])
+
+        self.user.is_staff = True
+        self.user.save()
+        claims = self.get_with_scope('permissions')
+        self.assertTrue(claims['administrator'])

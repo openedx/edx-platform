@@ -9,8 +9,9 @@
 <%
   homepage_overlay_html = microsite.get_value('homepage_overlay_html')
 
-  show_homepage_promo_video = microsite.get_value('show_homepage_promo_video', True)
-  homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "XNaiOGxWeto")
+  ## To display a welcome video, change False to True, and add a YouTube ID (11 chars, eg "123456789xX") in the following line
+  show_homepage_promo_video = microsite.get_value('show_homepage_promo_video', False)
+  homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
 
   show_partners = microsite.get_value('show_partners', True)
 %>
@@ -30,29 +31,6 @@
           % endif
         </hgroup>
 
-        ## Disable social buttons for non-edX sites
-        % if not self.theme_enabled():
-          <section class="actions">
-            <div class="main-cta">
-              <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">${_("Sign Up")}</a>
-            </div>
-
-            <div class="secondary-actions">
-              <div class="social-sharing">
-                <div class="sharing-message">${_("Stay up to date with all {platform_name} has to offer!").format(platform_name=settings.PLATFORM_NAME)}</div>
-                <a href="https://twitter.com/edXOnline" class="share">
-                  <img src="${static.url('images/social/twitter-sharing.png')}">
-                </a>
-                <a href="http://www.facebook.com/EdxOnline" class="share">
-                  <img src="${static.url('images/social/facebook-sharing.png')}">
-                </a>
-                <a href="https://plus.google.com/108235383044095082735/posts" class="share">
-                  <img src="${static.url('images/social/google-plus-sharing.png')}">
-                </a>
-              </div>
-            </div>
-          </section>
-          % endif
       </div>
 
         % if self.homepage_promo_video_file:
@@ -67,19 +45,23 @@
 
     </div>
   </header>
-  <section class="container">
+  <section class="courses-container">
     <section class="highlighted-courses">
 
       % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
         <section class="courses">
             <ul class="courses-listing">
-            %for course in courses:
+            ## cap for showing 9 or less courses
+            %for course in courses[:9]:
               <li class="courses-listing-item">
                 <%include file="course.html" args="course=course" />
               </li>
             %endfor
             </ul>
         </section>
+        <div class="courses-more">
+          <a class="courses-more-cta" href="${marketing_link('COURSES')}" > ${_("View all Courses")} </a>
+        </div>
       % endif
 
     </section>
@@ -92,6 +74,12 @@
 
 <section id="video-modal" class="modal home-page-video-modal video-modal">
   <div class="inner-wrapper">
+    <%
+      youtube_video_id = homepage_promo_video_youtube_id
+      if self.is_non_microsite_theme():
+        youtube_video_id = "2gmreZObCY4"
+    %>
+    <iframe title="YouTube Video" width="640" height="360" src="//www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>
 

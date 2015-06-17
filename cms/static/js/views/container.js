@@ -9,6 +9,8 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             // child xblocks within the page.
             requestToken: "",
 
+            new_child_view: 'reorderable_container_child_preview',
+
             xblockReady: function () {
                 XBlockView.prototype.xblockReady.call(this);
                 var reorderableClass, reorderableContainer,
@@ -37,7 +39,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         }
 
                         saving = new NotificationView.Mini({
-                            title: gettext('Saving&hellip;')
+                            title: gettext('Saving')
                         });
                         saving.show();
 
@@ -121,6 +123,10 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         xblockInfo.fetch();
                     }
                 });
+            },
+
+            acknowledgeXBlockDeletion: function(locator){
+                this.notifyRuntime('deleted-child', locator);
             },
 
             refresh: function() {

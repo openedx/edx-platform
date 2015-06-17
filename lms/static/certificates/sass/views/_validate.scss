@@ -1,0 +1,289 @@
+// ------------------------------
+// Open edX Certificates: DIY Validation Instructions View
+
+.view-validate-certificate {
+
+  // general
+  .content {
+
+    .title-lvl1 {
+      @extend %t-title-3;
+      @extend %t-weight3;
+      margin-bottom: $baseline-v;
+    }
+
+    .title-lvl2 {
+      @extend %t-title-5;
+      @extend %t-weight3;
+      margin-bottom: ($baseline-v/2);
+    }
+
+    .title-lvl3 {
+      @extend %t-title-6;
+      @extend %t-weight3;
+      margin-bottom: ($baseline-v/2);
+    }
+
+    .title-lvl4 {
+
+    }
+  }
+
+  // ====================
+
+  // introduction
+  .introduction {
+    @include span-columns(8 of 12);
+    @include shift(2);
+    margin-bottom: ($baseline-v*2);
+
+    @include media($bp-large) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-small) {
+      @include fill-parent();
+      @include shift(0);
+    }
+  }
+
+  // requirements
+  .requirements {
+    @include span-columns(8 of 12);
+    @include shift(2);
+    margin-bottom: ($baseline-v*2);
+
+    @include media($bp-large) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-small) {
+      @include fill-parent();
+      @include shift(0);
+    }
+  }
+
+  .list-requirements {
+    @extend %ui-no-list;
+    @include fill-parent();
+    counter-reset: instructions-counter;
+    margin: $baseline-v 0;
+
+    .item {
+      @extend %t-copy-base;
+      @include span-columns(4 of 8);
+      @include omega(2n);
+      min-height: ($baseline-v*8);
+      margin-bottom: $baseline-v;
+      border-radius: ($baseline-v/10);
+      border-top: 4px solid $blue-s1;
+      padding: ($baseline-v) ($baseline-h);
+      color: $gray-l1;
+      background: $gray-l5;
+
+      @include media($bp-large) {
+      }
+
+      @include media($bp-medium) {
+        @include fill-parent();
+        min-height: 0;
+      }
+
+      @include media($bp-small) {
+        @include fill-parent();
+        min-height: 0;
+      }
+
+      &:before {
+        @extend %t-title-6;
+        @extend %t-weight3;
+        content: counter(instructions-counter);
+        counter-increment: instructions-counter;
+        display: inline-block;
+        vertical-align: top;
+        max-width: 10%;
+        @include margin-right($baseline-h/2);
+        color: $gray-l3;
+      }
+
+      .requirement-label {
+        @extend %t-title-6;
+        @extend %t-weight3;
+        display: inline-block;
+        vertical-align: top;
+        margin-bottom: ($baseline-v/4);
+        max-width: 85%;
+        color: $gray-d4;
+      }
+
+      .requirement-details {
+        display: block;
+
+        @include media($bp-small) {
+          @include font-size(14); // can't use %t-copy-base for some reason
+          @include lh(14);
+        }
+      }
+    }
+
+    .requirement-allitems {
+      border-top-color: $pink;
+    }
+  }
+
+  // ====================
+
+  // instructions
+  .instructions {
+    @extend %ui-shadow-subtle-down;
+    @include span-columns(8 of 12);
+    @include shift(2);
+    @include pad($baseline-v $baseline-h);
+    margin-bottom: ($baseline-v*2);
+    border-radius: ($baseline-v/10);
+    border: 1px solid $gray-l5;
+    background: $white-t;
+
+    @include media($bp-large) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-small) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    .title {
+      @extend %t-title-2;
+      @extend %t-weight3;
+      margin-bottom: $baseline-v;
+      padding-bottom: ($baseline-v/2);
+      border-bottom: 3px solid $gray-l5;
+    }
+  }
+
+  .list-instructions {
+    @extend %ui-no-list;
+    counter-reset: instructions-counter;
+
+
+    .item {
+      @extend %t-copy-base;
+      @extend %wipe-last-child;
+      display: block;
+      margin-bottom: $baseline-v;
+      padding-bottom: $baseline-v;
+      border-bottom: 1px solid $gray-l5;
+      color: $gray-l1;
+
+      @include media($bp-small) {
+        @include font-size(16); // can't use %t-copy-base for some reason
+        @include lh(16);
+      }
+
+      &:before {
+        @extend %t-title-6;
+        @extend %t-weight4;
+        content: counter(instructions-counter);
+        counter-increment: instructions-counter;
+        display: inline-block;
+        vertical-align: top;
+        max-width: 10%;
+        @include margin-right($baseline-h/2);
+        color: $gray-l4;
+      }
+
+      .instruction-details {
+        @extend %wipe-last-child;
+        display: inline-block;
+        vertical-align: top;
+        margin-bottom: $baseline-v;
+        max-width: 85%;
+      }
+
+      .instruction-image {
+        @include fill-parent();
+        border-radius: ($baseline-v/10);
+        border: 1px solid $gray-l5;
+        padding: ($baseline-v/2) ($baseline-h/2);
+        background: $gray-l6;
+
+        img {
+          @include fill-parent();
+          display: block;
+        }
+      }
+    }
+  }
+
+  // specific instructions
+
+
+  // ====================
+
+  // support
+  .support {
+    @include span-columns(8 of 12);
+    @include shift(2);
+
+    @include media($bp-large) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-medium) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    @include media($bp-small) {
+      @include fill-parent();
+      @include shift(0);
+    }
+
+    .copy {
+
+      @include media($bp-small) {
+        @include font-size(14); // can't use %t-copy-base for some reason
+        @include lh(14);
+      }
+    }
+
+    .list-actions {
+      margin-top: ($baseline-v);
+
+      .action {
+        @extend %t-copy-sub1;
+        @extend %btn-primary;
+
+        @include media($bp-medium) {
+          display: block;
+          text-align: center;
+        }
+
+        @include media($bp-small) {
+          display: block;
+          text-align: center;
+        }
+      }
+    }
+  }
+}

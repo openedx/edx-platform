@@ -1,0 +1,10 @@
+<li class="discussion-category-item">
+    <div class="category-item">
+    <label>
+        <input type="checkbox" class="check-discussion-category"  <%- isCategoryCohorted ? 'checked="checked"' : '' %>/>
+        <span class="category-title"><%- name %></span>
+    </label>
+    </div>
+
+    <ul class="wrapper-tabs subcategories"><%= entries %></ul>
+</li>

@@ -7,7 +7,7 @@ var edx = edx || {};
     edx.student.account = edx.student.account || {};
 
     edx.student.account.PasswordResetView = edx.student.account.FormView.extend({
-        el: '#password-reset-wrapper',
+        el: '#password-reset-form',
 
         tpl: '#password_reset-tpl',
 
@@ -22,6 +22,8 @@ var edx = edx || {};
         submitButton: '.js-reset',
 
         preRender: function() {
+            this.element.show( $( this.el ) );
+            this.element.show( $( this.el ).parent() );
             this.listenTo( this.model, 'sync', this.saveSuccess );
         },
 
@@ -35,12 +37,11 @@ var edx = edx || {};
         },
 
         saveSuccess: function() {
-            var $el = $(this.el),
-                $msg = $el.find('.js-reset-success');
+            this.trigger('password-email-sent');
 
-            this.element.hide( $el.find('#password-reset-form') );
-            this.element.show( $msg );
-            this.element.scrollTop( $msg );
+            // Destroy the view (but not el) and unbind events
+            this.$el.empty().off();
+            this.stopListening();
         }
     });
 

@@ -5,7 +5,7 @@ so that we can run the lettuce acceptance tests.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .test import *
 from .sauce import *
@@ -24,7 +24,6 @@ logging.getLogger().setLevel(logging.ERROR)
 
 import os
 from random import choice
-import string
 
 
 def seed():
@@ -159,7 +158,7 @@ SELENIUM_GRID = {
 #####################################################################
 # See if the developer has any local overrides.
 try:
-    from .private import *  # pylint: disable=F0401
+    from .private import *  # pylint: disable=import-error
 except ImportError:
     pass
 
@@ -179,3 +178,11 @@ XQUEUE_INTERFACE = {
 YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+
+if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    # Use MockSearchEngine as the search engine for test scenario
+    SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
+# Generate a random UUID so that different runs of acceptance tests don't break each other
+import uuid
+SECRET_KEY = uuid.uuid4().hex

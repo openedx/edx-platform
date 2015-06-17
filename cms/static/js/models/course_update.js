@@ -3,7 +3,9 @@ define(["backbone", "jquery", "jquery.ui"], function(Backbone, $) {
     var CourseUpdate = Backbone.Model.extend({
         defaults: {
             "date" : $.datepicker.formatDate('MM d, yy', new Date()),
-            "content" : ""
+            "content" : "",
+            "push_notification_enabled": false,
+            "push_notification_selected" : false
         }
     });
     return CourseUpdate;

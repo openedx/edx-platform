@@ -19,6 +19,7 @@ class FormulaTest(unittest.TestCase):
     mathml_end = '</mstyle></math>'
 
     def setUp(self):
+        super(FormulaTest, self).setUp()
         self.formulaInstance = formula.formula('')
 
     def test_replace_mathvariants(self):

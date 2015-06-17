@@ -89,8 +89,8 @@
 
     .arrow_box {
       position: relative;
-      background: #fff;
-      border: 4px solid #000;
+      background: $white;
+      border: 4px solid $black;
     }
     .arrow_box:after, .arrow_box:before {
       top: 100%;
@@ -104,14 +104,14 @@
 
     .arrow_box:after {
       border-color: rgba(255, 255, 255, 0);
-      border-top-color: #fff;
+      border-top-color: $white;
       border-width: 30px;
       left: 50%;
-      margin-left: -30px;
+      margin-left: -($baseline*1.5);
     }
     .arrow_box:before {
-      border-color: rgba(0, 0, 0, 0);
-      border-top-color: #000;
+      border-color: $transparent;
+      border-top-color: $black;
       border-width: 36px;
       left: 50%;
       margin-left: -36px;
@@ -162,7 +162,7 @@
               right: ($baseline/2);
               opacity: 0.0;
 
-              [class^="icon-"] {
+              .icon {
                 @include border-top-radius(3px);
                 @extend %t-icon4;
                 display: inline-block;

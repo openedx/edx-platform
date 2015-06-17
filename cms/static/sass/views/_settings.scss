@@ -2,6 +2,8 @@
 // ====================
 
 .view-settings {
+  @include text-align(left);
+  @include direction();
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
@@ -25,8 +27,8 @@
     @extend %t-strong;
     display: none;
     border-bottom: 2px solid $yellow;
-    margin: 0 0 20px 0;
-    padding: 10px 20px;
+    margin: 0 0 $baseline 0;
+    padding: ($baseline/2) $baseline;
     background: $paleYellow;
 
     .text {
@@ -100,8 +102,12 @@
       @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       margin-top: ($baseline/4);
-      color: $gray-l3;
+      color: $gray-d1;
     }
+    .tip-inline{
+    display: inline;
+    margin-left: 5px;
+  }
 
     .message-error {
       @extend %t-copy-sub1;
@@ -135,10 +141,32 @@
 
     // form basics
     .list-input {
-      margin: 0;
-      padding: 0;
-      list-style: none;
+      @extend %cont-no-list;
 
+      .show-data{
+        .heading{
+          border: 1px solid #E0E0E0;
+          padding: 5px 15px;
+          margin-top: 5px;
+        }
+         .div-grade-requirements{
+            border: 1px solid #E0E0E0;
+            border-top: none;
+            padding: 10px 15px;
+           label{font-weight: 600;}
+           input#entrance-exam-minimum-score-pct{
+              height: 40px;
+              font-size: 18px;
+           }
+         }
+      }
+      #heading-entrance-exam{
+        font-weight: 600;
+      }
+
+      label[for="entrance-exam-enabled"] {
+        font-size: 14px;
+      }
       .field {
         margin: 0 0 ($baseline*2) 0;
 
@@ -221,11 +249,11 @@
           padding-top:  ($baseline/2);
   
           .action-primary {
-            @include blue-button();
+            @extend %btn-primary-blue;
             @extend %t-action3;
             font-weight: 600;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;
@@ -371,7 +399,7 @@
             @extend %t-action3;
             @extend %t-strong;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;
@@ -569,14 +597,15 @@
         height: ($baseline*2);
         position: relative;
         display: inline-block;
-        vertical-align: middle;
         margin-right: flex-gutter();
+        vertical-align: middle;
+        text-align: center;
         border-radius: 20px;
         border: 1px solid $darkGrey;
         background-color: #d1dae3;
         color: #6d788b;
 
-        .plus-icon {
+        .icon {
           position: absolute;
           top: 50%;
           left: 50%;
@@ -720,7 +749,7 @@
               .range {
                 @include font-size(10);
                 display: block;
-                margin-right: 15px;
+                margin-right: ($baseline*0.75);
                 line-height: 12px;
               }
 
@@ -730,7 +759,7 @@
                 right: -1px;
                 height: 50px;
                 width: 2px;
-                background-color: #fff;
+                background-color: $white;
                 box-shadow: -1px 0 3px rgba(0,0,0,0.1);
 
                 cursor: ew-resize;
@@ -919,7 +948,7 @@
       .CodeMirror {
         @extend %t-copy-base;
         @include box-sizing(border-box);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, .1) inset;
+        box-shadow: 0 1px 2px $shadow-l1 inset;
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));
         padding: 5px 8px;
         border: 1px solid $mediumGrey;
@@ -938,6 +967,19 @@
 
         .CodeMirror-sizer {
           top: 4px; /* Vertical alignment for monospace font */
+        }
+
+        .CodeMirror-scroll {
+          @include margin-left(-30px);
+          @include margin-right(0);
+
+          @include padding-left(30px);
+          @include padding-right(0);
+        }
+
+        .CodeMirror-vscrollbar {
+          @include left(0);
+          @include right(auto);
         }
 
         // editor color changes just for JSON

@@ -18,7 +18,7 @@
 
 <div id="no-webcam" style="display: none;" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
-    <i class="msg-icon icon-warning-sign"></i>
+    <i class="msg-icon fa fa-warning"></i>
     <div class="msg-content">
       <h3 class="title">${_("No Webcam Detected")}</h3>
       <div class="copy">
@@ -30,7 +30,7 @@
 
 <div id="no-flash" style="display: none;" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
-    <i class="msg-icon icon-warning-sign"></i>
+    <i class="msg-icon fa fa-warning"></i>
     <div class="msg-content">
       <h3 class="title">${_("No Flash Detected")}</h3>
       <div class="copy">
@@ -43,7 +43,7 @@
 %if error:
 <div id="submission-error" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
-    <i class="msg-icon icon-warning-sign"></i>
+    <i class="msg-icon fa fa-warning"></i>
     <div class="msg-content">
       <h3 class="title">${_("Error submitting your images")}</h3>
       <div class="copy">
@@ -60,9 +60,11 @@
     <div class="wrapper-reverification">
       <section class="reverification">
         <div class="message">
-          <h3 class="title">${_("Please Resubmit Your Verification Information")}</h3>
+          <h3 class="title">${_("Verify Your Identity")}</h3>
           <div class="copy">
-            <p>${_("There was an error with your previous verification. In order proceed in the verified certificate of achievement track of your current courses, please complete the following steps.")}</p>
+          ## Translators: {start_bold} and {end_bold} will be replaced with HTML tags.
+          ## Please do not translate these variables.
+            <p>${_("To verify your identity and continue as a verified student in this course, complete the following steps {start_bold}before the course verification deadline{end_bold}. If you do not verify your identity, you can still receive an honor code certificate for the course.").format(start_bold="<b>", end_bold="</b>")}</p>
           </div>
         </div>
 
@@ -92,7 +94,7 @@
 
           <li class="progress-step progress-step-icon" id="progress-step4">
             <span class="wrapper-step-number"><span class="step-number">
-              <i class="icon-ok"></i>
+              <i class="icon fa fa-check-square-o"></i>
             </span></span>
             <span class="step-name">${_("Confirmation")}</span>
           </li>
@@ -131,19 +133,19 @@
                     <ul class="list-controls">
                       <li class="control control-redo" id="face_reset_button">
                         <a class="action action-redo" href="">
-                          <i class="icon-undo"></i> <span class="sr">${_("Retake")}</span>
+                          <i class="icon fa fa-undo"></i> <span class="sr">${_("Retake")}</span>
                         </a>
                       </li>
 
                       <li class="control control-do" id="face_capture_button">
                         <a class="action action-do" href="">
-                          <i class="icon-camera"></i><span class="sr">${_("Take photo")}</span>
+                          <i class="icon fa fa-camera"></i><span class="sr">${_("Take photo")}</span>
                         </a>
                       </li>
 
                       <li class="control control-approve" id="face_approve_button">
                         <a class="action action-approve" href="">
-                          <i class="icon-ok"></i> <span class="sr">${_("Looks good")}</span>
+                          <i class="icon fa fa-check-square-o"></i> <span class="sr">${_("Looks good")}</span>
                         </a>
                       </li>
                     </ul>
@@ -159,8 +161,8 @@
                         <li class="help-item">${_("Make sure your face is well-lit")}</li>
                         <li class="help-item">${_("Be sure your entire face is inside the frame")}</li>
                         <li class="help-item">${_("Can we match the photo you took with the one on your ID?")}</li>
-                        <li class="help-item">${_("Once in position, use the camera button")} <span class="example">(<i class="icon-camera"></i>)</span> ${_("to capture your picture")}</li>
-                        <li class="help-item">${_("Use the checkmark button")} <span class="example">(<i class="icon-ok"></i>)</span> ${_("once you are happy with the photo")}</li>
+                        <li class="help-item">${_("Once in position, use the camera button {btn_icon} to capture your picture").format(btn_icon='<span class="example">(<i class="icon fa fa-camera"></i>)</span>')}</li>
+                        <li class="help-item">${_("Use the checkmark button {btn_icon} once you are happy with the photo").format(btn_icon='<span class="example">(<i class="icon fa fa-check-square-o"></i>)</span>')}</li>
                       </ul>
                     </div>
                   </div>
@@ -181,7 +183,7 @@
                 </div>
               </div>
 
-              <nav class="nav-wizard" id="face_next_button_nav">
+               <nav class="nav-wizard" id="face_next_button_nav" aria-label="${_('Verification')}">
                 <span class="help help-inline">${_("Once you verify your photo looks good, you can move on to step 2.")}</span>
 
                 <ol class="wizard-steps">
@@ -217,19 +219,19 @@
                     <ul class="list-controls">
                       <li class="control control-redo" id="photo_id_reset_button">
                         <a class="action action-redo" href="">
-                          <i class="icon-undo"></i> <span class="sr">${_("Retake")}</span>
+                          <i class="icon fa fa-undo"></i> <span class="sr">${_("Retake")}</span>
                         </a>
                       </li>
 
                       <li class="control control-do" id="photo_id_capture_button">
                         <a class="action action-do" href="">
-                          <i class="icon-camera"></i> <span class="sr">${_("Take photo")}</span>
+                          <i class="icon fa fa-camera"></i> <span class="sr">${_("Take photo")}</span>
                         </a>
                       </li>
 
                       <li class="control control-approve" id="photo_id_approve_button">
                         <a class="action action-approve" href="">
-                          <i class="icon-ok"></i> <span class="sr">${_("Looks good")}</span>
+                          <i class="icon fa fa-check-square-o"></i> <span class="sr">${_("Looks good")}</span>
                         </a>
                       </li>
                     </ul>
@@ -243,12 +245,12 @@
                     <div class="copy">
                       <ul class="list-help">
                         <li class="help-item">${_("Make sure your ID is well-lit")}</li>
-                        <li class="help-item help-item-emphasis">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
+                        <li class="help-item help-item-emphasis">${_("Acceptable IDs include driver's licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
                         <li class="help-item">${_("Check that there isn't any glare")}</li>
                         <li class="help-item">${_("Ensure that you can see your photo and read your name")}</li>
                         <li class="help-item">${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
-                        <li class="help-item">${_("Once in position, use the camera button")} <span class="example">(<i class="icon-camera"></i>)</span> ${_("to capture your ID")}</li>
-                        <li class="help-item">${_("Use the checkmark button")} <span class="example">(<i class="icon-ok"></i>)</span> ${_("once you are happy with the photo")}</li>
+                        <li class="help-item">${_("Once in position, use the camera button {btn_icon} to capture your ID").format(btn_icon='<span class="example">(<i class="icon fa fa-camera"></i>)</span>')}</li>
+                        <li class="help-item">${_("Use the checkmark button {btn_icon} once you are happy with the photo").format(btn_icon='<span class="example">(<i class="icon fa fa-check-square-o"></i>)</span>')}</li>
                       </ul>
                     </div>
                   </div>
@@ -269,7 +271,7 @@
                 </div>
               </div>
 
-              <nav class="nav-wizard" id="photo_id_next_button_nav">
+              <nav class="nav-wizard" id="photo_id_next_button_nav" aria-label="${_('Verification')}">
                 <span class="help help-inline">${_("Once you verify your ID photo looks good, you can move on to step 3.")}</span>
 
                 <ol class="wizard-steps">
@@ -347,7 +349,10 @@
                     <h4 class="title">${_("Check Your Name")}</h4>
 
                     <div class="copy">
-                        <p>${_("Make sure your full name on your edX account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
+                        <p>${_(u"Make sure your full name on your {platform_name} account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(
+                          full_name=u"<span id='full-name'>{name}</span>".format(name=user_full_name),
+                          platform_name=settings.PLATFORM_NAME,
+                        )}</p>
                     </div>
 
                     <ul class="list-actions">
@@ -359,7 +364,7 @@
                 </ol>
               </div>
 
-              <nav class="nav-wizard">
+              <nav class="nav-wizard" aria-label="${_('Verification')}">
                 <div class="prompt-verify">
                   <h3 class="title">Before proceeding, please confirm that your details match</h3>
 

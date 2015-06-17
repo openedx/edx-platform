@@ -1,0 +1,103 @@
+<%
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from contentstore.utils import ancestor_has_staff_lock
+
+cohorted_user_partition = get_cohorted_user_partition(xblock.location.course_key)
+unsorted_groups = cohorted_user_partition.groups if cohorted_user_partition else []
+groups = sorted(unsorted_groups, key=lambda group: group.name)
+selected_group_ids = xblock.group_access.get(cohorted_user_partition.id, []) if cohorted_user_partition else []
+has_selected_groups = len(selected_group_ids) > 0
+is_staff_locked = ancestor_has_staff_lock(xblock)
+%>
+
+<div class="modal-section visibility-summary">
+    % if len(groups) == 0:
+        <div class="is-not-configured has-actions">
+            <h4 class="title">${_('No content groups exist')}</h4>
+
+            <div class="copy">
+                <p>${_('Use content groups to give groups of students access to a specific set of course content. Create one or more content groups, and make specific components visible to them.')}</p>
+            </div>
+
+            <div class="actions">
+                <a href="${manage_groups_url}" class="action action-primary action-settings">${_('Manage content groups')}</a>
+            </div>
+        </div>
+    % elif is_staff_locked:
+        <div class="summary-message summary-message-warning visibility-summary-message">
+            <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <p class="copy">
+                ## Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                ${_(
+                    "{screen_reader_start}Warning:{screen_reader_end} The Unit this component is contained in is hidden from students. Visibility settings here will be trumped by this."
+                    ).format(
+                        screen_reader_start='<span class="sr">',
+                        screen_reader_end='</span>',
+                    )
+                }
+            </p>
+        </div>
+    % endif
+</div>
+
+% if len(groups) > 0:
+    <form class="visibility-controls-form" method="post" action="">
+
+        <div class="modal-section visibility-controls">
+            <h3 class="modal-section-title">${_('Make visible to:')}</h3>
+
+            <div class="modal-section-content">
+
+                <section class="visibility-controls-primary">
+                    <ul class="list-fields list-radio">
+                        <li class="field field-radio field-visibility-level">
+                            <input type="radio" id="visibility-level-all" name="visibility-level" value="" class="input input-radio visibility-level-all" ${'checked="checked"' if not has_selected_groups else ''} />
+                            <label for="visibility-level-all" class="label">${_('All Students and Staff')}</label>
+                        </li>
+
+                        <li class="field field-radio field-visibility-level">
+                            <input type="radio" id="visibility-level-specific" name="visibility-level" value="" class="input input-radio visibility-level-specific"  ${'checked="checked"' if has_selected_groups else ''} />
+                            <label for="visibility-level-specific" class="label">${_('Specific Content Groups')}</label>
+                        </li>
+                    </ul>
+                </section>
+
+                <div class="wrapper-visibility-specific" data-user-partition-id="${cohorted_user_partition.id}">
+                    <section class="visibility-controls-secondary">
+                        <div class="visibility-controls-group">
+                            <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
+                            <ul class="list-fields list-checkbox">
+                                <%
+                                missing_group_ids = set(selected_group_ids)
+                                %>
+                                % for group in groups:
+                                    <%
+                                    is_group_selected = group.id in selected_group_ids
+                                    if is_group_selected:
+                                        missing_group_ids.remove(group.id)
+                                    %>
+                                    <li class="field field-checkbox field-visibility-content-group">
+                                        <input type="checkbox" id="visibility-content-group-${group.id}" name="visibility-content-group" value="${group.id}" class="input input-checkbox"  ${'checked="checked"' if group.id in selected_group_ids else ''}/>
+                                        <label for="visibility-content-group-${group.id}" class="label">${group.name | h}</label>
+                                    </li>
+                                % endfor
+
+                                % for group_id in missing_group_ids:
+                                    <li class="field field-checkbox field-visibility-content-group was-removed">
+                                        <input type="checkbox" id="visibility-content-group-${group_id}" name="visibility-content-group" value="${group_id}" class="input input-checkbox" checked="checked" />
+                                        <label for="visibility-content-group-${group_id}" class="label">
+                                            ${_('Deleted Content Group')}
+                                            <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
+                                        </label>
+                                    </li>
+                                % endfor
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </form>
+% endif

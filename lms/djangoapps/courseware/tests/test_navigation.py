@@ -2,21 +2,17 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 import time
-from django.conf import settings
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.factories import GlobalStaffFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.tests.factories import GlobalStaffFactory
-
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
@@ -50,8 +46,10 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.tabssection = ItemFactory.create(parent=self.chapterchrome,
                                               display_name='tabs',
                                               chrome='tabs')
-        self.defaultchromesection = ItemFactory.create(parent=self.chapterchrome,
-                                             display_name='defaultchrome')
+        self.defaultchromesection = ItemFactory.create(
+            parent=self.chapterchrome,
+            display_name='defaultchrome',
+        )
         self.fullchromesection = ItemFactory.create(parent=self.chapterchrome,
                                                     display_name='fullchrome',
                                                     chrome='accordion,tabs')

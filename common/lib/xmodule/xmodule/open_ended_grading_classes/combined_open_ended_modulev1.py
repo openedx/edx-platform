@@ -8,7 +8,6 @@ from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
 from xmodule.open_ended_grading_classes import self_assessment_module
 from xmodule.open_ended_grading_classes import open_ended_module
-from xmodule.util.duedate import get_extended_due_date
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
@@ -67,7 +66,7 @@ HUMAN_STATES = {
 SKIP_BASIC_CHECKS = False
 
 
-class CombinedOpenEndedV1Module():
+class CombinedOpenEndedV1Module(object):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
     It transitions between problems, and support arbitrary ordering.
@@ -138,7 +137,7 @@ class CombinedOpenEndedV1Module():
         self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
         if system.open_ended_grading_interface:
-            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system.render_template)
         else:
             self.peer_gs = MockPeerGradingService()
 
@@ -150,7 +149,7 @@ class CombinedOpenEndedV1Module():
             'peer_grade_finished_submissions_when_none_pending', False
         )
 
-        due_date = get_extended_due_date(instance_state)
+        due_date = instance_state.get('due', None)
         grace_period_string = instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
@@ -159,7 +158,7 @@ class CombinedOpenEndedV1Module():
             raise
         self.display_due_date = self.timeinfo.display_due_date
 
-        self.rubric_renderer = CombinedOpenEndedRubric(system, True)
+        self.rubric_renderer = CombinedOpenEndedRubric(system.render_template, True)
         rubric_string = stringify_children(definition['rubric'])
         self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
 
@@ -567,12 +566,12 @@ class CombinedOpenEndedV1Module():
             'state': self.state,
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
-            'status': ugettext(self.get_status(False)),
+            'status': ugettext(self.get_status(False)),    # pylint: disable=translation-of-non-string
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': ugettext(HUMAN_STATES.get(self.state, "Not started.")),
+            'human_state': ugettext(HUMAN_STATES.get(self.state, HUMAN_STATES["intitial"])),    # pylint: disable=translation-of-non-string
             'is_staff': self.system.user_is_staff,
         }
 
@@ -1020,7 +1019,7 @@ class CombinedOpenEndedV1Module():
         current_task_human_name = ""
         for i in xrange(0, len(self.task_xml)):
             human_task_name = self.extract_human_name_from_task(self.task_xml[i])
-            human_task_name = ugettext(human_task_name)
+            human_task_name = ugettext(human_task_name)    # pylint: disable=translation-of-non-string
             # Extract the name of the current task for screen readers.
             if self.current_task_number == i:
                 current_task_human_name = human_task_name
@@ -1185,7 +1184,7 @@ class CombinedOpenEndedV1Module():
         return declaration
 
 
-class CombinedOpenEndedV1Descriptor():
+class CombinedOpenEndedV1Descriptor(object):
     """
     Module for adding combined open ended questions
     """

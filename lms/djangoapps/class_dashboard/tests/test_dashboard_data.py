@@ -3,25 +3,27 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
 import json
-from mock import patch
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from courseware.tests.factories import StaffFactory, InstructorFactory
+from mock import patch
+
+from capa.tests.response_xml_factory import StringResponseXMLFactory
+from courseware.tests.factories import StudentModuleFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from courseware.tests.factories import StudentModuleFactory, StaffFactory, InstructorFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from capa.tests.response_xml_factory import StringResponseXMLFactory
 
-from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_sequential_open_distrib,
-                                            get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
-                                            get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
-                                            get_section_display_name, get_array_section_has_problem,
-                                            get_students_opened_subsection, get_students_problem_grades,
-                                            get_non_student_list,
-                                            )
+from class_dashboard.dashboard_data import (
+    get_problem_grade_distribution, get_sequential_open_distrib,
+    get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
+    get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
+    get_section_display_name, get_array_section_has_problem,
+    get_students_opened_subsection, get_students_problem_grades,
+    get_non_student_list,
+)
 from class_dashboard.views import has_instructor_access_for_class
 from student.models import CourseEnrollment
 from courseware.models import StudentModule
@@ -29,13 +31,13 @@ from courseware.models import StudentModule
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
     """
 
     def setUp(self):
+        super(TestGetProblemGradeDistribution, self).setUp()
 
         self.request_factory = RequestFactory()
         self.instructor = AdminFactory.create()

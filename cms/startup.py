@@ -5,12 +5,10 @@ Module with code executed during Studio startup
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
-settings.INSTALLED_APPS  # pylint: disable=W0104
+settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-from django_startup import autostartup
+from openedx.core.lib.django_startup import autostartup
 from monkey_patch import django_utils_translation
-from util import keyword_substitution
-from lms.startup import get_keyword_function_map
 
 
 def run():
@@ -23,11 +21,9 @@ def run():
 
     add_mimetypes()
 
-    # Monkey patch the keyword function map
-    if keyword_substitution.keyword_function_map_is_empty():
-        keyword_substitution.add_keyword_function_map(get_keyword_function_map())
-        # Once keyword function map is set, make update function do nothing
-        keyword_substitution.add_keyword_function_map = lambda x: None
+    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
+        enable_theme()
+
 
 def add_mimetypes():
     """
@@ -41,3 +37,34 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-opentype', '.otf')
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
+
+
+def enable_theme():
+    """
+    Enable the settings for a custom theme, whose files should be stored
+    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
+    At this moment this is actually just a fix for collectstatic,
+    (see https://openedx.atlassian.net/browse/TNL-726),
+    but can be improved with a full theming option also for Studio
+    in the future (see lms.startup)
+    """
+    # Workaround for setting THEME_NAME to an empty
+    # string which is the default due to this ansible
+    # bug: https://github.com/ansible/ansible/issues/4812
+    if settings.THEME_NAME == "":
+        settings.THEME_NAME = None
+        return
+
+    assert settings.FEATURES['USE_CUSTOM_THEME']
+    settings.FAVICON_PATH = 'themes/{name}/images/favicon.ico'.format(
+        name=settings.THEME_NAME
+    )
+
+    # Calculate the location of the theme's files
+    theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
+
+    # Namespace the theme's static files to 'themes/<theme_name>' to
+    # avoid collisions with default edX static files
+    settings.STATICFILES_DIRS.append(
+        (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
+    )

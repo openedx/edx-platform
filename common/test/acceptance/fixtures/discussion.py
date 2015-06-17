@@ -44,7 +44,7 @@ class Thread(ContentFactory):
 
 
 class Comment(ContentFactory):
-    thread_id = None
+    thread_id = "dummy thread"
     depth = 0
     type = "comment"
     body = "dummy comment body"

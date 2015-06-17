@@ -11,16 +11,39 @@
 
 <%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 
-
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
+      var el = $("input[name='email_opt_in']"),
+        emailOptIn,
+        currentHref;
+
+      // Check if the email opt-in checkbox is missing
+      if ( $("#email-opt-in").length == 0 ) {
+        // Remove the corresponding hidden form element
+        el.remove();
+      } else {
+        // Check if the email opt-in checkbox is not checked
+        if ( !$("#email-opt-in").prop("checked") ) {
+          // Set the value of the corresponding hidden form element
+          el.val("false");
+        }
+
+        emailOptIn = el.val();
+        currentHref = $("a.register").attr("href");
+        if (currentHref) {
+          $("a.register").attr("href", currentHref + "&email_opt_in=" + emailOptIn);
+        }
+      }
+
       $("#class_enroll_form").submit();
       event.preventDefault();
     });
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+      var emailOptIn = '';
+
       if(xhr.status == 200) {
         if (xhr.responseText != "") {
           window.top.location.href = xhr.responseText;
@@ -29,7 +52,13 @@
           window.top.location.href = "${reverse('dashboard')}";
         }
       } else if (xhr.status == 403) {
-        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
+        // Check if the email opt-in checkbox is present
+        if ( $("#email-opt-in").length != 0 ) {
+          emailOptIn = '&email_opt_in=' + $("input[name='email_opt_in']").val();
+        }
+
+        ## Ugh.
+        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + emailOptIn;
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
@@ -71,8 +100,19 @@
             </span>
             %endif
         </a>
+
+        % if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
+          ## We only display the email opt-in checkbox if we've been given one or more organization names.
+          % if checkbox_label:
+            <p class="form-field">
+              <input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>
+              <label for="email-opt-in" class="register-emails">${checkbox_label}</label>
+            </p>
+          % endif
+        % endif
+
         %else:
-          <div class="action registration-closed is-disabled">${_("Enrollment Is Closed")}</div>
+          <div class="action registration-closed is-disabled" aria-disabled="true" >${_("Enrollment Is Closed")}</div>
         %endif
     </li>
   </ul>
@@ -81,12 +121,14 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
+        <legend class="sr">${_("Enroll")}</legend>
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
+        <input name="email_opt_in" type="hidden" value="true">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
-        <input name="enroll" type="submit" value="enroll">
+        <input name="enroll" type="submit" value="${_('enroll')}">
       </div>
     </form>
   </div>

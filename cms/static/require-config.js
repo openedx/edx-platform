@@ -20,6 +20,8 @@ require.config({
         "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
         "jquery.flot": "js/vendor/flot/jquery.flot.min",
         "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
+        "jquery.fileupload-process": "js/vendor/jQuery-File-Upload/js/jquery.fileupload-process",
+        "jquery.fileupload-validate": "js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate",
         "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
         "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
@@ -33,6 +35,7 @@ require.config({
         "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
         "xmodule": "/xmodule/xmodule",
+        "xblock/core": "js/xblock/core",
         "xblock": "coffee/src/xblock",
         "utility": "js/src/utility",
         "accessibility": "js/src/accessibility_tools",
@@ -64,12 +67,14 @@ require.config({
 
         // externally hosted files
         "tender": [
-            "//edxedge.tenderapp.com/tender_widget",
+            // if TENDER_SUBDOMAIN is defined, use that; otherwise, use a dummy value
+            // (the application JS will never `require(['tender'])` if it's not defined)
+            "//" + (typeof TENDER_SUBDOMAIN === "string" ? TENDER_SUBDOMAIN : "example") + ".tenderapp.com/tender_widget",
             // if tender fails to load, fallback on a local file
             // so that require doesn't fall over
             "js/src/tender_fallback"
         ],
-        "mathjax": "//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+        "mathjax": "//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": [
             // youtube URL does not end in ".js". We add "?noext" to the path so
             // that require.js adds the ".js" to the query component of the URL,
@@ -128,8 +133,14 @@ require.config({
             exports: "jQuery.fn.plot"
         },
         "jquery.fileupload": {
-            deps: ["jquery.iframe-transport"],
+            deps: ["jquery.ui", "jquery.iframe-transport"],
             exports: "jQuery.fn.fileupload"
+        },
+        "jquery.fileupload-process": {
+            deps: ["jquery.fileupload"]
+        },
+        "jquery.fileupload-validate": {
+            deps: ["jquery.fileupload"]
         },
         "jquery.inputnumber": {
             deps: ["jquery"],
@@ -211,7 +222,7 @@ require.config({
         "coffee/src/main": {
             deps: ["coffee/src/ajax_prefix"]
         },
-        "coffee/src/logger": {
+        "js/src/logger": {
             exports: "Logger",
             deps: ["coffee/src/ajax_prefix"]
         },

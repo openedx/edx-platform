@@ -3,32 +3,29 @@ Base test classes for LMS instructor-initiated background tasks
 
 """
 import os
-import shutil
-
 import json
-from uuid import uuid4
 from mock import Mock
+import shutil
+import unicodecsv
+from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
-
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
-from django.test.utils import override_settings
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from courseware.model_data import StudentModule
+from courseware.tests.tests import LoginEnrollmentTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
 from instructor_task.api_helper import encode_problem_and_student_input
-from instructor_task.models import PROGRESS, QUEUING
+from instructor_task.models import PROGRESS, QUEUING, ReportStore
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.views import instructor_task_status
 
@@ -51,6 +48,8 @@ class InstructorTaskTestCase(TestCase):
     Tests API and view methods that involve the reporting of status for background tasks.
     """
     def setUp(self):
+        super(InstructorTaskTestCase, self).setUp()
+
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
         self.problem_url = InstructorTaskTestCase.problem_location("test_urlname")
@@ -99,7 +98,6 @@ class InstructorTaskTestCase(TestCase):
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -184,7 +182,6 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         return request
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -248,3 +245,27 @@ class TestReportMixin(object):
         reports_download_path = settings.GRADES_DOWNLOAD['ROOT_PATH']
         if os.path.exists(reports_download_path):
             shutil.rmtree(reports_download_path)
+
+    def verify_rows_in_csv(self, expected_rows, verify_order=True):
+        """
+        Verify that the last ReportStore CSV contains the expected content.
+
+        Arguments:
+            expected_rows (iterable): An iterable of dictionaries,
+                where each dict represents a row of data in the last
+                ReportStore CSV.  Each dict maps keys from the CSV
+                header to values in that row's corresponding cell.
+            verify_order (boolean): When True, we verify that both the
+                content and order of `expected_rows` matches the
+                actual csv rows.  When False (default), we only verify
+                that the content matches.
+        """
+        report_store = ReportStore.from_config()
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+            # Expand the dict reader generator so we don't lose it's content
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+            if verify_order:
+                self.assertEqual(csv_rows, expected_rows)
+            else:
+                self.assertItemsEqual(csv_rows, expected_rows)

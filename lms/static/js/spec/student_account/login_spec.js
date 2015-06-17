@@ -4,12 +4,14 @@ define([
     'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
     'js/student_account/models/LoginModel',
-    'js/student_account/views/LoginView'
-], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView) {
+    'js/student_account/views/LoginView',
+    'js/student_account/models/PasswordResetModel'
+], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
     'use strict';
     describe('edx.student.account.LoginView', function() {
 
         var model = null,
+            resetModel = null,
             view = null,
             requests = null,
             authComplete = false,
@@ -24,13 +26,13 @@ define([
                 providers: [
                     {
                         name: 'Google',
-                        iconClass: 'icon-google-plus',
+                        iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
                         name: 'Facebook',
-                        iconClass: 'icon-facebook',
+                        iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
                         registerUrl: '/auth/login/facebook/?auth_entry=account_register'
                     }
@@ -41,16 +43,17 @@ define([
                 submit_url: '/user_api/v1/account/login_session/',
                 fields: [
                     {
+                        placeholder: 'username@domain.com',
                         name: 'email',
                         label: 'Email',
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
                         instructions: 'Enter your email.',
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'password',
                         label: 'Password',
                         defaultValue: '',
@@ -60,6 +63,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'remember',
                         label: 'Remember me',
                         defaultValue: '',
@@ -79,10 +83,17 @@ define([
                 method: FORM_DESCRIPTION.method
             });
 
+            // Initialize the passwordReset model
+            resetModel = new PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
+
             // Initialize the login view
             view = new LoginView({
                 fields: FORM_DESCRIPTION.fields,
                 model: model,
+                resetModel: resetModel,
                 thirdPartyAuth: THIRD_PARTY_AUTH,
                 platformName: PLATFORM_NAME
             });
@@ -141,7 +152,7 @@ define([
             AjaxHelpers.expectRequest(
                 requests, 'POST',
                 FORM_DESCRIPTION.submit_url,
-                $.param( USER_DATA )
+                $.param(USER_DATA)
             );
 
             // Respond with status code 200
@@ -152,7 +163,7 @@ define([
         });
 
         it('sends analytics info containing the enrolled course ID', function() {
-            createLoginView( this );
+            createLoginView(this);
 
             // Simulate that the user is attempting to enroll in a course
             // by setting the course_id query string param.

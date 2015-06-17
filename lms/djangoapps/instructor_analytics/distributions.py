@@ -92,7 +92,7 @@ def profile_distribution(course_id, feature):
     data types are EASY_CHOICE or OPEN_CHOICE
     """
 
-    if not feature in AVAILABLE_PROFILE_FEATURES:
+    if feature not in AVAILABLE_PROFILE_FEATURES:
         raise ValueError(
             "unsupported feature requested for distribution '{}'".format(
                 feature)

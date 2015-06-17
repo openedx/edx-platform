@@ -1,13 +1,12 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%!
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-  from django.conf import settings
-  from student.models import UserProfile
-  from edxmako.shortcuts import marketing_link
-%>
 <%namespace name='static' file='../static_content.html'/>
-<%! from microsite_configuration import microsite %>
+<%!
+from microsite_configuration import microsite
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
+from django.conf import settings
+from edxmako.shortcuts import marketing_link
+%>
 
 <%inherit file="../main.html" />
 <%block name="headextra">
@@ -58,14 +57,14 @@
       event.preventDefault();
     });
 
-    % if is_shopping_cart_enabled:
+    % if can_add_course_to_cart:
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
           location.href = "${cart_link}";
         }
         if (jqXHR.status == 400) {
           $("#register_error")
-            .html(jqXHR.responseText ? jqXHR.responseText : "${_('An error occurred. Please try again later.')}")
+            .html(jqXHR.responseText ? jqXHR.responseText : "${_("An error occurred. Please try again later.")}")
             .css("display", "block");
         }
         else if (jqXHR.status == 403) {
@@ -121,7 +120,7 @@
           location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });
@@ -178,7 +177,7 @@
         ## so that they can register and become a real user that can enroll.
         % elif not is_shib_course and not can_enroll:
           <span class="register disabled">${_("Enrollment is Closed")}</span>
-        %elif is_shopping_cart_enabled and registration_price:
+        %elif can_add_course_to_cart:
           <%
           if user.is_authenticated():
             reg_href = "#"
@@ -188,14 +187,13 @@
             reg_element_id = "reg_then_add_to_cart"
           %>
           <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${_("Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})")\
-              .format(course=course, currency_symbol=settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                      cost=registration_price)}
+            ${_("Add {course_name} to Cart ({price})")\
+              .format(course_name=course.display_number_with_default, price=course_price)}
           </a>
           <div id="register_error"></div>
         %else:
           <a href="#" class="register">
-            ${_("Register for {course.display_number_with_default}").format(course=course) | h}
+            ${_("Register for {course_name}").format(course_name=course.display_number_with_default) | h}
           </a>
           % if sneakpeek_allowed and not regularly_registered:
             <a href="#" class="course_sneakpeek"</a>
@@ -233,7 +231,7 @@
         </div>
       % endif
 
-      <nav>
+      <nav aria-label="${_('Course About')}">
         <a href="#" class="active">${_("Overview")}</a>
       ##  <a href="#">${_("FAQ")}</a>
       ##  <a href="#">${_("Requirements")}</a>
@@ -298,13 +296,13 @@
                 ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
-                <i class="icon icon-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
               </a>
               <a href="${facebook_link}" class="share">
-                <i class="icon icon-thumbs-up"></i><span class="sr">Post a Facebook message to say you've registered for this course</span>
+                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've registered for this course")}</span>
               </a>
               <a href="${email_subject}" class="share">
-                <i class="icon icon-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
               </a>
             % endif
           </div>
@@ -312,39 +310,58 @@
         </header>
 
         <ol class="important-dates">
-          <li><i class="icon icon-info-sign"></i><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><i class="icon fa fa-info-circle"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
-            <li><i class="icon icon-calendar"></i><p>${_("Classes Start")}</p><span class="start-date">${course.start_datetime_text()}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(course, "end_date") or course.end:
-            <li>
-                <i class="icon icon-calendar"></i>
-                <p>${_("Classes End")}</p><span class="final-date">
-                % if get_course_about_section(course, "end_date"):
-                    ${get_course_about_section(course, "end_date")}
-                % else:
-                    ${course.end_datetime_text()}
-                % endif
+            <li class="important-dates-item">
+                <i class="icon fa fa-calendar"></i>
+                <p class="important-dates-item-title">${_("Classes End")}</p>
+                <span class="important-dates-item-text final-date">
+                    % if get_course_about_section(course, "end_date"):
+                        ${get_course_about_section(course, "end_date")}
+                    % else:
+                        ${course.end_datetime_text()}
+                    % endif
                 </span>
             </li>
             % endif
 
           % if get_course_about_section(course, "effort"):
-            <li><i class="icon icon-pencil"></i><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(course, "effort")}</span></li>
           % endif
 
-          ##<li><i class="icon icon-time"></i><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
+          ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
-          <li>
-              <i class="icon icon-money"></i>
-              <p>${_("Price")}</p>
-              <span>${course_display_price}</span>
+          %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
+            <li class="important-dates-item">
+              <i class="icon fa fa-money"></i>
+              <p class="important-dates-item-title">${_("Price")}</p>
+              <span class="important-dates-item-text">${course_price}</span>
+            </li>
+          %endif
+
+          % if pre_requisite_courses:
+          <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
+          <li class="prerequisite-course important-dates-item">
+            <i class="icon fa fa-list-ul"></i>
+            <p class="important-dates-item-title">${_("Prerequisites")}</p>
+            ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
+            <span class="important-dates-item-text pre-requisite"><a href="${prc_target}">${pre_requisite_courses[0]['display']}</a></span>
+            <p class="tip">
+            ${_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.").format(
+              link_start='<a href="{}">'.format(prc_target),
+              link_end='</a>',
+              prc_display=pre_requisite_courses[0]['display'],
+            )}
+            </p>
           </li>
-
+          % endif
           % if get_course_about_section(course, "prerequisites"):
-            <li class="prerequisites"><i class="icon icon-book"></i><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       % if self.course_about_sidebar_extra_file:
@@ -384,11 +401,12 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
+        <legend class="sr">${_("Enroll")}</legend>
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="enroll">
+        <input name="submit" type="submit" value="${_('enroll')}">
       </div>
     </form>
   </div>

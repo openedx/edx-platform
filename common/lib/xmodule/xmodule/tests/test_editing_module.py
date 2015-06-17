@@ -28,10 +28,18 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
                 'template': "tabs/codemirror-edit.html",
                 'current': True,
                 'css': {
-                    'scss': [resource_string(__name__,
-                    '../../test_files/test_tabseditingdescriptor.scss')],
-                    'css': [resource_string(__name__,
-                    '../../test_files/test_tabseditingdescriptor.css')]
+                    'scss': [
+                        resource_string(
+                            __name__,
+                            '../../test_files/test_tabseditingdescriptor.scss'
+                        )
+                    ],
+                    'css': [
+                        resource_string(
+                            __name__,
+                            '../../test_files/test_tabseditingdescriptor.css'
+                        )
+                    ]
                 }
             },
             {

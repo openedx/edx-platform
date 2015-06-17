@@ -1,10 +1,14 @@
-define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"],
-    function(_, BaseView, AlertView, gettext) {
+define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext", "js/views/paging_mixin"],
+    function(_, BaseView, AlertView, gettext, PagingMixin) {
 
-        var PagingView = BaseView.extend({
+        var PagingView = BaseView.extend(PagingMixin).extend({
             // takes a Backbone Paginator as a model
 
             sortableColumns: {},
+
+            filterableColumns: {},
+
+            filterColumn: '',
 
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
@@ -19,22 +23,6 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 this.renderPageItems();
                 this.$('.column-sort-link').removeClass('current-sort');
                 this.$('#' + sortColumn).addClass('current-sort');
-            },
-
-            setPage: function(page) {
-                var self = this,
-                    collection = self.collection,
-                    oldPage = collection.currentPage;
-                collection.goTo(page, {
-                    reset: true,
-                    success: function() {
-                        window.scrollTo(0, 0);
-                    },
-                    error: function(collection) {
-                        collection.currentPage = oldPage;
-                        self.onError();
-                    }
-                });
             },
 
             onError: function() {
@@ -56,6 +44,34 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 if (currentPage > 0) {
                     this.setPage(currentPage - 1);
                 }
+            },
+
+            registerFilterableColumn: function(columnName, displayName, fieldName) {
+                this.filterableColumns[columnName] = {
+                    displayName: displayName,
+                    fieldName: fieldName
+                };
+            },
+
+            filterableColumnInfo: function(filterColumn) {
+                var filterInfo = this.filterableColumns[filterColumn];
+                if (!filterInfo) {
+                    throw "Unregistered filter column '" + filterInfo + '"';
+                }
+                return filterInfo;
+            },
+
+            filterDisplayName: function() {
+                var filterColumn = this.filterColumn,
+                    filterInfo = this.filterableColumnInfo(filterColumn);
+                return filterInfo.displayName;
+            },
+
+            setInitialFilterColumn: function(filterColumn) {
+                var collection = this.collection,
+                    filtertInfo = this.filterableColumns[filterColumn];
+                collection.filterField = filtertInfo.fieldName;
+                this.filterColumn = filterColumn;
             },
 
             /**
@@ -108,8 +124,19 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 }
                 this.sortColumn = sortColumn;
                 this.setPage(0);
+            },
+
+            selectFilter: function(filterColumn) {
+                var collection = this.collection,
+                    filterInfo = this.filterableColumnInfo(filterColumn),
+                    filterField = filterInfo.fieldName,
+                    defaultFilterKey = false;
+                if (collection.filterField !== filterField) {
+                    collection.filterField = filterField;
+                }
+                this.filterColumn = filterColumn;
+                this.setPage(0);
             }
         });
-
         return PagingView;
     }); // end define();

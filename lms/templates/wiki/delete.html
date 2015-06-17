@@ -46,11 +46,11 @@
       </script>
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-danger btn-large">
-            <i class="icon-remove"></i>
+            <i class="icon fa fa-remove"></i>
             {% trans "Delete article" %}
           </button>
           <a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}" class="btn btn-large back">
-            <i class="icon-circle-arrow-left"></i>
+            <i class="icon fa fa-circle-arrow-left"></i>
             {% trans "Go back" %}
           </a>
       </div>

@@ -119,7 +119,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.child_state == self.INITIAL:
             return ''
 
-        rubric_renderer = CombinedOpenEndedRubric(system, False)
+        rubric_renderer = CombinedOpenEndedRubric(system.render_template, False)
         rubric_dict = rubric_renderer.render_rubric(self.child_rubric)
         success = rubric_dict['success']
         rubric_html = rubric_dict['html']
@@ -286,7 +286,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return [rubric_scores]
 
 
-class SelfAssessmentDescriptor():
+class SelfAssessmentDescriptor(object):
     """
     Module for adding self assessment questions to courses
     """

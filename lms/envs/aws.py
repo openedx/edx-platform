@@ -9,12 +9,17 @@ Common traits:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
+
+# Pylint gets confused by path.py instances, which report themselves as class
+# objects. As a result, pylint applies the wrong regex in validating names,
+# and throws spurious errors. Therefore, we disable invalid-name checking.
+# pylint: disable=invalid-name
 
 import json
 
 from .common import *
-from logsettings import get_logger_config
+from openedx.core.lib.logsettings import get_logger_config
 import os
 
 from path import path
@@ -126,16 +131,18 @@ if STATIC_URL_BASE:
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
 
+# MEDIA_ROOT specifies the directory where user-uploaded files are stored.
+MEDIA_ROOT = ENV_TOKENS.get('MEDIA_ROOT', MEDIA_ROOT)
+MEDIA_URL = ENV_TOKENS.get('MEDIA_URL', MEDIA_URL)
+
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 ACCOUNT_NAME = ENV_TOKENS.get('ACCOUNT_NAME', ACCOUNT_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
 PLATFORM_TWITTER_ACCOUNT = ENV_TOKENS.get('PLATFORM_TWITTER_ACCOUNT', PLATFORM_TWITTER_ACCOUNT)
 PLATFORM_FACEBOOK_ACCOUNT = ENV_TOKENS.get('PLATFORM_FACEBOOK_ACCOUNT', PLATFORM_FACEBOOK_ACCOUNT)
-# Used for social media links.
-PLATFORM_TWITTER_URL = ENV_TOKENS.get('PLATFORM_TWITTER_URL', PLATFORM_TWITTER_URL)
-PLATFORM_MEETUP_URL = ENV_TOKENS.get('PLATFORM_MEETUP_URL', PLATFORM_MEETUP_URL)
-PLATFORM_LINKEDIN_URL = ENV_TOKENS.get('PLATFORM_LINKEDIN_URL', PLATFORM_LINKEDIN_URL)
-PLATFORM_GOOGLE_PLUS_URL = ENV_TOKENS.get('PLATFORM_GOOGLE_PLUS_URL', PLATFORM_GOOGLE_PLUS_URL)
+
+# Social media links for the page footer
+SOCIAL_MEDIA_FOOTER_URLS = ENV_TOKENS.get('SOCIAL_MEDIA_FOOTER_URLS', SOCIAL_MEDIA_FOOTER_URLS)
 
 CC_MERCHANT_NAME = ENV_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
@@ -149,6 +156,7 @@ SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 JABBER = ENV_TOKENS.get('JABBER', {})
 DATABASE_ROUTERS = ENV_TOKENS.get('DATABASE_ROUTERS', [])
+SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
 REGISTRATION_EXTRA_FIELDS = ENV_TOKENS.get('REGISTRATION_EXTRA_FIELDS', REGISTRATION_EXTRA_FIELDS)
 SESSION_COOKIE_SECURE = ENV_TOKENS.get('SESSION_COOKIE_SECURE', SESSION_COOKIE_SECURE)
 
@@ -183,6 +191,7 @@ TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 CONTACT_EMAIL = ENV_TOKENS.get('CONTACT_EMAIL', CONTACT_EMAIL)
 BUGS_EMAIL = ENV_TOKENS.get('BUGS_EMAIL', BUGS_EMAIL)
 PAYMENT_SUPPORT_EMAIL = ENV_TOKENS.get('PAYMENT_SUPPORT_EMAIL', PAYMENT_SUPPORT_EMAIL)
+FINANCE_EMAIL = ENV_TOKENS.get('FINANCE_EMAIL', FINANCE_EMAIL)
 UNIVERSITY_EMAIL = ENV_TOKENS.get('UNIVERSITY_EMAIL', UNIVERSITY_EMAIL)
 PRESS_EMAIL = ENV_TOKENS.get('PRESS_EMAIL', PRESS_EMAIL)
 
@@ -202,15 +211,23 @@ BULK_EMAIL_INFINITE_RETRY_CAP = ENV_TOKENS.get('BULK_EMAIL_INFINITE_RETRY_CAP', 
 BULK_EMAIL_LOG_SENT_EMAILS = ENV_TOKENS.get('BULK_EMAIL_LOG_SENT_EMAILS', BULK_EMAIL_LOG_SENT_EMAILS)
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = ENV_TOKENS.get('BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS', BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS)
 # We want Bulk Email running on the high-priority queue, so we define the
-# routing key that points to it.  At the moment, the name is the same.
+# routing key that points to it. At the moment, the name is the same.
 # We have to reset the value here, since we have changed the value of the queue name.
 BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# We can run smaller jobs on the low priority queue. See note above for why
+# we have to reset the value here.
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
+
+
+# Mobile store URL overrides
+MOBILE_STORE_URLS = ENV_TOKENS.get('MOBILE_STORE_URLS', MOBILE_STORE_URLS)
 
 # Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
@@ -306,6 +323,50 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
 CERT_NAME_SHORT = ENV_TOKENS.get('CERT_NAME_SHORT', CERT_NAME_SHORT)
 CERT_NAME_LONG = ENV_TOKENS.get('CERT_NAME_LONG', CERT_NAME_LONG)
+############# CORS headers for cross-domain requests #################
+
+if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
+    CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
+    CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
+
+    # If setting a cross-domain cookie, it's really important to choose
+    # a name for the cookie that is DIFFERENT than the cookies used
+    # by each subdomain.  For example, suppose the applications
+    # at these subdomains are configured to use the following cookie names:
+    #
+    # 1) foo.example.com --> "csrftoken"
+    # 2) baz.example.com --> "csrftoken"
+    # 3) bar.example.com --> "csrftoken"
+    #
+    # For the cross-domain version of the CSRF cookie, you need to choose
+    # a name DIFFERENT than "csrftoken"; otherwise, the new token configured
+    # for ".example.com" could conflict with the other cookies,
+    # non-deterministically causing 403 responses.
+    #
+    # Because of the way Django stores cookies, the cookie name MUST
+    # be a `str`, not unicode.  Otherwise there will `TypeError`s will be raised
+    # when Django tries to call the unicode `translate()` method with the wrong
+    # number of parameters.
+    CROSS_DOMAIN_CSRF_COOKIE_NAME = str(ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_NAME'))
+
+    # When setting the domain for the "cross-domain" version of the CSRF
+    # cookie, you should choose something like: ".example.com"
+    # (note the leading dot), where both the referer and the host
+    # are subdomains of "example.com".
+    #
+    # Browser security rules require that
+    # the cookie domain matches the domain of the server; otherwise
+    # the cookie won't get set.  And once the cookie gets set, the client
+    # needs to be on a domain that matches the cookie domain, otherwise
+    # the client won't be able to read the cookie.
+    CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
+
+
+# Field overrides.  To use the IDDE feature, add
+# 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
+FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
@@ -410,8 +471,15 @@ STUDENT_FILEUPLOAD_MAX_SIZE = ENV_TOKENS.get("STUDENT_FILEUPLOAD_MAX_SIZE", STUD
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 EVENT_TRACKING_BACKENDS.update(AUTH_TOKENS.get("EVENT_TRACKING_BACKENDS", {}))
-TRACKING_SEGMENTIO_WEBHOOK_SECRET = AUTH_TOKENS.get("TRACKING_SEGMENTIO_WEBHOOK_SECRET", TRACKING_SEGMENTIO_WEBHOOK_SECRET)
+TRACKING_SEGMENTIO_WEBHOOK_SECRET = AUTH_TOKENS.get(
+    "TRACKING_SEGMENTIO_WEBHOOK_SECRET",
+    TRACKING_SEGMENTIO_WEBHOOK_SECRET
+)
 TRACKING_SEGMENTIO_ALLOWED_TYPES = ENV_TOKENS.get("TRACKING_SEGMENTIO_ALLOWED_TYPES", TRACKING_SEGMENTIO_ALLOWED_TYPES)
+TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES = ENV_TOKENS.get(
+    "TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES",
+    TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES
+)
 TRACKING_SEGMENTIO_SOURCE_MAP = ENV_TOKENS.get("TRACKING_SEGMENTIO_SOURCE_MAP", TRACKING_SEGMENTIO_SOURCE_MAP)
 
 # Student identity verification settings
@@ -513,3 +581,77 @@ FORUM_MONGO_PARAMS = AUTH_TOKENS.get('FORUM_MONGO_PARAMS', FORUM_MONGO_PARAMS)
 
 # Register button on home page
 DISABLE_REGISTER_BUTTON = ENV_TOKENS.get('DISABLE_REGISTER_BUTTON', DISABLE_REGISTER_BUTTON)
+# Which access.py permission names to check;
+# We default this to the legacy permission 'see_exists'.
+COURSE_CATALOG_VISIBILITY_PERMISSION = ENV_TOKENS.get(
+    'COURSE_CATALOG_VISIBILITY_PERMISSION',
+    COURSE_CATALOG_VISIBILITY_PERMISSION
+)
+COURSE_ABOUT_VISIBILITY_PERMISSION = ENV_TOKENS.get(
+    'COURSE_ABOUT_VISIBILITY_PERMISSION',
+    COURSE_ABOUT_VISIBILITY_PERMISSION
+)
+
+#date format the api will be formatting the datetime values
+API_DATE_FORMAT = '%Y-%m-%d'
+API_DATE_FORMAT = ENV_TOKENS.get('API_DATE_FORMAT', API_DATE_FORMAT)
+
+# Enrollment API Cache Timeout
+ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = ENV_TOKENS.get('ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT', 60)
+
+# PDF RECEIPT/INVOICE OVERRIDES
+PDF_RECEIPT_TAX_ID = ENV_TOKENS.get('PDF_RECEIPT_TAX_ID', PDF_RECEIPT_TAX_ID)
+PDF_RECEIPT_FOOTER_TEXT = ENV_TOKENS.get('PDF_RECEIPT_FOOTER_TEXT', PDF_RECEIPT_FOOTER_TEXT)
+PDF_RECEIPT_DISCLAIMER_TEXT = ENV_TOKENS.get('PDF_RECEIPT_DISCLAIMER_TEXT', PDF_RECEIPT_DISCLAIMER_TEXT)
+PDF_RECEIPT_BILLING_ADDRESS = ENV_TOKENS.get('PDF_RECEIPT_BILLING_ADDRESS', PDF_RECEIPT_BILLING_ADDRESS)
+PDF_RECEIPT_TERMS_AND_CONDITIONS = ENV_TOKENS.get('PDF_RECEIPT_TERMS_AND_CONDITIONS', PDF_RECEIPT_TERMS_AND_CONDITIONS)
+PDF_RECEIPT_TAX_ID_LABEL = ENV_TOKENS.get('PDF_RECEIPT_TAX_ID_LABEL', PDF_RECEIPT_TAX_ID_LABEL)
+PDF_RECEIPT_LOGO_PATH = ENV_TOKENS.get('PDF_RECEIPT_LOGO_PATH', PDF_RECEIPT_LOGO_PATH)
+PDF_RECEIPT_COBRAND_LOGO_PATH = ENV_TOKENS.get('PDF_RECEIPT_COBRAND_LOGO_PATH', PDF_RECEIPT_COBRAND_LOGO_PATH)
+PDF_RECEIPT_LOGO_HEIGHT_MM = ENV_TOKENS.get('PDF_RECEIPT_LOGO_HEIGHT_MM', PDF_RECEIPT_LOGO_HEIGHT_MM)
+PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = ENV_TOKENS.get(
+    'PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM', PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM
+)
+
+if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    # Use ElasticSearch as the search engine herein
+    SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+# Facebook app
+FACEBOOK_API_VERSION = AUTH_TOKENS.get("FACEBOOK_API_VERSION")
+FACEBOOK_APP_SECRET = AUTH_TOKENS.get("FACEBOOK_APP_SECRET")
+FACEBOOK_APP_ID = AUTH_TOKENS.get("FACEBOOK_APP_ID")
+
+XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})
+
+##### CDN EXPERIMENT/MONITORING FLAGS #####
+CDN_VIDEO_URLS = ENV_TOKENS.get('CDN_VIDEO_URLS', CDN_VIDEO_URLS)
+ONLOAD_BEACON_SAMPLE_RATE = ENV_TOKENS.get('ONLOAD_BEACON_SAMPLE_RATE', ONLOAD_BEACON_SAMPLE_RATE)
+
+##### ECOMMERCE API CONFIGURATION SETTINGS #####
+ECOMMERCE_API_URL = ENV_TOKENS.get('ECOMMERCE_API_URL', ECOMMERCE_API_URL)
+ECOMMERCE_API_SIGNING_KEY = AUTH_TOKENS.get('ECOMMERCE_API_SIGNING_KEY', ECOMMERCE_API_SIGNING_KEY)
+ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TIMEOUT)
+
+##### Custom Courses for EdX #####
+if FEATURES.get('CUSTOM_COURSES_EDX'):
+    INSTALLED_APPS += ('ccx',)
+    MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)
+    FIELD_OVERRIDE_PROVIDERS += (
+        'ccx.overrides.CustomCoursesForEdxOverrideProvider',
+    )
+
+##### Individual Due Date Extensions #####
+if FEATURES.get('INDIVIDUAL_DUE_DATES'):
+    FIELD_OVERRIDE_PROVIDERS += (
+        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
+    )
+
+# PROFILE IMAGE CONFIG
+PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)
+PROFILE_IMAGE_DEFAULT_FILENAME = ENV_TOKENS.get('PROFILE_IMAGE_DEFAULT_FILENAME', PROFILE_IMAGE_DEFAULT_FILENAME)
+PROFILE_IMAGE_SECRET_KEY = AUTH_TOKENS.get('PROFILE_IMAGE_SECRET_KEY', PROFILE_IMAGE_SECRET_KEY)
+PROFILE_IMAGE_MAX_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MAX_BYTES', PROFILE_IMAGE_MAX_BYTES)
+PROFILE_IMAGE_MIN_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MIN_BYTES', PROFILE_IMAGE_MIN_BYTES)
+if FEATURES['IS_EDX_DOMAIN']:
+    PROFILE_IMAGE_DEFAULT_FILENAME = 'images/edx-theme/default-profile'

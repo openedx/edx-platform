@@ -4,7 +4,9 @@
 <%block name="content">
 <div class="wrapper-mast wrapper sr">
   <header class="mast">
-    <h1 class="page-header">${_("Studio Account Activation")}</h1>
+    <h1 class="page-header">
+      ${_("{studio_name} Account Activation").format(studio_name=settings.STUDIO_SHORT_NAME)}
+    </h1>
   </header>
 </div>
 
@@ -17,13 +19,15 @@
       <div class="msg">
         <h2 class="title">${_("Your account is already active")}</h2>
         <div class="copy">
-          <p>${_("This account, set up using {0}, has already been activated. Please sign in to start working within edX Studio.".format(user.email))}</p>
+          <p>${_("This account, set up using {email}, has already been activated. Please sign in to start working within {studio_name}.".format(email=user.email, studio_name=settings.STUDIO_NAME))}</p>
         </div>
       </div>
 
       <ul class="list-actions">
         <li class="action-item">
-          <a href="/signin" class="action-primary action-signin">${_("Sign into Studio")}</a>
+          <a href="/signin" class="action-primary action-signin">
+            ${_("Sign into {studio_name}").format(platform_name=settings.STUDIO_SHORT_NAME)}
+          </a>
         </li>
       </ul>
     </div>

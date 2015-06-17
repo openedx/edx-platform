@@ -9,6 +9,7 @@ import unittest
 from uuid import uuid4
 from mock import patch
 from pymongo.errors import PyMongoError
+from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -16,27 +17,25 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.utils.timezone import utc as UTC
 from django.utils.translation import ugettext as _
 import mongoengine
-from django.utils.timezone import utc as UTC
-from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from student.roles import CourseStaffRole, GlobalStaff
-from courseware.tests.modulestore_config import TEST_DATA_DIR
+from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE
+
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
+from datetime import datetime
 from external_auth.models import ExternalAuthMap
+from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from instructor_task.tests.factories import InstructorTaskFactory
-
-from xmodule.modulestore.tests.django_utils import xml_store_config
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['empty'])
+from xmodule.modulestore.xml import XMLModuleStore
 
 
 TEST_MONGODB_LOG = {
@@ -126,7 +125,6 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
@@ -134,6 +132,7 @@ class TestSysadmin(SysadminBaseTestCase):
     """
     Test sysadmin dashboard features using XMLModuleStore
     """
+    MODULESTORE = TEST_DATA_XML_MODULESTORE
 
     def test_staff_access(self):
         """Test access controls."""
@@ -760,6 +759,40 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         )
 
         self._rm_edx4edx()
+
+    def test_gitlog_pagination_out_of_range_invalid(self):
+        """
+        Make sure the pagination behaves properly when the requested page is out
+        of range.
+        """
+
+        self._setstaff_login()
+
+        mongoengine.connect(TEST_MONGODB_LOG['db'])
+
+        for _ in xrange(15):
+            CourseImportLog(
+                course_id=SlashSeparatedCourseKey("test", "test", "test"),
+                location="location",
+                import_log="import_log",
+                git_log="git_log",
+                repo_dir="repo_dir",
+                created=datetime.now()
+            ).save()
+
+        for page, expected in [(-1, 1), (1, 1), (2, 2), (30, 2), ('abc', 1)]:
+            response = self.client.get(
+                '{}?page={}'.format(
+                    reverse('gitlogs'),
+                    page
+                )
+            )
+            self.assertIn(
+                'Page {} of 2'.format(expected),
+                response.content
+            )
+
+        CourseImportLog.objects.delete()
 
     def test_gitlog_courseteam_access(self):
         """

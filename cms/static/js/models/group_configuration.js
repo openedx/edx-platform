@@ -9,8 +9,9 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
         defaults: function() {
             return {
                 name: '',
+                scheme: 'random',
                 description: '',
-                version: null,
+                version: 2,
                 groups: new GroupCollection([
                     {
                         name: gettext('Group A'),
@@ -34,7 +35,8 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
             collectionType: GroupCollection
         }],
 
-        initialize: function() {
+        initialize: function(attributes, options) {
+            this.canBeEmpty = options && options.canBeEmpty;
             this.setOriginalAttributes();
             return this;
         },
@@ -44,7 +46,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
         },
 
         reset: function() {
-            this.set(this._originalAttributes, { parse: true });
+            this.set(this._originalAttributes, { parse: true, validate: true });
         },
 
         isDirty: function() {
@@ -71,6 +73,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
             return {
                 id: this.get('id'),
                 name: this.get('name'),
+                scheme: this.get('scheme'),
                 description: this.get('description'),
                 version: this.get('version'),
                 groups: this.get('groups').toJSON()
@@ -85,23 +88,35 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 };
             }
 
-            if (attrs.groups.length < 1) {
+            if (!this.canBeEmpty && attrs.groups.length < 1) {
                 return {
                     message: gettext('There must be at least one group.'),
                     attributes: { groups: true }
                 };
             } else {
                 // validate all groups
-                var invalidGroups = [];
+                var validGroups = new Backbone.Collection(),
+                    invalidGroups = new Backbone.Collection();
                 attrs.groups.each(function(group) {
-                    if(!group.isValid()) {
-                        invalidGroups.push(group);
+                    if (!group.isValid()) {
+                        invalidGroups.add(group);
+                    } else {
+                        validGroups.add(group);
                     }
                 });
-                if (!_.isEmpty(invalidGroups)) {
+
+                if (!invalidGroups.isEmpty()) {
                     return {
                         message: gettext('All groups must have a name.'),
-                        attributes: { groups: invalidGroups }
+                        attributes: { groups: invalidGroups.toJSON() }
+                    };
+                }
+
+                var groupNames = validGroups.map(function(group) { return group.get('name'); });
+                if (groupNames.length !== _.uniq(groupNames).length) {
+                    return {
+                        message: gettext('All groups must have a unique name.'),
+                        attributes: { groups: validGroups.toJSON() }
                     };
                 }
             }

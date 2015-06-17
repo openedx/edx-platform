@@ -4,8 +4,14 @@ import django.db
 import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
-from student.views import reactivation_email_for_user, change_email_request, confirm_email_change, notify_enrollment_by_email
+from student.views import notify_enrollment_by_email
+from student.views import (
+    reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change,
+    SETTING_CHANGE_INITIATED
+)
 from student.models import UserProfile, PendingEmailChange
+from django.core.urlresolvers import reverse
+from django.core import mail
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
@@ -17,6 +23,7 @@ from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.testing import EventTestMixin
 
 
 class TestException(Exception):
@@ -96,6 +103,73 @@ class EnrollmentEmailTests(ModuleStoreTestCase):
         self.assertIn('is_success', email_result)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class ActivationEmailTests(TestCase):
+    """Test sending of the activation email. """
+
+    ACTIVATION_SUBJECT = "Activate Your {account_name} Account".format(account_name=settings.ACCOUNT_NAME)
+
+    # Text fragments we expect in the body of an email
+    # sent from an OpenEdX installation.
+    OPENEDX_FRAGMENTS = [
+        "Thank you for signing up for {platform}.".format(platform=settings.PLATFORM_NAME),
+        "http://edx.org/activate/",
+        (
+            "if you require assistance, check the help section of the "
+            "{platform} website".format(platform=settings.PLATFORM_NAME)
+        )
+    ]
+
+    # Text fragments we expect in the body of an email
+    # sent from an EdX-controlled domain.
+    EDX_DOMAIN_FRAGMENTS = [
+        "Thank you for signing up for {platform}".format(platform=settings.PLATFORM_NAME),
+        "http://edx.org/activate/",
+        "https://www.edx.org/contact-us",
+        "This email was automatically sent by edx.org"
+    ]
+
+    def setUp(self):
+        super(ActivationEmailTests, self).setUp()
+
+    def test_activation_email(self):
+        self._create_account()
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
+
+    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    def test_activation_email_edx_domain(self):
+        self._create_account()
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.EDX_DOMAIN_FRAGMENTS)
+
+    def _create_account(self):
+        """Create an account, triggering the activation email. """
+        url = reverse('create_account')
+        params = {
+            'username': 'test_user',
+            'email': 'test_user@example.com',
+            'password': 'edx',
+            'name': 'Test User',
+            'honor_code': True,
+            'terms_of_service': True
+        }
+        resp = self.client.post(url, params)
+        self.assertEqual(
+            resp.status_code, 200,
+            msg=u"Could not create account (status {status}). The response was {response}".format(
+                status=resp.status_code,
+                response=resp.content
+            )
+        )
+
+    def _assert_activation_email(self, subject, body_fragments):
+        """Verify that the activation email was sent. """
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.subject, subject)
+        for fragment in body_fragments:
+            self.assertIn(fragment, msg.body)
+
+
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
 class ReactivationEmailTests(EmailTestMixin, TestCase):
@@ -163,10 +237,11 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         self.assertTrue(response_data['success'])
 
 
-class EmailChangeRequestTests(TestCase):
+class EmailChangeRequestTests(EventTestMixin, TestCase):
     """Test changing a user's email address"""
 
     def setUp(self):
+        super(EmailChangeRequestTests, self).setUp('student.views.tracker')
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -205,10 +280,41 @@ class EmailChangeRequestTests(TestCase):
         self.request.POST['password'] = 'wrong'
         self.assertFailedRequest(self.run_request(), 'Invalid password')
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_duplicate_activation_key(self):
+        """Assert that if two users change Email address simultaneously, server should return 200"""
+
+        # New emails for the users
+        user1_new_email = "valid_user1_email@example.com"
+        user2_new_email = "valid_user2_email@example.com"
+
+        # Set new email for user1.
+        self.request.POST['new_email'] = user1_new_email
+
+        # Create a another user 'user2' & make request for change email
+        user2 = UserFactory.create(email=self.new_email, password="test2")
+        user2_request = self.req_factory.post('unused_url', data={
+            'password': 'test2',
+            'new_email': user2_new_email
+        })
+        user2_request.user = user2
+
+        # Send requests & check if response was successful
+        user1_response = change_email_request(self.request)
+        user2_response = change_email_request(user2_request)
+
+        self.assertEqual(user1_response.status_code, 200)
+        self.assertEqual(user2_response.status_code, 200)
+
     def test_invalid_emails(self):
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             self.request.POST['new_email'] = email
             self.assertFailedRequest(self.run_request(), 'Valid e-mail address required.')
+
+    def test_change_email_to_existing_value(self):
+        """ Test the error message if user attempts to change email to the existing value. """
+        self.request.POST['new_email'] = self.user.email
+        self.assertFailedRequest(self.run_request(), 'Old email is the same as the new email.')
 
     def check_duplicate_email(self, email):
         """Test that a request to change a users email to `email` fails"""
@@ -228,7 +334,37 @@ class EmailChangeRequestTests(TestCase):
         UserFactory.create(email=self.new_email)
         self.check_duplicate_email(self.new_email.capitalize())
 
-    # TODO: Finish testing the rest of change_email_request
+    @patch('django.core.mail.send_mail')
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_email_failure(self, send_mail):
+        """ Test the return value if sending the email for the user to click fails. """
+        send_mail.side_effect = [Exception, None]
+        self.request.POST['new_email'] = "valid@email.com"
+        self.assertFailedRequest(self.run_request(), 'Unable to send email activation link. Please try again later.')
+        self.assert_no_events_were_emitted()
+
+    @patch('django.core.mail.send_mail')
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_email_success(self, send_mail):
+        """ Test email was sent if no errors encountered. """
+        old_email = self.user.email
+        new_email = "valid@example.com"
+        registration_key = "test registration key"
+        do_email_change_request(self.user, new_email, registration_key)
+        context = {
+            'key': registration_key,
+            'old_email': old_email,
+            'new_email': new_email
+        }
+        send_mail.assert_called_with(
+            mock_render_to_string('emails/email_change_subject.txt', context),
+            mock_render_to_string('emails/email_change.txt', context),
+            settings.DEFAULT_FROM_EMAIL,
+            [new_email]
+        )
+        self.assert_event_emitted(
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'email', old=old_email, new=new_email
+        )
 
 
 @patch('django.contrib.auth.models.User.email_user')

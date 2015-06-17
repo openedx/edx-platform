@@ -10,6 +10,7 @@ from ...pages.xblock.acid import AcidView
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@skip('Jenkins builds are getting stuck on acid_block tests')
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
@@ -69,7 +70,7 @@ class XBlockAcidBase(WebAppTest):
 
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        unit = subsection.expand_subsection().unit('Test Unit').go_to()
 
         acid_block = AcidView(self.browser, unit.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
@@ -81,7 +82,7 @@ class XBlockAcidBase(WebAppTest):
 
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        unit = subsection.expand_subsection().unit('Test Unit').go_to()
 
         acid_block = AcidView(self.browser, unit.xblocks[0].edit().editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
@@ -116,6 +117,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         self.user = course_fix.user
 
 
+@skip('Jenkins builds are getting stuck on acid_block tests')
 class XBlockAcidParentBase(XBlockAcidBase):
     """
     Base class for tests that verify that parent XBlock integration is working correctly
@@ -133,7 +135,7 @@ class XBlockAcidParentBase(XBlockAcidBase):
 
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        unit = subsection.expand_subsection().unit('Test Unit').go_to()
         container = unit.xblocks[0].go_to_container()
 
         acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
@@ -169,6 +171,7 @@ class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
         self.user = course_fix.user
 
 
+@skip('Jenkins builds are getting stuck on acid_block tests')
 class XBlockAcidChildTest(XBlockAcidParentBase):
     """
     Tests of an AcidBlock with children

@@ -104,6 +104,7 @@
                   matlab_result_task = new PendingMatlabResult(get_callback);
                   matlab_result_task.task_poller.start();
               } else {
+                  // Used response.message because input_ajax is returning "message"
                   gentle_alert(problem_elt, response.message);
               }
           };
@@ -115,7 +116,8 @@
                       {'submission': submission}, plot_callback);
               }
               else {
-                  gentle_alert(problem_elt, response.message);
+                  // Used response.msg because problem_save is returning "msg" instead of "message"
+                  gentle_alert(problem_elt, response.msg);
               }
           };
 
