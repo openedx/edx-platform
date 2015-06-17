@@ -756,6 +756,9 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'oauth2_provider',
 
+    # Theming
+    'openedx.core.djangoapps.theming',
+
     # comment common
     'django_comment_common',
 
