@@ -12,7 +12,7 @@ Change Log
 
    * - Date
      - Change
-   * - 12 June 2015
+   * - 17 June 2015
      - Added the section :ref:`edX Bookmarks API Version 1.0`.
    * - 10 June 2015
      - Added the section :ref:`Profile Images API Version 1.0`.
