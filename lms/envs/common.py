@@ -1206,7 +1206,6 @@ courseware_js = (
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
     ['js/search/course/main.js'] +
-    ['js/courseware/proctored_exam/main.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
@@ -1469,6 +1468,7 @@ PIPELINE_JS = {
             'js/src/ie_shim.js',
             'js/src/string_utils.js',
             'js/src/logger.js',
+            'js/courseware/proctored_exam/main.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
