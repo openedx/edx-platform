@@ -560,7 +560,12 @@ class CourseBlocksAndNavigation(ListAPIView):
         )
 
         # verify the user has access to this block
-        if not has_access(request_info.request.user, 'load', block_info.block, course_key=request_info.course.id):
+        if (block_info.block is None or not has_access(
+                request_info.request.user,
+                'load',
+                block_info.block,
+                course_key=request_info.course.id
+        )):
             return
 
         # add the block's value to the result
