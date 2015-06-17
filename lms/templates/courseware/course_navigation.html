@@ -25,7 +25,7 @@ def url_class(is_active):
   is_student_masquerade = masquerade and masquerade.role == 'student'
   masquerade_group_id = masquerade.group_id if masquerade else None
 %>
-
+<div class="proctored_exam_status"></div>
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu">

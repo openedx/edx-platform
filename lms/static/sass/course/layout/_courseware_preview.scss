@@ -25,3 +25,44 @@
     }
   }
 }
+.exam-timer {
+  line-height: 56px;
+  background-color: #e5eaec;
+  padding-left: 42px;
+  padding-right: 32px;
+  border-left: 4px solid #14a6ea;
+  margin: 0 auto;
+  color: #4e575b;
+  font-size: 14px;
+  a {
+    color: #0979ba;
+  }
+  span.pull-right {
+    color: #646161;
+    line-height: 56px;
+    b {
+      color: #414040;
+    }
+  }
+  &.low-time {
+    color: #cdd7db;
+    background-color: #4F585C;
+    a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    span.pull-right {
+      color: #cdd7db;
+      b {
+        color: #fff;
+      }
+    }
+  }
+  &.warning {
+    border-left-color: #feb93e;
+  }
+  &.critical {
+    border-left-color: #b30101;
+    color: #fff;
+  }
+}
