@@ -30,7 +30,7 @@ staff_selected = selected(not masquerade or masquerade.role != "student")
 specific_student_selected = selected(not staff_selected and masquerade.user_name)
 student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
 %>
-
+<div class="proctored_exam_status"></div>
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu">
