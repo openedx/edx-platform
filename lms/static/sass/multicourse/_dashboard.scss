@@ -511,25 +511,11 @@
       }
 
       .enter-course {
-        @include button(simple, $button-color);
-        @include box-sizing(border-box);
-        border-radius: 3px;
+        @extend %btn-pl-primary-base;
         @include float(right);
-        font: normal 15px/1.6rem $sans-serif;
-        letter-spacing: 0;
-        text-align: center;
 
         &.archived {
-          @include button(simple, $button-archive-color);
-          font: normal 15px/1.6rem $sans-serif;
-
-          &:hover, &:focus {
-            text-decoration: none;
-          }
-        }
-
-        &:hover, &:focus {
-          text-decoration: none;
+          @extend %btn-pl-default-base;
         }
       }
     }
@@ -898,15 +884,8 @@
             position: relative;
 
             .cta {
-              @include button(simple, $green-d1);
-              @include box-sizing(border-box);
+              @extend %btn-pl-green-base;
               @include float(right);
-              border-radius: 3px;
-              display: block;
-              font: normal 15px/1.6rem $sans-serif;
-              letter-spacing: 0;
-              padding: 6px 32px 7px;
-              text-align: center;
             }
           }
         }
