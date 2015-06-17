@@ -143,7 +143,7 @@ def compile_sass(debug=False):
     if debug:
         parts.append("--sourcemap")
     else:
-        parts.append("--style compressed")
+        parts.append("--style compressed --quiet")
     for load_path in SASS_LOAD_PATHS + SASS_DIRS.keys():
         parts.append("--load-path {path}".format(path=load_path))
 
