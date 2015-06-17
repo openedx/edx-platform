@@ -716,6 +716,9 @@ INSTALLED_APPS = (
     'static_replace',
     'require',
 
+    # Theming
+    'openedx.core.djangoapps.theming',
+
     # comment common
     'django_comment_common',
 
