@@ -45,8 +45,11 @@ class ThreadListGetForm(_PaginationForm):
     """
     A form to validate query parameters in the thread list retrieval endpoint
     """
+    EXCLUSIVE_PARAMS = ["topic_id", "text_search"]
+
     course_id = CharField()
     topic_id = TopicIdField(required=False)
+    text_search = CharField(required=False)
 
     def clean_course_id(self):
         """Validate course_id"""
@@ -55,6 +58,19 @@ class ThreadListGetForm(_PaginationForm):
             return CourseLocator.from_string(value)
         except InvalidKeyError:
             raise ValidationError("'{}' is not a valid course id".format(value))
+
+    def clean(self):
+        cleaned_data = super(ThreadListGetForm, self).clean()
+        exclusive_params_count = sum(
+            1 for param in self.EXCLUSIVE_PARAMS if cleaned_data.get(param)
+        )
+        if exclusive_params_count > 1:
+            raise ValidationError(
+                "The following query parameters are mutually exclusive: {}".format(
+                    ", ".join(self.EXCLUSIVE_PARAMS)
+                )
+            )
+        return cleaned_data
 
 
 class ThreadActionsForm(Form):
