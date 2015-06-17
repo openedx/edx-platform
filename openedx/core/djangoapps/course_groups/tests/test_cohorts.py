@@ -886,7 +886,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             self.partition_id,
             self.group1_id,
         )
-        with self.assertRaisesRegexp(IntegrityError, 'not unique'):
+        with self.assertRaises(IntegrityError):
             self._link_cohort_partition_group(
                 self.first_cohort,
                 self.partition_id,
