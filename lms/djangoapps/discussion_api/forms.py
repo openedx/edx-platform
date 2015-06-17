@@ -75,7 +75,7 @@ class ThreadListGetForm(_PaginationForm):
 
 class ThreadActionsForm(Form):
     """
-    A form to handle fields in thread creation that require separate
+    A form to handle fields in thread creation/update that require separate
     interactions with the comments service.
     """
     following = BooleanField(required=False)
@@ -90,3 +90,11 @@ class CommentListGetForm(_PaginationForm):
     # TODO: should we use something better here? This only accepts "True",
     # "False", "1", and "0"
     endorsed = NullBooleanField(required=False)
+
+
+class CommentActionsForm(Form):
+    """
+    A form to handle fields in comment creation/update that require separate
+    interactions with the comments service.
+    """
+    voted = BooleanField(required=False)
