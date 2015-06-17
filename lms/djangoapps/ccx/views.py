@@ -477,7 +477,8 @@ def prep_course_for_grading(course, request):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id, request.user, course, depth=2)
     course = get_module_for_descriptor(
-        request.user, request, course, field_data_cache, course.id)
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
 
     course._field_data_cache = {}  # pylint: disable=protected-access
     course.set_grading_policy(course.grading_policy)

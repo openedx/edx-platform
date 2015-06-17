@@ -406,7 +406,7 @@ def _get_track_function_for_task(student, xmodule_instance_args=None, source_pag
 
 
 def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args=None,
-                                  grade_bucket_type=None):
+                                  grade_bucket_type=None, course=None):
     """
     Fetches a StudentModule instance for a given `course_id`, `student` object, and `module_descriptor`.
 
@@ -445,6 +445,8 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
         grade_bucket_type=grade_bucket_type,
         # This module isn't being used for front-end rendering
         request_token=None,
+        # pass in a loaded course for override enabling
+        course=course
     )
 
 
@@ -465,37 +467,76 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
     course_id = student_module.course_id
     student = student_module.student
     usage_key = student_module.module_state_key
-    instance = _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args, grade_bucket_type='rescore')
 
-    if instance is None:
-        # Either permissions just changed, or someone is trying to be clever
-        # and load something they shouldn't have access to.
-        msg = "No module {loc} for student {student}--access denied?".format(loc=usage_key,
-                                                                             student=student)
-        TASK_LOG.debug(msg)
-        raise UpdateProblemModuleStateError(msg)
+    with modulestore().bulk_operations(course_id):
+        course = get_course_by_id(course_id)
+        # TODO: Here is a call site where we could pass in a loaded course.  I
+        # think we certainly need it since grading is happening here, and field
+        # overrides would be important in handling that correctly
+        instance = _get_module_instance_for_task(
+            course_id,
+            student,
+            module_descriptor,
+            xmodule_instance_args,
+            grade_bucket_type='rescore',
+            course=course
+        )
 
-    if not hasattr(instance, 'rescore_problem'):
-        # This should also not happen, since it should be already checked in the caller,
-        # but check here to be sure.
-        msg = "Specified problem does not support rescoring."
-        raise UpdateProblemModuleStateError(msg)
+        if instance is None:
+            # Either permissions just changed, or someone is trying to be clever
+            # and load something they shouldn't have access to.
+            msg = "No module {loc} for student {student}--access denied?".format(
+                loc=usage_key,
+                student=student
+            )
+            TASK_LOG.debug(msg)
+            raise UpdateProblemModuleStateError(msg)
 
-    result = instance.rescore_problem()
-    instance.save()
-    if 'success' not in result:
-        # don't consider these fatal, but false means that the individual call didn't complete:
-        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"unexpected response {msg}".format(msg=result, course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_FAILED
-    elif result['success'] not in ['correct', 'incorrect']:
-        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_FAILED
-    else:
-        TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
-                       u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_SUCCEEDED
+        if not hasattr(instance, 'rescore_problem'):
+            # This should also not happen, since it should be already checked in the caller,
+            # but check here to be sure.
+            msg = "Specified problem does not support rescoring."
+            raise UpdateProblemModuleStateError(msg)
+
+        result = instance.rescore_problem()
+        instance.save()
+        if 'success' not in result:
+            # don't consider these fatal, but false means that the individual call didn't complete:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: unexpected response %(msg)s",
+                dict(
+                    msg=result,
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
+        elif result['success'] not in ['correct', 'incorrect']:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result['success'],
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
+        else:
+            TASK_LOG.debug(
+                u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result['success'],
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_SUCCEEDED
 
 
 @transaction.autocommit

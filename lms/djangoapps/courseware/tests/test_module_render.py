@@ -184,7 +184,13 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # call xqueue_callback with our mocked information
             request = self.request_factory.post(self.callback_url, data)
-            render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
+            render.xqueue_callback(
+                request,
+                unicode(self.course_key),
+                self.mock_user.id,
+                self.mock_module.id,
+                self.dispatch
+            )
 
         # Verify that handle ajax is called with the correct data
         request.POST['queuekey'] = fake_key
@@ -200,12 +206,24 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             # Test with missing xqueue data
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, {})
-                render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
+                render.xqueue_callback(
+                    request,
+                    unicode(self.course_key),
+                    self.mock_user.id,
+                    self.mock_module.id,
+                    self.dispatch
+                )
 
             # Test with missing xqueue_header
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, data)
-                render.xqueue_callback(request, self.course_key, self.mock_user.id, self.mock_module.id, self.dispatch)
+                render.xqueue_callback(
+                    request,
+                    unicode(self.course_key),
+                    self.mock_user.id,
+                    self.mock_module.id,
+                    self.dispatch
+                )
 
     def test_get_score_bucket(self):
         self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')
@@ -275,11 +293,28 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         course = CourseFactory()
         descriptor = ItemFactory(category=block_type, parent=course)
         field_data_cache = FieldDataCache([self.toy_course, descriptor], self.toy_course.id, self.mock_user)
-        render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
-        render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
+        # This is verifying that caching doesn't cause an error during get_module_for_descriptor, which
+        # is why it calls the method twice identically.
+        render.get_module_for_descriptor(
+            self.mock_user,
+            request,
+            descriptor,
+            field_data_cache,
+            self.toy_course.id,
+            course=self.toy_course
+        )
+        render.get_module_for_descriptor(
+            self.mock_user,
+            request,
+            descriptor,
+            field_data_cache,
+            self.toy_course.id,
+            course=self.toy_course
+        )
 
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
-        'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
+        'ccx.overrides.CustomCoursesForEdxOverrideProvider',
+    ))
     def test_rebind_different_users_ccx(self):
         """
         This tests the rebinding a descriptor to a student does not result
@@ -287,18 +322,18 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         request = self.request_factory.get('')
         request.user = self.mock_user
-        course = CourseFactory()
+        course = CourseFactory.create(enable_ccx=True)
 
         descriptor = ItemFactory(category='html', parent=course)
         field_data_cache = FieldDataCache(
-            [self.toy_course, descriptor], self.toy_course.id, self.mock_user
+            [course, descriptor], course.id, self.mock_user
         )
 
         # grab what _field_data was originally set to
         original_field_data = descriptor._field_data  # pylint: disable=protected-access, no-member
 
         render.get_module_for_descriptor(
-            self.mock_user, request, descriptor, field_data_cache, self.toy_course.id
+            self.mock_user, request, descriptor, field_data_cache, course.id, course=course
         )
 
         # check that _unwrapped_field_data is the same as the original
@@ -314,7 +349,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 request,
                 descriptor,
                 field_data_cache,
-                self.toy_course.id
+                course.id,
+                course=course
             )
 
         # _field_data should now be wrapped by LmsFieldData
@@ -832,6 +868,7 @@ class JsonInitDataTest(ModuleStoreTestCase):
             descriptor,
             field_data_cache,
             course.id,                          # pylint: disable=no-member
+            course=course
         )
         html = module.render(STUDENT_VIEW).content
         self.assertIn(json_output, html)
@@ -1098,6 +1135,8 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super(TestAnonymousStudentId, self).setUp(create_user=False)
         self.user = UserFactory()
+        self.course_key = self.create_toy_course()
+        self.course = modulestore().get_course(self.course_key)
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
     def _get_anonymous_id(self, course_id, xblock_class):
@@ -1135,6 +1174,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             track_function=Mock(name='track_function'),  # Track Function
             xqueue_callback_url_prefix=Mock(name='xqueue_callback_url_prefix'),  # XQueue Callback Url Prefix
             request_token='request_token',
+            course=self.course,
         ).xmodule_runtime.anonymous_student_id
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)
@@ -1444,7 +1484,8 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
             self.course.id,
             self.track_function,
             self.xqueue_callback_url_prefix,
-            self.request_token
+            self.request_token,
+            course=self.course
         )
         service = runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
@@ -1462,7 +1503,8 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
             self.course.id,
             self.track_function,
             self.xqueue_callback_url_prefix,
-            self.request_token
+            self.request_token,
+            course=self.course
         )
 
         self.assertFalse(getattr(runtime, u'user_is_beta_tester'))
@@ -1607,6 +1649,7 @@ class TestFilteredChildren(ModuleStoreTestCase):
             block,
             field_data_cache,
             course_id,
+            course=self.course
         )
 
     def _has_access(self, user, action, obj, course_key=None):

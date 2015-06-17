@@ -466,7 +466,11 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Set up tests
         """
         super(TestCCXGrades, self).setUp()
-        course = CourseFactory.create()
+        self.course = course = CourseFactory.create(enable_ccx=True)
+
+        # Create instructor account
+        self.coach = coach = AdminFactory.create()
+        self.client.login(username=coach.username, password="test")
 
         # Create a course outline
         self.mooc_start = start = datetime.datetime(
@@ -491,9 +495,6 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ] for section in sections
         ]
 
-        # Create instructor account
-        self.coach = coach = AdminFactory.create()
-
         # Create CCX
         role = CourseCcxCoachRole(course.id)
         role.add_users(coach)
@@ -505,7 +506,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         OverrideFieldData.provider_classes = None
         # pylint: disable=protected-access
         for block in iter_blocks(course):
-            block._field_data = OverrideFieldData.wrap(coach, block._field_data)
+            block._field_data = OverrideFieldData.wrap(coach, course, block._field_data)
             new_cache = {'tabs': [], 'discussion_topics': []}
             if 'grading_policy' in block._field_data_cache:
                 new_cache['grading_policy'] = block._field_data_cache['grading_policy']
@@ -559,6 +560,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @patch('ccx.views.render_to_response', intercept_renderer)
     def test_gradebook(self):
+        self.course.enable_ccx = True
         url = reverse(
             'ccx_gradebook',
             kwargs={'course_id': self.ccx_key}
@@ -574,6 +576,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             len(student_info['grade_summary']['section_breakdown']), 4)
 
     def test_grades_csv(self):
+        self.course.enable_ccx = True
         url = reverse(
             'ccx_grades_csv',
             kwargs={'course_id': self.ccx_key}
@@ -593,6 +596,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @patch('courseware.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
+        self.course.enable_ccx = True
         patch_context = patch('courseware.views.get_course_with_access')
         get_course = patch_context.start()
         get_course.return_value = self.course
