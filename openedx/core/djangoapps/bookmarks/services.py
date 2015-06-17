@@ -41,8 +41,9 @@ class BookmarksService(object):
             course_key (CourseKey): course_key of the course whose bookmarks cache should be returned.
             fetch (Bool): if the bookmarks should be fetched and cached if they already aren't.
         """
-        if hasattr(modulestore(), 'fill_in_run'):
-            course_key = modulestore().fill_in_run(course_key)
+        store = modulestore()
+        if hasattr(store, 'fill_in_run'):
+            course_key = store.fill_in_run(course_key)
         if course_key.run is None:
             return []
         cache_key = CACHE_KEY_TEMPLATE.format(self._user.id, course_key)
