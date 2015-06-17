@@ -727,6 +727,9 @@ INSTALLED_APPS = (
     # Theming
     'openedx.core.djangoapps.theming',
 
+    # Theming
+    'openedx.core.djangoapps.theming',
+
     # comment common
     'django_comment_common',
 
