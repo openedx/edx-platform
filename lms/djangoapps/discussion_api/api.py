@@ -15,7 +15,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 
 from courseware.courses import get_course_with_access
-from discussion_api.forms import ThreadActionsForm
+from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
@@ -335,25 +335,25 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     return get_paginated_data(request, results, page, num_pages)
 
 
-def _do_extra_thread_actions(api_thread, cc_thread, request_fields, actions_form, context):
+def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context):
     """
-    Perform any necessary additional actions related to thread creation or
+    Perform any necessary additional actions related to content creation or
     update that require a separate comments service request.
     """
     for field, form_value in actions_form.cleaned_data.items():
-        if field in request_fields and form_value != api_thread[field]:
-            api_thread[field] = form_value
+        if field in request_fields and form_value != api_content[field]:
+            api_content[field] = form_value
             if field == "following":
                 if form_value:
-                    context["cc_requester"].follow(cc_thread)
+                    context["cc_requester"].follow(cc_content)
                 else:
-                    context["cc_requester"].unfollow(cc_thread)
+                    context["cc_requester"].unfollow(cc_content)
             else:
                 assert field == "voted"
                 if form_value:
-                    context["cc_requester"].vote(cc_thread, "up")
+                    context["cc_requester"].vote(cc_content, "up")
                 else:
-                    context["cc_requester"].unvote(cc_thread)
+                    context["cc_requester"].unvote(cc_content)
 
 
 def create_thread(request, thread_data):
@@ -390,7 +390,7 @@ def create_thread(request, thread_data):
 
     cc_thread = serializer.object
     api_thread = serializer.data
-    _do_extra_thread_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
 
     track_forum_event(
         request,
@@ -428,11 +428,15 @@ def create_comment(request, comment_data):
         raise ValidationError({"thread_id": ["Invalid value."]})
 
     serializer = CommentSerializer(data=comment_data, context=context)
-    if not serializer.is_valid():
-        raise ValidationError(serializer.errors)
+    actions_form = CommentActionsForm(comment_data)
+    if not (serializer.is_valid() and actions_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
     serializer.save()
 
     cc_comment = serializer.object
+    api_comment = serializer.data
+    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
+
     track_forum_event(
         request,
         get_comment_created_event_name(cc_comment),
@@ -501,7 +505,7 @@ def update_thread(request, thread_id, update_data):
     if set(update_data) - set(actions_form.fields):
         serializer.save()
     api_thread = serializer.data
-    _do_extra_thread_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
 
 
@@ -513,7 +517,7 @@ def _get_comment_editable_fields(cc_comment, context):
     """
     Get the list of editable fields for the given comment in the given context
     """
-    ret = set()
+    ret = {"voted"}
     if _is_user_author_or_privileged(cc_comment, context):
         ret |= _COMMENT_EDITABLE_BY_AUTHOR
     if _is_user_author_or_privileged(context["thread"], context):
@@ -554,12 +558,15 @@ def update_comment(request, comment_id, update_data):
     editable_fields = _get_comment_editable_fields(cc_comment, context)
     _check_editable_fields(editable_fields, update_data)
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
-    if not serializer.is_valid():
-        raise ValidationError(serializer.errors)
-    # Only save comment object if the comment is actually modified
-    if update_data:
+    actions_form = CommentActionsForm(update_data)
+    if not (serializer.is_valid() and actions_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+    # Only save thread object if some of the edited fields are in the thread data, not extra actions
+    if set(update_data) - set(actions_form.fields):
         serializer.save()
-    return serializer.data
+    api_comment = serializer.data
+    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context)
+    return api_comment
 
 
 def delete_thread(request, thread_id):

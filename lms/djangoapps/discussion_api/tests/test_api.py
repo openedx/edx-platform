@@ -1359,6 +1359,21 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.assertEqual(actual_event_name, expected_event_name)
         self.assertEqual(actual_event_data, expected_event_data)
 
+    def test_voted(self):
+        self.register_post_comment_response({"id": "test_comment"}, "test_thread")
+        self.register_comment_votes_response("test_comment")
+        data = self.minimal_data.copy()
+        data["voted"] = "True"
+        result = create_comment(self.request, data)
+        self.assertEqual(result["voted"], True)
+        cs_request = httpretty.last_request()
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/votes")
+        self.assertEqual(cs_request.method, "PUT")
+        self.assertEqual(
+            cs_request.parsed_body,
+            {"user_id": [str(self.user.id)], "value": ["up"]}
+        )
+
     def test_thread_id_missing(self):
         with self.assertRaises(ValidationError) as assertion:
             create_comment(self.request, {})
@@ -1917,6 +1932,45 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 err.message_dict,
                 {"endorsed": ["This field is not editable."]}
             )
+
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    def test_voted(self, old_voted, new_voted):
+        """
+        Test attempts to edit the "voted" field.
+
+        old_voted indicates whether the comment should be upvoted at the start of
+        the test. new_voted indicates the value for the "voted" field in the
+        update. If old_voted and new_voted are the same, no update should be
+        made. Otherwise, a vote should be PUT or DELETEd according to the
+        new_voted value.
+        """
+        if old_voted:
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+        self.register_comment_votes_response("test_comment")
+        self.register_comment()
+        data = {"voted": new_voted}
+        result = update_comment(self.request, "test_comment", data)
+        self.assertEqual(result["voted"], new_voted)
+        last_request_path = urlparse(httpretty.last_request().path).path
+        votes_url = "/api/v1/comments/test_comment/votes"
+        if old_voted == new_voted:
+            self.assertNotEqual(last_request_path, votes_url)
+        else:
+            self.assertEqual(last_request_path, votes_url)
+            self.assertEqual(
+                httpretty.last_request().method,
+                "PUT" if new_voted else "DELETE"
+            )
+            actual_request_data = (
+                httpretty.last_request().parsed_body if new_voted else
+                parse_qs(urlparse(httpretty.last_request().path).query)
+            )
+            actual_request_data.pop("request_id", None)
+            expected_request_data = {"user_id": [str(self.user.id)]}
+            if new_voted:
+                expected_request_data["value"] = ["up"]
+            self.assertEqual(actual_request_data, expected_request_data)
 
 
 @ddt.ddt

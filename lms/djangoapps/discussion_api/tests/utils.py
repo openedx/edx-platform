@@ -203,6 +203,19 @@ class CommentsServiceMockMixin(object):
                 status=200
             )
 
+    def register_comment_votes_response(self, comment_id):
+        """
+        Register a mock response for PUT and DELETE on the CS comment votes
+        endpoint
+        """
+        for method in [httpretty.PUT, httpretty.DELETE]:
+            httpretty.register_uri(
+                method,
+                "http://localhost:4567/api/v1/comments/{}/votes".format(comment_id),
+                body=json.dumps({}),  # body is unused
+                status=200
+            )
+
     def register_delete_thread_response(self, thread_id):
         """
         Register a mock response for DELETE on the CS thread instance endpoint
