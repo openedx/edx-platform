@@ -247,7 +247,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
         # The first time we load a CourseOverview, it will be a cache miss, so
         # we expect the modulestore to be queried.
-        with check_mongo_calls_range(expected_num_mongo_calls):
+        with check_mongo_calls(expected_num_mongo_calls):
             _course_overview_1 = CourseOverview.get_from_id(course.id)
 
         # The second time we load a CourseOverview, it will be a cache hit, so
