@@ -141,6 +141,12 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             (including the bodies of comments in the thread) matches the search
             string will be returned.
 
+        * following: If true, retrieve only threads the requesting user is
+            following
+
+        The topic_id, text_search, and following parameters are mutually
+        exclusive (i.e. only one may be specified in a request)
+
     **POST Parameters**:
 
         * course_id (required): The course to create the thread in
@@ -229,6 +235,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["page_size"],
                 form.cleaned_data["topic_id"],
                 form.cleaned_data["text_search"],
+                form.cleaned_data["following"],
             )
         )
 

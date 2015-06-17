@@ -47,6 +47,8 @@ def get_context(course, request, thread=None):
         for user in role.users.all()
     }
     requester = request.user
+    cc_requester = CommentClientUser.from_django_user(requester).retrieve()
+    cc_requester["course_id"] = course.id
     return {
         "course": course,
         "request": request,
@@ -56,7 +58,7 @@ def get_context(course, request, thread=None):
         "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,
-        "cc_requester": CommentClientUser.from_django_user(requester).retrieve(),
+        "cc_requester": cc_requester,
     }
 
 

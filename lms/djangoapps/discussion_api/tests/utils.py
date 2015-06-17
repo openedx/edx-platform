@@ -191,6 +191,19 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_subscribed_threads_response(self, user, threads, page, num_pages):
+        """Register a mock response for GET on the CS user instance endpoint"""
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/users/{}/subscribed_threads".format(user.id),
+            body=json.dumps({
+                "collection": threads,
+                "page": page,
+                "num_pages": num_pages,
+            }),
+            status=200
+        )
+
     def register_subscription_response(self, user):
         """
         Register a mock response for POST and DELETE on the CS user subscription
