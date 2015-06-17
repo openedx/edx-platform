@@ -227,6 +227,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
                 field_data,
+                for_parent=kwargs.get('for_parent')
             )
         except Exception:  # pylint: disable=broad-except
             log.warning("Failed to load descriptor", exc_info=True)

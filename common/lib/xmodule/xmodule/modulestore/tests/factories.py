@@ -351,6 +351,8 @@ class StackTraceCounter(object):
             args: The positional arguments to capture at this stack frame
             kwargs: The keyword arguments to capture at this stack frame
         """
+        # pylint: disable=broad-except
+
         stack = traceback.extract_stack()[:-2]
 
         if self._top_of_stack in stack:
@@ -419,6 +421,7 @@ class StackTraceCounter(object):
         """
         stacks = StackTraceCounter(stack_depth, include_arguments)
 
+        # pylint: disable=missing-docstring
         @functools.wraps(func)
         def capture(*args, **kwargs):
             stacks.capture_stack(args, kwargs)

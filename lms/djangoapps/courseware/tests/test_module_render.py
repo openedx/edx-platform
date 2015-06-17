@@ -610,11 +610,11 @@ class TestTOC(ModuleStoreTestCase):
     # Split makes 6 queries to load the course to depth 2:
     #     - load the structure
     #     - load 5 definitions
-    # Split makes 6 queries to render the toc:
+    # Split makes 5 queries to render the toc:
     #     - it loads the active version at the start of the bulk operation
-    #     - it loads 5 definitions, because it instantiates the a CourseModule and 4 VideoModules
+    #     - it loads 4 definitions, because it instantiates 4 VideoModules
     #       each of which access a Scope.content field in __init__
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 6))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 5))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
@@ -634,9 +634,10 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
+            course = self.store.get_course(self.toy_course.id, depth=2)
             with check_mongo_calls(toc_finds):
                 actual = render.toc_for_course(
-                    self.request, self.toy_course, self.chapter, None, self.field_data_cache
+                    self.request, course, self.chapter, None, self.field_data_cache
                 )
         for toc_section in expected:
             self.assertIn(toc_section, actual)
@@ -648,11 +649,11 @@ class TestTOC(ModuleStoreTestCase):
     # Split makes 6 queries to load the course to depth 2:
     #     - load the structure
     #     - load 5 definitions
-    # Split makes 2 queries to render the toc:
+    # Split makes 5 queries to render the toc:
     #     - it loads the active version at the start of the bulk operation
-    #     - it loads 5 definitions, because it instantiates the a CourseModule and 4 VideoModules
+    #     - it loads 4 definitions, because it instantiates 4 VideoModules
     #       each of which access a Scope.content field in __init__
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 6))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 5))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
