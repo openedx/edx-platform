@@ -9,15 +9,16 @@ define(['backbone'], function (Backbone) {
             is_proctored: true,
             exam_display_name: 'Midterm',
             exam_url_path: '',
-            time_remaining_seconds: 2*60*60,
-            low_threshold: 25 * 60,
-            critically_low_threshold: 5 * 60,
+            time_remaining_seconds: 45, //2 * 60 + 15,
+            low_threshold: 30,
+            critically_low_threshold: 15,
             lastFetched: new Date()
         },
         getRemainingSeconds: function() {
             var currentTime = (new Date()).getTime();
             var lastFetched = this.get('lastFetched').getTime();
-            return this.get('time_remaining_seconds') - (currentTime - lastFetched)/1000;
+            var totalSeconds = this.get('time_remaining_seconds') - (currentTime - lastFetched)/1000;
+            return (totalSeconds > 0) ? totalSeconds : 0;
         },
         getFormattedRemainingTime: function() {
             var totalSeconds = this.getRemainingSeconds();
