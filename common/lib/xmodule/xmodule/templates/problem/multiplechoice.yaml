@@ -7,7 +7,6 @@ metadata:
        When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
 
        You can use the following example problem as a model.
-       _____________________________________________________________________________
 
        >>Which of the following countries has the largest population?<<
        ( ) Brazil
@@ -30,8 +29,7 @@ data: |
    <p>When you add the problem, be sure to select <strong>Settings</strong> 
    to specify a <strong>Display Name</strong> and other values that apply.</p>
    <p>You can use the following example problem as a model.</p>
-   <fieldset>
-      <legend>Which of the following countries has the largest population?</legend>
+      <p>Which of the following countries has the largest population?</p>
       <multiplechoiceresponse>
        <choicegroup type="MultipleChoice">
           <choice correct="false" name="brazil">Brazil</choice>
@@ -40,7 +38,6 @@ data: |
           <choice correct="false" name="russia">Russia</choice>
        </choicegroup>
       </multiplechoiceresponse>
-    </fieldset>
     <solution>
       <div class="detailed-solution">
         <p>Explanation</p>

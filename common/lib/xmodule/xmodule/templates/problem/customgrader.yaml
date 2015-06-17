@@ -45,20 +45,16 @@ data: |
           return test_add(10, ans)
 
       </script>
-      <fieldset>
-        <legend>Enter two integers that sum to 10.</legend>
+        <p>Enter two integers that sum to 10.</p>
         <customresponse cfn="test_add_to_ten">
           <textline size="40" correct_answer="3" label="Integer #1"/><br/>
           <textline size="40" correct_answer="7" label="Integer #2"/>
         </customresponse>
-      </fieldset>
-      <fieldset>
-        <legend>Enter two integers that sum to 20.</legend>
+        <p>Enter two integers that sum to 20.</p>
         <customresponse cfn="test_add" expect="20">
           <textline size="40" correct_answer="11" label="Integer #1"/><br/>
           <textline size="40" correct_answer="9" label="Integer #2"/>
         </customresponse>
-      </fieldset>
       <solution>
         <div class="detailed-solution">
           <p>Explanation</p>
