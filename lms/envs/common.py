@@ -2021,6 +2021,10 @@ FEATURES['CLASS_DASHBOARD'] = False
 if FEATURES.get('CLASS_DASHBOARD'):
     INSTALLED_APPS += ('class_dashboard',)
 
+################ Enable credit eligibility feature ####################
+ENABLE_CREDIT_ELIGIBILITY = False
+FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
+
 ######################## CAS authentication ###########################
 
 if FEATURES.get('AUTH_USE_CAS'):

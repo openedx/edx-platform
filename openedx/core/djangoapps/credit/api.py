@@ -419,26 +419,23 @@ def get_credit_requirement_status(course_key, username):
                     {
                         "namespace": "reverification",
                         "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                        "display_name": "In Course Reverification",
                         "criteria": {},
-                        "status": "satisfied",
-                    },
-                    {
-                        "namespace": "reverification",
-                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                        "criteria": {},
-                        "status": "Not satisfied",
+                        "status": "failed",
                     },
                     {
                         "namespace": "proctored_exam",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "display_name": "Proctored Mid Term Exam",
                         "criteria": {},
-                        "status": "error",
+                        "status": "satisfied",
                     },
                     {
                         "namespace": "grade",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "display_name": "Minimum Passing Grade",
                         "criteria": {"min_grade": 0.8},
-                        "status": None,
+                        "status": "failed",
                     },
                 ]
 
@@ -454,6 +451,7 @@ def get_credit_requirement_status(course_key, username):
         statuses.append({
             "namespace": requirement.namespace,
             "name": requirement.name,
+            "display_name": requirement.display_name,
             "criteria": requirement.criteria,
             "status": requirement_status.status if requirement_status else None,
             "status_date": requirement_status.modified if requirement_status else None,
@@ -473,18 +471,6 @@ def is_user_eligible_for_credit(username, course_key):
         True if user is eligible for the course else False
     """
     return CreditEligibility.is_user_eligible_for_credit(course_key, username)
-
-
-def is_credit_course(course_key):
-    """Check if the given course is a credit course
-
-    Arg:
-        course_key (CourseKey): The identifier for course
-
-    Returns:
-        True if course is credit course else False
-    """
-    return CreditCourse.is_credit_course(course_key)
 
 
 def get_credit_requirement(course_key, namespace, name):

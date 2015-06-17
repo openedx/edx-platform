@@ -7,6 +7,7 @@ import urllib
 import json
 import cgi
 
+from collections import OrderedDict
 from datetime import datetime
 from django.utils import translation
 from django.utils.translation import ugettext as _
@@ -1065,7 +1066,9 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
-    if is_credit_course(course_key):
+    credit_course_requirements = None
+    is_course_credit = settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)
+    if is_course_credit:
         requirement_statuses = get_credit_requirement_status(course_key, student.username)
         if any(requirement['status'] == 'failed' for requirement in requirement_statuses):
             eligibility_status = "not_eligible"
@@ -1073,12 +1076,16 @@ def _progress(request, course_key, student_id):
             eligibility_status = "eligible"
         else:
             eligibility_status = "partial_eligible"
-        credit_course = {
+
+        paired_requirements = {}
+        for requirement in requirement_statuses:
+            namespace = requirement.pop("namespace")
+            paired_requirements.setdefault(namespace, []).append(requirement)
+
+        credit_course_requirements = {
             'eligibility_status': eligibility_status,
-            'requirements': requirement_statuses
+            'requirements': OrderedDict(sorted(paired_requirements.items(), reverse=True))
         }
-    else:
-        credit_course = None
 
     context = {
         'course': course,
@@ -1089,7 +1096,8 @@ def _progress(request, course_key, student_id):
         'student': student,
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
-        'credit_course': credit_course
+        'credit_course_requirements': credit_course_requirements,
+        'is_credit_course': is_course_credit,
     }
 
     if show_generate_cert_btn:
