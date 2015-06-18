@@ -85,6 +85,7 @@ class Status(object):
         names = {
             'correct': _('correct'),
             'incorrect': _('incorrect'),
+            'partially-correct': _('partially-correct'),
             'incomplete': _('incomplete'),
             'unanswered': _('unanswered'),
             'unsubmitted': _('unanswered'),
@@ -896,7 +897,7 @@ class MatlabInput(CodeInput):
         Right now, we only want this button to show up when a problem has not been
         checked.
         """
-        if self.status in ['correct', 'incorrect']:
+        if self.status in ['correct', 'incorrect', 'partially-correct']:
             return False
         else:
             return True

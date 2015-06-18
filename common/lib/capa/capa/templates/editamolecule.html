@@ -1,7 +1,7 @@
 <section id="editamoleculeinput_${id}" class="editamoleculeinput">
   <div class="script_placeholder" data-src="${applet_loader}"/>
 
-    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
     <div class="${status.classname}" id="status_${id}">
     % endif
 
@@ -23,7 +23,7 @@
 
     <div class="error_message" style="padding: 5px 5px 5px 5px; background-color:#FA6666; height:60px;width:400px; display: none"></div>
 
-  % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+  % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
   </div>
   % endif
 </section>
