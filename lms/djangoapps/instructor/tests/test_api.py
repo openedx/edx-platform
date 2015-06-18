@@ -442,7 +442,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['general_errors'][0]['response'], 'Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+        self.assertEquals(data['general_errors'][0]['response'], 'Make sure that the file you upload is in .csv format and that it has no invalid characters or rows.')
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -528,8 +528,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        warning_message = 'An account with email {email} exists but the provided username {username} ' \
-                          'is different. Enrolling anyway with {email}.'.format(email='test_student@example.com', username='test_student_2')
+        warning_message = 'An account with this email address ({email}) exists, but the account has a different' \
+                          'username. The user with this email address will be enrolled in the course.'.format(email='test_student@example.com', username='test_student_2')
         self.assertNotEquals(len(data['warnings']), 0)
         self.assertEquals(data['warnings'][0]['response'], warning_message)
         user = User.objects.get(email='test_student@example.com')
@@ -553,7 +553,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(data['row_errors'][0]['response'], 'Username {user} already exists.'.format(user='test_student_1'))
+        self.assertEquals(data['row_errors'][0]['response'], 'This username ({username}) is already in use.'.format(user='test_student_1'))
 
     def test_csv_file_not_attached(self):
         """
@@ -2402,7 +2402,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.client.login(username=self.instructor.username, password='test')
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The enrollment report is being created. This report contains profile information for all enrolled learners.', response.content)
 
     def test_bulk_purchase_detailed_report(self):
         """
@@ -2452,7 +2452,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The enrollment report is being created. This report contains profile information for all enrolled learners.', response.content)
 
     def test_create_registration_code_without_invoice_and_order(self):
         """
@@ -2474,7 +2474,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The enrollment report is being created. This report contains profile information for all enrolled learners.', response.content)
 
     def test_invoice_payment_is_still_pending_for_registration_codes(self):
         """
@@ -2499,7 +2499,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The enrollment report is being created. This report contains profile information for all enrolled learners.', response.content)
 
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
@@ -2553,7 +2553,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
+        success_status = "The {report_type} report is currently being created." \
+                         " To view the status of the report, see Pending Instructor Tasks below.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2572,9 +2573,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your {report_type} report is being created." \
-                         " To view the status of the report, see the 'Pending Instructor Tasks'" \
-                         " section.".format(report_type=report_type)
+        success_status = "The {report_type} report is being created." \
+                         " To view the status of the report, see Pending Instructor Tasks below.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2594,9 +2594,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         with patch(task_api_endpoint) as mock:
             mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
-        already_running_status = "An {report_type} report is currently in progress." \
-                                 " To view the status of the report, see the 'Pending Instructor Tasks' section." \
-                                 " When completed, the report will be available for download in the table below." \
+        already_running_status = "The {report_type} report is currently being created." \
+                                 " To view the status of the report, see Pending Instructor Tasks below." \
                                  " You will be able to download the" \
                                  " report when it is complete.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
