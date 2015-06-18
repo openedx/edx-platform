@@ -644,6 +644,19 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             }
         )
 
+    def test_create_parent_id_too_deep(self):
+        self.register_get_comment_response({
+            "id": "test_parent",
+            "thread_id": "test_thread",
+            "depth": 2
+        })
+        data = self.minimal_data.copy()
+        data["parent_id"] = "test_parent"
+        context = get_context(self.course, self.request, make_minimal_cs_thread())
+        serializer = CommentSerializer(data=data, context=context)
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(serializer.errors, {"parent_id": ["Parent is too deep."]})
+
     def test_create_missing_field(self):
         for field in self.minimal_data:
             data = self.minimal_data.copy()

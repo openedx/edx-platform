@@ -22,6 +22,7 @@ from django_comment_client.utils import (
     add_courseware_context,
     get_annotated_content_info,
     get_ability,
+    is_comment_too_deep,
     JsonError,
     JsonResponse,
     prepare_content,
@@ -313,9 +314,8 @@ def create_comment(request, course_id, thread_id):
     given a course_id and thread_id, test for comment depth. if not too deep,
     call _create_comment to create the actual comment.
     """
-    if cc_settings.MAX_COMMENT_DEPTH is not None:
-        if cc_settings.MAX_COMMENT_DEPTH < 0:
-            return JsonError(_("Comment level too deep"))
+    if is_comment_too_deep(parent=None):
+        return JsonError(_("Comment level too deep"))
     return _create_comment(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), thread_id=thread_id)
 
 
@@ -397,9 +397,8 @@ def create_sub_comment(request, course_id, comment_id):
     given a course_id and comment_id, create a response to a comment
     after checking the max depth allowed, if allowed
     """
-    if cc_settings.MAX_COMMENT_DEPTH is not None:
-        if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
-            return JsonError(_("Comment level too deep"))
+    if is_comment_too_deep(parent=cc.Comment(comment_id)):
+        return JsonError(_("Comment level too deep"))
     return _create_comment(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), parent_id=comment_id)
 
 
