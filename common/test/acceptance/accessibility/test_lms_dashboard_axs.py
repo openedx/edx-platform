@@ -4,10 +4,10 @@ Accessibility tests for LMS dashboard page.
 Run just this test with:
 SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility -t test_lms_dashboard_axs.py
 """
-from ..tests.lms.test_lms_dashboard import LmsDashboardPageTest
+from ..tests.lms.test_lms_dashboard import BaseLmsDashboardTest
 
 
-class LmsDashboardAxsTest(LmsDashboardPageTest):
+class LmsDashboardAxsTest(BaseLmsDashboardTest):
     """
     Class to test lms student dashboard accessibility.
     """
