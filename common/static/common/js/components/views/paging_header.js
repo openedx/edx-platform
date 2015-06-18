@@ -13,14 +13,14 @@
                     var view = options.view,
                         collection = view.collection;
                     this.view = view;
-                    collection.bind('add', _.bind(this.render, this));
-                    collection.bind('remove', _.bind(this.render, this));
-                    collection.bind('reset', _.bind(this.render, this));
+                    this.collection = collection;
+                    this.collection.bind('add', _.bind(this.render, this));
+                    this.collection.bind('remove', _.bind(this.render, this));
+                    this.collection.bind('reset', _.bind(this.render, this));
                 },
 
                 render: function() {
-                    var view = this.view,
-                        collection = view.collection,
+                    var collection = this.collection,
                         currentPage = collection.currentPage,
                         lastPage = collection.totalPages - 1,
                         messageHtml = this.messageHtml();
@@ -35,8 +35,8 @@
                 messageHtml: function() {
                     var message = '';
                     var asset_type = false;
-                    if (this.view.collection.assetType) {
-                        if (this.view.collection.sortDirection === 'asc') {
+                    if (this.collection.assetType) {
+                        if (this.collection.sortDirection === 'asc') {
                             // Translators: sample result:
                             // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
                             message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, filtered by %(asset_type)s, sorted by %(sort_name)s ascending');
@@ -48,7 +48,7 @@
                         asset_type = this.filterNameLabel();
                     }
                     else {
-                        if (this.view.collection.sortDirection === 'asc') {
+                        if (this.collection.sortDirection === 'asc') {
                             // Translators: sample result:
                             // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
                             message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s ascending');
@@ -68,8 +68,7 @@
                 },
 
                 currentItemRangeLabel: function() {
-                    var view = this.view,
-                        collection = view.collection,
+                    var collection = this.collection,
                         start = collection.start,
                         count = collection.size(),
                         end = start + count;
@@ -83,7 +82,7 @@
                     var totalItemsLabel;
                     // Translators: turns into "25 total" to be used in other sentences, e.g. "Showing 0-9 out of 25 total".
                     totalItemsLabel = interpolate(gettext('%(total_items)s total'), {
-                        total_items: this.view.collection.totalCount
+                        total_items: this.collection.totalCount
                     }, true);
                     return interpolate('<span class="count-total">%(total_items_label)s</span>', {
                         total_items_label: totalItemsLabel
@@ -103,11 +102,11 @@
                 },
 
                 nextPage: function() {
-                    this.view.nextPage();
+                    this.collection.nextPage();
                 },
 
                 previousPage: function() {
-                    this.view.previousPage();
+                    this.collection.previousPage();
                 }
             });
 
