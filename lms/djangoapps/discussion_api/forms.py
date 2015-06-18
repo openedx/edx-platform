@@ -52,6 +52,10 @@ class ThreadListGetForm(_PaginationForm):
     topic_id = TopicIdField(required=False)
     text_search = CharField(required=False)
     following = NullBooleanField(required=False)
+    view = ChoiceField(
+        choices=[(choice, choice) for choice in ["unread", "unanswered"]],
+        required=False
+    )
 
     def clean_course_id(self):
         """Validate course_id"""
