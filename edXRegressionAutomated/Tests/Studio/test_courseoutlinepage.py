@@ -1,13 +1,11 @@
 from bok_choy.web_app_test import WebAppTest
-
 from pages.login import LoginPage
 from pages.mycoursespage import MyCoursesPage
 from pages.courseoutlinepage import CourseOutlinePage
-from Tests.LMS.pages.courseware import CoursewarePage
+from ..LMS.pages.courseware import CoursewarePage
 from pages.unitpage import UnitsPage
-from Tests.LMS.pages.lms_login import LMSLoginPage
-from Tests.Settings.config import GlobalVariables
-
+from ..LMS.pages.lms_login import LMSLoginPage
+from ..Settings.config import GlobalVariables
 
 class TestCourseOutline(WebAppTest):
     def setUp(self):
@@ -36,7 +34,8 @@ class TestCourseOutline(WebAppTest):
         self.course_outline_page.click_course_link()
 
     def test_new_section_main_button(self):
-        # Verify that user can click new section button (next to View Live Collapse/Expand buttons) and new section is added
+        # Verify that user can click new section button (next to View Live Collapse/Expand buttons) and new section is
+        # added
 
         self.course_outline_page.add_new_section_main_button("Section Main Button")
         self.course_outline_page.delete_sections()
@@ -54,7 +53,6 @@ class TestCourseOutline(WebAppTest):
         self.course_outline_page.add_new_section_main_button('Section Main Button') # Pre Req
         self.course_outline_page.add_new_subsection('New SubSection') # Pre Req
         self.course_outline_page.add_new_unit()
-
 
 class TestCourseOutlineWithViewLive(WebAppTest):
     def setUp(self):

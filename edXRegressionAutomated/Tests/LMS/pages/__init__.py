@@ -1,4 +1,3 @@
-__author__ = 'mac'
 import os
 
 AUTH_USER =os.environ['AUTH_USER_NAME']

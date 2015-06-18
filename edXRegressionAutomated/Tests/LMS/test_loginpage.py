@@ -1,8 +1,8 @@
 from bok_choy.web_app_test import WebAppTest
 
-from Tests.LMS.pages.lms_login import LMSLoginPage
-from Tests.LMS.pages.dashboard import Dashboard
-from Tests.Settings.config import GlobalVariables
+from pages.lms_login import LMSLoginPage
+from pages.dashboard import Dashboard
+from ..Settings.config import GlobalVariables
 
 
 class TestLMSLoginSuccess(WebAppTest):
@@ -20,4 +20,3 @@ class TestLMSLoginSuccess(WebAppTest):
         self.lms_login_page.login(GlobalVariables.user_name, GlobalVariables.password)
         self.lms_login_page.login_success_validation()
         self.assertTrue(self.lms_dashboard.is_browser_on_page(), "Successful pages login failed")
-

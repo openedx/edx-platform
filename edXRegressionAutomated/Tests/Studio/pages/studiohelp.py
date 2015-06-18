@@ -1,6 +1,5 @@
 from bok_choy.page_object import PageObject
 
-
 class StudioHelpPage(PageObject):
     """
     read the docs pages Help page

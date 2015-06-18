@@ -1,13 +1,11 @@
 from bok_choy.page_object import PageObject
-
 from . import BASE_URL
 from signup import SignUpPage
 from login import LoginPage
 from studiohelp import StudioHelpPage
 from termsofservice import TermsOfServicePage
 from privacypolicy import PrivacyPolicyPage
-from Tests.LMS.pages.homepage import LMSHomePage
-
+from ...LMS.pages.homepage import LMSHomePage
 
 class HomePage(PageObject):
 

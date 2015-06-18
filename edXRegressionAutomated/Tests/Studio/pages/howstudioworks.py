@@ -1,6 +1,5 @@
 from bok_choy.page_object import PageObject
 
-
 class HowStudioWorksPage(PageObject):
     """
     How pages Works (Help) page

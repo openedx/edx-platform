@@ -1,7 +1,5 @@
 from bok_choy.page_object import PageObject
-
-from Tests.LMS.pages import BASE_URL
-
+from . import BASE_URL
 
 class Dashboard(PageObject):
     """

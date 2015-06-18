@@ -1,12 +1,10 @@
 from bok_choy.web_app_test import WebAppTest
-
 from pages.login import LoginPage
 from pages.courseoutlinepage import CourseOutlinePage
 from pages.mycoursespage import MyCoursesPage
-from Tests.LMS.pages.lms_login import LMSLoginPage
+from ..LMS.pages.lms_login import LMSLoginPage
 from pages.unitpage import UnitsPage
-from Tests.Settings.config import GlobalVariables
-
+from ..Settings.config import GlobalVariables
 
 class TestUnitPage(WebAppTest):
     def setUp(self):
@@ -17,7 +15,6 @@ class TestUnitPage(WebAppTest):
         self.course_outline_page = CourseOutlinePage(self.browser)
         self.lms_login_page = LMSLoginPage(self.browser)
         self.unit_page = UnitsPage(self.browser)
-
 
         LoginPage(self.browser).visit()
         self.login_page.login(GlobalVariables.user_name, GlobalVariables.password)
@@ -37,7 +34,10 @@ class TestUnitPage(WebAppTest):
     def test_add_components(self):
         # Verify that all HTML components can be added and are displayed in pages
 
-        list_html_component = {'Announcement':'"announcement.yaml"', 'Anonymous User ID':'"anon_user_id.yaml"', 'Full Screen Image Tool':'"image_modal.yaml"', 'IFrame Tool':'"iframe.yaml"', 'Raw HTML':'"raw.yaml"', 'Zooming Image Tool':'"zooming_image.yaml"'}
+        list_html_component = {'Announcement':'"announcement.yaml"', 'Anonymous User ID':'"anon_user_id.yaml"',
+                               'Full Screen Image Tool':'"image_modal.yaml"', 'IFrame Tool':'"iframe.yaml"',
+                               'Raw HTML':'"raw.yaml"', 'Zooming Image Tool':'"zooming_image.yaml"'}
+
         for verify, add in list_html_component.iteritems():
             self.unit_page.click_unit_html_button()
             self.unit_page.add_component_html(add)
@@ -54,7 +54,13 @@ class TestUnitPage(WebAppTest):
 
         # Verify that all Common Problem Types are added and displayed in pages
 
-        list_common_problem_components = {'Blank Common Problem':'"blank_common.yaml"', 'Checkboxes':'"checkboxes_response.yaml"', 'Dropdown':'"optionresponse.yaml"', 'Multiple Choice':'"multiplechoice.yaml"', 'Numerical Input':'"numericalresponse.yaml"', 'Text Input':'"string_response.yaml"'}
+        list_common_problem_components = {'Blank Common Problem':'"blank_common.yaml"',
+                                          'Checkboxes':'"checkboxes_response.yaml"',
+                                          'Dropdown':'"optionresponse.yaml"',
+                                          'Multiple Choice':'"multiplechoice.yaml"',
+                                          'Numerical Input':'"numericalresponse.yaml"',
+                                          'Text Input':'"string_response.yaml"'}
+
         for verify, add in list_common_problem_components.iteritems():
             self.unit_page.click_unit_common_problem_button()
             self.unit_page.add_component_common_problem(add)
@@ -63,7 +69,15 @@ class TestUnitPage(WebAppTest):
 
         # Verify that all Advanced Problem Types are added and displayed in pages
 
-        list_advanced_problem_components = {'Circuit Schematic Builder':'"circuitschematic.yaml"', 'Custom Javascript Display and Grading':'"jsinput_response.yaml"', 'Custom Python-Evaluated Input':'"customgrader.yaml"', 'Drag and Drop':'"drag_and_drop.yaml"', 'Image Mapped Input':'"imageresponse.yaml"', 'Math Expression Input':'"formularesponse.yaml"', 'Molecular Structure':'"jsme.yaml"', 'Problem with Adaptive Hint':'"problem_with_hint.yaml"' }
+        list_advanced_problem_components = {'Circuit Schematic Builder':'"circuitschematic.yaml"',
+                                            'Custom Javascript Display and Grading':'"jsinput_response.yaml"',
+                                            'Custom Python-Evaluated Input':'"customgrader.yaml"',
+                                            'Drag and Drop':'"drag_and_drop.yaml"',
+                                            'Image Mapped Input':'"imageresponse.yaml"',
+                                            'Math Expression Input':'"formularesponse.yaml"',
+                                            'Molecular Structure':'"jsme.yaml"',
+                                            'Problem with Adaptive Hint':'"problem_with_hint.yaml"' }
+
         for verify, add in list_advanced_problem_components.iteritems():
             self.unit_page.click_unit_advanced_problem_button()
             self.unit_page.add_component_common_problem(add)

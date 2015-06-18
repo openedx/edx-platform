@@ -1,10 +1,8 @@
 from bok_choy.page_object import PageObject
-
 from . import BASE_URL
 from edgehelp import EdgeHelpPage
 from mycoursespage import MyCoursesPage
 from signup import SignUpPage
-
 
 class LoginPage(PageObject):
     """

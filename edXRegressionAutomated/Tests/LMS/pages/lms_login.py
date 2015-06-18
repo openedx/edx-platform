@@ -1,7 +1,6 @@
 from bok_choy.page_object import PageObject
-
-from Tests.LMS.pages import BASE_URL
-from Tests.LMS.pages.dashboard import Dashboard
+from . import BASE_URL
+from dashboard import Dashboard
 
 
 class LMSLoginPage(PageObject):

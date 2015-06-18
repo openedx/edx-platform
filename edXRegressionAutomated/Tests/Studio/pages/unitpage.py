@@ -1,7 +1,6 @@
 from bok_choy.page_object import PageObject
 from bok_choy.javascript import wait_for_js
 
-
 class UnitsPage(PageObject):
     """
     Units page of Auto course (Add New Component)
@@ -17,49 +16,47 @@ class UnitsPage(PageObject):
         self.q(css='.content-primary').first.click()
         self.wait_for_element_presence('.large-discussion-icon', 'Cannot find Discussion button')
         self.q(css='.large-discussion-icon').first.click()
-        self.wait_for_element_presence('.xmodule_DiscussionModule.xblock-initialized', 'Cannot find Inline Discussion')
-
+        self.wait_for_element_presence('.xmodule_DiscussionModule.xblock-initialized', 'Inline Discussion')
 
     def click_unit_html_button(self):
         # Click HTML unit in Add New Components
 
         self.wait_for_element_presence('.large-html-icon', 'Cannot find add components html button')
         self.q(css='.large-html-icon').first.click()
-        self.wait_for_element_presence('.new-component-html', 'Cannot find html component options')
+        self.wait_for_element_presence('.new-component-html', 'Html component options')
 
     def click_unit_common_problem_button(self):
         # Click Problem unit then Common Problem Type in Add New Components
 
         self.q(css='.large-problem-icon').first.click()
-        self.wait_for_element_presence('.new-component-problem', 'Cannot find problem component options')
+        self.wait_for_element_presence('.new-component-problem', 'Problem component options')
         self.q(css='a#ui-id-1.link-tab.ui-tabs-anchor').first.click()
 
     def click_unit_advanced_problem_button(self):
         # Click Problem unit then Advanced in Add New Components
 
         self.q(css='.large-problem-icon').first.click()
-        self.wait_for_element_presence('.new-component-problem', 'Cannot find problem component options')
+        self.wait_for_element_presence('.new-component-problem', 'Problem component options')
         self.q(css='a#ui-id-2.link-tab.ui-tabs-anchor').first.click()
-
 
     def add_component_html(self, component):
         # Add Html Units
 
         self.q(css='.new-component-html a[data-boilerplate='+ component + ']').click()
-        self.wait_for_element_presence('.editor-md', 'Cannot find new component')
+        self.wait_for_element_presence('.editor-md', 'New component')
 
     def add_component_common_problem(self, component):
         # Add Problem Units
 
         self.q(css='.new-component-problem a[data-boilerplate='+ component + ']').click()
-        self.wait_for_element_presence('.editor-md', 'Cannot find new component')
+        self.wait_for_element_presence('.editor-md', 'New component')
 
     @wait_for_js
     def verify_component(self, component):
         # Verify added Html and Problem Units on pages
 
-        self.wait_for_element_visibility('.wrapper-xblock.level-element', 'Component did not load')
-        self.wait_for_element_visibility('.edit-button.action-button', 'Cannot find X Block')
+        self.wait_for_element_visibility('.wrapper-xblock.level-element', 'Component')
+        self.wait_for_element_visibility('.edit-button.action-button', 'X Block')
         added_components = self.q(css='.xblock-display-name')
         for added_component in added_components:
             if added_component.text == component:
@@ -69,16 +66,15 @@ class UnitsPage(PageObject):
         # Click Video Unit in Add New Components
 
         self.q(css='.content-primary').first.click()
-        self.wait_for_element_presence('.large-video-icon', 'Cannot find Video button')
+        self.wait_for_element_presence('.large-video-icon', 'Video button')
         self.q(css='.large-video-icon').first.click()
-        self.wait_for_element_presence('.xmodule_VideoModule.xblock-initialized', 'Cannot find Added Video')
-
+        self.wait_for_element_presence('.xmodule_VideoModule.xblock-initialized', 'Added Video')
 
     def delete_component(self):
         # Delete the added component
-        self.wait_for_element_visibility('.wrapper-xblock.level-element', 'Component did not load')
+        self.wait_for_element_visibility('.wrapper-xblock.level-element', 'Component')
         self.q(css='.wrapper-xblock.level-element .delete-button.action-button').click()
-        self.wait_for_element_visibility('.button.action-primary', 'Cannot find Delete Unit Pop up')
+        self.wait_for_element_visibility('.button.action-primary', 'Delete Unit Pop up')
         self.q(css='.button.action-primary').click()
 
     def click_publish_button(self):

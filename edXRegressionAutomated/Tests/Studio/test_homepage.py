@@ -1,5 +1,4 @@
 from bok_choy.web_app_test import WebAppTest
-
 from pages.homepage import HomePage
 from pages.signup import SignUpPage
 from pages.howstudioworks import HowStudioWorksPage
@@ -7,8 +6,7 @@ from pages.studiohelp import StudioHelpPage
 from pages.termsofservice import TermsOfServicePage
 from pages.privacypolicy import PrivacyPolicyPage
 from pages.login import LoginPage
-from Tests.LMS.pages.homepage import LMSHomePage
-
+from ..LMS.pages.homepage import LMSHomePage
 
 class TestHomePage(WebAppTest):
     def setUp(self):

@@ -1,9 +1,7 @@
 from bok_choy.web_app_test import WebAppTest
-
 from pages.signup import SignUpPage
 from pages.termsofservice import TermsOfServicePage
 from pages.login import LoginPage
-
 
 class TestSignUpPage(WebAppTest):
     def setUp(self):

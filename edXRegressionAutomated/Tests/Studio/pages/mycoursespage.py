@@ -1,10 +1,8 @@
 from bok_choy.page_object import PageObject
-
 from studiohelp import StudioHelpPage
 from readthedocspdf import ReadTheDocsPDF
 from courseoutlinepage import CourseOutlinePage
 from edgehelp import EdgeHelpPage
-
 
 class MyCoursesPage(PageObject):
     """

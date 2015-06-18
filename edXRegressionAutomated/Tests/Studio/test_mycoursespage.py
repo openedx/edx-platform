@@ -1,13 +1,11 @@
 from bok_choy.web_app_test import WebAppTest
-
 from pages.mycoursespage import MyCoursesPage
 from pages.studiohelp import StudioHelpPage
 from pages.login import LoginPage
 from pages.edxlivepage import EdxLivePage
 from pages.readthedocspdf import ReadTheDocsPDF
-from Tests.Studio.pages.courseoutlinepage import CourseOutlinePage
-from Tests.Settings.config import GlobalVariables
-
+from .pages.courseoutlinepage import CourseOutlinePage
+from ..Settings.config import GlobalVariables
 
 class TestMyCoursesPage(WebAppTest):
     def setUp(self):
@@ -34,18 +32,21 @@ class TestMyCoursesPage(WebAppTest):
         self.mycourses_page.click_help_link()
 
     def test_mycourses_link_under_account_username(self):
-        # Verify that user can click My Courses link under Account Username drop down and is navigated to My Courses (same) page
+        # Verify that user can click My Courses link under Account Username drop down and is navigated to My Courses
+        # (same) page
 
         self.mycourses_page.click_mycourses_link()
 
     def test_email_to_create_course_link(self):
-        # Verify that user can click the Email staff to create course link and is navigated to outlook email with correct email in To
+        # Verify that user can click the Email staff to create course link and is navigated to outlook email with
+        # correct email in To
 
         self.mycourses_page.click_email_staff_to_create()
         self.assertEquals(self.mycourses_page.click_email_staff_to_create(), "mailto:studio-request@edx.org")
 
     def test_getting_started_with_studio_link(self):
-        # Verify that user can click Getting Started with edX pages link and is navigated to read the docs Getting Started with pages page
+        # Verify that user can click Getting Started with edX pages link and is navigated to read the docs Getting
+        # Started with pages page
 
         self.mycourses_page.click_getting_started_with_studio_link()
 
@@ -55,7 +56,8 @@ class TestMyCoursesPage(WebAppTest):
         self.mycourses_page.click_request_help_with_studio_link()
 
     def test_contact_edx_staff_help_create_course_link(self):
-        # Verify that user can click contact edX staff to help you create a course link and is navigated to outlook email with correct email in To
+        # Verify that user can click contact edX staff to help you create a course link and is navigated to outlook
+        # email with correct email in To
 
         self.mycourses_page.click_staff_to_help_create_course()
         self.assertEquals(self.mycourses_page.click_staff_to_help_create_course(), "mailto:studio-request@edx.org")

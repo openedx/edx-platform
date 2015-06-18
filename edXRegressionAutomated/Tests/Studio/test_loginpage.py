@@ -1,10 +1,8 @@
 from bok_choy.web_app_test import WebAppTest
-
 from pages.edgehelp import EdgeHelpPage
 from pages.login import LoginPage
 from pages.mycoursespage import MyCoursesPage
-from Tests.Settings.config import GlobalVariables
-
+from ..Settings.config import GlobalVariables
 
 class TestLoginSuccess(WebAppTest):
     def setUp(self):
@@ -57,4 +55,3 @@ class TestLoginFailure(WebAppTest):
 
         self.login_page.login('a@a.com', 'abc123')
         self.login_page.login_error_validation()
-

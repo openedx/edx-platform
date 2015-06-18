@@ -1,9 +1,7 @@
 from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
-
-from Tests.LMS.pages.courseware import CoursewarePage
+from ...LMS.pages.courseware import CoursewarePage
 from unitpage import UnitsPage
-
 
 class CourseOutlinePage(PageObject):
     """
@@ -28,11 +26,11 @@ class CourseOutlinePage(PageObject):
         if delete_section_css.is_present():
             for items in delete_section_css:
                 items.click()
-                self.wait_for_element_presence('.button.action-primary', 'Delete pop up did not display')
+                self.wait_for_element_presence('.button.action-primary', 'Delete pop up')
                 delete_section_confirmation.click()
                 self.wait_for_ajax()
         else:
-            self.wait_for_element_presence('.add-section p', 'All sections were not deleted')
+            self.wait_for_element_presence('.add-section p', 'All sections')
 
     def click_view_live_button(self):
         # Verify view live button
@@ -45,39 +43,51 @@ class CourseOutlinePage(PageObject):
         # Click Add section button that is next to View Live and Collapse/Expand buttons
         # Make sure there are no already added sections
 
-        self.wait_for_element_presence('.nav-item a.button.button-new', 'Section button not found')
+        self.wait_for_element_presence('.nav-item a.button.button-new', 'Section button')
         self.q(css='.nav-item a.button.button-new').first.click()
-        self.wait_for_element_visibility('.outline-item.outline-section', 'Added Section not found')
+        self.wait_for_element_visibility('.outline-item.outline-section', 'Added Section')
         self.q(css='.wrapper-content.wrapper').first.click()
         section_ids = self.q(css='.outline-item.outline-section').attrs('data-locator')
         id_of_section = ''
         for section_id in section_ids:
-            if self.q(css='.outline-item.outline-section[data-locator="' + section_id + '"] .section-title.item-title.xblock-field-value.incontext-editor-value').text[0] == "Section":
+            if self.q(
+                    css='.outline-item.outline-section[data-locator="' + section_id
+                            + '"] .section-title.item-title.xblock-field-value.incontext-editor-value').text[0] \
+                    == "Section":
                 id_of_section = section_id
-        self.q(css='.outline-item.outline-section[data-locator="' + id_of_section + '"] .icon.fa.fa-pencil').first.click()
-        self.browser.find_element_by_css_selector('.outline-item.outline-section[data-locator="' + id_of_section + '"] input').send_keys(new_name + Keys.ENTER)
-        self.wait_for_element_presence('.xblock-field-input.incontext-editor-input[value="' + new_name + '"]', 'Section not found')
+        self.q(css='.outline-item.outline-section[data-locator="' + id_of_section
+                   + '"] .icon.fa.fa-pencil').first.click()
+        self.browser.find_element_by_css_selector('.outline-item.outline-section[data-locator="' + id_of_section
+                                                  + '"] input').send_keys(new_name + Keys.ENTER)
+        self.wait_for_element_presence('.xblock-field-input.incontext-editor-input[value="' + new_name
+                                       + '"]', 'Section Button')
 
 
     def add_new_subsection(self, new_name):
         # Click Add a new subsection (pre req add a new section)
 
-        self.wait_for_element_presence('.add-subsection.add-item a.button.button-new', 'Subsection button not found')
+        self.wait_for_element_presence('.add-subsection.add-item a.button.button-new', 'Subsection button')
         self.q(css='.add-subsection.add-item a.button.button-new').first.click()
-        self.wait_for_element_visibility('input[class="xblock-field-input incontext-editor-input"][value="Subsection"]', 'Added Subsection not found')
+        self.wait_for_element_visibility('input[class="xblock-field-input incontext-editor-input"][value="Subsection"]',
+                                         'Added Subsection not found')
         self.q(css='.wrapper-content.wrapper').first.click()
         sub_section_ids = self.q(css='.outline-item.outline-subsection').attrs('data-locator')
         id_of_subsection = ''
         for sub_section_id in sub_section_ids:
-            if self.q(css='.outline-item.outline-subsection[data-locator="' + sub_section_id + '"] .subsection-title.item-title.xblock-field-value.incontext-editor-value').text[0] == "Subsection":
+            if self.q(css='.outline-item.outline-subsection[data-locator="' + sub_section_id
+                    + '"] .subsection-title.item-title.xblock-field-value.incontext-editor-value').text[0] \
+                    == "Subsection":
                 id_of_subsection = sub_section_id
-        self.q(css='.outline-item.outline-subsection[data-locator="' + id_of_subsection + '"] .icon.fa.fa-pencil').first.click()
-        self.browser.find_element_by_css_selector('.outline-item.outline-subsection[data-locator="' + id_of_subsection + '"] input').send_keys(new_name + Keys.ENTER)
-        self.wait_for_element_presence('.xblock-field-input.incontext-editor-input[value="' + new_name + '"]', 'Section not found')
+        self.q(css='.outline-item.outline-subsection[data-locator="' + id_of_subsection
+                   + '"] .icon.fa.fa-pencil').first.click()
+        self.browser.find_element_by_css_selector('.outline-item.outline-subsection[data-locator="' + id_of_subsection
+                                                  + '"] input').send_keys(new_name + Keys.ENTER)
+        self.wait_for_element_presence('.xblock-field-input.incontext-editor-input[value="' + new_name
+                                       + '"]', 'Section Button')
 
     def add_new_unit(self):
         # Click Add New Unit button
 
-        self.wait_for_element_presence('.add-unit.add-item a.button.button-new', 'Unit button not found')
+        self.wait_for_element_presence('.add-unit.add-item a.button.button-new', 'Unit button')
         self.q(css='.add-unit.add-item a.button.button-new').first.click()
         UnitsPage(self.browser).wait_for_page()

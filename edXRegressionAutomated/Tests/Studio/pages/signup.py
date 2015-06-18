@@ -1,14 +1,11 @@
-"""
-Studio Signup Page
-"""
-
 from bok_choy.page_object import PageObject
-
-from Tests.Studio.pages.termsofservice import TermsOfServicePage
+from termsofservice import TermsOfServicePage
 from . import BASE_URL
 
-
 class SignUpPage(PageObject):
+    """
+    Studio Signup Page
+    """
 
     url = BASE_URL + '/signup'
 
