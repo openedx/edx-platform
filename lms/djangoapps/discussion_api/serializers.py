@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 
 from rest_framework import serializers
 
+from discussion_api.render import render_body
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -65,6 +66,7 @@ class _ContentSerializer(serializers.Serializer):
     created_at = serializers.CharField(read_only=True)
     updated_at = serializers.CharField(read_only=True)
     raw_body = NonEmptyCharField(source="body")
+    rendered_body = serializers.SerializerMethodField("get_rendered_body")
     abuse_flagged = serializers.SerializerMethodField("get_abuse_flagged")
     voted = serializers.SerializerMethodField("get_voted")
     vote_count = serializers.SerializerMethodField("get_vote_count")
@@ -121,6 +123,10 @@ class _ContentSerializer(serializers.Serializer):
     def get_author_label(self, obj):
         """Returns the role label for the content author."""
         return None if self._is_anonymous(obj) else self._get_user_label(int(obj["user_id"]))
+
+    def get_rendered_body(self, obj):
+        """Returns the rendered body content."""
+        return render_body(obj["body"])
 
     def get_abuse_flagged(self, obj):
         """
