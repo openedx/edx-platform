@@ -97,6 +97,7 @@ fixture_paths:
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
+    - templates/courseware
     - templates/discovery
     - common/templates
     - teams/templates

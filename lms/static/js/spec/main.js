@@ -637,6 +637,7 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
+        'lms/include/js/spec/courseware/proctored_exams_spec.js',
         'lms/include/js/spec/discovery/discovery_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js'
     ]);

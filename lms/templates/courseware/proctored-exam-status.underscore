@@ -1,0 +1,13 @@
+<div class="exam-timer">
+<%- gettext("You're taking") %>
+<a href="<%- interpolate(gettext('%(exam_url_path)s'), { exam_url_path: exam_url_path }, true)%>" >
+
+<%- interpolate(gettext(' %(exam_display_name)s '), { exam_display_name: exam_display_name }, true) %>
+</a>
+<%- gettext(" exam as a proctored exam. Good Luck!") %>
+<span id="time_remaining_id" class="pull-right">
+<b>
+</b>
+</span>
+</div>
+
