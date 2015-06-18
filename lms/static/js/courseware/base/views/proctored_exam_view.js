@@ -14,14 +14,14 @@ define([
             this.$el = options.el;
             this.model = options.model;
             this.templateId = options.proctored_template;
-            this.template_html = $(this.templateId).html();
-            if(this.template_html !== null) {
-                this.template = _.template(this.template_el.html());
-            } else {
-                this.template = null;
-            }
-
+            this.template = null;
             this.timerId = null;
+
+            var template_html = $(this.templateId).html();
+            if(template_html !== null) {
+                /* don't assume this backbone view is running on a page with the underscore templates */
+                this.template = _.template(template_html);
+            }
         },
 
         render: function () {
