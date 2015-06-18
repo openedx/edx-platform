@@ -6,7 +6,7 @@ define(['backbone'], function(Backbone) {
     return function (ProctoredExamModel, ProctoredExamView) {
         var proctored_exam_view = new ProctoredExamView({
             el: $(".proctored_exam_status"),
-            proctored_template: '#proctored_exams_status-tpl',
+            proctored_template: '#proctored-exam-status-tpl',
             model: new ProctoredExamModel()
         });
         proctored_exam_view.render();

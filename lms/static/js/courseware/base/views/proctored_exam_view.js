@@ -17,7 +17,7 @@ define([
             this.template = null;
             this.timerId = null;
 
-            var template_html = $(this.templateId).html();
+            var template_html = $(this.templateId).text();
             if(template_html !== null) {
                 /* don't assume this backbone view is running on a page with the underscore templates */
                 this.template = _.template(template_html);
@@ -40,7 +40,7 @@ define([
             self.$el.find('div.exam-timer').addClass(self.model.getRemainingTimeState());
             self.$el.find('span#time_remaining_id b').html(self.model.getFormattedRemainingTime());
             if (self.model.getRemainingSeconds()<=0) {
-                clearInterval(this.timerId); // stop the timer once the time finishes.
+                clearInterval(self.timerId); // stop the timer once the time finishes.
             }
         }
     });
