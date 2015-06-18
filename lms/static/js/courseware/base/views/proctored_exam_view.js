@@ -14,16 +14,24 @@ define([
             this.$el = options.el;
             this.model = options.model;
             this.templateId = options.proctored_template;
-            this.template = _.template($(this.templateId).html());
+            this.template_html = $(this.templateId).html();
+            if(this.template_html !== null) {
+                this.template = _.template(this.template_el.html());
+            } else {
+                this.template = null;
+            }
+
             this.timerId = null;
         },
 
         render: function () {
-            var html = this.template(this.model.toJSON());
-            this.$el.html(html);
-            this.$el.show();
-            this.updateRemainingTime(this);
-            this.timerId = setInterval(this.updateRemainingTime, 1000, this);
+            if(this.template !== null) {
+                var html = this.template(this.model.toJSON());
+                this.$el.html(html);
+                this.$el.show();
+                this.updateRemainingTime(this);
+                this.timerId = setInterval(this.updateRemainingTime, 1000, this);
+            }
             return this;
         },
 
