@@ -10,6 +10,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.problem import ProblemPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from textwrap import dedent
+from ..helpers import EventsTestMixin
 
 
 class ProblemsTest(UniqueCourseTest):
@@ -86,3 +87,77 @@ class ProblemClarificationTest(ProblemsTest):
         self.assertIn('Return on Investment', tooltip_text)
         self.assertIn('per year', tooltip_text)
         self.assertNotIn('strong', tooltip_text)
+
+
+class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
+    """
+    Test that extended hint features plumb through to the page html and tracking log.
+    """
+    def get_problem(self):
+        """
+        Problem with extended hint features.
+        """
+        xml = dedent("""
+            <problem>
+            <p>question text</p>
+            <stringresponse answer="A">
+                <stringequalhint answer="B">hint</stringequalhint>
+                <textline size="20"/>
+            </stringresponse>
+            <demandhint>
+              <hint>demand-hint1</hint>
+              <hint>demand-hint2</hint>
+            </demandhint>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TITLE', data=xml)
+
+    def test_check_hint(self):
+        """
+        Test clicking Check shows the extended hint in the problem message.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_text[0], u'question text')
+        problem_page.fill_answer('B')
+        problem_page.click_check()
+        self.assertEqual(problem_page.message_text, u'Incorrect: hint')
+        # Check for corresponding tracking event
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
+            number_of_matches=1
+        )
+        self.assert_events_match(
+            [{'event': {'hint_label': u'Incorrect',
+                        'trigger_type': 'single',
+                        'student_answer': [u'B'],
+                        'correctness': False,
+                        'question_type': 'stringresponse',
+                        'hints': [{'text': 'hint'}]}}],
+            actual_events)
+
+    def test_demand_hint(self):
+        """
+        Test clicking hint button shows the demand hint in its div.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        # The hint button rotates through multiple hints
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): demand-hint1')
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): demand-hint2')
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): demand-hint1')
+        # Check corresponding tracking events
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
+            number_of_matches=3
+        )
+        self.assert_events_match(
+            [
+                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}},
+                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'demand-hint2'}},
+                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}}
+            ],
+            actual_events)

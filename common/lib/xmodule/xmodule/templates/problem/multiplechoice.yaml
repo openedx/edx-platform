@@ -9,7 +9,7 @@ metadata:
        You can use the following example problem as a model.
 
        >>Which of the following countries has the largest population?<<
-       ( ) Brazil
+       ( ) Brazil {{ timely feedback -- explain why an almost correct answer is wrong }}
        ( ) Germany
        (x) Indonesia
        ( ) Russia
@@ -32,7 +32,9 @@ data: |
       <p>Which of the following countries has the largest population?</p>
       <multiplechoiceresponse>
        <choicegroup type="MultipleChoice">
-          <choice correct="false" name="brazil">Brazil</choice>
+          <choice correct="false" name="brazil">Brazil
+            <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
+          </choice>
           <choice correct="false" name="germany">Germany</choice>
           <choice correct="true" name="indonesia">Indonesia</choice>
           <choice correct="false" name="russia">Russia</choice>

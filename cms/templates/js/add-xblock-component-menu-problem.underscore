@@ -4,13 +4,16 @@
             <a class="link-tab" href="#tab1"><%= gettext("Common Problem Types") %></a>
         </li>
         <li>
-            <a class="link-tab" href="#tab2"><%= gettext("Advanced") %></a>
+            <a class="link-tab" href="#tab2"><%= gettext("Common Problems with Hints and Feedback") %></a>
+        </li>
+        <li>
+            <a class="link-tab" href="#tab3"><%= gettext("Advanced") %></a>
         </li>
     </ul>
     <div class="tab current" id="tab1">
         <ul class="new-component-template">
             <% for (var i = 0; i < templates.length; i++) { %>
-                <% if (templates[i].is_common) { %>
+                <% if (templates[i].tab == "common") { %>
                     <% if (!templates[i].boilerplate_name) { %>
                     <li class="editor-md empty">
                         <a href="#" data-category="<%= templates[i].category %>">
@@ -32,7 +35,21 @@
     <div class="tab" id="tab2">
         <ul class="new-component-template">
             <% for (var i = 0; i < templates.length; i++) { %>
-                <% if (!templates[i].is_common) { %>
+                <% if (templates[i].tab == "hint") { %>
+                <li class="editor-manual">
+                    <a href="#" data-category="<%= templates[i].category %>"
+                       data-boilerplate="<%= templates[i].boilerplate_name %>">
+                        <span class="name"><%= templates[i].display_name %></span>
+                    </a>
+                </li>
+                <% } %>
+            <% } %>
+        </ul>
+    </div>
+    <div class="tab" id="tab3">
+        <ul class="new-component-template">
+            <% for (var i = 0; i < templates.length; i++) { %>
+                <% if (templates[i].tab == "advanced") { %>
                 <li class="editor-manual">
                     <a href="#" data-category="<%= templates[i].category %>"
                        data-boilerplate="<%= templates[i].boilerplate_name %>">

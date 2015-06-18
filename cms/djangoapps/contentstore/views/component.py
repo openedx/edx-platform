@@ -227,7 +227,7 @@ def get_component_templates(courselike, library=False):
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
-    def create_template_dict(name, cat, boilerplate_name=None, is_common=False):
+    def create_template_dict(name, cat, boilerplate_name=None, tab="common"):
         """
         Creates a component template dict.
 
@@ -235,14 +235,14 @@ def get_component_templates(courselike, library=False):
             display_name: the user-visible name of the component
             category: the type of component (problem, html, etc.)
             boilerplate_name: name of boilerplate for filling in default values. May be None.
-            is_common: True if "common" problem, False if "advanced". May be None, as it is only used for problems.
+            tab: common(default)/advanced/hint, which tab it goes in
 
         """
         return {
             "display_name": name,
             "category": cat,
             "boilerplate_name": boilerplate_name,
-            "is_common": is_common
+            "tab": tab
         }
 
     component_display_names = {
@@ -268,8 +268,8 @@ def get_component_templates(courselike, library=False):
         # add the default template with localized display name
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
-        display_name = xblock_type_display_name(category, _('Blank'))
-        templates_for_category.append(create_template_dict(display_name, category))
+        display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+        templates_for_category.append(create_template_dict(display_name, category, None, 'advanced'))
         categories.add(category)
 
         # add boilerplates
@@ -277,12 +277,20 @@ def get_component_templates(courselike, library=False):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, courselike):
+                    # Tab can be 'common' 'advanced' 'hint'
+                    # Default setting is common/advanced depending on the presence of markdown
+                    tab = 'common'
+                    if template['metadata'].get('markdown') is None:
+                        tab = 'advanced'
+                    # Then the problem can override that with a tab: setting
+                    tab = template['metadata'].get('tab', tab)
+
                     templates_for_category.append(
                         create_template_dict(
                             _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
                             category,
                             template.get('template_id'),
-                            template['metadata'].get('markdown') is not None
+                            tab
                         )
                     )
 
@@ -297,7 +305,7 @@ def get_component_templates(courselike, library=False):
                     log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
                 else:
                     templates_for_category.append(
-                        create_template_dict(component_display_name, component, boilerplate_name)
+                        create_template_dict(component_display_name, component, boilerplate_name, 'advanced')
                     )
                     categories.add(component)
 

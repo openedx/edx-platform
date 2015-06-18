@@ -59,12 +59,12 @@ def click_new_component_button(step, component_button_css):
 
 
 def _click_advanced():
-    css = 'ul.problem-type-tabs a[href="#tab2"]'
+    css = 'ul.problem-type-tabs a[href="#tab3"]'
     world.css_click(css)
 
     # Wait for the advanced tab items to be displayed
-    tab2_css = 'div.ui-tabs-panel#tab2'
-    world.wait_for_visible(tab2_css)
+    tab3_css = 'div.ui-tabs-panel#tab3'
+    world.wait_for_visible(tab3_css)
 
 
 def _find_matching_link(category, component_type):
