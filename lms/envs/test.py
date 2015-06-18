@@ -495,3 +495,4 @@ PROFILE_IMAGE_MIN_BYTES = 100
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
+AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
