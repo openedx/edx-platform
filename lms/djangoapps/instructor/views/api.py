@@ -1107,15 +1107,14 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     else:
         try:
             instructor_task.api.submit_calculate_students_features_csv(request, course_key, query_features)
-            success_status = _(
-                "Your enrolled student profile report is being generated! "
-                "You can view the status of the generation task in the 'Pending Tasks' section.")
+            success_status = _("The enrolled learner profile report is being created."
+                               " To view the status of the report, see Pending Instructor Tasks below.")
             return JsonResponse({"status": success_status})
         except AlreadyRunningError:
             already_running_status = _(
-                "An enrolled student profile report generation task is already in progress. "
-                "Check the 'Pending Tasks' table for the status of the task. When completed, "
-                "the report will be available for download in the table below.")
+                "This enrollment report is currently being created."
+                " To view the status of the report, see Pending Instructor Tasks below."
+                " You will be able to download the report when it is complete.")
             return JsonResponse({"status": already_running_status})
 
 
@@ -1136,15 +1135,16 @@ def get_students_who_may_enroll(request, course_id):
     try:
         instructor_task.api.submit_calculate_may_enroll_csv(request, course_key, query_features)
         success_status = _(
-            "Your students who may enroll report is being generated! "
-            "You can view the status of the generation task in the 'Pending Tasks' section."
+            "The enrollment report is being created. This report contains"
+            " information about learners who can enroll in the course."
+            " To view the status of the report, see Pending Instructor Tasks below."
         )
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
         already_running_status = _(
-            "A students who may enroll report generation task is already in progress. "
-            "Check the 'Pending Tasks' table for the status of the task. "
-            "When completed, the report will be available for download in the table below."
+            "This enrollment report is currently being created."
+            " To view the status of the report, see Pending Instructor Tasks below."
+            " You will be able to download the report when it is complete."
         )
         return JsonResponse({"status": already_running_status})
 
@@ -1234,15 +1234,13 @@ def get_enrollment_report(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         instructor_task.api.submit_detailed_enrollment_features_csv(request, course_key)
-        success_status = _(
-            "Your detailed enrollment report is being generated! "
-            "You can view the status of the generation task in the 'Pending Tasks' section.")
+        success_status = _("The detailed enrollment report is being created."
+                           " To view the status of the report, see Pending Instructor Tasks below.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
-        already_running_status = _(
-            "A detailed enrollment report generation task is already in progress. "
-            "Check the 'Pending Tasks' table for the status of the task. "
-            "When completed, the report will be available for download in the table below.")
+        already_running_status = _("The detailed enrollment report is being created."
+                                   " To view the status of the report, see Pending Instructor Tasks below."
+                                   " You will be able to download the report when it is complete.")
         return JsonResponse({
             "status": already_running_status
         })
@@ -1259,15 +1257,13 @@ def get_exec_summary_report(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         instructor_task.api.submit_executive_summary_report(request, course_key)
-        status_response = _(
-            "Your executive summary report is being created. "
-            "To view the status of the report, see the 'Pending Tasks' section.")
+        status_response = _("The executive summary report is being created."
+                            " To view the status of the report, see Pending Instructor Tasks below.")
     except AlreadyRunningError:
         status_response = _(
-            "An executive summary report is currently in progress. "
-            "To view the status of the report, see the 'Pending Tasks' section. "
-            "When completed, the report will be available for download in the table below. "
-            "You will be able to download the report when it is complete."
+            "The executive summary report is currently being created."
+            " To view the status of the report, see Pending Instructor Tasks below."
+            " You will be able to download the report when it is complete."
         )
     return JsonResponse({
         "status": status_response
@@ -2141,15 +2137,13 @@ def calculate_grades_csv(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         instructor_task.api.submit_calculate_grades_csv(request, course_key)
-        success_status = _(
-            "Your grade report is being generated! "
-            "You can view the status of the generation task in the 'Pending Tasks' section.")
+        success_status = _("The grade report is being created."
+                           " To view the status of the report, see Pending Instructor Tasks below.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
-        already_running_status = _(
-            "A grade report generation task is already in progress. "
-            "Check the 'Pending Tasks' table for the status of the task. "
-            "When completed, the report will be available for download in the table below.")
+        already_running_status = _("The grade report is currently being created."
+                                   " To view the status of the report, see Pending Instructor Tasks below."
+                                   " You will be able to download the report when it is complete.")
         return JsonResponse({
             "status": already_running_status
         })
@@ -2169,15 +2163,13 @@ def problem_grade_report(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         instructor_task.api.submit_problem_grade_report(request, course_key)
-        success_status = _(
-            "Your problem grade report is being generated! "
-            "You can view the status of the generation task in the 'Pending Tasks' section.")
+        success_status = _("The problem grade report is being created."
+                           " To view the status of the report, see Pending Instructor Tasks below.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
-        already_running_status = _(
-            "A problem grade report is already being generated. "
-            "Check the 'Pending Tasks' table for the status of the task. "
-            "When completed, the report will be available for download in the table below.")
+        already_running_status = _("A problem grade report is already being generated."
+                                   " To view the status of the report, see Pending Instructor Tasks below."
+                                   " You will be able to download the report when it is complete.")
         return JsonResponse({
             "status": already_running_status
         })
