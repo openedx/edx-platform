@@ -117,7 +117,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           "topic_id": "quux",
           "type": "discussion",
           "title": "Title text",
-          "body": "Body text"
+          "raw_body": "Body text"
         }
 
         PATCH /api/discussion/v1/threads/thread_id
@@ -143,6 +143,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * following: If true, retrieve only threads the requesting user is
             following
+
+        * view: "unread" for threads the requesting user has not read, or
+            "unanswered" for question threads with no marked answer. Only one
+            can be selected.
 
         The topic_id, text_search, and following parameters are mutually
         exclusive (i.e. only one may be specified in a request)
@@ -212,6 +216,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * editable_fields: The fields that the requesting user is allowed to
             modify with a PATCH request
 
+        * read: Boolean indicating whether the user has read this thread
+
+        * has_endorsed: Boolean indicating whether this thread has been answered
+
     **DELETE response values:
 
         No content is returned for a DELETE request
@@ -236,6 +244,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["topic_id"],
                 form.cleaned_data["text_search"],
                 form.cleaned_data["following"],
+                form.cleaned_data["view"],
             )
         )
 

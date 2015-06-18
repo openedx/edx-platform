@@ -95,6 +95,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "topic_id": [],
                 "text_search": "",
                 "following": None,
+                "view": ""
             }
         )
 
@@ -141,6 +142,10 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             "__all__",
             "The following query parameters are mutually exclusive: topic_id, text_search, following"
         )
+
+    def test_invalid_view_choice(self):
+        self.form_data["view"] = "not_a_valid_choice"
+        self.assert_error("view", "Select a valid choice. not_a_valid_choice is not one of the available choices.")
 
 
 class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
