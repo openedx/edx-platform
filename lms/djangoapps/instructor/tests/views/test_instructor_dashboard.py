@@ -13,12 +13,13 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
-from student.tests.factories import AdminFactory, UserFactory
+from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
 from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
+from student.models import CourseEnrollment
 
 
 @ddt.ddt
@@ -117,9 +118,25 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue('<td>Verified</td>' in response.content)
         self.assertTrue('<td>Audit</td>' in response.content)
         self.assertTrue('<td>Honor</td>' in response.content)
+        self.assertTrue('<td>Professional</td>' in response.content)
 
         # dashboard link hidden
         self.assertFalse(self.get_dashboard_enrollment_message() in response.content)
+
+    @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
+    @override_settings(ANALYTICS_DASHBOARD_URL='')
+    def test_show_enrollment_data_for_prof_ed(self):
+        # Create both "professional" (meaning professional + verification)
+        # and "no-id-professional" (meaning professional without verification)
+        # These should be aggregated for display purposes.
+        users = [UserFactory() for _ in range(2)]
+        CourseEnrollment.enroll(users[0], self.course.id, mode="professional")
+        CourseEnrollment.enroll(users[1], self.course.id, mode="no-id-professional")
+
+        response = self.client.get(self.url)
+
+        # Check that the number of professional enrollments is two
+        self.assertContains(response, "<td>Professional</td><td>2</td>")
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
@@ -134,6 +151,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse('<td>Verified</td>' in response.content)
         self.assertFalse('<td>Audit</td>' in response.content)
         self.assertFalse('<td>Honor</td>' in response.content)
+        self.assertFalse('<td>Professional</td>' in response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
