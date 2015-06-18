@@ -13,8 +13,8 @@ from django.db import transaction
 from django.core.validators import RegexValidator
 from simple_history.models import HistoricalRecords
 
-
 from jsonfield.fields import JSONField
+from util.date_utils import to_timestamp
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
 from django.utils.translation import ugettext_lazy
@@ -378,7 +378,7 @@ class CreditRequest(TimeStampedModel):
         [
             {
                 "uuid": "557168d0f7664fe59097106c67c3f847",
-                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "timestamp": 1434631630,
                 "course_key": "course-v1:HogwartsX+Potions101+1T2015",
                 "provider": {
                     "id": "HogwartsX",
@@ -393,7 +393,7 @@ class CreditRequest(TimeStampedModel):
         return [
             {
                 "uuid": request.uuid,
-                "timestamp": request.modified,
+                "timestamp": to_timestamp(request.modified),
                 "course_key": request.course.course_key,
                 "provider": {
                     "id": request.provider.provider_id,

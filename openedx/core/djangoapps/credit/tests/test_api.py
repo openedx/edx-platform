@@ -5,7 +5,6 @@ Tests for the API functions in the credit app.
 import datetime
 import ddt
 import pytz
-import dateutil.parser as date_parser
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection, transaction
@@ -13,6 +12,7 @@ from django.db import connection, transaction
 from opaque_keys.edx.keys import CourseKey
 
 from student.tests.factories import UserFactory
+from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.exceptions import (
     InvalidCreditRequirements,
@@ -340,7 +340,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 
         # Validate the timestamp
         self.assertIn('timestamp', parameters)
-        parsed_date = date_parser.parse(parameters['timestamp'])
+        parsed_date = from_timestamp(parameters['timestamp'])
         self.assertTrue(parsed_date < datetime.datetime.now(pytz.UTC))
 
         # Validate course information
