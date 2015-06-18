@@ -1,5 +1,7 @@
 define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, AssetModel) {
     var AssetCollection = BackbonePaginator.requestPager.extend({
+        sortableColumns: {},
+        filterableColumns: {},
         assetType: '',
         model : AssetModel,
         paginator_core: {
@@ -33,6 +35,32 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
             this.currentPage = currentPage;
             this.start = start;
             return response.assets;
+        },
+
+        setPage: function (page) {
+            var oldPage = this.currentPage,
+                self = this;
+            this.goTo(page, {
+                reset: true,
+                success: function () {
+                    self.trigger('page_changed');
+                },
+                error: function () {
+                    self.currentPage = oldPage;
+                }
+            });
+        },
+
+        nextPage: function () {
+            if (this.currentPage < this.totalPages - 1) {
+                this.setPage(this.currentPage + 1);
+            }
+        },
+
+        previousPage: function () {
+            if (this.currentPage > 0) {
+                this.setPage(this.currentPage - 1);
+            }
         }
     });
     return AssetCollection;

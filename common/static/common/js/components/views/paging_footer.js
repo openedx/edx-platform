@@ -11,18 +11,15 @@
                 },
 
                 initialize: function(options) {
-                    var view = options.view,
-                        collection = view.collection;
-                    this.view = view;
-                    collection.bind('add', _.bind(this.render, this));
-                    collection.bind('remove', _.bind(this.render, this));
-                    collection.bind('reset', _.bind(this.render, this));
+                    this.collection = options.collection;
+                    this.collection.bind('add', _.bind(this.render, this));
+                    this.collection.bind('remove', _.bind(this.render, this));
+                    this.collection.bind('reset', _.bind(this.render, this));
                     this.render();
                 },
 
                 render: function() {
-                    var view = this.view,
-                        collection = view.collection,
+                    var collection = this.collection,
                         currentPage = collection.currentPage,
                         lastPage = collection.totalPages - 1;
                     this.$el.html(_.template(paging_footer_template, {
@@ -35,8 +32,7 @@
                 },
 
                 changePage: function() {
-                    var view = this.view,
-                        collection = view.collection,
+                    var collection = this.collection,
                         currentPage = collection.currentPage + 1,
                         pageInput = this.$("#page-number-input"),
                         pageNumber = parseInt(pageInput.val(), 10);
@@ -49,17 +45,17 @@
                     // If we still have a page number by this point,
                     // and it's not the current page, load it.
                     if (pageNumber && pageNumber !== currentPage) {
-                        view.setPage(pageNumber - 1);
+                        collection.setPage(pageNumber - 1);
                     }
                     pageInput.val(""); // Clear the value as the label will show beneath it
                 },
 
                 nextPage: function() {
-                    this.view.nextPage();
+                    this.collection.nextPage();
                 },
 
                 previousPage: function() {
-                    this.view.previousPage();
+                    this.collection.previousPage();
                 }
             });
 

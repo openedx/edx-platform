@@ -71,7 +71,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/asset
                         tableBody = this.$('#asset-table-body');
                         this.tableBody = tableBody;
                         this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
-                        this.pagingFooter = new PagingFooter({view: this, el: $('#asset-paging-footer')});
+                        this.pagingFooter = new PagingFooter({collection: this.collection, el: $('#asset-paging-footer')});
                         this.pagingHeader.render();
                         this.pagingFooter.render();
 
@@ -97,7 +97,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/asset
                 pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 pagingView.setInitialSortColumn('js-asset-date-col');
                 pagingView.setInitialFilterColumn('js-asset-type-col');
-                pagingView.setPage(0);
+                this.collection.setPage(0);
                 return pagingView;
             },
 
