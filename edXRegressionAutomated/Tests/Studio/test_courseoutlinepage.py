@@ -84,3 +84,4 @@ class TestCourseOutlineWithViewLive(WebAppTest):
         # Verify that user can click View Live button and is navigated to pages on a new tab
 
         self.course_outline_page.click_view_live_button()
+
