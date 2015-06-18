@@ -2543,3 +2543,9 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 # when a credit provider notifies us that a student has been approved
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
+
+# Default domain for the e-mail address associated with users who are created
+# via the LTI Provider feature. Note that the generated e-mail addresses are
+# not expected to be active; this setting simply allows administrators to
+# route any messages intended for LTI users to a common domain.
+LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
