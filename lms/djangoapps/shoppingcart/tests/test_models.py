@@ -499,6 +499,14 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key=self.course_key)
         self.assertEqual(total_amount, 40.00)
 
+    def test_get_total_amount_empty(self):
+        """
+        Test to check the total amount of the
+        purchased items.
+        """
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key=self.course_key)
+        self.assertEqual(total_amount, 0.00)
+
     def test_add_to_order(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
 
@@ -526,6 +534,25 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.cart.purchase()
         registration_codes = CourseRegistrationCode.order_generated_registration_codes(self.course_key)
         self.assertEqual(registration_codes.count(), item.qty)
+
+    def test_order_generated_totals(self):
+        """
+        Test to check for the order generated registration
+        codes.
+        """
+
+        total_amount = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course_key)
+        self.assertEqual(total_amount, 0)
+
+        self.cart.order_type = 'business'
+        self.cart.save()
+        item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        self.cart.purchase()
+        registration_codes = CourseRegistrationCode.order_generated_registration_codes(self.course_key)
+        self.assertEqual(registration_codes.count(), item.qty)
+
+        total_amount = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course_key)
+        self.assertEqual(total_amount, 80.00)
 
     def add_coupon(self, course_key, is_active, code):
         """
@@ -1168,6 +1195,13 @@ class InvoiceHistoryTest(TestCase):
         )
         total_amount_paid = InvoiceTransaction.get_total_amount_of_paid_course_invoices(self.course_key)
         self.assertEqual(float(total_amount_paid), 123.45)
+
+    def test_get_total_amount_of_no_invoices(self):
+        """
+        Test to check the Invoice Transactions amount.
+        """
+        total_amount_paid = InvoiceTransaction.get_total_amount_of_paid_course_invoices(self.course_key)
+        self.assertEqual(float(total_amount_paid), 0)
 
     def test_invoice_contact_info_history(self):
         self._assert_history_invoice_info(
