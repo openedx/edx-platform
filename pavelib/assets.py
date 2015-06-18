@@ -16,7 +16,7 @@ from .utils.cmd import cmd, django_cmd
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
 SASS_LOAD_PATHS = ['./common/static/sass']
-SASS_UPDATE_DIRS = ['*/static']
+SASS_UPDATE_DIRS = ['*/static/sass', 'common/static']
 SASS_CACHE_PATH = '/tmp/sass-cache'
 
 
