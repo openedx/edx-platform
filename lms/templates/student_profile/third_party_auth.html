@@ -19,7 +19,7 @@ from third_party_auth import pipeline
                         <i class="icon fa fa-unlink"></i><span class="copy">${_('Not Linked')}</span>
                     % endif
                 </div>
-                <span class="provider">${state.provider.NAME}</span>
+                <span class="provider">${state.provider.UINAME}</span>
                 <span class="control">
                     <form
                         action="${pipeline.get_disconnect_url(state.provider.NAME)}"

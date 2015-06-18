@@ -374,6 +374,7 @@ def account_settings_context(request):
 
         context['auth']['providers'] = [{
             'name': state.provider.NAME,  # The name of the provider e.g. Facebook
+            'uiname': state.provider.UINAME, # The ui name of the provider e.g. Office 365
             'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
             # If the user is not connected, they should be directed to this page to authenticate
             # with the particular provider.

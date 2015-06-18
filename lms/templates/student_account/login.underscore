@@ -44,7 +44,7 @@
             if ( provider.loginUrl ) { %>
                 <button type="button" class="button button-primary button-<%- provider.name %> login-provider login-<%- provider.name %>" data-provider-url="<%- provider.loginUrl %>">
                     <div class="icon fa <%- provider.iconClass %>" aria-hidden="true"></div>
-                    <%- provider.name %>
+                    <%- provider.uiname %>
                 </button>
             <% }
         }); %>
