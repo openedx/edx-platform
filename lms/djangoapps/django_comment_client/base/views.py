@@ -29,7 +29,7 @@ from django_comment_client.utils import (
     get_discussion_categories_ids,
     get_discussion_id_map,
 )
-from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission
 from eventtracking import tracker
 import lms.lib.comment_client as cc
 
@@ -490,7 +490,10 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
+    remove_all = (
+        has_permission(request.user, 'openclose_thread', course_key) or
+        has_access(request.user, 'staff', course)
+    )
     thread.unFlagAbuse(user, thread, remove_all)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
@@ -522,7 +525,10 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
-    remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
+    remove_all = (
+        has_permission(request.user, 'openclose_thread', course_key) or
+        has_access(request.user, 'staff', course)
+    )
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))

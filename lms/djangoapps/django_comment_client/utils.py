@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
-from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission
 from edxmako import lookup_template
 
 from courseware.access import has_access
@@ -506,8 +506,8 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
 
         # Only reveal endorser if requester can see author or if endorser is staff
         if (
-            endorser and
-            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_key))
+                endorser and
+                ("username" in fields or has_permission(endorser, "endorse_comment", course_key))
         ):
             endorsement["username"] = endorser.username
         else:
@@ -552,7 +552,7 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
             requested_group_id = request.GET.get('group_id')
         elif request.method == "POST":
             requested_group_id = request.POST.get('group_id')
-        if cached_has_permission(request.user, "see_all_cohorts", course_key):
+        if has_permission(request.user, "see_all_cohorts", course_key):
             if not requested_group_id:
                 return None
             try:
