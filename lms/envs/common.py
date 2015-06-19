@@ -1206,12 +1206,15 @@ courseware_js = (
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
     ['js/search/course/main.js'] +
-    ['js/courseware/base/**/*.js'] +
-    ['js/courseware/proctored_exam/proctored_app.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
 courseware_search_js = ['js/search/course/main.js']
+
+proctoring_js = (
+    ['js/courseware/base/**/*.js'] +
+    ['js/courseware/proctored_exam/proctored_app.js']
+)
 
 
 # Before a student accesses courseware, we do not
@@ -1475,6 +1478,12 @@ PIPELINE_JS = {
         ],
         'output_filename': 'js/lms-application.js',
     },
+
+    'proctoring': {
+	'source_filenames': proctoring_js,
+        'output_filename': 'js/lms-proctoring.js',
+    },
+
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',

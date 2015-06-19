@@ -26,6 +26,7 @@ def url_class(is_active):
   is_student_masquerade = masquerade and masquerade.role == 'student'
   masquerade_group_id = masquerade.group_id if masquerade else None
 %>
+<%static:js group='proctoring'/>
 % for template_name in ["proctored-exam-status"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="courseware/${template_name}.underscore" />
