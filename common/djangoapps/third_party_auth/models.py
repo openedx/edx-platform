@@ -300,7 +300,7 @@ class SAMLConfiguration(ConfigurationModel):
         default='{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}',
         help_text=(
             "JSON object defining advanced settings that are passed on to python-saml. "
-            "Valid keys that can be set here include: SECURITY_CONFIG, SP_NAMEID_FORMATS, SP_EXTRA"
+            "Valid keys that can be set here include: SECURITY_CONFIG and SP_EXTRA"
         ),
     )
 
@@ -344,7 +344,7 @@ class SAMLConfiguration(ConfigurationModel):
         if name == "SUPPORT_CONTACT":
             return {"givenName": "SAML Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
         other_config = json.loads(self.other_config_str)
-        return other_config[name]  # SECURITY_CONFIG, SP_NAMEID_FORMATS, SP_EXTRA
+        return other_config[name]  # SECURITY_CONFIG, SP_EXTRA, or similar extra settings
 
 
 class SAMLProviderData(models.Model):

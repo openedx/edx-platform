@@ -69,7 +69,8 @@ pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
-# python-social-auth==0.2.7 was here but is temporarily moved to github.txt
+python-social-auth==0.2.11
+python-saml==2.1.3
 pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
