@@ -10,12 +10,13 @@
              */
             itemViewClass: Backbone.View,
 
-            initialize: function () {
-                this.collection.on('update', this.render, this);
+            initialize: function (options) {
+                this.itemViewClass = options.itemViewClass || this.itemViewClass;
+                this.collection.on('add', this.render, this);
+                this.collection.on('remove', this.render, this);
                 this.collection.on('reset', this.render, this);
                 this.collection.on('sync', this.render, this);
                 this.collection.on('sort', this.render, this);
-
                 // Keep track of our children for garbage collection
                 this.itemViews = [];
             },
