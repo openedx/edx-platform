@@ -17,6 +17,7 @@ from opaque_keys.edx.locator import CourseKey
 from courseware.courses import get_course_with_access
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
+from discussion_api.permissions import can_delete, get_editable_fields
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
     THREAD_CREATED_EVENT_NAME,
@@ -89,19 +90,6 @@ def _get_comment_and_context(request, comment_id):
         return cc_comment, context
     except CommentClientRequestError:
         raise Http404
-
-
-def _is_user_author_or_privileged(cc_content, context):
-    """
-    Check if the user is the author of a content object or a privileged user.
-
-    Returns:
-        Boolean
-    """
-    return (
-        context["is_requester_privileged"] or
-        context["cc_requester"]["id"] == cc_content["user_id"]
-    )
 
 
 def get_thread_list_url(request, course_key, topic_id_list=None):
@@ -352,6 +340,21 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     return get_paginated_data(request, results, page, num_pages)
 
 
+def _check_editable_fields(cc_content, data, context):
+    """
+    Raise ValidationError if the given update data contains a field that is not
+    in editable_fields.
+    """
+    editable_fields = get_editable_fields(cc_content, context)
+    non_editable_errors = {
+        field: ["This field is not editable."]
+        for field in data.keys()
+        if field not in editable_fields
+    }
+    if non_editable_errors:
+        raise ValidationError(non_editable_errors)
+
+
 def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context):
     """
     Perform any necessary additional actions related to content creation or
@@ -462,35 +465,7 @@ def create_comment(request, comment_data):
         get_comment_created_event_data(cc_comment, cc_thread["commentable_id"], followed=False)
     )
 
-    return serializer.data
-
-
-_THREAD_EDITABLE_BY_ANY = {"following", "voted"}
-_THREAD_EDITABLE_BY_AUTHOR = {"topic_id", "type", "title", "raw_body"} | _THREAD_EDITABLE_BY_ANY
-
-
-def _get_thread_editable_fields(cc_thread, context):
-    """
-    Get the list of editable fields for the given thread in the given context
-    """
-    if _is_user_author_or_privileged(cc_thread, context):
-        return _THREAD_EDITABLE_BY_AUTHOR
-    else:
-        return _THREAD_EDITABLE_BY_ANY
-
-
-def _check_editable_fields(editable_fields, update_data):
-    """
-    Raise ValidationError if the given update data contains a field that is not
-    in editable_fields.
-    """
-    non_editable_errors = {
-        field: ["This field is not editable."]
-        for field in update_data.keys()
-        if field not in editable_fields
-    }
-    if non_editable_errors:
-        raise ValidationError(non_editable_errors)
+    return api_comment
 
 
 def update_thread(request, thread_id, update_data):
@@ -512,8 +487,7 @@ def update_thread(request, thread_id, update_data):
         detail.
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    editable_fields = _get_thread_editable_fields(cc_thread, context)
-    _check_editable_fields(editable_fields, update_data)
+    _check_editable_fields(cc_thread, update_data, context)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
@@ -524,22 +498,6 @@ def update_thread(request, thread_id, update_data):
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
-
-
-_COMMENT_EDITABLE_BY_AUTHOR = {"raw_body"}
-_COMMENT_EDITABLE_BY_THREAD_AUTHOR = {"endorsed"}
-
-
-def _get_comment_editable_fields(cc_comment, context):
-    """
-    Get the list of editable fields for the given comment in the given context
-    """
-    ret = {"voted"}
-    if _is_user_author_or_privileged(cc_comment, context):
-        ret |= _COMMENT_EDITABLE_BY_AUTHOR
-    if _is_user_author_or_privileged(context["thread"], context):
-        ret |= _COMMENT_EDITABLE_BY_THREAD_AUTHOR
-    return ret
 
 
 def update_comment(request, comment_id, update_data):
@@ -572,13 +530,12 @@ def update_comment(request, comment_id, update_data):
           is empty or thread_id is included)
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    editable_fields = _get_comment_editable_fields(cc_comment, context)
-    _check_editable_fields(editable_fields, update_data)
+    _check_editable_fields(cc_comment, update_data, context)
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
     actions_form = CommentActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
-    # Only save thread object if some of the edited fields are in the thread data, not extra actions
+    # Only save comment object if some of the edited fields are in the comment data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
     api_comment = serializer.data
@@ -603,7 +560,7 @@ def delete_thread(request, thread_id):
 
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    if _is_user_author_or_privileged(cc_thread, context):
+    if can_delete(cc_thread, context):
         cc_thread.delete()
     else:
         raise PermissionDenied
@@ -626,7 +583,7 @@ def delete_comment(request, comment_id):
 
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    if _is_user_author_or_privileged(cc_comment, context):
+    if can_delete(cc_comment, context):
         cc_comment.delete()
     else:
         raise PermissionDenied
