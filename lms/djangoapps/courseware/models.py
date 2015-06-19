@@ -26,6 +26,7 @@ from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
+log = logging.getLogger(__name__)
 
 log = logging.getLogger("edx.courseware")
 
@@ -72,7 +73,6 @@ class StudentModule(models.Model):
     Keeps student state for a particular module in a particular course.
     """
     objects = ChunkingManager()
-
     MODEL_TAGS = ['course_id', 'module_type']
 
     # For a homework problem, contains a JSON
@@ -96,10 +96,10 @@ class StudentModule(models.Model):
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_state_key', 'course_id'),)
 
-    ## Internal state of the object
+    # Internal state of the object
     state = models.TextField(null=True, blank=True)
 
-    ## Grade, and are we done?
+    # Grade, and are we done?
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (
@@ -146,7 +146,6 @@ class StudentModuleHistory(models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
-
     HISTORY_SAVING_TYPES = {'problem'}
 
     class Meta(object):  # pylint: disable=missing-docstring
@@ -211,7 +210,6 @@ class XModuleUserStateSummaryField(XBlockFieldBase):
     """
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
-
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('usage_id', 'field_name'),)
 
@@ -223,7 +221,6 @@ class XModuleStudentPrefsField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
-
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_type', 'field_name'),)
 
@@ -237,10 +234,8 @@ class XModuleStudentInfoField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
-
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('student', 'field_name'),)
-
     student = models.ForeignKey(User, db_index=True)
 
 
