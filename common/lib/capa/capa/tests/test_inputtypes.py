@@ -219,6 +219,7 @@ class TextLineTest(unittest.TestCase):
         self.assertEqual(context, expected)
 
     def test_math_rendering(self):
+
         size = "42"
         preprocessorClass = "preParty"
         script = "foo/party.js"
