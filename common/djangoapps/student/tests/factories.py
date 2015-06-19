@@ -1,7 +1,7 @@
 """Provides factories for student models."""
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
-                            PendingEmailChange, UserStanding,
+                            PendingEmailChange, UserStandingConfig,
                             CourseAccessRole)
 from course_modes.models import CourseMode
 from django.contrib.auth.models import Group, AnonymousUser
@@ -24,11 +24,9 @@ class GroupFactory(DjangoModelFactory):
 
 
 class UserStandingFactory(DjangoModelFactory):
-    FACTORY_FOR = UserStanding
+    FACTORY_FOR = UserStandingConfig
 
-    user = None
-    account_status = None
-    changed_by = None
+    disabled = ""
 
 
 class UserProfileFactory(DjangoModelFactory):
