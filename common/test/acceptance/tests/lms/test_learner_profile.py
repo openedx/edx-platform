@@ -14,11 +14,12 @@ from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.dashboard import DashboardPage
+from bok_choy.web_app_test import WebAppTest
 
 from ..helpers import EventsTestMixin
 
 
-class LearnerProfileTestMixin(EventsTestMixin):
+class LearnerProfileTestMixin(EventsTestMixin, WebAppTest):
     """
     Mixin with helper methods for testing learner profile pages.
     """
@@ -47,7 +48,11 @@ class LearnerProfileTestMixin(EventsTestMixin):
         Fill in the public profile fields of a user.
         """
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
+        query = self.q(css='.u-field-{} select'.format('language_proficiencies'))
+        self.browser.execute_script("$('" + query + "').focusout()")
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
+        query = self.q(css='.u-field-{} select'.format('country'))
+        self.browser.execute_script("$('" + query + "').focusout()")
         profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_profile_page(self, username, privacy=None):

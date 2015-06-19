@@ -308,7 +308,6 @@
 
             events: {
                 'click': 'startEditing',
-                'change select': 'finishEditing',
                 'focusout select': 'finishEditing'
             },
 

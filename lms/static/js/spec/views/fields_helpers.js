@@ -145,6 +145,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             }
 
             view.$(data.valueInputSelector).val(data.validValue).change();
+            if (data.element === 'DropDown') {
+                view.$(data.valueInputSelector).focusout();
+            }
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators.inProgress);
@@ -164,6 +167,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             }
 
             view.$(data.valueInputSelector).val(data.invalidValue1).change();
+            if (data.element === 'DropDown') {
+                view.$(data.valueInputSelector).focusout();
+            }
             request_data[data.valueAttribute] = data.invalidValue1;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -175,6 +181,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val(data.invalidValue2).change();
+            if (data.element === 'DropDown') {
+                view.$(data.valueInputSelector).focusout();
+            }
             request_data[data.valueAttribute] = data.invalidValue2;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -186,6 +195,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val('').change();
+            if (data.element === 'DropDown') {
+                view.$(data.valueInputSelector).focusout();
+            }
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.defaultValue);
             request_data[data.valueAttribute] = data.defaultValue;
@@ -204,7 +216,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         var verifyTextField = function (view, data, requests) {
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
-                    valueInputSelector: '.u-field-value > input'
+                    valueInputSelector: '.u-field-value > input',
+                    element: 'TextField'
                 }, data
             ), requests);
         };
@@ -212,7 +225,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         var verifyDropDownField = function (view, data, requests) {
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
-                    valueInputSelector: '.u-field-value > select'
+                    valueInputSelector: '.u-field-value > select',
+                    element: 'DropDown'
                 }, data
             ), requests);
         };

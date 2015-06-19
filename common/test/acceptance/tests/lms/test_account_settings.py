@@ -226,7 +226,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), initial_value)
 
         for new_value in new_values:
+            query = self.q(css='.u-field-{} select'.format(field_id))
             self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
+            self.browser.execute_script("$('" + query + "').focusout()")
             self.account_settings_page.wait_for_messsage(field_id, success_message)
             if reloads_on_save:
                 self.account_settings_page.wait_for_loading_indicator()

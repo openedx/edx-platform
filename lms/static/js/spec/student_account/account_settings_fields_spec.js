@@ -55,7 +55,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
 
                 var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
-                view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).val(data[fieldData.valueAttribute]).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -70,6 +70,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -102,6 +103,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 var data = {'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
                 view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
             });
