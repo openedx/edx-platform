@@ -30,9 +30,6 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 # custom opaque-key implementations for ccx
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
-# For SAML Support (To be moved to PyPi installation in base.txt once our changes are merged):
--e git+https://github.com/open-craft/python-saml.git@9602b8133056d8c3caa7c3038761147df3d4b257#egg=python-saml
--e git+https://github.com/open-craft/python-social-auth.git@02ab628b8961b969021de87aeb23551da4e751b7#egg=python-social-auth
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@74fdc5a361f48e5596acf3846ca3790a33a05253#egg=XBlock
