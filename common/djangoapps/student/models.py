@@ -1854,3 +1854,47 @@ class CourseEnrollmentAttribute(models.Model):
             name=self.name,
             value=self.value,
         )
+
+    @classmethod
+    def add_enrollment_attr(cls, enrollment, data_list):
+        """Delete all the enrollment attributes for the given enrollment and
+        add new attributes.
+
+        Args:
+            enrollment(CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
+            data(list): list of dictionaries containing data to save
+        """
+        cls.objects.filter(enrollment=enrollment).delete()
+        attributes = [
+            cls(enrollment=enrollment, namespace=data['namespace'], name=data['name'], value=data['value'])
+            for data in data_list
+        ]
+        cls.objects.bulk_create(attributes)
+
+    @classmethod
+    def get_enrollment_attributes(cls, enrollment):
+        """Retrieve list of all enrollment attributes.
+
+        Args:
+            enrollment(CourseEnrollment): 'CourseEnrollment' for which list is to retrieve
+
+        Returns: list
+
+        Example:
+        >>> CourseEnrollmentAttribute.get_enrollment_attributes(CourseEnrollment)
+        [
+            {
+                "namespace": "credit",
+                "name": "provider_id",
+                "value": "hogwarts",
+            },
+        ]
+        """
+        return [
+            {
+                "namespace": attribute.namespace,
+                "name": attribute.name,
+                "value": attribute.value,
+            }
+            for attribute in cls.objects.filter(enrollment=enrollment)
+        ]

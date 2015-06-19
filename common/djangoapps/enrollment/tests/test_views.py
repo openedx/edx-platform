@@ -46,6 +46,7 @@ class EnrollmentTestMixin(object):
             as_server=False,
             mode=CourseMode.HONOR,
             is_active=None,
+            enrollment_attributes=None,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -62,7 +63,8 @@ class EnrollmentTestMixin(object):
             'course_details': {
                 'course_id': course_id
             },
-            'user': username
+            'user': username,
+            'enrollment_attributes': enrollment_attributes
         }
 
         if is_active is not None:
@@ -546,6 +548,78 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
         self.assertEqual(course_mode, CourseMode.VERIFIED)
+
+    def test_enrollment_with_credit_mode(self):
+        """With the right API key, update an existing enrollment with credit
+        mode and set enrollment attributes.
+        """
+        for mode in [CourseMode.HONOR, CourseMode.CREDIT_MODE]:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode,
+                mode_display_name=mode,
+            )
+
+        # Create an enrollment
+        self.assert_enrollment_status(as_server=True)
+
+        # Check that the enrollment is honor.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, CourseMode.HONOR)
+
+        # Check that the enrollment upgraded to credit.
+        enrollment_attributes = [{
+            "namespace": "credit",
+            "name": "provider_id",
+            "value": "hogwarts",
+        }]
+        self.assert_enrollment_status(
+            as_server=True,
+            mode=CourseMode.CREDIT_MODE,
+            expected_status=status.HTTP_200_OK,
+            enrollment_attributes=enrollment_attributes
+        )
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, CourseMode.CREDIT_MODE)
+
+    def test_enrollment_with_invalid_attr(self):
+        """Check response status is bad request when invalid enrollment
+        attributes are passed
+        """
+        for mode in [CourseMode.HONOR, CourseMode.CREDIT_MODE]:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode,
+                mode_display_name=mode,
+            )
+
+        # Create an enrollment
+        self.assert_enrollment_status(as_server=True)
+
+        # Check that the enrollment is honor.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, CourseMode.HONOR)
+
+        # Check that the enrollment upgraded to credit.
+        enrollment_attributes = [{
+            "namespace": "credit",
+            "name": "invalid",
+            "value": "hogwarts",
+        }]
+        self.assert_enrollment_status(
+            as_server=True,
+            mode=CourseMode.CREDIT_MODE,
+            expected_status=status.HTTP_400_BAD_REQUEST,
+            enrollment_attributes=enrollment_attributes
+        )
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(course_mode, CourseMode.HONOR)
 
     def test_downgrade_enrollment_with_mode(self):
         """With the right API key, downgrade an existing enrollment with a new mode. """
