@@ -26,28 +26,28 @@
                         current_page: collection.currentPage,
                         total_pages: collection.totalPages
                     }));
-                    this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);;
-                    this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
+                    var onFirstPage = !this.collection.hasPreviousPage();
+                    var onLastPage = !this.collection.hasNextPage();
+                    this.$(".previous-page-link").toggleClass("is-disabled", onFirstPage).attr('aria-disabled', onFirstPage);
+                    this.$(".next-page-link").toggleClass("is-disabled", onLastPage).attr('aria-disabled', onLastPage);
                     return this;
                 },
 
                 changePage: function() {
                     var collection = this.collection,
-                        currentPage = collection.currentPage + 1,
+                        currentPage = collection.currentPage,
                         pageInput = this.$("#page-number-input"),
-                        pageNumber = parseInt(pageInput.val(), 10);
-                    if (pageNumber > collection.totalPages) {
-                        pageNumber = false;
-                    }
-                    if (pageNumber <= 0) {
-                        pageNumber = false;
+                        pageNumber = parseInt(pageInput.val(), 10),
+                        validInput = true;
+                    if (!pageNumber || pageNumber > collection.totalPages || pageNumber < 1) {
+                        validInput = false;
                     }
                     // If we still have a page number by this point,
                     // and it's not the current page, load it.
-                    if (pageNumber && pageNumber !== currentPage) {
-                        collection.setPage(pageNumber - 1);
+                    if (validInput && pageNumber !== currentPage) {
+                        collection.setPage(pageNumber);
                     }
-                    pageInput.val(""); // Clear the value as the label will show beneath it
+                    pageInput.val(''); // Clear the value as the label will show beneath it
                 },
 
                 nextPage: function() {

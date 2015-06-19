@@ -24,7 +24,7 @@
 <script type="text/javascript">
     (function (require) {
         require(['teams/js/teams_tab_factory'], function (TeamsTabFactory) {
-            new TeamsTabFactory(${ json.dumps(topics, cls=EscapedEdxJSONEncoder) }, '${ topics_url }');
+            new TeamsTabFactory(${ json.dumps(topics, cls=EscapedEdxJSONEncoder) }, '${ topics_url }', '${ unicode(course.id) }');
         });
     }).call(this, require || RequireJS.require);
 </script>

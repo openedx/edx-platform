@@ -24,8 +24,10 @@
                     this.$el.html(_.template(paging_header_template, {
                         messageHtml: messageHtml
                     }));
-                    this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);
-                    this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
+                    var onFirstPage = !this.collection.hasPreviousPage();
+                    var onLastPage = !this.collection.hasNextPage();
+                    this.$(".previous-page-link").toggleClass("is-disabled", onFirstPage).attr('aria-disabled', onFirstPage);
+                    this.$(".next-page-link").toggleClass("is-disabled", onLastPage).attr('aria-disabled', onLastPage);
                     return this;
                 },
 

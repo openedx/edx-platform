@@ -45,8 +45,7 @@
                            view = tab.view;
                        this.$('a.is-active').removeClass('is-active').attr('aria-selected', 'false');
                        this.$('a[data-index='+index+']').addClass('is-active').attr('aria-selected', 'true');
-                       view.render();
-                       this.$('.page-content-main').html(view.$el.html());
+                       view.setElement(this.$('.page-content-main')).render();
                        this.$('.sr-is-focusable').focus();
                        this.router.navigate(tab.url, {replace: true});
                    },
