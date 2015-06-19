@@ -8,7 +8,7 @@
            function (Backbone, _, $, tabbedViewTemplate, tabTemplate) {
                var TabbedView = Backbone.View.extend({
                    events: {
-                       'click .nav-item': 'switchTab'
+                       'click .nav-item[role="tab"]': 'switchTab'
                    },
 
                    template: _.template(tabbedViewTemplate),
