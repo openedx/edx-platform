@@ -64,6 +64,7 @@
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
+            'js/inline_analytics': 'js/inline_analytics',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -299,9 +300,15 @@
                 exports: 'js/shoppingcart/shoppingcart',
                 deps: ['jquery', 'underscore', 'gettext']
             },
+<<<<<<< HEAD
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext']
+=======
+            'js/inline_analytics': {
+            	exports: 'js/inline_analytics',
+            	deps: ['gettext']
+>>>>>>> 6589646... Display of student analytics in-line on the problem page.
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -638,7 +645,8 @@
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
         'lms/include/js/spec/discovery/discovery_spec.js',
-        'lms/include/js/spec/ccx/schedule_spec.js'
+        'lms/include/js/spec/ccx/schedule_spec.js',
+        'lms/include/js/spec/inline_analytics_spec.js'
     ]);
 
 }).call(this, requirejs, define);

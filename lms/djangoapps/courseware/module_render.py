@@ -50,6 +50,7 @@ from openedx.core.lib.xblock_utils import (
     add_staff_markup,
     wrap_xblock,
     request_token as xblock_request_token,
+    add_inline_analytics,
 )
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
@@ -585,6 +586,11 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         if has_access(user, 'staff', descriptor, course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access, disable_staff_debug_info))
+
+    # Add button for in-line analytics answer distribution
+    if getattr(settings, 'ANALYTICS_DATA_URL'):
+        if has_access(user, 'staff', descriptor, course_id):
+            block_wrappers.append(partial(add_inline_analytics, user))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

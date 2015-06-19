@@ -2511,3 +2511,13 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 # when a credit provider notifies us that a student has been approved
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
+
+####################### In-line Analytics ######################
+INLINE_ANALYTICS_SUPPORTED_TYPES = {
+    'MultipleChoiceResponse': 'radio',
+    'ChoiceResponse': 'checkbox',
+    'OptionResponse': 'option',
+    'NumericalResponse': 'numerical',
+    'StringResponse': 'string',
+    'FormulaResponse': 'formula',
+}
