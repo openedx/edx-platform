@@ -442,7 +442,6 @@ class TestCourseGrader(TestSubmittingProblems):
         baseline = StudentModuleHistory.objects.filter(
             student_module=student_module
         )
-        x_module.breakpoint = True
         baseline_count = baseline.count()
         self.assertEqual(baseline_count, 2)
 
