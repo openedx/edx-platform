@@ -1,18 +1,5 @@
-define([
-    'jquery',
-    'backbone',
-    'logger',
-    'common/js/spec_helpers/template_helpers',
-    'js/courseware/base/models/proctored_exam_model',
-    'js/courseware/base/views/proctored_exam_view'
-], function(
-    $,
-    Backbone,
-    Logger,
-    TemplateHelpers,
-    ProctoredExamModel,
-    ProctoredExamView
-) {
+define(['jquery', 'backbone', 'common/js/spec_helpers/template_helpers', 'js/courseware/base/models/proctored_exam_model', 'js/courseware/base/views/proctored_exam_view'
+], function($, Backbone, TemplateHelpers, ProctoredExamModel, ProctoredExamView) {
     'use strict';
 
     describe('Proctored Exam', function () {
@@ -35,7 +22,7 @@ define([
     });
 
     describe('ProctoredExamView', function () {
-        function beforeEachHelper(ProctoredExamView) {
+        beforeEach(function () {
             TemplateHelpers.installTemplate('templates/courseware/proctored-exam-status', true, 'proctored-exam-status-tpl');
             appendSetFixtures('<div class="proctored_exam_status"></div>');
 
@@ -50,7 +37,7 @@ define([
                 lastFetched: new Date()
             });
 
-            this.proctored_exam_view = new ProctoredExamView(
+            this.proctored_exam_view = new edx.coursware.proctored_exam.ProctoredExamView(
                 {
                     model: this.model,
                     el: $(".proctored_exam_status"),
@@ -58,35 +45,29 @@ define([
                 }
             );
             this.proctored_exam_view.render();
-        }
-        describe('ProctoredExamStatusView', function () {
-            beforeEach(function () {
-                jasmine.Clock.useMock();
-                beforeEachHelper.call(this, ProctoredExamView);
-            });
-            it('renders items correctly', function () {
-                expect(this.proctored_exam_view.$el.find('a')).toHaveAttr('href',  this.model.get("exam_url_path"));
-                expect(this.proctored_exam_view.$el.find('a')).toContainHtml(this.model.get('exam_display_name'));
-            });
-            it('changes behavior when clock time decreases low threshold', function () {
-                spyOn(this.model, 'getRemainingSeconds').andCallFake(function () {
-                    return 25;
-                });
-                expect(this.model.getRemainingSeconds()).toEqual(25);
-                expect(this.proctored_exam_view.$el.find('div.exam-timer')).not.toHaveClass('low-time warning');
-                this.proctored_exam_view.render();
-                expect(this.proctored_exam_view.$el.find('div.exam-timer')).toHaveClass('low-time warning');
-            });
-            it('changes behavior when clock time decreases critically low threshold', function () {
-                spyOn(this.model, 'getRemainingSeconds').andCallFake(function () {
-                    return 5;
-                });
-                expect(this.model.getRemainingSeconds()).toEqual(5);
-                expect(this.proctored_exam_view.$el.find('div.exam-timer')).not.toHaveClass('low-time critical');
-                this.proctored_exam_view.render();
-                expect(this.proctored_exam_view.$el.find('div.exam-timer')).toHaveClass('low-time critical');
-            });
         });
 
+        it('renders items correctly', function () {
+            expect(this.proctored_exam_view.$el.find('a')).toHaveAttr('href',  this.model.get("exam_url_path"));
+            expect(this.proctored_exam_view.$el.find('a')).toContainHtml(this.model.get('exam_display_name'));
+        });
+        it('changes behavior when clock time decreases low threshold', function () {
+            spyOn(this.model, 'getRemainingSeconds').andCallFake(function () {
+                return 25;
+            });
+            expect(this.model.getRemainingSeconds()).toEqual(25);
+            expect(this.proctored_exam_view.$el.find('div.exam-timer')).not.toHaveClass('low-time warning');
+            this.proctored_exam_view.render();
+            expect(this.proctored_exam_view.$el.find('div.exam-timer')).toHaveClass('low-time warning');
+        });
+        it('changes behavior when clock time decreases critically low threshold', function () {
+            spyOn(this.model, 'getRemainingSeconds').andCallFake(function () {
+                return 5;
+            });
+            expect(this.model.getRemainingSeconds()).toEqual(5);
+            expect(this.proctored_exam_view.$el.find('div.exam-timer')).not.toHaveClass('low-time critical');
+            this.proctored_exam_view.render();
+            expect(this.proctored_exam_view.$el.find('div.exam-timer')).toHaveClass('low-time critical');
+        });
     });
 });
