@@ -155,7 +155,8 @@
 
     define([
         // Run the common tests that use RequireJS.
-        'common-requirejs/include/common/js/spec/components/paging_spec.js'
+        'common-requirejs/include/common/js/spec/components/paging_spec.js',
+        'common-requirejs/include/common/js/spec/components/list_spec.js'
     ]);
 
 }).call(this, requirejs, define);
