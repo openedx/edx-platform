@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-12 18:53+0000\n"
-"PO-Revision-Date: 2015-06-12 18:54:38.109866\n"
+"POT-Creation-Date: 2015-06-19 13:46+0000\n"
+"PO-Revision-Date: 2015-06-19 13:47:59.519977\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -158,6 +158,7 @@ msgstr "غخعق ذاشرلثس اشدث زثثر سشدثي."
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
@@ -189,7 +190,6 @@ msgstr "سشدث"
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/signatory-editor.underscore
-#: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "ذمخسث"
 
@@ -806,11 +806,9 @@ msgstr "بخقوشف"
 msgid "Formats"
 msgstr "بخقوشفس"
 
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/templates/js/image-modal.underscore
 msgid "Fullscreen"
 msgstr "بعممسذقثثر"
 
@@ -1121,12 +1119,9 @@ msgstr "رثص يخذعوثرف"
 msgid "New window"
 msgstr "رثص صهريخص"
 
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/paging-footer.underscore
-#: cms/templates/js/paging-header.underscore
 msgid "Next"
 msgstr "رثطف"
 
@@ -1543,6 +1538,7 @@ msgstr "دثقفهذشم سحشذث"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
@@ -2068,6 +2064,54 @@ msgstr "صث اشي سخوث فقخعزمث يثمثفهرل فاهس ذخووث
 msgid "Are you sure you want to delete this response?"
 msgstr "شقث غخع سعقث غخع صشرف فخ يثمثفث فاهس قثسحخرسث?"
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgstr ""
+"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, بهمفثقثي زغ "
+"%(asset_type)s, سخقفثي زغ %(sort_name)s شسذثريهرل"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s descending"
+msgstr ""
+"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, بهمفثقثي زغ "
+"%(asset_type)s, سخقفثي زغ %(sort_name)s يثسذثريهرل"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, سخقفثي زغ "
+"%(sort_name)s شسذثريهرل"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, سخقفثي زغ "
+"%(sort_name)s يثسذثريهرل"
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: common/static/common/js/components/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr "%(total_items)s فخفشم"
+
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
 msgstr "يقخح فشقلثف هوشلث"
@@ -2217,6 +2261,7 @@ msgid "Date posted"
 msgstr "يشفث حخسفثي"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/static/js/courseware/credit_progress.js
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
 msgstr "وخقث"
@@ -2309,6 +2354,12 @@ msgstr "وغ فثشوس"
 msgid "Browse"
 msgstr "زقخصسث"
 
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "%(team_count)s Team"
+msgid_plural "%(team_count)s Teams"
+msgstr[0] "%(team_count)s فثشو"
+msgstr[1] "%(team_count)s فثشوس"
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "خحثر ذشمذعمشفخق"
@@ -2344,7 +2395,6 @@ msgid "Error retrieving grading configuration."
 msgstr "ثققخق قثفقهثدهرل لقشيهرل ذخربهلعقشفهخر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Error generating grades. Please try again."
 msgstr "ثققخق لثرثقشفهرل لقشيثس. حمثشسث فقغ شلشهر."
 
@@ -3167,6 +3217,11 @@ msgstr "ثرفثق يعث يشفث"
 msgid "Enter Start Date"
 msgstr "ثرفثق سفشقف يشفث"
 
+#: lms/static/js/courseware/credit_progress.js
+#: lms/templates/edxnotes/note-item.underscore
+msgid "Less"
+msgstr "مثسس"
+
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
 msgstr "حمثشسث ثرفثق ش دشمهي يخرشفهخر شوخعرف."
@@ -3380,6 +3435,14 @@ msgid "Prevent students from generating certificates in this course?"
 msgstr "حقثدثرف سفعيثرفس بقخو لثرثقشفهرل ذثقفهبهذشفثس هر فاهس ذخعقسث?"
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
+msgid ""
+"There was a problem creating the report. Select \"Create Executive Summary\""
+" to try again."
+msgstr ""
+"فاثقث صشس ش حقخزمثو ذقثشفهرل فاث قثحخقف. سثمثذف \"ذقثشفث ثطثذعفهدث سعووشقغ\""
+" فخ فقغ شلشهر."
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
 msgstr "ثرفثق فاث ثرقخمموثرف ذخيث."
 
@@ -3447,6 +3510,22 @@ msgstr "صث صثقثر'ف شزمث فخ سثري غخع ش حشسسصخقي ق�
 #: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
 msgstr "حمثشسث ذاثذن غخعق ثوشهم فخ ذخربهقو فاث ذاشرلث"
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Saving your email preference"
+msgstr "سشدهرل غخعق ثوشهم حقثبثقثرذث"
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Enrolling you in the selected course"
+msgstr "ثرقخممهرل غخع هر فاث سثمثذفثي ذخعقسث"
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Adding the selected course to your cart"
+msgstr "شييهرل فاث سثمثذفثي ذخعقسث فخ غخعق ذشقف"
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Loading your courses"
+msgstr "مخشيهرل غخعق ذخعقسثس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information (required)"
@@ -4263,8 +4342,7 @@ msgstr "لقشذث حثقهخي وعسف زث سحثذهبهثي هر اا:وو 
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "رخف شزمث فخ سثف حشسسهرل لقشيث فخ مثسس فاشر %(minimum_grade_cutoff)s%."
 
-#: cms/static/js/spec/views/assets_spec.js
-#: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
+#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
 #: cms/templates/js/asset-library.underscore
 msgid "Type"
 msgstr "فغحث"
@@ -4589,54 +4667,6 @@ msgstr "رخف لقشيثي"
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
 msgstr "يشفث شييثي"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s ascending"
-msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, بهمفثقثي زغ "
-"%(asset_type)s, سخقفثي زغ %(sort_name)s شسذثريهرل"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s descending"
-msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, بهمفثقثي زغ "
-"%(asset_type)s, سخقفثي زغ %(sort_name)s يثسذثريهرل"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s ascending"
-msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, سخقفثي زغ "
-"%(sort_name)s شسذثريهرل"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s descending"
-msgstr ""
-"ساخصهرل %(current_item_range)s خعف خب %(total_items_count)s, سخقفثي زغ "
-"%(sort_name)s يثسذثريهرل"
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: cms/static/js/views/paging_header.js
-msgid "%(total_items)s total"
-msgstr "%(total_items)s فخفشم"
 
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
@@ -4994,46 +5024,6 @@ msgstr "شذفهخرس"
 msgid "Status"
 msgstr "سفشفعس"
 
-#: common/templates/js/image-modal.underscore
-msgid "Large"
-msgstr "مشقلث"
-
-#: common/templates/js/image-modal.underscore
-msgid "Zoom In"
-msgstr "ظخخو هر"
-
-#: common/templates/js/image-modal.underscore
-msgid "Zoom Out"
-msgstr "ظخخو خعف"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "This post is visible only to %(group_name)s."
-msgstr "فاهس حخسف هس دهسهزمث خرمغ فخ %(group_name)s."
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr "فاهس حخسف هس دهسهزمث فخ ثدثقغخرث."
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "%(post_type)s posted %(time_ago)s by %(author)s"
-msgstr "%(post_type)s حخسفثي %(time_ago)s زغ %(author)s"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr "حهررثي"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Reported"
-msgstr "قثحخقفثي"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Closed"
-msgstr "ذمخسثي"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Related to: %(courseware_title_linked)s"
-msgstr "قثمشفثي فخ: %(courseware_title_linked)s"
-
 #: lms/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "عرهف"
@@ -5166,10 +5156,6 @@ msgstr "قثبهرث غخعق سثشقذا"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
 msgstr "اهلامهلافثي فثطف"
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Less"
-msgstr "مثسس"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Note"
@@ -5465,13 +5451,13 @@ msgstr "بخقلخف حشسسصخقي?"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
-"You've successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account isn't linked with an %(platformName)s account. "
-"To link your accounts, go to your %(platformName)s account settings."
+"You have successfully signed into %(currentProvider)s, but your "
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
-"غخع'دث سعذذثسسبعممغ سهلرثي هرفخ %(currentProvider)s, زعف غخعق "
-"%(currentProvider)s شذذخعرف هسر'ف مهرنثي صهفا شر %(platformName)s شذذخعرف. "
-"فخ مهرن غخعق شذذخعرفس, لخ فخ غخعق %(platformName)s شذذخعرف سثففهرلس."
+"غخع اشدث سعذذثسسبعممغ سهلرثي هرفخ %(currentProvider)s, زعف غخعق "
+"%(currentProvider)s شذذخعرف يخثس رخف اشدث ش مهرنثي %(platformName)s شذذخعرف."
+" فخ مهرن غخعق شذذخعرفس, سهلر هر رخص عسهرل غخعق %(platformName)s حشسسصخقي."
 
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
@@ -5488,6 +5474,10 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
 msgstr "صث ذخعمير'ف سهلر غخع هر."
+
+#: lms/templates/student_account/login.underscore
+msgid "An error occurred when signing you in to %(platformName)s."
+msgstr "شر ثققخق خذذعققثي صاثر سهلرهرل غخع هر فخ %(platformName)s."
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
@@ -5507,6 +5497,7 @@ msgid "Create an account"
 msgstr "ذقثشفث شر شذذخعرف"
 
 #: lms/templates/student_account/password_reset.underscore
+#: lms/templates/student_account/register.underscore
 msgid "An error occurred."
 msgstr "شر ثققخق خذذعققثي."
 
@@ -6046,6 +6037,10 @@ msgstr "سفشفعس"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "ذخووخر حقخزمثو فغحثس"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Common Problems with Hints and Feedback"
+msgstr "ذخووخر حقخزمثوس صهفا اهرفس شري بثثيزشذن"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -6605,15 +6600,6 @@ msgstr "غخع اشدثر'ف شييثي شرغ فثطفزخخنس فخ فاهس 
 #: cms/templates/js/no-textbooks.underscore
 msgid "Add your first textbook"
 msgstr "شيي غخعق بهقسف فثطفزخخن"
-
-#: cms/templates/js/paging-footer.underscore
-#: cms/templates/js/paging-header.underscore
-msgid "Previous"
-msgstr "حقثدهخعس"
-
-#: cms/templates/js/paging-footer.underscore
-msgid "Page number"
-msgstr "حشلث رعوزثق"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
