@@ -15,6 +15,30 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
+// grid - configuration (susy-based)
+$susy: (
+    use-custom clearfix: true,
+    math: fluid,
+    output: float,
+    columns: 12,
+    gutters: .5,
+    container: 1200px,
+);
+
+// grid - breakpoints
+$bp-tiny:  320px;
+$bp-medium: 540px;
+$bp-medium: 768px;
+$bp-large:  769px;
+$bp-huge:   980px;
+
+// grid - breakpoints (edX-centric)
+$edx-bp-tiny:  320px;
+$edx-bp-medium: 540px;
+$edx-bp-medium: 768px;
+$edx-bp-large:  769px;
+$edx-bp-huge:   980px;
+
 // ====================
 
 // FONTS

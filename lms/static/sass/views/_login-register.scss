@@ -1,7 +1,6 @@
 // lms - views - login/register view
 // ====================
 @import '../base/grid-settings';
-@import "neat/neat"; // lib - Neat
 
 $sm-btn-google: #dd4b39;
 $sm-btn-facebook: #3b5998;
@@ -9,7 +8,7 @@ $sm-btn-linkedin: #0077b5;
 
 .login-register {
     @include box-sizing(border-box);
-    @include outer-container;
+    @include container();
     $grid-columns: 12;
     background: $white;
     min-height: 100%;
@@ -40,7 +39,7 @@ $sm-btn-linkedin: #0077b5;
     }
 
     .header {
-        @include outer-container;
+        @include container();
         border-bottom: 1px solid $gray-l4;
         width: 100%;
         padding-top: 35px;
@@ -503,11 +502,7 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
-    @include media( max-width 330px) {
-        .form-type {
-            width: 98%;
-            margin: 0 1%;
-        }
+    @media screen and (min-width: 330px) {
 
         .login-provider {
             width: 100%;

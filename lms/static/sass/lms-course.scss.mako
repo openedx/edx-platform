@@ -1,9 +1,12 @@
 @import 'bourbon/bourbon';
+@import 'susy/susy';
+@import 'breakpoint/breakpoint';
 @import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 @import 'base/reset';
 @import 'base/font_face';
 @import 'base/variables';
+@import 'base/variables-ltr';
 @import 'base/mixins';
 
 ## THEMING

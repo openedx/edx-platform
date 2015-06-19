@@ -1,12 +1,9 @@
 // edX theme: LMS Footer
 // ====================
 @import '../base/grid-settings';
-@import 'neat/neat'; // lib - Neat
-
 
 $edx-footer-link-color: $link-color;
 $edx-footer-bg-color: rgb(252,252,252);
-
 
 // Aggressively scoped for Drupal
 // ==============================
@@ -14,12 +11,14 @@ $edx-footer-bg-color: rgb(252,252,252);
 // sites so the scope has to be aggressive to override default
 // CMS styles
 footer#footer-edx-v3 {
+  @include container();
+  @include box-sizing(border-box);
   background: $edx-footer-bg-color;
   padding: 20px;
   border-top: 1px solid $courseware-button-border-color;
 
   .footer-content-wrapper {
-    @include outer-container;
+    @include container();
     @include box-sizing(border-box);
   }
 
@@ -51,7 +50,7 @@ footer#footer-edx-v3 {
   .footer-logo,
   .site-details,
   .external-links {
-    @include span-columns(12);
+    @include span(5 of 12);
   }
 
   .site-details,
@@ -139,15 +138,15 @@ footer#footer-edx-v3 {
     }
   }
 
-  @include media( $edx-bp-large ) {
+  @include susy-breakpoint($edx-bp-large, $susy) {
     padding: 20px 10px;
 
     .site-details {
-      @include span-columns(7);
+      @include span(7);
     }
 
     .external-links {
-      @include span-columns(5);
+      @include span(5);
     }
 
     .social-media-links,
@@ -161,17 +160,17 @@ footer#footer-edx-v3 {
     }
   }
 
-  @include media( $edx-bp-huge ) {
+  @include susy-breakpoint($edx-bp-huge, $susy) {
     .footer-logo {
-      @include span-columns(2);
+      @include span(2);
     }
 
     .site-details {
-      @include span-columns(6);
+      @include span(6);
     }
 
     .external-links {
-      @include span-columns(4);
+      @include span(4);
     }
 
     .social-media-links {
