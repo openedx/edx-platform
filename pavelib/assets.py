@@ -1,14 +1,17 @@
 """
 Asset compilation and collection.
 """
+
 from __future__ import print_function
+
 import argparse
+import glob
+import traceback
+
 from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
-import glob
-import traceback
-import os
+
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 
@@ -24,30 +27,35 @@ SASS_DIRS = {
 SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
 SASS_CACHE_PATH = '/tmp/sass-cache'
 
-edxapp_env = Env()
-if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
-    theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
-    parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
-    theme_root = parent_dir / "themes" / theme_name
-    COFFEE_DIRS.append(theme_root)
-    sass_dir = theme_root / "static" / "sass"
-    css_dir = theme_root / "static" / "css"
-    if sass_dir.isdir():
-        css_dir.mkdir_p()
-        SASS_DIRS[sass_dir] = css_dir
 
-if edxapp_env.env_tokens.get("COMP_THEME_DIR", False):
-    theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
-    lms_sass = theme_dir / "lms" / "static" / "sass"
-    lms_css = theme_dir / "lms" / "static" / "css"
-    if lms_sass.isdir():
-        lms_css.mkdir_p()
-        SASS_DIRS[lms_sass] = lms_css
-    studio_sass = theme_dir / "studio" / "static" / "sass"
-    studio_css = theme_dir / "studio" / "static" / "css"
-    if studio_sass.isdir():
-        studio_css.mkdir_p()
-        SASS_DIRS[studio_sass] = studio_css
+def configure_paths():
+    """Configure our paths based on settings.  Called immediately."""
+    edxapp_env = Env()
+    if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
+        theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
+        parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
+        theme_root = parent_dir / "themes" / theme_name
+        COFFEE_DIRS.append(theme_root)
+        sass_dir = theme_root / "static" / "sass"
+        css_dir = theme_root / "static" / "css"
+        if sass_dir.isdir():
+            css_dir.mkdir_p()
+            SASS_DIRS[sass_dir] = css_dir
+
+    if edxapp_env.env_tokens.get("COMP_THEME_DIR", False):
+        theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
+        lms_sass = theme_dir / "lms" / "static" / "sass"
+        lms_css = theme_dir / "lms" / "static" / "css"
+        if lms_sass.isdir():
+            lms_css.mkdir_p()
+            SASS_DIRS[lms_sass] = lms_css
+        studio_sass = theme_dir / "studio" / "static" / "sass"
+        studio_css = theme_dir / "studio" / "static" / "css"
+        if studio_sass.isdir():
+            studio_css.mkdir_p()
+            SASS_DIRS[studio_sass] = studio_css
+
+configure_paths()
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
