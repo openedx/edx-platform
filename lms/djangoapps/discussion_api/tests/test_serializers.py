@@ -644,18 +644,36 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
             }
         )
 
-    def test_create_parent_id_too_deep(self):
-        self.register_get_comment_response({
-            "id": "test_parent",
-            "thread_id": "test_thread",
-            "depth": 2
-        })
-        data = self.minimal_data.copy()
-        data["parent_id"] = "test_parent"
-        context = get_context(self.course, self.request, make_minimal_cs_thread())
-        serializer = CommentSerializer(data=data, context=context)
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(serializer.errors, {"parent_id": ["Parent is too deep."]})
+    @ddt.data(None, -1, 0, 2, 5)
+    def test_create_parent_id_too_deep(self, max_depth):
+        with mock.patch("django_comment_client.utils.MAX_COMMENT_DEPTH", max_depth):
+            data = self.minimal_data.copy()
+            context = get_context(self.course, self.request, make_minimal_cs_thread())
+            if max_depth is None or max_depth >= 0:
+                if max_depth != 0:
+                    self.register_get_comment_response({
+                        "id": "not_too_deep",
+                        "thread_id": "test_thread",
+                        "depth": max_depth - 1 if max_depth else 100
+                    })
+                    data["parent_id"] = "not_too_deep"
+                else:
+                    data["parent_id"] = None
+                serializer = CommentSerializer(data=data, context=context)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+            if max_depth is not None:
+                if max_depth >= 0:
+                    self.register_get_comment_response({
+                        "id": "too_deep",
+                        "thread_id": "test_thread",
+                        "depth": max_depth
+                    })
+                    data["parent_id"] = "too_deep"
+                else:
+                    data["parent_id"] = None
+                serializer = CommentSerializer(data=data, context=context)
+                self.assertFalse(serializer.is_valid())
+                self.assertEqual(serializer.errors, {"parent_id": ["Comment level is too deep."]})
 
     def test_create_missing_field(self):
         for field in self.minimal_data:
