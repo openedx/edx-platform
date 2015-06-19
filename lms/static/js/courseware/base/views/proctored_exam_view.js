@@ -1,15 +1,12 @@
-;(function (define) {
+var edx = edx || {};
 
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'gettext'
-], function ($, _, Backbone, gettext) {
+(function(Backbone, $, _) {
+    'use strict';
 
-   'use strict';
+    edx.coursware = edx.coursware || {};
+    edx.coursware.proctored_exam = {};
 
-    return Backbone.View.extend({
+    edx.coursware.proctored_exam.ProctoredExamView = Backbone.View.extend({
         initialize: function (options) {
             this.$el = options.el;
             this.model = options.model;
@@ -18,14 +15,14 @@ define([
             this.timerId = null;
 
             var template_html = $(this.templateId).text();
-            if(template_html !== null) {
+            if (template_html !== null) {
                 /* don't assume this backbone view is running on a page with the underscore templates */
                 this.template = _.template(template_html);
             }
         },
 
         render: function () {
-            if(this.template !== null) {
+            if (this.template !== null) {
                 var html = this.template(this.model.toJSON());
                 this.$el.html(html);
                 this.$el.show();
@@ -35,16 +32,14 @@ define([
             return this;
         },
 
-        updateRemainingTime: function(self) {
+        updateRemainingTime: function (self) {
             self.$el.find('div.exam-timer').removeClass("low-time warning critical");
             self.$el.find('div.exam-timer').addClass(self.model.getRemainingTimeState());
             self.$el.find('span#time_remaining_id b').html(self.model.getFormattedRemainingTime());
-            if (self.model.getRemainingSeconds()<=0) {
+            if (self.model.getRemainingSeconds() <= 0) {
                 clearInterval(self.timerId); // stop the timer once the time finishes.
             }
         }
     });
-});
-
-
-})(define || RequireJS.define);
+    this.edx.coursware.proctored_exam.ProctoredExamView = edx.coursware.proctored_exam.ProctoredExamView;
+}).call(this, Backbone, $, _);
