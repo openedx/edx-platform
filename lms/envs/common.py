@@ -1206,7 +1206,8 @@ courseware_js = (
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
     ['js/search/course/main.js'] +
-    ['js/courseware/proctored_exam/main.js'] +
+    ['js/courseware/base/**/*.js'] +
+    ['js/courseware/proctored_exam/proctored_app.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
