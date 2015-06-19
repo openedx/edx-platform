@@ -444,7 +444,7 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         x_module.breakpoint = True
         baseline_count = baseline.count()
-        self.assertEqual(baseline_count, 3)
+        self.assertEqual(baseline_count, 2)
 
         # now click "show answer"
         self.show_question_answer('p1')
@@ -454,7 +454,7 @@ class TestCourseGrader(TestSubmittingProblems):
             student_module=student_module
         )
         current_count = csmh.count()
-        self.assertEqual(current_count, 3)
+        self.assertEqual(current_count, 2)
 
     def test_none_grade(self):
         """
