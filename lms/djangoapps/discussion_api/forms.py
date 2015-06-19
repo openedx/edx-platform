@@ -80,6 +80,7 @@ class ThreadActionsForm(Form):
     """
     following = BooleanField(required=False)
     voted = BooleanField(required=False)
+    pinned = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):

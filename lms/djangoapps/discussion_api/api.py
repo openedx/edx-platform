@@ -467,6 +467,7 @@ def create_comment(request, comment_data):
 
 _THREAD_EDITABLE_BY_ANY = {"following", "voted"}
 _THREAD_EDITABLE_BY_AUTHOR = {"topic_id", "type", "title", "raw_body"} | _THREAD_EDITABLE_BY_ANY
+_THREAD_EDITABLE_BY_AUTHOR = {"pinned"} | _THREAD_EDITABLE_BY_AUTHOR
 
 
 def _get_thread_editable_fields(cc_thread, context):

@@ -164,7 +164,7 @@ class ThreadSerializer(_ContentSerializer):
         choices=[(val, val) for val in ["discussion", "question"]]
     )
     title = NonEmptyCharField()
-    pinned = serializers.BooleanField(read_only=True)
+    pinned = serializers.BooleanField(required=False)
     closed = serializers.BooleanField(read_only=True)
     following = serializers.SerializerMethodField("get_following")
     comment_count = serializers.IntegerField(source="comments_count", read_only=True)
