@@ -505,6 +505,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+
         if _has_staff_access_to_descriptor(user, descriptor, course_key):
             return ACCESS_GRANTED
 
@@ -780,4 +781,5 @@ def in_preview_mode():
     Returns whether the user is in preview mode or not.
     """
     hostname = get_current_request_hostname()
-    return hostname and settings.PREVIEW_DOMAIN in hostname.split('.')
+    return hostname is not None and settings.PREVIEW_DOMAIN in hostname.split('.')
+
