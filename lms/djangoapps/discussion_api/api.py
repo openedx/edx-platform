@@ -239,7 +239,10 @@ def get_thread_list(
         topic_id_list=None,
         text_search=None,
         following=False,
-        view=None):
+        view=None,
+        order_by=None,
+        order_direction=None,
+        ):
     """
     Return the list of all discussion threads pertaining to the given course
 
@@ -253,6 +256,9 @@ def get_thread_list(
     text_search A text search query string to match
     following: If true, retrieve only threads the requester is following
     view: filters for either "unread" or "unanswered" threads
+    order_by: The key in which to sort the threads by. The only values are
+        "last_activity_at", "comment_count", and "vote_count".
+    order_direction: The direction in which to sort the threads by
 
     Note that topic_id_list, text_search, and following are mutually exclusive.
 
@@ -274,6 +280,7 @@ def get_thread_list(
 
     course = _get_course_or_404(course_key, request.user)
     context = get_context(course, request)
+
     query_params = {
         "user_id": unicode(request.user.id),
         "group_id": (

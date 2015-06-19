@@ -147,8 +147,15 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * view: "unread" for threads the requesting user has not read, or
             "unanswered" for question threads with no marked answer.
 
+        * order_by: Must be "last_activity_at", "comment_count", or
+            "vote_count". The key to sort the threads by.
+
+        * order_direction: Must be "asc" or "desc". The direction in which to
+            sort the threads by.
+
         The topic_id, text_search, and following parameters are mutually
         exclusive (i.e. only one may be specified in a request)
+
 
     **POST Parameters**:
 
@@ -244,6 +251,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["text_search"],
                 form.cleaned_data["following"],
                 form.cleaned_data["view"],
+                form.cleaned_data["order_by"],
+                form.cleaned_data["order_direction"],
             )
         )
 
