@@ -1290,7 +1290,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for key, value in fields.iteritems():
                 setattr(xmodule, key, value)
         # decache any pending field settings from init
-        xmodule.save()
         return xmodule
 
     def create_item(self, user_id, course_key, block_type, block_id=None, **kwargs):

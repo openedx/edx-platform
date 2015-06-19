@@ -1106,7 +1106,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                     scope_ids=self.scope_ids,
                     field_data=self._field_data,
                 )
-                self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
                 # xmodule_instance is set by the XModule.__init__. If we had an error after that,
                 # we need to clean it out so that we can set up the ErrorModule instead

@@ -1960,7 +1960,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if parent_xblock is not None:
             parent_xblock.children.append(new_block.scope_ids.usage_id)
             # decache pending children field settings
-            parent_xblock.save()
         return new_block
 
     def persist_xblock_dag(self, xblock, user_id, force=False):

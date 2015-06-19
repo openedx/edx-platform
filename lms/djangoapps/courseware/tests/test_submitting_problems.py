@@ -18,11 +18,12 @@ from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
 )
 from courseware import grades
-from courseware.models import StudentModule
+from courseware.models import StudentModule, StudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
+from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -147,15 +148,16 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             parent_location=section_location,
             category='problem',
             data=prob_xml,
-            metadata={'rerandomize': 'always'},
-            display_name=name
+            metadata={'rerandomize': RANDOMIZATION.ALWAYS},
+            display_name=name,
+            showanswer=SHOWANSWER.ALWAYS,
         )
 
         # re-fetch the course from the database so the object is up to date
         self.refresh_course()
         return problem
 
-    def add_graded_section_to_course(self, name, section_format='Homework', late=False, reset=False, showanswer=False):
+    def add_graded_section_to_course(self, name, section_format='Homework', late=False, reset=False, showanswer=True):
         """
         Creates a graded homework section within a chapter and returns the section.
         """
@@ -179,19 +181,19 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
-                rerandomize='always',
+                rerandomize=RANDOMIZATION.ALWAYS,
                 metadata={
                     'graded': True,
                     'format': section_format,
                 }
             )
 
-        elif showanswer:
+        elif not showanswer:
             section = ItemFactory.create(
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
-                showanswer='never',
+                showanswer=SHOWANSWER.NEVER,
                 metadata={
                     'graded': True,
                     'format': section_format,
@@ -203,6 +205,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
+                showanswer=SHOWANSWER.ALWAYS,
                 metadata={'graded': True, 'format': section_format}
             )
 
@@ -417,7 +420,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_submission_show_answer(self):
         """Test problem for ProcessingErrors due to showing answer"""
-        self.basic_setup(showanswer=True)
+        self.basic_setup(showanswer=False)
         resp = self.show_question_answer('p1')
         self.assertEqual(resp.status_code, 200)
         err_msg = (
@@ -425,6 +428,32 @@ class TestCourseGrader(TestSubmittingProblems):
             "Please refresh your page."
         )
         self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    def test_show_answer_doesnt_write_to_csm(self):
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': u'Incorrect'})
+
+        # Now fetch the state entry for that problem.
+        student_module = StudentModule.objects.get(
+            course_id=self.course.id,
+            student=self.student_user
+        )
+        # count how many state history entries there are
+        baseline = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        )
+        baseline_count = baseline.count()
+        self.assertEqual(baseline_count, 2)
+
+        # now click "show answer"
+        self.show_question_answer('p1')
+
+        # check that we don't have more state history entries
+        csmh = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        )
+        current_count = csmh.count()
+        self.assertEqual(current_count, 2)
 
     def test_none_grade(self):
         """
