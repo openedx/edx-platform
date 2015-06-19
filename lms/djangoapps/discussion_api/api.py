@@ -17,7 +17,12 @@ from opaque_keys.edx.locator import CourseKey
 from courseware.courses import get_course_with_access
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
-from discussion_api.permissions import can_delete, get_editable_fields
+from discussion_api.permissions import (
+    can_delete,
+    get_editable_fields,
+    get_initializable_comment_fields,
+    get_initializable_thread_fields,
+)
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
     THREAD_CREATED_EVENT_NAME,
@@ -295,7 +300,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     """
     Return the list of comments in the given thread.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
@@ -361,19 +366,76 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     return get_paginated_data(request, results, page, num_pages)
 
 
+def _check_fields(allowed_fields, data, message):
+    """
+    Checks that the keys given in data is in allowed_fields
+
+    Arguments:
+        allowed_fields (set): A set of allowed fields
+        data (dict): The data to compare the allowed_fields against
+        message (str): The message to return if there are any invalid fields
+
+    Raises:
+        ValidationError if the given data contains a key that is not in
+            allowed_fields
+    """
+    non_allowed_fields = {field: [message] for field in data.keys() if field not in allowed_fields}
+    if non_allowed_fields:
+        raise ValidationError(non_allowed_fields)
+
+
+def _check_initializable_thread_fields(data, context):  # pylint: disable=invalid-name
+    """
+    Checks if the given data contains a thread field that is not initializable
+    by the requesting user
+
+    Arguments:
+        data (dict): The data to compare the allowed_fields against
+        context (dict): The context appropriate for use with the thread which
+            includes the requesting user
+
+    Raises:
+        ValidationError if the given data contains a thread field that is not
+            initializable by the requesting user
+    """
+    _check_fields(
+        get_initializable_thread_fields(context),
+        data,
+        "This field is not initializable."
+    )
+
+
+def _check_initializable_comment_fields(data, context):  # pylint: disable=invalid-name
+    """
+    Checks if the given data contains a comment field that is not initializable
+    by the requesting user
+
+    Arguments:
+        data (dict): The data to compare the allowed_fields against
+        context (dict): The context appropriate for use with the comment which
+            includes the requesting user
+
+    Raises:
+        ValidationError if the given data contains a comment field that is not
+            initializable by the requesting user
+    """
+    _check_fields(
+        get_initializable_comment_fields(context),
+        data,
+        "This field is not initializable."
+    )
+
+
 def _check_editable_fields(cc_content, data, context):
     """
     Raise ValidationError if the given update data contains a field that is not
-    in editable_fields.
+    editable by the requesting user
     """
-    editable_fields = get_editable_fields(cc_content, context)
-    non_editable_errors = {
-        field: ["This field is not editable."]
-        for field in data.keys()
-        if field not in editable_fields
-    }
-    if non_editable_errors:
-        raise ValidationError(non_editable_errors)
+    _check_fields(
+        get_editable_fields(cc_content, context),
+        data,
+        "This field is not editable."
+    )
 
 
 def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context):
@@ -406,7 +468,7 @@ def create_thread(request, thread_data):
     """
     Create a thread.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
@@ -428,6 +490,13 @@ def create_thread(request, thread_data):
         raise ValidationError({"course_id": ["Invalid value."]})
 
     context = get_context(course, request)
+    _check_initializable_thread_fields(thread_data, context)
+    if (
+            "group_id" not in thread_data and
+            is_commentable_cohorted(course_key, thread_data.get("topic_id"))
+    ):
+        thread_data = thread_data.copy()
+        thread_data["group_id"] = get_cohort_id(request.user, course_key)
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
@@ -453,7 +522,7 @@ def create_comment(request, comment_data):
     """
     Create a comment.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
@@ -473,6 +542,7 @@ def create_comment(request, comment_data):
     except Http404:
         raise ValidationError({"thread_id": ["Invalid value."]})
 
+    _check_initializable_comment_fields(comment_data, context)
     serializer = CommentSerializer(data=comment_data, context=context)
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
@@ -498,7 +568,7 @@ def update_thread(request, thread_id, update_data):
     """
     Update a thread.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
@@ -530,7 +600,7 @@ def update_comment(request, comment_id, update_data):
     """
     Update a comment.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
@@ -573,7 +643,7 @@ def delete_thread(request, thread_id):
     """
     Delete a thread.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
@@ -596,7 +666,7 @@ def delete_comment(request, comment_id):
     """
     Delete a comment.
 
-    Parameters:
+    Arguments:
 
         request: The django request object used for build_absolute_uri and
           determining the requesting user.
