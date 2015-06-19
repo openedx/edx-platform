@@ -18,6 +18,7 @@ class WikiTab(EnrolledTab):
     title = _('Wiki')
     view_name = "course_wiki"
     is_hideable = True
+    is_default = False
 
     @classmethod
     def is_enabled(cls, course, user=None):
