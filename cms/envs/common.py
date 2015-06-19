@@ -42,6 +42,9 @@ from lms.envs.common import (
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
 
+    # Default Course Image static path
+    DEFAULT_COURSE_ABOUT_IMAGE_URL,
+
     # Django REST framework configuration
     REST_FRAMEWORK,
 )
