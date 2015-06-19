@@ -850,7 +850,8 @@ class Invoice(TimeStampedModel):
         """
         result = cls.objects.filter(course_id=course_key, is_valid=True).aggregate(total=Sum('total_amount'))  # pylint: disable=no-member
 
-        return result.get('total', 0)
+        total = result.get('total', 0)
+        return total if total else 0
 
     def generate_pdf_invoice(self, course, course_price, quantity, sale_price):
         """
@@ -1022,7 +1023,8 @@ class InvoiceTransaction(TimeStampedModel):
             total=Sum('amount')
         )  # pylint: disable=no-member
 
-        return result.get('total', 0)
+        total = result.get('total', 0)
+        return total if total else 0
 
     def snapshot(self):
         """Create a snapshot of the invoice transaction.
