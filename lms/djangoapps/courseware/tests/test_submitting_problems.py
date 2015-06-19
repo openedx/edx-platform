@@ -456,7 +456,6 @@ class TestCourseGrader(TestSubmittingProblems):
         current_count = csmh.count()
         self.assertEqual(current_count, 3)
 
-
     def test_none_grade(self):
         """
         Check grade is 0 to begin with.
