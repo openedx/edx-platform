@@ -1,17 +1,8 @@
-;(function (define) {
-
-define(['backbone'], function(Backbone) {
-    'use strict';
-
-    return function (ProctoredExamModel, ProctoredExamView) {
-        var proctored_exam_view = new ProctoredExamView({
-            el: $(".proctored_exam_status"),
-            proctored_template: '#proctored-exam-status-tpl',
-            model: new ProctoredExamModel()
-        });
-        proctored_exam_view.render();
-    };
-
+$(function() {
+    var proctored_exam_view = new edx.coursware.proctored_exam.ProctoredExamView({
+        el: $(".proctored_exam_status"),
+        proctored_template: '#proctored-exam-status-tpl',
+        model: new ProctoredExamModel()
+    });
+    proctored_exam_view.render();
 });
-
-})(define || RequireJS.define);
