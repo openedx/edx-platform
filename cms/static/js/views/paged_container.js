@@ -27,7 +27,23 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     // of paginator, on the current page.
                     size: function() { return self.collection._size; },
                     // Toggles the functionality for showing and hiding child previews.
-                    showChildrenPreviews: true
+                    showChildrenPreviews: true,
+
+                    sortDisplayName: function() {
+                        return gettext("Date added");  // TODO add support for sorting
+                    },
+
+                    setPage: function (page) {
+                        self.setPage(page);
+                    },
+
+                    nextPage: function () {
+                        self.nextPage();
+                    },
+
+                    previousPage: function() {
+                        self.previousPage();
+                    }
                 };
             },
 
@@ -115,11 +131,11 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     this.pagingFooter.undelegateEvents();
 
                 this.pagingHeader = new PagingHeader({
-                    view: this,
+                    collection: this.collection,
                     el: this.$el.find('.container-paging-header')
                 });
                 this.pagingFooter = new PagingFooter({
-                    view: this,
+                    collection: this.collection,
                     el: this.$el.find('.container-paging-footer')
                 });
 
@@ -189,10 +205,6 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     this.pagingHeader.render();
                     this.pagingFooter.render();
                 }
-            },
-
-            sortDisplayName: function() {
-                return gettext("Date added");  // TODO add support for sorting
             },
 
             togglePreviews: function(){
