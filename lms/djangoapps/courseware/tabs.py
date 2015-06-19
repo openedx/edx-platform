@@ -32,6 +32,7 @@ class CoursewareTab(EnrolledTab):
     priority = 10
     view_name = 'courseware'
     is_movable = False
+    is_default = False
 
 
 class CourseInfoTab(CourseTab):
@@ -44,6 +45,7 @@ class CourseInfoTab(CourseTab):
     view_name = 'info'
     tab_id = 'info'
     is_movable = False
+    is_default = False
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -59,6 +61,7 @@ class SyllabusTab(EnrolledTab):
     priority = 30
     view_name = 'syllabus'
     allow_multiple = True
+    is_default = False
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
@@ -76,6 +79,7 @@ class ProgressTab(EnrolledTab):
     priority = 40
     view_name = 'progress'
     is_hideable = True
+    is_default = False
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
@@ -91,6 +95,7 @@ class TextbookTabsBase(CourseTab):
     # Translators: 'Textbooks' refers to the tab in the course that leads to the course' textbooks
     title = _("Textbooks")
     is_collection = True
+    is_default = False
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
@@ -222,6 +227,7 @@ class ExternalDiscussionCourseTab(LinkTab):
     # Translators: 'Discussion' refers to the tab in the courseware that leads to the discussion forums
     title = _('Discussion')
     priority = None
+    is_default = False
 
     @classmethod
     def validate(cls, tab_dict, raise_error=True):
