@@ -239,7 +239,10 @@ def get_thread_list(
         topic_id_list=None,
         text_search=None,
         following=False,
-        view=None):
+        view=None,
+        order_by="last_activity_at",
+        order_direction="desc",
+):
     """
     Return the list of all discussion threads pertaining to the given course
 
@@ -253,6 +256,11 @@ def get_thread_list(
     text_search A text search query string to match
     following: If true, retrieve only threads the requester is following
     view: filters for either "unread" or "unanswered" threads
+    order_by: The key in which to sort the threads by. The only values are
+        "last_activity_at", "comment_count", and "vote_count". The default is
+        "last_activity_at".
+    order_direction: The direction in which to sort the threads by. The only
+        values are "asc" or "desc". The default is "desc".
 
     Note that topic_id_list, text_search, and following are mutually exclusive.
 
@@ -263,7 +271,7 @@ def get_thread_list(
 
     Raises:
 
-    ValidationError: if an invalid value is passed for a field
+    ValidationError: if an invalid value is passed for a field.
     ValueError: if more than one of the mutually exclusive parameters is
       provided
     Http404: if the requesting user does not have access to the requested course
@@ -273,19 +281,31 @@ def get_thread_list(
     if exclusive_param_count > 1:  # pragma: no cover
         raise ValueError("More than one mutually exclusive param passed to get_thread_list")
 
+    cc_map = {"last_activity_at": "date", "comment_count": "comments", "vote_count": "votes"}
+    if order_by not in cc_map:
+        raise ValidationError({
+            "order_by":
+                ["Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
+        })
+    if order_direction not in ["asc", "desc"]:
+        raise ValidationError({
+            "order_direction": ["Invalid value. '{}' must be 'asc' or 'desc'".format(order_direction)]
+        })
+
     course = _get_course_or_404(course_key, request.user)
     context = get_context(course, request)
+
     query_params = {
         "user_id": unicode(request.user.id),
         "group_id": (
             None if context["is_requester_privileged"] else
             get_cohort_id(request.user, course.id)
         ),
-        "sort_key": "date",
-        "sort_order": "desc",
         "page": page,
         "per_page": page_size,
         "text": text_search,
+        "sort_key": cc_map.get(order_by),
+        "sort_order": order_direction,
     }
 
     text_search_rewrite = None
