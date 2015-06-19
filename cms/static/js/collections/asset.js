@@ -2,6 +2,8 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
     var AssetCollection = BackbonePaginator.requestPager.extend({
         sortableColumns: {},
         filterableColumns: {},
+        sortColumn: '',
+        filterColumn: '',
         assetType: '',
         model : AssetModel,
         paginator_core: {
@@ -61,6 +63,45 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
             if (this.currentPage > 0) {
                 this.setPage(this.currentPage - 1);
             }
+        },
+
+        registerSortableColumn: function(columnName, displayName, fieldName, defaultSortDirection) {
+            this.sortableColumns[columnName] = {
+                displayName: displayName,
+                fieldName: fieldName,
+                defaultSortDirection: defaultSortDirection
+            }
+        },
+
+        sortableColumnInfo: function (sortColumn) {
+            var sortInfo = this.sortableColumns[sortColumn];
+            if (!sortInfo) {
+                throw "Unregistered filter column '" + filterInfo + "'";
+            }
+            return sortInfo;
+        },
+
+        sortDisplayName: function () {
+            return this.sortableColumnInfo(this.sortColumn).displayName;
+        },
+
+        registerFilterableColumn: function (columnName, displayName, fieldName) {
+            this.filterableColumns[columnName] = {
+                displayName: displayName,
+                fieldName: fieldName
+            };
+        },
+
+        filterableColumnInfo: function(filterColumn) {
+            var filterInfo = this.filterableColumns[filterColumn];
+            if (!filterInfo) {
+                throw "Unregistered filter column'" + filterInfo + "'";
+            }
+            return filterInfo;
+        },
+
+        filterDisplayName: function () {
+            return this.filterableColumnInfo(this.filterColumn).displayName;
         }
     });
     return AssetCollection;
