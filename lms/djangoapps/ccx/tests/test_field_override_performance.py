@@ -143,7 +143,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
 
             with self.assertNumQueries(queries):
                 with check_mongo_calls(reads):
-                    with check_sum_of_calls(XBlock, ['__init__'], xblocks, xblocks):
+                    with check_sum_of_calls(XBlock, ['__init__'], xblocks, xblocks, include_arguments=False):
                         self.grade_course(self.course)
 
     @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(1, 4), (True, False)))
