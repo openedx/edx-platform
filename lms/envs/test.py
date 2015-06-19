@@ -242,10 +242,12 @@ THIRD_PARTY_AUTH = {
         "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
     },
     "Facebook": {
-        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
-        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+        "SOCIAL_AUTH_FACEBOOK_KEY": "test",
+        "SOCIAL_AUTH_FACEBOOK_SECRET": "test",
     },
 }
+
+FEATURES['ENABLE_DUMMY_THIRD_PARTY_AUTH_PROVIDER'] = True
 
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True

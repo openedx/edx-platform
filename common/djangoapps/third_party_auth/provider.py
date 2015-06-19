@@ -36,7 +36,7 @@ class BaseProvider(object):
         return '%s.%s' % (cls.BACKEND_CLASS.__module__, cls.BACKEND_CLASS.__name__)
 
     @classmethod
-    def get_email(cls, unused_provider_details):
+    def get_email(cls, provider_details):
         """Gets user's email address.
 
         Provider responses can contain arbitrary data. This method can be
@@ -44,16 +44,16 @@ class BaseProvider(object):
         extracted by the social_details pipeline step.
 
         Args:
-            unused_provider_details: dict of string -> string. Data about the
+            provider_details: dict of string -> string. Data about the
                 user passed back by the provider.
 
         Returns:
             String or None. The user's email address, if any.
         """
-        return None
+        return provider_details.get('email')
 
     @classmethod
-    def get_name(cls, unused_provider_details):
+    def get_name(cls, provider_details):
         """Gets user's name.
 
         Provider responses can contain arbitrary data. This method can be
@@ -61,13 +61,13 @@ class BaseProvider(object):
         extracted by the social_details pipeline step.
 
         Args:
-            unused_provider_details: dict of string -> string. Data about the
+            provider_details: dict of string -> string. Data about the
                 user passed back by the provider.
 
         Returns:
             String or None. The user's full name, if any.
         """
-        return None
+        return provider_details.get('fullname')
 
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):
@@ -121,14 +121,6 @@ class GoogleOauth2(BaseProvider):
         'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET': None,
     }
 
-    @classmethod
-    def get_email(cls, provider_details):
-        return provider_details.get('email')
-
-    @classmethod
-    def get_name(cls, provider_details):
-        return provider_details.get('fullname')
-
 
 class LinkedInOauth2(BaseProvider):
     """Provider for LinkedIn's Oauth2 auth system."""
@@ -141,14 +133,6 @@ class LinkedInOauth2(BaseProvider):
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET': None,
     }
 
-    @classmethod
-    def get_email(cls, provider_details):
-        return provider_details.get('email')
-
-    @classmethod
-    def get_name(cls, provider_details):
-        return provider_details.get('fullname')
-
 
 class FacebookOauth2(BaseProvider):
     """Provider for LinkedIn's Oauth2 auth system."""
@@ -160,14 +144,6 @@ class FacebookOauth2(BaseProvider):
         'SOCIAL_AUTH_FACEBOOK_KEY': None,
         'SOCIAL_AUTH_FACEBOOK_SECRET': None,
     }
-
-    @classmethod
-    def get_email(cls, provider_details):
-        return provider_details.get('email')
-
-    @classmethod
-    def get_name(cls, provider_details):
-        return provider_details.get('fullname')
 
 
 class Registry(object):

@@ -80,7 +80,7 @@ class FieldsMixin(object):
         query = self.q(css='.u-field-{} .u-field-message'.format(field_id))
         return query.text[0] if query.present else None
 
-    def wait_for_messsage(self, field_id, message):
+    def wait_for_message(self, field_id, message):
         """
         Wait for a message to appear in a field.
         """

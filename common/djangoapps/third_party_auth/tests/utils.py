@@ -66,7 +66,7 @@ class ThirdPartyOAuthTestMixin(object):
 class ThirdPartyOAuthTestMixinFacebook(object):
     """Tests oauth with the Facebook backend"""
     BACKEND = "facebook"
-    USER_URL = "https://graph.facebook.com/me"
+    USER_URL = "https://graph.facebook.com/v2.3/me"
     # In facebook responses, the "id" field is used as the user's identifier
     UID_FIELD = "id"
 
@@ -74,6 +74,6 @@ class ThirdPartyOAuthTestMixinFacebook(object):
 class ThirdPartyOAuthTestMixinGoogle(object):
     """Tests oauth with the Google backend"""
     BACKEND = "google-oauth2"
-    USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
+    USER_URL = "https://www.googleapis.com/plus/v1/people/me"
     # In google-oauth2 responses, the "email" field is used as the user's identifier
     UID_FIELD = "email"

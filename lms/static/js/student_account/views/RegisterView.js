@@ -23,6 +23,7 @@ var edx = edx || {};
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+            this.errorMessage = data.thirdPartyAuth.errorMessage || '';
             this.platformName = data.platformName;
 
             this.listenTo( this.model, 'sync', this.saveSuccess );
@@ -38,6 +39,7 @@ var edx = edx || {};
                 context: {
                     fields: fields,
                     currentProvider: this.currentProvider,
+                    errorMessage: this.errorMessage,
                     providers: this.providers,
                     platformName: this.platformName
                 }

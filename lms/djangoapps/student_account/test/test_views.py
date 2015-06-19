@@ -245,36 +245,39 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
     )
     @ddt.unpack
     def test_login_and_registration_form_signin_preserves_params(self, is_edx_domain, url_name):
-        params = {
-            'enrollment_action': 'enroll',
-            'course_id': 'edX/DemoX/Demo_Course'
-        }
+        params = [
+            ('course_id', 'edX/DemoX/Demo_Course'),
+            ('enrollment_action', 'enroll'),
+        ]
 
         # The response should have a "Sign In" button with the URL
         # that preserves the querystring params
         with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
             response = self.client.get(reverse(url_name), params)
-        self.assertContains(response, "login?course_id=edX%2FDemoX%2FDemo_Course&enrollment_action=enroll")
+        expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
+        self.assertContains(response, expected_url)
 
-        # Add an additional "course mode" parameter
-        params['course_mode'] = 'honor'
+        # Add additional parameters:
+        params = [
+            ('course_id', 'edX/DemoX/Demo_Course'),
+            ('enrollment_action', 'enroll'),
+            ('course_mode', 'honor'),
+            ('email_opt_in', 'true'),
+            ('next', '/custom/final/destination')
+        ]
 
         # Verify that this parameter is also preserved
         with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
             response = self.client.get(reverse(url_name), params)
 
-        expected_url = (
-            "login?course_id=edX%2FDemoX%2FDemo_Course"
-            "&enrollment_action=enroll"
-            "&course_mode=honor"
-        )
+        expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
         self.assertContains(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data("account_login", "account_register")
     def test_third_party_auth_disabled(self, url_name):
         response = self.client.get(reverse(url_name))
-        self._assert_third_party_auth_data(response, None, [])
+        self._assert_third_party_auth_data(response, None, None, [])
 
     @ddt.data(
         ("account_login", None, None),
@@ -286,175 +289,40 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
     )
     @ddt.unpack
     def test_third_party_auth(self, url_name, current_backend, current_provider):
+        params = [
+            ('course_id', 'edX/DemoX/Demo_Course'),
+            ('enrollment_action', 'enroll'),
+            ('course_mode', 'honor'),
+            ('email_opt_in', 'true'),
+            ('next', '/custom/final/destination'),
+        ]
+
         # Simulate a running pipeline
         if current_backend is not None:
             pipeline_target = "student_account.views.third_party_auth.pipeline"
             with simulate_running_pipeline(pipeline_target, current_backend):
-                response = self.client.get(reverse(url_name))
+                response = self.client.get(reverse(url_name), params)
 
         # Do NOT simulate a running pipeline
         else:
-            response = self.client.get(reverse(url_name))
+            response = self.client.get(reverse(url_name), params)
 
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
-                "loginUrl": self._third_party_login_url("facebook", "login"),
-                "registerUrl": self._third_party_login_url("facebook", "register")
+                "loginUrl": self._third_party_login_url("facebook", "login", params),
+                "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
             {
                 "name": "Google",
                 "iconClass": "fa-google-plus",
-                "loginUrl": self._third_party_login_url("google-oauth2", "login"),
-                "registerUrl": self._third_party_login_url("google-oauth2", "register")
+                "loginUrl": self._third_party_login_url("google-oauth2", "login", params),
+                "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
             }
         ]
-        self._assert_third_party_auth_data(response, current_provider, expected_providers)
-
-    @ddt.data([], ["honor"], ["honor", "verified", "audit"], ["professional"], ["no-id-professional"])
-    def test_third_party_auth_course_id_verified(self, modes):
-        # Create a course with the specified course modes
-        course = CourseFactory.create()
-        for slug in modes:
-            CourseModeFactory.create(
-                course_id=course.id,
-                mode_slug=slug,
-                mode_display_name=slug
-            )
-
-        # Verify that the entry URL for third party auth
-        # contains the course ID and redirects to the track selection page.
-        course_modes_choose_url = reverse(
-            "course_modes_choose",
-            kwargs={"course_id": unicode(course.id)}
-        )
-        expected_providers = [
-            {
-                "name": "Facebook",
-                "iconClass": "fa-facebook",
-                "loginUrl": self._third_party_login_url(
-                    "facebook", "login",
-                    course_id=unicode(course.id),
-                    redirect_url=course_modes_choose_url
-                ),
-                "registerUrl": self._third_party_login_url(
-                    "facebook", "register",
-                    course_id=unicode(course.id),
-                    redirect_url=course_modes_choose_url
-                )
-            },
-            {
-                "name": "Google",
-                "iconClass": "fa-google-plus",
-                "loginUrl": self._third_party_login_url(
-                    "google-oauth2", "login",
-                    course_id=unicode(course.id),
-                    redirect_url=course_modes_choose_url
-                ),
-                "registerUrl": self._third_party_login_url(
-                    "google-oauth2", "register",
-                    course_id=unicode(course.id),
-                    redirect_url=course_modes_choose_url
-                )
-            }
-        ]
-
-        # Verify that the login page contains the correct provider URLs
-        response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
-        self._assert_third_party_auth_data(response, None, expected_providers)
-
-    def test_third_party_auth_course_id_shopping_cart(self):
-        # Create a course with a white-label course mode
-        course = CourseFactory.create()
-        CourseModeFactory.create(
-            course_id=course.id,
-            mode_slug="honor",
-            mode_display_name="Honor",
-            min_price=100
-        )
-
-        # Verify that the entry URL for third party auth
-        # contains the course ID and redirects to the shopping cart
-        shoppingcart_url = reverse("shoppingcart.views.show_cart")
-        expected_providers = [
-            {
-                "name": "Facebook",
-                "iconClass": "fa-facebook",
-                "loginUrl": self._third_party_login_url(
-                    "facebook", "login",
-                    course_id=unicode(course.id),
-                    redirect_url=shoppingcart_url
-                ),
-                "registerUrl": self._third_party_login_url(
-                    "facebook", "register",
-                    course_id=unicode(course.id),
-                    redirect_url=shoppingcart_url
-                )
-            },
-            {
-                "name": "Google",
-                "iconClass": "fa-google-plus",
-                "loginUrl": self._third_party_login_url(
-                    "google-oauth2", "login",
-                    course_id=unicode(course.id),
-                    redirect_url=shoppingcart_url
-                ),
-                "registerUrl": self._third_party_login_url(
-                    "google-oauth2", "register",
-                    course_id=unicode(course.id),
-                    redirect_url=shoppingcart_url
-                )
-            }
-        ]
-
-        # Verify that the login page contains the correct provider URLs
-        response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
-        self._assert_third_party_auth_data(response, None, expected_providers)
-
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
-    def test_third_party_auth_enrollment_embargo(self):
-        course = CourseFactory.create()
-
-        # Start the pipeline attempting to enroll in a restricted course
-        with restrict_course(course.id) as redirect_url:
-            response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
-
-            # Expect that the course ID has been removed from the
-            # login URLs (so the user won't be enrolled) and
-            # the ?next param sends users to the blocked message.
-            expected_providers = [
-                {
-                    "name": "Facebook",
-                    "iconClass": "fa-facebook",
-                    "loginUrl": self._third_party_login_url(
-                        "facebook", "login",
-                        course_id=unicode(course.id),
-                        redirect_url=redirect_url
-                    ),
-                    "registerUrl": self._third_party_login_url(
-                        "facebook", "register",
-                        course_id=unicode(course.id),
-                        redirect_url=redirect_url
-                    )
-                },
-                {
-                    "name": "Google",
-                    "iconClass": "fa-google-plus",
-                    "loginUrl": self._third_party_login_url(
-                        "google-oauth2", "login",
-                        course_id=unicode(course.id),
-                        redirect_url=redirect_url
-                    ),
-                    "registerUrl": self._third_party_login_url(
-                        "google-oauth2", "register",
-                        course_id=unicode(course.id),
-                        redirect_url=redirect_url
-                    )
-                }
-            ]
-            self._assert_third_party_auth_data(response, None, expected_providers)
+        self._assert_third_party_auth_data(response, current_backend, current_provider, expected_providers)
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
@@ -477,32 +345,41 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         self.assertContains(resp, "Register for Test Microsite")
         self.assertContains(resp, "register-form")
 
-    def _assert_third_party_auth_data(self, response, current_provider, providers):
+    def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
         auth_info = markupsafe.escape(
             json.dumps({
                 "currentProvider": current_provider,
-                "providers": providers
+                "providers": providers,
+                "finishAuthUrl": "/auth/complete/{}?".format(current_backend) if current_backend else None,
+                "errorMessage": None,
             })
         )
 
         expected_data = u"data-third-party-auth='{auth_info}'".format(
             auth_info=auth_info
         )
+
         self.assertContains(response, expected_data)
 
-    def _third_party_login_url(self, backend_name, auth_entry, course_id=None, redirect_url=None):
+    def _third_party_login_url(self, backend_name, auth_entry, login_params):
         """Construct the login URL to start third party authentication. """
-        params = [("auth_entry", auth_entry)]
-        if redirect_url:
-            params.append(("next", redirect_url))
-        if course_id:
-            params.append(("enroll_course_id", course_id))
-
-        return u"{url}?{params}".format(
+        return u"{url}?auth_entry={auth_entry}&{param_str}".format(
             url=reverse("social:begin", kwargs={"backend": backend_name}),
-            params=urlencode(params)
+            auth_entry=auth_entry,
+            param_str=self._finish_auth_url_param(login_params),
         )
+
+    def _finish_auth_url_param(self, params):
+        """
+        Make the next=... URL parameter that indicates where the user should go next.
+
+        >>> _finish_auth_url_param([('next', '/dashboard')])
+        '/account/finish_auth?next=%2Fdashboard'
+        """
+        return urlencode({
+            'next': '/account/finish_auth?{}'.format(urlencode(params))
+        })
 
 
 class AccountSettingsViewTest(TestCase):

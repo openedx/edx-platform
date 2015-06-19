@@ -106,8 +106,8 @@ from util.password_policy_validators import (
 import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
-    auth_pipeline_urls, set_logged_in_cookie,
-    check_verify_status_by_course
+    set_logged_in_cookie, check_verify_status_by_course,
+    auth_pipeline_urls, get_next_url_for_login_page
 )
 from student.models import anonymous_id_for_user
 from xmodule.error_module import ErrorDescriptor
@@ -356,24 +356,30 @@ def signin_user(request):
     external_auth_response = external_auth_login(request)
     if external_auth_response is not None:
         return external_auth_response
+    # Determine the URL to redirect to following login:
+    redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
+        return redirect(redirect_to)
 
-    course_id = request.GET.get('course_id')
-    email_opt_in = request.GET.get('email_opt_in')
+    third_party_auth_error = None
+    for msg in messages.get_messages(request):
+        if msg.extra_tags.split()[0] == "social-auth":
+            # msg may or may not be translated. Try translating [again] in case we are able to:
+            third_party_auth_error = _(msg)  # pylint: disable=translation-of-non-string
+            break
+
     context = {
-        'course_id': course_id,
-        'email_opt_in': email_opt_in,
-        'enrollment_action': request.GET.get('enrollment_action'),
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
         # Bool injected into JS to submit form if we're inside a running third-
         # party auth pipeline; distinct from the actual instance of the running
         # pipeline, if any.
         'pipeline_running': 'true' if pipeline.running(request) else 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, course_id=course_id, email_opt_in=email_opt_in),
+        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
+        'third_party_auth_error': third_party_auth_error
     }
 
     return render_to_response('login.html', context)
@@ -382,24 +388,21 @@ def signin_user(request):
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
+    # Determine the URL to redirect to following login:
+    redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
+        return redirect(redirect_to)
 
     external_auth_response = external_auth_register(request)
     if external_auth_response is not None:
         return external_auth_response
 
-    course_id = request.GET.get('course_id')
-    email_opt_in = request.GET.get('email_opt_in')
-
     context = {
-        'course_id': course_id,
-        'email_opt_in': email_opt_in,
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
         'email': '',
-        'enrollment_action': request.GET.get('enrollment_action'),
         'name': '',
         'running_pipeline': None,
-        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, course_id=course_id, email_opt_in=email_opt_in),
+        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, redirect_url=redirect_to),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -729,33 +732,6 @@ def _allow_donation(course_modes, course_id, enrollment):
     return donations_enabled and enrollment.mode in course_modes[course_id] and course_modes[course_id][enrollment.mode].min_price == 0
 
 
-def try_change_enrollment(request):
-    """
-    This method calls change_enrollment if the necessary POST
-    parameters are present, but does not return anything in most cases. It
-    simply logs the result or exception. This is usually
-    called after a registration or login, as secondary action.
-    It should not interrupt a successful registration or login.
-    """
-    if 'enrollment_action' in request.POST:
-        try:
-            enrollment_response = change_enrollment(request)
-            # There isn't really a way to display the results to the user, so we just log it
-            # We expect the enrollment to be a success, and will show up on the dashboard anyway
-            log.info(
-                u"Attempted to automatically enroll after login. Response code: %s; response body: %s",
-                enrollment_response.status_code,
-                enrollment_response.content
-            )
-            # Hack: since change_enrollment delivers its redirect_url in the content
-            # of its response, we check here that only the 200 codes with content
-            # will return redirect_urls.
-            if enrollment_response.status_code == 200 and enrollment_response.content != '':
-                return enrollment_response.content
-        except Exception as exc:  # pylint: disable=broad-except
-            log.exception(u"Exception automatically enrolling after login: %s", exc)
-
-
 def _update_email_opt_in(request, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
 
@@ -780,9 +756,8 @@ def change_enrollment(request, check_access=True):
     course, a 400 error will be returned. If the user is not logged in, 403
     will be returned; it is important that only this case return 403 so the
     front end can redirect the user to a registration or login page when this
-    happens. This function should only be called from an AJAX request or
-    as a post-login/registration helper, so the error messages in the responses
-    should never actually be user-visible.
+    happens. This function should only be called from an AJAX request, so
+    the error messages in the responses should never actually be user-visible.
 
     Args:
         request (`Request`): The Django request object
@@ -874,20 +849,6 @@ def change_enrollment(request, check_access=True):
 
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
-
-    elif action == "add_to_cart":
-        # Pass the request handling to shoppingcart.views
-        # The view in shoppingcart.views performs error handling and logs different errors.  But this elif clause
-        # is only used in the "auto-add after user reg/login" case, i.e. it's always wrapped in try_change_enrollment.
-        # This means there's no good way to display error messages to the user.  So we log the errors and send
-        # the user to the shopping cart page always, where they can reasonably discern the status of their cart,
-        # whether things got added, etc
-
-        shoppingcart.views.add_course_to_cart(request, course_id.to_deprecated_string())
-        return HttpResponse(
-            reverse("shoppingcart.views.show_cart")
-        )
-
     elif action == "unenroll":
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
@@ -905,8 +866,9 @@ def accounts_login(request):
     if external_auth_response is not None:
         return external_auth_response
 
-    redirect_to = request.GET.get('next')
+    redirect_to = get_next_url_for_login_page(request)
     context = {
+        'login_redirect_url': redirect_to,
         'pipeline_running': 'false',
         'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
         'platform_name': settings.PLATFORM_NAME,
@@ -1091,8 +1053,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             log.exception(exc)
             raise
 
-        redirect_url = try_change_enrollment(request)
-
+        redirect_url = None  # The AJAX method calling should know the default destination upon success
         if third_party_auth_successful:
             redirect_url = pipeline.get_complete_url(backend_name)
 
@@ -1129,7 +1090,7 @@ def login_oauth_token(request, backend):
     """
     warnings.warn("Please use AccessTokenExchangeView instead.", DeprecationWarning)
 
-    backend = request.social_strategy.backend
+    backend = request.backend
     if isinstance(backend, social_oauth.BaseOAuth1) or isinstance(backend, social_oauth.BaseOAuth2):
         if "access_token" in request.POST:
             # Tell third party auth pipeline that this is an API call
@@ -1137,7 +1098,7 @@ def login_oauth_token(request, backend):
             user = None
             try:
                 user = backend.do_auth(request.POST["access_token"])
-            except HTTPError:
+            except (HTTPError, AuthException):
                 pass
             # do_auth can return a non-User object if it fails
             if user and isinstance(user, User):
@@ -1445,9 +1406,13 @@ def create_account_with_params(request, params):
         # first, create the account
         (user, profile, registration) = _do_create_account(form)
 
-        # next, link the account with social auth, if provided
+        # next, link the account with social auth, if provided via the API.
+        # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
         if should_link_with_social_auth:
-            request.social_strategy = social_utils.load_strategy(backend=params['provider'], request=request)
+            backend_name = params['provider']
+            request.social_strategy = social_utils.load_strategy(request)
+            redirect_uri = reverse('social:complete', args=(backend_name, ))
+            request.backend = social_utils.load_backend(request.social_strategy, backend_name, redirect_uri)
             social_access_token = params.get('access_token')
             if not social_access_token:
                 raise ValidationError({
@@ -1461,7 +1426,7 @@ def create_account_with_params(request, params):
             pipeline_user = None
             error_message = ""
             try:
-                pipeline_user = request.social_strategy.backend.do_auth(social_access_token, user=user)
+                pipeline_user = request.backend.do_auth(social_access_token, user=user)
             except AuthAlreadyAssociated:
                 error_message = _("The provided access_token is already associated with another user.")
             except (HTTPError, AuthException):
@@ -1635,7 +1600,7 @@ def create_account(request, post_override=None):
             status=400
         )
 
-    redirect_url = try_change_enrollment(request)
+    redirect_url = None  # The AJAX method calling should know the default destination upon success
 
     # Resume the third-party-auth pipeline if necessary.
     if third_party_auth.is_enabled() and pipeline.running(request):

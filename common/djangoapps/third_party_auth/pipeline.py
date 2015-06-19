@@ -69,22 +69,13 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 from social.pipeline.social_auth import associate_by_email
 
 import student
-from embargo import api as embargo_api
-from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=import-error
-from shoppingcart.exceptions import (  # pylint: disable=import-error
-    CourseDoesNotExistException,
-    ItemAlreadyInCartException,
-    AlreadyEnrolledInCourseException
-)
-from student.models import CourseEnrollment, CourseEnrollmentException
-from course_modes.models import CourseMode
-from opaque_keys.edx.keys import CourseKey
 
 from logging import getLogger
 
@@ -103,14 +94,8 @@ from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 # `AUTH_REDIRECT_KEY` provides an optional URL to redirect
 # to upon successful authentication
 # (if not provided, defaults to `_SOCIAL_AUTH_LOGIN_REDIRECT_URL`)
-#
-# `AUTH_ENROLL_COURSE_ID_KEY` provides the course ID that a student
-# is trying to enroll in, used to generate analytics events
-# and auto-enroll students.
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_REDIRECT_KEY = 'next'
-AUTH_ENROLL_COURSE_ID_KEY = 'enroll_course_id'
-AUTH_EMAIL_OPT_IN_KEY = 'email_opt_in'
 
 
 # The following are various possible values for the AUTH_ENTRY_KEY.
@@ -192,6 +177,19 @@ class AuthEntryError(AuthException):
     """
 
 
+class NotActivatedException(AuthException):
+    """ Raised when a user tries to login to an unverified account """
+    def __init__(self, backend, email):
+        self.email = email
+        super(NotActivatedException, self).__init__(backend, email)
+
+    def __str__(self):
+        return (
+            _('This account has not yet been activated. An activation email has been re-sent to {email_address}.')
+            .format(email_address=self.email)
+        )
+
+
 class ProviderUserState(object):
     """Object representing the provider state (attached or not) for a user.
 
@@ -260,7 +258,7 @@ def _get_enabled_provider_by_name(provider_name):
     return enabled_provider
 
 
-def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll_course_id=None, email_opt_in=None):
+def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None):
     """Creates a URL to hook into social auth endpoints."""
     kwargs = {'backend': backend_name}
     url = reverse(view_name, kwargs=kwargs)
@@ -271,12 +269,6 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll
 
     if redirect_url:
         query_params[AUTH_REDIRECT_KEY] = redirect_url
-
-    if enroll_course_id:
-        query_params[AUTH_ENROLL_COURSE_ID_KEY] = enroll_course_id
-
-    if email_opt_in:
-        query_params[AUTH_EMAIL_OPT_IN_KEY] = email_opt_in
 
     return u"{url}?{params}".format(
         url=url,
@@ -322,7 +314,7 @@ def get_disconnect_url(provider_name):
     return _get_url('social:disconnect', enabled_provider.BACKEND_CLASS.name)
 
 
-def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id=None, email_opt_in=None):
+def get_login_url(provider_name, auth_entry, redirect_url=None):
     """Gets the login URL for the endpoint that kicks off auth with a provider.
 
     Args:
@@ -335,14 +327,6 @@ def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id
     Keyword Args:
         redirect_url (string): If provided, redirect to this URL at the end
             of the authentication process.
-
-        enroll_course_id (string): If provided, auto-enroll the user in this
-            course upon successful authentication.
-
-        email_opt_in (string): If set to 'true' (case insensitive), user will
-            be opted into organization-wide email. Any other string will
-            equate to False, and the user will be opted out of organization-wide
-            email.
 
     Returns:
         String. URL that starts the auth pipeline for a provider.
@@ -357,8 +341,6 @@ def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id
         enabled_provider.BACKEND_CLASS.name,
         auth_entry=auth_entry,
         redirect_url=redirect_url,
-        enroll_course_id=enroll_course_id,
-        email_opt_in=email_opt_in
     )
 
 
@@ -445,13 +427,44 @@ def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
     auth_entry = strategy.session.get(AUTH_ENTRY_KEY)
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
-        raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
+        raise AuthEntryError(strategy.request.backend, 'auth_entry missing or invalid')
 
     return {'auth_entry': auth_entry}
 
 
+def set_pipeline_timeout(strategy, user, *args, **kwargs):
+    """
+    Set a short session timeout while the pipeline runs, to improve security.
+
+    Consider the following attack:
+    1. Attacker on a public computer visits edX and initiates the third-party login flow
+    2. Attacker logs into their own third-party account
+    3. Attacker closes the window and does not complete the login flow
+    4. Victim on the same computer logs into edX with username/password
+    5. edX links attacker's third-party account with victim's edX account
+    6. Attacker logs into victim's edX account using attacker's own third-party account
+
+    We have two features of the pipeline designed to prevent this attack:
+    * This method shortens the Django session timeout during the pipeline. This should mean that
+      if there is a reasonable delay between steps 3 and 4, the session and pipeline will be
+      reset, and the attack foiled.
+      Configure the timeout with the SOCIAL_AUTH_PIPELINE_TIMEOUT setting (Default: 600 seconds)
+    * On step 4, the login page displays an obvious message to the user, saying "You've
+      successfully signed into (Google), but your (Google) account isn't linked with an edX
+      account. To link your accounts, login now using your edX password.".
+    """
+    if strategy.request and not user:  # If user is set, we're currently logged in (and/or linked) so it doesn't matter.
+        strategy.request.session.set_expiry(strategy.setting('PIPELINE_TIMEOUT', 600))
+        # We don't need to reset this timeout later. Because the user is not logged in and this
+        # account is not yet linked to an edX account, either the normal 'login' or 'register'
+        # code must occur during the subsequent ensure_user_information step, and those methods
+        # will change the session timeout to the "normal" value according to the "Remember Me"
+        # choice of the user.
+
+
 @partial.partial
-def ensure_user_information(strategy, auth_entry, user=None, *args, **kwargs):
+def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None,
+                            allow_inactive_user=False, *args, **kwargs):
     """
     Ensure that we have the necessary information about a user (either an
     existing account or registration data) to proceed with the pipeline.
@@ -470,63 +483,58 @@ def ensure_user_information(strategy, auth_entry, user=None, *args, **kwargs):
     # invariants have been violated and future misbehavior is likely.
     def dispatch_to_login():
         """Redirects to the login page."""
-        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], strategy))
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
 
     def dispatch_to_register():
         """Redirects to the registration page."""
-        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], strategy))
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
-    user_inactive = user and not user.is_active
-
-    if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
-        if not user:
+    if not user:
+        if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
-
-    elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
-        if not user or user_inactive:
+        elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
+            # User has authenticated with the third party provider but we don't know which edX
+            # account corresponds to them yet, if any.
             return dispatch_to_login()
-
-    elif auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2]:
-        if not user:
+        elif auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2]:
+            # User has authenticated with the third party provider and now wants to finish
+            # creating their edX account.
             return dispatch_to_register()
-        elif user_inactive:
-            # If the user has a linked account, but has not yet activated
-            # we should send them to the login page. The login page
-            # will tell them that they need to activate their account.
-            return dispatch_to_login()
+        elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
+            raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
+        else:
+            raise AuthEntryError(backend, 'auth_entry invalid')
 
+    if not user.is_active:
+        # The user account has not been verified yet.
+        if allow_inactive_user:
+            # This parameter is used by the auth_exchange app, which always allows users to
+            # login, whether or not their account is validated.
+            pass
+        # IF the user has just registered a new account as part of this pipeline, that is fine
+        # and we allow the login to continue this once, because if we pause again to force the
+        # user to activate their account via email, the pipeline may get lost (e.g. email takes
+        # too long to arrive, user opens the activation email on a different device, etc.).
+        # This is consistent with first party auth and ensures that the pipeline completes
+        # fully, which is critical.
+        # But if this is an existing account, we refuse to allow them to login again until they
+        # check their email and activate the account.
+        elif social is not None:
+            # This third party account is already linked to a user account. That means that the
+            # user's account existed before this pipeline originally began (since the creation
+            # of the 'social' link entry occurs in one of the following pipeline steps).
+            # Reject this login attempt and tell the user to validate their account first.
 
-def _create_redirect_url(url, strategy):
-    """ Given a URL and a Strategy, construct the appropriate redirect URL.
+            # Send them another activation email:
+            student.views.reactivation_email_for_user(user)
 
-    Construct a redirect URL and append the URL parameters that should be preserved.
-
-    Args:
-        url (string): The base URL to use for the redirect.
-        strategy (Strategy): Used to determine which URL parameters to append to the redirect.
-
-    Returns:
-        A string representation of the URL, with parameters, for redirect.
-    """
-    url_params = {}
-    enroll_course_id = strategy.session_get(AUTH_ENROLL_COURSE_ID_KEY)
-    if enroll_course_id:
-        url_params['course_id'] = enroll_course_id
-        url_params['enrollment_action'] = 'enroll'
-    email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
-    if email_opt_in:
-        url_params[AUTH_EMAIL_OPT_IN_KEY] = email_opt_in
-    if url_params:
-        return u'{url}?{params}'.format(
-            url=url,
-            params=urllib.urlencode(url_params)
-        )
-    else:
-        return url
+            raise NotActivatedException(backend, user.email)
+        # else: The user must have just successfully registered their account, so we proceed.
+        # We know they did not just login, because the login process rejects unverified users.
 
 
 @partial.partial
-def set_logged_in_cookie(backend=None, user=None, request=None, auth_entry=None, *args, **kwargs):
+def set_logged_in_cookie(backend=None, user=None, strategy=None, auth_entry=None, *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
 
     Some installations have a marketing site front-end separate from
@@ -552,6 +560,8 @@ def set_logged_in_cookie(backend=None, user=None, request=None, auth_entry=None,
 
     """
     if not is_api(auth_entry) and user is not None and user.is_authenticated():
+        request = strategy.request if strategy else None
+        # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
@@ -587,7 +597,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
             event_name,
             {
                 'category': "conversion",
-                'label': strategy.session_get('enroll_course_id'),
+                'label': None,
                 'provider': getattr(kwargs['backend'], 'name')
             },
             context={
@@ -599,100 +609,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
 
 
 @partial.partial
-def change_enrollment(strategy, auth_entry=None, user=None, *args, **kwargs):
-    """Enroll a user in a course.
-
-    If a user entered the authentication flow when trying to enroll
-    in a course, then attempt to enroll the user.
-    We will try to do this if the pipeline was started with the
-    querystring param `enroll_course_id`.
-
-    In the following cases, we can't enroll the user:
-        * The course does not have an honor mode.
-        * The course has an honor mode with a minimum price.
-        * The course is not yet open for enrollment.
-        * The course does not exist.
-
-    If we can't enroll the user now, then skip this step.
-    For paid courses, users will be redirected to the payment flow
-    upon completion of the authentication pipeline
-    (configured using the ?next parameter to the third party auth login url).
-
-    Keyword Arguments:
-        auth_entry: The entry mode into the pipeline.
-        user (User): The user being authenticated.
-    """
-    # We skip enrollment if the user entered the flow from the "link account"
-    # button on the account settings page.  At this point, either:
-    #
-    # 1) The user already had a linked account when they started the enrollment flow,
-    # in which case they would have been enrolled during the normal authentication process.
-    #
-    # 2) The user did NOT have a linked account, in which case they would have
-    # needed to go through the login/register page.  Since we preserve the querystring
-    # args when sending users to this page, successfully authenticating through this page
-    # would also enroll the student in the course.
-    enroll_course_id = strategy.session_get('enroll_course_id')
-    if enroll_course_id and auth_entry != AUTH_ENTRY_ACCOUNT_SETTINGS:
-        course_id = CourseKey.from_string(enroll_course_id)
-        modes = CourseMode.modes_for_course_dict(course_id)
-
-        # If the email opt in parameter is found, set the preference.
-        email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
-        if email_opt_in:
-            opt_in = email_opt_in.lower() == 'true'
-            update_email_opt_in(user, course_id.org, opt_in)
-
-        # Check whether we're blocked from enrolling by a
-        # country access rule.
-        # Note: We skip checking the user's profile setting
-        # for country here because the "redirect URL" pointing
-        # to the blocked message page is set when the user
-        # *enters* the pipeline, at which point they're
-        # not authenticated.  If they end up being blocked
-        # from the courseware, it's better to let them
-        # enroll and then show the message when they
-        # enter the course than to skip enrollment
-        # altogether.
-        is_blocked = not embargo_api.check_course_access(
-            course_id, ip_address=get_ip(strategy.request),
-            url=strategy.request.path
-        )
-        if is_blocked:
-            # If we're blocked, skip enrollment.
-            # A redirect URL should have been set so the user
-            # ends up on the embargo page when enrollment completes.
-            pass
-
-        elif CourseMode.can_auto_enroll(course_id, modes_dict=modes):
-            try:
-                CourseEnrollment.enroll(user, course_id, check_access=True)
-            except CourseEnrollmentException:
-                pass
-            except Exception as ex:
-                logger.exception(ex)
-
-        # Handle white-label courses as a special case
-        # If a course is white-label, we should add it to the shopping cart.
-        elif CourseMode.is_white_label(course_id, modes_dict=modes):
-            try:
-                cart = Order.get_cart_for_user(user)
-                PaidCourseRegistration.add_to_order(cart, course_id)
-            except (
-                CourseDoesNotExistException,
-                ItemAlreadyInCartException,
-                AlreadyEnrolledInCourseException,
-            ):
-                pass
-            # It's more important to complete login than to
-            # ensure that the course was added to the shopping cart.
-            # Log errors, but don't stop the authentication pipeline.
-            except Exception as ex:  # pylint: disable=broad-except
-                logger.exception(ex)
-
-
-@partial.partial
-def associate_by_email_if_login_api(auth_entry, strategy, details, user, *args, **kwargs):
+def associate_by_email_if_login_api(auth_entry, backend, details, user, *args, **kwargs):
     """
     This pipeline step associates the current social auth with the user with the
     same email address in the database.  It defers to the social library's associate_by_email
@@ -701,7 +618,7 @@ def associate_by_email_if_login_api(auth_entry, strategy, details, user, *args, 
     This association is done ONLY if the user entered the pipeline through a LOGIN API.
     """
     if auth_entry == AUTH_ENTRY_LOGIN_API:
-        association_response = associate_by_email(strategy, details, user, *args, **kwargs)
+        association_response = associate_by_email(backend, details, user, *args, **kwargs)
         if (
             association_response and
             association_response.get('user') and
