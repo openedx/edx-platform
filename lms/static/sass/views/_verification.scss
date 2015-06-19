@@ -165,7 +165,7 @@
 
   // elements - controls
   .action-primary {
-    @extend %btn-primary-blue;
+    @extend %btn-verify-primary;
     // needed for override due to .register a:link styling
     border: 0 !important;
     color: $white !important;
