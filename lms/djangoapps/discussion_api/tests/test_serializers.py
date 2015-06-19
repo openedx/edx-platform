@@ -473,6 +473,16 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
                 {field: ["This field is required."]}
             )
 
+    @ddt.data("", " ")
+    def test_create_empty_string(self, value):
+        data = self.minimal_data.copy()
+        data.update({field: value for field in ["topic_id", "title", "raw_body"]})
+        serializer = ThreadSerializer(data=data, context=get_context(self.course, self.request))
+        self.assertEqual(
+            serializer.errors,
+            {field: ["This field is required."] for field in ["topic_id", "title", "raw_body"]}
+        )
+
     def test_create_type(self):
         self.register_post_thread_response({"id": "test_id"})
         data = self.minimal_data.copy()
@@ -529,10 +539,11 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         for key in data:
             self.assertEqual(saved[key], data[key])
 
-    def test_update_empty_string(self):
+    @ddt.data("", " ")
+    def test_update_empty_string(self, value):
         serializer = ThreadSerializer(
             self.existing_thread,
-            data={field: "" for field in ["topic_id", "title", "raw_body"]},
+            data={field: value for field in ["topic_id", "title", "raw_body"]},
             partial=True,
             context=get_context(self.course, self.request)
         )
@@ -735,10 +746,11 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
         self.assertEqual(saved["endorsed_by"], self.user.username)
         self.assertEqual(saved["endorsed_at"], "2015-06-05T00:00:00Z")
 
-    def test_update_empty_raw_body(self):
+    @ddt.data("", " ")
+    def test_update_empty_raw_body(self, value):
         serializer = CommentSerializer(
             self.existing_comment,
-            data={"raw_body": ""},
+            data={"raw_body": value},
             partial=True,
             context=get_context(self.course, self.request)
         )

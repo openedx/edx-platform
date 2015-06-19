@@ -33,5 +33,5 @@ class NonEmptyCharField(CharField):
     """
     def validate(self, value):
         super(NonEmptyCharField, self).validate(value)
-        if not value:
+        if not value.strip():
             raise ValidationError(self.error_messages["required"])
