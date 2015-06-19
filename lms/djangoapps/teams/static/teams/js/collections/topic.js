@@ -15,6 +15,7 @@
                 perPage: 50
             },
             sort_field: 'name',
+            sortDisplayName: function() {return this.sort_field;},
             server_api: {
                 'order_by': function() {return this.sort_field;},
                 'page_size': function() {return this.perPage;},
