@@ -266,7 +266,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
         **Post Parameters**
 
-            * user:  The user ID of the currently logged in user. Optional. You cannot use the command to enroll a different user.
+            * user:  The username of the currently logged in user. Optional. You cannot use the command to enroll a different user.
 
             * mode: The Course Mode for the enrollment. Individual users cannot upgrade their enrollment mode from
               'honor'. Only server-to-server requests can enroll with other modes. Optional.
@@ -316,7 +316,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
                     * invite_only: Whether students must be invited to enroll in the course; true or false.
 
-                * user: The ID of the user.
+                * user: The username of the user.
     """
 
     authentication_classes = OAuth2AuthenticationAllowInactiveUser, EnrollmentCrossDomainSessionAuth
