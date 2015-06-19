@@ -180,6 +180,10 @@ class ThreadSerializer(_ContentSerializer):
         # type is an invalid class attribute name, so we must declare a
         # different name above and modify it here
         self.fields["type"] = self.fields.pop("type_")
+        # Compensate for the fact that some threads in the comments service do
+        # not have the pinned field set
+        if self.object and self.object.get("pinned") is None:
+            self.object["pinned"] = False
 
     def get_group_name(self, obj):
         """Returns the name of the group identified by the thread's group_id."""

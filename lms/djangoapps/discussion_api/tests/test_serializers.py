@@ -212,6 +212,17 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
         })
         self.assertEqual(self.serialize(thread), expected)
 
+    def test_pinned_missing(self):
+        """
+        Make sure that older threads in the comments service without the pinned
+        field do not break serialization
+        """
+        thread_data = self.make_cs_content({})
+        del thread_data["pinned"]
+        self.register_get_thread_response(thread_data)
+        serialized = self.serialize(Thread(id=thread_data["id"]))
+        self.assertEqual(serialized["pinned"], False)
+
     def test_group(self):
         cohort = CohortFactory.create(course_id=self.course.id)
         serialized = self.serialize(self.make_cs_content({"group_id": cohort.id}))
