@@ -33,6 +33,7 @@ from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -100,6 +101,9 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseDescriptor):
         return _has_access_course_desc(user, action, obj)
 
+    if isinstance(obj, CourseOverview):
+        return _has_access_course_overview(user, action, obj)
+
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, action, obj, course_key)
 
@@ -129,6 +133,62 @@ def has_access(user, action, obj, course_key=None):
 
 
 # ================ Implementation helpers ================================
+def _can_access_descriptor_with_start_date(user, descriptor):  # pylint: disable=invalid-name
+    """
+    Checks if a user has access to a descriptor based on its start date.
+
+    If there is no start date specified, grant access.
+    Else, check if we're past the start date.
+    NOTE: We do NOT check whether the user is staff... it assumed that staff
+        access is checked at a higher level.
+
+    Arguments:
+        user (User): the user whose descriptor access we are checking.
+        descriptor (AType): the descriptor for which we are checking access.
+    where AType is CourseDescriptor, CourseOverview, or any other class that
+        represents a descriptor and has the attributes .location, .id, .start,
+        and .days_early_for_beta.
+    """
+    start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
+    masquerading = is_masquerading_as_student(user, descriptor.id)
+    now = datetime.now(UTC())
+    effective_start = _adjust_start_date_for_beta_testers(
+        user,
+        descriptor,
+        course_key=descriptor.id
+    )
+    return (
+        (start_dates_disabled and not masquerading)
+        or descriptor.start is None
+        or now > effective_start
+        or in_preview_mode()
+    )
+
+
+def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
+    """
+    Checks if a user has access to a course based on its prerequisites.
+
+    If the user is staff or anonymous, immediately grant access.
+    Else, return whether or not the prerequisite courses have been passed.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        course (AType): the course for which we are checking access.
+    where AType is CourseDescriptor, CourseOverview, or any other class that
+        represents a course and has the attributes .location and .id.
+    """
+    return (
+        _has_staff_access_to_descriptor(user, course, course.id)
+        or user.is_anonymous()
+        or not (
+            settings.FEATURES['ENABLE_PREREQUISITE_COURSES']
+            and course.pre_requisite_courses
+            and get_pre_requisite_courses_not_completed(user, [course.id])
+        )
+    )
+
+
 def _has_access_course_desc(user, action, course):
     """
     Check if user has access to a course descriptor.
@@ -274,24 +334,10 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
-    def can_view_courseware_with_prerequisites():  # pylint: disable=invalid-name
-        """
-        Checks if prerequisite courses feature is enabled and course has prerequisites
-        and user is neither staff nor anonymous then it returns False if user has not
-        passed prerequisite courses otherwise return True.
-        """
-        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
-                and not _has_staff_access_to_descriptor(user, course, course.id) \
-                and course.pre_requisite_courses \
-                and not user.is_anonymous() \
-                and get_pre_requisite_courses_not_completed(user, [course.id]):
-            return False
-        else:
-            return True
-
     checkers = {
         'load': can_load,
-        'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
+        'view_courseware_with_prerequisites':
+            lambda: _can_view_courseware_with_prerequisites(user, course),
         'load_mobile': can_load_mobile,
         'enroll': can_enroll,
         'see_exists': see_exists,
@@ -302,6 +348,40 @@ def _has_access_course_desc(user, action, course):
     }
 
     return _dispatch(checkers, action, user, course)
+
+
+def _has_access_course_overview(user, action, course_overview):
+    """
+    Check if user has access to a course overview.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        action (str): the action the user is trying to perform. Valid values:
+            * 'load' -- load the courseware, see inside the coursecourse catalog.
+            * 'view_courseware_with_prerequisites'
+        course_overview (CourseOverview): overview of the course in question.
+    """
+    def can_load():
+        """
+        Can this user load this course?
+
+        NOTE: this is not checking whether user is actually enrolled in the course.
+        """
+        return (
+            _has_staff_access_to_descriptor(user, course_overview, course_overview.id)
+            or (
+                not course_overview.visible_to_staff_only
+                and _can_access_descriptor_with_start_date(user, course_overview)
+            )
+        )
+
+    checkers = {
+        'load': can_load,
+        'view_courseware_with_prerequisites':
+            lambda: _can_view_courseware_with_prerequisites(user, course_overview),
+    }
+
+    return _dispatch(checkers, action, user, course_overview)
 
 
 def _has_access_error_desc(user, action, descriptor, course_key):
@@ -408,38 +488,17 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-        if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
-            return False
-
-        # enforce group access
-        if not _has_group_access(descriptor, user, course_key):
-            # if group_access check failed, deny access unless the requestor is staff,
-            # in which case immediately grant access.
-            return _has_staff_access_to_descriptor(user, descriptor, course_key)
-
-        # If start dates are off, can always load
-        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user, course_key):
-            debug("Allow: DISABLE_START_DATES")
-            return True
-
-        # Check start date
-        if 'detached' not in descriptor._class_tags and descriptor.start is not None:
-            now = datetime.now(UTC())
-            effective_start = _adjust_start_date_for_beta_testers(
-                user,
-                descriptor,
-                course_key=course_key
+        return (
+            _has_staff_access_to_descriptor(user, descriptor, course_key)
+            or (
+                not descriptor.visible_to_staff_only
+                and _has_group_access(descriptor, user, course_key)
+                and (
+                    'detached' not in descriptor._class_tags
+                    or _can_access_descriptor_with_start_date(user, descriptor)
+                )
             )
-            if in_preview_mode() or now > effective_start:
-                # after start date, everyone can see it
-                debug("Allow: now > effective start date")
-                return True
-            # otherwise, need staff access
-            return _has_staff_access_to_descriptor(user, descriptor, course_key)
-
-        # No start date, so can always load.
-        debug("Allow: no start date")
-        return True
+        )
 
     checkers = {
         'load': can_load,
