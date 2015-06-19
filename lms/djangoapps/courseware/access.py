@@ -35,7 +35,7 @@ from xmodule.course_module import DEFAULT_START_DATE
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
-# from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -50,7 +50,7 @@ from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
-from access_response import *
+from access_response import AccessResponse, StartDateError, MilestoneError, VisibilityError, MobileAvailabilityError
 
 DEBUG_ACCESS = False
 ACCESS_GRANTED = AccessResponse(True)
@@ -107,8 +107,8 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseDescriptor):
         return _has_access_course_desc(user, action, obj)
 
-    # if isinstance(obj, CourseOverview):
-        # return _has_access_course_overview(user, action, obj)
+    if isinstance(obj, CourseOverview):
+        return _has_access_course_overview(user, action, obj)
 
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, action, obj, course_key)
@@ -142,10 +142,12 @@ def has_access(user, action, obj, course_key=None):
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     Checks if a user has access to a descriptor based on its start date.
+
     If there is no start date specified, grant access.
     Else, check if we're past the start date.
     NOTE: We do NOT check whether the user is staff... it assumed that staff
         access is checked at a higher level.
+
     Arguments:
         user (User): the user whose descriptor access we are checking.
         descriptor (AType): the descriptor for which we are checking access.
@@ -163,21 +165,20 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
             descriptor,
             course_key=course_key
         )
-        if (descriptor.start is None
-            or now > effective_start
-            or in_preview_mode()):
-                return ACCESS_GRANTED
+        if descriptor.start is None or now > effective_start or in_preview_mode():
+            return ACCESS_GRANTED
 
         start_message = None
-        if isinstance(descriptor, CourseDescriptor):
-            if descriptor.advertised_start is not None:
-                start_message = _(descriptor.advertised_start)
-            elif descriptor.start != DEFAULT_START_DATE:
-                start_message = descriptor.start
-            else:
-                start_message = _("coming soon")
+    if hasattr(descriptor, 'advertised_start'):
+        if descriptor.advertised_start is not None:
+            start_message = _(descriptor.advertised_start)
+        elif descriptor.start != DEFAULT_START_DATE:
+            start_message = descriptor.start
+        else:
+            start_message = _("coming soon")
 
-        return StartDateError(start_message)
+    return StartDateError(start_message)
+
 
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
     """
@@ -240,7 +241,8 @@ def _has_access_course_desc(user, action, course):
         if not access_response:
             return access_response
 
-        if any_unfulfilled_milestones(course.id, user.id) and not _has_staff_access_to_descriptor(user, course, course.id):
+        if any_unfulfilled_milestones(course.id, user.id) \
+                and not _has_staff_access_to_descriptor(user, course, course.id):
             return MilestoneError()
 
         return ACCESS_GRANTED
@@ -388,7 +390,7 @@ def _has_access_course_overview(user, action, course_overview):
         if course_overview.visible_to_staff_only:
             return VisibilityError()
 
-        access_response = _can_access_descriptor_with_start_date(user, course_overview)
+        access_response = _can_access_descriptor_with_start_date(user, course_overview, course_overview.id)
         if not access_response:
             return access_response
 
@@ -784,4 +786,3 @@ def in_preview_mode():
     """
     hostname = get_current_request_hostname()
     return hostname is not None and settings.PREVIEW_DOMAIN in hostname.split('.')
-
