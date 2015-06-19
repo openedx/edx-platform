@@ -70,7 +70,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/asset
                         this.$el.html(_.template(asset_library_template, {typeData: this.typeData}));
                         tableBody = this.$('#asset-table-body');
                         this.tableBody = tableBody;
-                        this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
+                        this.pagingHeader = new PagingHeader({collection: this.collection, el: $('#asset-paging-header')});
                         this.pagingFooter = new PagingFooter({collection: this.collection, el: $('#asset-paging-footer')});
                         this.pagingHeader.render();
                         this.pagingFooter.render();
@@ -296,7 +296,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/asset
                     title.addClass('column-selected-link');
                 }
 
-                this.pagingView.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
+                this.pagingView.collection.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
                 this.pagingView.selectFilter('js-asset-type-col');
                 this.closeFilterPopup(this.$el.find(
                     '.column-filter-link[data-assetfilter="' + assettype + '"]'));

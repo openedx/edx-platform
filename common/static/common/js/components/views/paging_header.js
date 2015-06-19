@@ -10,10 +10,7 @@
                 },
 
                 initialize: function(options) {
-                    var view = options.view,
-                        collection = view.collection;
-                    this.view = view;
-                    this.collection = collection;
+                    this.collection = options.collection;
                     this.collection.bind('add', _.bind(this.render, this));
                     this.collection.bind('remove', _.bind(this.render, this));
                     this.collection.bind('reset', _.bind(this.render, this));
@@ -91,13 +88,13 @@
 
                 sortNameLabel: function() {
                     return interpolate('<span class="sort-order">%(sort_name)s</span>', {
-                        sort_name: this.view.sortDisplayName()
+                        sort_name: this.collection.sortDisplayName()
                     }, true);
                 },
 
                 filterNameLabel: function() {
                     return interpolate('<span class="filter-column">%(filter_name)s</span>', {
-                        filter_name: this.view.filterDisplayName()
+                        filter_name: this.collection.filterDisplayName()
                     }, true);
                 },
 

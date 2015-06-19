@@ -6,12 +6,6 @@
             var PagingView = Backbone.View.extend({
                 // takes a Backbone Paginator as a model
 
-                sortableColumns: {},
-
-                filterableColumns: {},
-
-                filterColumn: '',
-
                 initialize: function() {
                     Backbone.View.prototype.initialize.call(this);
                     var collection = this.collection;
@@ -23,7 +17,7 @@
                 },
 
                 onPageRefresh: function() {
-                    var sortColumn = this.sortColumn;
+                    var sortColumn = this.collection.sortColumn;
                     this.renderPageItems();
                     this.$('.column-sort-link').removeClass('current-sort');
                     this.$('#' + sortColumn).addClass('current-sort');
@@ -34,31 +28,22 @@
                 },
 
                 registerFilterableColumn: function(columnName, displayName, fieldName) {
-                    this.filterableColumns[columnName] = {
-                        displayName: displayName,
-                        fieldName: fieldName
-                    };
+                    this.collection.registerFilterableColumn(columnName, displayName, fieldName);
                 },
 
                 filterableColumnInfo: function(filterColumn) {
-                    var filterInfo = this.filterableColumns[filterColumn];
-                    if (!filterInfo) {
-                        throw "Unregistered filter column '" + filterInfo + '"';
-                    }
-                    return filterInfo;
+                    return this.collection.filterableColumnInfo(filterColumn);
                 },
 
                 filterDisplayName: function() {
-                    var filterColumn = this.filterColumn,
-                        filterInfo = this.filterableColumnInfo(filterColumn);
-                    return filterInfo.displayName;
+                    return this.collection.filterDisplayName();
                 },
 
                 setInitialFilterColumn: function(filterColumn) {
                     var collection = this.collection,
-                        filtertInfo = this.filterableColumns[filterColumn];
-                    collection.filterField = filtertInfo.fieldName;
-                    this.filterColumn = filterColumn;
+                        filterInfo = collection.filterableColumns[filterColumn];
+                    collection.filterField = filterInfo.fieldName;
+                    collection.filterColumn = filterColumn;
                 },
 
                 /**
@@ -69,38 +54,28 @@
                 * @param defaultSortDirection The default sort direction for the column
                 */
                 registerSortableColumn: function(columnName, displayName, fieldName, defaultSortDirection) {
-                    this.sortableColumns[columnName] = {
-                        displayName: displayName,
-                        fieldName: fieldName,
-                        defaultSortDirection: defaultSortDirection
-                    };
+                    this.collection.registerSortableColumn(columnName, displayName, fieldName, defaultSortDirection);
                 },
 
                 sortableColumnInfo: function(sortColumn) {
-                    var sortInfo = this.sortableColumns[sortColumn];
-                    if (!sortInfo) {
-                        throw "Unregistered sort column '" + sortColumn + '"';
-                    }
-                    return sortInfo;
+                    return this.collection.sortableColumnInfo(sortColumn);
                 },
 
                 sortDisplayName: function() {
-                    var sortColumn = this.sortColumn,
-                        sortInfo = this.sortableColumnInfo(sortColumn);
-                    return sortInfo.displayName;
+                    return this.collection.sortDisplayName();
                 },
 
                 setInitialSortColumn: function(sortColumn) {
                     var collection = this.collection,
-                        sortInfo = this.sortableColumns[sortColumn];
+                        sortInfo = collection.sortableColumnInfo(sortColumn);
                     collection.sortField = sortInfo.fieldName;
                     collection.sortDirection = sortInfo.defaultSortDirection;
-                    this.sortColumn = sortColumn;
+                    collection.sortColumn = sortColumn;
                 },
 
                 toggleSortOrder: function(sortColumn) {
                     var collection = this.collection,
-                        sortInfo = this.sortableColumnInfo(sortColumn),
+                        sortInfo = this.collection.sortableColumnInfo(sortColumn),
                         sortField = sortInfo.fieldName,
                         defaultSortDirection = sortInfo.defaultSortDirection;
                     if (collection.sortField === sortField) {
@@ -109,19 +84,19 @@
                         collection.sortField = sortField;
                         collection.sortDirection = defaultSortDirection;
                     }
-                    this.sortColumn = sortColumn;
+                    collection.sortColumn = sortColumn;
                     this.collection.setPage(0);
                 },
 
                 selectFilter: function(filterColumn) {
                     var collection = this.collection,
-                        filterInfo = this.filterableColumnInfo(filterColumn),
+                        filterInfo = collection.filterableColumnInfo(filterColumn),
                         filterField = filterInfo.fieldName,
                         defaultFilterKey = false;
                     if (collection.filterField !== filterField) {
                         collection.filterField = filterField;
                     }
-                    this.filterColumn = filterColumn;
+                    collection.filterColumn = filterColumn;
                     this.collection.setPage(0);
                 }
             });
