@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-12 18:54+0000\n"
-"PO-Revision-Date: 2015-06-12 18:54:37.775531\n"
+"POT-Creation-Date: 2015-06-19 13:47+0000\n"
+"PO-Revision-Date: 2015-06-19 13:47:59.148161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -557,6 +557,24 @@ msgstr ""
 "Thé ÌSÖ 639-1 längüägé çödé för thïs längüägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
+#: common/djangoapps/student/models.py
+msgid "Namespace of enrollment attribute e.g. credit"
+msgstr ""
+"Näméspäçé öf énröllmént ättrïßüté é.g. çrédït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/student/models.py
+msgid "Name of the enrollment attribute e.g. provider_id"
+msgstr ""
+"Nämé öf thé énröllmént ättrïßüté é.g. prövïdér_ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/models.py
+msgid "Value of the enrollment attribute e.g. ASU"
+msgstr ""
+"Välüé öf thé énröllmént ättrïßüté é.g. ÀSÛ Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
 msgstr "Çöürsé ïd nöt spéçïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -798,6 +816,14 @@ msgstr "Nämé réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: common/djangoapps/student/views.py
 msgid "Invalid ID"
 msgstr "Ìnvälïd ÌD Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/djangoapps/third_party_auth/pipeline.py
+msgid ""
+"This account has not yet been activated. An activation email has been re-"
+"sent to {email_address}."
+msgstr ""
+"Thïs äççöünt häs nöt ýét ßéén äçtïvätéd. Àn äçtïvätïön émäïl häs ßéén ré-"
+"sént tö {email_address}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -1269,12 +1295,13 @@ msgstr ""
 msgid "Answer received."
 msgstr "Ànswér réçéïvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#. Translators: '<choice>' is a tag name and should not be translated.
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
 #: common/lib/capa/capa/inputtypes.py
-msgid "Expected a <choice> tag; got {given_tag} instead"
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
 msgstr ""
-"Éxpéçtéd ä <choice> täg; göt {given_tag} ïnstéäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєт#"
+"Éxpéçtéd ä <choice> ör <compoundhint> täg; göt {given_tag} ïnstéäd Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -1342,6 +1369,18 @@ msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
 "Éxpéçtéd ä {expected_tag} täg; göt {given_tag} ïnstéäd Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/combinedopenended/open_ended_result_table.html
+#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
+msgid "Correct"
+msgstr "Çörréçt Ⱡ'σяєм ιρѕυм #"
+
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/combinedopenended/open_ended_result_table.html
+#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
+msgid "Incorrect"
+msgstr "Ìnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -1952,6 +1991,16 @@ msgstr ""
 "Ìf thïs érrör pérsïsts, pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Hint: "
+msgstr "Hïnt:  Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
+#. hints.
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Hint ({hint_num} of {hints_count}): "
+msgstr "Hïnt ({hint_num} öf {hints_count}):  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2222,6 +2271,15 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
 "тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
 " qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση#"
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid ""
+"ORA1 is no longer supported. To use this assessment, replace this ORA1 "
+"component with an ORA2 component."
+msgstr ""
+"ÖRÀ1 ïs nö löngér süppörtéd. Tö üsé thïs ässéssmént, répläçé thïs ÖRÀ1 "
+"çömpönént wïth än ÖRÀ2 çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -5339,6 +5397,20 @@ msgstr ""
 "Ýöü müst ßé ä ÇÇX Çöäçh tö äççéss thïs vïéw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
+#: lms/djangoapps/ccx/views.py
+msgid "You must be the coach for this ccx to access this view"
+msgstr ""
+"Ýöü müst ßé thé çöäçh för thïs ççx tö äççéss thïs vïéw Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/ccx/views.py
+msgid ""
+"You cannot create a CCX from a course using a deprecated id. Please create a"
+" rerun of this course in the studio to allow this action."
+msgstr ""
+"Ýöü çännöt çréäté ä ÇÇX fröm ä çöürsé üsïng ä dépréçätéd ïd. Pléäsé çréäté ä"
+" rérün öf thïs çöürsé ïn thé stüdïö tö ällöw thïs äçtïön.#"
+
 #: lms/djangoapps/certificates/badge_handler.py
 msgid ""
 "Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
@@ -5998,6 +6070,12 @@ msgid "Your certificate will be available when you pass the course."
 msgstr ""
 "Ýöür çértïfïçäté wïll ßé äväïläßlé whén ýöü päss thé çöürsé. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate has already been created."
+msgstr ""
+"Çértïfïçäté häs älréädý ßéén çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/courseware/views.py
 msgid "Certificate is being created."
@@ -6724,6 +6802,52 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Coupon Code"
+msgstr "Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Course Id"
+msgstr "Çöürsé Ìd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "% Discount"
+msgstr "% Dïsçöünt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: wiki/plugins/attachments/forms.py
+msgid "Description"
+msgstr "Désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Expiration Date"
+msgstr "Éxpïrätïön Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Is Active"
+msgstr "Ìs Àçtïvé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Code Redeemed Count"
+msgstr "Çödé Rédééméd Çöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Discounted Seats"
+msgstr "Tötäl Dïsçöüntéd Séäts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Discounted Amount"
+msgstr "Tötäl Dïsçöüntéd Àmöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
 "of the generation task in the 'Pending Instructor Tasks' section."
@@ -6751,6 +6875,29 @@ msgstr ""
 " qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαт#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your executive summary report is being created. To view the status of the "
+"report, see the 'Pending Instructor Tasks' section."
+msgstr ""
+"Ýöür éxéçütïvé sümmärý répört ïs ßéïng çréätéd. Tö vïéw thé stätüs öf thé "
+"répört, séé thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Ⱡ'σяєм #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An executive summary report is currently in progress. To view the status of "
+"the report, see the 'Pending Instructor Tasks' section. When completed, the "
+"report will be available for download in the table below. You will be able "
+"to download the report when it is complete."
+msgstr ""
+"Àn éxéçütïvé sümmärý répört ïs çürréntlý ïn prögréss. Tö vïéw thé stätüs öf "
+"thé répört, séé thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Whén çömplétéd, thé "
+"répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ýöü wïll ßé äßlé "
+"tö döwnlöäd thé répört whén ït ïs çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -7996,14 +8143,6 @@ msgid "Date: {date}"
 msgstr "Däté: {date} Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: wiki/plugins/attachments/forms.py
-msgid "Description"
-msgstr "Désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
 msgstr "Qüäntïtý Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -8116,6 +8255,7 @@ msgid "Course Announce Date"
 msgstr "Çöürsé Ànnöünçé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "Çöürsé Stärt Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -10999,6 +11139,11 @@ msgstr "éxämplé: JänéDöé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 msgid "Preferred Language"
 msgstr "Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Course End Date"
+msgstr "Çöürsé Énd Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
 msgstr "Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -11047,6 +11192,11 @@ msgstr "Hélp Ⱡ'σяєм ι#"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/widgets/tabs-aggregator.html
+#: lms/templates/courseware/progress.html
+msgid "name"
+msgstr "nämé Ⱡ'σяєм ι#"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -11812,6 +11962,12 @@ msgstr ""
 "Ýöür émäïl ör pässwörd ïs ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/login.html
+msgid "An error occurred when signing you in to {platform_name}."
+msgstr ""
+"Àn érrör öççürréd whén sïgnïng ýöü ïn tö {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/login.html
 msgid ""
 "Please provide the following information to log into your {platform_name} "
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
@@ -12037,6 +12193,10 @@ msgstr "Ýöü dö nöt hävé äný nötés. Ⱡ'σяєм ιρѕυм ∂σłσ�
 #: lms/templates/problem.html
 msgid "your answer"
 msgstr "ýöür änswér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/problem.html
+msgid "Hint"
+msgstr "Hïnt Ⱡ'σяєм ι#"
 
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
@@ -13188,8 +13348,8 @@ msgid "Download student grades"
 msgstr "Döwnlöäd stüdént grädés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Share on:"
-msgstr "Shäré ön: Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "Take this with you:"
+msgstr "Täké thïs wïth ýöü: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to Mozilla Backpack"
@@ -13200,15 +13360,12 @@ msgid "Print Certificate"
 msgstr "Prïnt Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Add Certificate to LinkedIn Profile"
-msgstr ""
-"Àdd Çértïfïçäté tö LïnkédÌn Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+msgid "Add to LinkedIn Profile"
+msgstr "Àdd tö LïnkédÌn Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "Shäré ön LïnkédÌn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+#: lms/templates/certificates/_accomplishment-header.html
+msgid "{platform_name} Home"
+msgstr "{platform_name} Hömé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Noted by"
@@ -13355,11 +13512,6 @@ msgstr ""
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Correct"
-msgstr "Çörréçt Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Correct"
 msgstr "Pärtïällý Çörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -13372,11 +13524,6 @@ msgstr "Nö Öpïnïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Incorrect"
 msgstr "Pärtïällý Ìnçörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Incorrect"
-msgstr "Ìnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -14259,18 +14406,16 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade,you can request an {link_start} updated certificate "
-"{link_end}."
+"receive a higher grade, you can request an updated certificate."
 msgstr ""
 "Ýöü çän nöw döwnlöäd ýöür çértïfïçäté äs ä PDF. Ìf ýöü kéép wörkïng änd "
-"réçéïvé ä hïghér grädé,ýöü çän réqüést än {link_start} üpdätéd çértïfïçäté "
-"{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
-"єѕт#"
+"réçéïvé ä hïghér grädé, ýöü çän réqüést än üpdätéd çértïfïçäté. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
 
 #: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
@@ -14326,6 +14471,53 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr "Réqüést Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/courseware/progress.html
+msgid "Requirements for Course Credit"
+msgstr "Réqüïréménts för Çöürsé Çrédït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/courseware/progress.html
+msgid "You are no longer eligible for this course."
+msgstr ""
+"Ýöü äré nö löngér élïgïßlé för thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/courseware/progress.html
+msgid "You have met the requirements for credit in this course."
+msgstr ""
+"Ýöü hävé mét thé réqüïréménts för çrédït ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/courseware/progress.html
+msgid "Go to your dashboard"
+msgstr "Gö tö ýöür däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/courseware/progress.html
+msgid "to purchase course credit."
+msgstr "tö pürçhäsé çöürsé çrédït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/courseware/progress.html
+msgid "You have not yet met the requirements for credit."
+msgstr ""
+"Ýöü hävé nöt ýét mét thé réqüïréménts för çrédït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/courseware/progress.html
+msgid "Verification Submitted"
+msgstr "Vérïfïçätïön Süßmïttéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/courseware/progress.html
+msgid "Verification Failed"
+msgstr "Vérïfïçätïön Fäïléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/courseware/progress.html
+msgid "Upcoming"
+msgstr "Ûpçömïng Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "More"
+msgstr "Möré Ⱡ'σяєм ι#"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -14456,6 +14648,15 @@ msgstr ""
 msgid "Complete our course feedback survey"
 msgstr ""
 "Çömplété öür çöürsé féédßäçk sürvéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Add Certificate to LinkedIn Profile"
+msgstr ""
+"Àdd Çértïfïçäté tö LïnkédÌn Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "Shäré ön LïnkédÌn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -15193,10 +15394,6 @@ msgstr "Ûnpïn Ⱡ'σяєм ιρѕ#"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Open"
 msgstr "Öpén Ⱡ'σяєм ι#"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
-msgstr "Möré Ⱡ'σяєм ι#"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_profile_thread.mustache
@@ -16365,11 +16562,6 @@ msgstr ""
 "¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Coupon Code"
-msgstr "Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Discount Percentage"
 msgstr "Dïsçöünt Pérçéntägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -16451,6 +16643,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "Àüdït Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Professional"
+msgstr "Pröféssïönäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -16799,8 +16995,26 @@ msgid "Resubmit Invoice"
 msgstr "Résüßmït Ìnvöïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download Enrollment Report"
-msgstr "Döwnlöäd Énröllmént Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid ""
+"Create a .csv file that contains enrollment information for your course."
+msgstr ""
+"Çréäté ä .çsv fïlé thät çöntäïns énröllmént ïnförmätïön för ýöür çöürsé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Create Enrollment Report"
+msgstr "Çréäté Énröllmént Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid ""
+"Create an HTML file that contains an executive summary for this course."
+msgstr ""
+"Çréäté än HTML fïlé thät çöntäïns än éxéçütïvé sümmärý för thïs çöürsé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Create Executive Summary"
+msgstr "Çréäté Éxéçütïvé Sümmärý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Available Reports"
@@ -16855,11 +17069,6 @@ msgstr "Döwnlöäd Çöüpön Çödés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon Codes"
 msgstr "Çöüpön Çödés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Expiration Date"
-msgstr "Éxpïrätïön Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon (%)"
@@ -17010,6 +17219,110 @@ msgstr "Pérçéntägé Dïsçöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Code"
 msgstr "Ûpdäté Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Executive Summary for {display_name}"
+msgstr ""
+"Éxéçütïvé Sümmärý för {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Report Creation Date"
+msgstr "Répört Çréätïön Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of Seats"
+msgstr "Nümßér öf Séäts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of Enrollments"
+msgstr "Nümßér öf Énröllménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Gross Revenue Collected"
+msgstr "Gröss Révénüé Çölléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Gross Revenue Pending"
+msgstr "Gröss Révénüé Péndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of Enrollment Refunds"
+msgstr "Nümßér öf Énröllmént Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Amount Refunded"
+msgstr "Àmöünt Réfündéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Average Price per Seat"
+msgstr "Àvérägé Prïçé pér Séät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Frequently Used Coupon Codes"
+msgstr "Fréqüéntlý Ûséd Çöüpön Çödés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased using coupon codes"
+msgstr ""
+"Nümßér öf séäts pürçhäséd üsïng çöüpön çödés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Rank"
+msgstr "Ränk Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percent Discount"
+msgstr "Pérçént Dïsçöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Times Used"
+msgstr "Tïmés Ûséd Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Bulk and Single Seat Purchases"
+msgstr "Bülk änd Sïnglé Séät Pürçhäsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased individually"
+msgstr ""
+"Nümßér öf séäts pürçhäséd ïndïvïdüällý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased in bulk"
+msgstr ""
+"Nümßér öf séäts pürçhäséd ïn ßülk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased with invoices"
+msgstr ""
+"Nümßér öf séäts pürçhäséd wïth ïnvöïçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Unused bulk purchase seats (revenue at risk)"
+msgstr ""
+"Ûnüséd ßülk pürçhäsé séäts (révénüé ät rïsk) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percentage of seats purchased individually"
+msgstr ""
+"Pérçéntägé öf séäts pürçhäséd ïndïvïdüällý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percentage of seats purchased in bulk"
+msgstr ""
+"Pérçéntägé öf séäts pürçhäséd ïn ßülk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percentage of seats purchased with invoices"
+msgstr ""
+"Pérçéntägé öf séäts pürçhäséd wïth ïnvöïçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -17304,9 +17617,9 @@ msgstr ""
 "Répörts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Therefore, please given enough detail to account for this action."
+msgid "Therefore, please give enough detail to account for this action."
 msgstr ""
-"Théréföré, pléäsé gïvén énöügh détäïl tö äççöünt för thïs äçtïön. Ⱡ'σяєм "
+"Théréföré, pléäsé gïvé énöügh détäïl tö äççöünt för thïs äçtïön. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -18563,8 +18876,9 @@ msgid "State"
 msgstr "Stäté Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Registration for"
-msgstr "Régïsträtïön för Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Registration for:"
+msgstr "Régïsträtïön för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Course Dates"
@@ -18711,11 +19025,6 @@ msgstr[1] ""
 msgid "Cover Image"
 msgstr "Çövér Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#. Translators: "Registration for:" is followed by a course name
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Registration for:"
-msgstr "Régïsträtïön för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Course Dates:"
 msgstr "Çöürsé Dätés: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -18780,10 +19089,6 @@ msgstr "Shöppïng çärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} -  Shöppïng Çärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Steps"
-msgstr "Stéps Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -18903,6 +19208,14 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr ""
 "Çürréntlý thé {platform_name} sérvérs äré övérlöädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/student_account/finish_auth.html
+msgid "Please Wait"
+msgstr "Pléäsé Wäït Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/student_account/finish_auth.html
+msgid "Please wait"
+msgstr "Pléäsé wäït Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
@@ -22687,10 +23000,6 @@ msgid "(UTC)"
 msgstr "(ÛTÇ) Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/settings.html
-msgid "Course End Date"
-msgstr "Çöürsé Énd Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/settings.html
 msgid "Last day your course is active"
 msgstr "Läst däý ýöür çöürsé ïs äçtïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -23612,10 +23921,6 @@ msgid "Have problems, questions, or suggestions about {studio_name}?"
 msgstr ""
 "Hävé prößléms, qüéstïöns, ör süggéstïöns äßöüt {studio_name}? Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/widgets/tabs-aggregator.html
-msgid "name"
-msgstr "nämé Ⱡ'σяєм ι#"
 
 # empty
 msgid "This is a key string."
