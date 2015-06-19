@@ -52,8 +52,12 @@ h2 {
 					<td align="right">${total_enrollments}</td>
 				</tr>
 				<tr>
-					<td>${_("Gross Revenue Collected")}</td>
+					<td>${_("Gross Revenue")}</td>
 					<td align="right">${currency}${"{0:0.2f}".format(gross_revenue)}</td>
+				</tr>
+				<tr>
+					<td>${_("Gross Revenue Collected")}</td>
+					<td align="right">${currency}${"{0:0.2f}".format(gross_paid_revenue)}</td>
 				</tr>
 				<tr>
 					<td>${_("Gross Revenue Pending")}</td>

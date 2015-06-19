@@ -1108,10 +1108,12 @@ def get_executive_report(course_id):
     single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(course_id)
     bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(course_id)
     paid_invoices_total = InvoiceTransaction.get_total_amount_of_paid_course_invoices(course_id)
-    gross_revenue = single_purchase_total + bulk_purchase_total + paid_invoices_total
+    gross_paid_revenue = single_purchase_total + bulk_purchase_total + paid_invoices_total
 
     all_invoices_total = Invoice.get_invoice_total_amount_for_course(course_id)
     gross_pending_revenue = all_invoices_total - float(paid_invoices_total)
+
+    gross_revenue = float(gross_paid_revenue) + float(gross_pending_revenue)
 
     refunded_self_purchased_seats = PaidCourseRegistration.get_self_purchased_seat_count(
         course_id, status='refunded'
@@ -1165,6 +1167,7 @@ def get_executive_report(course_id):
         'total_seats': total_seats,
         'currency': currency,
         'gross_revenue': float(gross_revenue),
+        'gross_paid_revenue': float(gross_paid_revenue),
         'gross_pending_revenue': gross_pending_revenue,
         'total_seats_refunded': total_seats_refunded,
         'total_amount_refunded': float(total_amount_refunded),
