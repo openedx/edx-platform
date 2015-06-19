@@ -12,24 +12,19 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
 import rfc6266
 
-from edxval.api import create_video, get_videos_for_ids, SortDirection, VideoSortField
+from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField
 from opaque_keys.edx.keys import CourseKey
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
 from util.json_request import expect_json, JsonResponse
-from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore.django import modulestore
 
 from .course import get_course_and_check_access
 
 
 __all__ = ["videos_handler", "video_encodings_download"]
 
-
-# String constant used in asset keys to identify video assets.
-VIDEO_ASSET_TYPE = "video"
 
 # Default expiration, in seconds, of one-time URLs used for uploading videos.
 KEY_EXPIRATION_IN_SECONDS = 86400
@@ -217,15 +212,9 @@ def _get_and_validate_course(course_key_string, user):
 
 def _get_videos(course):
     """
-    Retrieves the list of videos from VAL corresponding to the videos listed in
-    the asset metadata store.
+    Retrieves the list of videos from VAL corresponding to this course.
     """
-    edx_videos_ids = [
-        v.asset_id.path
-        for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
-    ]
-
-    videos = list(get_videos_for_ids(edx_videos_ids, VideoSortField.created, SortDirection.desc))
+    videos = list(get_videos_for_course(course.id, VideoSortField.created, SortDirection.desc))
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
@@ -332,11 +321,6 @@ def videos_post(course, request):
             "PUT",
             headers={"Content-Type": req_file["content_type"]}
         )
-
-        # persist edx_video_id as uploaded through this course
-        user_id = request.user.id
-        video_meta_data = AssetMetadata(course.id.make_asset_key(VIDEO_ASSET_TYPE, edx_video_id), created_by=user_id)
-        modulestore().save_asset_metadata(video_meta_data, user_id)
 
         # persist edx_video_id in VAL
         create_video({
