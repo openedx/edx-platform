@@ -74,8 +74,8 @@ class ProviderConfig(ConfigurationModel):
     secondary = models.BooleanField(
         default=False,
         help_text=_(
-            "Secondary providers are displayed less prominently, "
-            "in a dropdown list on the side of the page."
+            'Secondary providers are displayed less prominently, '
+            'in a separate list of "Institution" login providers.'
         ),
     )
     skip_registration_form = models.BooleanField(
@@ -90,7 +90,7 @@ class ProviderConfig(ConfigurationModel):
         default=False,
         help_text=_(
             "If this option is selected, users will not be required to confirm their "
-            "email, and their account will be activated immediately upon reigstration."
+            "email, and their account will be activated immediately upon registration."
         ),
     )
     prefix = None  # used for provider_id. Set to a string value in subclass

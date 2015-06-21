@@ -58,6 +58,7 @@ define([
                     thirdPartyAuth: {
                         currentProvider: null,
                         providers: [],
+                        secondaryProviders: [{name: "provider"}],
                         finishAuthUrl: finishAuthUrl
                     },
                     nextUrl: nextUrl, // undefined for default
@@ -97,6 +98,8 @@ define([
                 TemplateHelpers.installTemplate('templates/student_account/register');
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
+                TemplateHelpers.installTemplate('templates/student_account/institution_login');
+                TemplateHelpers.installTemplate('templates/student_account/institution_register');
 
                 // Stub analytics tracking
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'pageview', 'trackLink']);
@@ -133,6 +136,30 @@ define([
                 // Simulate selection of the login form
                 selectForm('login');
                 assertForms('#login-form', '#register-form');
+            });
+
+            it('toggles between the login and institution login view', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate clicking on institution login button
+                $('#login-form .button-secondary-login[data-type="institution_login"]').click();
+                assertForms('#institution_login-form', '#login-form');
+
+                // Simulate selection of the login form
+                selectForm('login');
+                assertForms('#login-form', '#institution_login-form');
+            });
+
+            it('toggles between the register and institution register view', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                // Simulate clicking on institution login button
+                $('#register-form .button-secondary-login[data-type="institution_login"]').click();
+                assertForms('#institution_login-form', '#register-form');
+
+                // Simulate selection of the login form
+                selectForm('register');
+                assertForms('#register-form', '#institution_login-form');
             });
 
             it('displays the reset password form', function() {

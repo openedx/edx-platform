@@ -164,13 +164,12 @@ def _third_party_auth_context(request, redirect_to):
     context = {
         "currentProvider": None,
         "providers": [],
+        "secondaryProviders": [],
         "finishAuthUrl": None,
         "errorMessage": None,
     }
 
     if third_party_auth.is_enabled():
-        context["providers"] = []
-        context["secondaryProviders"] = []
         for enabled in third_party_auth.provider.Registry.enabled():
             info = {
                 "id": enabled.provider_id,
