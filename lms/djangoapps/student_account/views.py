@@ -169,8 +169,10 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        context["providers"] = [
-            {
+        context["providers"] = []
+        context["secondaryProviders"] = []
+        for enabled in third_party_auth.provider.Registry.enabled():
+            info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
                 "iconClass": enabled.icon_class,
@@ -185,8 +187,7 @@ def _third_party_auth_context(request, redirect_to):
                     redirect_url=redirect_to,
                 ),
             }
-            for enabled in third_party_auth.provider.Registry.enabled()
-        ]
+            context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
 
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:

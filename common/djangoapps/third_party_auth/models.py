@@ -68,10 +68,34 @@ class ProviderConfig(ConfigurationModel):
         help_text=(
             'The Font Awesome (or custom) icon class to use on the login button for this provider. '
             'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university'
-        ))
+        ),
+    )
     name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
+    secondary = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Secondary providers are displayed less prominently, "
+            "in a dropdown list on the side of the page."
+        ),
+    )
+    skip_registration_form = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is enabled, users will not be asked to confirm their details "
+            "(name, email, etc.) during the registration process. Only select this option "
+            "for trusted providers that are known to provide accurate user information."
+        ),
+    )
+    skip_email_verification = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users will not be required to confirm their "
+            "email, and their account will be activated immediately upon reigstration."
+        ),
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
+
     # "enabled" field is inherited from ConfigurationModel
 
     class Meta(object):  # pylint: disable=missing-docstring

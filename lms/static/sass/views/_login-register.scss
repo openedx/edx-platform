@@ -67,7 +67,7 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
-    form {
+    form, .other-login-wrapper {
         border: 1px solid $gray-l4;
         border-radius: 5px;
         padding: 0px 25px 20px 25px;
@@ -350,6 +350,8 @@ $sm-btn-linkedin: #0077b5;
         @extend %btn-secondary-grey-outline;
         width: 130px;
         padding: 0 0 0 ($baseline*2);
+        margin-right: 6px;
+        margin-bottom: $baseline;
         height: 34px;
         text-align: left;
         text-shadow: none;
@@ -357,10 +359,6 @@ $sm-btn-linkedin: #0077b5;
         position: relative;
         font-size: 0.8em;
         border-color: $lightGrey1;
-
-        &:nth-of-type(odd) {
-            margin-right: 13px;
-        }
 
         .icon {
             color: white;
@@ -371,6 +369,7 @@ $sm-btn-linkedin: #0077b5;
             height: 34px;
             line-height: 34px;
             text-align: center;
+            background: $m-blue-d3;
         }
 
         &:hover,
@@ -382,10 +381,6 @@ $sm-btn-linkedin: #0077b5;
                 line-height: 32px;
                 top: 0;
             }
-        }
-
-        &:last-child {
-            margin-bottom: $baseline;
         }
 
         &.button-oa2-google-oauth2 {
@@ -447,6 +442,15 @@ $sm-btn-linkedin: #0077b5;
 
     }
 
+    .button-secondary-login {
+        @extend .nav-btn;
+        font-size: 0.8em;
+        font-weight: normal;
+        border-color: $lightGrey1;
+        height: 34px;
+        padding: 0;
+    }
+
     /** Error Container - from _account.scss **/
     .status {
         @include box-sizing(border-box);
@@ -500,6 +504,12 @@ $sm-btn-linkedin: #0077b5;
 
         .message-copy {
 
+        }
+    }
+
+    .institution-list {
+        li {
+            line-height: 1.5em;
         }
     }
 

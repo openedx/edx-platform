@@ -22,6 +22,7 @@ var edx = edx || {};
 
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
+            this.hasSecondaryProviders = data.thirdPartyAuth.providers && data.thirdPartyAuth.providers.length;
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
             this.errorMessage = data.thirdPartyAuth.errorMessage || '';
             this.platformName = data.platformName;
@@ -41,6 +42,7 @@ var edx = edx || {};
                     currentProvider: this.currentProvider,
                     errorMessage: this.errorMessage,
                     providers: this.providers,
+                    hasSecondaryProviders: this.hasSecondaryProviders,
                     platformName: this.platformName
                 }
             }));

@@ -1,0 +1,32 @@
+<div class="other-login-wrapper">
+    <div class="section-title lines">
+        <h2>
+            <span class="text">
+                <span class="icon fa fa-university" aria-hidden="true"></span>
+                <%- gettext("Register with Institution/Campus Credentials") %>
+            </span>
+        </h2>
+    </div>
+
+    <p><%- gettext("Choose your institution from the list below:") %></p>
+
+    <ul class="institution-list">
+        <% _.each( _.sortBy(providers, "name"), function( provider ) {
+            if ( provider.registerUrl ) { %>
+                <li>
+                    <a href="<%- provider.registerUrl %>"><%- provider.name %></a>
+                </li>
+            <% }
+        }); %>
+    </ul>
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("or") %></span>
+        </h2>
+    </div>
+
+    <div class="toggle-form">
+        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Back to register") %></button>
+    </div>
+</div>
