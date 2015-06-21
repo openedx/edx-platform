@@ -195,6 +195,10 @@ def _third_party_auth_context(request, redirect_to):
             context["currentProvider"] = current_provider.name
             context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
 
+            if current_provider.skip_registration_form:
+                # As a reliable way of "skipping" the registration form, we just submit it automatically
+                context["autoSubmitRegForm"] = True
+
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
             if msg.extra_tags.split()[0] == "social-auth":

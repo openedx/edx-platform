@@ -26,6 +26,7 @@ var edx = edx || {};
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
             this.errorMessage = data.thirdPartyAuth.errorMessage || '';
             this.platformName = data.platformName;
+            this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
 
             this.listenTo( this.model, 'sync', this.saveSuccess );
         },
@@ -49,6 +50,12 @@ var edx = edx || {};
 
             this.postRender();
 
+            if (this.autoSubmit) {
+                $(this.el).hide();
+                $('#register-honor_code').prop('checked', true);
+                this.submitForm();
+            }
+
             return this;
         },
 
@@ -65,6 +72,7 @@ var edx = edx || {};
         },
         
         saveError: function( error ) {
+            $(this.el).show(); // Show in case the form was hidden for auto-submission
             this.errors = _.flatten(
                 _.map(
                     JSON.parse(error.responseText),
@@ -78,6 +86,13 @@ var edx = edx || {};
             );
             this.setErrors();
             this.toggleDisableButton(false);
-        }
+        },
+
+        postFormSubmission: function() {
+            if (_.compact(this.errors).length) {
+                // The form did not get submitted due to validation errors.
+                $(this.el).show(); // Show in case the form was hidden for auto-submission
+            }
+        },
     });
 })(jQuery, _, gettext);
