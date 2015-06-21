@@ -25,6 +25,9 @@ var edx = edx || {};
 
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
+            this.hasSecondaryProviders = (
+                data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
+            );
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
             this.errorMessage = data.thirdPartyAuth.errorMessage || '';
             this.platformName = data.platformName;
@@ -45,6 +48,7 @@ var edx = edx || {};
                     currentProvider: this.currentProvider,
                     errorMessage: this.errorMessage,
                     providers: this.providers,
+                    hasSecondaryProviders: this.hasSecondaryProviders,
                     platformName: this.platformName
                 }
             }));

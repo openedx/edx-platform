@@ -1498,6 +1498,13 @@ def create_account_with_params(request, params):
 
     dog_stats_api.increment("common.student.account_created")
 
+    # If the user is registering via 3rd party auth, track which provider they use
+    third_party_provider = None
+    running_pipeline = None
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        running_pipeline = pipeline.get(request)
+        third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+
     # Track the user's registration
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
@@ -1506,20 +1513,13 @@ def create_account_with_params(request, params):
             'username': user.username,
         })
 
-        # If the user is registering via 3rd party auth, track which provider they use
-        provider_name = None
-        if third_party_auth.is_enabled() and pipeline.running(request):
-            running_pipeline = pipeline.get(request)
-            current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-            provider_name = current_provider.name
-
         analytics.track(
             user.id,
             "edx.bi.user.account.registered",
             {
                 'category': 'conversion',
                 'label': params.get('course_id'),
-                'provider': provider_name
+                'provider': third_party_provider.name if third_party_provider else None
             },
             context={
                 'Google Analytics': {
@@ -1536,6 +1536,7 @@ def create_account_with_params(request, params):
     # 2. Random user generation for other forms of testing.
     # 3. External auth bypassing activation.
     # 4. Have the platform configured to not require e-mail activation.
+    # 5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
     #
     # Note that this feature is only tested as a flag set one way or
     # the other for *new* systems. we need to be careful about
@@ -1544,7 +1545,11 @@ def create_account_with_params(request, params):
     send_email = (
         not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
         not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
-        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'))
+        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
+        not (
+            third_party_provider and third_party_provider.skip_email_verification and
+            user.email == running_pipeline['kwargs'].get('details', {}).get('email')
+        )
     )
     if send_email:
         context = {

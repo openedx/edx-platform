@@ -359,6 +359,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             json.dumps({
                 "currentProvider": current_provider,
                 "providers": providers,
+                "secondaryProviders": [],
                 "finishAuthUrl": finish_auth_url,
                 "errorMessage": None,
             })

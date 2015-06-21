@@ -503,12 +503,19 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         """Redirects to the registration page."""
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
+    def should_force_account_creation():
+        """ For some third party providers, we auto-create user accounts """
+        current_provider = provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+        return current_provider and current_provider.skip_email_verification
+
     if not user:
         if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
         elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
+            if should_force_account_creation():
+                return dispatch_to_register()
             return dispatch_to_login()
         elif auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2]:
             # User has authenticated with the third party provider and now wants to finish
