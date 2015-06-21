@@ -84,6 +84,7 @@
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
             'js/student_account/views/LoginView': 'js/student_account/views/LoginView',
+            'js/student_account/views/InstitutionLoginView': 'js/student_account/views/InstitutionLoginView',
             'js/student_account/models/PasswordResetModel': 'js/student_account/models/PasswordResetModel',
             'js/student_account/views/PasswordResetView': 'js/student_account/views/PasswordResetView',
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
@@ -410,6 +411,14 @@
                     'js/student_account/views/FormView'
                 ]
             },
+            'js/student_account/views/InstitutionLoginView': {
+                exports: 'edx.student.account.InstitutionLoginView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone'
+                ]
+            },
             'js/student_account/models/PasswordResetModel': {
                 exports: 'edx.student.account.PasswordResetModel',
                 deps: ['jquery', 'jquery.cookie', 'backbone']
@@ -450,6 +459,7 @@
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',
                     'js/student_account/views/RegisterView',
+                    'js/student_account/views/InstitutionLoginView',
                     'js/student_account/models/LoginModel',
                     'js/student_account/models/PasswordResetModel',
                     'js/student_account/models/RegisterModel',
@@ -613,6 +623,7 @@
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/finish_auth_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
+        'lms/include/js/spec/student_account/institution_login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
         'lms/include/js/spec/student_account/enrollment_spec.js',

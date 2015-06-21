@@ -19,7 +19,7 @@
                 <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
             </p>
         </div>
-    <% } else if ( context.providers.length > 0 ) {  %>
+    <% } else if ( context.providers.length > 0 || context.hasSecondaryProviders ) {  %>
         <div class="login-providers">
             <div class="section-title lines">
                 <h2>
@@ -35,6 +35,12 @@
                     </button>
             <%  }
             }); %>
+
+            <% if ( context.hasSecondaryProviders ) { %>
+                <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
+                    <%- gettext("Use my institution/campus credentials") %>
+                </button>
+            <% } %>
         </div>
         <div class="section-title lines">
             <h2>
