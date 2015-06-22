@@ -5,19 +5,19 @@
             paginator_core: {
                 type: 'GET',
                 dataType: 'json',
-                url: function () { return this.url }
+                url: function () { return this.url; }
             },
 
             paginator_ui: {
                 firstPage: function () { return this.isZeroIndexed ? 0 : 1; },
                 currentPage: function () { return this.isZeroIndexed ? 0 : 1; },
-                perPage: function () { return this.perPage }
+                perPage: function () { return this.perPage; }
             },
 
             server_api: {
                 'page': function () { return this.currentPage; },
                 'page_size': function () { return this.perPage; },
-                'sort_order': function () { return this.sortDirection }
+                'sort_order': function () { return this.sortDirection; }
             },
 
             parse: function (response) {
@@ -59,7 +59,7 @@
                     error: function () {
                         self.currentPage = oldPage;
                     }
-                })
+                });
             },
 
             /**

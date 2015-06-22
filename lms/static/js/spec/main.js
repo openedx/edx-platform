@@ -31,6 +31,7 @@
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
+            'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             "backbone-super": "js/vendor/backbone-super",
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
@@ -627,6 +628,7 @@
         // Run the LMS tests
         'lms/include/teams/js/spec/teams_factory_spec.js',
         'lms/include/teams/js/spec/topic_card_spec.js',
+        'lms/include/teams/js/spec/topic_collection_spec.js',
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',

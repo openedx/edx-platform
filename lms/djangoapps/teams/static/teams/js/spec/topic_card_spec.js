@@ -15,7 +15,7 @@ define(['jquery',
                         'name': 'Renewable Energy',
                         'description': 'Explore how changes in <ⓡⓔⓝⓔⓦⓐⓑⓛⓔ> ʎƃɹǝuǝ will affect our lives.',
                         'team_count': 34
-                    }),
+                    })
                 });
             });
 
