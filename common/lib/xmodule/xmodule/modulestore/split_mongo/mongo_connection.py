@@ -15,7 +15,7 @@ from time import time
 
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
-from django.core.cache import get_cache
+from django.core.cache import get_cache, InvalidCacheBackendError
 import dogstats_wrapper as dog_stats_api
 
 from contracts import check, new_contract
@@ -215,7 +215,10 @@ class CourseStructureCache(object):
     The course structures are pickled and compressed when cached.
     """
     def __init__(self):
-        self.cache = get_cache('course_structure_cache')
+        try:
+            self.cache = get_cache('course_structure_cache')
+        except InvalidCacheBackendError:
+            self.cache = get_cache('default')
 
     def get(self, key):
         """Pull the compressed, pickled struct data from cache and deserialize."""
