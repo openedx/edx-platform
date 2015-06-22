@@ -50,7 +50,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/edx/edx-search.git@release-2015-06-16#egg=edx-search
 -e git+https://github.com/edx/edx-milestones.git@release-2015-06-17#egg=edx-milestones
 git+https://github.com/edx/edx-lint.git@ed8c8d2a0267d4d42f43642d193e25f8bd575d9b#egg=edx_lint==0.2.3
--e git+https://github.com/edx/xblock-utils.git@db22bc40fd2a75458a3c66d057f88aff5a7383e6#egg=xblock-utils
+-e git+https://github.com/edx/xblock-utils.git@213a97a50276d6a2504d8133650b2930ead357a0#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/edx-reverification-block.git@a286e89c73e1b788e35ac5b08a54b71a9fa63cfd#egg=edx-reverification-block
 git+https://github.com/edx/ecommerce-api-client.git@1.0.0#egg=ecommerce-api-client==1.0.0
