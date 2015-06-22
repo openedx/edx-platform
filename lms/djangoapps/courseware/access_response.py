@@ -25,6 +25,7 @@ class AccessResponse(object):
     def __hash__(self):
         return hash((self.has_access, self.access_error))
 
+
     def to_json(self):
         """Returns json representation of this AccessResponse"""
         return {
