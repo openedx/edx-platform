@@ -8,6 +8,8 @@ class AccessResponse(object):
         """
         self.has_access = has_access
         self.access_error = access_error
+        if has_access:
+            assert access_error is None
 
     def __nonzero__(self):
         """Overrides bool() to correct truth value testing"""
@@ -29,6 +31,7 @@ class AccessResponse(object):
             "has_access": self.has_access,
             "access_error": self.access_error.to_json() if self.access_error is not None else None
         }
+
 
 class AccessError(object):
     """
@@ -65,39 +68,49 @@ class AccessError(object):
             "user_message": self.user_message
         }
 
-class StartDateError(AccessError):
+
+class StartDateError(AccessResponse):
     """
-    Subclasses AccessError
+    Subclasses AccessResponse
     Access denied because the course has not started yet and the user is not staff
     """
     def __init__(self, user_message):
-        developer_message = "Course does not start until {start} and user does not have staff access".format(start = user_message)
-        super(StartDateError, self).__init__("course_not_started", developer_message, user_message)
+        error_code = "course_not_started"
+        developer_message = "Course does not start until {start} and user does not have staff access".format(start=user_message)
+        super(StartDateError, self).__init__(False, AccessError(error_code, developer_message, user_message))
 
-class MilestoneError(AccessError):
+
+class MilestoneError(AccessResponse):
     """
-    Subclasses AccessError
+    Subclasses AccessResponse
     Access denied because the user hasn't completed the needed milestones (pre-reqs/entrance exams).
     """
     def __init__(self):
-        super(MilestoneError, self).__init__("unfulfilled milestones", "User has not completed the necessary milestones", "You have uncompleted milestones")
+        error_code = "unfulfilled milestones"
+        developer_message = "User has not completed the necessary milestones"
+        user_message = "You have uncompleted milestones"
+        super(MilestoneError, self).__init__(False, AccessError(error_code, developer_message, user_message))
 
-class VisibilityError(AccessError):
+
+class VisibilityError(AccessResponse):
     """
-    Subclasses AccessError
+    Subclasses AccessResponse
     Access denied because the course is only visible to staff and the user is not staff
     """
     def __init__(self):
+        error_code = "visible_to_staff_only"
         developer_message = "Course is only visible to staff and user is not staff"
         user_message = "Course is not visible to you"
-        super(VisibilityError, self).__init__("visible_to_staff_only", developer_message, user_message)
+        super(VisibilityError, self).__init__(False, AccessError(error_code, developer_message, user_message))
 
-class MobileAvailabilityError(AccessError):
+
+class MobileAvailabilityError(AccessResponse):
     """
-    Subclasses AccessError
+    Subclasses AccessResponse
     Access denied because the course is not available on mobile and the user is not a beta tester or staff
     """
     def __init__(self):
+        error_code = "mobile_unavailable"
         developer_message = "Course is not available on mobile for this user"
         user_message = "You cannot view this course on mobile"
-        super(MobileAvailabilityError, self).__init__("mobile_unavailable", developer_message, user_message)
+        super(MobileAvailabilityError, self).__init__(error_code, developer_message, user_message)
