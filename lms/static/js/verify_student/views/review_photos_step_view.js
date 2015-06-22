@@ -10,8 +10,6 @@ var edx = edx || {};
 
     edx.verify_student.ReviewPhotosStepView = edx.verify_student.StepView.extend({
 
-        templateName: "review_photos_step",
-
         defaultContext: function() {
             return {
                 platformName: '',

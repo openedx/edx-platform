@@ -10,8 +10,6 @@ var edx = edx || {};
 
     edx.verify_student.PaymentConfirmationStepView = edx.verify_student.StepView.extend({
 
-        templateName: "payment_confirmation_step",
-
         defaultContext: function() {
             return {
                 courseKey: '',

@@ -74,12 +74,10 @@ var edx = edx || {};
                 requirements: el.data('requirements')
             },
             'face-photo-step': {
-                platformName: el.data('platform-name'),
-                captureSoundPath: el.data('capture-sound')
+                platformName: el.data('platform-name')
             },
             'id-photo-step': {
-                platformName: el.data('platform-name'),
-                captureSoundPath: el.data('capture-sound')
+                platformName: el.data('platform-name')
             },
             'review-photos-step': {
                 fullName: el.data('full-name'),

@@ -10,8 +10,6 @@ var edx = edx || {};
 
     edx.verify_student.MakePaymentStepView = edx.verify_student.StepView.extend({
 
-        templateName: "make_payment_step",
-
         defaultContext: function() {
             return {
                 isActive: true,
