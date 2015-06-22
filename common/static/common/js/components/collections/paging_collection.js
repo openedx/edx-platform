@@ -1,3 +1,21 @@
+/**
+ * A generic paging collection for use with a ListView, PagingHeader, and PagingFooter.
+ *
+ * By default this collection is designed to work with Django Rest Framework APIs, but can be configured to work with
+ * others. There is support for ascending or descending sort on a particular field, as well as filtering on a field.
+ * While the backend API may use either zero or one indexed page numbers, this collection uniformly exposes a one
+ * indexed interface to make consumption easier for views.
+ *
+ * Subclasses may want to override the following properties:
+ *      - url (string): The base url for the API endpoint.
+ *      - isZeroIndexed (boolean): If true, API calls will use page numbers starting at zero. Defaults to false.
+ *      - perPage (number): Count of elements to fetch for each page.
+ *      - server_api (object): Query parameters for the API call. Subclasses may add entries as necessary. By default,
+ *          a 'sort_order' field is included to specify the field to sort on. This field may be removed for subclasses
+ *          that do not support sort ordering, or support it in a non-standard way. By default filterField and
+ *          sortDirection do not affect the API calls. It is up to subclasses to add this information to the appropriate
+ *          query string parameters in server_api.
+ */
 ;(function (define) {
     'use strict';
     define(['backbone.paginator'], function (BackbonePaginator) {
@@ -17,7 +35,7 @@
             server_api: {
                 'page': function () { return this.currentPage; },
                 'page_size': function () { return this.perPage; },
-                'sort_order': function () { return this.sortDirection; }
+                'sort_order': function () { return this.sortField; }
             },
 
             parse: function (response) {
@@ -28,8 +46,11 @@
                 return response.results;
             },
 
+            isZeroIndexed: false,
+            perPage: 10,
+
             sortField: '',
-            sortDirection: 'desc',
+            sortDirection: 'descending',
             sortableFields: {},
 
             filterField: '',
@@ -139,16 +160,28 @@
             },
 
             /**
-             * Sets the field to sort on. If the field is already set, then the sort order is toggled.
+             * Sets the field to sort on.
              * @param fieldName name of the field to sort on
+             * @param toggleDirection if true, the sort direction is toggled if the given field was already set
              */
-            toggleSortField: function (fieldName) {
-                if (this.sortField === fieldName) {
-                    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-                } else {
-                    this.sortDirection = 'desc';
+            setSortField: function (fieldName, toggleDirection) {
+                if (toggleDirection) {
+                    if (this.sortField === fieldName) {
+                        this.sortDirection = PagingCollection.SortDirection.flip(this.sortDirection);
+                    } else {
+                        this.sortDirection = PagingCollection.SortDirection.DESCENDING;
+                    }
                 }
                 this.sortField = fieldName;
+                this.setPage(1);
+            },
+
+            /**
+             * Sets the direction of the sort.
+             * @param direction either ASCENDING or DESCENDING from PagingCollection.SortDirection.
+             */
+            setSortDirection: function (direction) {
+                this.sortDirection = direction;
                 this.setPage(1);
             },
 
@@ -159,6 +192,14 @@
             setFilterField: function (fieldName) {
                 this.filterField = fieldName;
                 this.setPage(1);
+            }
+        }, {
+            SortDirection: {
+                ASCENDING: 'ascending',
+                DESCENDING: 'descending',
+                flip: function (direction) {
+                    return direction == this.ASCENDING ? this.DESCENDING : this.ASCENDING;
+                }
             }
         });
         return PagingCollection;

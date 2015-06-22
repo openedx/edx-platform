@@ -5,7 +5,7 @@
             var TopicCollection = PagingCollection.extend({
                 initialize: function(topics, options) {
                     PagingCollection.prototype.initialize.call(this);
-                    this.isZeroIndexed = false;
+
                     this.course_id = options.course_id;
                     this.perPage = topics.results.length;
                     this.server_api['course_id'] = function () { return this.course_id; };
@@ -14,7 +14,7 @@
 
                     this.registerSortableField('name', gettext('name'));
                     this.registerSortableField('team_count', gettext('team count'));
-                    this.toggleSortField('name');
+                    this.setSortField('name', false);
                 },
 
                 model: TopicModel
