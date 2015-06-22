@@ -48,7 +48,7 @@ class JsTestSuite(TestSuite):
         """
         cmd = (
             "js-test-tool {mode} {test_id} --use-firefox --timeout-sec "
-            "600 --xunit-report {xunit_report}".format(
+            "1200 --xunit-report {xunit_report}".format(
                 mode=self.mode,
                 test_id=self.test_id,
                 xunit_report=self.xunit_report,
