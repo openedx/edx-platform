@@ -309,7 +309,7 @@ class MongoConnection(object):
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     doc = self.structures.find_one({'_id': key})
                     tagger_find_one.measure("blocks", len(doc['blocks']))
-                    structure = structure_from_mongo(doc)
+                    structure = structure_from_mongo(doc, course_context)
 
             return structure
 
