@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 import json
 import logging
 from social.backends.base import BaseAuth
@@ -54,7 +54,7 @@ class AuthNotConfigured(SocialAuthBaseException):
         self.provider_name = provider_name
 
     def __str__(self):
-        return _('Authentication with {} is currently unavailable.').format(
+        return _('Authentication with {} is currently unavailable.').format(  # pylint: disable=no-member
             self.provider_name
         )
 

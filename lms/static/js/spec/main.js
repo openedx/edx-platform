@@ -420,7 +420,7 @@
                 deps: [
                     'jquery',
                     'underscore',
-                    'gettext'
+                    'backbone'
                 ]
             },
             'js/student_account/models/PasswordResetModel': {
