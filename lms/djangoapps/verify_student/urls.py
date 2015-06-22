@@ -90,28 +90,23 @@ urlpatterns = patterns(
     ),
 
     url(
+        r'^submit-photos/$',
+        views.submit_photos_for_verification,
+        name="verify_student_submit_photos"
+    ),
+
+    # End-point for reverification
+    # Reverification occurs when a user's initial verification attempt
+    # is denied or expires.  The user is allowed to retry by submitting
+    # new photos.  This is different than *in-course* reverification,
+    # in which a student submits only face photos, which are matched
+    # against the ID photo from the user's initial verification attempt.
+    url(
         r'^reverify$',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
     ),
 
-    url(
-        r'^reverification_confirmation$',
-        views.reverification_submission_confirmation,
-        name="verify_student_reverification_confirmation"
-    ),
-
-    url(
-        r'^reverification_window_expired$',
-        views.reverification_window_expired,
-        name="verify_student_reverification_window_expired"
-    ),
-
-    url(
-        r'^submit-photos/$',
-        views.submit_photos_for_verification,
-        name="verify_student_submit_photos"
-    ),
     # Endpoint for in-course reverification
     # Users are sent to this end-point from within courseware
     # to re-verify their identities by re-submitting face photos.

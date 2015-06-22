@@ -14,7 +14,7 @@
 
 
   <div class="facephoto view">
-    <h2 class="title photo_verification"><%- gettext( "Take Your Photo" ) %></h2>
+    <h3 class="title"><%- gettext( "Take Your Photo" ) %></h2>
     <div class="instruction">
       <p><%=  _.sprintf( gettext( "When your face is in position, use the camera button %(icon)s below to take your photo." ), { icon: '<span class="example">(<i class="icon fa fa-camera" aria-hidden="true"></i><span class="sr">icon</span>)</span>' } ) %></p>
     </div>

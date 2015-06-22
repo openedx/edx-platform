@@ -6,7 +6,6 @@ import datetime
 import decimal
 import json
 import logging
-from collections import namedtuple
 from pytz import UTC
 from ipware.ip import get_ip
 
@@ -14,10 +13,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
-from django.http import (
-    HttpResponse, HttpResponseBadRequest,
-    HttpResponseRedirect, Http404
-)
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -63,8 +59,6 @@ from staticfiles.storage import staticfiles_storage
 
 
 log = logging.getLogger(__name__)
-EVENT_NAME_USER_ENTERED_INCOURSE_REVERIFY_VIEW = 'edx.bi.reverify.started'
-EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY = 'edx.bi.reverify.submitted'
 
 
 class PayAndVerifyView(View):
@@ -156,43 +150,14 @@ class PayAndVerifyView(View):
         INTRO_STEP,
     ]
 
-    Step = namedtuple(
-        'Step',
-        [
-            'title',
-            'template_name'
-        ]
-    )
-
-    STEP_INFO = {
-        INTRO_STEP: Step(
-            title=ugettext_lazy("Intro"),
-            template_name="intro_step"
-        ),
-        MAKE_PAYMENT_STEP: Step(
-            title=ugettext_lazy("Make payment"),
-            template_name="make_payment_step"
-        ),
-        PAYMENT_CONFIRMATION_STEP: Step(
-            title=ugettext_lazy("Payment confirmation"),
-            template_name="payment_confirmation_step"
-        ),
-        FACE_PHOTO_STEP: Step(
-            title=ugettext_lazy("Take photo"),
-            template_name="face_photo_step"
-        ),
-        ID_PHOTO_STEP: Step(
-            title=ugettext_lazy("Take a photo of your ID"),
-            template_name="id_photo_step"
-        ),
-        REVIEW_PHOTOS_STEP: Step(
-            title=ugettext_lazy("Review your info"),
-            template_name="review_photos_step"
-        ),
-        ENROLLMENT_CONFIRMATION_STEP: Step(
-            title=ugettext_lazy("Enrollment confirmation"),
-            template_name="enrollment_confirmation_step"
-        ),
+    STEP_TITLES = {
+        INTRO_STEP: ugettext_lazy("Intro"),
+        MAKE_PAYMENT_STEP: ugettext_lazy("Make payment"),
+        PAYMENT_CONFIRMATION_STEP: ugettext_lazy("Payment confirmation"),
+        FACE_PHOTO_STEP: ugettext_lazy("Take photo"),
+        ID_PHOTO_STEP: ugettext_lazy("Take a photo of your ID"),
+        REVIEW_PHOTOS_STEP: ugettext_lazy("Review your info"),
+        ENROLLMENT_CONFIRMATION_STEP: ugettext_lazy("Enrollment confirmation"),
     }
 
     # Messages
@@ -554,8 +519,7 @@ class PayAndVerifyView(View):
         return [
             {
                 'name': step,
-                'title': unicode(self.STEP_INFO[step].title),
-                'templateName': self.STEP_INFO[step].template_name
+                'title': unicode(self.STEP_TITLES[step]),
             }
             for step in display_steps
             if step not in remove_steps
@@ -1044,85 +1008,52 @@ def results_callback(request):
 
 class ReverifyView(View):
     """
-    The main reverification view. Under similar constraints as the main verification view.
-    Has to perform these functions:
-        - take new face photo
-        - take new id photo
-        - submit photos to photo verification service
+    Reverification occurs when a user's initial verification is denied
+    or expires.  When this happens, users can re-submit photos through
+    the re-verification flow.
 
-    Does not need to be attached to a particular course.
-    Does not need to worry about pricing
+    Unlike in-course reverification, this flow requires users to submit
+    *both* face and ID photos.  In contrast, during in-course reverification,
+    students submit only face photos, which are matched against the ID photo
+    the user submitted during initial verification.
+
     """
     @method_decorator(login_required)
     def get(self, request):
         """
-        display this view
+        Render the reverification flow.
+
+        Most of the work is done client-side by composing the same
+        Backbone views used in the initial verification flow.
         """
-        context = {
-            "user_full_name": request.user.profile.name,
-            "error": False,
-        }
-
-        return render_to_response("verify_student/photo_reverification.html", context)
-
-    @method_decorator(login_required)
-    def post(self, request):
-        """
-        submits the reverification to SoftwareSecure
-        """
-
-        try:
-            attempt = SoftwareSecurePhotoVerification(user=request.user)
-            b64_face_image = request.POST['face_image'].split(",")[1]
-            b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
-
-            attempt.upload_face_image(b64_face_image.decode('base64'))
-            attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
-            attempt.mark_ready()
-
-            # save this attempt
-            attempt.save()
-            # then submit it across
-            attempt.submit()
-            return HttpResponseRedirect(reverse('verify_student_reverification_confirmation'))
-        except Exception:
-            log.exception(
-                "Could not submit verification attempt for user {}".format(request.user.id)
-            )
+        status, _ = SoftwareSecurePhotoVerification.user_status(request.user)
+        if status in ["must_reverify", "expired"]:
             context = {
                 "user_full_name": request.user.profile.name,
-                "error": True,
+                "platform_name": settings.PLATFORM_NAME,
+                "capture_sound": staticfiles_storage.url("audio/camera_capture.wav"),
             }
-            return render_to_response("verify_student/photo_reverification.html", context)
-
-
-@login_required
-def reverification_submission_confirmation(_request):
-    """
-    Shows the user a confirmation page if the submission to SoftwareSecure was successful
-    """
-    return render_to_response("verify_student/reverification_confirmation.html")
-
-
-@login_required
-def reverification_window_expired(_request):
-    """
-    Displays an error page if a student tries to submit a reverification, but the window
-    for that reverification has already expired.
-    """
-    # TODO need someone to review the copy for this template
-    return render_to_response("verify_student/reverification_window_expired.html")
+            return render_to_response("verify_student/reverify.html", context)
+        else:
+            context = {
+                "status": status
+            }
+            return render_to_response("verify_student/reverify_not_allowed.html", context)
 
 
 class InCourseReverifyView(View):
     """
     The in-course reverification view.
-    Needs to perform these functions:
-        - take new face photo
-        - retrieve the old id photo
-        - submit these photos to photo verification service
 
-    Does not need to worry about pricing
+    In-course reverification occurs while a student is taking a course.
+    At points in the course, students are prompted to submit face photos,
+    which are matched against the ID photos the user submitted during their
+    initial verification.
+
+    Students are prompted to enter this flow from an "In Course Reverification"
+    XBlock (courseware component) that course authors add to the course.
+    See https://github.com/edx/edx-reverification-block for more details.
+
     """
     @method_decorator(login_required)
     def get(self, request, course_id, usage_id):
@@ -1168,9 +1099,7 @@ class InCourseReverifyView(View):
             return self._redirect_no_initial_verification(user, course_key)
 
         # emit the reverification event
-        self._track_reverification_events(
-            EVENT_NAME_USER_ENTERED_INCOURSE_REVERIFY_VIEW, user.id, course_id, checkpoint.checkpoint_name
-        )
+        self._track_reverification_events('edx.bi.reverify.started', user.id, course_id, checkpoint.checkpoint_name)
 
         context = {
             'course_key': unicode(course_key),
@@ -1235,7 +1164,8 @@ class InCourseReverifyView(View):
 
             # emit the reverification event
             self._track_reverification_events(
-                EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY, user.id, course_id, checkpoint.checkpoint_name
+                'edx.bi.reverify.submitted',
+                user.id, course_id, checkpoint.checkpoint_name
             )
 
             redirect_url = get_redirect_url(course_key, usage_key)
