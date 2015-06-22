@@ -26,6 +26,10 @@ from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.djangoapps.credit.api import (
+    set_credit_requirements, get_credit_requirement_status
+)
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
@@ -238,6 +242,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
         )
 
+        fake_request.user = self.student_user
         return grades.grade(self.student_user, fake_request, self.course)
 
     def get_progress_summary(self):
@@ -593,6 +598,43 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(1.0)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
+
+    def test_min_grade_credit_requirements_status(self):
+        """
+        Test for credit course. If user passes minimum grade requirement then
+        status will be updated as satisfied in requirement status table.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+
+        # Enable the course for credit
+        credit_course = CreditCourse.objects.create(
+            course_key=self.course.id,
+            enabled=True,
+        )
+
+        # Configure a credit provider for the course
+        credit_provider = CreditProvider.objects.create(
+            provider_id="ASU",
+            enable_integration=True,
+            provider_url="https://credit.example.com/request",
+        )
+        credit_course.providers.add(credit_provider)
+        credit_course.save()
+
+        requirements = [{
+            "namespace": "grade",
+            "name": "grade",
+            "display_name": "Grade",
+            "criteria": {"min_grade": 0.52}
+        }]
+        # Add a single credit requirement (final grade)
+        set_credit_requirements(self.course.id, requirements)
+
+        self.get_grade_summary()
+        req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
+        self.assertEqual(req_status[0]["status"], 'satisfied')
 
 
 @attr('shard_1')
