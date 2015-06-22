@@ -173,18 +173,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         # (providers, course_width, enable_ccx): # of sql queries, # of mongo queries, # of xblocks
-        ('no_overrides', 1, True): (27, 7, 19),
-        ('no_overrides', 2, True): (135, 7, 131),
-        ('no_overrides', 3, True): (595, 7, 537),
-        ('ccx', 1, True): (27, 7, 47),
-        ('ccx', 2, True): (135, 7, 455),
-        ('ccx', 3, True): (595, 7, 2037),
-        ('no_overrides', 1, False): (27, 7, 19),
-        ('no_overrides', 2, False): (135, 7, 131),
-        ('no_overrides', 3, False): (595, 7, 537),
-        ('ccx', 1, False): (27, 7, 19),
-        ('ccx', 2, False): (135, 7, 131),
-        ('ccx', 3, False): (595, 7, 537),
+        ('no_overrides', 1, True): (26, 7, 19),
+        ('no_overrides', 2, True): (134, 7, 131),
+        ('no_overrides', 3, True): (594, 7, 537),
+        ('ccx', 1, True): (26, 7, 47),
+        ('ccx', 2, True): (134, 7, 455),
+        ('ccx', 3, True): (594, 7, 2037),
+        ('no_overrides', 1, False): (26, 7, 19),
+        ('no_overrides', 2, False): (134, 7, 131),
+        ('no_overrides', 3, False): (594, 7, 537),
+        ('ccx', 1, False): (26, 7, 19),
+        ('ccx', 2, False): (134, 7, 131),
+        ('ccx', 3, False): (594, 7, 537),
     }
 
 
@@ -196,16 +196,16 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True): (27, 4, 9),
-        ('no_overrides', 2, True): (135, 19, 54),
-        ('no_overrides', 3, True): (595, 84, 215),
-        ('ccx', 1, True): (27, 4, 9),
-        ('ccx', 2, True): (135, 19, 54),
-        ('ccx', 3, True): (595, 84, 215),
-        ('no_overrides', 1, False): (27, 4, 9),
-        ('no_overrides', 2, False): (135, 19, 54),
-        ('no_overrides', 3, False): (595, 84, 215),
-        ('ccx', 1, False): (27, 4, 9),
-        ('ccx', 2, False): (135, 19, 54),
-        ('ccx', 3, False): (595, 84, 215),
+        ('no_overrides', 1, True): (26, 4, 9),
+        ('no_overrides', 2, True): (134, 19, 54),
+        ('no_overrides', 3, True): (594, 84, 215),
+        ('ccx', 1, True): (26, 4, 9),
+        ('ccx', 2, True): (134, 19, 54),
+        ('ccx', 3, True): (594, 84, 215),
+        ('no_overrides', 1, False): (26, 4, 9),
+        ('no_overrides', 2, False): (134, 19, 54),
+        ('no_overrides', 3, False): (594, 84, 215),
+        ('ccx', 1, False): (26, 4, 9),
+        ('ccx', 2, False): (134, 19, 54),
+        ('ccx', 3, False): (594, 84, 215),
     }
