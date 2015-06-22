@@ -4,9 +4,6 @@
             <a class="link-tab" href="#tab1"><%= gettext("Common Problem Types") %></a>
         </li>
         <li>
-            <a class="link-tab" href="#tab2"><%= gettext("Common Problems with Hints and Feedback") %></a>
-        </li>
-        <li>
             <a class="link-tab" href="#tab3"><%= gettext("Advanced") %></a>
         </li>
     </ul>
