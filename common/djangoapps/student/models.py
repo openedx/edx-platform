@@ -29,6 +29,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
+from django.db import transaction
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
@@ -951,7 +952,10 @@ class CourseEnrollment(models.Model):
             mode_changed = True
 
         if activation_changed or mode_changed:
-            self.save()
+            # A successful save here will force the open transaction to be committed.
+            # Any future database operations will occur in a separate transaction.
+            with transaction.autocommit():
+                self.save()
 
         if activation_changed:
             if self.is_active:
