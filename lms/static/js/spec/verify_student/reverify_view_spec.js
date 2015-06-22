@@ -1,7 +1,7 @@
 /**
 * Tests for the reverification view.
 **/
-define(['jquery', 'js/common_helpers/template_helpers', 'js/verify_student/views/reverify_view'],
+define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/views/reverify_view'],
     function( $, TemplateHelpers, ReverifyView ) {
         'use strict';
 
