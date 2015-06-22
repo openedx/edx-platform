@@ -1849,7 +1849,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         """
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        self.due_date = datetime(2015, 6, 22, tzinfo=pytz.UTC)
+        self.due_date = datetime.now(pytz.UTC) + timedelta(days=20)
         self.allowed_attempts = 1
 
         # Create the course modes
