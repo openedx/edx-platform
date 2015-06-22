@@ -10,10 +10,11 @@
                     this.perPage = topics.results.length;
                     this.server_api['course_id'] = function () { return this.course_id; };
                     this.server_api['order_by'] = function () { return this.sortField; };
+                    delete this.server_api['sort_order']; // Sort order is not specified for the Team API
 
                     this.registerSortableField('name', gettext('name'));
                     this.registerSortableField('team_count', gettext('team count'));
-                    this.setSortField('name');
+                    this.toggleSortField('name');
                 },
 
                 model: TopicModel
