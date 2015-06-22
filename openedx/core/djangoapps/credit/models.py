@@ -14,7 +14,6 @@ from django.core.validators import RegexValidator
 from simple_history.models import HistoricalRecords
 
 from jsonfield.fields import JSONField
-from util.date_utils import to_timestamp
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
 from django.utils.translation import ugettext_lazy
@@ -343,7 +342,6 @@ class CreditRequest(TimeStampedModel):
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="credit_requests")
     provider = models.ForeignKey(CreditProvider, related_name="credit_requests")
-    timestamp = models.DateTimeField(auto_now_add=True)
     parameters = JSONField()
 
     REQUEST_STATUS_PENDING = "pending"
@@ -393,7 +391,7 @@ class CreditRequest(TimeStampedModel):
         return [
             {
                 "uuid": request.uuid,
-                "timestamp": to_timestamp(request.modified),
+                "timestamp": request.parameters.get("timestamp"),
                 "course_key": request.course.course_key,
                 "provider": {
                     "id": request.provider.provider_id,

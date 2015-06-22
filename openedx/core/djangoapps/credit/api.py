@@ -267,8 +267,6 @@ def create_credit_request(course_key, provider_id, username):
 
     if created:
         credit_request.uuid = uuid.uuid4().hex
-    else:
-        credit_request.timestamp = datetime.datetime.now(pytz.UTC)
 
     # Retrieve user account and profile info
     user = User.objects.select_related('profile').get(username=username)
@@ -291,7 +289,7 @@ def create_credit_request(course_key, provider_id, username):
 
     parameters = {
         "request_uuid": credit_request.uuid,
-        "timestamp": to_timestamp(credit_request.timestamp),
+        "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),
         "course_org": course_key.org,
         "course_num": course_key.course,
         "course_run": course_key.run,
