@@ -11,6 +11,10 @@ import unittest
 
 from dark_lang.middleware import DarkLangMiddleware
 from dark_lang.models import DarkLangConfig
+# TODO PLAT-671 Import from Django 1.8
+# from django.utils.translation import LANGUAGE_SESSION_KEY
+from django_locale.trans_real import LANGUAGE_SESSION_KEY
+from student.tests.factories import UserFactory
 
 
 UNSET = object()
@@ -40,18 +44,18 @@ class DarkLangMiddlewareTests(TestCase):
             enabled=True
         ).save()
 
-    def process_request(self, django_language=UNSET, accept=UNSET, preview_lang=UNSET, clear_lang=UNSET):
+    def process_request(self, language_session_key=UNSET, accept=UNSET, preview_lang=UNSET, clear_lang=UNSET):
         """
         Build a request and then process it using the ``DarkLangMiddleware``.
 
         Args:
-            django_language (str): The language code to set in request.session['django_language']
+            language_session_key (str): The language code to set in request.session[LANUGAGE_SESSION_KEY]
             accept (str): The accept header to set in request.META['HTTP_ACCEPT_LANGUAGE']
             preview_lang (str): The value to set in request.GET['preview_lang']
             clear_lang (str): The value to set in request.GET['clear_lang']
         """
         session = {}
-        set_if_set(session, 'django_language', django_language)
+        set_if_set(session, LANGUAGE_SESSION_KEY, language_session_key)
 
         meta = {}
         set_if_set(meta, 'HTTP_ACCEPT_LANGUAGE', accept)
@@ -64,7 +68,8 @@ class DarkLangMiddlewareTests(TestCase):
             spec=HttpRequest,
             session=session,
             META=meta,
-            GET=get
+            GET=get,
+            user=UserFactory()
         )
         self.assertIsNone(DarkLangMiddleware().process_request(request))
         return request
@@ -231,11 +236,11 @@ class DarkLangMiddlewareTests(TestCase):
 
     def assertSessionLangEquals(self, value, request):
         """
-        Assert that the 'django_language' set in request.session is equal to value
+        Assert that the LANGUAGE_SESSION_KEY set in request.session is equal to value
         """
         self.assertEquals(
             value,
-            request.session.get('django_language', UNSET)
+            request.session.get(LANGUAGE_SESSION_KEY, UNSET)
         )
 
     def test_preview_lang_with_released_language(self):
@@ -247,7 +252,7 @@ class DarkLangMiddlewareTests(TestCase):
 
         self.assertSessionLangEquals(
             'rel',
-            self.process_request(preview_lang='rel', django_language='notrel')
+            self.process_request(preview_lang='rel', language_session_key='notrel')
         )
 
     def test_preview_lang_with_dark_language(self):
@@ -258,7 +263,7 @@ class DarkLangMiddlewareTests(TestCase):
 
         self.assertSessionLangEquals(
             'unrel',
-            self.process_request(preview_lang='unrel', django_language='notrel')
+            self.process_request(preview_lang='unrel', language_session_key='notrel')
         )
 
     def test_clear_lang(self):
@@ -269,12 +274,12 @@ class DarkLangMiddlewareTests(TestCase):
 
         self.assertSessionLangEquals(
             UNSET,
-            self.process_request(clear_lang=True, django_language='rel')
+            self.process_request(clear_lang=True, language_session_key='rel')
         )
 
         self.assertSessionLangEquals(
             UNSET,
-            self.process_request(clear_lang=True, django_language='unrel')
+            self.process_request(clear_lang=True, language_session_key='unrel')
         )
 
     def test_disabled(self):
@@ -287,17 +292,17 @@ class DarkLangMiddlewareTests(TestCase):
 
         self.assertSessionLangEquals(
             'rel',
-            self.process_request(clear_lang=True, django_language='rel')
+            self.process_request(clear_lang=True, language_session_key='rel')
         )
 
         self.assertSessionLangEquals(
             'unrel',
-            self.process_request(clear_lang=True, django_language='unrel')
+            self.process_request(clear_lang=True, language_session_key='unrel')
         )
 
         self.assertSessionLangEquals(
             'rel',
-            self.process_request(preview_lang='unrel', django_language='rel')
+            self.process_request(preview_lang='unrel', language_session_key='rel')
         )
 
     def test_accept_chinese_language_codes(self):
