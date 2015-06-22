@@ -219,7 +219,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           * course_updates: The URI to get data for course updates.
           * number: The course number.
           * org: The organization that created the course.
-          * video_outline: The URI to get the list of all vides the user can
+          * video_outline: The URI to get the list of all videos the user can
             access in the course.
           * id: The unique ID of the course.
           * subscription_id: A unique "clean" (alphanumeric with '_') ID of the course.
@@ -227,7 +227,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           * end: The end date of the course.
           * name: The name of the course.
           * course_handouts: The URI to get data for course handouts.
-          * start: The data and time the course starts.
+          * start: The date and time the course starts.
           * course_image: The path to the course image.
     """
     queryset = CourseEnrollment.objects.all()
@@ -241,7 +241,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created').reverse()
         return [
             enrollment for enrollment in enrollments
-            if enrollment.course and is_mobile_available_for_user(self.request.user, enrollment.course)
+            if enrollment.course_overview and
+            is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         ]
 
 
