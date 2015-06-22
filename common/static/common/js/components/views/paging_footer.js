@@ -19,12 +19,9 @@
                 },
 
                 render: function() {
-                    var collection = this.collection,
-                        currentPage = collection.currentPage,
-                        lastPage = collection.totalPages - 1;
                     this.$el.html(_.template(paging_footer_template, {
-                        current_page: collection.currentPage,
-                        total_pages: collection.totalPages
+                        current_page: this.collection.currentOneIndexPage(),
+                        total_pages: this.collection.totalPages
                     }));
                     var onFirstPage = !this.collection.hasPreviousPage();
                     var onLastPage = !this.collection.hasNextPage();
@@ -35,7 +32,7 @@
 
                 changePage: function() {
                     var collection = this.collection,
-                        currentPage = collection.currentPage,
+                        currentPage = collection.currentOneIndexPage(),
                         pageInput = this.$("#page-number-input"),
                         pageNumber = parseInt(pageInput.val(), 10),
                         validInput = true;
