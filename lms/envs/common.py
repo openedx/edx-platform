@@ -1504,12 +1504,10 @@ PIPELINE_JS = {
         ],
         'output_filename': 'js/lms-application.js',
     },
-
     'proctoring': {
-	'source_filenames': proctoring_js,
+        'source_filenames': proctoring_js,
         'output_filename': 'js/lms-proctoring.js',
     },
-
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
