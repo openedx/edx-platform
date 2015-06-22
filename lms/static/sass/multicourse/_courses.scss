@@ -55,12 +55,12 @@ $facet-background-color: #007db8;
         max-height: $course-card-height;
       }
 
-      /* Style grid settings if course discovery turned on */
+      // CASE: Course Discovery Search enabled
       &:not(.no-course-discovery) {
         @include span-columns(9);
 
         @include media($bp-medium) {
-          @include span-columns(4);
+          @include span-columns(8);
         }
 
         @include media($bp-large) {
@@ -73,8 +73,8 @@ $facet-background-color: #007db8;
 
         .courses-listing .courses-listing-item {
           @include media($bp-medium) {
-            @include span-columns(8); // 4 of 8
-            @include omega(1n);
+            @include span-columns(4); // 4 of 8
+            @include omega(2n);
           }
 
           @include media($bp-large) {
@@ -89,12 +89,12 @@ $facet-background-color: #007db8;
         }
       }
 
-      /* Style grid settings if course discovery turned off */
-      &.no-course-discovery{
+      // CASE: Course Discovery Search disabled
+      &.no-course-discovery {
         @include span-columns(12);
 
         @include media($bp-medium) {
-          @include span-columns(4); // 4 of 8
+          @include span-columns(8); // 8 of 8
           @include omega(2n);
         }
 
