@@ -39,6 +39,7 @@
             'js/certificates/factories/certificates_page_factory',
             'js/factories/import',
             'js/factories/index',
+            'js/factories/library',
             'js/factories/login',
             'js/factories/manage_users',
             'js/factories/outline',
