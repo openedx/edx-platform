@@ -2067,6 +2067,9 @@ REGISTRATION_EXTRA_FIELDS = {
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
 
+############ CERTIFICATE VERIFICATION URL (STATIC FILES) ###########
+CERTIFICATES_STATIC_VERIFY_URL = "https://verify-test.edx.org/cert/"
+
 #################### Badgr OpenBadges generation #######################
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None

@@ -824,7 +824,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         If certificate web view is enabled then certificate web view button should appear for user who certificate is
         available/generated
         """
-        GeneratedCertificateFactory.create(
+        certificate = GeneratedCertificateFactory.create(
             user=self.user,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
@@ -859,7 +859,12 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertContains(resp, u"View Certificate")
         self.assertContains(resp, u"You can now view your certificate")
-        self.assertContains(resp, certs_api.get_certificate_url(user_id=self.user.id, course_id=self.course.id))
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id,
+            verify_uuid=certificate.verify_uuid
+        )
+        self.assertContains(resp, cert_url)
 
         # when course certificate is not active
         certificates[0]['is_active'] = False

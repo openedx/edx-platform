@@ -253,15 +253,18 @@ def example_certificates_status(course_key):
 
 
 # pylint: disable=no-member
-def get_certificate_url(user_id, course_id):
+def get_certificate_url(user_id, course_id, verify_uuid):
     """
     :return certificate url
     """
-    url = u'{url}'.format(url=reverse('cert_html_view',
-                                      kwargs=dict(
-                                          user_id=str(user_id),
-                                          course_id=unicode(course_id))))
-    return url
+    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        return u'{url}'.format(
+            url=reverse(
+                'cert_html_view',
+                kwargs=dict(user_id=str(user_id), course_id=unicode(course_id))
+            )
+        )
+    return '{url}{uuid}'.format(url=settings.CERTIFICATES_STATIC_VERIFY_URL, uuid=verify_uuid)
 
 
 def get_active_web_certificate(course, is_preview_mode=None):
@@ -290,7 +293,7 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
     data = {
         'user_id': user.id,
         'course_id': unicode(course_id),
-        'certificate_url': get_certificate_url(user.id, course_id)
+        'certificate_url': get_certificate_url(user.id, course_id, event_data['certificate_id'])
     }
     event_data = event_data or {}
     event_data.update(data)

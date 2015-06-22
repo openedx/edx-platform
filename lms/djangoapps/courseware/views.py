@@ -1100,7 +1100,11 @@ def _progress(request, course_key, student_id):
                 context.update({
                     'show_cert_web_view': True,
                     'cert_web_view_url': u'{url}'.format(
-                        url=certs_api.get_certificate_url(user_id=student.id, course_id=unicode(course.id))
+                        url=certs_api.get_certificate_url(
+                            user_id=student.id,
+                            course_id=unicode(course.id),
+                            verify_uuid=None
+                        )
                     )
                 })
             else:

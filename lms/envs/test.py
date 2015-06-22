@@ -472,9 +472,6 @@ FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
 
-# Certificates Views
-FEATURES['CERTIFICATES_HTML_VIEW'] = True
-
 ######### custom courses #########
 INSTALLED_APPS += ('ccx',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
