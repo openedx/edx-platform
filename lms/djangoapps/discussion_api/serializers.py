@@ -179,7 +179,8 @@ class ThreadSerializer(_ContentSerializer):
     comment_list_url = serializers.SerializerMethodField("get_comment_list_url")
     endorsed_comment_list_url = serializers.SerializerMethodField("get_endorsed_comment_list_url")
     non_endorsed_comment_list_url = serializers.SerializerMethodField("get_non_endorsed_comment_list_url")
-
+    has_endorsed = serializers.BooleanField(read_only=True, source="endorsed")
+    read = serializers.BooleanField(read_only=True)
     non_updatable_fields = ("course_id",)
 
     def __init__(self, *args, **kwargs):
