@@ -154,7 +154,7 @@ class XBlockVisibilityTestCase(ModuleStoreTestCase):
         super(XBlockVisibilityTestCase, self).setUp()
 
         self.dummy_user = ModuleStoreEnum.UserID.test
-        self.past = datetime(1970, 1, 1)
+        self.past = datetime(1970, 1, 1, tzinfo=UTC)
         self.future = datetime.now(UTC) + timedelta(days=1)
         self.course = CourseFactory.create()
 
