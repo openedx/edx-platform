@@ -879,7 +879,7 @@ class ChoiceResponse(LoncapaResponse):
         tree = self.xml
         problem_xml = tree.xpath('.')
 
-        # Partial credit type - can set 'points' only at the moment.
+        # Partial credit type - only one type at a time right now.
         credit_type = problem_xml[0].get('partial_credit', default=False)
 
         try:
@@ -1490,6 +1490,15 @@ class OptionResponse(LoncapaResponse):
         # Partial credit type - can set 'points' only at the moment.
         credit_type = problem_xml[0].get('partial_credit', default=False)
 
+        try:
+            credit_type = str(credit_type).lower().strip()
+        except ValueError:
+            _ = self.capa_system.i18n.ugettext
+            # Translators: 'partial_credit' is an attribute name and should not be translated.
+            msg = _("partial_credit value can only be set to 'points' or be removed.")
+            raise LoncapaProblemError(msg)
+        
+
         for aid in amap:
             for word in amap[aid]:
                 if aid in student_answers and student_answers[aid] == word:
@@ -1723,8 +1732,9 @@ class NumericalResponse(LoncapaResponse):
         credit_type = problem_xml[0].get('partial_credit', default=False)
         
         # Allowing for multiple partial credit types. Divide on commas, strip whitespace.
-        credit_type = credit_type.split(',')
-        credit_type = [word.strip().lower() for word in credit_type]
+        if credit_type:
+            credit_type = credit_type.split(',')
+            credit_type = [word.strip().lower() for word in credit_type]
         
         # What multiple of the tolerance is worth partial credit?
         has_partial_range = tree.xpath('responseparam[@partial-range]')
@@ -1776,7 +1786,9 @@ class NumericalResponse(LoncapaResponse):
                 if boundaries[0] < student_float < boundaries[1]:
                     is_correct = 'correct'
                 else:
-                    if 'close' in credit_type:
+                    if credit_type is False:
+                        pass
+                    elif 'close' in credit_type:
                         """
                         Partial credit: 50% if the student is outside the specified boundaries,
                         but within an extended set of boundaries.
@@ -1813,6 +1825,8 @@ class NumericalResponse(LoncapaResponse):
             
             if compare_with_tolerance(student_float, correct_float, self.tolerance):
                 is_correct = 'correct'
+            elif credit_type is False:
+                pass
             elif 'list' in credit_type:
                 for value in partial_answers:
                     if compare_with_tolerance(student_float, value, self.tolerance):
@@ -2371,15 +2385,16 @@ class CustomResponse(LoncapaResponse):
                     Returning any other truthy value for "ok" gives correct
                     """
 
-                    if ret['ok'] == False or str(ret["ok"]).lower().strip() == "false":
+                    if bool(ret['ok']) == False or str(ret["ok"]).lower().strip() == "false":
                         correct = 'incorrect'
                     elif 'partial' in str(ret['ok']).lower().strip():
                         correct = 'partially-correct'
                     else:
                         correct = 'correct'
-                    correct = [correct] * len(idset)
+                    correct = [correct] * len(idset) # All inputs share the same mark.
                     # old version, no partial credit:
                     # correct = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
+                    
                     msg = ret.get('msg', None)
                     msg = self.clean_message_html(msg)
 
@@ -2393,8 +2408,8 @@ class CustomResponse(LoncapaResponse):
                     if 'grade_decimal' in ret:
                         decimal = float(ret['grade_decimal'])
                     else:
-                        decimal = 1.0 if ret['ok'] else 0.0
-                        decimal = self.default_pc if 'partial' in str(ret['ok']).lower().strip() else 0.0
+                        decimal = 1.0 if correct[0] == 'correct' else 0.0
+                        decimal = self.default_pc if correct[0] == 'partially_correct' else 0.0
                     grade_decimals = [decimal] * len(idset)
                     self.context['grade_decimals'] = grade_decimals
 
