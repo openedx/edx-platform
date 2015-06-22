@@ -17,10 +17,7 @@
                 },
 
                 render: function() {
-                    var collection = this.collection,
-                        currentPage = collection.currentPage,
-                        lastPage = collection.totalPages - 1,
-                        messageHtml = this.messageHtml();
+                    var messageHtml = this.messageHtml();
                     this.$el.html(_.template(paging_header_template, {
                         messageHtml: messageHtml
                     }));
