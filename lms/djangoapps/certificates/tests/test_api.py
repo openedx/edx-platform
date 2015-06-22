@@ -148,7 +148,7 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
             'edx.certificate.created',
             user_id=self.student.id,
             course_id=unicode(self.course.id),
-            certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id),
+            certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id, cert.verify_uuid),
             certificate_id=cert.verify_uuid,
             enrollment_mode=cert.mode,
             generation_mode='batch'
@@ -164,7 +164,7 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
         self.assertEqual(cert.status, 'error')
         self.assertIn(self.ERROR_REASON, cert.error_reason)
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_new_cert_requests_returns_generating_for_html_certificate(self):
         """
         Test no message sent to Xqueue if HTML certificate view is enabled
