@@ -10,8 +10,6 @@ var edx = edx || {};
 
     edx.verify_student.IntroStepView = edx.verify_student.StepView.extend({
 
-        templateName: "intro_step",
-
         defaultContext: function() {
             return {
                 introTitle: '',

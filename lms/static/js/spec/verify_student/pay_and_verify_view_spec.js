@@ -18,16 +18,19 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
             ];
 
             var INTRO_STEP = {
+                templateName: "intro_step",
                 name: "intro-step",
                 title: "Intro"
             };
 
             var DISPLAY_STEPS_FOR_PAYMENT = [
                 {
+                    templateName: "make_payment_step",
                     name: "make-payment-step",
                     title: "Make Payment"
                 },
                 {
+                    templateName: "payment_confirmation_step",
                     name: "payment-confirmation-step",
                     title: "Payment Confirmation"
                 }
@@ -35,18 +38,22 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
             var DISPLAY_STEPS_FOR_VERIFICATION = [
                 {
+                    templateName: "face_photo_step",
                     name: "face-photo-step",
                     title: "Take Face Photo"
                 },
                 {
+                    templateName: "id_photo_step",
                     name: "id-photo-step",
                     title: "ID Photo"
                 },
                 {
+                    templateName: "review_photos_step",
                     name: "review-photos-step",
                     title: "Review Photos"
                 },
                 {
+                    templateName: "enrollment_confirmation_step",
                     name: "enrollment-confirmation-step",
                     title: "Enrollment Confirmation"
                 }
@@ -60,7 +67,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 }).render();
             };
 
-            var expectStepRendered = function( stepName ) {
+            var expectStepRendered = function( stepName, stepNum, numSteps ) {
                 // Expect that the step container div rendered
                 expect( $( '.' + stepName ).length > 0 ).toBe( true );
             };
@@ -82,27 +89,27 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 );
 
                 // Verify that the first step rendered
-                expectStepRendered('make-payment-step');
+                expectStepRendered('make-payment-step', 1, 6);
 
                 // Iterate through the steps, ensuring that each is rendered
                 view.nextStep();
-                expectStepRendered('payment-confirmation-step');
+                expectStepRendered('payment-confirmation-step', 2, 6);
 
                 view.nextStep();
-                expectStepRendered('face-photo-step');
+                expectStepRendered('face-photo-step', 3, 6);
 
                 view.nextStep();
-                expectStepRendered('id-photo-step');
+                expectStepRendered('id-photo-step', 4, 6);
 
                 view.nextStep();
-                expectStepRendered('review-photos-step');
+                expectStepRendered('review-photos-step', 5, 6);
 
                 view.nextStep();
-                expectStepRendered('enrollment-confirmation-step');
+                expectStepRendered('enrollment-confirmation-step', 6, 6);
 
                 // Going past the last step stays on the last step
                 view.nextStep();
-                expectStepRendered('enrollment-confirmation-step');
+                expectStepRendered('enrollment-confirmation-step', 6, 6);
             });
 
             it( 'renders intro and verification steps', function() {
@@ -112,20 +119,20 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 );
 
                 // Verify that the first step rendered
-                expectStepRendered('intro-step');
+                expectStepRendered('intro-step', 1, 5);
 
                 // Iterate through the steps, ensuring that each is rendered
                 view.nextStep();
-                expectStepRendered('face-photo-step');
+                expectStepRendered('face-photo-step', 2, 5);
 
                 view.nextStep();
-                expectStepRendered('id-photo-step');
+                expectStepRendered('id-photo-step', 3, 5);
 
                 view.nextStep();
-                expectStepRendered('review-photos-step');
+                expectStepRendered('review-photos-step', 4, 5);
 
                 view.nextStep();
-                expectStepRendered('enrollment-confirmation-step');
+                expectStepRendered('enrollment-confirmation-step', 5, 5);
             });
 
             it( 'starts from a later step', function() {
@@ -136,11 +143,11 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 );
 
                 // Verify that we start on the right step
-                expectStepRendered('payment-confirmation-step');
+                expectStepRendered('payment-confirmation-step', 2, 6);
 
                 // Try moving to the next step
                 view.nextStep();
-                expectStepRendered('face-photo-step');
+                expectStepRendered('face-photo-step', 3, 6);
 
             });
 
@@ -153,7 +160,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
                 // Jump back to the face photo step
                 view.goToStep('face-photo-step');
-                expectStepRendered('face-photo-step');
+                expectStepRendered('face-photo-step', 1, 4);
 
             });
         });
