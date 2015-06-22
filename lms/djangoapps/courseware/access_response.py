@@ -14,10 +14,7 @@ class AccessResponse(object):
         )
 
     def __hash__(self):
-        return hash(self.__key())
-
-    def __key(self):
-        return self.has_access, self.access_error
+        return hash((self.has_access, self.access_error))
 
     def to_json(self):
         return {
@@ -39,11 +36,8 @@ class AccessError(object):
             self.developer_message == other.developer_message
         )
 
-    def __key(self):
-        return self.error_code, self.developer_message, self.user_message
-
     def __hash__(self):
-        return hash(self.__key())
+        return hash((self.error_code, self.developer_message, self.user_message))
 
     def to_json(self):
         return {
