@@ -16,7 +16,8 @@
 
             server_api: {
                 'page': function () { return this.currentPage; },
-                'page_size': function () { return this.perPage; }
+                'page_size': function () { return this.perPage; },
+                'sort_order': function () { return this.sortDirection }
             },
 
             parse: function (response) {
@@ -138,10 +139,15 @@
             },
 
             /**
-             * Sets the field to sort on.
+             * Sets the field to sort on. If the field is already set, then the sort order is toggled.
              * @param fieldName name of the field to sort on
              */
-            setSortField: function (fieldName) {
+            toggleSortField: function (fieldName) {
+                if (this.sortField === fieldName) {
+                    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.sortDirection = 'desc';
+                }
                 this.sortField = fieldName;
                 this.setPage(1);
             },
