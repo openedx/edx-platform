@@ -309,6 +309,14 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
+            'js/courseware/base/views/proctored_exam_view': {
+                exports: 'edx.coursware.proctored_exam.ProctoredExamView',
+                deps: ['backbone', 'jquery', 'underscore']
+            },
+            'js/courseware/base/models/proctored_exam_model': {
+                exports: 'ProctoredExamModel',
+                deps: ['backbone']
+            },
             'js/groups/models/cohort': {
                 exports: 'edx.groups.CohortModel',
                 deps: ['backbone']
