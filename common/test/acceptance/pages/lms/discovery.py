@@ -15,7 +15,15 @@ class CourseDiscoveryPage(PageObject):
     form = "#discovery-form"
 
     def is_browser_on_page(self):
-        return "Courses" in self.browser.title
+        """
+        Loading indicator must be present, but not visible
+        """
+        loading_css = "#loading-indicator"
+        courses_css = '.courses-listing'
+
+        return self.q(css=courses_css).visible \
+            and self.q(css=loading_css).present \
+            and not self.q(css=loading_css).visible
 
     @property
     def result_items(self):
