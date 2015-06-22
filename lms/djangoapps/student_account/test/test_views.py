@@ -239,7 +239,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
 
     @ddt.data(
         (False, "account_login"),
-        (False, "account_login"),
+        (False, "account_register"),
         (True, "account_login"),
         (True, "account_register"),
     )
