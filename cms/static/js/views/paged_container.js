@@ -34,7 +34,7 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     },
 
                     setPage: function (page) {
-                        self.setPage(page);
+                        self.setPage(page - 1);
                     },
 
                     nextPage: function () {
@@ -43,6 +43,18 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
 
                     previousPage: function() {
                         self.previousPage();
+                    },
+
+                    currentOneIndexPage: function () {
+                        return self.collection.currentPage + 1;
+                    },
+
+                    hasPreviousPage: function () {
+                        return self.collection.currentPage > 0;
+                    },
+
+                    hasNextPage: function () {
+                        return self.collection.currentPage < self.collection.totalPages - 1;
                     }
                 };
             },
