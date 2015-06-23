@@ -123,7 +123,7 @@
                         collection.sortDirection = defaultSortDirection;
                     }
                     this.sortColumn = sortColumn;
-                    this.collection.setPage(0);
+                    this.collection.setPage(1);
                 },
 
                 selectFilter: function(filterColumn) {
@@ -135,7 +135,7 @@
                         collection.filterField = filterField;
                     }
                     this.filterColumn = filterColumn;
-                    this.collection.setPage(0);
+                    this.collection.setPage(1);
                 }
             });
             return PagingView;
