@@ -12,6 +12,7 @@ import uuid
 
 from contracts import contract
 from nose.plugins.attrib import attr
+from django.core.cache import get_cache
 
 from openedx.core.lib import tempdir
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
@@ -29,6 +30,7 @@ from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import mock_tab_from_json
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -769,6 +771,37 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
+
+
+@patch.dict(
+    'django.conf.settings.CACHES', {
+        "course_structure_cache": {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'edx_course_structure_mem_cache',
+        }
+    }
+)
+class TestCourseStructureCache(SplitModuleTest):
+    """Tests for the CourseStructureCache"""
+
+    def tearDown(self):
+        # make sure we clear the cache after every test
+        cache = get_cache('course_structure_cache')
+        cache.clear()
+
+        super(TestCourseStructureCache, self).tearDown()
+
+    def test_course_structure_cache(self):
+        user = random.getrandbits(32)
+        new_course = modulestore().create_course(
+            'org', 'course', 'test_run', user, BRANCH_NAME_DRAFT,
+        )
+
+        with check_mongo_calls(4):
+            not_cached_course = modulestore().get_course(new_course.id)
+        # when cache is warmed, we should have one fewer mongo call
+        with check_mongo_calls(3):
+            cached_course = modulestore().get_course(new_course.id)
 
 
 class SplitModuleItemTests(SplitModuleTest):
