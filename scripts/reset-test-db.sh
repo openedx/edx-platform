@@ -34,12 +34,16 @@ echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
 if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then
 
     # Load the schema, then the data (including the migration history)
+    echo "Loading cached schema and fixture data..."
     mysql -u root edxtest < $DB_CACHE_DIR/bok_choy_schema.sql
     ./manage.py lms --settings bok_choy loaddata $DB_CACHE_DIR/bok_choy_data.json
 
     # Re-run migrations to ensure we are up-to-date
-    ./manage.py lms --settings bok_choy migrate --traceback --noinput
-    ./manage.py cms --settings bok_choy migrate --traceback --noinput
+    echo "Executing lms migrations..."
+    ./manage.py lms --settings bok_choy migrate --traceback --noinput --verbosity 0
+    echo "Executing studio migrations..."
+    ./manage.py cms --settings bok_choy migrate --traceback --noinput --verbosity 0
+    echo "Finished resetting the bok-choy test database."
 
 # Otherwise, update the test database and update the cache
 else
