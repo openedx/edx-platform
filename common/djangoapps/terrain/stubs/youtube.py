@@ -97,6 +97,9 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             if self.server.config.get('youtube_api_blocked'):
                 self.send_response(404, content='', headers={'Content-type': 'text/plain'})
             else:
+                # Delay the response to simulate network latency
+                time.sleep(self.server.config.get('time_to_response', self.DEFAULT_DELAY_SEC))
+
                 # Get the response to send from YouTube.
                 # We need to do this every time because Google sometimes sends different responses
                 # as part of their own experiments, which has caused our tests to become "flaky"
