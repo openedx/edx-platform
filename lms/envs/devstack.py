@@ -76,6 +76,12 @@ def should_show_debug_toolbar(_):
 
 ########################### PIPELINE #################################
 
+# Skip RequireJS optimizer in development
+# STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = DEBUG
+
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 ########################### VERIFIED CERTIFICATES #################################

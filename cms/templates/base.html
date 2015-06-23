@@ -81,7 +81,7 @@ import json
 
     <%block name="jsextra"></%block>
     <script type="text/javascript">
-      require(['js/factories/common_deps'], function () {
+      require(['common/js/common_libraries'], function () {
           require(['js/factories/base'], function () {
             % if context_course:
               require(['js/factories/course'], function(CourseFactory) {

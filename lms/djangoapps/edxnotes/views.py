@@ -46,7 +46,8 @@ def edxnotes(request, course_id):
         "search_endpoint": reverse("search_notes", kwargs={"course_id": course_id}),
         "notes": notes,
         "debug": json.dumps(settings.DEBUG),
-        'position': None,
+        "position": None,
+        "enable_require_js": True,
     }
 
     if not notes:
