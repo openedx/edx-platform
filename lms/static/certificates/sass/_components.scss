@@ -118,6 +118,15 @@
 
         .icon {
             @include margin-right(spacing-horizontal(x-small));
+            font-size: font-size(mid-large);
+        }
+
+        // CASE: icon display only
+        &.icon-only {
+
+            .action-label {
+                @extend %a11y-hide;
+            }
         }
 
         // CASE mozilla open badges logo

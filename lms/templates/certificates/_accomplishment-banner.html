@@ -34,6 +34,23 @@
                 <div class="message-actions">
                     <h3 class="sr-only">${_("Take this with you:")}</h3>
 
+                    <a href="" class="action action-share-facebook btn btn-overlay btn-small icon-only" id="action-share-facebook">
+                        <i class="icon fa fa-facebook-official" aria-hidden="true"></i>
+                        <span class="action-label">${_("Post this on Facebook")}</span>
+                    </a>
+
+                    <a href="" class="action action-share-twitter btn btn-overlay btn-small icon-only" id="action-share-twitter">
+                        <i class="icon fa fa-twitter" aria-hidden="true"></i>
+                        <span class="action-label">${_("Tweet this Accomplishment")}</span>
+                    </a>
+
+                    %if linked_in_url:
+                    <a class="action action-share-linkedin btn btn-overlay btn-small icon-only" id="action-share-linkedin" target="_blank" href="${linked_in_url}" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
+                        <i class="icon fa fa-linkedin" aria-hidden="true"></i>
+                        <span class="action-label">${_("Add to LinkedIn Profile")}</span>
+                    </a>
+                    %endif
+
                     %if badge:
                     <button class="action action-share-mozillaopenbadges btn btn-overlay btn-small">
                         <img class="icon icon-mozillaopenbadges" src="/static/certificates/images/ico-mozillaopenbadges.png" alt="Mozilla Open Badges Backpack">
@@ -45,16 +62,6 @@
                         <i class="icon fa fa-print" aria-hidden="true"></i>
                         ${_("Print Certificate")}
                     </button>
-                %if linked_in_url:
-                    <a class="action-linkedin-profile" target="_blank" href="${linked_in_url}"
-                        title="${_('Add to LinkedIn Profile')}"
-                        data-course-id="${course_id}"
-                        data-certificate-mode="${course_mode}">
-                        <img class="action-linkedin-profile-img"
-                            src="${static.url('images/linkedin_add_to_profile.png')}"
-                            alt="${_('Add to LinkedIn Profile')}" />
-                    </a>
-                %endif
                 </div>
             </div>
         </div>
