@@ -30,11 +30,6 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus,
     CreditEligibility
 )
-from openedx.core.djangoapps.credit.api import (
-    set_credit_requirements,
-    set_credit_requirement_status,
-    get_credit_requirement
-)
 from student.models import CourseEnrollment
 from student.views import _create_credit_availability_message
 from student.tests.factories import UserFactory
@@ -240,7 +235,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 }
             }
         ]
-        requirement = get_credit_requirement(self.course_key, "grade", "grade")
+        requirement = api.get_credit_requirement(self.course_key, "grade", "grade")
         self.assertIsNone(requirement)
 
         expected_requirement = {
@@ -252,8 +247,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 "min_grade": 0.8
             }
         }
-        set_credit_requirements(self.course_key, requirements)
-        requirement = get_credit_requirement(self.course_key, "grade", "grade")
+        api.set_credit_requirements(self.course_key, requirements)
+        requirement = api.get_credit_requirement(self.course_key, "grade", "grade")
         self.assertIsNotNone(requirement)
         self.assertEqual(requirement, expected_requirement)
 
@@ -276,25 +271,128 @@ class CreditRequirementApiTests(CreditApiTestBase):
             }
         ]
 
-        set_credit_requirements(self.course_key, requirements)
-        course_requirements = CreditRequirement.get_course_requirements(self.course_key)
+        api.set_credit_requirements(self.course_key, requirements)
+        course_requirements = api.get_credit_requirements(self.course_key)
         self.assertEqual(len(course_requirements), 2)
 
-        requirement = get_credit_requirement(self.course_key, "grade", "grade")
-        set_credit_requirement_status("staff", requirement, 'satisfied', {})
-        course_requirement = CreditRequirement.get_course_requirement(
-            requirement['course_key'], requirement['namespace'], requirement['name']
-        )
-        status = CreditRequirementStatus.objects.get(username="staff", requirement=course_requirement)
-        self.assertEqual(status.requirement.namespace, requirement['namespace'])
-        self.assertEqual(status.status, "satisfied")
+        # Initially, the status should be None
+        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
+        self.assertEqual(req_status[0]["status"], None)
 
-        set_credit_requirement_status(
-            "staff", requirement, 'failed', {'failure_reason': "requirements not satisfied"}
+        # Set the requirement to "satisfied" and check that it's actually set
+        api.set_credit_requirement_status("staff", self.course_key, "grade", "grade")
+        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
+        self.assertEqual(req_status[0]["status"], "satisfied")
+
+        # Set the requirement to "failed" and check that it's actually set
+        api.set_credit_requirement_status("staff", self.course_key, "grade", "grade", status="failed")
+        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
+        self.assertEqual(req_status[0]["status"], "failed")
+
+    def test_satisfy_all_requirements(self):
+        # Configure a course with two credit requirements
+        self.add_credit_course()
+        requirements = [
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": 0.8
+                }
+            },
+            {
+                "namespace": "reverification",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
+                "criteria": {}
+            }
+        ]
+        api.set_credit_requirements(self.course_key, requirements)
+
+        # Satisfy one of the requirements, but not the other
+        with self.assertNumQueries(7):
+            api.set_credit_requirement_status(
+                "bob",
+                self.course_key,
+                requirements[0]["namespace"],
+                requirements[0]["name"]
+            )
+
+        # The user should not be eligible (because only one requirement is satisfied)
+        self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
+
+        # Satisfy the other requirement
+        with self.assertNumQueries(10):
+            api.set_credit_requirement_status(
+                "bob",
+                self.course_key,
+                requirements[1]["namespace"],
+                requirements[1]["name"]
+            )
+
+        # Now the user should be eligible
+        self.assertTrue(api.is_user_eligible_for_credit("bob", self.course_key))
+
+        # The user should remain eligible even if the requirement status is later changed
+        api.set_credit_requirement_status(
+            "bob",
+            self.course_key,
+            requirements[0]["namespace"],
+            requirements[0]["name"],
+            status="failed"
         )
-        status = CreditRequirementStatus.objects.get(username="staff", requirement=course_requirement)
-        self.assertEqual(status.requirement.namespace, requirement['namespace'])
-        self.assertEqual(status.status, "failed")
+        self.assertTrue(api.is_user_eligible_for_credit("bob", self.course_key))
+
+    def test_set_credit_requirement_status_req_not_configured(self):
+        # Configure a credit course with no requirements
+        self.add_credit_course()
+
+        # A user satisfies a requirement.  This could potentially
+        # happen if there's a lag when the requirements are updated
+        # after the course is published.
+        api.set_credit_requirement_status("bob", self.course_key, "grade", "grade")
+
+        # Since the requirement hasn't been published yet, it won't show
+        # up in the list of requirements.
+        req_status = api.get_credit_requirement_status(self.course_key, "bob", namespace="grade", name="grade")
+        self.assertEqual(req_status, [])
+
+        # Now add the requirements, simulating what happens when a course is published.
+        requirements = [
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": 0.8
+                }
+            },
+            {
+                "namespace": "reverification",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
+                "criteria": {}
+            }
+        ]
+        api.set_credit_requirements(self.course_key, requirements)
+
+        # The user should not have satisfied the requirements, since they weren't
+        # in effect when the user completed the requirement
+        req_status = api.get_credit_requirement_status(self.course_key, "bob")
+        self.assertEqual(len(req_status), 2)
+        self.assertEqual(req_status[0]["status"], None)
+        self.assertEqual(req_status[0]["status"], None)
+
+        # The user should *not* have satisfied the reverification requirement
+        req_status = api.get_credit_requirement_status(
+            self.course_key,
+            "bob",
+            namespace=requirements[1]["namespace"],
+            name=requirements[1]["name"]
+        )
+        self.assertEqual(len(req_status), 1)
+        self.assertEqual(req_status[0]["status"], None)
 
 
 @ddt.ddt

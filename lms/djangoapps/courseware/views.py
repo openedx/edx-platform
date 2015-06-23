@@ -1066,27 +1066,6 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
-    credit_course_requirements = None
-    is_course_credit = settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)
-    if is_course_credit:
-        requirement_statuses = get_credit_requirement_status(course_key, student.username)
-        if any(requirement['status'] == 'failed' for requirement in requirement_statuses):
-            eligibility_status = "not_eligible"
-        elif is_user_eligible_for_credit(student.username, course_key):
-            eligibility_status = "eligible"
-        else:
-            eligibility_status = "partial_eligible"
-
-        paired_requirements = {}
-        for requirement in requirement_statuses:
-            namespace = requirement.pop("namespace")
-            paired_requirements.setdefault(namespace, []).append(requirement)
-
-        credit_course_requirements = {
-            'eligibility_status': eligibility_status,
-            'requirements': OrderedDict(sorted(paired_requirements.items(), reverse=True))
-        }
-
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -1096,8 +1075,7 @@ def _progress(request, course_key, student_id):
         'student': student,
         'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn,
-        'credit_course_requirements': credit_course_requirements,
-        'is_credit_course': is_course_credit,
+        'credit_course_requirements': _credit_course_requirements(course_key, student),
     }
 
     if show_generate_cert_btn:
@@ -1122,6 +1100,64 @@ def _progress(request, course_key, student_id):
         response = render_to_response('courseware/progress.html', context)
 
     return response
+
+
+def _credit_course_requirements(course_key, student):
+    """Return information about which credit requirements a user has satisfied.
+
+    Arguments:
+        course_key (CourseKey): Identifier for the course.
+        student (User): Currently logged in user.
+
+    Returns: dict
+
+    """
+    # If credit eligibility is not enabled or this is not a credit course,
+    # short-circuit and return `None`.  This indicates that credit requirements
+    # should NOT be displayed on the progress page.
+    if not (settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)):
+        return None
+
+    # Retrieve the status of the user for each eligibility requirement in the course.
+    # For each requirement, the user's status is either "satisfied", "failed", or None.
+    # In this context, `None` means that we don't know the user's status, either because
+    # the user hasn't done something (for example, submitting photos for verification)
+    # or we're waiting on more information (for example, a response from the photo
+    # verification service).
+    requirement_statuses = get_credit_requirement_status(course_key, student.username)
+
+    # If the user has been marked as "eligible", then they are *always* eligible
+    # unless someone manually intervenes.  This could lead to some strange behavior
+    # if the requirements change post-launch.  For example, if the user was marked as eligible
+    # for credit, then a new requirement was added, the user will see that they're eligible
+    # AND that one of the requirements is still pending.
+    # We're assuming here that (a) we can mitigate this by properly training course teams,
+    # and (b) it's a better user experience to allow students who were at one time
+    # marked as eligible to continue to be eligible.
+    # If we need to, we can always manually move students back to ineligible by
+    # deleting CreditEligibility records in the database.
+    if is_user_eligible_for_credit(student.username, course_key):
+        eligibility_status = "eligible"
+
+    # If the user has *failed* any requirements (for example, if a photo verification is denied),
+    # then the user is NOT eligible for credit.
+    elif any(requirement['status'] == 'failed' for requirement in requirement_statuses):
+        eligibility_status = "not_eligible"
+
+    # Otherwise, the user may be eligible for credit, but the user has not
+    # yet completed all the requirements.
+    else:
+        eligibility_status = "partial_eligible"
+
+    paired_requirements = {}
+    for requirement in requirement_statuses:
+        namespace = requirement.pop("namespace")
+        paired_requirements.setdefault(namespace, []).append(requirement)
+
+    return {
+        'eligibility_status': eligibility_status,
+        'requirements': OrderedDict(sorted(paired_requirements.items(), reverse=True))
+    }
 
 
 @login_required
