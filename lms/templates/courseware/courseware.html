@@ -28,12 +28,13 @@ ${page_title_breadcrumbs(course_name())}
 
 % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-    <script type="text/template" id="${template_name}-tpl">
-        <%static:include path="search/${template_name}.underscore" />
-    </script>
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="search/${template_name}.underscore" />
+        </script>
+    % endfor
 % endif
 
-% for template_name in ["proctored_exams_status"]:
+% for template_name in ["proctored-exam-status"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="courseware/${template_name}.underscore" />
   </script>
