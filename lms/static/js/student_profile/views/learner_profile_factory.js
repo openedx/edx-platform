@@ -71,7 +71,8 @@
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Username'),
                     valueAttribute: "username",
-                    helpMessage: ""
+                    helpMessage: "",
+                    isTitle: true
             });
 
             var sectionOneFieldViews = [
