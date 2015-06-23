@@ -8,6 +8,7 @@ import ddt
 from xmodule.modulestore.store_utilities import (
     get_draft_subtree_roots, draft_node_constructor
 )
+from xmodule.modulestore import BlockData, EditInfo
 
 
 @ddt.ddt

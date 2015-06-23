@@ -4,9 +4,7 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 import datetime
 import cPickle as pickle
 import math
-import re
 import zlib
-from mongodb_proxy import autoretry_read, MongoProxy
 import pymongo
 import pytz
 import re
@@ -213,15 +211,22 @@ class CourseStructureCache(object):
     """
     Wrapper around django cache object to cache course structure objects.
     The course structures are pickled and compressed when cached.
+
+    If the 'course_structure_cache' doesn't exist, then don't do anything for
+    for set and get.
     """
     def __init__(self):
+        self.no_cache_found = False
         try:
             self.cache = get_cache('course_structure_cache')
         except InvalidCacheBackendError:
-            self.cache = get_cache('default')
+            self.no_cache_found = True
 
     def get(self, key):
         """Pull the compressed, pickled struct data from cache and deserialize."""
+        if self.no_cache_found:
+            return None
+
         compressed_pickled_data = self.cache.get(key)
         if compressed_pickled_data is None:
             return None
@@ -229,6 +234,9 @@ class CourseStructureCache(object):
 
     def set(self, key, structure):
         """Given a structure, will pickle, compress, and write to cache."""
+        if self.no_cache_found:
+            return None
+
         pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
         # 1 = Fastest (slightly larger results)
         compressed_pickled_data = zlib.compress(pickled_data, 1)
