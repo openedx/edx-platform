@@ -92,6 +92,9 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "id": unicode(self.course.id),
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
+                "following_thread_list_url": (
+                    "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True"
+                ),
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
             }
         )
@@ -269,6 +272,28 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "recursive": ["False"],
             "text": ["test search string"],
         })
+
+    def test_following(self):
+        self.register_get_user_response(self.user)
+        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=1)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": unicode(self.course.id),
+                "page": "1",
+                "page_size": "4",
+                "following": "True",
+            }
+        )
+        self.assert_response_correct(
+            response,
+            200,
+            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+        )
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/users/{}/subscribed_threads".format(self.user.id)
+        )
 
 
 @httpretty.activate
