@@ -1,5 +1,5 @@
 <div class="exam-timer">
-<%- gettext("You're taking") %>
+<%- gettext("You are taking") %>
 <a href="<%- interpolate(gettext('%(exam_url_path)s'), { exam_url_path: exam_url_path }, true)%>" >
 
 <%- interpolate(gettext(' %(exam_display_name)s '), { exam_display_name: exam_display_name }, true) %>
