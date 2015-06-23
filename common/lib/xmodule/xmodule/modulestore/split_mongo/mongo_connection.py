@@ -2,7 +2,11 @@
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
 import datetime
+import cPickle as pickle
 import math
+import re
+import zlib
+from mongodb_proxy import autoretry_read, MongoProxy
 import pymongo
 import pytz
 import re
@@ -11,6 +15,8 @@ from time import time
 
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+from django.core.cache import get_cache, InvalidCacheBackendError
+import dogstats_wrapper as dog_stats_api
 
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read, MongoProxy
@@ -203,6 +209,40 @@ def structure_to_mongo(structure, course_context=None):
         return new_structure
 
 
+class CourseStructureCache(object):
+    """
+    Wrapper around django cache object to cache course structure objects.
+    The course structures are pickled and compressed when cached.
+    """
+    def __init__(self):
+        try:
+            self.cache = get_cache('course_structure_cache')
+        except InvalidCacheBackendError:
+            self.cache = get_cache('default')
+
+    def get(self, key):
+        """Pull the compressed, pickled struct data from cache and deserialize."""
+        compressed_pickled_data = self.cache.get(key)
+        if compressed_pickled_data is None:
+            return None
+        return pickle.loads(zlib.decompress(compressed_pickled_data))
+
+    def set(self, key, structure):
+        """Given a structure, will pickle, compress, and write to cache."""
+        pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
+        # 1 = Fastest (slightly larger results)
+        compressed_pickled_data = zlib.compress(pickled_data, 1)
+
+        # record compressed course structure sizes
+        dog_stats_api.histogram(
+            'compressed_course_structure.size',
+            len(compressed_pickled_data),
+            tags=[key]
+        )
+        # Stuctures are immutable, so we set a timeout of "never"
+        self.cache.set(key, compressed_pickled_data, None)
+
+
 class MongoConnection(object):
     """
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
@@ -256,15 +296,23 @@ class MongoConnection(object):
 
     def get_structure(self, key, course_context=None):
         """
-        Get the structure from the persistence mechanism whose id is the given key
+        Get the structure from the persistence mechanism whose id is the given key.
+
+        This method will use a cached version of the structure if it is availble.
         """
         with TIMER.timer("get_structure", course_context) as tagger_get_structure:
-            with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
-                doc = self.structures.find_one({'_id': key})
-                tagger_find_one.measure("blocks", len(doc['blocks']))
-            tagger_get_structure.measure("blocks", len(doc['blocks']))
+            cache = CourseStructureCache()
 
-            return structure_from_mongo(doc, course_context)
+            structure = cache.get(key)
+            tagger_get_structure.tag(from_cache='true' if structure else 'false')
+            if not structure:
+                with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
+                    doc = self.structures.find_one({'_id': key})
+                    tagger_find_one.measure("blocks", len(doc['blocks']))
+                    structure = structure_from_mongo(doc, course_context)
+                cache.set(key, structure)
+
+            return structure
 
     @autoretry_read()
     def find_structures_by_id(self, ids, course_context=None):

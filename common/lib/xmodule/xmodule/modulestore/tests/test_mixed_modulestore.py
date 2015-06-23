@@ -794,7 +794,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
-    #   find: active_version & structure
+    #   find: active_version & structure (cached)
     #   send: update structure and active_versions
     @ddt.data(('draft', 4, 1), ('split', 2, 2))
     @ddt.unpack
