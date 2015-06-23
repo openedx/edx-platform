@@ -10,11 +10,11 @@ define(['teams/js/views/topic_header', 'teams/js/collections/topic'],
                                "description": "description " + i,
                                "name": "topic " + i,
                                "id": "id " + i
-                           }
+                           };
                        });
                        var collection = new TopicCollection(
                            {results: _.first(results, perPage)},
-                           {course_id: courseId}
+                           {course_id: courseId, parse: true}
                        );
                        collection.start = 0;
                        collection.totalCount = results.length;
@@ -42,6 +42,6 @@ define(['teams/js/views/topic_header', 'teams/js/collections/topic'],
                    }).render();
                    expect(topicHeader.$el.find('.search-count').text())
                        .toContain('Currently viewing all 5 topics');
-               })
+               });
            });
 });
