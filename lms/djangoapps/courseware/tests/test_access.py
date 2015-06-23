@@ -8,6 +8,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
+import courseware.access_response as access_response
 from courseware.masquerade import CourseMasquerade
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -46,12 +47,26 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def verify_access(self, mock_unit, student_should_have_access):
         """ Verify the expected result from _has_access_descriptor """
+
+        self.assertEqual(
+            student_should_have_access,
+            bool(access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key))
+        )
+
+        """
         self.assertEqual(
             student_should_have_access,
             access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key)
         )
+        """
         self.assertTrue(
             access._has_access_descriptor(self.course_staff, 'load', mock_unit, course_key=self.course.course_key)
+        )
+
+    def verify_error_type(self, mock_unit, expected_error_type):
+        self.assertIsInstance(
+            access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key),
+            expected_error_type
         )
 
     def test_has_access_to_course(self):
@@ -147,6 +162,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # No start date, staff lock on
         mock_unit.visible_to_staff_only = True
         self.verify_access(mock_unit, False)
+        self.verify_error_type(mock_unit, access_response.VisibilityError)
 
         # No start date, staff lock off.
         mock_unit.visible_to_staff_only = False
@@ -156,6 +172,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         mock_unit.visible_to_staff_only = True
         self.verify_access(mock_unit, False)
+        self.verify_error_type(mock_unit, access_response.VisibilityError)
 
         # Start date in the past, staff lock off.
         mock_unit.visible_to_staff_only = False
@@ -165,10 +182,12 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
         mock_unit.visible_to_staff_only = True
         self.verify_access(mock_unit, False)
+        self.verify_error_type(mock_unit, access_response.VisibilityError)
 
         # Start date in the future, staff lock off.
         mock_unit.visible_to_staff_only = False
         self.verify_access(mock_unit, False)
+        self.verify_error_type(mock_unit, access_response.StartDateError)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     @patch('courseware.access.get_current_request_hostname', Mock(return_value='preview.localhost'))
@@ -211,6 +230,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # Start date in the future.
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
         self.verify_access(mock_unit, False)
+        self.verify_error_type(mock_unit, access_response.StartDateError)
 
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
@@ -317,7 +337,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         #user should not be able to load course even if enrolled
         CourseEnrollmentFactory(user=user, course_id=course.id)
-        self.assertFalse(access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course))
+        response = access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course)
+        self.assertFalse(response)
+        self.assertIsInstance(response, access_response.MilestoneError)
 
         # Staff can always access course
         staff = StaffFactory.create(course_key=course.id)
