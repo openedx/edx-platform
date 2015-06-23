@@ -482,7 +482,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### Pipeline #######################################
-STATICFILES_STORAGE = 'cms.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -618,6 +618,8 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # auto will autodetect the environment and make use of node if available and rhino if not.
 # It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
+
+################################# TENDER ######################################
 
 # If you want to enable Tender integration (http://tenderapp.com/),
 # put in the subdomain where Tender hosts tender_widget.js. For example,

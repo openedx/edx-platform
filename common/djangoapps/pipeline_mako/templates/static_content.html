@@ -51,3 +51,21 @@ except:
 from django.template.loaders.filesystem import _loader
 source, template_path = _loader.load_template_source(path)
 %>${source}</%def>
+
+<%def name="require_module(module_name, class_name)">
+    <script type="text/javascript">
+        (function (require) {
+            % if settings.REQUIRE_DEBUG:
+                require(['${module_name}'], function (${class_name}) {
+                    ${caller.body()}
+                });
+            % else:
+                require(['${staticfiles_storage.url(module_name + ".js")}'], function () {
+                    require(['${module_name}'], function (${class_name}) {
+                        ${caller.body()}
+                    });
+                });
+            % endif
+        }).call(this, require || RequireJS.require);
+    </script>
+</%def>
