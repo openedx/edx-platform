@@ -337,7 +337,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         #user should not be able to load course even if enrolled
         CourseEnrollmentFactory(user=user, course_id=course.id)
-        self.assertFalse(access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course))
+        response = access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course)
+        self.assertFalse(response)
+        self.assertIsInstance(response, access_response.MilestoneError)
 
         # Staff can always access course
         staff = StaffFactory.create(course_key=course.id)
