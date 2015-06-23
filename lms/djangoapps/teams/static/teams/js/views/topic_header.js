@@ -17,8 +17,7 @@
             render: function () {
                 var currentlyViewing,
                     start = this.collection.start,
-                    perPage = this.collection.perPage,
-                    end = start + perPage,
+                    end = start + this.collection.length,
                     size = this.collection.totalCount;
                 // Translators: becomes either "all 10 topics" or "1 through 5 of 10 topics"
                 if (end >= size && start === 0) {
