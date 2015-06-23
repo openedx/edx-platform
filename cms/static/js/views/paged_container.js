@@ -29,10 +29,6 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     // Toggles the functionality for showing and hiding child previews.
                     showChildrenPreviews: true,
 
-                    sortDisplayName: function() {
-                        return gettext("Date added");  // TODO add support for sorting
-                    },
-
                     setPage: function (page) {
                         self.setPage(page - 1);
                     },
@@ -143,7 +139,7 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     this.pagingFooter.undelegateEvents();
 
                 this.pagingHeader = new PagingHeader({
-                    collection: this.collection,
+                    view: this,
                     el: this.$el.find('.container-paging-header')
                 });
                 this.pagingFooter = new PagingFooter({
@@ -217,6 +213,10 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                     this.pagingHeader.render();
                     this.pagingFooter.render();
                 }
+            },
+
+            sortDisplayName: function() {
+                return gettext("Date added");  // TODO add support for sorting
             },
 
             togglePreviews: function(){
