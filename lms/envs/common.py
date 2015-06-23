@@ -535,11 +535,6 @@ AUTHENTICATION_BACKENDS = (
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
-# FIXME:
-# We should have separate S3 staged URLs in case we need to make changes to
-# these assets and test them.
-LIB_URL = '/static/js/'
-
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
