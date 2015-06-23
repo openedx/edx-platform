@@ -260,8 +260,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEquals(mock_unit.start, DEFAULT_START_DATE)
         self.verify_error_type(mock_unit, access_response.StartDateError)
 
-
-
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
