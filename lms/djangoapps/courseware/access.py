@@ -747,7 +747,7 @@ def is_mobile_available_for_user(user, descriptor):
     """
     return ACCESS_GRANTED if (
         descriptor.mobile_available or
-        auth.has_access(user, CourseBetaTesterRole(descriptor.id)) or
+        auth.has_role(user, CourseBetaTesterRole(descriptor.id)) or
         _has_staff_access_to_descriptor(user, descriptor, descriptor.id)
     ) else MobileAvailabilityError()
 
