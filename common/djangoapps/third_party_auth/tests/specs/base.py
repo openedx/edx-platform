@@ -372,11 +372,15 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             response["Location"],
             pipeline.get_complete_url(self.PROVIDER_CLASS.BACKEND_CLASS.name)
         )
-        self.assertEqual(response.cookies[django_settings.EDXMKTG_COOKIE_NAME].value, 'true')
+        self.assertEqual(response.cookies[django_settings.EDXMKTG_LOGGED_IN_COOKIE_NAME].value, 'true')
+        self.assertIn(django_settings.EDXMKTG_USER_INFO_COOKIE_NAME, response.cookies)
 
-    def set_logged_in_cookie(self, request):
+    def set_logged_in_cookies(self, request):
         """Simulate setting the marketing site cookie on the request. """
-        request.COOKIES[django_settings.EDXMKTG_COOKIE_NAME] = 'true'
+        request.COOKIES[django_settings.EDXMKTG_LOGGED_IN_COOKIE_NAME] = 'true'
+        request.COOKIES[django_settings.EDXMKTG_USER_INFO_COOKIE_NAME] = json.dumps({
+            'version': django_settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
+        })
 
     # Actual tests, executed once per child.
 
@@ -434,7 +438,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         ))
 
         # Set the cookie and try again
-        self.set_logged_in_cookie(request)
+        self.set_logged_in_cookies(request)
 
         # Fire off the auth pipeline to link.
         self.assert_redirect_to_dashboard_looks_correct(actions.do_complete(
@@ -456,7 +460,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_social_auth_exists_for_user(user, strategy)
 
         # We're already logged in, so simulate that the cookie is set correctly
-        self.set_logged_in_cookie(request)
+        self.set_logged_in_cookies(request)
 
         # Instrument the pipeline to get to the dashboard with the full
         # expected state.
@@ -582,7 +586,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         ))
 
         # Set the cookie and try again
-        self.set_logged_in_cookie(request)
+        self.set_logged_in_cookies(request)
 
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(request.backend, social_views._do_login, user=user))
@@ -683,7 +687,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         ))
 
         # Set the cookie and try again
-        self.set_logged_in_cookie(request)
+        self.set_logged_in_cookies(request)
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user))
         # Now the user has been redirected to the dashboard. Their third party account should now be linked.

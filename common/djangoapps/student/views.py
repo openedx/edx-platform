@@ -106,9 +106,10 @@ from util.password_policy_validators import (
 import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
-    set_logged_in_cookie, check_verify_status_by_course,
+    check_verify_status_by_course,
     auth_pipeline_urls, get_next_url_for_login_page
 )
+from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
@@ -1064,7 +1065,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
 
         # Ensure that the external marketing site can
         # detect that the user is logged in.
-        return set_logged_in_cookie(request, response)
+        return set_logged_in_cookies(request, response, user)
 
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
@@ -1128,10 +1129,8 @@ def logout_user(request):
     else:
         target = '/'
     response = redirect(target)
-    response.delete_cookie(
-        settings.EDXMKTG_COOKIE_NAME,
-        path='/', domain=settings.SESSION_COOKIE_DOMAIN,
-    )
+
+    delete_logged_in_cookies(response)
     return response
 
 
@@ -1549,6 +1548,8 @@ def create_account_with_params(request, params):
             new_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
+    return new_user
+
 
 @csrf_exempt
 def create_account(request, post_override=None):
@@ -1559,7 +1560,7 @@ def create_account(request, post_override=None):
     warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
 
     try:
-        create_account_with_params(request, post_override or request.POST)
+        user = create_account_with_params(request, post_override or request.POST)
     except AccountValidationError as exc:
         return JsonResponse({'success': False, 'value': exc.message, 'field': exc.field}, status=400)
     except ValidationError as exc:
@@ -1584,7 +1585,7 @@ def create_account(request, post_override=None):
         'success': True,
         'redirect_url': redirect_url,
     })
-    set_logged_in_cookie(request, response)
+    set_logged_in_cookies(request, response, user)
     return response
 
 

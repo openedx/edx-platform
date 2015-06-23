@@ -61,7 +61,6 @@ import random
 import string  # pylint: disable-msg=deprecated-module
 from collections import OrderedDict
 import urllib
-from ipware.ip import get_ip
 import analytics
 from eventtracking import tracker
 
@@ -534,7 +533,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
 
 @partial.partial
-def set_logged_in_cookie(backend=None, user=None, strategy=None, auth_entry=None, *args, **kwargs):
+def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=None, *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
 
     Some installations have a marketing site front-end separate from
@@ -566,7 +565,7 @@ def set_logged_in_cookie(backend=None, user=None, strategy=None, auth_entry=None
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
-            has_cookie = student.helpers.is_logged_in_cookie_set(request)
+            has_cookie = student.cookies.is_logged_in_cookie_set(request)
             if not has_cookie:
                 try:
                     redirect_url = get_complete_url(backend.name)
@@ -577,7 +576,7 @@ def set_logged_in_cookie(backend=None, user=None, strategy=None, auth_entry=None
                     pass
                 else:
                     response = redirect(redirect_url)
-                    return student.helpers.set_logged_in_cookie(request, response)
+                    return student.cookies.set_logged_in_cookies(request, response, user)
 
 
 @partial.partial
