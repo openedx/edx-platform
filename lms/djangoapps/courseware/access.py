@@ -848,9 +848,8 @@ def is_mobile_available_for_user(user, descriptor):
     Arguments:
         descriptor (CourseDescriptor|CourseOverview): course or overview of course in question
     """
-
     return (
-        auth.has_access(user, CourseBetaTesterRole(descriptor.id))
+        auth.user_has_role(user, CourseBetaTesterRole(descriptor.id))
         or _has_staff_access_to_descriptor(user, descriptor, descriptor.id)
         or _is_descriptor_mobile_available(descriptor)
     )
