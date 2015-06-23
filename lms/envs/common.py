@@ -394,6 +394,8 @@ FEATURES = {
         'TWITTER_SHARING': False,
         'TWITTER_SHARING_TEXT': None
     },
+
+    'ENABLE_PROGRESS_SUMMARY': True,
 }
 
 # Ignore static asset files on import which match this pattern

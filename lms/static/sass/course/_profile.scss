@@ -130,6 +130,15 @@
     }
   }
 
+  #course-info-progress {
+    .progress-info-mouseover {
+      padding: 15px;
+      margin: 15px 0;
+      border: 1px dashed #CCC;
+      background-color: #EEE;
+    }
+  }
+
   .course-info {
     @extend .content;
 

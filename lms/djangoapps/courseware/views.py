@@ -1066,13 +1066,16 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    courseware_summary = grades.progress_summary(student, request, course)
+    courseware_summary = None
+    if settings.FEATURES['ENABLE_PROGRESS_SUMMARY']:
+        courseware_summary = grades.progress_summary(student, request, course)
+        if courseware_summary is None:
+            # This means the student didn't have access to the course (which the instructor requested)
+            raise Http404
+
     studio_url = get_studio_url(course, 'settings/grading')
     grade_summary = grades.grade(student, request, course)
 
-    if courseware_summary is None:
-        #This means the student didn't have access to the course (which the instructor requested)
-        raise Http404
 
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
