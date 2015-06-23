@@ -115,7 +115,7 @@ def _create_library(request):
     """
     Helper method for creating a new library.
     """
-    if not auth.has_access(request.user, CourseCreatorRole()):
+    if not auth.has_role(request.user, CourseCreatorRole()):
         log.exception(u"User %s tried to create a library without permission", request.user.username)
         raise PermissionDenied()
     display_name = None
