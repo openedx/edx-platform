@@ -41,9 +41,10 @@ class Tagger(object):
     An object used by :class:`QueryTimer` to allow timed code blocks
     to add measurements and tags to the timer.
     """
-    def __init__(self):
+    def __init__(self, default_sample_rate):
         self.added_tags = []
         self.measures = []
+        self.sample_rate = default_sample_rate
 
     def measure(self, name, size):
         """
@@ -108,7 +109,7 @@ class QueryTimer(object):
             metric_name: The name used to aggregate all of these metrics.
             course_context: The course which the query is being made for.
         """
-        tagger = Tagger()
+        tagger = Tagger(self._sample_rate)
         metric_name = "{}.{}".format(self._metric_base, metric_name)
 
         start = time()
@@ -124,24 +125,24 @@ class QueryTimer(object):
                     size,
                     timestamp=end,
                     tags=[tag for tag in tags if not tag.startswith('{}:'.format(metric_name))],
-                    sample_rate=self._sample_rate,
+                    sample_rate=tagger.sample_rate,
                 )
             dog_stats_api.histogram(
                 '{}.duration'.format(metric_name),
                 end - start,
                 timestamp=end,
                 tags=tags,
-                sample_rate=self._sample_rate,
+                sample_rate=tagger.sample_rate,
             )
             dog_stats_api.increment(
                 metric_name,
                 timestamp=end,
                 tags=tags,
-                sample_rate=self._sample_rate,
+                sample_rate=tagger.sample_rate,
             )
 
 
-TIMER = QueryTimer(__name__, 0.001)
+TIMER = QueryTimer(__name__, 0.01)
 
 
 def structure_from_mongo(structure, course_context=None):
@@ -231,6 +232,8 @@ class CourseStructureCache(object):
             tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
 
             if compressed_pickled_data is None:
+                # Always log cache misses, because they are unexpected
+                tagger.sample_rate = 1
                 return None
 
             tagger.measure('compressed_size', len(compressed_pickled_data))
@@ -320,10 +323,15 @@ class MongoConnection(object):
             structure = cache.get(key, course_context)
             tagger_get_structure.tag(from_cache=str(bool(structure)).lower())
             if not structure:
+                # Always log cache misses, because they are unexpected
+                tagger_get_structure.sample_rate = 1
+
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     doc = self.structures.find_one({'_id': key})
                     tagger_find_one.measure("blocks", len(doc['blocks']))
                     structure = structure_from_mongo(doc, course_context)
+                    tagger_find_one.sample_rate = 1
+
                 cache.set(key, structure, course_context)
 
             return structure
