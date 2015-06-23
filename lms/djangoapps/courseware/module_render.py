@@ -605,11 +605,11 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             # the result would always be "False".
             masquerade_settings = user.real_user.masquerade_settings
             del user.real_user.masquerade_settings
-            instructor_access = has_access(user.real_user, 'instructor', descriptor, course_id)
+            instructor_access = bool(has_access(user.real_user, 'instructor', descriptor, course_id))
             user.real_user.masquerade_settings = masquerade_settings
         else:
             staff_access = has_access(user, 'staff', descriptor, course_id)
-            instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            instructor_access = bool(has_access(user, 'instructor', descriptor, course_id))
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, instructor_access, disable_staff_debug_info))
 
@@ -629,7 +629,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
 
     field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
-    user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
+    user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -703,7 +703,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         )
 
     system.set(u'user_is_staff', user_is_staff)
-    system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
+    system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
 

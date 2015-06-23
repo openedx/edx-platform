@@ -22,7 +22,7 @@ def index(request, course_id, book_index, page=None):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.textbooks):
@@ -79,7 +79,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.pdf_textbooks):
@@ -147,7 +147,7 @@ def html_index(request, course_id, book_index, chapter=None):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
     notes_enabled = notes_enabled_for_course(course)
 
     book_index = int(book_index)

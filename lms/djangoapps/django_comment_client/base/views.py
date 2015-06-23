@@ -484,7 +484,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    remove_all = (
+    remove_all = bool(
         has_permission(request.user, 'openclose_thread', course_key) or
         has_access(request.user, 'staff', course)
     )
@@ -519,7 +519,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
-    remove_all = (
+    remove_all = bool(
         has_permission(request.user, 'openclose_thread', course_key) or
         has_access(request.user, 'staff', course)
     )
