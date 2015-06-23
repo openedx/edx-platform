@@ -135,7 +135,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 var setup;
                 setup = function(responseData) {
                     var requests = AjaxHelpers.requests(this);
-                    assetsView.collection.setPage(0);
+                    assetsView.pagingView.setPage(0);
                     if (!responseData){
                         AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
                     }
@@ -185,7 +185,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     spyOn(assetsView, "addAsset").andCallFake(function () {
                         assetsView.collection.add(mockAssetUploadResponse.asset);
                         assetsView.pagingView.renderPageItems();
-                        assetsView.collection.setPage(0);
+                        assetsView.pagingView.setPage(0);
                     });
 
                     $('a:contains("Upload your first asset")').click();
@@ -268,9 +268,9 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 it('make sure _toggleFilterColumn filters asset list', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    $.each(assetsView.collection.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
                         var $typeColumn = $('#' + columnID);
-                        assetsView.collection.setPage(0);
+                        assetsView.pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         var assetsNumber = assetsView.collection.length;
                         assetsView._toggleFilterColumn('Images', 'Images');
@@ -284,7 +284,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 it('opens and closes select type menu', function () {
                     expect(assetsView).toBeDefined();
                     setup.call(this, mockExampleAssetsResponse);
-                    $.each(assetsView.collection.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData){
                         var $typeColumn = $('#' + columnID);
                         expect($typeColumn).toBeVisible();
                         var assetsNumber = $('#asset-table-body .type-col').length;
@@ -303,7 +303,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     assetsView.pagingView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
                     assetsView.pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                     assetsView.pagingView.setInitialSortColumn('name-col');
-                    assetsView.collection.setPage(0);
+                    assetsView.pagingView.setPage(0);
                     respondWithMockAssets(requests);
                     var sortInfo = assetsView.pagingView.sortableColumnInfo('name-col');
                     expect(sortInfo.defaultSortDirection).toBe('asc');
@@ -318,8 +318,8 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 it('shows type select menu, selects type, and filters results', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    $.each(assetsView.collection.filterableColumns, function(columnID, columnData) {
-                        assetsView.collection.setPage(0);
+                    $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
+                        assetsView.pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         var $typeColumn = $('#' + columnID);
                         expect($typeColumn).toBeVisible();
