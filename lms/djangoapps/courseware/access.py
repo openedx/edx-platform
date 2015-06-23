@@ -33,7 +33,7 @@ from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
-# import openedx.core.djangoapps.content.course_overviews.models as c
+# from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -51,8 +51,8 @@ import dogstats_wrapper as dog_stats_api
 from access_response import *
 
 DEBUG_ACCESS = False
-ACCESS_GRANTED = AccessResponse(True, None)
-ACCESS_DENIED = AccessResponse(False, None)
+ACCESS_GRANTED = AccessResponse(True)
+ACCESS_DENIED = AccessResponse(False)
 
 log = logging.getLogger(__name__)
 
