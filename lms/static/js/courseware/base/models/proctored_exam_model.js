@@ -1,13 +1,15 @@
 (function(Backbone) {
     var ProctoredExamModel = Backbone.Model.extend({
+        url: '/api/edx_proctoring/v1/proctored_exam/status',
+
         defaults: {
-            in_timed_exam: true,
-            is_proctored: true,
-            exam_display_name: 'Midterm',
+            in_timed_exam: null,
+            is_proctored: null,
+            exam_display_name: '',
             exam_url_path: '',
-            time_remaining_seconds: 45, //2 * 60 + 15,
-            low_threshold: 30,
-            critically_low_threshold: 15,
+            time_remaining_seconds: null,
+            low_threshold: null,
+            critically_low_threshold: null,
             lastFetched: new Date()
         },
         getRemainingSeconds: function () {

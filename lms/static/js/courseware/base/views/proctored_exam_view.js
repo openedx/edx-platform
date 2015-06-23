@@ -19,8 +19,17 @@ var edx = edx || {};
                 /* don't assume this backbone view is running on a page with the underscore templates */
                 this.template = _.template(template_html);
             }
-        },
+            /* re-render if the model changes */
+            this.listenTo(this.model,'change', this.modelChanged);
 
+            /* make the async call to the backend REST API */
+            /* after it loads, the listenTo event will file and */
+            /* will call into the rendering */
+            this.model.fetch();
+        },
+        modelChanged: function() {
+            this.render();
+        },
         render: function () {
             if (this.template !== null) {
                 var html = this.template(this.model.toJSON());
