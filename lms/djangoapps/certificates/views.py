@@ -41,6 +41,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import LinkedInAddToProfileConfiguration
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.bad_request_rate_limiter import BadRequestRateLimiter
+from courseware.courses import course_image_url
 
 logger = logging.getLogger(__name__)
 
@@ -301,6 +302,8 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_copy_username'] = user.username
     context['accomplishment_copy_course_org'] = course.org
     context['accomplishment_copy_course_name'] = course.display_name
+    context['course_image_url'] = course_image_url(course)
+    context['share_settings'] = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
     except BadgeAssertion.DoesNotExist:

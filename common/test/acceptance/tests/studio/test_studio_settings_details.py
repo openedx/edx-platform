@@ -120,7 +120,7 @@ class SettingsMilestonesTest(StudioCourseTest):
 
         # Refresh the page again to confirm the prerequisite course selection is properly reflected
         self.settings_detail.refresh_page()
-
+        self.settings_detail.wait_for_prerequisite_course_options()
         dropdown_status = is_option_value_selected(
             browser_query=self.settings_detail.pre_requisite_course_options,
             value=pre_requisite_course_id

@@ -165,7 +165,7 @@ FEATURES = {
     'CERTIFICATES_HTML_VIEW': False,
 
     # Social Media Sharing on Student Dashboard
-    'DASHBOARD_SHARE_SETTINGS': {
+    'SOCIAL_SHARING_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
     },
