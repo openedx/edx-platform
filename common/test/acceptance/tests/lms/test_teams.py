@@ -21,7 +21,11 @@ class TeamsTabTest(UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.teams_page = TeamsPage(self.browser, self.course_id)
-        self.test_topic = {u"name": u"a topic", u"description": u"test topic", u"id": 0}
+        # self.test_topic = {u"name": u"a topic", u"description": u"test topic", u"id": 0}
+
+    def create_topics(self, num_topics):
+        """Create `num_topics` test topics."""
+        return [{u"description": str(i), u"name": str(i), u"id": i} for i in xrange(num_topics)]
 
     def set_team_configuration(self, configuration, enroll_in_course=True, global_staff=False):
         """
@@ -79,7 +83,10 @@ class TeamsTabTest(UniqueCourseTest):
         When I view the course info page
         Then I should not see the Teams tab
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": [self.test_topic]}, enroll_in_course=False)
+        self.set_team_configuration(
+            {u"max_team_size": 10, u"topics": self.create_topics(1)},
+            enroll_in_course=False
+        )
         self.verify_teams_present(False)
 
     def test_teams_enabled(self):
@@ -90,7 +97,7 @@ class TeamsTabTest(UniqueCourseTest):
         Then I should see the Teams tab
         And the correct content should be on the page
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": [self.test_topic]})
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(1)})
         self.verify_teams_present(True)
 
     def test_teams_enabled_global_staff(self):
@@ -103,6 +110,82 @@ class TeamsTabTest(UniqueCourseTest):
         And the correct content should be on the page
         """
         self.set_team_configuration(
-            {u"max_team_size": 10, u"topics": [self.test_topic]}, enroll_in_course=False, global_staff=True
+            {u"max_team_size": 10, u"topics": self.create_topics(1)},
+            enroll_in_course=False,
+            global_staff=True
         )
         self.verify_teams_present(True)
+
+    def test_list_topics(self):
+        """
+        Scenario: a list of topics should be visible in the "Browse" tab
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        Then I should see a list of topics for the course
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(2)})
+        self.teams_page.visit()
+        self.teams_page.browse_topics()
+        self.assertEqual(len(self.teams_page.get_topic_cards()), 2)
+        self.assertEqual(self.teams_page.get_pagination_text(), 'Currently viewing all 2 topics')
+
+    def test_topic_pagination(self):
+        """
+        Scenario: a list of topics should be visible in the "Browse" tab, paginated 5 per page
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        Then I should see only the first 5 topics
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(10)})
+        self.teams_page.visit()
+        self.teams_page.browse_topics()
+        self.assertEqual(len(self.teams_page.get_topic_cards()), 5)
+        self.assertEqual(self.teams_page.get_pagination_text(), 'Currently viewing 1 through 5 of 10 topics')
+
+    def test_go_to_numbered_page(self):
+        """
+        Scenario: topics should be able to be navigated by page number
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        And I enter a valid page number in the page number input
+        Then I should see that page of topics
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(16)})
+        self.teams_page.visit()
+        self.teams_page.browse_topics()
+        self.teams_page.go_to_topics_list_page(4)
+        self.assertEqual(len(self.teams_page.get_topic_cards()), 1)
+
+    def test_go_to_invalid_page(self):
+        """
+        Scenario: browsing topics should not respond to invalid page numbers
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        And I enter an invalid page number in the page number input
+        Then I should stay on the current page
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(5)})
+        self.teams_page.visit()
+        self.teams_page.browse_topics()
+        self.teams_page.go_to_topics_list_page(2)
+        self.assertEqual(self.teams_page.get_current_page_text(), '1')
+
+    def test_next_page_button(self):
+        """
+        Scenario: browsing topics should not respond to invalid page numbers
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        And I press the next page button
+        Then I should move to the next page
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(6)})
+        self.teams_page.visit()
+        self.teams_page.browse_topics()
+        self.teams_page.press_next_page_button()
+        self.assertEqual(len(self.teams_page.get_topic_cards()), 1)
+        self.assertEqual(self.teams_page.get_pagination_text(), 'Currently viewing 6 through 6 of 6 topics')
