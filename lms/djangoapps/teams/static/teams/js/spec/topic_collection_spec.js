@@ -1,4 +1,4 @@
-define(['URI', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic'], function (URI, AjaxHelpers, TopicCollection) {
+define(['URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic'], function (URI, _, AjaxHelpers, TopicCollection) {
     describe('TopicCollection', function () {
         var topicCollection;
         beforeEach(function () {
@@ -39,30 +39,32 @@ define(['URI', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topi
                 {course_id: 'my/course/id', parse: true});
         });
 
+        var testRequestParam = function (self, param, value) {
+            var requests = AjaxHelpers.requests(self),
+                url,
+                params;
+            topicCollection.fetch();
+            expect(requests.length).toBe(1);
+            url = new URI(requests[0].url);
+            params = url.query(true);
+            expect(params[param]).toBe(value);
+        };
+
         it('sets its perPage based on initial page size', function () {
             expect(topicCollection.perPage).toBe(5);
         });
 
         it('sorts by name', function () {
-            var requests = AjaxHelpers.requests(this),
-                url,
-                params;
-            topicCollection.fetch();
-            expect(requests.length).toBe(1);
-            url = new URI(requests[0].url);
-            params = url.query(true);
-            expect(params.order_by).toBe('name');
+            testRequestParam(this, 'order_by', 'name');
         });
 
         it('passes a course_id to the server', function () {
-            var requests = AjaxHelpers.requests(this),
-                url,
-                params;
-            topicCollection.fetch();
-            expect(requests.length).toBe(1);
-            url = new URI(requests[0].url);
-            params = url.query(true);
-            expect(params.course_id).toBe('my/course/id');
+            testRequestParam(this, 'course_id', 'my/course/id');
+        });
+
+        it('URL encodes its course_id ', function () {
+            topicCollection.course_id = 'my+course+id';
+            testRequestParam(this, 'course_id', 'my+course+id');
         });
     });
 });
