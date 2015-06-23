@@ -310,6 +310,7 @@ class MongoConnection(object):
                     doc = self.structures.find_one({'_id': key})
                     tagger_find_one.measure("blocks", len(doc['blocks']))
                     structure = structure_from_mongo(doc, course_context)
+                cache.set(key, structure)
 
             return structure
 
