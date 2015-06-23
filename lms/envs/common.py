@@ -1901,6 +1901,9 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    # edX Proctoring
+    'edx_proctoring'
 )
 
 ######################### CSRF #########################################
