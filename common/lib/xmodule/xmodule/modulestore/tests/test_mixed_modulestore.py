@@ -794,7 +794,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
-    #   find: active_version & structure (cached)
+    #   find: active_version & structure
     #   send: update structure and active_versions
     @ddt.data(('draft', 4, 1), ('split', 2, 2))
     @ddt.unpack
@@ -2627,3 +2627,4 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
             with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, source_course_key):
                 component = self.store.get_item(unit.location)
                 self.assertEqual(component.display_name, updated_display_name)
+
