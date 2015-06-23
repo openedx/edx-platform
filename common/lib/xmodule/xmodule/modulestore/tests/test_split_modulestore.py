@@ -773,39 +773,38 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
 
 
-@patch.dict(
-    'django.conf.settings.CACHES', {
-        "course_structure_cache": {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'edx_course_structure_mem_cache',
-        }
-    }
-)
 class TestCourseStructureCache(SplitModuleTest):
     """Tests for the CourseStructureCache"""
 
     def setUp(self):
-        # make sure we clear the cache before every test
-        cache = get_cache('course_structure_cache')
-        cache.clear()
+        # use the default cache, since the `course_structure_cache`
+        # is a dummy cache during testing
+        self.cache = get_cache('default')
+
+        # make sure we clear the cache before every test...
+        self.cache.clear()
+        # ... and after
+        self.addCleanup(self.cache.clear)
 
         super(TestCourseStructureCache, self).setUp()
 
-    def test_course_structure_cache(self):
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache(self, mock_get_cache):
+        # force get_cache to return the default cache so we can test
+        # its caching behavior
+        mock_get_cache.return_value = self.cache
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
             'org', 'course', 'test_run', user, BRANCH_NAME_DRAFT,
         )
 
         with check_mongo_calls(1):
-            # not_cached_course = modulestore().get_course(new_course.id)
             not_cached_structure = modulestore().db_connection.get_structure(
                 new_course.location.as_object_id(new_course.location.version_guid)
             )
 
         # when cache is warmed, we should have one fewer mongo call
         with check_mongo_calls(0):
-            # cached_course = modulestore().get_course(new_course.id)
             cached_structure = modulestore().db_connection.get_structure(
                 new_course.location.as_object_id(new_course.location.version_guid)
             )
