@@ -1937,8 +1937,11 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
-
+    
     'xblock_django',
+
+    # edX Proctoring
+    'edx_proctoring'
 )
 
 ######################### CSRF #########################################
