@@ -8,7 +8,6 @@ var edx = edx || {};
 
     edx.coursware.proctored_exam.ProctoredExamView = Backbone.View.extend({
         initialize: function (options) {
-            //Backbone.$.ajaxSetup({ cache: false });
             this.$el = options.el;
             this.model = options.model;
             this.templateId = options.proctored_template;
