@@ -1550,33 +1550,6 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
 
-def set_marketing_cookie(request, response):
-    """
-    Set the login cookie for the edx marketing site on the given response. Its
-    expiration will match that of the given request's session.
-    """
-    if request.session.get_expire_at_browser_close():
-        max_age = None
-        expires = None
-    else:
-        max_age = request.session.get_expiry_age()
-        expires_time = time.time() + max_age
-        expires = cookie_date(expires_time)
-
-    # we want this cookie to be accessed via javascript
-    # so httponly is set to None
-    response.set_cookie(
-        settings.EDXMKTG_COOKIE_NAME,
-        'true',
-        max_age=max_age,
-        expires=expires,
-        domain=settings.SESSION_COOKIE_DOMAIN,
-        path='/',
-        secure=None,
-        httponly=None
-    )
-
-
 @csrf_exempt
 def create_account(request, post_override=None):
     """
@@ -1611,7 +1584,7 @@ def create_account(request, post_override=None):
         'success': True,
         'redirect_url': redirect_url,
     })
-    set_marketing_cookie(request, response)
+    set_logged_in_cookie(request, response)
     return response
 
 

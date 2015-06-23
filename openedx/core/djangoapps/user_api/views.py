@@ -24,7 +24,8 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
-from student.views import create_account_with_params, set_marketing_cookie
+from student.views import create_account_with_params
+from student.helpers import set_logged_in_cookie
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
@@ -306,7 +307,7 @@ class RegistrationView(APIView):
             return JsonResponse(errors, status=400)
 
         response = JsonResponse({"success": True})
-        set_marketing_cookie(request, response)
+        set_logged_in_cookie(request, response)
         return response
 
     def _add_email_field(self, form_desc, required=True):
