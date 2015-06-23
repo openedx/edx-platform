@@ -25,6 +25,7 @@ from pkg_resources import resource_string
 
 from django.conf import settings
 
+from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
@@ -82,6 +83,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
+@XBlock.wants('settings')
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule):
     """
     XML source example:
@@ -248,6 +250,14 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             cdn_eval = False
             cdn_exp_group = None
 
+        settings_service = self.runtime.service(self, 'settings')
+
+        yt_api_key = None
+        if settings_service:
+            xblock_settings = settings_service.get_settings_bucket(self)
+            if xblock_settings and 'YOUTUBE_API_KEY' in xblock_settings:
+                yt_api_key = xblock_settings['YOUTUBE_API_KEY']
+
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -275,7 +285,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_api_url': settings.YOUTUBE['API'],
-            'yt_test_url': settings.YOUTUBE['TEST_URL'],
+            'yt_test_url': settings.YOUTUBE['METADATA_URL'],
+            'yt_key': yt_api_key,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.descriptor.fields['transcript_download_format'].values,
             'transcript_language': transcript_language,

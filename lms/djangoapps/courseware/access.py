@@ -504,11 +504,16 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
                 descriptor,
                 course_key=course_key
             )
-
-            if in_preview_mode() or now > effective_start:
+            if in_preview_mode():
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
                 return True
+            if now > effective_start:
+                # after start date, all registered users can see it
+                # nonregistered users shouldn't be able to access certain descriptor types
+                debug("Allow: now > effective start date")
+                return UserProfile.has_registered(user) or _can_load_descriptor_nonregistered(descriptor)
+
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor, course_key)
 

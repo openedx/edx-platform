@@ -198,16 +198,19 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Tests that descriptor has no access when start date in future & without preview.
         """
+
+        # I've changed the logic of this test since it would otherwise fail due to an
+        # unauthenticated access check in access.py. (dcadams 8/13/2015)
         mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
 
         # No start date.
         mock_unit.visible_to_staff_only = False
-        self.verify_access(mock_unit, True)
+        self.verify_access(mock_unit, False)
 
         # Start date in the past.
         mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
-        self.verify_access(mock_unit, True)
+        self.verify_access(mock_unit, False)
 
         # Start date in the future.
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future

@@ -36,10 +36,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/edx/bok-choy.git@v0.3.4#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 
-#-e git+https://github.com/Stanford-Online/edx-ora2.git@188914ed75d2fee87aef6ff40e9d7d6153782805#egg=edx-ora2
 -e git+https://github.com/Stanford-Online/edx-ora2.git@ba471878b6506cae62302a7310daba08b5d1d0e1#egg=edx-ora2
-#-e /home/dcadams/DevProjects/edx-ora2
-
 
 # Forking Submissions repo for ORA2 score override function.
 -e git+https://github.com/Stanford-Online/edx-submissions.git@906c52584ff3f2d37ddb1d741a6313525f7547a2#egg=edx-submissions

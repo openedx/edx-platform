@@ -43,6 +43,7 @@ from lms.envs.common import (
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
+    YOUTUBE_API_KEY,
 )
 from path import path
 from warnings import simplefilter
@@ -635,10 +636,10 @@ CELERY_QUEUES = {
 
 YOUTUBE = {
     # YouTube JavaScript API
-    'API': 'www.youtube.com/iframe_api',
+    'API': 'https://www.youtube.com/iframe_api',
 
-    # URL to test YouTube availability
-    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+    # URL to get YouTube metadata
+    'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
     # Current youtube api for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
@@ -988,5 +989,11 @@ SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
+    }
+}
+
+XBLOCK_SETTINGS = {
+    'VideoModule': {
+        'YOUTUBE_API_KEY': YOUTUBE_API_KEY
     }
 }
