@@ -96,6 +96,29 @@ class CommandTest(TestCase):
         self.assertIn('test_dir/social_stats_course-v1SandboxSandboxSandbox', calls[1][0][1])
         self.assertIn('test_dir/social_stats_course-v1TestTestyTestify', calls[2][0][1])
 
+    def test_all_cohortedonly_options_together(self, patched_get_course):
+        """ Ensure the 'all' option doesn't stop when one of the course doesn't have cohorted discussions """
+        self.set_up_default_mocks(patched_get_course)
+        type(patched_get_course.return_value).cohort_config = mock.PropertyMock(
+            return_value={'cohorted_inline_discussions': []}
+        )
+        self.command.get_all_courses = mock.Mock()
+        course_list = [mock.Mock() for __ in range(0, 3)]
+        locator_list = [
+            CourseLocator(org="edX", course="demoX", run="now"),
+            CourseLocator(org="Sandbox", course="Sandbox", run="Sandbox"),
+            CourseLocator(org="Test", course="Testy", run="Testify"),
+        ]
+        for index, course in enumerate(course_list):
+            course.location.course_key = locator_list[index]
+        self.command.get_all_courses.return_value = course_list
+        self.command.handle("test_dir", all=True, cohorted_only=True, dummy='test')
+        calls = patched_get_course.call_args_list
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(calls[0][0][0], locator_list[0])
+        self.assertEqual(calls[1][0][0], locator_list[1])
+        self.assertEqual(calls[2][0][0], locator_list[2])
+
     @ddt.data("edX/demoX/now", "otherX/CourseX/later")
     def test_handle_writes_to_correct_location_when_output_file_not_specified(self, course_key, patched_get_course):
         """ Tests that when no explicit filename is given data is exported to default location """
