@@ -130,8 +130,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <ol class="list-input">
                   % if 'grade' in credit_requirements:
                     <li class="field text is-not-editable" id="credit-minimum-passing-grade">
-                      <label for="minimum-passing-grade">${_("Minimum Passing Grade")}</label>
+                      <label>${_("Minimum Passing Grade")}</label>
                         % for requirement in credit_requirements['grade']:
+                          <label for="${requirement['name']}" class="sr">${_("Minimum Passing Grade")}</label>
                           <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                               class="long" id="${requirement['name']}" value="${'{0:.0f}%'.format(float(requirement['criteria']['min_grade'] or 0)*100)}" readonly />
                         % endfor
@@ -140,8 +141,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
                   % if 'proctored_exam' in credit_requirements:
                     <li class="field text is-not-editable" id="credit-proctoring-requirements">
-                      <label for="proctoring-requirements">${_("Successful Proctored Exam")}</label>
+                      <label>${_("Successful Proctored Exam")}</label>
                         % for requirement in credit_requirements['proctored_exam']:
+                          <label for="${requirement['name']}" class="sr">${_('Proctored Exam {number}').format(number=loop.index+1)}</label>
                           <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                               class="long" id="${requirement['name']}" value="${requirement['display_name']}" readonly />
                         % endfor
@@ -150,9 +152,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
                   % if 'reverification' in credit_requirements:
                     <li class="field text is-not-editable" id="credit-reverification-requirements">
-                      <label for="reverification-requirements">${_("Successful In Course Reverification")}</label>
+                      <label>${_("Successful In-Course Reverification")}</label>
                         % for requirement in credit_requirements['reverification']:
                           ## Translators: 'Access to Assessment 1' means the access for a requirement with name 'Assessment 1'
+                          <label for="${requirement['name']}" class="sr">${_('In-Course Reverification {number}').format(number=loop.index+1)}</label>
                           <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                               class="long" id="${requirement['name']}" value="${_('Access to {display_name}').format(display_name=requirement['display_name'])}" readonly />
                         % endfor
