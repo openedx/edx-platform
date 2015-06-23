@@ -220,27 +220,30 @@ class CourseStructureCache(object):
         except InvalidCacheBackendError:
             self.cache = get_cache('default')
 
-    def get(self, key):
+    def get(self, key, course_context=None):
         """Pull the compressed, pickled struct data from cache and deserialize."""
-        compressed_pickled_data = self.cache.get(key)
-        if compressed_pickled_data is None:
-            return None
-        return pickle.loads(zlib.decompress(compressed_pickled_data))
+        with TIMER.timer("CourseStructureCache.get", course_context) as tagger:
+            compressed_pickled_data = self.cache.get(key)
 
-    def set(self, key, structure):
+            tagger.tag(from_cache=str(compressed_pickled_data is not None))
+
+            if compressed_pickled_data is None:
+                return None
+            tagger.measure('compressed_size', len(compressed_pickled_data))
+
+            return pickle.loads(zlib.decompress(compressed_pickled_data))
+
+    def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
-        pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
-        # 1 = Fastest (slightly larger results)
-        compressed_pickled_data = zlib.compress(pickled_data, 1)
+        with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
+            pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
+            # 1 = Fastest (slightly larger results)
+            compressed_pickled_data = zlib.compress(pickled_data, 1)
 
-        # record compressed course structure sizes
-        dog_stats_api.histogram(
-            'compressed_course_structure.size',
-            len(compressed_pickled_data),
-            tags=[key]
-        )
-        # Stuctures are immutable, so we set a timeout of "never"
-        self.cache.set(key, compressed_pickled_data, None)
+            tagger.measure('compressed_size', len(compressed_pickled_data))
+
+            # Stuctures are immutable, so we set a timeout of "never"
+            self.cache.set(key, compressed_pickled_data, None)
 
 
 class MongoConnection(object):
@@ -303,14 +306,14 @@ class MongoConnection(object):
         with TIMER.timer("get_structure", course_context) as tagger_get_structure:
             cache = CourseStructureCache()
 
-            structure = cache.get(key)
-            tagger_get_structure.tag(from_cache='true' if structure else 'false')
+            structure = cache.get(key, course_context)
+            tagger_get_structure.tag(from_cache=str(bool(structure)))
             if not structure:
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     doc = self.structures.find_one({'_id': key})
                     tagger_find_one.measure("blocks", len(doc['blocks']))
                     structure = structure_from_mongo(doc, course_context)
-                cache.set(key, structure)
+                cache.set(key, structure, course_context)
 
             return structure
 
