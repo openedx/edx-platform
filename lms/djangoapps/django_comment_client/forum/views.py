@@ -13,7 +13,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.http import require_GET
 import newrelic.agent
 
@@ -55,7 +55,7 @@ class DiscussionTab(EnrolledTab):
     """
 
     type = 'discussion'
-    title = _('Discussion')
+    title = ugettext_noop('Discussion')
     priority = None
     view_name = 'django_comment_client.forum.views.forum_form_discussion'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)

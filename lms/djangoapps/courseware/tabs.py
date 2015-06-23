@@ -3,7 +3,7 @@ This module is essentially a broker to xmodule/tabs.py -- it was originally intr
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ugettext_noop
 
 from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
@@ -28,7 +28,7 @@ class CoursewareTab(EnrolledTab):
     The main courseware view.
     """
     type = 'courseware'
-    title = _('Courseware')
+    title = ugettext_noop('Courseware')
     priority = 10
     view_name = 'courseware'
     is_movable = False
@@ -40,7 +40,7 @@ class CourseInfoTab(CourseTab):
     The course info view.
     """
     type = 'course_info'
-    title = _('Course Info')
+    title = ugettext_noop('Course Info')
     priority = 20
     view_name = 'info'
     tab_id = 'info'
@@ -57,7 +57,7 @@ class SyllabusTab(EnrolledTab):
     A tab for the course syllabus.
     """
     type = 'syllabus'
-    title = _('Syllabus')
+    title = ugettext_noop('Syllabus')
     priority = 30
     view_name = 'syllabus'
     allow_multiple = True
@@ -75,7 +75,7 @@ class ProgressTab(EnrolledTab):
     The course progress view.
     """
     type = 'progress'
-    title = _('Progress')
+    title = ugettext_noop('Progress')
     priority = 40
     view_name = 'progress'
     is_hideable = True
@@ -93,7 +93,7 @@ class TextbookTabsBase(CourseTab):
     Abstract class for textbook collection tabs classes.
     """
     # Translators: 'Textbooks' refers to the tab in the course that leads to the course' textbooks
-    title = _("Textbooks")
+    title = ugettext_noop("Textbooks")
     is_collection = True
     is_default = False
 
@@ -225,7 +225,7 @@ class ExternalDiscussionCourseTab(LinkTab):
 
     type = 'external_discussion'
     # Translators: 'Discussion' refers to the tab in the courseware that leads to the discussion forums
-    title = _('Discussion')
+    title = ugettext_noop('Discussion')
     priority = None
     is_default = False
 
