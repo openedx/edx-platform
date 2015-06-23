@@ -13,7 +13,6 @@ from django.db import transaction
 from django.core.validators import RegexValidator
 from simple_history.models import HistoricalRecords
 
-
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
@@ -343,7 +342,6 @@ class CreditRequest(TimeStampedModel):
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="credit_requests")
     provider = models.ForeignKey(CreditProvider, related_name="credit_requests")
-    timestamp = models.DateTimeField(auto_now_add=True)
     parameters = JSONField()
 
     REQUEST_STATUS_PENDING = "pending"
@@ -378,7 +376,7 @@ class CreditRequest(TimeStampedModel):
         [
             {
                 "uuid": "557168d0f7664fe59097106c67c3f847",
-                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "timestamp": 1434631630,
                 "course_key": "course-v1:HogwartsX+Potions101+1T2015",
                 "provider": {
                     "id": "HogwartsX",
@@ -393,7 +391,7 @@ class CreditRequest(TimeStampedModel):
         return [
             {
                 "uuid": request.uuid,
-                "timestamp": request.modified,
+                "timestamp": request.parameters.get("timestamp"),
                 "course_key": request.course.course_key,
                 "provider": {
                     "id": request.provider.provider_id,

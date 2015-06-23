@@ -4,9 +4,13 @@ Contains the APIs for course credit requirements.
 
 import logging
 import uuid
+import datetime
+
+import pytz
 
 from django.db import transaction
 
+from util.date_utils import to_timestamp
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -191,7 +195,7 @@ def create_credit_request(course_key, provider_id, username):
             "method": "POST",
             "parameters": {
                 "request_uuid": "557168d0f7664fe59097106c67c3f847",
-                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "timestamp": 1434631630,
                 "course_org": "HogwartsX",
                 "course_num": "Potions101",
                 "course_run": "1T2015",
@@ -285,7 +289,7 @@ def create_credit_request(course_key, provider_id, username):
 
     parameters = {
         "request_uuid": credit_request.uuid,
-        "timestamp": credit_request.timestamp.isoformat(),
+        "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),
         "course_org": course_key.org,
         "course_num": course_key.course,
         "course_run": course_key.run,
@@ -391,7 +395,7 @@ def get_credit_requests_for_user(username):
     [
         {
             "uuid": "557168d0f7664fe59097106c67c3f847",
-            "timestamp": "2015-05-04T20:57:57.987119+00:00",
+            "timestamp": 1434631630,
             "course_key": "course-v1:HogwartsX+Potions101+1T2015",
             "provider": {
                 "id": "HogwartsX",
