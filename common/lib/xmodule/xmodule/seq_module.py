@@ -49,9 +49,10 @@ class SequenceFields(object):
     )
 
     is_time_limited = Boolean(
-        display_name=_("Is Timed Limited"),
+        display_name=_("Is Time Limited"),
         help=_(
-            "This field indicates if this courseware container will have a time limit to view/interact. "
+            "This setting indicates whether students have a limited time"
+            " to view or interact with this courseware component."
         ),
         default=False,
         scope=Scope.settings,
@@ -60,8 +61,7 @@ class SequenceFields(object):
     default_time_limit_mins = Integer(
         display_name=_("Time Limit in Minutes"),
         help=_(
-            "The number of minutes a user will have to view this courseware."
-            "once he/she has started."
+            "The number of minutes available to users for viewing or interacting with this courseware component."
         ),
         default=None,
         scope=Scope.settings,
@@ -69,7 +69,7 @@ class SequenceFields(object):
 
     time_student_started = Date(
         display_name=_("Time Student Started"),
-        help=_("The time the user has started the time limited content."),
+        help=_("The time at which the student began interacting with the time limited content."),
         default=None,
         scope=Scope.user_state,  # pylint: disable=no-member
     )
@@ -77,18 +77,18 @@ class SequenceFields(object):
     student_time_limit_mins = Integer(
         display_name=_("Student Time Limit in Minutes"),
         help=_(
-            "The number of minutes a particular user will have to complete the content "
-            "once he/she has started. This will optionally override the "
-            "default_time_limit_mins to allow for special accommodations."
+            "The number of minutes available to this student for viewing or interacting with this courseware component."
+            " If specified, this time limit overrides the default time limit. "
+            "(Is this correct? is a particular student specified somehow?)"
         ),
         default=None,
         scope=Scope.user_state,  # pylint: disable=no-member
     )
 
     is_proctored_enabled = Boolean(
-        display_name=_("Is Proctored Enabled"),
+        display_name=_("Is Proctoring Enabled"),
         help=_(
-            "This field indicates if this exam will be proctored or not."
+            "This setting indicates whether this exam is a proctored exam."
         ),
         default=False,
         scope=Scope.settings,

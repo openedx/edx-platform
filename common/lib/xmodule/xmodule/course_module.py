@@ -904,7 +904,7 @@ class CourseFields(object):
     enable_proctored_exams = Boolean(
         display_name=_("Enable Proctored Exams"),
         help=_(
-            "Set this to true if your course would like to support timed proctored exams."
+            "Enter true or false. If this value is true, timed and proctored exams are enabled in your course."
         ),
         default=False,
         scope=Scope.settings
