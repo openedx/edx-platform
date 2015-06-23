@@ -306,19 +306,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             self._test_successful_ecommerce_api_call(False)
 
 
-class OrdersViewTests(BasketsViewTests):
-    """
-    Ensures that /orders/ points to and behaves like /baskets/, for backward
-    compatibility with stale js clients during updates.
-
-    (XCOM-214) remove after release.
-    """
-
-    def setUp(self):
-        super(OrdersViewTests, self).setUp()
-        self.url = reverse('commerce:orders')
-
-
 @attr('shard_1')
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
