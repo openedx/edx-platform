@@ -2023,8 +2023,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
 
     def test_denied_email_message_with_close_verification_dates(self):
         # Due date given and expired
-
-        return_value = datetime(2016, 1, 1, tzinfo=timezone.utc)
+        return_value = datetime.now(tz=pytz.UTC) + timedelta(days=22)
         with patch.object(timezone, 'now', return_value=return_value):
             __, body = _compose_message_reverification_email(
                 self.course.id, self.user.id, self.reverification_location, "denied", self.request
