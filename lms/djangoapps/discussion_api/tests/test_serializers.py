@@ -197,7 +197,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["following", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "voted"],
         }
         self.assertEqual(self.serialize(thread), expected)
 
@@ -305,7 +305,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 4,
             "children": [],
-            "editable_fields": ["voted"],
+            "editable_fields": ["abuse_flagged", "voted"],
         }
         self.assertEqual(self.serialize(comment), expected)
 

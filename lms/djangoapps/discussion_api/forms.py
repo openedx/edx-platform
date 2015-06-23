@@ -90,6 +90,7 @@ class ThreadActionsForm(Form):
     """
     following = BooleanField(required=False)
     voted = BooleanField(required=False)
+    abuse_flagged = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
@@ -108,3 +109,4 @@ class CommentActionsForm(Form):
     interactions with the comments service.
     """
     voted = BooleanField(required=False)
+    abuse_flagged = BooleanField(required=False)

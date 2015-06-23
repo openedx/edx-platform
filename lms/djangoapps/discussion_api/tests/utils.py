@@ -243,6 +243,28 @@ class CommentsServiceMockMixin(object):
                 status=200
             )
 
+    def register_flag_response(self, content_type, content_id):
+        """Register a mock response for PUT on the CS flag endpoints"""
+        for path in ["abuse_flag", "abuse_unflag"]:
+            httpretty.register_uri(
+                "PUT",
+                "http://localhost:4567/api/v1/{content_type}s/{content_id}/{path}".format(
+                    content_type=content_type,
+                    content_id=content_id,
+                    path=path
+                ),
+                body=json.dumps({}),  # body is unused
+                status=200
+            )
+
+    def register_thread_flag_response(self, thread_id):
+        """Register a mock response for PUT on the CS thread flag endpoints"""
+        self.register_flag_response("thread", thread_id)
+
+    def register_comment_flag_response(self, comment_id):
+        """Register a mock response for PUT on the CS comment flag endpoints"""
+        self.register_flag_response("comment", comment_id)
+
     def register_delete_thread_response(self, thread_id):
         """
         Register a mock response for DELETE on the CS thread instance endpoint
