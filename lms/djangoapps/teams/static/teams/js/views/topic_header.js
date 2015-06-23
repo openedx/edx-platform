@@ -15,18 +15,29 @@
             },
 
             render: function () {
-                var currentlyViewing,
+                var message,
                     start = this.collection.start,
                     end = start + this.collection.length,
-                    size = this.collection.totalCount;
-                // Translators: becomes either "all 10 topics" or "1 through 5 of 10 topics"
-                if (end >= size && start === 0) {
-                    currentlyViewing = gettext("all ") + size;
+                    num_topics = this.collection.totalCount;
+                if (!this.collection.hasPreviousPage() && !this.collection.hasNextPage()) {
+                    // Only one page of results
+                    message = interpolate(
+                        ngettext(
+                            // Translators: 'num_topics' is the number of topics that the student sees
+                            'Currently viewing %(num_topics)s topic',
+                            'Currently viewing all %(num_topics)s topics',
+                            num_topics
+                        ),
+                        {num_topics: num_topics}, true
+                    );
+                } else {
+                    // Many pages of results
+                    message = interpolate(
+                        gettext('Currently viewing %(first_index)s through %(last_index)s of %(num_topics)s topics'),
+                        {first_index: Math.min(start + 1, end), last_index: end, num_topics: num_topics}, true
+                    );
                 }
-                else {
-                    currentlyViewing = Math.min(start + 1, end) + gettext(" through ") + end + gettext(" of ") + size;
-                }
-                this.$el.html(_.template(headerTemplate, {currentlyViewing: currentlyViewing}));
+                this.$el.html(_.template(headerTemplate, {message: message}));
                 return this;
             }
         });
