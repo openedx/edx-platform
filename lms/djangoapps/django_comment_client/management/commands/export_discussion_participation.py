@@ -153,7 +153,10 @@ class Command(BaseCommand):
                 raw_course_key,
                 dir_name / self.get_default_file_location(raw_course_key)
             ]
-            self.dump_one(*args, **options)
+            try:
+                self.dump_one(*args, **options)
+            except CommandError as e:
+                print('Error generating CSV for course {}: {}'.format(raw_course_key, e.message))
 
     def dump_one(self, *args, **options):
         if not args:
