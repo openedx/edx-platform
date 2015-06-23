@@ -132,10 +132,12 @@ def compile_coffeescript(*files):
 
 @task
 @no_help
-def compile_sass(debug=False):
+@cmdopts([('debug', 'd', 'Debug mode')])
+def compile_sass(options):
     """
     Compile Sass to CSS.
     """
+    debug = options.get('debug')
     parts = ["sass"]
     parts.append("--update")
     parts.append("--cache-location {cache}".format(cache=SASS_CACHE_PATH))
@@ -244,7 +246,7 @@ def update_assets(args):
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
-    compile_sass(args.debug)
+    call_task('compile_sass', options={'debug': args.debug})
 
     if args.collect:
         collect_assets(args.system, args.settings)
