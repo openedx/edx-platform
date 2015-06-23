@@ -158,6 +158,43 @@ class LoginTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
 
+    def test_login_user_info_cookie(self):
+        response, _ = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=True)
+
+        # Verify the format of the "user info" cookie set on login
+        cookie = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME]
+        user_info = json.loads(cookie.value)
+
+        # Check that the version is set
+        self.assertEqual(user_info["version"], settings.EDXMKTG_USER_INFO_COOKIE_VERSION)
+
+        # Check that the username and email are set
+        self.assertEqual(user_info["username"], self.user.username)
+        self.assertEqual(user_info["email"], self.user.email)
+
+        # Check that the URLs are absolute
+        for url in user_info["header_urls"].values():
+            self.assertIn("http://testserver/", url)
+
+    def test_logout_deletes_mktg_cookies(self):
+        response, _ = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=True)
+
+        # Check that the marketing site cookies have been set
+        self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
+        self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
+
+        # Log out
+        logout_url = reverse('logout')
+        response = self.client.post(logout_url)
+
+        # Check that the marketing site cookies have been deleted
+        # (cookies are deleted by setting an expiration date in 1970)
+        for cookie_name in [settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, settings.EDXMKTG_USER_INFO_COOKIE_NAME]:
+            cookie = self.client.cookies[cookie_name]
+            self.assertIn("01-Jan-1970", cookie.get('expires'))
+
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):
         response, _ = self._login_response('test@edx.org', 'test_password')
