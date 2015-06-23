@@ -4,9 +4,7 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 import datetime
 import cPickle as pickle
 import math
-import re
 import zlib
-from mongodb_proxy import autoretry_read, MongoProxy
 import pymongo
 import pytz
 import re
