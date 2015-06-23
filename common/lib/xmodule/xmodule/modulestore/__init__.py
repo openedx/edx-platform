@@ -369,6 +369,10 @@ class EditInfo(object):
             source_version="UNSET" if self.source_version is None else self.source_version,
         )  # pylint: disable=bad-continuation
 
+    def __eq__(self, edit_info):
+        # Two edit infos are equal iff their storable representations are equal
+        return self.to_storable() == edit_info.to_storable()
+
 
 class BlockData(object):
     """
@@ -425,6 +429,13 @@ class BlockData(object):
             self=self,
             classname=self.__class__.__name__,
         )  # pylint: disable=bad-continuation
+
+    def __eq__(self, block_data):
+        """
+        Two block data objects are equal iff all their attributes are equal.
+        """
+        attrs = ['fields', 'block_type', 'definition', 'defaults', 'edit_info']
+        return all(getattr(self, attr) == getattr(block_data, attr) for attr in attrs)
 
 
 new_contract('BlockData', BlockData)
