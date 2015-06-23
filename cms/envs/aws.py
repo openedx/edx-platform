@@ -348,6 +348,7 @@ if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
 
 XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})
 XBLOCK_SETTINGS.setdefault("VideoDescriptor", {})["licensing_enabled"] = FEATURES.get("LICENSING", False)
+XBLOCK_SETTINGS.setdefault("VideoModule", {})['YOUTUBE_API_KEY'] = AUTH_TOKENS.get('YOUTUBE_API_KEY', YOUTUBE_API_KEY)
 
 
 ################# PROCTORING CONFIGURATION ##################

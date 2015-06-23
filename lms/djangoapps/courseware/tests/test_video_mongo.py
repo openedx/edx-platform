@@ -62,8 +62,9 @@ class TestVideoYouTube(TestVideo):
                 "transcriptLanguage": "en",
                 "transcriptLanguages": OrderedDict({"en": "English", "uk": u"Українська"}),
                 "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
+                "ytApiUrl": "https://www.youtube.com/iframe_api",
+                "ytMetadataUrl": "https://www.googleapis.com/youtube/v3/videos/",
+                "ytKey": None,
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
@@ -139,8 +140,9 @@ class TestVideoNonYouTube(TestVideo):
                 "transcriptLanguage": "en",
                 "transcriptLanguages": OrderedDict({"en": "English"}),
                 "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
+                "ytApiUrl": "https://www.youtube.com/iframe_api",
+                "ytMetadataUrl": "https://www.googleapis.com/youtube/v3/videos/",
+                "ytKey": None,
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
@@ -192,8 +194,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             "transcriptLanguage": "en",
             "transcriptLanguages": OrderedDict({"en": "English"}),
             "ytTestTimeout": 1500,
-            "ytApiUrl": "www.youtube.com/iframe_api",
-            "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
+            "ytApiUrl": "https://www.youtube.com/iframe_api",
+            "ytMetadataUrl": "https://www.googleapis.com/youtube/v3/videos/",
+            "ytKey": None,
             "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation/__lang__'
             ).rstrip('/?'),
@@ -1181,8 +1184,9 @@ class TestVideoWithBumper(TestVideo):
                 "transcriptLanguage": "en",
                 "transcriptLanguages": OrderedDict({"en": "English", "uk": u"Українська"}),
                 "ytTestTimeout": 1500,
-                "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "gdata.youtube.com/feeds/api/videos/",
+                "ytApiUrl": "https://www.youtube.com/iframe_api",
+                "ytMetadataUrl": "https://www.googleapis.com/youtube/v3/videos/",
+                "ytKey": None,
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
