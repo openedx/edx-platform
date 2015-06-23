@@ -5,6 +5,7 @@ from uuid import uuid4
 from nose.plugins.attrib import attr
 
 import ddt
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,6 +18,8 @@ from commerce.constants import Messages
 from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
 from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from course_modes.models import CourseMode
+from embargo.test_utils import restrict_course
+from openedx.core.lib.django_test_client_utils import get_absolute_url
 from enrollment.api import get_enrollment
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseModeFactory
@@ -42,7 +45,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
     """
     Tests for the commerce orders view.
     """
-
     def _post_to_view(self, course_id=None):
         """
         POST to the view being tested.
@@ -95,6 +97,17 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         # Ignore events fired from UserFactory creation
         self.reset_tracker()
+
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def test_embargo_restriction(self):
+        """
+        The view should return HTTP 403 status if the course is embargoed.
+        """
+        with restrict_course(self.course.id) as redirect_url:
+            response = self._post_to_view()
+            self.assertEqual(403, response.status_code)
+            body = json.loads(response.content)
+            self.assertEqual(get_absolute_url(redirect_url), body['user_message_url'])
 
     def test_login_required(self):
         """

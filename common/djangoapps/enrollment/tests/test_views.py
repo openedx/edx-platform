@@ -26,6 +26,7 @@ from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
+from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
@@ -725,10 +726,6 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
             'user': self.user.username
         })
 
-    def _get_absolute_url(self, path):
-        """ Generate an absolute URL for a resource on the test server. """
-        return u'http://testserver/{}'.format(path.lstrip('/'))
-
     def assert_access_denied(self, user_message_path):
         """
         Verify that the view returns HTTP status 403 and includes a URL in the response, and no enrollment is created.
@@ -741,7 +738,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
 
         # Expect that the redirect URL is included in the response
         resp_data = json.loads(response.content)
-        user_message_url = self._get_absolute_url(user_message_path)
+        user_message_url = get_absolute_url(user_message_path)
         self.assertEqual(resp_data['user_message_url'], user_message_url)
 
         # Verify that we were not enrolled
