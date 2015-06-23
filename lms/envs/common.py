@@ -1204,7 +1204,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### Pipeline #######################################
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -1236,6 +1236,8 @@ base_vendor_js = [
     'js/vendor/underscore-min.js',
     'js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
+    'js/vendor/URI.min.js',
+    'js/vendor/backbone-min.js'
 ]
 
 main_vendor_js = base_vendor_js + [
@@ -1244,7 +1246,12 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/URI.min.js',
+]
+
+# Common files used by both RequireJS code and non-RequireJS code
+base_application_js = [
+    'js/src/utility.js',
+    'js/src/logger.js',
 ]
 
 dashboard_js = (
@@ -1272,7 +1279,6 @@ student_account_js = [
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
-    'js/src/utility.js',
     'js/src/accessibility_tools.js',
     'js/src/ie_shim.js',
     'js/src/string_utils.js',
@@ -1298,7 +1304,6 @@ verify_student_js = [
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
-    'js/src/utility.js',
     'js/src/accessibility_tools.js',
     'js/src/ie_shim.js',
     'js/src/string_utils.js',
@@ -1485,20 +1490,23 @@ project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - s
 
 
 PIPELINE_JS = {
+    'base_application': {
+        'source_filenames': base_application_js,
+        'output_filename': 'js/lms-base-application.js',
+    },
+
     'application': {
 
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + [
+        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
-            'js/src/utility.js',
             'js/src/accessibility_tools.js',
             'js/src/ie_shim.js',
             'js/src/string_utils.js',
-            'js/src/logger.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
@@ -1590,10 +1598,6 @@ PIPELINE_JS = {
         'source_filenames': certificates_web_view_js,
         'output_filename': 'js/certificates/web_view.js'
     },
-    'utility': {
-        'source_filenames': ['js/src/utility.js'],
-        'output_filename': 'js/utility.js'
-    },
     'credit_wv': {
         'source_filenames': credit_web_view_js,
         'output_filename': 'js/credit/web_view.js'
@@ -1627,7 +1631,10 @@ PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
-    "coffee/*",
+    "coffee/*.coffee",
+    "coffee/*/*.coffee",
+    "coffee/*/*/*.coffee",
+    "coffee/*/*/*/*.coffee",
 
     # Symlinks used by js-test-tool
     "xmodule_js",
@@ -1637,6 +1644,36 @@ PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
+
+
+################################# DJANGO-REQUIRE ###############################
+
+# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
+REQUIRE_BASE_URL = "./"
+
+# The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
+# A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
+# Set to False to disable running the default profile (e.g. if only using it to build Standalone
+# Modules)
+REQUIRE_BUILD_PROFILE = "lms/js/build.js"
+
+# The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
+REQUIRE_JS = "js/vendor/require.js"
+
+# A dictionary of standalone modules to build with almond.js.
+REQUIRE_STANDALONE_MODULES = {}
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = False
+
+# A tuple of files to exclude from the compilation result of r.js.
+REQUIRE_EXCLUDE = ("build.txt",)
+
+# The execution environment in which to run r.js: auto, node or rhino.
+# auto will autodetect the environment and make use of node if available and rhino if not.
+# It can also be a path to a custom class that subclasses require.environments.Environment
+# and defines some "args" function that returns a list with the command arguments to execute.
+REQUIRE_ENVIRONMENT = "node"
 
 
 ################################# CELERY ######################################
