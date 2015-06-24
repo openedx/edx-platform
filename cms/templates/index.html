@@ -24,12 +24,12 @@
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Course")}</a>
-            % if libraries_enabled:
-              <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
-              ${_("New Library")}</a>
-            % endif
           % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
+          % endif
+          % if show_new_library_button:
+            <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
+            ${_("New Library")}</a>
           % endif
         </li>
       </ul>
@@ -449,7 +449,7 @@
               </div>
           </div>
         </div>
-        %if course_creator_status == "granted":
+        % if show_new_library_button:
         <div class="notice-item has-actions">
           <div class="msg">
               <h3 class="title">${_('Create Your First Library')}</h3>
@@ -464,7 +464,7 @@
           </li>
         </ul>
         </div>
-        %endif
+        % endif
       </div>
       %endif
 
