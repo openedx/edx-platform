@@ -2,7 +2,7 @@
 Acceptance tests for the teams feature.
 """
 from ..helpers import UniqueCourseTest
-from ...pages.lms.teams import TeamsPage
+from ...pages.lms.teams import TeamsPage, BrowseTopicsPage
 from nose.plugins.attrib import attr
 from ...fixtures.course import CourseFixture
 from ...pages.lms.tab_nav import TabNavPage
@@ -21,7 +21,6 @@ class TeamsTabTest(UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.teams_page = TeamsPage(self.browser, self.course_id)
-        # self.test_topic = {u"name": u"a topic", u"description": u"test topic", u"id": 0}
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
@@ -79,6 +78,7 @@ class TeamsTabTest(UniqueCourseTest):
         """
         Scenario: teams tab should not be present if student is not enrolled in the course
         Given there is a course with team configuration and topics
+
         And I am not enrolled in that course, and am not global staff
         When I view the course info page
         Then I should not see the Teams tab
@@ -116,6 +116,17 @@ class TeamsTabTest(UniqueCourseTest):
         )
         self.verify_teams_present(True)
 
+
+@attr('shard_5')
+class BrowseTopicsTest(TeamsTabTest):
+    """
+    Tests for the Browse tab of the Teams page.
+    """
+
+    def setUp(self):
+        super(BrowseTopicsTest, self).setUp()
+        self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
+
     def test_list_topics(self):
         """
         Scenario: a list of topics should be visible in the "Browse" tab
@@ -125,10 +136,12 @@ class TeamsTabTest(UniqueCourseTest):
         Then I should see a list of topics for the course
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(2)})
-        self.teams_page.visit()
-        self.teams_page.browse_topics()
-        self.assertEqual(len(self.teams_page.get_topic_cards()), 2)
-        self.assertEqual(self.teams_page.get_pagination_text(), 'Currently viewing all 2 topics')
+        self.topics_page.visit()
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 2)
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing all 2 topics')
+        self.assertEqual(self.topics_page.get_current_page_number(), 1)
+        self.assertFalse(self.topics_page.is_previous_page_button_enabled())
+        self.assertFalse(self.topics_page.is_next_page_button_enabled())
 
     def test_topic_pagination(self):
         """
@@ -139,10 +152,11 @@ class TeamsTabTest(UniqueCourseTest):
         Then I should see only the first 5 topics
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(10)})
-        self.teams_page.visit()
-        self.teams_page.browse_topics()
-        self.assertEqual(len(self.teams_page.get_topic_cards()), 5)
-        self.assertEqual(self.teams_page.get_pagination_text(), 'Currently viewing 1 through 5 of 10 topics')
+        self.topics_page.visit()
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 5)
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 5 of 10 topics')
+        self.assertFalse(self.topics_page.is_previous_page_button_enabled())
+        self.assertTrue(self.topics_page.is_next_page_button_enabled())
 
     def test_go_to_numbered_page(self):
         """
@@ -154,10 +168,11 @@ class TeamsTabTest(UniqueCourseTest):
         Then I should see that page of topics
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(16)})
-        self.teams_page.visit()
-        self.teams_page.browse_topics()
-        self.teams_page.go_to_topics_list_page(4)
-        self.assertEqual(len(self.teams_page.get_topic_cards()), 1)
+        self.topics_page.visit()
+        self.topics_page.go_to_page(4)
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 1)
+        self.assertTrue(self.topics_page.is_previous_page_button_enabled())
+        self.assertFalse(self.topics_page.is_next_page_button_enabled())
 
     def test_go_to_invalid_page(self):
         """
@@ -169,23 +184,26 @@ class TeamsTabTest(UniqueCourseTest):
         Then I should stay on the current page
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(5)})
-        self.teams_page.visit()
-        self.teams_page.browse_topics()
-        self.teams_page.go_to_topics_list_page(2)
-        self.assertEqual(self.teams_page.get_current_page_text(), '1')
+        self.topics_page.visit()
+        self.topics_page.go_to_page(2)
+        self.assertEqual(self.topics_page.get_current_page_number(), 1)
 
-    def test_next_page_button(self):
+    def test_page_navigation_buttons(self):
         """
         Scenario: browsing topics should not respond to invalid page numbers
         Given I am enrolled in a course with team configuration and topics
         When I visit the Teams page
         And I browse topics
-        And I press the next page button
+        When I press the next page button
         Then I should move to the next page
+        When I press the previous page button
+        Then I should move to the previous page
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(6)})
-        self.teams_page.visit()
-        self.teams_page.browse_topics()
-        self.teams_page.press_next_page_button()
-        self.assertEqual(len(self.teams_page.get_topic_cards()), 1)
-        self.assertEqual(self.teams_page.get_pagination_text(), 'Currently viewing 6 through 6 of 6 topics')
+        self.topics_page.visit()
+        self.topics_page.press_next_page_button()
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 1)
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 6 through 6 of 6 topics')
+        self.topics_page.press_previous_page_button()
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 5)
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 5 of 6 topics')
