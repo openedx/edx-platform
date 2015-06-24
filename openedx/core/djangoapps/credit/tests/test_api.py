@@ -1,17 +1,18 @@
 """
 Tests for the API functions in the credit app.
 """
-
+import unittest
 import datetime
 import ddt
 import pytz
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection, transaction
+from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
 
-from student.tests.factories import UserFactory
 from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.exceptions import (
@@ -34,13 +35,20 @@ from openedx.core.djangoapps.credit.api import (
     set_credit_requirement_status,
     get_credit_requirement
 )
+from student.models import CourseEnrollment
+from student.views import _create_credit_availability_message
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
-    "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY
+    "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY,
+    "ASU": TEST_CREDIT_PROVIDER_SECRET_KEY,
+    "MIT": TEST_CREDIT_PROVIDER_SECRET_KEY
 })
 class CreditApiTestBase(TestCase):
     """
@@ -212,7 +220,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
     def test_is_user_eligible_for_credit(self):
         credit_course = self.add_credit_course()
         CreditEligibility.objects.create(
-            course=credit_course, username="staff", provider=CreditProvider.objects.get(provider_id=self.PROVIDER_ID)
+            course=credit_course, username="staff"
         )
         is_eligible = api.is_user_eligible_for_credit('staff', credit_course.course_key)
         self.assertTrue(is_eligible)
@@ -380,19 +388,26 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Initial status should be "pending"
         self._assert_credit_status("pending")
 
+        credit_request_status = api.get_credit_request_status(self.USER_INFO['username'], self.course_key)
+        self.assertEqual(credit_request_status["status"], "pending")
+
         # Update the status
         api.update_credit_request_status(request["parameters"]["request_uuid"], self.PROVIDER_ID, status)
         self._assert_credit_status(status)
 
+        credit_request_status = api.get_credit_request_status(self.USER_INFO['username'], self.course_key)
+        self.assertEqual(credit_request_status["status"], status)
+
     def test_query_counts(self):
         # Yes, this is a lot of queries, but this API call is also doing a lot of work :)
-        # - 1 query: Check the user's eligibility and retrieve the credit course and provider.
+        # - 1 query: Check the user's eligibility and retrieve the credit course
+        # - 1 Get the provider of the credit course.
         # - 2 queries: Get-or-create the credit request.
         # - 1 query: Retrieve user account and profile information from the user API.
         # - 1 query: Look up the user's final grade from the credit requirements table.
         # - 2 queries: Update the request.
         # - 2 queries: Update the history table for the request.
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(10):
             request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
         # - 3 queries: Retrieve and update the request
@@ -522,12 +537,131 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         status.save()
 
         CreditEligibility.objects.create(
-            username=self.USER_INFO["username"],
-            course=CreditCourse.objects.get(course_key=self.course_key),
-            provider=CreditProvider.objects.get(provider_id=self.PROVIDER_ID)
+            username=self.USER_INFO['username'],
+            course=CreditCourse.objects.get(course_key=self.course_key)
         )
 
     def _assert_credit_status(self, expected_status):
         """Check the user's credit status. """
         statuses = api.get_credit_requests_for_user(self.USER_INFO["username"])
         self.assertEqual(statuses[0]["status"], expected_status)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CreditMessagesTests(ModuleStoreTestCase, CreditApiTestBase):
+    """
+    Test dashboard messages of credit course.
+    """
+
+    FINAL_GRADE = 0.8
+
+    def setUp(self):
+        super(CreditMessagesTests, self).setUp()
+        self.student = UserFactory()
+        self.student.set_password('test')  # pylint: disable=no-member
+        self.student.save()  # pylint: disable=no-member
+
+        self.client.login(username=self.student.username, password='test')
+        # New Course
+        self.course = CourseFactory.create()
+        self.enrollment = CourseEnrollment.enroll(self.student, self.course.id)
+
+    def _set_creditcourse(self):
+        """
+        Mark the course to credit
+
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.first_provider = CreditProvider.objects.create(
+            provider_id="ASU",
+            display_name="Arizona State University",
+            provider_url="google.com",
+            enable_integration=True
+        )  # pylint: disable=attribute-defined-outside-init
+        self.second_provider = CreditProvider.objects.create(
+            provider_id="MIT",
+            display_name="Massachusetts Institute of Technology",
+            provider_url="MIT.com",
+            enable_integration=True
+        )  # pylint: disable=attribute-defined-outside-init
+
+        self.credit_course = CreditCourse.objects.create(course_key=self.course.id, enabled=True)  # pylint: disable=attribute-defined-outside-init
+        self.credit_course.providers.add(self.first_provider)
+        self.credit_course.providers.add(self.second_provider)
+
+    def _set_user_eligible(self, credit_course, username):
+        """
+        Mark the user eligible for credit for the given credit course.
+        """
+        self.eligibility = CreditEligibility.objects.create(username=username, course=credit_course)  # pylint: disable=attribute-defined-outside-init
+
+    def test_user_request_status(self):
+        request_status = api.get_credit_request_status(self.student.username, self.course.id)
+        self.assertEqual(len(request_status), 0)
+
+    def test_credit_messages(self):
+        self._set_creditcourse()
+
+        requirement = CreditRequirement.objects.create(
+            course=self.credit_course,
+            namespace="grade",
+            name="grade",
+            active=True
+        )
+        status = CreditRequirementStatus.objects.create(
+            username=self.student.username,
+            requirement=requirement,
+        )
+        status.status = "satisfied"
+        status.reason = {"final_grade": self.FINAL_GRADE}
+        status.save()
+
+        self._set_user_eligible(self.credit_course, self.student.username)
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(
+            response,
+            "<b>Congratulations</b> {}, You have meet requirements for credit.".format(
+                self.student.get_full_name()  # pylint: disable=no-member
+            )
+        )
+
+        api.create_credit_request(self.course.id, self.first_provider.provider_id, self.student.username)
+
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(
+            response,
+            'Thank you, your payment is complete, your credit is processing. '
+            'Please see {provider_link} for more information.'.format(
+                provider_link='<a href="#" target="_blank">{provider_name}</a>'.format(
+                    provider_name=self.first_provider.display_name
+                )
+            )
+        )
+
+    def test_query_counts(self):
+        # This check the number of queries executed while rendering the
+        # credit message to display on the dashboard.
+        # - 1 query: Check the user's eligibility.
+        # - 1 query: Get the user credit requests.
+
+        self._set_creditcourse()
+
+        requirement = CreditRequirement.objects.create(
+            course=self.credit_course,
+            namespace="grade",
+            name="grade",
+            active=True
+        )
+        status = CreditRequirementStatus.objects.create(
+            username=self.student.username,
+            requirement=requirement,
+        )
+        status.status = "satisfied"
+        status.reason = {"final_grade": self.FINAL_GRADE}
+        status.save()
+
+        with self.assertNumQueries(2):
+            enrollment_dict = {unicode(self.course.id): self.course}
+            _create_credit_availability_message(
+                enrollment_dict, self.student
+            )
