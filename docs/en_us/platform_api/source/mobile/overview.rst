@@ -8,7 +8,7 @@ Use the Mobile API to build mobile applications for students to
 view course information and videos for courses on your instance of Open edX.
 
 ******************************************
-Mobile API Version 0.5, Alpha
+Mobile API Version and Status
 ******************************************
 
 The Mobile API is currently at version 0.5 and is an Alpha
@@ -20,19 +20,67 @@ release. We plan on making significant enhancements and changes to the API.
  while keeping in mind that endpoints might change.
 
 *************************************
-Mobile API Capabilities
+Mobile API Resources and Endpoints
 *************************************
 
-With the Mobile API, you can complete these tasks.
+The Mobile API supports the following resources, tasks, methods, and endpoints. 
 
-* Get :ref:`user details<Get User Details>` and :ref:`course enrollments<Get a
-  User's Course Enrollments>` for a user.
+========================
+Mobile User API Resource
+========================
 
-* :ref:`Get or change user status in a course <Get or Change User Status in a
-  Course>`
+.. list-table::
+   :widths: 20 10 70
+   :header-rows: 1
 
-* Get :ref:`updates<Get Course Updates>`, and :ref:`handouts<Get Course
-  Handouts>` for courses the user is enrolled in.
+   * - Task
+     - Method
+     - Endpoint
+   * - :ref:`Get details about a user<Get User Details>`
+     - GET 
+     - /api/mobile/v0.5/users/{username}
+   * - :ref:`Get course enrollments for a user<Get a User's Course Enrollments>`
+     - GET 
+     - /api/mobile/v0.5/users/{username}/course_enrollments/
+   * - :ref:`Get a user's status in a course<Get or Change User Status in a Course>`
+     - GET 
+     - /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
+   * - :ref:`Change a user's status in a course<Get or Change User Status in a Course>`
+     - PATCH 
+     - /api/mobile/v0.5/rs/{username}/course_status_info/{course_id}
 
-* Get :ref:`videos<Get the Video List>` and :ref:`transcripts<Get a Video
-  Transcript>` for courses the user is enrolled in.
+========================================
+Mobile Course Information API Resource
+========================================
+
+.. list-table::
+   :widths: 20 10 70
+   :header-rows: 1
+
+   * - Task
+     - Method
+     - Endpoint
+   * - :ref:`Get updates for a course<Get Course Updates>`
+     - GET
+     - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates   
+   * - :ref:`Get handouts for a course<Get Course Handouts>`
+     - GET
+     - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/handouts
+
+=====================================
+Mobile Video Outlines API Resource
+=====================================
+
+.. list-table::
+   :widths: 20 10 70
+   :header-rows: 1
+
+   * - Task
+     - Method
+     - Endpoint
+   * - :ref:`Get videos in a course<Get the Video List>`
+     - GET
+     - /api/mobile/v0.5/video_outlines/courses/{organization}/{course_number}/{course_run}
+   * - :ref:`Get a video transcript<Get a Video Transcript>`
+     - GET
+     - /api/mobile/v0.5/video_outlines/transcripts/{organization}/{course_number}/{course_run}/{video ID}/{language code}

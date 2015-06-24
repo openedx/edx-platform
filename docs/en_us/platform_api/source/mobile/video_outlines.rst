@@ -71,7 +71,3 @@ Get a Video Transcript
 ***********************
 
 .. autoclass:: mobile_api.video_outlines.views.VideoTranscripts
-    
-**Response Values**
-
-An HttpResponse with an SRT file download.
