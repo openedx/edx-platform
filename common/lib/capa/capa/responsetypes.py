@@ -1988,6 +1988,10 @@ class StringResponse(LoncapaResponse):
         )
         self.correct_answer = [contextualize_text(answer, self.context).strip() for answer in correct_answers]
 
+        # remove additional_answer from xml, otherwise they will be displayed
+        for el in self.xml.findall('additional_answer'):
+            self.xml.remove(el)
+
     def get_score(self, student_answers):
         """Grade a string response """
         if self.answer_id not in student_answers:
@@ -2360,8 +2364,12 @@ class CustomResponse(LoncapaResponse):
             if grade_decimals:
                 npoints = max_points * grade_decimals[k]
             else:
-                npoints = max_points if correct[k] == 'correct' else 0
-                npoints = max_points * self.default_pc if correct[k] == 'partially-correct' else 0
+                if correct[k] == 'correct':
+                    npoints = max_points
+                elif correct[k] == 'partially_correct':
+                    npoints = max_points * self.default_pc
+                else:
+                    npoints = 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
