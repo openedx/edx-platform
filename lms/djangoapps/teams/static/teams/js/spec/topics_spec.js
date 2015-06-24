@@ -4,7 +4,7 @@ define([
     describe('TopicsView', function () {
         var initialTopics, topicCollection, topicsView;
 
-        function generateTopics (startIndex, stopIndex) {
+        function generateTopics(startIndex, stopIndex) {
             return _.map(_.range(startIndex, stopIndex + 1), function (i) {
                 return {
                     "description": "description " + i,
@@ -35,7 +35,7 @@ define([
          * Verify that the topics view's header reflects the page we're currently viewing.
          * @param matchString the header we expect to see
          */
-        function expectHeader (matchString) {
+        function expectHeader(matchString) {
             expect(topicsView.$('.topics-paging-header').text()).toMatch(matchString);
         }
 
@@ -46,7 +46,7 @@ define([
          *  - currentPage: the one-indexed page we expect to be viewing
          *  - totalPages: the total number of pages to page through
          */
-        function expectViewReflectsState (options) {
+        function expectViewReflectsState(options) {
             var topicCards;
             // Verify the topics list
             topicCards = topicsView.$('.topic-card');
@@ -58,7 +58,7 @@ define([
             });
             // Verify the footer
             expect(topicsView.$('.topics-paging-footer').text())
-                .toMatch(new RegExp(options.currentPage + '\\s+\/\\s+' + topicCollection.totalPages));
+                .toMatch(new RegExp(options.currentPage + '\\s+out of\\s+\/\\s+' + topicCollection.totalPages));
         }
 
         it('can render the first of many pages', function () {
@@ -127,6 +127,20 @@ define([
             });
             expectHeader('Currently viewing 1 through 5 of 6 topics');
             expectViewReflectsState({currentPage: 1, totalPages: 2});
+        });
+
+        it('sets focus for screen readers', function () {
+            var requests = AjaxHelpers.requests(this);
+            spyOn($.fn, 'focus');
+            topicsView.$('.next-page-link').click();
+            AjaxHelpers.respondWithJson(requests, {
+                "count": 6,
+                "num_pages": 2,
+                "current_page": 2,
+                "start": 5,
+                "results": generateTopics(1, 1)
+            });
+            expect(topicsView.$('.sr-is-focusable').focus).toHaveBeenCalled();
         });
     });
 });

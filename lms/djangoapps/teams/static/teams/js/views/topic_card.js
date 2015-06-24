@@ -47,7 +47,7 @@
                         gettext('View Teams in the %(topic_name)s Topic'),
                         { topic_name: this.model.get('name') }, true
                     ));
-                    return '<span class="sr">' + screenReaderText + '</span><i class="icon fa fa-arrow-right"></i>';
+                    return '<span class="sr">' + screenReaderText + '</span><i class="icon fa fa-arrow-right" aria-hidden="true"></i>';
                 }
             });
 

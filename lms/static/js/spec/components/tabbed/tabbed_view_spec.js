@@ -77,6 +77,12 @@
                        view.$('.nav-item[data-index=1]').click();
                        expect(Backbone.history.navigate).toHaveBeenCalledWith('test 2', {replace: true});
                    });
+
+                   it('sets focus for screen readers', function () {
+                       spyOn($.fn, 'focus');
+                       view.$('.nav-item[data-index=1]').click();
+                       expect(view.$('.sr-is-focusable.sr-tab').focus).toHaveBeenCalled();
+                   });
                });
            }
           );
