@@ -85,7 +85,7 @@ except ImportError:
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
-
+@XBlock.wants('settings')
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule, LicenseMixin):
     """
     XML source example:
@@ -261,6 +261,15 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             cdn_exp_group = None
 
         self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
+
+        settings_service = self.runtime.service(self, 'settings')
+
+        api_key = None
+        if settings_service:
+            xb_settings = settings_service.get_settings_bucket(self)
+            if xb_settings and 'api_key' in xb_settings:
+                api_key = xb_settings['api_key']
+
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -287,6 +296,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
             'ytApiUrl': settings.YOUTUBE['API'],
             'ytTestUrl': settings.YOUTUBE['TEST_URL'],
+            'ytKey': api_key,
+
             'transcriptTranslationUrl': self.runtime.handler_url(
                 self, 'transcript', 'translation/__lang__'
             ).rstrip('/?'),

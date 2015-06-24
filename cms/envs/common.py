@@ -655,7 +655,7 @@ YOUTUBE = {
     'API': 'www.youtube.com/iframe_api',
 
     # URL to test YouTube availability
-    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+    'TEST_URL': 'www.googleapis.com/youtube/v3/videos',
 
     # Current youtube api for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
@@ -994,6 +994,9 @@ ELASTIC_FIELD_MAPPINGS = {
 XBLOCK_SETTINGS = {
     "VideoDescriptor": {
         "licensing_enabled": FEATURES.get("LICENSING", False)
+    },
+    "VideoModule": {
+        "api_key": 'AIzaSyD4Nl2sPF86nAty2TWM5hdMoKJTmqxMZoc'
     }
 }
 

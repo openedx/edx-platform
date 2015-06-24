@@ -518,7 +518,7 @@ function (VideoPlayer, i18n, moment) {
             _renderElements(this);
         } else {
             if (!this.youtubeXhr) {
-                this.youtubeXhr = this.isYoutubeAvailable();
+                this.youtubeXhr = this.getVideoMetadata();
             }
 
             this.youtubeXhr
@@ -675,8 +675,8 @@ function (VideoPlayer, i18n, moment) {
         }
 
         return $.ajax({
-            url: [document.location.protocol, '//', 'www.googleapis.com/youtube/v3/videos?id=', url,
-                '&part=contentDetails&key=AIzaSyD4Nl2sPF86nAty2TWM5hdMoKJTmqxMZoc&referrer=*.edx.org/*'].join(''),
+            url: ['https:', '//', this.config.ytTestUrl, '?id=', url,
+                '&part=contentDetails&key=', this.config.ytKey ,'&referrer=*.edx.org/*'].join(''),
             timeout: this.config.ytTestTimeout,
             success: _.isFunction(callback) ? callback : null
         });
@@ -685,8 +685,10 @@ function (VideoPlayer, i18n, moment) {
     function isYoutubeAvailable() {
         // Todo, Change this mechanism, this has false positives.
         return $.ajax({
-            url: ['https:', '//', 'www.youtube.com/favicon.ico'].join(''),
-            timeout: this.config.ytTestTimeout
+            url: ['https:', '//', 'www.youtube.com/'].join(''),
+            timeout: this.config.ytTestTimeout,
+            type: 'HEAD',
+            headers: {"Access-Control-Allow-Origin": "*"}
         });
     }
 

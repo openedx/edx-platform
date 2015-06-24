@@ -89,6 +89,9 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS = {
     "VideoDescriptor": {
         "licensing_enabled": True
+    },
+    "VideoModule": {
+        "api_key": 'AIzaSyD4Nl2sPF86nAty2TWM5hdMoKJTmqxMZoc'
     }
 }
 
