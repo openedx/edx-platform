@@ -17,6 +17,7 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -30,6 +31,7 @@ from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 from xmodule.util.django import get_current_request_hostname
+from xmodule.course_module import DEFAULT_START_DATE
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
@@ -140,38 +142,42 @@ def has_access(user, action, obj, course_key=None):
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     Checks if a user has access to a descriptor based on its start date.
-
     If there is no start date specified, grant access.
     Else, check if we're past the start date.
     NOTE: We do NOT check whether the user is staff... it assumed that staff
         access is checked at a higher level.
-
     Arguments:
         user (User): the user whose descriptor access we are checking.
         descriptor (AType): the descriptor for which we are checking access.
-    where AType is CourseDescriptor, CourseOverview, or any other class that
-        represents a descriptor and has the attributes .location, .id, .start,
-        and .days_early_for_beta.
+    where AType is any descriptor that has the attributes .location and
+        .days_early_for_beta
     """
     start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
-    masquerading = is_masquerading_as_student(user, descriptor.id)
-    now = datetime.now(UTC())
-    effective_start = _adjust_start_date_for_beta_testers(
-        user,
-        descriptor,
-        course_key=descriptor.id
-    )
+    masquerading = is_masquerading_as_student(user, course_key)
+    if start_dates_disabled and not masquerading:
+        return ACCESS_GRANTED
+    else:
+        now = datetime.now(UTC())
+        effective_start = _adjust_start_date_for_beta_testers(
+            user,
+            descriptor,
+            course_key=course_key
+        )
+        if (descriptor.start is None
+            or now > effective_start
+            or in_preview_mode()):
+                return ACCESS_GRANTED
 
-    if not (
-        (start_dates_disabled and not masquerading)
-        or descriptor.start is None
-        or now > effective_start
-        or in_preview_mode()
-    ):
-        # TODO: localization
-        return StartDateError("date")
-    return ACCESS_GRANTED
+        start_message = None
+        if isinstance(descriptor, CourseDescriptor):
+            if descriptor.advertised_start is not None:
+                start_message = _(descriptor.advertised_start)
+            elif descriptor.start != DEFAULT_START_DATE:
+                start_message = descriptor.start
+            else:
+                start_message = _("coming soon")
 
+        return StartDateError(start_message)
 
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
     """
@@ -508,7 +514,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if not access_response:
             return access_response
 
-        access_response = _can_access_descriptor_with_start_date(user, descriptor)
+        access_response = _can_access_descriptor_with_start_date(user, descriptor, course_key)
         if 'detached' not in descriptor._class_tags and not access_response:
             return access_response
 

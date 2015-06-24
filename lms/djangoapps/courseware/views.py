@@ -693,7 +693,7 @@ def course_info(request, course_id):
         if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-        staff_access = has_access(request.user, 'staff', course)
+        staff_access = bool(has_access(request.user, 'staff', course))
         masquerade = setup_masquerade(request, course_key, staff_access)  # allow staff to masquerade on the info page
         studio_url = get_studio_url(course, 'course_info')
 
