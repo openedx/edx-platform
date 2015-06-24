@@ -1,13 +1,12 @@
 import logging
 import random
+from lxml import etree
 
 from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
-
-from lxml import etree
-
 from xblock.fields import Scope, Integer
 from xblock.fragment import Fragment
+
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -38,12 +37,11 @@ class RandomizeModule(RandomizeFields, XModule):
         grading interaction is a tangle between super and subclasses of descriptors and
         modules.
 """
+
     def __init__(self, *args, **kwargs):
         super(RandomizeModule, self).__init__(*args, **kwargs)
 
-        # NOTE: calling self.get_children() creates a circular reference--
-        # it calls get_child_descriptors() internally, but that doesn't work until
-        # we've picked a choice
+        # NOTE: calling self.get_children() doesn't work until we've picked a choice
         num_choices = len(self.descriptor.get_children())
 
         if self.choice > num_choices:
@@ -58,15 +56,23 @@ class RandomizeModule(RandomizeFields, XModule):
                 else:
                     self.choice = random.randrange(0, num_choices)
 
-        if self.choice is not None:
-            self.child_descriptor = self.descriptor.get_children()[self.choice]
-            # Now get_children() should return a list with one element
-            log.debug("children of randomize module (should be only 1): %s",
-                      self.get_children())
-            self.child = self.get_children()[0]
-        else:
-            self.child_descriptor = None
-            self.child = None
+        if self.child is not None:
+            log.debug("children of randomize module (should be only 1): %s", self.child)
+
+    @property
+    def child_descriptor(self):
+        """ Return descriptor of selected choice """
+        if self.choice is None:
+            return None
+        return self.descriptor.get_children()[self.choice]
+
+    @property
+    def child(self):
+        """ Return module instance of selected choice """
+        child_descriptor = self.child_descriptor
+        if child_descriptor is None:
+            return None
+        return self.system.get_module(child_descriptor)
 
     def get_child_descriptors(self):
         """
@@ -95,7 +101,6 @@ class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
     filename_extension = "xml"
 
     def definition_to_xml(self, resource_fs):
-
         xml_object = etree.Element('randomize')
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
