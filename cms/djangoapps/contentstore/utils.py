@@ -310,3 +310,22 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     Creates the URL for handlers that use usage_keys as URL parameters.
     """
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
+
+
+def has_active_web_certificate(course):
+    """
+    Returns True if given course has active web certificate configuration.
+    If given course has no active web certificate configuration returns False.
+    Returns None If `CERTIFICATES_HTML_VIEW` is not enabled of course has not enabled
+    `cert_html_view_enabled` settings.
+    """
+    cert_config = None
+    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and course.cert_html_view_enabled:
+        cert_config = False
+        certificates = getattr(course, 'certificates', {})
+        configurations = certificates.get('certificates', [])
+        for config in configurations:
+            if config.get('is_active'):
+                cert_config = True
+                break
+    return cert_config

@@ -52,6 +52,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
+        self.assertIsNone(details.has_cert_config)
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -1007,6 +1008,41 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         tab_list.append(self.notes_tab)
         self.assertEqual(tab_list, course.tabs)
+
+    @override_settings(FEATURES={'CERTIFICATES_HTML_VIEW': True})
+    def test_web_view_certifcate_configuration_settings(self):
+        """
+        Test that has_cert_config is updated based on cert_html_view_enabled setting.
+        """
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                "cert_html_view_enabled": {"value": "true"}
+            },
+            user=self.user
+        )
+        self.assertIn('cert_html_view_enabled', test_model)
+        url = get_url(self.course.id)
+        response = self.client.get_json(url)
+        course_detail_json = json.loads(response.content)
+        self.assertFalse(course_detail_json['has_cert_config'])
+
+        # Now add a certificate configuration
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Certificate Config Name',
+                'course_title': 'Title override',
+                'org_logo_path': '/c4x/test/CSS101/asset/org_logo.png',
+                'signatories': [],
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        modulestore().update_item(self.course, self.user.id)
+        response = self.client.get_json(url)
+        course_detail_json = json.loads(response.content)
+        self.assertTrue(course_detail_json['has_cert_config'])
 
 
 class CourseGraderUpdatesTest(CourseTestCase):

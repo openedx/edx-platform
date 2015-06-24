@@ -267,6 +267,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         ]
 
         self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
@@ -422,6 +423,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         ]
 
         self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
@@ -483,6 +485,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             }
         ]
         self.course.certificates = {'certificates': test_certificates}
+        self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
         response = self.client.get(test_url)
@@ -506,6 +509,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             }
         ]
         self.course.certificates = {'certificates': test_certificates}
+        self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
         response = self.client.get(test_url)
@@ -646,6 +650,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             verify_uuid=self.cert.verify_uuid
         )
         test_url = '{}?evidence_visit=1'.format(cert_url)
+        self._add_course_certificates(count=1, signatory_count=2)
         self.recreate_tracker()
         assertion = BadgeAssertion(
             user=self.user, course_id=self.course_id, mode='honor',

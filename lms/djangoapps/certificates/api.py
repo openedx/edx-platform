@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from eventtracking import tracker
+from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
 
@@ -211,10 +212,14 @@ def has_html_certificates_enabled(course_key, course=None):
     It determines if course has html certificates enabled
     """
     html_certificates_enabled = False
-    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+    try:
+        if not isinstance(course_key, CourseKey):
+            course_key = CourseKey.from_string(course_key)
         course = course if course else modulestore().get_course(course_key, depth=0)
-        if get_active_web_certificate(course) is not None:
+        if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and course.cert_html_view_enabled:
             html_certificates_enabled = True
+    except:  # pylint: disable=bare-except
+        pass
     return html_certificates_enabled
 
 
