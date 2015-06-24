@@ -28,9 +28,9 @@
          * done.
          */
         modules: getModulesList([
-            // 'js/edxnotes/views/notes_factory.js',
-            // 'js/student_profile/views/learner_profile_factory.js',
-            // 'teams/js/teams_tab_factory.js'
+            'js/edxnotes/views/notes_factory',
+            'js/student_profile/views/learner_profile_factory',
+            'teams/js/teams_tab_factory'
         ]),
         /**
          * By default all the configuration for optimization happens from the command
