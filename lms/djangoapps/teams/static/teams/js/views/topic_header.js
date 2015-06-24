@@ -33,7 +33,11 @@
                 } else {
                     // Many pages of results
                     message = interpolate(
-                        gettext('Currently viewing %(first_index)s through %(last_index)s of %(num_topics)s topics'),
+                        ngettext(
+                            'Currently viewing %(first_index)s through %(last_index)s of %(num_topics)s topic',
+                            'Currently viewing %(first_index)s through %(last_index)s of %(num_topics)s topics',
+                            num_topics
+                        ),
                         {first_index: Math.min(start + 1, end), last_index: end, num_topics: num_topics}, true
                     );
                 }

@@ -74,7 +74,8 @@ from branding import api as branding_api
     window.baseUrl = "${settings.STATIC_URL}";
     (function (require) {
     % if settings.DEBUG is True:
-        var urlArgs = "";
+        ## Using what amounts to a random number in the Development environment for cache-busting
+        var urlArgs = "bust=" + (new Date()).getTime();
     % else:
         var urlArgs = "v=${settings.EDX_PLATFORM_REVISION}";
     % endif

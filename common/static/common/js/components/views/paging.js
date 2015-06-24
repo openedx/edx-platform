@@ -69,8 +69,8 @@
 
                 setInitialFilterColumn: function(filterColumn) {
                     var collection = this.collection,
-                        filtertInfo = this.filterableColumns[filterColumn];
-                    collection.filterField = filtertInfo.fieldName;
+                        filterInfo = this.filterableColumns[filterColumn];
+                    collection.filterField = filterInfo.fieldName;
                     this.filterColumn = filterColumn;
                 },
 
