@@ -248,17 +248,26 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
 
+         # Start date default and advertised start set
+        mock_unit.start = datetime.datetime(2030, 1, 1, tzinfo = UTC())
+        self.verify_error_type(mock_unit, access_response.StartDateError)
+        self.verify_start_message(mock_unit, DEFAULT_START_DATE)
+
         # Start date not default and advertised start set
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         mock_unit.advertised_start = "Spring 2016"
-
         self.verify_error_type(mock_unit, access_response.StartDateError)
         self.verify_start_message(mock_unit, mock_unit.advertised_start)
 
-        # Start date default and advertised start set
-        mock_unit.start = datetime.datetime(2030, 1, 1, tzinfo = UTC())
-        self.assertEquals(mock_unit.start, DEFAULT_START_DATE)
+        # Start date not default and no advertised start
+        mock_unit.advertised_start = None
         self.verify_error_type(mock_unit, access_response.StartDateError)
+        self.verify_start_message(mock_unit, mock_unit.start)
+
+        # Start date default and no advertised start
+        mock_unit.start = datetime.datetime(2030, 1, 1, tzinfo = UTC())
+        self.verify_error_type(mock_unit, access_response.StartDateError)
+        self.verify_start_message(mock_unit, None)
 
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
