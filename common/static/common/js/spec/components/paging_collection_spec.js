@@ -143,6 +143,7 @@ define(['jquery',
                         collection.on('error', function () { errorTriggered = true; });
                         collection.setPage(3);
                         AjaxHelpers.respondWithError(requests, 500, {}, requests.length - 1);
+                        expect(errorTriggered).toBe(true);
                     });
                 });
 
