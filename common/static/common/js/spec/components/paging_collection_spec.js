@@ -1,11 +1,12 @@
 define(['jquery',
         'backbone',
         'underscore',
+        'URI',
         'common/js/components/collections/paging_collection',
         'common/js/spec_helpers/ajax_helpers',
         'common/js/spec_helpers/spec_helpers'
     ],
-    function ($, Backbone, _, PagingCollection, AjaxHelpers, SpecHelpers) {
+    function ($, Backbone, _, URI, PagingCollection, AjaxHelpers, SpecHelpers) {
         'use strict';
 
         describe('PagingCollection', function () {
@@ -15,10 +16,10 @@ define(['jquery',
                     isZeroIndexed: false,
                     count: 43,
                     respond: function () {
-                        var url = requests[requests.length - 1].url;
-                        var page = parseInt(url.match(/page=(\d+)/)[1], 10);
-                        var page_size = parseInt(url.match(/page_size=(\d+)/)[1]);
-                        var page_count = Math.ceil(this.count / page_size);
+                        var params = (new URI(requests[requests.length - 1].url)).query(true),
+                            page = parseInt(params['page'], 10),
+                            page_size = parseInt(params['page_size'], 10),
+                            page_count = Math.ceil(this.count / page_size);
 
                         // Make zeroPage consistently start at zero for ease of calculation
                         var zeroPage = page - (this.isZeroIndexed ? 0 : 1);
@@ -34,6 +35,12 @@ define(['jquery',
                             }, requests.length - 1);
                         }
                     }
+                },
+                assertQueryParams = function (params) {
+                    var urlParams = (new URI(requests[requests.length - 1].url)).query(true);
+                    _.each(params, function (value, key) {
+                        expect(urlParams[key]).toBe(value);
+                    });
                 };
 
             beforeEach(function () {
@@ -60,6 +67,7 @@ define(['jquery',
                 collection.registerSortableField('test_field', 'Test Field');
                 collection.setSortField('test_field', false);
                 expect(requests.length).toBe(1);
+                assertQueryParams({'sort_order': 'test_field'});
                 expect(collection.sortField).toBe('test_field');
                 expect(collection.sortDisplayName()).toBe('Test Field');
             });
@@ -68,6 +76,7 @@ define(['jquery',
                 collection.registerFilterableField('test_field', 'Test Field');
                 collection.setFilterField('test_field');
                 expect(requests.length).toBe(1);
+                // The default implementation does not send any query params for filtering
                 expect(collection.filterField).toBe('test_field');
                 expect(collection.filterDisplayName()).toBe('Test Field');
             });
@@ -75,6 +84,7 @@ define(['jquery',
             it('can set the sort direction', function () {
                 collection.setSortDirection(PagingCollection.SortDirection.ASCENDING);
                 expect(requests.length).toBe(1);
+                // The default implementation does not send any query params for sort direction
                 expect(collection.sortDirection).toBe(PagingCollection.SortDirection.ASCENDING);
                 collection.setSortDirection(PagingCollection.SortDirection.DESCENDING);
                 expect(requests.length).toBe(2);
@@ -94,24 +104,15 @@ define(['jquery',
                 expect(collection.sortDirection).toBe(PagingCollection.SortDirection.DESCENDING);
             });
 
-            it('queries with page, page_size, and sort_order parameters when zero indexed', function () {
-                collection.isZeroIndexed = true;
+            SpecHelpers.withData({
+                'queries with page, page_size, and sort_order parameters when zero indexed': [true, 2],
+                'queries with page, page_size, and sort_order parameters when one indexed': [false, 3],
+            }, function (isZeroIndexed, page) {
+                collection.isZeroIndexed = isZeroIndexed;
                 collection.perPage = 5;
                 collection.sortField = 'test_field';
                 collection.setPage(3);
-                expect(requests[0].url).toContain('page=2');
-                expect(requests[0].url).toContain('page_size=5');
-                expect(requests[0].url).toContain('sort_order=test_field');
-            });
-
-            it('queries with page, page_size, and sort_order parameters when one indexed', function () {
-                collection.isZeroIndexed = false;
-                collection.perPage = 5;
-                collection.sortField = 'test_field';
-                collection.setPage(3);
-                expect(requests[0].url).toContain('page=3');
-                expect(requests[0].url).toContain('page_size=5');
-                expect(requests[0].url).toContain('sort_order=test_field');
+                assertQueryParams({'page': page.toString(), 'page_size': '5', 'sort_order': 'test_field'});
             });
 
             SpecHelpers.withConfiguration({

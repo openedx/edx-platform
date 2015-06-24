@@ -1,5 +1,5 @@
 /**
- * A generic paging collection for use with a ListView, PagingHeader, and PagingFooter.
+ * A generic paging collection for use with a ListView and PagingFooter.
  *
  * By default this collection is designed to work with Django Rest Framework APIs, but can be configured to work with
  * others. There is support for ascending or descending sort on a particular field, as well as filtering on a field.
@@ -73,7 +73,8 @@
 
             /**
              * Sets the current page of the collection. Page is assumed to be one indexed, regardless of the indexing
-             * of the underlying server API.
+             * of the underlying server API. If there is an error fetching the page, the Backbone 'error' event is
+             * triggered and the page does not change. A 'page_changed' event is triggered on a successful page change.
              * @param page one-indexed page to change to
              */
             setPage: function (page) {
@@ -105,7 +106,7 @@
             },
 
             /**
-             * Moves the collection to the next page, if it exists.
+             * Moves the collection to the next page if it exists.
              */
             nextPage: function () {
                 if (this.hasNextPage()) {
@@ -114,7 +115,7 @@
             },
 
             /**
-             * Moves the collection to the previous page, if it exists.
+             * Moves the collection to the previous page if it exists.
              */
             previousPage: function () {
                 if (this.hasPreviousPage()) {
@@ -167,7 +168,8 @@
             },
 
             /**
-             * Sets the field to sort on.
+             * Sets the field to sort on. Sends a request to the server to fetch the first page of the collection with
+             * the new sort order. If successful, the collection resets to page one with the new data.
              * @param fieldName name of the field to sort on
              * @param toggleDirection if true, the sort direction is toggled if the given field was already set
              */
@@ -184,7 +186,8 @@
             },
 
             /**
-             * Sets the direction of the sort.
+             * Sets the direction of the sort. Sends a request to the server to fetch the first page of the collection
+             * with the new sort order. If successful, the collection resets to page one with the new data.
              * @param direction either ASCENDING or DESCENDING from PagingCollection.SortDirection.
              */
             setSortDirection: function (direction) {
@@ -193,7 +196,8 @@
             },
 
             /**
-             * Sets the field to filter on.
+             * Sets the field to filter on. Sends a request to the server to fetch the first page of the collection
+             * with the new filter options. If successful, the collection resets to page one with the new data.
              * @param fieldName name of the field to filter on
              */
             setFilterField: function (fieldName) {
@@ -205,7 +209,7 @@
                 ASCENDING: 'ascending',
                 DESCENDING: 'descending',
                 flip: function (direction) {
-                    return direction == this.ASCENDING ? this.DESCENDING : this.ASCENDING;
+                    return direction === this.ASCENDING ? this.DESCENDING : this.ASCENDING;
                 }
             }
         });
