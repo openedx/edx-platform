@@ -69,7 +69,7 @@ registry = TagRegistry()  # pylint: disable=invalid-name
 class Status(object):
     """
     Problem status
-    attributes: classname, display_name
+    attributes: classname, display_name, display_tooltip
     """
     css_classes = {
         # status: css class
@@ -77,7 +77,7 @@ class Status(object):
         'incomplete': 'incorrect',
         'queued': 'processing',
     }
-    __slots__ = ('classname', '_status', 'display_name')
+    __slots__ = ('classname', '_status', 'display_name', 'display_tooltip')
 
     def __init__(self, status, gettext_func=unicode):
         self.classname = self.css_classes.get(status, status)
@@ -90,7 +90,16 @@ class Status(object):
             'unsubmitted': _('unanswered'),
             'queued': _('processing'),
         }
+        tooltips = {
+            # Translators: these are tooltips that indicate the state of an assessment question
+            'correct': _('This is correct.'),
+            'incorrect': _('This is incorrect.'),
+            'unanswered': _('This is unanswered.'),
+            'unsubmitted': _('This is unanswered.'),
+            'queued': _('This is being processed.'),
+        }
         self.display_name = names.get(status, unicode(status))
+        self.display_tooltip = tooltips.get(status, u'')
         self._status = status or ''
 
     def __str__(self):

@@ -468,9 +468,9 @@ class @Problem
     # They should set handlers on each <input> to reset the whole.
     formulaequationinput: (element) ->
       $(element).find('input').on 'input', ->
-        $p = $(element).find('p.status')
+        $p = $(element).find('span.status')
         `// Translators: the word unanswered here is about answering a problem the student must solve.`
-        $p.parent().removeClass().addClass "unanswered"
+        $p.parent().removeClass().addClass "unsubmitted"
 
     choicegroup: (element) ->
       $element = $(element)
@@ -496,9 +496,9 @@ class @Problem
 
     textline: (element) ->
       $(element).find('input').on 'input', ->
-        $p = $(element).find('p.status')
+        $p = $(element).find('span.status')
         `// Translators: the word unanswered here is about answering a problem the student must solve.`
-        $p.parent().removeClass("correct incorrect").addClass "unanswered"
+        $p.parent().removeClass("correct incorrect").addClass "unsubmitted"
 
   inputtypeSetupMethods:
 

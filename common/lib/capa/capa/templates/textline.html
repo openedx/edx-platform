@@ -27,18 +27,20 @@
    />
    ${trailing_text | h}
 
-      <p class="status" 
+      <span class="status" 
          %if status != 'unsubmitted':
          %endif
-         aria-describedby="input_${id}">
-        %if value:
-        ${value|h}
-        % else:
-        ${label}
-        %endif
-        -
-        ${status.display_name}
-      </p>
+         aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
+        <span class="sr">
+          %if value:
+            ${value|h}
+          % else:
+            ${label}
+          %endif
+            -
+            ${status.display_name}
+        </span>
+      </span>
 
       <p id="answer_${id}" class="answer"></p>
 
