@@ -41,12 +41,14 @@
                    },
 
                    setActiveTab: function (index) {
+                       var tab = this.tabs[index],
+                           view = tab.view;
                        this.$('a.is-active').removeClass('is-active').attr('aria-selected', 'false');
                        this.$('a[data-index='+index+']').addClass('is-active').attr('aria-selected', 'true');
-                       var view = this.tabs[index].view;
                        view.render();
                        this.$('.page-content-main').html(view.$el.html());
                        this.$('.sr-is-focusable').focus();
+                       this.router.navigate(tab.url, {replace: true});
                    },
 
                    switchTab: function (event) {
