@@ -58,7 +58,6 @@ def set_logged_in_cookies(request, response, user):
         'expires': expires,
         'domain': settings.SESSION_COOKIE_DOMAIN,
         'path': '/',
-        'secure': None,
         'httponly': None,
     }
 
@@ -66,7 +65,7 @@ def set_logged_in_cookies(request, response, user):
     # is logged in.  This is just a boolean value, so it's not very useful.
     # In the future, we should be able to replace this with the "user info"
     # cookie set below.
-    response.set_cookie(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, 'true', **cookie_settings)
+    response.set_cookie(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, 'true', secure=None, **cookie_settings)
 
     # Set a cookie with user info.  This can be used by external sites
     # to customize content based on user information.  Currently,
@@ -96,9 +95,21 @@ def set_logged_in_cookies(request, response, user):
         'header_urls': header_urls,
     }
 
+    # In production, TLS should be enabled so that this cookie is encrypted
+    # when we send it.  We also need to set "secure" to True so that the browser
+    # will transmit it only over secure connections.
+    #
+    # In non-production environments (acceptance tests, devstack, and sandboxes),
+    # we still want to set this cookie.  However, we do NOT want to set it to "secure"
+    # because the browser won't send it back to us.  This can cause an infinite redirect
+    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
+    # whether it needs to set the cookie or continue to the next pipeline stage.
+    user_info_cookie_is_secure = request.is_secure()
+
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         json.dumps(user_info),
+        secure=user_info_cookie_is_secure,
         **cookie_settings
     )
 
