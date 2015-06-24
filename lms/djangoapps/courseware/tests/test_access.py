@@ -123,6 +123,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertRaises(ValueError, access._has_access_string, user, 'not_staff', 'global')
 
     def test__has_access_error_desc(self):
+
         descriptor = Mock()
 
         self.assertFalse(access._has_access_error_desc(self.student, 'load', descriptor, self.course.course_key))
@@ -231,6 +232,16 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
         self.verify_access(mock_unit, False)
         self.verify_error_type(mock_unit, access_response.StartDateError)
+
+    def test__has_access_descriptor_start_date(self):
+
+        mock_unit = Mock(user_partitions=[])
+        mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
+        mock_unit.visible_to_staff_only = False
+        mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+        mock_unit.advertised_start = "Spring 2016"
+        self.verify_access(mock_unit, False)
+        self.verify_error_type(mock_unit, access_response.VisibilityError)
 
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
