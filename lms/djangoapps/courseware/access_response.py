@@ -18,18 +18,6 @@ class AccessResponse(object):
         """Overrides bool() to correct truth value testing"""
         return self.has_access
 
-    '''
-    def __eq__(self, other):
-        return (
-            isinstance(other, AccessResponse) and
-            self.has_access == other.has_access and
-            self.access_error == other.access_error
-        )
-
-    def __hash__(self):
-        return hash((self.has_access, self.access_error))
-    '''
-
     def to_json(self):
         """Returns json representation of this AccessResponse"""
         return {
@@ -53,24 +41,12 @@ class AccessError(AccessResponse):
         """
         super(AccessError, self).__init__(False, error_code, developer_message, user_message)
 
-    """
-    def __eq__(self, other):
-        return (
-            isinstance(other, AccessError) and
-            self.error_code == other.error_code and
-            self.user_message == other.user_message and
-            self.developer_message == other.developer_message
-        )
-
-    def __hash__(self):
-        return hash((self.error_code, self.developer_message, self.user_message))
-        """
-
 class StartDateError(AccessError):
     """Access denied because the course has not started yet and the user is not staff"""
-    def __init__(self, user_message):
+    def __init__(self, start_message):
         error_code = "course_not_started"
-        developer_message = "Course does not start until {start} and user does not have staff access".format(start=user_message)
+        developer_message = "Course does not start until {start} and user does not have staff access".format(start=start_message)
+        user_message = start_message
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
 
