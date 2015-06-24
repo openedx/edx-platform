@@ -2,6 +2,8 @@
  * Generally useful helper functions for writing Jasmine unit tests.
  */
 define([], function () {
+    'use strict';
+
     /**
      * Runs func as a test case multiple times, using entries from data as arguments. Like Python's DDT.
      * @param data An object mapping test names to arrays of function parameters. The name is passed to it() as the name
