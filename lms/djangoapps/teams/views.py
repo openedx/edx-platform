@@ -47,7 +47,7 @@ from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 
 # Constants
-TOPICS_PER_PAGE = 5
+TOPICS_PER_PAGE = 12
 
 
 class TeamsDashboardView(View):
@@ -533,7 +533,15 @@ class TopicListView(GenericAPIView):
 
 
 def get_ordered_topics(course_module, ordering):
-    """Return """
+    """Return a sorted list of team topics.
+
+    Arguments:
+        course_module (xmodule): the course which owns the team topics
+        ordering (str): the key belonging to topic dicts by which we sort
+
+    Returns:
+        list: a list of sorted team topics
+    """
     return sorted(course_module.teams_topics, key=lambda t: t[ordering].lower())
 
 
