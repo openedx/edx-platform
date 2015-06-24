@@ -15,8 +15,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 
 from courseware.courses import get_course_with_access
-from discussion_api.forms import ThreadActionsForm
+from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
+from discussion_api.permissions import can_delete, get_editable_fields
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import (
     THREAD_CREATED_EVENT_NAME,
@@ -85,36 +86,57 @@ def _get_comment_and_context(request, comment_id):
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
-        _, context = _get_thread_and_context(
-            request,
-            cc_comment["thread_id"],
-            cc_comment["parent_id"]
-        )
+        _, context = _get_thread_and_context(request, cc_comment["thread_id"])
         return cc_comment, context
     except CommentClientRequestError:
         raise Http404
 
 
-def _is_user_author_or_privileged(cc_content, context):
-    """
-    Check if the user is the author of a content object or a privileged user.
-
-    Returns:
-        Boolean
-    """
-    return (
-        context["is_requester_privileged"] or
-        context["cc_requester"]["id"] == cc_content["user_id"]
-    )
-
-
-def get_thread_list_url(request, course_key, topic_id_list):
+def get_thread_list_url(request, course_key, topic_id_list=None):
     """
     Returns the URL for the thread_list_url field, given a list of topic_ids
     """
     path = reverse("thread-list")
-    query_list = [("course_id", unicode(course_key))] + [("topic_id", topic_id) for topic_id in topic_id_list]
+    query_list = (
+        [("course_id", unicode(course_key))] +
+        [("topic_id", topic_id) for topic_id in topic_id_list or []]
+    )
     return request.build_absolute_uri(urlunparse(("", "", path, "", urlencode(query_list), "")))
+
+
+def get_course(request, course_key):
+    """
+    Return general discussion information for the course.
+
+    Parameters:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        course_key: The key of the course to get information for
+
+    Returns:
+
+        The course information; see discussion_api.views.CourseView for more
+        detail.
+
+    Raises:
+
+        Http404: if the course does not exist or is not accessible to the
+          requesting user
+    """
+    course = _get_course_or_404(course_key, request.user)
+    return {
+        "id": unicode(course_key),
+        "blackouts": [
+            {"start": blackout["start"].isoformat(), "end": blackout["end"].isoformat()}
+            for blackout in course.get_discussion_blackout_datetimes()
+        ],
+        "thread_list_url": get_thread_list_url(request, course_key, topic_id_list=[]),
+        "topics_url": request.build_absolute_uri(
+            reverse("course_topics", kwargs={"course_id": course_key})
+        )
+    }
 
 
 def get_course_topics(request, course_key):
@@ -189,7 +211,7 @@ def get_course_topics(request, course_key):
     }
 
 
-def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
+def get_thread_list(request, course_key, page, page_size, topic_id_list=None, text_search=None):
     """
     Return the list of all discussion threads pertaining to the given course
 
@@ -200,16 +222,30 @@ def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
     page: The page number (1-indexed) to retrieve
     page_size: The number of threads to retrieve per page
     topic_id_list: The list of topic_ids to get the discussion threads for
+    text_search A text search query string to match
+
+    Note that topic_id_list and text_search are mutually exclusive.
 
     Returns:
 
     A paginated result containing a list of threads; see
     discussion_api.views.ThreadViewSet for more detail.
+
+    Raises:
+
+    ValueError: if more than one of the mutually exclusive parameters is
+      provided
+    Http404: if the requesting user does not have access to the requested course
+      or a page beyond the last is requested
     """
+    exclusive_param_count = sum(1 for param in [topic_id_list, text_search] if param)
+    if exclusive_param_count > 1:  # pragma: no cover
+        raise ValueError("More than one mutually exclusive param passed to get_thread_list")
+
     course = _get_course_or_404(course_key, request.user)
     context = get_context(course, request)
     topic_ids_csv = ",".join(topic_id_list) if topic_id_list else None
-    threads, result_page, num_pages, _ = Thread.search({
+    threads, result_page, num_pages, text_search_rewrite = Thread.search({
         "course_id": unicode(course.id),
         "group_id": (
             None if context["is_requester_privileged"] else
@@ -220,6 +256,7 @@ def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
         "page": page,
         "per_page": page_size,
         "commentable_ids": topic_ids_csv,
+        "text": text_search,
     })
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
@@ -228,7 +265,9 @@ def get_thread_list(request, course_key, page, page_size, topic_id_list=None):
         raise Http404
 
     results = [ThreadSerializer(thread, context=context).data for thread in threads]
-    return get_paginated_data(request, results, page, num_pages)
+    ret = get_paginated_data(request, results, page, num_pages)
+    ret["text_search_rewrite"] = text_search_rewrite
+    return ret
 
 
 def get_comment_list(request, thread_id, endorsed, page, page_size):
@@ -301,25 +340,40 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     return get_paginated_data(request, results, page, num_pages)
 
 
-def _do_extra_thread_actions(api_thread, cc_thread, request_fields, actions_form, context):
+def _check_editable_fields(cc_content, data, context):
     """
-    Perform any necessary additional actions related to thread creation or
+    Raise ValidationError if the given update data contains a field that is not
+    in editable_fields.
+    """
+    editable_fields = get_editable_fields(cc_content, context)
+    non_editable_errors = {
+        field: ["This field is not editable."]
+        for field in data.keys()
+        if field not in editable_fields
+    }
+    if non_editable_errors:
+        raise ValidationError(non_editable_errors)
+
+
+def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context):
+    """
+    Perform any necessary additional actions related to content creation or
     update that require a separate comments service request.
     """
     for field, form_value in actions_form.cleaned_data.items():
-        if field in request_fields and form_value != api_thread[field]:
-            api_thread[field] = form_value
+        if field in request_fields and form_value != api_content[field]:
+            api_content[field] = form_value
             if field == "following":
                 if form_value:
-                    context["cc_requester"].follow(cc_thread)
+                    context["cc_requester"].follow(cc_content)
                 else:
-                    context["cc_requester"].unfollow(cc_thread)
+                    context["cc_requester"].unfollow(cc_content)
             else:
                 assert field == "voted"
                 if form_value:
-                    context["cc_requester"].vote(cc_thread, "up")
+                    context["cc_requester"].vote(cc_content, "up")
                 else:
-                    context["cc_requester"].unvote(cc_thread)
+                    context["cc_requester"].unvote(cc_content)
 
 
 def create_thread(request, thread_data):
@@ -356,7 +410,7 @@ def create_thread(request, thread_data):
 
     cc_thread = serializer.object
     api_thread = serializer.data
-    _do_extra_thread_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
 
     track_forum_event(
         request,
@@ -394,11 +448,15 @@ def create_comment(request, comment_data):
         raise ValidationError({"thread_id": ["Invalid value."]})
 
     serializer = CommentSerializer(data=comment_data, context=context)
-    if not serializer.is_valid():
-        raise ValidationError(serializer.errors)
+    actions_form = CommentActionsForm(comment_data)
+    if not (serializer.is_valid() and actions_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
     serializer.save()
 
     cc_comment = serializer.object
+    api_comment = serializer.data
+    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
+
     track_forum_event(
         request,
         get_comment_created_event_name(cc_comment),
@@ -407,21 +465,7 @@ def create_comment(request, comment_data):
         get_comment_created_event_data(cc_comment, cc_thread["commentable_id"], followed=False)
     )
 
-    return serializer.data
-
-
-_THREAD_EDITABLE_BY_ANY = {"following", "voted"}
-_THREAD_EDITABLE_BY_AUTHOR = {"topic_id", "type", "title", "raw_body"} | _THREAD_EDITABLE_BY_ANY
-
-
-def _get_thread_editable_fields(cc_thread, context):
-    """
-    Get the list of editable fields for the given thread in the given context
-    """
-    if _is_user_author_or_privileged(cc_thread, context):
-        return _THREAD_EDITABLE_BY_AUTHOR
-    else:
-        return _THREAD_EDITABLE_BY_ANY
+    return api_comment
 
 
 def update_thread(request, thread_id, update_data):
@@ -443,14 +487,7 @@ def update_thread(request, thread_id, update_data):
         detail.
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    editable_fields = _get_thread_editable_fields(cc_thread, context)
-    non_editable_errors = {
-        field: ["This field is not editable."]
-        for field in update_data.keys()
-        if field not in editable_fields
-    }
-    if non_editable_errors:
-        raise ValidationError(non_editable_errors)
+    _check_editable_fields(cc_thread, update_data, context)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
@@ -459,7 +496,7 @@ def update_thread(request, thread_id, update_data):
     if set(update_data) - set(actions_form.fields):
         serializer.save()
     api_thread = serializer.data
-    _do_extra_thread_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
 
 
@@ -493,15 +530,17 @@ def update_comment(request, comment_id, update_data):
           is empty or thread_id is included)
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    if not _is_user_author_or_privileged(cc_comment, context):
-        raise PermissionDenied()
+    _check_editable_fields(cc_comment, update_data, context)
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
-    if not serializer.is_valid():
-        raise ValidationError(serializer.errors)
-    # Only save comment object if the comment is actually modified
-    if update_data:
+    actions_form = CommentActionsForm(update_data)
+    if not (serializer.is_valid() and actions_form.is_valid()):
+        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+    # Only save comment object if some of the edited fields are in the comment data, not extra actions
+    if set(update_data) - set(actions_form.fields):
         serializer.save()
-    return serializer.data
+    api_comment = serializer.data
+    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context)
+    return api_comment
 
 
 def delete_thread(request, thread_id):
@@ -521,7 +560,7 @@ def delete_thread(request, thread_id):
 
     """
     cc_thread, context = _get_thread_and_context(request, thread_id)
-    if _is_user_author_or_privileged(cc_thread, context):
+    if can_delete(cc_thread, context):
         cc_thread.delete()
     else:
         raise PermissionDenied
@@ -544,7 +583,7 @@ def delete_comment(request, comment_id):
 
     """
     cc_comment, context = _get_comment_and_context(request, comment_id)
-    if _is_user_author_or_privileged(cc_comment, context):
+    if can_delete(cc_comment, context):
         cc_comment.delete()
     else:
         raise PermissionDenied

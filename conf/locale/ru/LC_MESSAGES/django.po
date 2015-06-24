@@ -10,6 +10,7 @@
 # berseneva, 2013
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
+# Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Евгений Козлов <eudjin@gmail.com>, 2014
@@ -175,7 +176,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-12 18:44+0000\n"
+"POT-Creation-Date: 2015-06-19 13:36+0000\n"
 "PO-Revision-Date: 2015-06-01 16:30+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
@@ -604,6 +605,18 @@ msgstr ""
 msgid "The ISO 639-1 language code for this language."
 msgstr ""
 
+#: common/djangoapps/student/models.py
+msgid "Namespace of enrollment attribute e.g. credit"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Name of the enrollment attribute e.g. provider_id"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Value of the enrollment attribute e.g. ASU"
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
 msgstr "Идентификатор курса не указан"
@@ -792,6 +805,12 @@ msgstr "Имя - обязательное поле"
 #: common/djangoapps/student/views.py
 msgid "Invalid ID"
 msgstr "Неверный идентификатор"
+
+#: common/djangoapps/third_party_auth/pipeline.py
+msgid ""
+"This account has not yet been activated. An activation email has been re-"
+"sent to {email_address}."
+msgstr ""
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -1242,9 +1261,10 @@ msgstr "ChoiceGroup: неопределённый тег {tag_name}"
 msgid "Answer received."
 msgstr ""
 
-#. Translators: '<choice>' is a tag name and should not be translated.
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
 #: common/lib/capa/capa/inputtypes.py
-msgid "Expected a <choice> tag; got {given_tag} instead"
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1301,6 +1321,16 @@ msgstr ""
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
+
+#: lms/templates/combinedopenended/open_ended_result_table.html
+#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
+msgid "Correct"
+msgstr "Верно"
+
+#: lms/templates/combinedopenended/open_ended_result_table.html
+#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
+msgid "Incorrect"
+msgstr "Неверно"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -1812,6 +1842,16 @@ msgstr ""
 msgid "If this error persists, please contact the course staff."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Hint: "
+msgstr ""
+
+#. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
+#. hints.
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Hint ({hint_num} of {hints_count}): "
+msgstr ""
+
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2022,6 +2062,13 @@ msgid ""
 " have the requisite number of graders, but ONLY WHEN all submissions they "
 "are eligible to grade already have enough graders.  This is intended for use"
 " when settings for `Required Peer Grading` > `Peer Graders per Response`"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid ""
+"ORA1 is no longer supported. To use this assessment, replace this ORA1 "
+"component with an ORA2 component."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -4322,6 +4369,16 @@ msgstr ""
 msgid "You must be a CCX Coach to access this view."
 msgstr ""
 
+#: lms/djangoapps/ccx/views.py
+msgid "You must be the coach for this ccx to access this view"
+msgstr ""
+
+#: lms/djangoapps/ccx/views.py
+msgid ""
+"You cannot create a CCX from a course using a deprecated id. Please create a"
+" rerun of this course in the studio to allow this action."
+msgstr ""
+
 #: lms/djangoapps/certificates/badge_handler.py
 msgid ""
 "Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
@@ -4814,6 +4871,10 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "Your certificate will be available when you pass the course."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "Certificate has already been created."
 msgstr ""
 
 #: lms/djangoapps/courseware/views.py
@@ -5401,6 +5462,51 @@ msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Coupon Code"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Course Id"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "% Discount"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Description"
+msgstr "Описание"
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Expiration Date"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Is Active"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Code Redeemed Count"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Discounted Seats"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Total Discounted Amount"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
 "of the generation task in the 'Pending Instructor Tasks' section."
@@ -5411,6 +5517,20 @@ msgid ""
 "A detailed enrollment report generation task is already in progress. Check "
 "the 'Pending Instructor Tasks' table for the status of the task. When "
 "completed, the report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your executive summary report is being created. To view the status of the "
+"report, see the 'Pending Instructor Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An executive summary report is currently in progress. To view the status of "
+"the report, see the 'Pending Instructor Tasks' section. When completed, the "
+"report will be available for download in the table below. You will be able "
+"to download the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6391,13 +6511,6 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Date: {date}"
 msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Description"
-msgstr "Описание"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
@@ -8778,6 +8891,11 @@ msgstr "образец: JaneDoe"
 msgid "Preferred Language"
 msgstr ""
 
+#: cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Course End Date"
+msgstr ""
+
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
 msgstr ""
@@ -8822,6 +8940,11 @@ msgstr "Помощь"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Sign Out"
+msgstr ""
+
+#: cms/templates/widgets/tabs-aggregator.html
+#: lms/templates/courseware/progress.html
+msgid "name"
 msgstr ""
 
 #: common/templates/license.html
@@ -9446,6 +9569,10 @@ msgid "Your email or password is incorrect"
 msgstr ""
 
 #: lms/templates/login.html
+msgid "An error occurred when signing you in to {platform_name}."
+msgstr ""
+
+#: lms/templates/login.html
 msgid ""
 "Please provide the following information to log into your {platform_name} "
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
@@ -9641,6 +9768,10 @@ msgstr ""
 
 #: lms/templates/problem.html
 msgid "your answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "Hint"
 msgstr ""
 
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
@@ -10625,7 +10756,7 @@ msgid "Download student grades"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Share on:"
+msgid "Take this with you:"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
@@ -10637,13 +10768,11 @@ msgid "Print Certificate"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Add Certificate to LinkedIn Profile"
+msgid "Add to LinkedIn Profile"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
+#: lms/templates/certificates/_accomplishment-header.html
+msgid "{platform_name} Home"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-rendering.html
@@ -10771,11 +10900,6 @@ msgstr ""
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Correct"
-msgstr "Верно"
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Correct"
 msgstr ""
 
@@ -10788,11 +10912,6 @@ msgstr ""
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Incorrect"
 msgstr ""
-
-#: lms/templates/combinedopenended/open_ended_result_table.html
-#: lms/templates/combinedopenended/openended/open_ended_evaluation.html
-msgid "Incorrect"
-msgstr "Неверно"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -11521,8 +11640,7 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade,you can request an {link_start} updated certificate "
-"{link_end}."
+"receive a higher grade, you can request an updated certificate."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11562,6 +11680,47 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Requirements for Course Credit"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "You are no longer eligible for this course."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "You have met the requirements for credit in this course."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Go to your dashboard"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "to purchase course credit."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "You have not yet met the requirements for credit."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Verification Submitted"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Verification Failed"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Upcoming"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "More"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11661,6 +11820,14 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Add Certificate to LinkedIn Profile"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -12295,10 +12462,6 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Open"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -13156,11 +13319,6 @@ msgid "Enter information about the coupon code below."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Coupon Code"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Discount Percentage"
 msgstr ""
 
@@ -13227,6 +13385,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Professional"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -13489,7 +13651,21 @@ msgid "Resubmit Invoice"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download Enrollment Report"
+msgid ""
+"Create a .csv file that contains enrollment information for your course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Create Enrollment Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid ""
+"Create an HTML file that contains an executive summary for this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Create Executive Summary"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -13526,11 +13702,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon Codes"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Expiration Date"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -13659,6 +13830,94 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Executive Summary for {display_name}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Report Creation Date"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of Seats"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of Enrollments"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Gross Revenue Collected"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Gross Revenue Pending"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of Enrollment Refunds"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Amount Refunded"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Average Price per Seat"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Frequently Used Coupon Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased using coupon codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Rank"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percent Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Times Used"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Bulk and Single Seat Purchases"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased individually"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased in bulk"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Number of seats purchased with invoices"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Unused bulk purchase seats (revenue at risk)"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percentage of seats purchased individually"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percentage of seats purchased in bulk"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Percentage of seats purchased with invoices"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -13901,7 +14160,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Therefore, please given enough detail to account for this action."
+msgid "Therefore, please give enough detail to account for this action."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14875,7 +15134,8 @@ msgid "State"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Registration for"
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Registration for:"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -14988,11 +15248,6 @@ msgstr[3] ""
 msgid "Cover Image"
 msgstr ""
 
-#. Translators: "Registration for:" is followed by a course name
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Registration for:"
-msgstr ""
-
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Course Dates:"
 msgstr ""
@@ -15052,10 +15307,6 @@ msgstr "Корзина"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "{platform_name} -  Shopping Cart"
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Steps"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -15140,6 +15391,14 @@ msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
+msgstr ""
+
+#: lms/templates/student_account/finish_auth.html
+msgid "Please Wait"
+msgstr ""
+
+#: lms/templates/student_account/finish_auth.html
+msgid "Please wait"
 msgstr ""
 
 #: lms/templates/student_account/login_and_register.html
@@ -17909,10 +18168,6 @@ msgid "(UTC)"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Course End Date"
-msgstr ""
-
-#: cms/templates/settings.html
 msgid "Last day your course is active"
 msgstr ""
 
@@ -18603,10 +18858,6 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about {studio_name}?"
-msgstr ""
-
-#: cms/templates/widgets/tabs-aggregator.html
-msgid "name"
 msgstr ""
 
 # empty

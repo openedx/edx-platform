@@ -18,19 +18,16 @@ from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv, \
-    upload_enrollment_report
+    upload_enrollment_report, upload_exec_summary_report
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistrationCode, Invoice, \
-    CourseRegistrationCodeInvoiceItem, InvoiceTransaction
-from student.tests.factories import UserFactory
-from student.models import (
-    CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit,
-    ALLOWEDTOENROLL_TO_ENROLLED
-)
+    CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
+from student.tests.factories import UserFactory, CourseModeFactory
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -712,6 +709,132 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
                 ]
             )),
         ])
+
+
+@ddt.ddt
+class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that Executive Summary report generation works.
+    """
+    def setUp(self):
+        super(TestExecutiveSummaryReport, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, min_price=50)
+
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.student1 = UserFactory()
+        self.student2 = UserFactory()
+        self.student1_cart = Order.get_cart_for_user(self.student1)
+        self.student2_cart = Order.get_cart_for_user(self.student2)
+
+        self.sale_invoice_1 = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='Test@company.com',
+            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
+            internal_reference="A", course_id=self.course.id, is_valid=True
+        )
+        InvoiceTransaction.objects.create(
+            invoice=self.sale_invoice_1,
+            amount=self.sale_invoice_1.total_amount,
+            status='completed',
+            created_by=self.instructor,
+            last_modified_by=self.instructor
+        )
+        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.sale_invoice_1,
+            qty=10,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
+        for i in range(5):
+            coupon = Coupon(
+                code='coupon{0}'.format(i), description='test_description', course_id=self.course.id,
+                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True,
+            )
+            coupon.save()
+
+    def test_successfully_generate_executive_summary_report(self):
+        """
+        Test that successfully generates the executive summary report.
+        """
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_exec_summary_report(
+                None, None, self.course.id,
+                task_input, 'generating executive summary report'
+            )
+        ReportStore.from_config(config_name='FINANCIAL_REPORTS')
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+
+    def students_purchases(self):
+        """
+        Students purchases the courses using enrollment
+        and coupon codes.
+        """
+        self.client.login(username=self.student1.username, password='test')
+        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.student1_cart, self.course.id)
+        # update the quantity of the cart item paid_course_reg_item
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {
+            'ItemId': paid_course_reg_item.id, 'qty': '4'
+        })
+        self.assertEqual(resp.status_code, 200)
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
+        self.assertEqual(resp.status_code, 200)
+
+        self.student1_cart.purchase()
+
+        course_reg_codes = CourseRegistrationCode.objects.filter(order=self.student1_cart)
+        redeem_url = reverse('register_code_redemption', args=[course_reg_codes[0].code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
+
+        self.client.login(username=self.student2.username, password='test')
+        PaidCourseRegistration.add_to_order(self.student2_cart, self.course.id)
+
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
+        self.assertEqual(resp.status_code, 200)
+
+        self.student2_cart.purchase()
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_generate_executive_summary_report(self):
+        """
+        test to generate executive summary report
+        and then test the report authenticity.
+        """
+        self.students_purchases()
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_exec_summary_report(
+                None, None, self.course.id,
+                task_input, 'generating executive summary report'
+            )
+        report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
+        expected_data = [
+            'Gross Revenue Collected', '$1481.82',
+            'Gross Revenue Pending', '$0.00',
+            'Average Price per Seat', '$296.36',
+            'Number of seats purchased using coupon codes', '<td>2</td>'
+        ]
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+        self._verify_html_file_report(report_store, expected_data)
+
+    def _verify_html_file_report(self, report_store, expected_data):
+        """
+        Verify grade report data.
+        """
+        report_html_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_html_filename)) as html_file:
+            html_file_data = html_file.read()
+            for data in expected_data:
+                self.assertTrue(data in html_file_data)
 
 
 @ddt.ddt

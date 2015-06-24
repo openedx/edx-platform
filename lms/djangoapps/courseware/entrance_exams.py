@@ -144,7 +144,8 @@ def get_entrance_exam_score(request, course):
             request,
             descriptor,
             field_data_cache,
-            course.id
+            course.id,
+            course=course
         )
 
     exam_module_generators = yield_dynamic_descriptor_descendants(

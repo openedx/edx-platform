@@ -29,7 +29,6 @@ from .models import (
 )
 from .signature import signature, get_shared_secret_key
 
-
 log = logging.getLogger(__name__)
 
 
@@ -404,6 +403,152 @@ def get_credit_requests_for_user(username):
 
     """
     return CreditRequest.credit_requests_for_user(username)
+
+
+def get_credit_requirement_status(course_key, username):
+    """ Retrieve the user's status for each credit requirement in the course.
+
+    Args:
+        course_key (CourseKey): The identifier for course
+        username (str): The identifier of the user
+
+    Example:
+        >>> get_credit_requirement_status("course-v1-edX-DemoX-1T2015", "john")
+
+                [
+                    {
+                        "namespace": "reverification",
+                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                        "criteria": {},
+                        "status": "satisfied",
+                    },
+                    {
+                        "namespace": "reverification",
+                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                        "criteria": {},
+                        "status": "Not satisfied",
+                    },
+                    {
+                        "namespace": "proctored_exam",
+                        "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "criteria": {},
+                        "status": "error",
+                    },
+                    {
+                        "namespace": "grade",
+                        "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "criteria": {"min_grade": 0.8},
+                        "status": None,
+                    },
+                ]
+
+    Returns:
+        list of requirement statuses
+    """
+    requirements = CreditRequirement.get_course_requirements(course_key)
+    requirement_statuses = CreditRequirementStatus.get_statuses(requirements, username)
+    requirement_statuses = dict((o.requirement, o) for o in requirement_statuses)
+    statuses = []
+    for requirement in requirements:
+        requirement_status = requirement_statuses.get(requirement)
+        statuses.append({
+            "namespace": requirement.namespace,
+            "name": requirement.name,
+            "criteria": requirement.criteria,
+            "status": requirement_status.status if requirement_status else None,
+            "status_date": requirement_status.modified if requirement_status else None,
+        })
+    return statuses
+
+
+def is_user_eligible_for_credit(username, course_key):
+    """Returns a boolean indicating if the user is eligible for credit for
+    the given course
+
+    Args:
+        username(str): The identifier for user
+        course_key (CourseKey): The identifier for course
+
+    Returns:
+        True if user is eligible for the course else False
+    """
+    return CreditEligibility.is_user_eligible_for_credit(course_key, username)
+
+
+def is_credit_course(course_key):
+    """Check if the given course is a credit course
+
+    Arg:
+        course_key (CourseKey): The identifier for course
+
+    Returns:
+        True if course is credit course else False
+    """
+    return CreditCourse.is_credit_course(course_key)
+
+
+def get_credit_requirement(course_key, namespace, name):
+    """Returns the requirement of a given course, namespace and name.
+
+    Args:
+        course_key(CourseKey): The identifier for course
+        namespace(str): Namespace of requirement
+        name(str): Name of the requirement
+
+    Returns: dict
+
+    Example:
+    >>> get_credit_requirement_status(
+        "course-v1-edX-DemoX-1T2015", "proctored_exam", "i4x://edX/DemoX/proctoring-block/final_uuid"
+        )
+            {
+                "course_key": "course-v1-edX-DemoX-1T2015"
+                "namespace": "reverification",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "reverification"
+                "criteria": {},
+            }
+
+    """
+    requirement = CreditRequirement.get_course_requirement(course_key, namespace, name)
+    return {
+        "course_key": requirement.course.course_key,
+        "namespace": requirement.namespace,
+        "name": requirement.name,
+        "display_name": requirement.display_name,
+        "criteria": requirement.criteria
+    } if requirement else None
+
+
+def set_credit_requirement_status(username, requirement, status="satisfied", reason=None):
+    """Update Credit Requirement Status for given username and requirement
+        if exists else add new.
+
+    Args:
+        username(str): Username of the user
+        requirement(dict): requirement dict
+        status(str): Status of the requirement
+        reason(dict): Reason of the status
+
+    Example:
+        >>> set_credit_requirement_status(
+            "staff",
+            {
+                "course_key": "course-v1-edX-DemoX-1T2015"
+                "namespace": "reverification",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+            },
+            "satisfied",
+            {}
+            )
+
+    """
+    credit_requirement = CreditRequirement.get_course_requirement(
+        requirement['course_key'], requirement['namespace'], requirement['name']
+    )
+    CreditRequirementStatus.add_or_update_requirement_status(
+        username, credit_requirement, status, reason
+    )
 
 
 def _get_requirements_to_disable(old_requirements, new_requirements):

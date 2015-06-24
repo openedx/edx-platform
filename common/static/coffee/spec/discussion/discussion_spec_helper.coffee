@@ -38,7 +38,7 @@ class @DiscussionSpecHelper
 
     @setUnderscoreFixtures = ->
         for templateName in ['thread-show']
-            templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
+            templateFixture = readFixtures('common/templates/discussion/' + templateName + '.underscore')
             appendSetFixtures($('<script>', { id: templateName + '-template', type: 'text/template' })
                 .text(templateFixture))
         appendSetFixtures("""

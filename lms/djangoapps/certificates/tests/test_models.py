@@ -101,12 +101,10 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.configuration_string = """{
             "default": {
                 "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png",
-                "logo_alt": "Valid Certificate"
+                "logo_src": "http://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png",
-                "logo_alt": "Honor Certificate"
+                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
             }
         }"""
         self.config = CertificateHtmlViewConfiguration(configuration=self.configuration_string)
@@ -134,12 +132,10 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         expected_config = {
             "default": {
                 "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png",
-                "logo_alt": "Valid Certificate"
+                "logo_src": "http://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png",
-                "logo_alt": "Honor Certificate"
+                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
             }
         }
         self.assertEquals(self.config.get_config(), expected_config)

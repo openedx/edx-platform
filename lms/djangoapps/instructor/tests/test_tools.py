@@ -227,7 +227,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         # just inject the override field storage in this brute force manner.
         for block in (course, week1, week2, week3, homework, assignment):
             block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
-                user, block._field_data)  # pylint: disable=protected-access
+                user, course, block._field_data)  # pylint: disable=protected-access
 
     def tearDown(self):
         super(TestSetDueDateExtension, self).tearDown()

@@ -15,6 +15,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from course_modes.tests.factories import CourseModeFactory
 from config_models.models import cache
+from util.testing import EventTestMixin
 
 from certificates import api as certs_api
 from certificates.models import (
@@ -112,15 +113,19 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
 
 @attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
-class GenerateUserCertificatesTest(ModuleStoreTestCase):
+class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
 
     ERROR_REASON = "Kaboom!"
 
     def setUp(self):
-        super(GenerateUserCertificatesTest, self).setUp()
+        super(GenerateUserCertificatesTest, self).setUp('certificates.api.tracker')
 
-        self.student = UserFactory()
+        self.student = UserFactory.create(
+            email='joe_user@edx.org',
+            username='joeuser',
+            password='foo'
+        )
         self.student_no_cert = UserFactory()
         self.course = CourseFactory.create(
             org='edx',
@@ -139,6 +144,15 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
         # Verify that the certificate has status 'generating'
         cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
         self.assertEqual(cert.status, CertificateStatuses.generating)
+        self.assert_event_emitted(
+            'edx.certificate.created',
+            user_id=self.student.id,
+            course_id=unicode(self.course.id),
+            certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id, cert.verify_uuid),
+            certificate_id=cert.verify_uuid,
+            enrollment_mode=cert.mode,
+            generation_mode='batch'
+        )
 
     def test_xqueue_submit_task_error(self):
         with self._mock_passing_grade():
@@ -150,7 +164,7 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
         self.assertEqual(cert.status, 'error')
         self.assertIn(self.ERROR_REASON, cert.error_reason)
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_new_cert_requests_returns_generating_for_html_certificate(self):
         """
         Test no message sent to Xqueue if HTML certificate view is enabled

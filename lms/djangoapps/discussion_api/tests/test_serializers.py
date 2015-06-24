@@ -151,6 +151,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
 
     def test_basic(self):
         thread = {
+            "type": "thread",
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
@@ -184,6 +185,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "type": "discussion",
             "title": "Test Title",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "pinned": True,
             "closed": False,
             "following": False,
@@ -195,6 +197,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "voted"],
         }
         self.assertEqual(self.serialize(thread), expected)
 
@@ -210,6 +213,17 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             ),
         })
         self.assertEqual(self.serialize(thread), expected)
+
+    def test_pinned_missing(self):
+        """
+        Make sure that older threads in the comments service without the pinned
+        field do not break serialization
+        """
+        thread_data = self.make_cs_content({})
+        del thread_data["pinned"]
+        self.register_get_thread_response(thread_data)
+        serialized = self.serialize(Thread(id=thread_data["id"]))
+        self.assertEqual(serialized["pinned"], False)
 
     def test_group(self):
         cohort = CohortFactory.create(course_id=self.course.id)
@@ -258,6 +272,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         comment = {
+            "type": "comment",
             "id": "test_comment",
             "thread_id": "test_thread",
             "user_id": str(self.author.id),
@@ -281,6 +296,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "endorsed": False,
             "endorsed_by": None,
             "endorsed_by_label": None,
@@ -289,6 +305,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 4,
             "children": [],
+            "editable_fields": ["voted"],
         }
         self.assertEqual(self.serialize(comment), expected)
 
@@ -456,6 +473,16 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
                 {field: ["This field is required."]}
             )
 
+    @ddt.data("", " ")
+    def test_create_empty_string(self, value):
+        data = self.minimal_data.copy()
+        data.update({field: value for field in ["topic_id", "title", "raw_body"]})
+        serializer = ThreadSerializer(data=data, context=get_context(self.course, self.request))
+        self.assertEqual(
+            serializer.errors,
+            {field: ["This field is required."] for field in ["topic_id", "title", "raw_body"]}
+        )
+
     def test_create_type(self):
         self.register_post_thread_response({"id": "test_id"})
         data = self.minimal_data.copy()
@@ -512,10 +539,11 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         for key in data:
             self.assertEqual(saved[key], data[key])
 
-    def test_update_empty_string(self):
+    @ddt.data("", " ")
+    def test_update_empty_string(self, value):
         serializer = ThreadSerializer(
             self.existing_thread,
-            data={field: "" for field in ["topic_id", "title", "raw_body"]},
+            data={field: value for field in ["topic_id", "title", "raw_body"]},
             partial=True,
             context=get_context(self.course, self.request)
         )
@@ -656,6 +684,27 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
                 {field: ["This field is required."]}
             )
 
+    def test_create_endorsed(self):
+        # TODO: The comments service doesn't populate the endorsement field on
+        # comment creation, so this is sadly realistic
+        self.register_post_comment_response({}, thread_id="test_thread")
+        data = self.minimal_data.copy()
+        data["endorsed"] = True
+        saved = self.save_and_reserialize(data)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+                "endorsed": ["True"],
+            }
+        )
+        self.assertTrue(saved["endorsed"])
+        self.assertIsNone(saved["endorsed_by"])
+        self.assertIsNone(saved["endorsed_by_label"])
+        self.assertIsNone(saved["endorsed_at"])
+
     def test_update_empty(self):
         self.register_put_comment_response(self.existing_comment.attributes)
         self.save_and_reserialize({}, instance=self.existing_comment)
@@ -672,8 +721,13 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
         )
 
     def test_update_all(self):
-        self.register_put_comment_response(self.existing_comment.attributes)
-        data = {"raw_body": "Edited body"}
+        cs_response_data = self.existing_comment.attributes.copy()
+        cs_response_data["endorsement"] = {
+            "user_id": str(self.user.id),
+            "time": "2015-06-05T00:00:00Z",
+        }
+        self.register_put_comment_response(cs_response_data)
+        data = {"raw_body": "Edited body", "endorsed": True}
         saved = self.save_and_reserialize(data, instance=self.existing_comment)
         self.assertEqual(
             httpretty.last_request().parsed_body,
@@ -683,15 +737,20 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
                 "user_id": [str(self.user.id)],
                 "anonymous": ["False"],
                 "anonymous_to_peers": ["False"],
-                "endorsed": ["False"],
+                "endorsed": ["True"],
+                "endorsement_user_id": [str(self.user.id)],
             }
         )
-        self.assertEqual(saved["raw_body"], data["raw_body"])
+        for key in data:
+            self.assertEqual(saved[key], data[key])
+        self.assertEqual(saved["endorsed_by"], self.user.username)
+        self.assertEqual(saved["endorsed_at"], "2015-06-05T00:00:00Z")
 
-    def test_update_empty_raw_body(self):
+    @ddt.data("", " ")
+    def test_update_empty_raw_body(self, value):
         serializer = CommentSerializer(
             self.existing_comment,
-            data={"raw_body": ""},
+            data={"raw_body": value},
             partial=True,
             context=get_context(self.course, self.request)
         )

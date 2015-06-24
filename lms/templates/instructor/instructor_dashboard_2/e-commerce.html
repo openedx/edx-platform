@@ -96,11 +96,20 @@ import pytz
         <div>
           <span class="csv_tip">
             <div>
-              <p>${_("Download a .csv file for all credit card purchases or for all invoices, regardless of status.")}</p>
-              <input type="button" class="add blue-button" name="user-enrollment-report" value="${_("Download Enrollment Report")}" data-endpoint="${ section_data['enrollment_report_url'] }">
+              <p>${_("Create a .csv file that contains enrollment information for your course.")}</p>
+              <input type="button" class="add blue-button" name="user-enrollment-report" value="${_("Create Enrollment Report")}" data-endpoint="${ section_data['enrollment_report_url'] }">
             </div>
-            <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
-            <div class="request-response-error msg msg-warning copy" id="report-request-response-error"></div>
+            <div class="request-response msg msg-confirm copy" id="enrollment-report-request-response"></div>
+            <div class="request-response-error msg msg-warning copy" id="enrollment-report-request-response-error"></div>
+            <br>
+          </span>
+          <span class="csv_tip">
+            <div>
+              <p>${_("Create an HTML file that contains an executive summary for this course.")}</p>
+              <input type="button" class="add blue-button" name="exec-summary-report" value="${_("Create Executive Summary")}" data-endpoint="${ section_data['exec_summary_report_url'] }">
+            </div>
+            <div class="request-response msg msg-confirm copy" id="exec-summary-report-request-response"></div>
+            <div class="request-response-error msg msg-warning copy" id="exec-summary-report-request-response-error"></div>
             <br>
           </span>
           <div class="reports-download-container action-type-container">

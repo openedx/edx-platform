@@ -555,7 +555,8 @@ class CourseBlocksAndNavigation(ListAPIView):
             request_info.request,
             block_info.block,
             request_info.field_data_cache,
-            request_info.course.id
+            request_info.course.id,
+            course=request_info.course
         )
 
         # verify the user has access to this block

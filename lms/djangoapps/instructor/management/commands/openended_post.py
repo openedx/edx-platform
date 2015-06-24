@@ -77,7 +77,7 @@ def post_submission_for_student(student, course, location, task_number, dry_run=
     request.host = hostname
 
     try:
-        module = get_module_for_student(student, location, request=request)
+        module = get_module_for_student(student, location, request=request, course=course)
         if module is None:
             print "  WARNING: No state found."
             return False

@@ -67,6 +67,36 @@ class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         )
 
 
+class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for CourseView"""
+    def setUp(self):
+        super(CourseViewTest, self).setUp()
+        self.url = reverse("discussion_course", kwargs={"course_id": unicode(self.course.id)})
+
+    def test_404(self):
+        response = self.client.get(
+            reverse("course_topics", kwargs={"course_id": "non/existent/course"})
+        )
+        self.assert_response_correct(
+            response,
+            404,
+            {"developer_message": "Not found."}
+        )
+
+    def test_get_success(self):
+        response = self.client.get(self.url)
+        self.assert_response_correct(
+            response,
+            200,
+            {
+                "id": unicode(self.course.id),
+                "blackouts": [],
+                "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
+                "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
+            }
+        )
+
+
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseTopicsView"""
     def setUp(self):
@@ -128,6 +158,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     def test_basic(self):
         self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
         source_threads = [{
+            "type": "thread",
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
@@ -161,6 +192,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "type": "discussion",
             "title": "Test Title",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "pinned": False,
             "closed": False,
             "following": False,
@@ -172,6 +204,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "voted"],
         }]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id)})
@@ -182,6 +215,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "results": expected_threads,
                 "next": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
         self.assert_last_query_params({
@@ -212,6 +246,28 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "page": ["18"],
             "per_page": ["4"],
             "recursive": ["False"],
+        })
+
+    def test_text_search(self):
+        self.register_get_user_response(self.user)
+        self.register_get_threads_search_response([], None)
+        response = self.client.get(
+            self.url,
+            {"course_id": unicode(self.course.id), "text_search": "test search string"}
+        )
+        self.assert_response_correct(
+            response,
+            200,
+            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+        )
+        self.assert_last_query_params({
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "recursive": ["False"],
+            "text": ["test search string"],
         })
 
 
@@ -250,6 +306,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "type": "discussion",
             "title": "Test Title",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "pinned": False,
             "closed": False,
             "following": False,
@@ -261,6 +318,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         response = self.client.post(
             self.url,
@@ -339,6 +397,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "type": "discussion",
             "title": "Original Title",
             "raw_body": "Edited body",
+            "rendered_body": "<p>Edited body</p>",
             "pinned": False,
             "closed": False,
             "following": False,
@@ -350,6 +409,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
@@ -459,6 +519,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     def test_basic(self):
         self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
         source_comments = [{
+            "type": "comment",
             "id": "test_comment",
             "thread_id": self.thread_id,
             "parent_id": None,
@@ -483,6 +544,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "created_at": "2015-05-11T00:00:00Z",
             "updated_at": "2015-05-11T11:11:11Z",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "endorsed": False,
             "endorsed_by": None,
             "endorsed_by_label": None,
@@ -491,6 +553,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": True,
             "vote_count": 4,
             "children": [],
+            "editable_fields": ["voted"],
         }]
         self.register_get_thread_response({
             "id": self.thread_id,
@@ -635,6 +698,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "created_at": "2015-05-27T00:00:00Z",
             "updated_at": "2015-05-27T00:00:00Z",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "endorsed": False,
             "endorsed_by": None,
             "endorsed_by_label": None,
@@ -643,6 +707,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 0,
             "children": [],
+            "editable_fields": ["raw_body", "voted"],
         }
         response = self.client.post(
             self.url,
@@ -717,6 +782,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "created_at": "2015-06-03T00:00:00Z",
             "updated_at": "2015-06-03T00:00:00Z",
             "raw_body": "Edited body",
+            "rendered_body": "<p>Edited body</p>",
             "endorsed": False,
             "endorsed_by": None,
             "endorsed_by_label": None,
@@ -725,6 +791,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "voted": False,
             "vote_count": 0,
             "children": [],
+            "editable_fields": ["raw_body", "voted"],
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,

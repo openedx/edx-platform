@@ -109,8 +109,7 @@ class DashboardPage(PageObject):
             # There should only be one course listing corresponding to the provided course name.
             el = course_listing[0]
 
-            # Expand the upsell copy and click the upgrade button
-            el.find_element_by_css_selector('.message-upsell .ui-toggle-expansion').click()
+            # Click the upgrade button
             el.find_element_by_css_selector('#upgrade-to-verified').click()
 
             upgrade_page.wait_for_page()

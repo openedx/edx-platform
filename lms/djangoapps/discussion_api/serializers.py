@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse
 
 from rest_framework import serializers
 
+from discussion_api.permissions import get_editable_fields
+from discussion_api.render import render_body
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -65,9 +67,11 @@ class _ContentSerializer(serializers.Serializer):
     created_at = serializers.CharField(read_only=True)
     updated_at = serializers.CharField(read_only=True)
     raw_body = NonEmptyCharField(source="body")
+    rendered_body = serializers.SerializerMethodField("get_rendered_body")
     abuse_flagged = serializers.SerializerMethodField("get_abuse_flagged")
     voted = serializers.SerializerMethodField("get_voted")
     vote_count = serializers.SerializerMethodField("get_vote_count")
+    editable_fields = serializers.SerializerMethodField("get_editable_fields")
 
     non_updatable_fields = ()
 
@@ -122,6 +126,10 @@ class _ContentSerializer(serializers.Serializer):
         """Returns the role label for the content author."""
         return None if self._is_anonymous(obj) else self._get_user_label(int(obj["user_id"]))
 
+    def get_rendered_body(self, obj):
+        """Returns the rendered body content."""
+        return render_body(obj["body"])
+
     def get_abuse_flagged(self, obj):
         """
         Returns a boolean indicating whether the requester has flagged the
@@ -139,6 +147,10 @@ class _ContentSerializer(serializers.Serializer):
     def get_vote_count(self, obj):
         """Returns the number of votes for the content."""
         return obj["votes"]["up_count"]
+
+    def get_editable_fields(self, obj):
+        """Return the list of the fields the requester can edit"""
+        return sorted(get_editable_fields(obj, self.context))
 
 
 class ThreadSerializer(_ContentSerializer):
@@ -174,6 +186,10 @@ class ThreadSerializer(_ContentSerializer):
         # type is an invalid class attribute name, so we must declare a
         # different name above and modify it here
         self.fields["type"] = self.fields.pop("type_")
+        # Compensate for the fact that some threads in the comments service do
+        # not have the pinned field set
+        if self.object and self.object.get("pinned") is None:
+            self.object["pinned"] = False
 
     def get_group_name(self, obj):
         """Returns the name of the group identified by the thread's group_id."""
@@ -231,7 +247,7 @@ class CommentSerializer(_ContentSerializer):
     """
     thread_id = serializers.CharField()
     parent_id = serializers.CharField(required=False)
-    endorsed = serializers.BooleanField(read_only=True)
+    endorsed = serializers.BooleanField(required=False)
     endorsed_by = serializers.SerializerMethodField("get_endorsed_by")
     endorsed_by_label = serializers.SerializerMethodField("get_endorsed_by_label")
     endorsed_at = serializers.SerializerMethodField("get_endorsed_at")
@@ -300,6 +316,11 @@ class CommentSerializer(_ContentSerializer):
         if instance:
             for key, val in attrs.items():
                 instance[key] = val
+                # TODO: The comments service doesn't populate the endorsement
+                # field on comment creation, so we only provide
+                # endorsement_user_id on update
+                if key == "endorsed":
+                    instance["endorsement_user_id"] = self.context["cc_requester"]["id"]
             return instance
         return Comment(
             course_id=self.context["thread"]["course_id"],

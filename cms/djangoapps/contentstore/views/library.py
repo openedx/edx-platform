@@ -26,7 +26,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from .user import user_with_role
 
-from .component import get_component_templates, CONTAINER_TEMPATES
+from .component import get_component_templates, CONTAINER_TEMPLATES
 from student.auth import (
     STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
 )
@@ -197,7 +197,7 @@ def library_blocks_view(library, user, response_format):
         'context_library': library,
         'component_templates': json.dumps(component_templates),
         'xblock_info': xblock_info,
-        'templates': CONTAINER_TEMPATES,
+        'templates': CONTAINER_TEMPLATES,
     })
 
 

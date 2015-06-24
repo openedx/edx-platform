@@ -10,7 +10,7 @@ from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">courseware ${course.css_class or ''}</%block>
+<%block name="bodyclass">view-incourse view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
@@ -22,16 +22,16 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="header_extras">
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
-    <%static:include path="js/${template_name}.underscore" />
+    <%static:include path="common/templates/${template_name}.underscore" />
 </script>
 % endfor
-
-% for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="search/${template_name}.underscore" />
-</script>
+% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="search/${template_name}.underscore" />
+    </script>
 % endfor
-
+% endif
 </%block>
 
 <%block name="headextra">
@@ -65,6 +65,9 @@ ${page_title_breadcrumbs(course_name())}
 
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
+  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    <%static:js group='courseware_search'/>
+  % endif
 
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:

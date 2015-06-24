@@ -17,6 +17,11 @@ class IndividualStudentOverrideProvider(FieldOverrideProvider):
     def get(self, block, name, default):
         return get_override_for_user(self.user, block, name, default)
 
+    @classmethod
+    def enabled_for(cls, course):
+        """This simple override provider is always enabled"""
+        return True
+
 
 def get_override_for_user(user, block, name, default=None):
     """

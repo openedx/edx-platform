@@ -26,6 +26,7 @@ from discussion_api.api import (
     delete_comment,
     delete_thread,
     get_comment_list,
+    get_course,
     get_course_topics,
     get_thread_list,
     update_comment,
@@ -61,6 +62,72 @@ def _remove_discussion_tab(course, user_id):
     """
     course.tabs = [tab for tab in course.tabs if not tab.type == 'discussion']
     modulestore().update_item(course, user_id)
+
+
+@ddt.ddt
+class GetCourseTest(UrlResetMixin, ModuleStoreTestCase):
+    """Test for get_course"""
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(GetCourseTest, self).setUp()
+        self.course = CourseFactory.create(org="x", course="y", run="z")
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def test_nonexistent_course(self):
+        with self.assertRaises(Http404):
+            get_course(self.request, CourseLocator.from_string("non/existent/course"))
+
+    def test_not_enrolled(self):
+        unenrolled_user = UserFactory.create()
+        self.request.user = unenrolled_user
+        with self.assertRaises(Http404):
+            get_course(self.request, self.course.id)
+
+    def test_discussions_disabled(self):
+        _remove_discussion_tab(self.course, self.user.id)
+        with self.assertRaises(Http404):
+            get_course(self.request, self.course.id)
+
+    def test_basic(self):
+        self.assertEqual(
+            get_course(self.request, self.course.id),
+            {
+                "id": unicode(self.course.id),
+                "blackouts": [],
+                "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
+                "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
+            }
+        )
+
+    def test_blackout(self):
+        # A variety of formats is accepted
+        self.course.discussion_blackouts = [
+            ["2015-06-09T00:00:00Z", "6-10-15"],
+            [1433980800000, datetime(2015, 6, 12)],
+        ]
+        modulestore().update_item(self.course, self.user.id)
+        result = get_course(self.request, self.course.id)
+        self.assertEqual(
+            result["blackouts"],
+            [
+                {"start": "2015-06-09T00:00:00+00:00", "end": "2015-06-10T00:00:00+00:00"},
+                {"start": "2015-06-11T00:00:00+00:00", "end": "2015-06-12T00:00:00+00:00"},
+            ]
+        )
+
+    @ddt.data(None, "not a datetime", "2015", [])
+    def test_blackout_errors(self, bad_value):
+        self.course.discussion_blackouts = [
+            [bad_value, "2015-06-09T00:00:00Z"],
+            ["2015-06-10T00:00:00Z", "2015-06-11T00:00:00Z"],
+        ]
+        modulestore().update_item(self.course, self.user.id)
+        result = get_course(self.request, self.course.id)
+        self.assertEqual(result["blackouts"], [])
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
@@ -404,7 +471,15 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.author = UserFactory.create()
         self.cohort = CohortFactory.create(course_id=self.course.id)
 
-    def get_thread_list(self, threads, page=1, page_size=1, num_pages=1, course=None, topic_id_list=None):
+    def get_thread_list(
+            self,
+            threads,
+            page=1,
+            page_size=1,
+            num_pages=1,
+            course=None,
+            topic_id_list=None,
+    ):
         """
         Register the appropriate comments service response, then call
         get_thread_list and return the result.
@@ -435,6 +510,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": None,
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
 
@@ -465,6 +541,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
     def test_thread_content(self):
         source_threads = [
             {
+                "type": "thread",
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
@@ -486,6 +563,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "unread_comments_count": 3,
             },
             {
+                "type": "thread",
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_y",
@@ -521,6 +599,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "type": "discussion",
                 "title": "Test Title",
                 "raw_body": "Test body",
+                "rendered_body": "<p>Test body</p>",
                 "pinned": False,
                 "closed": False,
                 "following": False,
@@ -532,6 +611,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
                 "endorsed_comment_list_url": None,
                 "non_endorsed_comment_list_url": None,
+                "editable_fields": ["following", "voted"],
             },
             {
                 "id": "test_thread_id_1",
@@ -546,6 +626,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "type": "question",
                 "title": "Another Test Title",
                 "raw_body": "More content",
+                "rendered_body": "<p>More content</p>",
                 "pinned": False,
                 "closed": True,
                 "following": False,
@@ -561,6 +642,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
+                "editable_fields": ["following", "voted"],
             },
         ]
         self.assertEqual(
@@ -569,6 +651,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": expected_threads,
                 "next": None,
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
 
@@ -603,6 +686,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": "http://testserver/test_path?page=2",
                 "previous": None,
+                "text_search_rewrite": None,
             }
         )
         self.assertEqual(
@@ -611,6 +695,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": "http://testserver/test_path?page=3",
                 "previous": "http://testserver/test_path?page=1",
+                "text_search_rewrite": None,
             }
         )
         self.assertEqual(
@@ -619,6 +704,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "results": [],
                 "next": None,
                 "previous": "http://testserver/test_path?page=2",
+                "text_search_rewrite": None,
             }
         )
 
@@ -626,6 +712,34 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         self.register_get_threads_response([], page=3, num_pages=3)
         with self.assertRaises(Http404):
             get_thread_list(self.request, self.course.id, page=4, page_size=10)
+
+    @ddt.data(None, "rewritten search string")
+    def test_text_search(self, text_search_rewrite):
+        self.register_get_threads_search_response([], text_search_rewrite)
+        self.assertEqual(
+            get_thread_list(
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=10,
+                text_search="test search string"
+            ),
+            {
+                "results": [],
+                "next": None,
+                "previous": None,
+                "text_search_rewrite": text_search_rewrite,
+            }
+        )
+        self.assert_last_query_params({
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": ["desc"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "recursive": ["False"],
+            "text": ["test search string"],
+        })
 
 
 @ddt.ddt
@@ -805,6 +919,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     def test_discussion_content(self):
         source_comments = [
             {
+                "type": "comment",
                 "id": "test_comment_1",
                 "thread_id": "test_thread",
                 "user_id": str(self.author.id),
@@ -820,6 +935,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "children": [],
             },
             {
+                "type": "comment",
                 "id": "test_comment_2",
                 "thread_id": "test_thread",
                 "user_id": str(self.author.id),
@@ -845,6 +961,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "created_at": "2015-05-11T00:00:00Z",
                 "updated_at": "2015-05-11T11:11:11Z",
                 "raw_body": "Test body",
+                "rendered_body": "<p>Test body</p>",
                 "endorsed": False,
                 "endorsed_by": None,
                 "endorsed_by_label": None,
@@ -853,6 +970,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 4,
                 "children": [],
+                "editable_fields": ["voted"],
             },
             {
                 "id": "test_comment_2",
@@ -863,6 +981,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "created_at": "2015-05-11T22:22:22Z",
                 "updated_at": "2015-05-11T33:33:33Z",
                 "raw_body": "More content",
+                "rendered_body": "<p>More content</p>",
                 "endorsed": False,
                 "endorsed_by": None,
                 "endorsed_by_label": None,
@@ -871,6 +990,7 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 7,
                 "children": [],
+                "editable_fields": ["voted"],
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1078,6 +1198,7 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "type": "discussion",
             "title": "Test Title",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "pinned": False,
             "closed": False,
             "following": False,
@@ -1089,6 +1210,7 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1245,6 +1367,7 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "created_at": "2015-05-27T00:00:00Z",
             "updated_at": "2015-05-27T00:00:00Z",
             "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
             "endorsed": False,
             "endorsed_by": None,
             "endorsed_by_label": None,
@@ -1253,6 +1376,7 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "voted": False,
             "vote_count": 0,
             "children": [],
+            "editable_fields": ["raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         expected_url = (
@@ -1291,6 +1415,21 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         actual_event_name, actual_event_data = mock_emit.call_args[0]
         self.assertEqual(actual_event_name, expected_event_name)
         self.assertEqual(actual_event_data, expected_event_data)
+
+    def test_voted(self):
+        self.register_post_comment_response({"id": "test_comment"}, "test_thread")
+        self.register_comment_votes_response("test_comment")
+        data = self.minimal_data.copy()
+        data["voted"] = "True"
+        result = create_comment(self.request, data)
+        self.assertEqual(result["voted"], True)
+        cs_request = httpretty.last_request()
+        self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/votes")
+        self.assertEqual(cs_request.method, "PUT")
+        self.assertEqual(
+            cs_request.parsed_body,
+            {"user_id": [str(self.user.id)], "value": ["up"]}
+        )
 
     def test_thread_id_missing(self):
         with self.assertRaises(ValidationError) as assertion:
@@ -1406,7 +1545,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "user_id": str(self.user.id),
             "created_at": "2015-05-29T00:00:00Z",
             "updated_at": "2015-05-29T00:00:00Z",
-            "type": "discussion",
+            "thread_type": "discussion",
             "title": "Original Title",
             "body": "Original body",
         })
@@ -1439,6 +1578,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "type": "discussion",
             "title": "Original Title",
             "raw_body": "Edited body",
+            "rendered_body": "<p>Edited body</p>",
             "pinned": False,
             "closed": False,
             "following": False,
@@ -1450,6 +1590,7 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
+            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1689,18 +1830,20 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         for request in httpretty.httpretty.latest_requests:
             self.assertEqual(request.method, "GET")
 
-    def test_basic(self):
-        self.register_comment()
+    @ddt.data(None, "test_parent")
+    def test_basic(self, parent_id):
+        self.register_comment({"parent_id": parent_id})
         actual = update_comment(self.request, "test_comment", {"raw_body": "Edited body"})
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
-            "parent_id": None,  # TODO: we can't get this without retrieving from the thread :-(
+            "parent_id": parent_id,
             "author": self.user.username,
             "author_label": None,
             "created_at": "2015-06-03T00:00:00Z",
             "updated_at": "2015-06-03T00:00:00Z",
             "raw_body": "Edited body",
+            "rendered_body": "<p>Edited body</p>",
             "endorsed": False,
             "endorsed_by": None,
             "endorsed_by_label": None,
@@ -1709,6 +1852,7 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             "voted": False,
             "vote_count": 0,
             "children": [],
+            "editable_fields": ["raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         self.assertEqual(
@@ -1788,22 +1932,111 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
         except Http404:
             self.assertTrue(expected_error)
 
-    @ddt.data(
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_COMMUNITY_TA,
-        FORUM_ROLE_STUDENT,
-    )
-    def test_role_access(self, role_name):
+    @ddt.data(*itertools.product(
+        [
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_STUDENT,
+        ],
+        [True, False],
+        [True, False],
+    ))
+    @ddt.unpack
+    def test_raw_body_access(self, role_name, is_thread_author, is_comment_author):
         role = Role.objects.create(name=role_name, course_id=self.course.id)
         role.users = [self.user]
-        self.register_comment({"user_id": str(self.user.id + 1)})
-        expected_error = role_name == FORUM_ROLE_STUDENT
+        self.register_comment(
+            {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
+            thread_overrides={
+                "user_id": str(self.user.id if is_thread_author else (self.user.id + 1))
+            }
+        )
+        expected_error = role_name == FORUM_ROLE_STUDENT and not is_comment_author
         try:
             update_comment(self.request, "test_comment", {"raw_body": "edited"})
             self.assertFalse(expected_error)
-        except PermissionDenied:
+        except ValidationError as err:
             self.assertTrue(expected_error)
+            self.assertEqual(
+                err.message_dict,
+                {"raw_body": ["This field is not editable."]}
+            )
+
+    @ddt.data(*itertools.product(
+        [
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_STUDENT,
+        ],
+        [True, False],
+        ["question", "discussion"],
+        [True, False],
+    ))
+    @ddt.unpack
+    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
+        role = Role.objects.create(name=role_name, course_id=self.course.id)
+        role.users = [self.user]
+        self.register_comment(
+            {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
+            thread_overrides={
+                "thread_type": thread_type,
+                "user_id": str(self.user.id if is_thread_author else (self.user.id + 1)),
+            }
+        )
+        expected_error = (
+            role_name == FORUM_ROLE_STUDENT and
+            (thread_type == "discussion" or not is_thread_author)
+        )
+        try:
+            update_comment(self.request, "test_comment", {"endorsed": True})
+            self.assertFalse(expected_error)
+        except ValidationError as err:
+            self.assertTrue(expected_error)
+            self.assertEqual(
+                err.message_dict,
+                {"endorsed": ["This field is not editable."]}
+            )
+
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    def test_voted(self, old_voted, new_voted):
+        """
+        Test attempts to edit the "voted" field.
+
+        old_voted indicates whether the comment should be upvoted at the start of
+        the test. new_voted indicates the value for the "voted" field in the
+        update. If old_voted and new_voted are the same, no update should be
+        made. Otherwise, a vote should be PUT or DELETEd according to the
+        new_voted value.
+        """
+        if old_voted:
+            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+        self.register_comment_votes_response("test_comment")
+        self.register_comment()
+        data = {"voted": new_voted}
+        result = update_comment(self.request, "test_comment", data)
+        self.assertEqual(result["voted"], new_voted)
+        last_request_path = urlparse(httpretty.last_request().path).path
+        votes_url = "/api/v1/comments/test_comment/votes"
+        if old_voted == new_voted:
+            self.assertNotEqual(last_request_path, votes_url)
+        else:
+            self.assertEqual(last_request_path, votes_url)
+            self.assertEqual(
+                httpretty.last_request().method,
+                "PUT" if new_voted else "DELETE"
+            )
+            actual_request_data = (
+                httpretty.last_request().parsed_body if new_voted else
+                parse_qs(urlparse(httpretty.last_request().path).query)
+            )
+            actual_request_data.pop("request_id", None)
+            expected_request_data = {"user_id": [str(self.user.id)]}
+            if new_voted:
+                expected_request_data["value"] = ["up"]
+            self.assertEqual(actual_request_data, expected_request_data)
 
 
 @ddt.ddt

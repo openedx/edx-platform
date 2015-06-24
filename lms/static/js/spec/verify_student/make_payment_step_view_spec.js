@@ -2,8 +2,8 @@ define([
         'jquery',
         'underscore',
         'backbone',
-        'js/common_helpers/ajax_helpers',
-        'js/common_helpers/template_helpers',
+        'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/verify_student/views/make_payment_step_view'
     ],
     function( $, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView ) {

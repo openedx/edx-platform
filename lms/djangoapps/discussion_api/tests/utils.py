@@ -71,6 +71,20 @@ class CommentsServiceMockMixin(object):
             status=200
         )
 
+    def register_get_threads_search_response(self, threads, rewrite):
+        """Register a mock response for GET on the CS thread search endpoint"""
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/search/threads",
+            body=json.dumps({
+                "collection": threads,
+                "page": 1,
+                "num_pages": 1,
+                "corrected_text": rewrite,
+            }),
+            status=200
+        )
+
     def register_post_thread_response(self, thread_data):
         """Register a mock response for POST on the CS commentable endpoint"""
         httpretty.register_uri(
@@ -203,6 +217,19 @@ class CommentsServiceMockMixin(object):
                 status=200
             )
 
+    def register_comment_votes_response(self, comment_id):
+        """
+        Register a mock response for PUT and DELETE on the CS comment votes
+        endpoint
+        """
+        for method in [httpretty.PUT, httpretty.DELETE]:
+            httpretty.register_uri(
+                method,
+                "http://localhost:4567/api/v1/comments/{}/votes".format(comment_id),
+                body=json.dumps({}),  # body is unused
+                status=200
+            )
+
     def register_delete_thread_response(self, thread_id):
         """
         Register a mock response for DELETE on the CS thread instance endpoint
@@ -246,6 +273,7 @@ def make_minimal_cs_thread(overrides=None):
     comments service with dummy data and optional overrides
     """
     ret = {
+        "type": "thread",
         "id": "dummy",
         "course_id": "dummy/dummy/dummy",
         "commentable_id": "dummy",
@@ -278,6 +306,7 @@ def make_minimal_cs_comment(overrides=None):
     comments service with dummy data and optional overrides
     """
     ret = {
+        "type": "comment",
         "id": "dummy",
         "thread_id": "dummy",
         "parent_id": None,

@@ -831,7 +831,9 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         Returns the course module.
         """
         field_data_cache = FieldDataCache([self.course], self.course.id, self.user)
-        return get_module_for_descriptor(self.user, MagicMock(), self.course, field_data_cache, self.course.id)
+        return get_module_for_descriptor(
+            self.user, MagicMock(), self.course, field_data_cache, self.course.id, course=self.course
+        )
 
     def test_edxnotes_tab(self):
         """

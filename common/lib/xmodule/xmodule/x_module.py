@@ -1215,6 +1215,7 @@ class MetricsMixin(object):
 
         finally:
             end_time = time.time()
+            duration = end_time - start_time
             course_id = getattr(self, 'course_id', '')
             tags = [
                 u'view_name:{}'.format(view_name),
@@ -1227,9 +1228,16 @@ class MetricsMixin(object):
             dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
             dog_stats_api.histogram(
                 XMODULE_DURATION_METRIC_NAME,
-                end_time - start_time,
+                duration,
                 tags=tags,
                 sample_rate=XMODULE_METRIC_SAMPLE_RATE,
+            )
+            log.debug(
+                "%.3fs - render %s.%s (%s)",
+                duration,
+                block.__class__.__name__,
+                view_name,
+                getattr(block, 'location', ''),
             )
 
     def handle(self, block, handler_name, request, suffix=''):
@@ -1244,6 +1252,7 @@ class MetricsMixin(object):
 
         finally:
             end_time = time.time()
+            duration = end_time - start_time
             course_id = getattr(self, 'course_id', '')
             tags = [
                 u'handler_name:{}'.format(handler_name),
@@ -1256,9 +1265,16 @@ class MetricsMixin(object):
             dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
             dog_stats_api.histogram(
                 XMODULE_DURATION_METRIC_NAME,
-                end_time - start_time,
+                duration,
                 tags=tags,
                 sample_rate=XMODULE_METRIC_SAMPLE_RATE
+            )
+            log.debug(
+                "%.3fs - handle %s.%s (%s)",
+                duration,
+                block.__class__.__name__,
+                handler_name,
+                getattr(block, 'location', ''),
             )
 
 

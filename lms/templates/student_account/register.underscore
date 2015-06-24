@@ -4,6 +4,14 @@
 </div>
 
 <form id="register" class="register-form" autocomplete="off" tabindex="-1">
+
+    <% if (context.errorMessage) { %>
+        <div class="status submission-error">
+            <h4 class="message-title"><%- gettext("An error occurred.") %></h4>
+            <ul class="message-copy"><%- context.errorMessage %></ul>
+        </div>
+    <% } %>
+
     <% if (context.currentProvider) { %>
         <div class="status" aria-hidden="false">
             <p class="message-copy">

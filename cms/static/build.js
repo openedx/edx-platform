@@ -39,6 +39,7 @@
             'js/certificates/factories/certificates_page_factory',
             'js/factories/import',
             'js/factories/index',
+            'js/factories/library',
             'js/factories/login',
             'js/factories/manage_users',
             'js/factories/outline',
@@ -118,7 +119,7 @@
          * As of 1.0.3, this value can also be a string that is converted to a
          * RegExp via new RegExp().
          */
-        fileExclusionRegExp: /^\.|spec/,
+        fileExclusionRegExp: /^\.|spec|spec_helpers/,
         /**
          * Allow CSS optimizations. Allowed values:
          * - "standard": @import inlining and removal of comments, unnecessary
@@ -153,6 +154,6 @@
          * SILENT: 4
          * Default is 0.
          */
-        logLevel: 4
+        logLevel: 1
     };
 } ())

@@ -2,7 +2,6 @@
 
 import logging
 import json
-from ipware.ip import get_ip
 
 from django.conf import settings
 from django.contrib import messages
@@ -19,12 +18,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from lang_pref.api import released_languages
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
 
-from embargo import api as embargo_api
 from external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
@@ -34,16 +30,13 @@ from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-from student_account.helpers import auth_pipeline_urls
+from student.helpers import get_next_url_for_login_page
 import third_party_auth
 from third_party_auth import pipeline
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-
-from student_account.helpers import auth_pipeline_urls
 
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -61,9 +54,12 @@ def login_and_registration_form(request, initial_mode="login"):
         initial_mode (string): Either "login" or "register".
 
     """
+    # Determine the URL to redirect to following login/registration/third_party_auth
+    redirect_to = get_next_url_for_login_page(request)
+
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
+        return redirect(redirect_to)
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
@@ -83,9 +79,10 @@ def login_and_registration_form(request, initial_mode="login"):
 
     # Otherwise, render the combined login/registration page
     context = {
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
         'disable_courseware_js': True,
         'initial_mode': initial_mode,
-        'third_party_auth': json.dumps(_third_party_auth_context(request)),
+        'third_party_auth': json.dumps(_third_party_auth_context(request, redirect_to)),
         'platform_name': settings.PLATFORM_NAME,
         'responsive': True,
 
@@ -96,12 +93,6 @@ def login_and_registration_form(request, initial_mode="login"):
         'login_form_desc': form_descriptions['login'],
         'registration_form_desc': form_descriptions['registration'],
         'password_reset_form_desc': form_descriptions['password_reset'],
-
-        # We need to pass these parameters so that the header's
-        # "Sign In" button preserves the querystring params.
-        'enrollment_action': request.GET.get('enrollment_action'),
-        'course_id': request.GET.get('course_id'),
-        'course_mode': request.GET.get('course_mode'),
     }
 
     return render_to_response('student_account/login_and_register.html', context)
@@ -157,12 +148,14 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
-def _third_party_auth_context(request):
+def _third_party_auth_context(request, redirect_to):
     """Context for third party auth providers and the currently running pipeline.
 
     Arguments:
         request (HttpRequest): The request, used to determine if a pipeline
             is currently running.
+        redirect_to: The URL to send the user to following successful
+            authentication.
 
     Returns:
         dict
@@ -170,72 +163,43 @@ def _third_party_auth_context(request):
     """
     context = {
         "currentProvider": None,
-        "providers": []
+        "providers": [],
+        "finishAuthUrl": None,
+        "errorMessage": None,
     }
-
-    course_id = request.GET.get("course_id")
-    email_opt_in = request.GET.get('email_opt_in')
-    redirect_to = request.GET.get("next")
-
-    # Check if the user is trying to enroll in a course
-    # that they don't have access to based on country
-    # access rules.
-    #
-    # If so, set the redirect URL to the blocked page.
-    # We need to set it here, rather than redirecting
-    # from within the pipeline, because a redirect
-    # from the pipeline can prevent users
-    # from completing the authentication process.
-    #
-    # Note that we can't check the user's country
-    # profile at this point, since the user hasn't
-    # authenticated.  If the user ends up being blocked
-    # by their country preference, we let them enroll;
-    # they'll still be blocked when they try to access
-    # the courseware.
-    if course_id:
-        try:
-            course_key = CourseKey.from_string(course_id)
-            redirect_url = embargo_api.redirect_if_blocked(
-                course_key,
-                ip_address=get_ip(request),
-                url=request.path
-            )
-            if redirect_url:
-                redirect_to = embargo_api.message_url_path(course_key, "enrollment")
-        except InvalidKeyError:
-            pass
-
-    login_urls = auth_pipeline_urls(
-        third_party_auth.pipeline.AUTH_ENTRY_LOGIN,
-        course_id=course_id,
-        email_opt_in=email_opt_in,
-        redirect_url=redirect_to
-    )
-    register_urls = auth_pipeline_urls(
-        third_party_auth.pipeline.AUTH_ENTRY_REGISTER,
-        course_id=course_id,
-        email_opt_in=email_opt_in,
-        redirect_url=redirect_to
-    )
 
     if third_party_auth.is_enabled():
         context["providers"] = [
             {
                 "name": enabled.NAME,
                 "iconClass": enabled.ICON_CLASS,
-                "loginUrl": login_urls[enabled.NAME],
-                "registerUrl": register_urls[enabled.NAME]
+                "loginUrl": pipeline.get_login_url(
+                    enabled.NAME,
+                    pipeline.AUTH_ENTRY_LOGIN,
+                    redirect_url=redirect_to,
+                ),
+                "registerUrl": pipeline.get_login_url(
+                    enabled.NAME,
+                    pipeline.AUTH_ENTRY_REGISTER,
+                    redirect_url=redirect_to,
+                ),
             }
             for enabled in third_party_auth.provider.Registry.enabled()
         ]
 
-        running_pipeline = third_party_auth.pipeline.get(request)
+        running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_by_backend_name(
                 running_pipeline.get('backend')
             )
             context["currentProvider"] = current_provider.NAME
+            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.BACKEND_CLASS.name)
+
+        # Check for any error messages we may want to display:
+        for msg in messages.get_messages(request):
+            if msg.extra_tags.split()[0] == "social-auth":
+                context['errorMessage'] = unicode(msg)
+                break
 
     return context
 
@@ -324,6 +288,39 @@ def account_settings(request):
 
     """
     return render_to_response('student_account/account_settings.html', account_settings_context(request))
+
+
+@login_required
+@require_http_methods(['GET'])
+def finish_auth(request):  # pylint: disable=unused-argument
+    """ Following logistration (1st or 3rd party), handle any special query string params.
+
+    See FinishAuthView.js for details on the query string params.
+
+    e.g. auto-enroll the user in a course, set email opt-in preference.
+
+    This view just displays a "Please wait" message while AJAX calls are made to enroll the
+    user in the course etc. This view is only used if a parameter like "course_id" is present
+    during login/registration/third_party_auth. Otherwise, there is no need for it.
+
+    Ideally this view will finish and redirect to the next step before the user even sees it.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the page was sent successfully
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        GET /account/finish_auth/?course_id=course-v1:blah&enrollment_action=enroll
+
+    """
+    return render_to_response('student_account/finish_auth.html', {
+        'disable_courseware_js': True,
+    })
 
 
 def account_settings_context(request):

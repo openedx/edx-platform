@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
 tests for overrides
 """
@@ -35,6 +36,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         super(TestFieldOverrides, self).setUp()
         self.course = course = CourseFactory.create()
+        self.course.enable_ccx = True
 
         # Create a course outline
         self.mooc_start = start = datetime.datetime(
@@ -70,7 +72,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         OverrideFieldData.provider_classes = None
         for block in iter_blocks(ccx.course):
             block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
-                AdminFactory.create(), block._field_data)   # pylint: disable=protected-access
+                AdminFactory.create(), course, block._field_data)   # pylint: disable=protected-access
 
         def cleanup_provider_classes():
             """

@@ -1,11 +1,9 @@
-define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
+define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
 ($, jasmine, AjaxHelpers, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
     assetLibraryTpl = readFixtures('asset-library.underscore')
     assetTpl = readFixtures('asset.underscore')
-    pagingHeaderTpl = readFixtures('paging-header.underscore')
-    pagingFooterTpl = readFixtures('paging-footer.underscore')
 
     describe "Asset view", ->
         beforeEach ->
@@ -141,8 +139,6 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
         beforeEach ->
             setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl))
             appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
-            appendSetFixtures($("<script>", {id: "paging-header-tpl", type: "text/template"}).text(pagingHeaderTpl))
-            appendSetFixtures($("<script>", {id: "paging-footer-tpl", type: "text/template"}).text(pagingFooterTpl))
             appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
             window.course_location_analytics = jasmine.createSpy()
@@ -241,7 +237,7 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
         describe "Basic", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = (requests) ->
-                @view.setPage(0)
+                @view.pagingView.setPage(0)
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
 
             $.fn.fileupload = ->
@@ -285,7 +281,7 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetsView(this)
                 appendSetFixtures('<div class="ui-loading"/>')
                 expect($('.ui-loading').is(':visible')).toBe(true)
-                @view.setPage(0)
+                @view.pagingView.setPage(0)
                 AjaxHelpers.respondWithError(requests)
                 expect($('.ui-loading').is(':visible')).toBe(false)
 
@@ -333,27 +329,27 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
         describe "Sorting", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = (requests) ->
-                @view.setPage(0)
+                @view.pagingView.setPage(0)
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
 
             it "should have the correct default sort order", ->
                 {view: @view, requests: requests} = @createAssetsView(this)
                 setup.call(this, requests)
-                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should toggle the sort order when clicking on the currently sorted column", ->
                 {view: @view, requests: requests} = @createAssetsView(this)
                 setup.call(this, requests)
-                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
                 @view.$("#js-asset-date-col").click()
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("asc")
                 @view.$("#js-asset-date-col").click()
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should switch the sort order when clicking on a different column", ->
@@ -361,11 +357,11 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
                 setup.call(this, requests)
                 @view.$("#js-asset-name-col").click()
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.sortDisplayName()).toBe("Name")
+                expect(@view.pagingView.sortDisplayName()).toBe("Name")
                 expect(@view.collection.sortDirection).toBe("asc")
                 @view.$("#js-asset-name-col").click()
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.sortDisplayName()).toBe("Name")
+                expect(@view.pagingView.sortDisplayName()).toBe("Name")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should switch sort to most recent date added when a new asset is added", ->
@@ -375,5 +371,5 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 addMockAsset.call(this, requests)
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
-                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.pagingView.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")

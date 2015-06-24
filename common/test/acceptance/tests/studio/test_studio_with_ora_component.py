@@ -81,3 +81,22 @@ class ORAComponentTest(StudioCourseTest):
             location_input_element.get_attribute('value'),
             peer_problem_location
         )
+
+    def test_verify_ora1_deprecation_message(self):
+        """
+        Scenario: Verifies the ora1 deprecation message on ora components.
+
+        Given I have a course with ora 1 components
+        When I go to the unit page
+        Then I see a deprecation error message in ora 1 components.
+        """
+        self.course_outline_page.visit()
+        unit = self._go_to_unit_page()
+
+        for xblock in unit.xblocks:
+            self.assertTrue(xblock.has_validation_error)
+            self.assertEqual(
+                xblock.validation_error_text,
+                "ORA1 is no longer supported. To use this assessment, "
+                "replace this ORA1 component with an ORA2 component."
+            )

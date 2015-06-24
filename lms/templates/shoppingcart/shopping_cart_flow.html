@@ -15,12 +15,12 @@ from microsite_configuration import microsite
   <header class="wrapper confirm-enrollment shopping-cart">
   <h1> ${_("{platform_name} -  Shopping Cart").format(platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME))}</h1>
       % if shoppingcart_items:
-      <ul class="steps" aria-label="${_('Steps')}">
+      <ol class="steps">
           <li <%block name="review_highlight"/>>${_('Review')}</li>
           <%block name="billing_details_highlight"/>
           <li <%block name="payment_highlight"/>>${_('Payment')}</li>
           <li <%block name="confirmation_highlight"/>>${_('Confirmation')}</li>
-      </ul>
+      </ol>
       %endif
   </header>
 </div>

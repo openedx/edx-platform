@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.keys import CourseKey
 
 from discussion_api.api import (
     create_comment,
@@ -17,6 +17,7 @@ from discussion_api.api import (
     delete_thread,
     delete_comment,
     get_comment_list,
+    get_course,
     get_course_topics,
     get_thread_list,
     update_comment,
@@ -35,6 +36,38 @@ class _ViewMixin(object):
     permission_classes = (IsAuthenticated,)
 
 
+class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Retrieve general discussion metadata for a course.
+
+    **Example Requests**:
+
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015
+
+    **Response Values**:
+
+        * id: The identifier of the course
+
+        * blackouts: A list of objects representing blackout periods (during
+            which discussions are read-only except for privileged users). Each
+            item in the list includes:
+
+            * start: The ISO 8601 timestamp for the start of the blackout period
+
+            * end: The ISO 8601 timestamp for the end of the blackout period
+
+        * thread_list_url: The URL of the list of all threads in the course.
+
+        * topics_url: The URL of the topic listing for the course.
+    """
+    def get(self, request, course_id):
+        """Implements the GET method as described in the class docstring."""
+        course_key = CourseKey.from_string(course_id)  # TODO: which class is right?
+        return Response(get_course(request, course_key))
+
+
 class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
@@ -44,7 +77,7 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
 
     **Example Requests**:
 
-        GET /api/discussion/v1/course_topics/{course_id}
+        GET /api/discussion/v1/course_topics/course-v1:ExampleX+Subject101+2015
 
     **Response Values**:
 
@@ -63,7 +96,7 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     """
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
-        course_key = CourseLocator.from_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         return Response(get_course_topics(request, course_key))
 
 
@@ -104,6 +137,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             multiple topic_id queries to retrieve threads from multiple topics
             at once.
 
+        * text_search: A search string to match. Any thread whose content
+            (including the bodies of comments in the thread) matches the search
+            string will be returned.
+
     **POST Parameters**:
 
         * course_id (required): The course to create the thread in
@@ -132,6 +169,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * next: The URL of the next page (or null if first page)
 
         * previous: The URL of the previous page (or null if last page)
+
+        * text_search_rewrite: The search string to which the text_search
+            parameter was rewritten in order to match threads (e.g. for spelling
+            correction)
 
     **POST/PATCH response values**:
 
@@ -162,6 +203,9 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             that were created or updated since the last time the user read
             the thread
 
+        * editable_fields: The fields that the requesting user is allowed to
+            modify with a PATCH request
+
     **DELETE response values:
 
         No content is returned for a DELETE request
@@ -184,6 +228,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["page"],
                 form.cleaned_data["page_size"],
                 form.cleaned_data["topic_id"],
+                form.cleaned_data["text_search"],
             )
         )
 
@@ -309,6 +354,9 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * vote_count: The number of votes for the comment
 
         * children: The list of child comments (with the same format)
+
+        * editable_fields: The fields that the requesting user is allowed to
+            modify with a PATCH request
 
     **DELETE Response Value**
 

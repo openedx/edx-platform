@@ -75,7 +75,8 @@ EXPECTED_CSV_HEADER = (
     '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
     '"customer_reference_number","internal_reference"'
 )
-EXPECTED_COUPON_CSV_HEADER = '"code","course_id","percentage_discount","code_redeemed_count","description"'
+EXPECTED_COUPON_CSV_HEADER = '"Coupon Code","Course Id","% Discount","Description","Expiration Date",' \
+                             '"Is Active","Code Redeemed Count","Total Discounted Seats","Total Discounted Amount"'
 
 # ddt data for test cases involving reports
 REPORTS_DATA = (
@@ -103,6 +104,16 @@ REPORTS_DATA = (
         'task_api_endpoint': 'instructor_task.api.submit_calculate_may_enroll_csv',
         'extra_instructor_api_kwargs': {},
     }
+)
+
+# ddt data for test cases involving executive summary report
+EXECUTIVE_SUMMARY_DATA = (
+    {
+        'report_type': 'executive summary',
+        'instructor_api_endpoint': 'get_exec_summary_report',
+        'task_api_endpoint': 'instructor_task.api.submit_executive_summary_report',
+        'extra_instructor_api_kwargs': {}
+    },
 )
 
 
@@ -215,6 +226,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('get_students_features', {}),
             ('get_enrollment_report', {}),
             ('get_students_who_may_enroll', {}),
+            ('get_exec_summary_report', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -2544,9 +2556,36 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
-    @ddt.data(*REPORTS_DATA)
+    @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack
-    def test_calculate_report_csv_already_running(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+    def test_executive_summary_report_success(
+            self,
+            report_type,
+            instructor_api_endpoint,
+            task_api_endpoint,
+            extra_instructor_api_kwargs
+    ):
+        kwargs = {'course_id': unicode(self.course.id)}
+        kwargs.update(extra_instructor_api_kwargs)
+        url = reverse(instructor_api_endpoint, kwargs=kwargs)
+
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        with patch(task_api_endpoint):
+            response = self.client.get(url, {})
+        success_status = "Your {report_type} report is being created." \
+                         " To view the status of the report, see the 'Pending Instructor Tasks'" \
+                         " section.".format(report_type=report_type)
+        self.assertIn(success_status, response.content)
+
+    @ddt.data(*EXECUTIVE_SUMMARY_DATA)
+    @ddt.unpack
+    def test_executive_summary_report_already_running(
+            self,
+            report_type,
+            instructor_api_endpoint,
+            task_api_endpoint,
+            extra_instructor_api_kwargs
+    ):
         kwargs = {'course_id': unicode(self.course.id)}
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
@@ -2555,7 +2594,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         with patch(task_api_endpoint) as mock:
             mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
-        already_running_status = "{report_type} report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.".format(report_type=report_type)
+        already_running_status = "An {report_type} report is currently in progress." \
+                                 " To view the status of the report, see the 'Pending Instructor Tasks' section." \
+                                 " When completed, the report will be available for download in the table below." \
+                                 " You will be able to download the" \
+                                 " report when it is complete.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
 
     def test_get_distribution_no_feature(self):
@@ -4246,13 +4289,20 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         # filter all the coupons
         for coupon in Coupon.objects.all():
-            self.assertIn('"{code}","{course_id}","{discount}","0","{description}","{expiration_date}","True"'.format(
-                code=coupon.code,
-                course_id=coupon.course_id,
-                discount=coupon.percentage_discount,
-                description=coupon.description,
-                expiration_date=coupon.display_expiry_date
-            ), response.content)
+            self.assertIn(
+                '"{coupon_code}","{course_id}","{discount}","{description}","{expiration_date}","{is_active}",'
+                '"{code_redeemed_count}","{total_discounted_seats}","{total_discounted_amount}"'.format(
+                    coupon_code=coupon.code,
+                    course_id=coupon.course_id,
+                    discount=coupon.percentage_discount,
+                    description=coupon.description,
+                    expiration_date=coupon.display_expiry_date,
+                    is_active=coupon.is_active,
+                    code_redeemed_count="0",
+                    total_discounted_seats="0",
+                    total_discounted_amount="0",
+                ), response.content
+            )
 
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')

@@ -74,8 +74,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-12 18:41+0000\n"
-"PO-Revision-Date: 2015-06-05 17:38+0000\n"
+"POT-Creation-Date: 2015-06-19 13:34+0000\n"
+"PO-Revision-Date: 2015-06-19 13:38+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -216,6 +216,7 @@ msgstr ""
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
@@ -246,13 +247,10 @@ msgstr ""
 "#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
 "حفظ"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/signatory-editor.underscore
-#: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "إغلاق "
 
@@ -871,18 +869,11 @@ msgstr "التنسيق"
 msgid "Formats"
 msgstr "التنسيقات"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/templates/js/image-modal.underscore
-#, fuzzy
 msgid "Fullscreen"
-msgstr ""
-"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"العرض بشاشة كاملة\n"
-"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
-"عرض بشاشة كاملة"
+msgstr "العرض بشاشة كاملة"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1191,12 +1182,9 @@ msgstr "مستند جديد"
 msgid "New window"
 msgstr "نافذة جديدة"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/paging-footer.underscore
-#: cms/templates/js/paging-header.underscore
 msgid "Next"
 msgstr "التالي"
 
@@ -1610,6 +1598,7 @@ msgstr "مسافة عمودية"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
@@ -2167,6 +2156,46 @@ msgstr "نأسف لحدوث مشكلة في حذف هذا التعليق. يُر
 msgid "Are you sure you want to delete this response?"
 msgstr "هل أنت واثق من أنّك تودّ حذف هذا الرد؟"
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s descending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
+#: common/static/common/js/components/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: common/static/common/js/components/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr ""
+
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
 msgstr "إسقاط الصورة المطلوبة"
@@ -2350,6 +2379,7 @@ msgid "Date posted"
 msgstr "تاريخ النشر"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/static/js/courseware/credit_progress.js
 #: lms/templates/edxnotes/note-item.underscore
 #, fuzzy
 msgid "More"
@@ -2444,6 +2474,16 @@ msgstr ""
 msgid "Browse"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "%(team_count)s Team"
+msgid_plural "%(team_count)s Teams"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "فتح الآلة الحاسبة "
@@ -2481,7 +2521,6 @@ msgid "Error retrieving grading configuration."
 msgstr "نأسف لحدوث خطأ في استرجاع طريقة ضبط إعدادات التقييم."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Error generating grades. Please try again."
 msgstr "نأسف لحدوث خطأ في استحداث الدرجات. يُرجى إعادة المحاولة."
 
@@ -3298,6 +3337,10 @@ msgstr ""
 msgid "Enter Start Date"
 msgstr ""
 
+#: lms/templates/edxnotes/note-item.underscore
+msgid "Less"
+msgstr "أقلّ"
+
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
 msgstr "يُرجى إدخال مبلغ تبرّع صحيح."
@@ -3526,6 +3569,12 @@ msgid "Prevent students from generating certificates in this course?"
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
+msgid ""
+"There was a problem creating the report. Select \"Create Executive Summary\""
+" to try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
 msgstr ""
 
@@ -3597,6 +3646,22 @@ msgstr ""
 #: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
 msgstr "يُرجى التحقق من بريدك الإلكتروني لتأكيد التغيير."
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Saving your email preference"
+msgstr ""
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Enrolling you in the selected course"
+msgstr ""
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Adding the selected course to your cart"
+msgstr ""
+
+#: lms/static/js/student_account/views/FinishAuthView.js
+msgid "Loading your courses"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information (required)"
@@ -4389,8 +4454,7 @@ msgstr "يجب تحديد فترة السماح بصيغة HH:MM."
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 
-#: cms/static/js/spec/views/assets_spec.js
-#: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
+#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
 #: cms/templates/js/asset-library.underscore
 msgid "Type"
 msgstr "النوع"
@@ -4720,46 +4784,6 @@ msgstr ""
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
 msgstr "تاريخ الإضافة "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s ascending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s descending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s ascending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s descending"
-msgstr ""
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: cms/static/js/views/paging_header.js
-msgid "%(total_items)s total"
-msgstr "المجموع %(total_items)s "
 
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
@@ -5127,46 +5151,6 @@ msgstr ""
 msgid "Status"
 msgstr "الحالة"
 
-#: common/templates/js/image-modal.underscore
-msgid "Large"
-msgstr "كبير "
-
-#: common/templates/js/image-modal.underscore
-msgid "Zoom In"
-msgstr "تكبير"
-
-#: common/templates/js/image-modal.underscore
-msgid "Zoom Out"
-msgstr "تصغير"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "This post is visible only to %(group_name)s."
-msgstr "هذا المنشور مرئيٌّ فقط لـ %(group_name)s."
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr "هذا المنشور مرئيٌّ للجميع."
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "%(post_type)s posted %(time_ago)s by %(author)s"
-msgstr "%(post_type)s منشور منذ %(time_ago)s من قِبل %(author)s"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr "مُثَبَّت"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Reported"
-msgstr "مبلَّغ عنه"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Closed"
-msgstr "مغلق"
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
-
 #: lms/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr ""
@@ -5298,10 +5282,6 @@ msgstr ""
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
 msgstr "النص المظلَّل"
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Less"
-msgstr "أقلّ"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Note"
@@ -5599,9 +5579,9 @@ msgstr "هل نسيت كلمة المرور؟"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
-"You've successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account isn't linked with an %(platformName)s account. "
-"To link your accounts, go to your %(platformName)s account settings."
+"You have successfully signed into %(currentProvider)s, but your "
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -5621,6 +5601,10 @@ msgid "We couldn't sign you in."
 msgstr "عذرًا، لم نتمكّن من تسجيل دخولك. "
 
 #: lms/templates/student_account/login.underscore
+msgid "An error occurred when signing you in to %(platformName)s."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr "تسجيل الدخول"
@@ -5638,6 +5622,7 @@ msgid "Create an account"
 msgstr "إنشاء حساب "
 
 #: lms/templates/student_account/password_reset.underscore
+#: lms/templates/student_account/register.underscore
 msgid "An error occurred."
 msgstr "نأسف لحدوث خطأ. "
 
@@ -6169,6 +6154,10 @@ msgstr "الحالة"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "أنواع المسائل الشائعة"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Common Problems with Hints and Feedback"
+msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -6725,15 +6714,6 @@ msgstr "لم تُضِف بعد أي كتب إلى هذا المساق."
 #: cms/templates/js/no-textbooks.underscore
 msgid "Add your first textbook"
 msgstr "أضِف أوّل كتاب لك."
-
-#: cms/templates/js/paging-footer.underscore
-#: cms/templates/js/paging-header.underscore
-msgid "Previous"
-msgstr "السابق"
-
-#: cms/templates/js/paging-footer.underscore
-msgid "Page number"
-msgstr "رقم الصفحة"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"

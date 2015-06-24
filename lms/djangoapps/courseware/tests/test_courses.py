@@ -262,7 +262,8 @@ class CourseInstantiationTests(ModuleStoreTestCase):
                 fake_request,
                 course,
                 field_data_cache,
-                course.id
+                course.id,
+                course=course
             )
             for chapter in course_module.get_children():
                 for section in chapter.get_children():

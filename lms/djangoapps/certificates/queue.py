@@ -187,7 +187,8 @@ class XQueueCertInterface(object):
                          will be skipped.
           generate_pdf - Boolean should a message be sent in queue to generate certificate PDF
 
-        Will change the certificate status to 'generating'.
+        Will change the certificate status to 'generating' or
+        `downloadable` in case of web view certificates.
 
         Certificate must be in the 'unavailable', 'error',
         'deleted' or 'generating' state.
@@ -201,7 +202,7 @@ class XQueueCertInterface(object):
         If a student does not have a passing grade the status
         will change to status.notpassing
 
-        Returns the student's status
+        Returns the student's status and newly created certificate instance
         """
 
         valid_statuses = [
@@ -215,6 +216,7 @@ class XQueueCertInterface(object):
 
         cert_status = certificate_status_for_student(student, course_id)['status']
         new_status = cert_status
+        cert = None
 
         if cert_status not in valid_statuses:
             LOGGER.warning(
@@ -260,16 +262,7 @@ class XQueueCertInterface(object):
             if forced_grade:
                 grade['grade'] = forced_grade
 
-            cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
-
-            if not created:
-                LOGGER.info(
-                    u"Regenerate certificate for user %s in course %s "
-                    u"with status %s, download_uuid %s, "
-                    u"and download_url %s",
-                    cert.user.id, unicode(cert.course_id),
-                    cert.status, cert.download_uuid, cert.download_url
-                )
+            cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
             cert.mode = cert_mode
             cert.user = student
@@ -389,7 +382,7 @@ class XQueueCertInterface(object):
                     new_status
                 )
 
-        return new_status
+        return new_status, cert
 
     def add_example_cert(self, example_cert):
         """Add a task to create an example certificate.

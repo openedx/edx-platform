@@ -6,6 +6,7 @@ running state of a course.
 import json
 from collections import OrderedDict
 from datetime import datetime
+from django.conf import settings
 from eventtracking import tracker
 from itertools import chain
 from time import time
@@ -19,7 +20,13 @@ from django.core.files.storage import DefaultStorage
 from django.db import transaction, reset_queries
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
+from StringIO import StringIO
+from edxmako.shortcuts import render_to_string
 from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from shoppingcart.models import (
+    PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
+    Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
+)
 
 from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
@@ -41,7 +48,7 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseAccessRole
 from verify_student.models import SoftwareSecurePhotoVerification
 
 
@@ -50,7 +57,7 @@ TASK_LOG = logging.getLogger('edx.celery.task')
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
-
+FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']
 # define values for update functions to use to return status to perform_module_state_update
 UPDATE_STATUS_SUCCEEDED = 'succeeded'
 UPDATE_STATUS_FAILED = 'failed'
@@ -399,7 +406,7 @@ def _get_track_function_for_task(student, xmodule_instance_args=None, source_pag
 
 
 def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args=None,
-                                  grade_bucket_type=None):
+                                  grade_bucket_type=None, course=None):
     """
     Fetches a StudentModule instance for a given `course_id`, `student` object, and `module_descriptor`.
 
@@ -438,6 +445,8 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
         grade_bucket_type=grade_bucket_type,
         # This module isn't being used for front-end rendering
         request_token=None,
+        # pass in a loaded course for override enabling
+        course=course
     )
 
 
@@ -458,37 +467,76 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
     course_id = student_module.course_id
     student = student_module.student
     usage_key = student_module.module_state_key
-    instance = _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args, grade_bucket_type='rescore')
 
-    if instance is None:
-        # Either permissions just changed, or someone is trying to be clever
-        # and load something they shouldn't have access to.
-        msg = "No module {loc} for student {student}--access denied?".format(loc=usage_key,
-                                                                             student=student)
-        TASK_LOG.debug(msg)
-        raise UpdateProblemModuleStateError(msg)
+    with modulestore().bulk_operations(course_id):
+        course = get_course_by_id(course_id)
+        # TODO: Here is a call site where we could pass in a loaded course.  I
+        # think we certainly need it since grading is happening here, and field
+        # overrides would be important in handling that correctly
+        instance = _get_module_instance_for_task(
+            course_id,
+            student,
+            module_descriptor,
+            xmodule_instance_args,
+            grade_bucket_type='rescore',
+            course=course
+        )
 
-    if not hasattr(instance, 'rescore_problem'):
-        # This should also not happen, since it should be already checked in the caller,
-        # but check here to be sure.
-        msg = "Specified problem does not support rescoring."
-        raise UpdateProblemModuleStateError(msg)
+        if instance is None:
+            # Either permissions just changed, or someone is trying to be clever
+            # and load something they shouldn't have access to.
+            msg = "No module {loc} for student {student}--access denied?".format(
+                loc=usage_key,
+                student=student
+            )
+            TASK_LOG.debug(msg)
+            raise UpdateProblemModuleStateError(msg)
 
-    result = instance.rescore_problem()
-    instance.save()
-    if 'success' not in result:
-        # don't consider these fatal, but false means that the individual call didn't complete:
-        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"unexpected response {msg}".format(msg=result, course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_FAILED
-    elif result['success'] not in ['correct', 'incorrect']:
-        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_FAILED
-    else:
-        TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
-                       u"{msg}".format(msg=result['success'], course=course_id, loc=usage_key, student=student))
-        return UPDATE_STATUS_SUCCEEDED
+        if not hasattr(instance, 'rescore_problem'):
+            # This should also not happen, since it should be already checked in the caller,
+            # but check here to be sure.
+            msg = "Specified problem does not support rescoring."
+            raise UpdateProblemModuleStateError(msg)
+
+        result = instance.rescore_problem()
+        instance.save()
+        if 'success' not in result:
+            # don't consider these fatal, but false means that the individual call didn't complete:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: unexpected response %(msg)s",
+                dict(
+                    msg=result,
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
+        elif result['success'] not in ['correct', 'incorrect']:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result['success'],
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
+        else:
+            TASK_LOG.debug(
+                u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result['success'],
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_SUCCEEDED
 
 
 @transaction.autocommit
@@ -558,6 +606,36 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
         rows
     )
     tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": csv_name, })
+
+
+def upload_exec_summary_to_store(data_dict, report_name, course_id, generated_at, config_name='FINANCIAL_REPORTS'):
+    """
+    Upload Executive Summary Html file using ReportStore.
+
+    Arguments:
+        data_dict: containing executive report data.
+        report_name: Name of the resulting Html File.
+        course_id: ID of the course
+    """
+    report_store = ReportStore.from_config(config_name)
+
+    # Use the data dict and html template to generate the output buffer
+    output_buffer = StringIO(render_to_string("instructor/instructor_dashboard_2/executive_summary.html", data_dict))
+
+    report_store.store(
+        course_id,
+        u"{course_prefix}_{report_name}_{timestamp_str}.html".format(
+            course_prefix=course_filename_prefix_generator(course_id),
+            report_name=report_name,
+            timestamp_str=generated_at.strftime("%Y-%m-%d-%H%M")
+        ),
+        output_buffer,
+        config={
+            'content_type': 'text/html',
+            'content_encoding': None,
+        }
+    )
+    tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": report_name})
 
 
 def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=too-many-statements
@@ -1020,6 +1098,152 @@ def upload_may_enroll_csv(_xmodule_instance_args, _entry_id, course_id, task_inp
     # Perform the upload
     upload_csv_to_report_store(rows, 'may_enroll_info', course_id, start_date)
 
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def get_executive_report(course_id):
+    """
+    Returns dict containing information about the course executive summary.
+    """
+    single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(course_id)
+    bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(course_id)
+    paid_invoices_total = InvoiceTransaction.get_total_amount_of_paid_course_invoices(course_id)
+    gross_paid_revenue = single_purchase_total + bulk_purchase_total + paid_invoices_total
+
+    all_invoices_total = Invoice.get_invoice_total_amount_for_course(course_id)
+    gross_pending_revenue = all_invoices_total - float(paid_invoices_total)
+
+    gross_revenue = float(gross_paid_revenue) + float(gross_pending_revenue)
+
+    refunded_self_purchased_seats = PaidCourseRegistration.get_self_purchased_seat_count(
+        course_id, status='refunded'
+    )
+    refunded_bulk_purchased_seats = CourseRegCodeItem.get_bulk_purchased_seat_count(
+        course_id, status='refunded'
+    )
+    total_seats_refunded = refunded_self_purchased_seats + refunded_bulk_purchased_seats
+
+    self_purchased_refunds = PaidCourseRegistration.get_total_amount_of_purchased_item(
+        course_id,
+        status='refunded'
+    )
+    bulk_purchase_refunds = CourseRegCodeItem.get_total_amount_of_purchased_item(course_id, status='refunded')
+    total_amount_refunded = self_purchased_refunds + bulk_purchase_refunds
+
+    top_discounted_codes = CouponRedemption.get_top_discount_codes_used(course_id)
+    total_coupon_codes_purchases = CouponRedemption.get_total_coupon_code_purchases(course_id)
+
+    bulk_purchased_codes = CourseRegistrationCode.order_generated_registration_codes(course_id)
+
+    unused_registration_codes = 0
+    for registration_code in bulk_purchased_codes:
+        if not RegistrationCodeRedemption.is_registration_code_redeemed(registration_code.code):
+            unused_registration_codes += 1
+
+    self_purchased_seat_count = PaidCourseRegistration.get_self_purchased_seat_count(course_id)
+    bulk_purchased_seat_count = CourseRegCodeItem.get_bulk_purchased_seat_count(course_id)
+    total_invoiced_seats = CourseRegistrationCode.invoice_generated_registration_codes(course_id).count()
+
+    total_seats = self_purchased_seat_count + bulk_purchased_seat_count + total_invoiced_seats
+
+    self_purchases_percentage = 0.0
+    bulk_purchases_percentage = 0.0
+    invoice_purchases_percentage = 0.0
+    avg_price_paid = 0.0
+
+    if total_seats != 0:
+        self_purchases_percentage = (float(self_purchased_seat_count) / float(total_seats)) * 100
+        bulk_purchases_percentage = (float(bulk_purchased_seat_count) / float(total_seats)) * 100
+        invoice_purchases_percentage = (float(total_invoiced_seats) / float(total_seats)) * 100
+        avg_price_paid = gross_revenue / total_seats
+
+    course = get_course_by_id(course_id, depth=0)
+    currency = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+
+    return {
+        'display_name': course.display_name,
+        'start_date': course.start.strftime("%Y-%m-%d") if course.start is not None else 'N/A',
+        'end_date': course.end.strftime("%Y-%m-%d") if course.end is not None else 'N/A',
+        'total_seats': total_seats,
+        'currency': currency,
+        'gross_revenue': float(gross_revenue),
+        'gross_paid_revenue': float(gross_paid_revenue),
+        'gross_pending_revenue': gross_pending_revenue,
+        'total_seats_refunded': total_seats_refunded,
+        'total_amount_refunded': float(total_amount_refunded),
+        'average_paid_price': float(avg_price_paid),
+        'discount_codes_data': top_discounted_codes,
+        'total_seats_using_discount_codes': total_coupon_codes_purchases,
+        'total_self_purchase_seats': self_purchased_seat_count,
+        'total_bulk_purchase_seats': bulk_purchased_seat_count,
+        'total_invoiced_seats': total_invoiced_seats,
+        'unused_bulk_purchase_code_count': unused_registration_codes,
+        'self_purchases_percentage': self_purchases_percentage,
+        'bulk_purchases_percentage': bulk_purchases_percentage,
+        'invoice_purchases_percentage': invoice_purchases_percentage,
+    }
+
+
+def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=too-many-statements
+    """
+    For a given `course_id`, generate a html report containing information,
+    which provides a snapshot of how the course is doing.
+    """
+    start_time = time()
+    report_generation_date = datetime.now(UTC)
+    status_interval = 100
+
+    enrolled_users = CourseEnrollment.objects.users_enrolled_in(course_id)
+    true_enrollment_count = 0
+    for user in enrolled_users:
+        if not user.is_staff and not CourseAccessRole.objects.filter(
+                user=user, course_id=course_id, role__in=FILTERED_OUT_ROLES
+        ).exists():
+            true_enrollment_count += 1
+
+    task_progress = TaskProgress(action_name, true_enrollment_count, start_time)
+
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+    current_step = {'step': 'Gathering executive summary report information'}
+
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s, generating executive summary report',
+        task_info_string,
+        action_name,
+        current_step
+    )
+
+    if task_progress.attempted % status_interval == 0:
+        task_progress.update_task_state(extra_meta=current_step)
+    task_progress.attempted += 1
+
+    # get the course executive summary report information.
+    data_dict = get_executive_report(course_id)
+    data_dict.update(
+        {
+            'total_enrollments': true_enrollment_count,
+            'report_generation_date': report_generation_date.strftime("%Y-%m-%d"),
+        }
+    )
+
+    # By this point, we've got the data that we need to generate html report.
+    current_step = {'step': 'Uploading executive summary report HTML file'}
+    task_progress.update_task_state(extra_meta=current_step)
+    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
+
+    # Perform the actual upload
+    upload_exec_summary_to_store(data_dict, 'executive_report', course_id, report_generation_date)
+    task_progress.succeeded += 1
+    # One last update before we close out...
+    TASK_LOG.info(u'%s, Task type: %s, Finalizing executive summary report task', task_info_string, action_name)
     return task_progress.update_task_state(extra_meta=current_step)
 
 

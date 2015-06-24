@@ -1,4 +1,7 @@
 $annotation-yellow: rgba(255,255,10,0.3);
+$color-copy-tip: rgb(100,100,100);
+$color-success: rgb(0, 136, 1);
+$color-fail: rgb(212, 64, 64);
 
 h2 {
   margin-top: 0;
@@ -17,6 +20,39 @@ h2 {
     width: auto;
     border-right: 0;
   }
+}
+
+.feedback-hint-correct {
+  margin-top: ($baseline/2);
+  color: $color-success;
+}
+
+.feedback-hint-incorrect {
+  margin-top: ($baseline/2);
+  color: $color-fail;
+}
+
+.feedback-hint-text {
+  color: $color-copy-tip;
+}
+
+.problem-hint {
+  color: $color-copy-tip;
+  margin-bottom: 20px;
+}
+
+.hint-label {
+  font-weight: bold;
+  display: inline-block;
+  padding-right: 0.5em;
+}
+
+.hint-text {
+  display: inline-block;
+}
+
+.feedback-hint-multi .hint-text {
+  display: block;
 }
 
 
@@ -631,7 +667,7 @@ div.problem {
   div.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset {
+    .save, .check, .show, .reset, .hint-button {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;

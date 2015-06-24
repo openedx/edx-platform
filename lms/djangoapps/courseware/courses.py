@@ -203,7 +203,8 @@ def get_course_about_section(course, section_key):
                 field_data_cache,
                 log_if_not_found=False,
                 wrap_xmodule_display=False,
-                static_asset_path=course.static_asset_path
+                static_asset_path=course.static_asset_path,
+                course=course
             )
 
             html = ''
@@ -256,7 +257,8 @@ def get_course_info_section_module(request, course, section_key):
         field_data_cache,
         log_if_not_found=False,
         wrap_xmodule_display=False,
-        static_asset_path=course.static_asset_path
+        static_asset_path=course.static_asset_path,
+        course=course
     )
 
 

@@ -118,6 +118,7 @@
     },
     "SECRET_KEY": "",
     "THIRD_PARTY_AUTH": {
+        "Dummy": {},
         "Google": {
             "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
             "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"

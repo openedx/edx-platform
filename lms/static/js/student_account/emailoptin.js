@@ -22,13 +22,12 @@ var edx = edx || {};
          * @param  {string} courseKey  Slash-separated course key.
          * @param {string} emailOptIn The preference to opt in or out of organization emails.
          */
-        setPreference: function( courseKey, emailOptIn, context ) {
+        setPreference: function( courseKey, emailOptIn ) {
             return $.ajax({
                 url: this.urls.emailOptInUrl,
                 type: 'POST',
                 data: {course_id: courseKey, email_opt_in: emailOptIn},
-                headers: this.headers,
-                context: context
+                headers: this.headers
             });
         }
     };

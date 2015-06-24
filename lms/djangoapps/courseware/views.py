@@ -38,6 +38,11 @@ from courseware.courses import (
     sort_by_start_date,
 )
 from courseware.masquerade import setup_masquerade
+from openedx.core.djangoapps.credit.api import (
+    get_credit_requirement_status,
+    is_user_eligible_for_credit,
+    is_credit_course
+)
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 from .entrance_exams import (
@@ -248,7 +253,7 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
-def save_positions_recursively_up(user, request, field_data_cache, xmodule):
+def save_positions_recursively_up(user, request, field_data_cache, xmodule, course=None):
     """
     Recurses up the course tree starting from a leaf
     Saving the position property based on the previous node as it goes
@@ -260,7 +265,14 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule):
         parent = None
         if parent_location:
             parent_descriptor = modulestore().get_item(parent_location)
-            parent = get_module_for_descriptor(user, request, parent_descriptor, field_data_cache, current_module.location.course_key)
+            parent = get_module_for_descriptor(
+                user,
+                request,
+                parent_descriptor,
+                field_data_cache,
+                current_module.location.course_key,
+                course=course
+            )
 
         if parent and hasattr(parent, 'position'):
             save_child_position(parent, current_module.location.name)
@@ -407,7 +419,9 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course_key)
+        course_module = get_module_for_descriptor(
+            user, request, course, field_data_cache, course_key, course=course
+        )
         if course_module is None:
             log.warning(u'If you see this, something went wrong: if we got this'
                         u' far, should have gotten a course module for this user')
@@ -527,7 +541,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 section_descriptor,
                 field_data_cache,
                 course_key,
-                position
+                position,
+                course=course
             )
 
             if section_module is None:
@@ -1050,6 +1065,21 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
+    if is_credit_course(course_key):
+        requirement_statuses = get_credit_requirement_status(course_key, student.username)
+        if any(requirement['status'] == 'failed' for requirement in requirement_statuses):
+            eligibility_status = "not_eligible"
+        elif is_user_eligible_for_credit(student.username, course_key):
+            eligibility_status = "eligible"
+        else:
+            eligibility_status = "partial_eligible"
+        credit_course = {
+            'eligibility_status': eligibility_status,
+            'requirements': requirement_statuses
+        }
+    else:
+        credit_course = None
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -1058,7 +1088,8 @@ def _progress(request, course_key, student_id):
         'staff_access': staff_access,
         'student': student,
         'passed': is_course_passed(course, grade_summary),
-        'show_generate_cert_btn': show_generate_cert_btn
+        'show_generate_cert_btn': show_generate_cert_btn,
+        'credit_course': credit_course
     }
 
     if show_generate_cert_btn:
@@ -1069,7 +1100,11 @@ def _progress(request, course_key, student_id):
                 context.update({
                     'show_cert_web_view': True,
                     'cert_web_view_url': u'{url}'.format(
-                        url=certs_api.get_certificate_url(user_id=student.id, course_id=unicode(course.id))
+                        url=certs_api.get_certificate_url(
+                            user_id=student.id,
+                            course_id=unicode(course.id),
+                            verify_uuid=None
+                        )
                     )
                 })
             else:
@@ -1159,7 +1194,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
     logging.debug('course_module = {0}'.format(tab_module))
@@ -1217,7 +1252,8 @@ def get_course_lti_endpoints(request, course_id):
                 anonymous_user,
                 descriptor
             ),
-            course_key
+            course_key,
+            course=course
         )
         for descriptor in lti_descriptors
     ]
@@ -1328,7 +1364,9 @@ def generate_user_cert(request, course_id):
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
-    if certificate_status["is_generating"]:
+    if certificate_status["is_downloadable"]:
+        return HttpResponseBadRequest(_("Certificate has already been created."))
+    elif certificate_status["is_generating"]:
         return HttpResponseBadRequest(_("Certificate is being created."))
     else:
         # If the certificate is not already in-process or completed,
@@ -1337,7 +1375,7 @@ def generate_user_cert(request, course_id):
         # mark the certificate with "error" status, so it can be re-run
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
-        certs_api.generate_user_certificates(student, course.id)
+        certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse()
 
@@ -1388,7 +1426,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         # get the block, which verifies whether the user has access to the block.
         block, _ = get_module_by_usage_id(
-            request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True
+            request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True, course=course
         )
 
         context = {

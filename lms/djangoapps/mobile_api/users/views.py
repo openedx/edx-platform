@@ -106,7 +106,9 @@ class UserCourseStatus(views.APIView):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course.id)
+        course_module = get_module_for_descriptor(
+            request.user, request, course, field_data_cache, course.id, course=course
+        )
 
         path = [course_module]
         chapter = get_current_child(course_module, min_depth=2)
@@ -140,7 +142,9 @@ class UserCourseStatus(views.APIView):
             module_descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
-        module = get_module_for_descriptor(request.user, request, module_descriptor, field_data_cache, course.id)
+        module = get_module_for_descriptor(
+            request.user, request, module_descriptor, field_data_cache, course.id, course=course
+        )
 
         if modification_date:
             key = KeyValueStore.Key(
@@ -154,7 +158,7 @@ class UserCourseStatus(views.APIView):
                 # old modification date so skip update
                 return self._get_course_info(request, course)
 
-        save_positions_recursively_up(request.user, request, field_data_cache, module)
+        save_positions_recursively_up(request.user, request, field_data_cache, module, course=course)
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)

@@ -23,6 +23,7 @@ requirejs.config({
         "jquery.simulate": "xmodule_js/common_static/js/vendor/jquery.simulate",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
+        "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
         "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
@@ -240,13 +241,11 @@ define([
     "js/spec/views/active_video_upload_list_spec",
     "js/spec/views/previous_video_upload_spec",
     "js/spec/views/previous_video_upload_list_spec",
-    "js/spec/views/paging_spec",
     "js/spec/views/assets_spec",
     "js/spec/views/baseview_spec",
     "js/spec/views/container_spec",
     "js/spec/views/paged_container_spec",
     "js/spec/views/group_configuration_spec",
-    "js/spec/views/paging_spec",
     "js/spec/views/unit_outline_spec",
     "js/spec/views/xblock_spec",
     "js/spec/views/xblock_editor_spec",
@@ -279,6 +278,7 @@ define([
     "js/certificates/spec/views/certificate_details_spec",
     "js/certificates/spec/views/certificate_editor_spec",
     "js/certificates/spec/views/certificates_list_spec",
+    "js/certificates/spec/views/certificate_preview_spec",
 
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js

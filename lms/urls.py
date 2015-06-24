@@ -75,9 +75,6 @@ urlpatterns = (
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('enrollment.urls')),
 
-    # CourseInfo API RESTful endpoints
-    url(r'^api/course/details/v0/', include('course_about.urls')),
-
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
 
@@ -666,11 +663,10 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     )
 
 # Certificates Web/HTML View
-if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-    urlpatterns += (
-        url(r'^certificates/user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
-            'certificates.views.render_html_view', name='cert_html_view'),
-    )
+urlpatterns += (
+    url(r'^certificates/user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
+        'certificates.views.render_html_view', name='cert_html_view'),
+)
 
 BADGE_SHARE_TRACKER_URL = url(
     r'^certificates/badge_share_tracker/{}/(?P<network>[^/]+)/(?P<student_username>[^/]+)/$'.format(

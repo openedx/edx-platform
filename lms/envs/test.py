@@ -244,10 +244,12 @@ THIRD_PARTY_AUTH = {
         "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
     },
     "Facebook": {
-        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
-        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+        "SOCIAL_AUTH_FACEBOOK_KEY": "test",
+        "SOCIAL_AUTH_FACEBOOK_SECRET": "test",
     },
 }
+
+FEATURES['ENABLE_DUMMY_THIRD_PARTY_AUTH_PROVIDER'] = True
 
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
@@ -471,9 +473,6 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
-
-# Certificates Views
-FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ######### custom courses #########
 INSTALLED_APPS += ('ccx',)

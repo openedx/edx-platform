@@ -109,7 +109,8 @@ urlpatterns = patterns(
     # Reports..
     url(r'get_enrollment_report$',
         'instructor.views.api.get_enrollment_report', name="get_enrollment_report"),
-
+    url(r'get_exec_summary_report$',
+        'instructor.views.api.get_exec_summary_report', name="get_exec_summary_report"),
 
     # Coupon Codes..
     url(r'get_coupon_codes',
