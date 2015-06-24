@@ -101,12 +101,13 @@ class CourseMetadataUtilsTestCase(TestCase):
             Returns (str): format_string + " " + str(date_time)
             """
             if format_string in ['DATE_TIME', 'TIME', 'SHORT_DATE', 'LONG_DATE']:
-                return format_string + " " + str(date_time)
+                return format_string + " " + date_time.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 raise ValueError("Invalid format string :" + format_string)
 
         test_datetime = datetime(1945, 02, 06, 04, 20, 00, tzinfo=UTC())
         advertised_start_parsable = "2038-01-19 03:14:07"
+        advertised_start_bad_date = "215-01-01 10:10:10"
         advertised_start_unparsable = "This coming fall"
 
         FunctionTest = namedtuple('FunctionTest', 'function scenarios')  # pylint: disable=invalid-name
@@ -114,10 +115,12 @@ class CourseMetadataUtilsTestCase(TestCase):
 
         function_tests = [
             FunctionTest(clean_course_key, [
+                # Test with a Mongo course and '=' as padding.
                 TestScenario(
                     (self.demo_course.id, '='),
                     "course_MVSFQL2EMVWW6WBOGEXUMYLMNRPTEMBRGQ======"
                 ),
+                # Test with a Split course and '~' as padding.
                 TestScenario(
                     (self.html_course.id, '~'),
                     "course_MNXXK4TTMUWXMMJ2KVXGS5TFOJZWS5DZLAVUGUZNGIYDGK2ZGIYDSNQ~"
@@ -128,7 +131,9 @@ class CourseMetadataUtilsTestCase(TestCase):
                 TestScenario((self.html_course.location,), self.html_course.location.name),
             ]),
             FunctionTest(display_name_with_default, [
+                # Test course with no display name.
                 TestScenario((self.demo_course,), "Empty"),
+                # Test course with a display name that contains characters that need escaping.
                 TestScenario((self.html_course,), "Intro to &lt;html&gt;"),
             ]),
             FunctionTest(number_for_course_location, [
@@ -150,18 +155,34 @@ class CourseMetadataUtilsTestCase(TestCase):
                 TestScenario((DEFAULT_START_DATE, None), True),
             ]),
             FunctionTest(course_start_datetime_text, [
+                # Test parsable advertised start date.
+                # Expect start datetime to be parsed and formatted back into a string.
                 TestScenario(
                     (DEFAULT_START_DATE, advertised_start_parsable, 'DATE_TIME', ugettext, mock_strftime_localized),
                     mock_strftime_localized(Date().from_json(advertised_start_parsable), 'DATE_TIME') + " UTC"
                 ),
+                # Test un-parsable advertised start date.
+                # Expect date parsing to throw a ValueError, and the advertised
+                # start to be returned in Title Case.
                 TestScenario(
                     (test_datetime, advertised_start_unparsable, 'DATE_TIME', ugettext, mock_strftime_localized),
                     advertised_start_unparsable.title()
                 ),
+                # Test parsable advertised start date from before January 1, 1900.
+                # Expect mock_strftime_localized to throw a ValueError, and the
+                # advertised start to be returned in Title Case.
+                TestScenario(
+                    (test_datetime, advertised_start_bad_date, 'DATE_TIME', ugettext, mock_strftime_localized),
+                    advertised_start_bad_date.title()
+                ),
+                # Test without advertised start date, but with a set start datetime.
+                # Expect formatted datetime to be returned.
                 TestScenario(
                     (test_datetime, None, 'SHORT_DATE', ugettext, mock_strftime_localized),
                     mock_strftime_localized(test_datetime, 'SHORT_DATE')
                 ),
+                # Test without advertised start date and with default start datetime.
+                # Expect TBD to be returned.
                 TestScenario(
                     (DEFAULT_START_DATE, None, 'SHORT_DATE', ugettext, mock_strftime_localized),
                     # Translators: TBD stands for 'To Be Determined' and is used when a course
@@ -170,10 +191,14 @@ class CourseMetadataUtilsTestCase(TestCase):
                 )
             ]),
             FunctionTest(course_end_datetime_text, [
+                # Test with a set end datetime.
+                # Expect formatted datetime to be returned.
                 TestScenario(
                     (test_datetime, 'TIME', mock_strftime_localized),
                     mock_strftime_localized(test_datetime, 'TIME') + " UTC"
                 ),
+                # Test with default end datetime.
+                # Expect empty string to be returned.
                 TestScenario(
                     (None, 'TIME', mock_strftime_localized),
                     ""
