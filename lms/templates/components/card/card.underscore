@@ -1,5 +1,8 @@
 <div class="card-core-wrapper">
     <div class="card-core">
+        <% if (pennant) { %>
+            <p class="card-type pennant"><%- pennant %></p>
+        <% } %>
         <h3 class="card-title"><%- title %></h3>
         <p class="card-description"><%- description %></p>
     </div>

@@ -18,7 +18,14 @@
                 it('can render itself as a list card', function () {
                     var view = new CardView({ configuration: 'list_card' });
                     expect(view.$el).toHaveClass('list-card');
-                    expect(view.$el.find('.card-core-wrapper .action').length).toBe(1);
+                    expect(view.$el.find('.card-meta-wrapper .action').length).toBe(1);
+                });
+
+                it('renders a pennant only if the pennant value is truthy', function () {
+                    var view = new (CardView.extend({ pennant: '' }))();
+                    expect(view.$el.find('.pennant').length).toBe(0);
+                    view = new (CardView.extend({ pennant: 'Test Pennant' }))();
+                    expect(view.$el.find('.pennant').length).toBe(1);
                 });
 
                 it('can render child views', function () {
@@ -38,6 +45,7 @@
 
                 var verifyContent = function (view) {
                     expect(view.$el).toHaveClass('test-card');
+                    expect(view.$el.find('.pennant').text()).toContain('Pennant');
                     expect(view.$el.find('.card-title').text()).toContain('A test title');
                     expect(view.$el.find('.card-description').text()).toContain('A test description');
                     expect(view.$el.find('.action')).toHaveClass('test-action');
@@ -45,9 +53,10 @@
                     expect(view.$el.find('.action').text()).toContain('A test action');
                 };
 
-                it('can have strings for cardClass, title, description, and action', function () {
+                it('can have strings for cardClass, pennant, title, description, and action', function () {
                     var view = new (CardView.extend({
                         cardClass: 'test-card',
+                        pennant: 'Pennant',
                         title: 'A test title',
                         description: 'A test description',
                         actionClass: 'test-action',
@@ -57,9 +66,10 @@
                     verifyContent(view);
                 });
 
-                it('can have functions for cardClass, title, description, and action', function () {
+                it('can have functions for cardClass, pennant, title, description, and action', function () {
                     var view = new (CardView.extend({
                         cardClass: function () { return 'test-card'; },
+                        pennant: function () { return 'Pennant'; },
                         title: function () { return 'A test title'; },
                         description: function () { return 'A test description'; },
                         actionClass: function () { return 'test-action'; },
