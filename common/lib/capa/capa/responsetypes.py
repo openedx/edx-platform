@@ -1510,6 +1510,7 @@ class OptionResponse(LoncapaResponse):
             raise LoncapaProblemError(msg)
 
         for aid in answer_map:
+            # Set correct/incorrect first, check for partial credit later.
             for word in answer_map[aid]:
                 if aid in student_answers and student_answers[aid] == word:
                     cmap.set(aid, 'correct')
@@ -1524,6 +1525,8 @@ class OptionResponse(LoncapaResponse):
 
                 if not cmap.is_correct(aid) and partial_map[aid] is not None:
                     for index, word in enumerate(partial_map[aid]):
+                        # Set the correctness and point value
+                        # for each answer id independently.
                         if aid in student_answers and student_answers[aid] == word:
                             cmap.set(aid, 'partially-correct')
                             cmap.set_property(aid, 'npoints', points_map[aid][index])
