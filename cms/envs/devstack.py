@@ -33,7 +33,7 @@ FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 ########################### PIPELINE #################################
 
 # Skip RequireJS optimizer in development
-# STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 ############################# ADVANCED COMPONENTS #############################
 
