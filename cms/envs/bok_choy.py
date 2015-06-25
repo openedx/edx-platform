@@ -36,7 +36,7 @@ from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo
-TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  # pylint: disable=no-value-for-parameter
+TEST_ROOT = REPO_ROOT / "test_root"  # pylint: disable=no-value-for-parameter
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
@@ -64,7 +64,7 @@ STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
 )
 STATICFILES_DIRS = (
-    (TEST_ROOT / "staticfiles").abspath(),
+    (TEST_ROOT / "staticfiles" / "cms").abspath(),
 )
 
 # Silence noisy logs

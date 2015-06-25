@@ -75,7 +75,7 @@ EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
 # Enable django-pipeline and staticfiles
-STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
+STATIC_ROOT = (TEST_ROOT / "staticfiles" / "lms").abspath()
 
 # Silence noisy logs
 import logging
