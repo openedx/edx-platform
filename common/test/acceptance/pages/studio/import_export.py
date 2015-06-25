@@ -239,9 +239,15 @@ class ImportMixin(object):
 
     def is_timestamp_visible(self):
         """
-        Checks if the UTC timestamp of the last successfull import is visible
+        Checks if the UTC timestamp of the last successful import is visible
         """
         return self.q(css='.item-progresspoint-success-date').visible
+
+    def wait_for_timestamp_visible(self):
+        """
+        Wait for the timestamp of the last successful import to be visible.
+        """
+        EmptyPromise(self.is_timestamp_visible, 'Timestamp Visible', timeout=30).fulfill()
 
     def wait_for_filename_error(self):
         """

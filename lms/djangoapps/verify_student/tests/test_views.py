@@ -1965,7 +1965,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             "We could not verify your identity for the {assessment} assessment "
             "in the {course_name} course. You have used "
             "{used_attempts} out of {allowed_attempts} attempts to "
-            "verify your identity.".format(
+            "verify your identity".format(
                 course_name=self.course.display_name_with_default,
                 assessment=self.assessment,
                 used_attempts=1,
