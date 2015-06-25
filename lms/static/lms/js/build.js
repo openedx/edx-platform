@@ -1,24 +1,10 @@
 (function () {
     'use strict';
-    var commonLibrariesPath = 'common/js/common_libraries';
-
-    var getModule = function (moduleName, excludeCommonDeps) {
-        var module = {
-            name: moduleName
-        };
-
-        if (excludeCommonDeps) {
-            module.exclude = [commonLibrariesPath];
-        }
-
-        return module;
-    };
 
     var getModulesList = function (modules) {
-        var result = [getModule(commonLibrariesPath)];
-        return result.concat(modules.map(function (moduleName) {
-            return getModule(moduleName, true);
-        }));
+        return modules.map(function (moduleName) {
+            return { name: moduleName};
+        });
     };
 
     return {
@@ -57,7 +43,14 @@
          */
         paths: {
             'gettext': 'empty:',
-            'coffee/src/ajax_prefix': 'empty:'
+            'coffee/src/ajax_prefix': 'empty:',
+            'jquery': 'empty:',
+            'backbone': 'empty:',
+            'underscore': 'empty:',
+            'logger': 'empty:',
+            'URI': 'empty:',
+            'tinymce': 'empty:',
+            'jquery.tinymce': 'empty:'
         },
         /**
          * If shim config is used in the app during runtime, duplicate the config
