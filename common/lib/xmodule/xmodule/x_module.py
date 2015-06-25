@@ -20,7 +20,7 @@ from lazy import lazy
 
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import (
-    Scope, Integer, Float, List, XBlockMixin,
+    Scope, Integer, Float, List,
     String, Dict, ScopeIds, Reference, ReferenceList,
     ReferenceValueDict, UserScope
 )
@@ -265,7 +265,7 @@ class XModuleFields(object):
     )
 
 
-class XModuleMixin(XModuleFields, XBlockMixin):
+class XModuleMixin(XModuleFields, XBlock):
     """
     Fields and methods used by XModules internally.
 
@@ -742,7 +742,7 @@ module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disa
 
 
 @XBlock.needs("i18n")
-class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-method
+class XModule(HTMLSnippet, XModuleMixin):  # pylint: disable=abstract-method
     """ Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -949,7 +949,7 @@ class ResourceTemplates(object):
 
 
 @XBlock.needs("i18n")
-class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
+class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
