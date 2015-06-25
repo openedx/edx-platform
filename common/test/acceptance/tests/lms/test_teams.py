@@ -145,16 +145,16 @@ class BrowseTopicsTest(TeamsTabTest):
 
     def test_topic_pagination(self):
         """
-        Scenario: a list of topics should be visible in the "Browse" tab, paginated 5 per page
+        Scenario: a list of topics should be visible in the "Browse" tab, paginated 12 per page
         Given I am enrolled in a course with team configuration and topics
         When I visit the Teams page
         And I browse topics
-        Then I should see only the first 5 topics
+        Then I should see only the first 12 topics
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(10)})
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(20)})
         self.topics_page.visit()
-        self.assertEqual(len(self.topics_page.get_topic_cards()), 5)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 5 of 10 topics')
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 12)
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 12 of 20 topics')
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertTrue(self.topics_page.is_next_page_button_enabled())
 
@@ -167,9 +167,9 @@ class BrowseTopicsTest(TeamsTabTest):
         And I enter a valid page number in the page number input
         Then I should see that page of topics
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(16)})
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(25)})
         self.topics_page.visit()
-        self.topics_page.go_to_page(4)
+        self.topics_page.go_to_page(3)
         self.assertEqual(len(self.topics_page.get_topic_cards()), 1)
         self.assertTrue(self.topics_page.is_previous_page_button_enabled())
         self.assertFalse(self.topics_page.is_next_page_button_enabled())
@@ -199,11 +199,11 @@ class BrowseTopicsTest(TeamsTabTest):
         When I press the previous page button
         Then I should move to the previous page
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(6)})
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(13)})
         self.topics_page.visit()
         self.topics_page.press_next_page_button()
         self.assertEqual(len(self.topics_page.get_topic_cards()), 1)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 6 through 6 of 6 topics')
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 13 through 13 of 13 topics')
         self.topics_page.press_previous_page_button()
-        self.assertEqual(len(self.topics_page.get_topic_cards()), 5)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 5 of 6 topics')
+        self.assertEqual(len(self.topics_page.get_topic_cards()), 12)
+        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 12 of 13 topics')
