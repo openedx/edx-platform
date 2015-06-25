@@ -50,7 +50,8 @@ from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
-from access_response import *
+from courseware.access_response import AccessResponse, StartDateError, MilestoneError, \
+    VisibilityError, MobileAvailabilityError
 
 DEBUG_ACCESS = False
 ACCESS_GRANTED = AccessResponse(True)
@@ -163,21 +164,20 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
             descriptor,
             course_key=course_key
         )
-        if (descriptor.start is None
-            or now > effective_start
-            or in_preview_mode()):
-                return ACCESS_GRANTED
+        if descriptor.start is None or now > effective_start or in_preview_mode():
+            return ACCESS_GRANTED
 
     start_message = None
     if hasattr(descriptor, 'advertised_start'):
         if descriptor.advertised_start is not None:
-            start_message = _(descriptor.advertised_start)
+            start_message = _(descriptor.advertised_start)  # pylint: disable=translation-of-non-string
         elif descriptor.start != DEFAULT_START_DATE:
             start_message = descriptor.start
         else:
             start_message = _("coming soon")
 
     return StartDateError(start_message)
+
 
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
     """
@@ -200,6 +200,7 @@ def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=in
             and get_pre_requisite_courses_not_completed(user, [course.id]):
         return MilestoneError()
     return ACCESS_GRANTED
+
 
 def _has_access_course_desc(user, action, course):
     """
@@ -238,7 +239,8 @@ def _has_access_course_desc(user, action, course):
         if not access_response:
             return access_response
 
-        if any_unfulfilled_milestones(course.id, user.id) and not _has_staff_access_to_descriptor(user, course, course.id):
+        if any_unfulfilled_milestones(course.id, user.id) \
+                and not _has_staff_access_to_descriptor(user, course, course.id):
             return MilestoneError()
 
         return ACCESS_GRANTED
@@ -385,7 +387,7 @@ def _has_access_course_overview(user, action, course_overview):
         if course_overview.visible_to_staff_only:
             return VisibilityError()
 
-        access_response = _can_access_descriptor_with_start_date(user, course_overview)
+        access_response = _can_access_descriptor_with_start_date(user, course_overview, course_overview.id)
         if not access_response:
             return access_response
 
@@ -445,7 +447,7 @@ def _has_group_access(descriptor, user, course_key):
     # if a referenced partition could not be found, access will be denied.
     try:
         partitions = [
-            descriptor._get_user_partition(partition_id)  # pylint:disable=protected-access
+            descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
             for partition_id, group_ids in merged_access.items()
             if group_ids is not None
         ]
@@ -515,7 +517,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             return access_response
 
         access_response = _can_access_descriptor_with_start_date(user, descriptor, course_key)
-        if 'detached' not in descriptor._class_tags and not access_response:
+        if 'detached' not in descriptor._class_tags and not access_response:  # pylint: disable=protected-access
             return access_response
 
         return ACCESS_GRANTED

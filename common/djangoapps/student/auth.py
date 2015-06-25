@@ -33,7 +33,7 @@ def has_role(user, role):
         return True
     # CourseCreator is odd b/c it can be disabled via config
     if isinstance(role, CourseCreatorRole):
-        # complestely shut down course creation setting
+        # completely shut down course creation setting
         if settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
             return False
         # wide open course creation setting
