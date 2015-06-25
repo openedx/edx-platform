@@ -387,6 +387,13 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         fulfill_course_milestone(pre_requisite_course.id, user)
         self.assertTrue(access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course))
 
+    def test__access_on_mobile(self):
+        # staff, mobile_available is false - staff should override mobile availability flag
+        user = Mock(is_staff=True)
+        descriptor = Mock(user_partitions=[])
+        descriptor.mobile_available = False
+        self.assertTrue(access.is_mobile_available_for_user(user, descriptor))
+
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_courseware_page_unfulfilled_prereqs(self):
         """
