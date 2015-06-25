@@ -5,6 +5,7 @@ Does not include any access control, be sure to check access before calling.
 """
 
 import json
+import logging
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -21,6 +22,11 @@ from student.models import anonymous_id_for_user
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 from microsite_configuration import microsite
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+
+log = logging.getLogger(__name__)
 
 
 class EmailEnrollmentState(object):
@@ -203,6 +209,19 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
         submissions.SubmissionError: unexpected error occurred while resetting the score in the submissions API.
 
     """
+    try:
+        # A block may have children. Clear state on children first.
+        block = modulestore().get_item(module_state_key)
+        if block.has_children:
+            for child in block.children:
+                try:
+                    reset_student_attempts(course_id, student, child, delete_module=delete_module)
+                except StudentModule.DoesNotExist:
+                    # If a particular child doesn't have any state, no big deal, as long as the parent does.
+                    pass
+    except ItemNotFoundError:
+        log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
+
     # Reset the student's score in the submissions API
     # Currently this is used only by open assessment (ORA 2)
     # We need to do this *before* retrieving the `StudentModule` model,
