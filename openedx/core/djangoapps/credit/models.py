@@ -6,17 +6,18 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
-from collections import defaultdict
 import logging
+from collections import defaultdict
 
-from django.db import models, transaction, IntegrityError
 from django.core.validators import RegexValidator
-from simple_history.models import HistoricalRecords
+from django.db import models, transaction, IntegrityError
+from django.utils.translation import ugettext_lazy
 
 from jsonfield.fields import JSONField
+from simple_history.models import HistoricalRecords
+
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
-from django.utils.translation import ugettext_lazy
 
 
 log = logging.getLogger(__name__)
@@ -259,6 +260,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     REQUIREMENT_STATUS_CHOICES = (
         ("satisfied", "satisfied"),
+        ("skipped", "skipped"),
         ("failed", "failed"),
     )
 

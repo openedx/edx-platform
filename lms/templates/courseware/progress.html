@@ -127,10 +127,13 @@ from django.utils.http import urlquote_plus
                             <div class="requirement-status">
                                 %if requirement['status']:
                                     %if requirement['status'] == 'submitted':
-                                        <span class="requirement-submitted">${_("Verification Submitted")}</span>
+                                        <span class="requirement-submitted">${_("Verification submitted")}</span>
                                     %elif requirement['status'] == 'failed':
                                         <i class="fa fa-times"></i>
-                                        <span>${_("Verification Failed" )}</span>
+                                        <span>${_("Verification failed" )}</span>
+                                    %elif requirement['status'] == 'skipped':
+                                        <i class="fa fa-times"></i>
+                                        <span>${_("Verification skipped" )}</span>
                                     %elif requirement['status'] == 'satisfied':
                                         <i class="fa fa-check"></i>
                                         <span>Verified on ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
