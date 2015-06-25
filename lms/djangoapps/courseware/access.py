@@ -168,7 +168,7 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
         if descriptor.start is None or now > effective_start or in_preview_mode():
             return ACCESS_GRANTED
 
-        start_message = None
+    start_message = None
     if hasattr(descriptor, 'advertised_start'):
         if descriptor.advertised_start is not None:
             start_message = _(descriptor.advertised_start)
