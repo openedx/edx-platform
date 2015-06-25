@@ -41,6 +41,8 @@ class TestTrackViews(TestCase):
             views.user_track(request)
 
         expected_event = {
+            'accept_language': '',
+            'referer': '',
             'username': 'anonymous',
             'session': sentinel.session,
             'ip': '127.0.0.1',
@@ -65,6 +67,8 @@ class TestTrackViews(TestCase):
             views.user_track(request)
 
         expected_event = {
+            'accept_language': '',
+            'referer': '',
             'username': 'anonymous',
             'session': sentinel.session,
             'ip': '127.0.0.1',
@@ -95,6 +99,8 @@ class TestTrackViews(TestCase):
             views.user_track(request)
 
             expected_event = {
+                'accept_language': '',
+                'referer': '',
                 'username': 'anonymous',
                 'session': '',
                 'ip': '127.0.0.1',
@@ -123,6 +129,8 @@ class TestTrackViews(TestCase):
         views.server_track(request, str(sentinel.event_type), '{}')
 
         expected_event = {
+            'accept_language': '',
+            'referer': '',
             'username': 'anonymous',
             'ip': '127.0.0.1',
             'event_source': 'server',
@@ -147,6 +155,8 @@ class TestTrackViews(TestCase):
             views.server_track(request, str(sentinel.event_type), '{}')
 
             expected_event = {
+                'accept_language': '',
+                'referer': '',
                 'username': 'anonymous',
                 'ip': '127.0.0.1',
                 'event_source': 'server',
@@ -180,6 +190,8 @@ class TestTrackViews(TestCase):
             views.server_track(request, str(sentinel.event_type), '{}')
 
             expected_event = {
+                'accept_language': '',
+                'referer': '',
                 'username': 'anonymous',
                 'ip': '127.0.0.1',
                 'event_source': 'server',
@@ -207,6 +219,8 @@ class TestTrackViews(TestCase):
         views.server_track(request, str(sentinel.event_type), '{}')
 
         expected_event = {
+            'accept_language': '',
+            'referer': '',
             'username': 'anonymous',
             'ip': '',
             'event_source': 'server',
@@ -223,6 +237,8 @@ class TestTrackViews(TestCase):
     @freeze_time(expected_time)
     def test_task_track(self):
         request_info = {
+            'accept_language': '',
+            'referer': '',
             'username': 'anonymous',
             'ip': '127.0.0.1',
             'agent': 'agent',

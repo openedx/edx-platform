@@ -104,4 +104,7 @@ def run_background_process(cmd, out_log=None, err_log=None, cwd=None):
         for child_pid in child_pids:
             os.kill(child_pid.pid, signal.SIGINT)
 
+        # Wait for process to actually finish
+        proc.wait()
+
     atexit.register(exit_handler)

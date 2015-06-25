@@ -69,7 +69,6 @@ from xml.sax.saxutils import escape
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
-from xmodule.course_module import CourseDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from pkg_resources import resource_string
 from xblock.core import String, Scope, List, XBlock
@@ -80,10 +79,9 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
-DOCS_ANCHOR_TAG = (
-    "<a target='_blank'"
+DOCS_ANCHOR_TAG_OPEN = (
+    "<a target='_blank' "
     "href='http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html'>"
-    "the edX LTI documentation</a>"
 )
 
 
@@ -122,7 +120,10 @@ class LTIFields(object):
             "Enter the LTI ID for the external LTI provider.  "
             "This value must be the same LTI ID that you entered in the "
             "LTI Passports setting on the Advanced Settings page."
-            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        ).format(
+            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
+            anchor_close="</a>"
         ),
         default='',
         scope=Scope.settings
@@ -132,7 +133,10 @@ class LTIFields(object):
         help=_(
             "Enter the URL of the external tool that this component launches. "
             "This setting is only used when Hide External Tool is set to False."
-            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        ).format(
+            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
+            anchor_close="</a>"
         ),
         default='http://www.example.com',
         scope=Scope.settings)
@@ -141,7 +145,10 @@ class LTIFields(object):
         help=_(
             "Add the key/value pair for any custom parameters, such as the page your e-book should open to or "
             "the background color for this component."
-            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        ).format(
+            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
+            anchor_close="</a>"
         ),
         scope=Scope.settings)
     open_in_a_new_page = Boolean(
@@ -253,6 +260,13 @@ class LTIFields(object):
         display_name=_("Accept grades past deadline"),
         help=_("Select True to allow third party systems to post grades past the deadline."),
         default=False,
+        scope=Scope.settings
+    )
+
+    accept_grades_past_due = Boolean(
+        display_name=_("Accept grades past deadline"),
+        help=_("Select True to allow third party systems to post grades past the deadline."),
+        default=True,
         scope=Scope.settings
     )
 
@@ -842,18 +856,39 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
         oauth_headers = dict(oauth_params)
         oauth_signature = oauth_headers.pop('oauth_signature')
-        mock_request = mock.Mock(
+        mock_request_lti_1 = mock.Mock(
+            uri=unicode(urllib.unquote(self.get_outcome_service_url())),
+            http_method=unicode(request.method),
+            params=oauth_headers.items(),
+            signature=oauth_signature
+        )
+        mock_request_lti_2 = mock.Mock(
             uri=unicode(urllib.unquote(request.url)),
             http_method=unicode(request.method),
             params=oauth_headers.items(),
             signature=oauth_signature
         )
-
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
+            log.error(
+                "OAuth body hash verification failed, provided: {}, "
+                "calculated: {}, for url: {}, body is: {}".format(
+                    oauth_headers.get('oauth_body_hash'),
+                    oauth_body_hash,
+                    self.get_outcome_service_url(),
+                    request.body
+                )
+            )
             raise LTIError("OAuth body hash verification is failed.")
 
-        if not signature.verify_hmac_sha1(mock_request, client_secret):
-            raise LTIError("OAuth signature verification is failed.")
+        if (not signature.verify_hmac_sha1(mock_request_lti_1, client_secret) and not
+                signature.verify_hmac_sha1(mock_request_lti_2, client_secret)):
+            log.error("OAuth signature verification failed, for "
+                      "headers:{} url:{} method:{}".format(
+                          oauth_headers,
+                          self.get_outcome_service_url(),
+                          unicode(request.method)
+                      ))
+            raise LTIError("OAuth signature verification has failed.")
 
     def get_client_key_secret(self):
         """
@@ -883,7 +918,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-        return (close_date is not None and datetime.datetime.now(UTC()) > close_date)
+        return close_date is not None and datetime.datetime.now(UTC()) > close_date
 
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

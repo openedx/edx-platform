@@ -48,10 +48,12 @@ define([
             });
 
             it('should be able to reset itself', function() {
-                this.model.set('name', 'foobar');
-                this.model.reset();
+                var originalName = 'Original Name',
+                    model = new GroupConfigurationModel({name: originalName});
+                model.set({name: 'New Name'});
+                model.reset();
 
-                expect(this.model.get('name')).toEqual('');
+                expect(model.get('name')).toEqual(originalName);
             });
 
             it('should be dirty after it\'s been changed', function() {
@@ -99,14 +101,17 @@ define([
                         'id': 10,
                         'name': 'My Group Configuration',
                         'description': 'Some description',
-                        'version': 1,
+                        'version': 2,
+                        'scheme': 'random',
                         'groups': [
                             {
                                 'version': 1,
-                                'name': 'Group 1'
+                                'name': 'Group 1',
+                                'usage': []
                             }, {
                                 'version': 1,
-                                'name': 'Group 2'
+                                'name': 'Group 2',
+                                'usage': []
                             }
                         ]
                     },
@@ -114,18 +119,21 @@ define([
                         'id': 10,
                         'name': 'My Group Configuration',
                         'description': 'Some description',
+                        'scheme': 'random',
                         'showGroups': false,
                         'editing': false,
-                        'version': 1,
+                        'version': 2,
                         'groups': [
                             {
                                 'version': 1,
                                 'order': 0,
-                                'name': 'Group 1'
+                                'name': 'Group 1',
+                                'usage': []
                             }, {
                                 'version': 1,
                                 'order': 1,
-                                'name': 'Group 2'
+                                'name': 'Group 2',
+                                'usage': []
                             }
                         ],
                         'usage': []
@@ -147,9 +155,41 @@ define([
             });
 
             it('can pass validation', function() {
+                // Note that two groups - Group A and Group B - are
+                // created by default.
                 var model = new GroupConfigurationModel({ name: 'foo' });
 
                 expect(model.isValid()).toBeTruthy();
+            });
+
+            it('requires at least one group', function() {
+                var group1 = new GroupModel({ name: 'Group A' }),
+                    model = new GroupConfigurationModel({ name: 'foo', groups: [] });
+
+                expect(model.isValid()).toBeFalsy();
+
+                model.get('groups').add(group1);
+                expect(model.isValid()).toBeTruthy();
+            });
+
+            it('requires a valid group', function() {
+                var model = new GroupConfigurationModel({ name: 'foo', groups: [{ name: '' }] });
+
+                expect(model.isValid()).toBeFalsy();
+            });
+
+            it('requires all groups to be valid', function() {
+                var model = new GroupConfigurationModel({ name: 'foo', groups: [{ name: 'Group A' }, { name: '' }] });
+
+                expect(model.isValid()).toBeFalsy();
+            });
+
+            it('requires all groups to have unique names', function() {
+                var model = new GroupConfigurationModel({
+                    name: 'foo', groups: [{ name: 'Group A' }, { name: 'Group A' }]
+                });
+
+                expect(model.isValid()).toBeFalsy();
             });
         });
     });
@@ -181,36 +221,6 @@ define([
                 var model = new GroupConfigurationModel({ name: 'foo' });
 
                 expect(model.isValid()).toBeTruthy();
-            });
-
-            it('requires at least one group', function() {
-                var group1 = new GroupModel({ name: 'Group A' }),
-                    model = new GroupConfigurationModel({ name: 'foo' });
-
-                model.get('groups').reset([]);
-                expect(model.isValid()).toBeFalsy();
-
-                model.get('groups').add(group1);
-                expect(model.isValid()).toBeTruthy();
-            });
-
-            it('requires a valid group', function() {
-                var group = new GroupModel(),
-                    model = new GroupConfigurationModel({ name: 'foo' });
-
-                model.get('groups').reset([group]);
-
-                expect(model.isValid()).toBeFalsy();
-            });
-
-            it('requires all groups to be valid', function() {
-                var group1 = new GroupModel({ name: 'Group A' }),
-                    group2 = new GroupModel(),
-                    model = new GroupConfigurationModel({ name: 'foo' });
-
-                model.get('groups').reset([group1, group2]);
-
-                expect(model.isValid()).toBeFalsy();
             });
         });
     });

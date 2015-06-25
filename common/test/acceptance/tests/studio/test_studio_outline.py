@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import itertools
 from pytz import UTC
 from bok_choy.promise import EmptyPromise
+from nose.plugins.attrib import attr
 
 from ...pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
 from ...pages.studio.utils import add_discussion, drag, verify_ordering
@@ -67,6 +68,7 @@ class CourseOutlineTest(StudioCourseTest):
         verify_ordering(self, outline_page, expected_ordering)
 
 
+@attr('shard_3')
 class CourseOutlineDragAndDropTest(CourseOutlineTest):
     """
     Tests of drag and drop within the outline page.
@@ -121,6 +123,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
         self.drag_and_verify(self.seq_1_vert_2_handle, self.chap_1_seq_2_handle, expected_ordering, course_outline_page)
 
 
+@attr('shard_3')
 class WarningMessagesTest(CourseOutlineTest):
     """
     Feature: Warning messages on sections, subsections, and units
@@ -289,7 +292,7 @@ class WarningMessagesTest(CourseOutlineTest):
         self.course_outline_page.visit()
         section = self.course_outline_page.section(unit_state.name)
         subsection = section.subsection_at(0)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
         unit = subsection.unit_at(0)
         if expected_status_message == self.STAFF_ONLY_WARNING:
             self.assertEqual(section.status_message, self.STAFF_ONLY_WARNING)
@@ -311,7 +314,7 @@ class WarningMessagesTest(CourseOutlineTest):
         name = unit_state.name
         self.course_outline_page.visit()
         subsection = self.course_outline_page.section(name).subsection(name)
-        subsection.toggle_expand()
+        subsection.expand_subsection()
 
         if unit_state.publish_state == self.PublishState.UNPUBLISHED_CHANGES:
             unit = subsection.unit(name).go_to()
@@ -325,6 +328,7 @@ class WarningMessagesTest(CourseOutlineTest):
             unit.toggle_staff_lock()
 
 
+@attr('shard_3')
 class EditingSectionsTest(CourseOutlineTest):
     """
     Feature: Editing Release date, Due date and grading type.
@@ -472,6 +476,7 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertIn(release_text, self.course_outline_page.section_at(0).subsection_at(0).release_date)
 
 
+@attr('shard_3')
 class StaffLockTest(CourseOutlineTest):
     """
     Feature: Sections, subsections, and units can be locked and unlocked from the course outline.
@@ -708,7 +713,7 @@ class StaffLockTest(CourseOutlineTest):
             When I enable explicit staff lock on one section
             And I click the View Live button to switch to staff view
             Then I see two sections in the sidebar
-            And when I click to toggle to student view
+            And when I switch the view mode to student view
             Then I see one section in the sidebar
         """
         self.course_outline_page.visit()
@@ -718,7 +723,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_sections, 2)
-        StaffPage(self.browser).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertEqual(courseware.num_sections, 1)
 
     def test_locked_subsections_do_not_appear_in_lms(self):
@@ -728,7 +733,7 @@ class StaffLockTest(CourseOutlineTest):
             When I enable explicit staff lock on one subsection
             And I click the View Live button to switch to staff view
             Then I see two subsections in the sidebar
-            And when I click to toggle to student view
+            And when I switch the view mode to student view
             Then I see one section in the sidebar
         """
         self.course_outline_page.visit()
@@ -737,7 +742,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_subsections, 2)
-        StaffPage(self.browser).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertEqual(courseware.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
@@ -853,6 +858,7 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
+@attr('shard_3')
 class EditNamesTest(CourseOutlineTest):
     """
     Feature: Click-to-edit section/subsection names
@@ -956,7 +962,7 @@ class EditNamesTest(CourseOutlineTest):
             Then the section is collapsed
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).expand_subsection()
         self.assertFalse(self.course_outline_page.section_at(0).in_editable_form())
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
         self.course_outline_page.section_at(0).edit_name()
@@ -968,6 +974,7 @@ class EditNamesTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
 
 
+@attr('shard_3')
 class CreateSectionsTest(CourseOutlineTest):
     """
     Feature: Create new sections/subsections/units
@@ -1054,6 +1061,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
+@attr('shard_3')
 class DeleteContentTest(CourseOutlineTest):
     """
     Feature: Deleting sections/subsections/units
@@ -1130,7 +1138,7 @@ class DeleteContentTest(CourseOutlineTest):
             And the unit should immediately be deleted from the course outline
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 1)
         self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).delete()
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 0)
@@ -1145,7 +1153,7 @@ class DeleteContentTest(CourseOutlineTest):
             And the unit should remain in the course outline
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 1)
         self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).delete(cancel=True)
         self.assertEqual(len(self.course_outline_page.section_at(0).subsection_at(0).units()), 1)
@@ -1165,6 +1173,7 @@ class DeleteContentTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
 
+@attr('shard_3')
 class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
     """
     Feature: Courses with multiple sections can expand and collapse all sections.
@@ -1199,7 +1208,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         Toggles the expand collapse state of all sections.
         """
         for section in self.course_outline_page.sections():
-            section.toggle_expand()
+            section.expand_subsection()
 
     def test_expanded_by_default(self):
         """
@@ -1256,7 +1265,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.verify_all_sections(collapsed=False)
-        self.course_outline_page.section_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
@@ -1290,12 +1299,13 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
-        self.course_outline_page.section_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
 
+@attr('shard_3')
 class ExpandCollapseSingleSectionTest(CourseOutlineTest):
     """
     Feature: Courses with a single section can expand and collapse all sections.
@@ -1335,6 +1345,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
+@attr('shard_3')
 class ExpandCollapseEmptyTest(CourseOutlineTest):
     """
     Feature: Courses with no sections initially can expand and collapse all sections after addition.
@@ -1372,6 +1383,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
+@attr('shard_3')
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with an empty course
@@ -1396,6 +1408,7 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
+@attr('shard_3')
 class DefaultStatesContentTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with a course with content
@@ -1420,6 +1433,7 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
 
+@attr('shard_3')
 class UnitNavigationTest(CourseOutlineTest):
     """
     Feature: Navigate to units
@@ -1435,11 +1449,12 @@ class UnitNavigationTest(CourseOutlineTest):
             Then I will be taken to the appropriate unit page
         """
         self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
+        self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).go_to()
         self.assertTrue(unit.is_browser_on_page)
 
 
+@attr('shard_3')
 class PublishSectionTest(CourseOutlineTest):
     """
     Feature: Publish sections.
@@ -1560,6 +1575,6 @@ class PublishSectionTest(CourseOutlineTest):
         """
         section = self.course_outline_page.section(SECTION_NAME)
         subsection = section.subsection(SUBSECTION_NAME)
-        unit = subsection.toggle_expand().unit(UNIT_NAME)
+        unit = subsection.expand_subsection().unit(UNIT_NAME)
 
         return (section, subsection, unit)

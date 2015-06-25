@@ -3,7 +3,7 @@ Acceptance tests for Studio related to edit/save peer grading interface.
 """
 
 from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.export import ExportPage
+from ...pages.studio.import_export import ExportCoursePage
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.overview import CourseOutlinePage
 from base_studio_test import StudioCourseTest
@@ -22,7 +22,10 @@ class ORAComponentTest(StudioCourseTest):
         self.course_outline_page = CourseOutlinePage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
-        self.export_page = ExportPage(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+        self.export_page = ExportCoursePage(
+            self.browser,
+            self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -33,8 +36,14 @@ class ORAComponentTest(StudioCourseTest):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('combinedopenended', "Peer Problem",
-                              data=load_data_str('ora_peer_problem.xml'), metadata={'graded': True}),
+                        XBlockFixtureDesc(
+                            'combinedopenended',
+                            "Peer Problem",
+                            data=load_data_str('ora_peer_problem.xml'),
+                            metadata={
+                                'graded': True,
+                            },
+                        ),
                         XBlockFixtureDesc('peergrading', 'Peer Module'),
                     )
                 )
@@ -44,7 +53,7 @@ class ORAComponentTest(StudioCourseTest):
     def _go_to_unit_page(self, section_name='Test Section', subsection_name='Test Subsection', unit_name='Test Unit'):
         self.course_outline_page.visit()
         subsection = self.course_outline_page.section(section_name).subsection(subsection_name)
-        return subsection.toggle_expand().unit(unit_name).go_to()
+        return subsection.expand_subsection().unit(unit_name).go_to()
 
     def test_edit_save_and_export(self):
         """

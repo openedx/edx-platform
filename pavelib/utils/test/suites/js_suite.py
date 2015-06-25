@@ -17,6 +17,7 @@ class JsTestSuite(TestSuite):
         super(JsTestSuite, self).__init__(*args, **kwargs)
         self.run_under_coverage = kwargs.get('with_coverage', True)
         self.mode = kwargs.get('mode', 'run')
+        self.port = kwargs.get('port')
 
         try:
             self.test_id = (Env.JS_TEST_ID_FILES[Env.JS_TEST_ID_KEYS.index(self.root)])
@@ -31,7 +32,8 @@ class JsTestSuite(TestSuite):
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
         self.report_dir.makedirs_p()
-        test_utils.clean_test_files()
+        if not self.skip_clean:
+            test_utils.clean_test_files()
 
         if self.mode == 'run' and not self.run_under_coverage:
             test_utils.clean_dir(self.report_dir)
@@ -52,6 +54,9 @@ class JsTestSuite(TestSuite):
                 xunit_report=self.xunit_report,
             )
         )
+
+        if self.port:
+            cmd += " -p {port}".format(port=self.port)
 
         if self.run_under_coverage:
             cmd += " --coverage-xml {report_dir}".format(

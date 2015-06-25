@@ -5,8 +5,227 @@ Acceptance tests for Studio's Setting pages
 from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
-
+from bok_choy.promise import EmptyPromise
+from ...fixtures.course import XBlockFixtureDesc
+from ..helpers import create_user_partition_json
+from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from unittest import skip
+from textwrap import dedent
+from xmodule.partitions.partitions import Group
+
+
+@attr('shard_1')
+class ContentGroupConfigurationTest(StudioCourseTest):
+    """
+    Tests for content groups in the Group Configurations Page.
+    There are tests for the experiment groups in test_studio_split_test.
+    """
+    def setUp(self):
+        super(ContentGroupConfigurationTest, self).setUp()
+        self.group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        self.outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Populates test course with chapter, sequential, and 1 problems.
+        The problem is visible only to Group "alpha".
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
+        )
+
+    def create_and_verify_content_group(self, name, existing_groups):
+        """
+        Creates a new content group and verifies that it was properly created.
+        """
+        self.assertEqual(existing_groups, len(self.group_configurations_page.content_groups))
+        if existing_groups == 0:
+            self.group_configurations_page.create_first_content_group()
+        else:
+            self.group_configurations_page.add_content_group()
+        config = self.group_configurations_page.content_groups[existing_groups]
+        config.name = name
+        # Save the content group
+        self.assertEqual(config.get_text('.action-primary'), "Create")
+        self.assertFalse(config.delete_button_is_present)
+        config.save()
+        self.assertIn(name, config.name)
+        return config
+
+    def test_no_content_groups_by_default(self):
+        """
+        Scenario: Ensure that message telling me to create a new content group is
+            shown when no content groups exist.
+        Given I have a course without content groups
+        When I go to the Group Configuration page in Studio
+        Then I see "You have not created any content groups yet." message
+        """
+        self.group_configurations_page.visit()
+        self.assertTrue(self.group_configurations_page.no_content_groups_message_is_present)
+        self.assertIn(
+            "You have not created any content groups yet.",
+            self.group_configurations_page.no_content_groups_message_text
+        )
+
+    def test_can_create_and_edit_content_groups(self):
+        """
+        Scenario: Ensure that the content groups can be created and edited correctly.
+        Given I have a course without content groups
+        When I click button 'Add your first Content Group'
+        And I set new the name and click the button 'Create'
+        Then I see the new content is added and has correct data
+        And I click 'New Content Group' button
+        And I set the name and click the button 'Create'
+        Then I see the second content group is added and has correct data
+        When I edit the second content group
+        And I change the name and click the button 'Save'
+        Then I see the second content group is saved successfully and has the new name
+        """
+        self.group_configurations_page.visit()
+        self.create_and_verify_content_group("New Content Group", 0)
+        second_config = self.create_and_verify_content_group("Second Content Group", 1)
+
+        # Edit the second content group
+        second_config.edit()
+        second_config.name = "Updated Second Content Group"
+        self.assertEqual(second_config.get_text('.action-primary'), "Save")
+        second_config.save()
+
+        self.assertIn("Updated Second Content Group", second_config.name)
+
+    def test_cannot_delete_used_content_group(self):
+        """
+        Scenario: Ensure that the user cannot delete used content group.
+        Given I have a course with 1 Content Group
+        And I go to the Group Configuration page
+        When I try to delete the Content Group with name "New Content Group"
+        Then I see the delete button is disabled.
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Configuration alpha,',
+                        'Content Group Partition',
+                        [Group("0", 'alpha')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+        problem_data = dedent("""
+            <problem markdown="Simple Problem" max_attempts="" weight="">
+              <p>Choose Yes.</p>
+              <choiceresponse>
+                <checkboxgroup direction="vertical">
+                  <choice correct="true">Yes</choice>
+                </checkboxgroup>
+              </choiceresponse>
+            </problem>
+        """)
+        vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+        self.course_fixture.create_xblock(
+            vertical.locator,
+            XBlockFixtureDesc('problem', "VISIBLE TO ALPHA", data=problem_data, metadata={"group_access": {0: [0]}}),
+        )
+        self.group_configurations_page.visit()
+        config = self.group_configurations_page.content_groups[0]
+        self.assertTrue(config.delete_button_is_disabled)
+
+    def test_can_delete_unused_content_group(self):
+        """
+        Scenario: Ensure that the user can delete unused content group.
+        Given I have a course with 1 Content Group
+        And I go to the Group Configuration page
+        When I delete the Content Group with name "New Content Group"
+        Then I see that there is no Content Group
+        When I refresh the page
+        Then I see that the content group has been deleted
+        """
+        self.group_configurations_page.visit()
+        config = self.create_and_verify_content_group("New Content Group", 0)
+        self.assertTrue(config.delete_button_is_present)
+
+        self.assertEqual(len(self.group_configurations_page.content_groups), 1)
+
+        # Delete content group
+        config.delete()
+        self.assertEqual(len(self.group_configurations_page.content_groups), 0)
+
+        self.group_configurations_page.visit()
+        self.assertEqual(len(self.group_configurations_page.content_groups), 0)
+
+    def test_must_supply_name(self):
+        """
+        Scenario: Ensure that validation of the content group works correctly.
+        Given I have a course without content groups
+        And I create new content group without specifying a name click the button 'Create'
+        Then I see error message "Content Group name is required."
+        When I set a name and click the button 'Create'
+        Then I see the content group is saved successfully
+        """
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config = self.group_configurations_page.content_groups[0]
+        config.save()
+        self.assertEqual(config.mode, 'edit')
+        self.assertEqual("Group name is required", config.validation_message)
+        config.name = "Content Group Name"
+        config.save()
+        self.assertIn("Content Group Name", config.name)
+
+    def test_can_cancel_creation_of_content_group(self):
+        """
+        Scenario: Ensure that creation of a content group can be canceled correctly.
+        Given I have a course without content groups
+        When I click button 'Add your first Content Group'
+        And I set new the name and click the button 'Cancel'
+        Then I see that there is no content groups in the course
+        """
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config = self.group_configurations_page.content_groups[0]
+        config.name = "Content Group"
+        config.cancel()
+        self.assertEqual(0, len(self.group_configurations_page.content_groups))
+
+    def test_content_group_empty_usage(self):
+        """
+        Scenario: When content group is not used, ensure that the link to outline page works correctly.
+        Given I have a course without content group
+        And I create new content group
+        Then I see a link to the outline page
+        When I click on the outline link
+        Then I see the outline page
+        """
+        self.group_configurations_page.visit()
+        config = self.create_and_verify_content_group("New Content Group", 0)
+        config.toggle()
+        config.click_outline_anchor()
+
+        # Waiting for the page load and verify that we've landed on course outline page
+        EmptyPromise(
+            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
+            timeout=30
+        ).fulfill()
 
 
 @attr('shard_1')
@@ -169,3 +388,19 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
                 "Course Announcement Date": '"string"',
             }
         )
+
+    def test_only_expected_fields_are_displayed(self):
+        """
+        Scenario: The Advanced Settings screen displays settings/fields not specifically hidden from
+        view by a developer.
+        Given I have a set of CourseMetadata fields defined for the course
+        When I view the Advanced Settings screen for the course
+        The total number of fields displayed matches the number I expect
+        And the actual fields displayed match the fields I expect to see
+        """
+        expected_fields = self.advanced_settings.expected_settings_names
+        displayed_fields = self.advanced_settings.displayed_settings_names
+        self.assertEqual(len(expected_fields), len(displayed_fields))
+        for field in displayed_fields:
+            if field not in expected_fields:
+                self.fail("Field '{}' not expected for Advanced Settings display.".format(field))

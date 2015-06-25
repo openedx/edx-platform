@@ -10,8 +10,12 @@
 
     data-streams="${youtube_streams}"
 
-    ${'data-sub="{}"'.format(sub) if sub else ''}
-    ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
+    % if sub:
+      data-sub="${sub}"
+    % endif
+    % if autoplay:
+      data-autoplay="${autoplay}"
+    % endif
 
     data-sources='${sources}'
     data-save-state-url="${ajax_url}"
@@ -104,14 +108,13 @@
   <ul class="wrapper-downloads">
     % if download_video_link:
         <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
+            <a href="${download_video_link}">${_('Download video')}</a>
         </li>
     % endif
     % if track:
         <li class="video-tracks video-download-button">
           % if transcript_download_format:
-            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
-            }
+            <a href="${track}">${_('Download transcript')}</a>
             <div class="a11y-menu-container">
                 <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
                 <ol class="a11y-menu-list">
@@ -121,8 +124,8 @@
                   % else:
                   <li class="a11y-menu-item">
                   % endif
-		      ## This is necessary so we don't scrape 'display_name' as a string.
-		      <% dname = item['display_name'] %>
+                  ## This is necessary so we don't scrape 'display_name' as a string.
+                  <% dname = item['display_name'] %>
                       <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
                         ${_(dname)}
                       </a>
@@ -131,15 +134,47 @@
                 </ol>
             </div>
           % else:
-            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
-            }
+            <a href="${track}" class="external-track">${_('Download transcript')}</a>
           % endif
         </li>
     % endif
     % if handout:
         <li class="video-handout video-download-button">
-            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
+            <a href="${handout}" target="_blank">${_('Download Handout')}</a>
         </li>
+    % endif
+
+    % if branding_info:
+      <li id="branding" class="branding">
+        <span class="host-tag">${branding_info['logo_tag']}</span>
+        <a href="${branding_info['url']}" target="_blank" title="${branding_info['logo_tag']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+      </li>
     % endif
   </ul>
 </div>
+% if cdn_eval:
+<script>
+  function sendPerformanceBeacon(id, expgroup, value, event_name) {
+    var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
+    $.ajax({method: "POST", url: "/performance", data: data});
+  }
+  var cdnStartTime;
+  var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  function initializeCDNExperiment() {
+    sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, "", "load");
+    cdnStartTime = Date.now();
+    $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
+                    'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
+                    function(index, eventName) {
+      $("#video_${id}").bind("html5:" + eventName, null, function() {
+        timeElapsed = Date.now() - cdnStartTime;
+        sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
+      });
+    });
+  }
+  $("#video_${id}").bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_${id}").hasClass("is-initialized")) {
+    initializeCDNExperiment();
+  }
+</script>
+% endif;

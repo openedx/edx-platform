@@ -164,3 +164,42 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+// border control
+%no-border-top {
+  border-top: none;
+}
+
+%no-border-bottom {
+  border-bottom: none;
+}
+
+%no-border-left {
+  border-left: none;
+}
+
+%no-border-right {
+  border-right: none;
+}
+
+// outline
+%no-outline {
+  outline: none;
+}
+
+// shame-based mixins to centrally override poor styling
+%shame-link-base {
+  color: $link-color;
+
+  &:hover, &:focus {
+    color: saturate($link-color, 50%);
+  }
+}
+
+%shame-link-text {
+  @extend %shame-link-base;
+
+  &:hover, &:focus {
+    text-decoration: underline !important;
+  }
+}

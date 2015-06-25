@@ -81,7 +81,7 @@ class StudentModuleHistoryCleaner(object):
             for smid in self.module_ids_to_check(batch_size):
                 try:
                     self.clean_one_student_module(smid)
-                except Exception:       # pylint: disable=W0703
+                except Exception:       # pylint: disable=broad-except
                     trace = traceback.format_exc()
                     self.say("Couldn't clean student_module_id {}:\n{}".format(smid, trace))
             if not self.dry_run:

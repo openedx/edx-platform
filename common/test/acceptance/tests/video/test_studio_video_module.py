@@ -83,7 +83,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.outline.visit()
 
         # Visit Unit page
-        self.unit_page = self.outline.section('Test Section').subsection('Test Subsection').toggle_expand().unit(
+        self.unit_page = self.outline.section('Test Section').subsection('Test Subsection').expand_subsection().unit(
             'Test Unit').go_to()
 
         self.video.wait_for_video_component_render()
@@ -150,7 +150,7 @@ class CMSVideoTest(CMSVideoBaseTest):
             YouTubeStubConfig.configure(youtube_stub_config)
 
         if subtitles:
-            self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
 
         self.navigate_to_course_unit()
 
@@ -181,6 +181,7 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.assertTrue(self.video.is_button_shown('play'))
         self.video.click_player_button('play')
+        self.video.wait_for_state('playing')
         self.assertTrue(self.video.is_button_shown('pause'))
 
     def test_youtube_stub_blocks_youtube_api(self):
@@ -287,9 +288,9 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.video.show_captions()
 
-        self.video.focus_caption_line(1)
+        self.video.focus_caption_line(2)
 
-        self.assertTrue(self.video.is_caption_line_focused(1))
+        self.assertTrue(self.video.is_caption_line_focused(2))
 
     def test_slider_range_works(self):
         """
@@ -319,5 +320,3 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.save_unit_settings()
 
         self.video.click_player_button('play')
-
-        self.assertTrue(self.video.is_slider_range_visible)

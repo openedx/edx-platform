@@ -1,0 +1,43 @@
+// ------------------------------
+// Open edX Certificates: Header
+
+// grid/layout
+.wrapper-header {
+  @extend %ui-shadow-subtle-down;
+  margin-bottom: ($baseline-v*2);
+  padding: ($baseline-v) ($baseline-h*2);
+  background: $white-t;
+  color: $black;
+
+  @include media($bp-medium) {
+    padding: ($baseline-v) ($baseline-h);
+  }
+
+  @include media($bp-small) {
+    padding: ($baseline-v) ($baseline-h);
+  }
+}
+
+.header-app {
+  @include outer-container;
+}
+
+// masthead
+.title-logo {
+  text-align: center;
+
+  .logo {
+    display: inline-block;
+    vertical-align: middle;
+    @include margin-right($baseline-h);
+  }
+
+  .title-sub {
+    @extend %ui-text-sr;
+    @extend %t-title-5;
+    display: inline-block;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+  }
+}

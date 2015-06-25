@@ -87,7 +87,7 @@ def switch_branch(branch, rdir):
     except subprocess.CalledProcessError as ex:
         log.exception('Getting a list of remote branches failed: %r', ex.output)
         raise GitImportError(GitImportError.CANNOT_BRANCH)
-    if not branch in output:
+    if branch not in output:
         raise GitImportError(GitImportError.REMOTE_BRANCH_MISSING)
     # Check it the remote branch has already been made locally
     cmd = ['git', 'branch', '-a', ]
@@ -124,7 +124,7 @@ def add_repo(repo, rdir_in, branch=None):
     If branch is left as None, it will fetch the most recent
     version of the current branch.
     """
-    # pylint: disable=R0915
+    # pylint: disable=too-many-statements
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {
@@ -231,7 +231,7 @@ def add_repo(repo, rdir_in, branch=None):
 
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
-    match = re.search(r'(?ms)===> IMPORTING course (\S+)', ret_import)
+    match = re.search(r'(?ms)===> IMPORTING courselike (\S+)', ret_import)
     if match:
         course_id = match.group(1)
         try:

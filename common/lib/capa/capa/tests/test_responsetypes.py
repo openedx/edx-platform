@@ -24,8 +24,24 @@ import calc
 from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
+from capa.tests.response_xml_factory import (
+    AnnotationResponseXMLFactory,
+    ChoiceResponseXMLFactory,
+    CodeResponseXMLFactory,
+    ChoiceTextResponseXMLFactory,
+    CustomResponseXMLFactory,
+    FormulaResponseXMLFactory,
+    ImageResponseXMLFactory,
+    JavascriptResponseXMLFactory,
+    MultipleChoiceResponseXMLFactory,
+    NumericalResponseXMLFactory,
+    OptionResponseXMLFactory,
+    SchematicResponseXMLFactory,
+    StringResponseXMLFactory,
+    SymbolicResponseXMLFactory,
+    TrueFalseResponseXMLFactory,
+)
 from capa.util import convert_files_to_filenames
-from capa.util import compare_with_tolerance
 from capa.xqueue_interface import dateformat
 
 
@@ -38,6 +54,7 @@ class ResponseTest(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
+        super(ResponseTest, self).setUp()
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
@@ -77,7 +94,6 @@ class ResponseTest(unittest.TestCase):
 
 
 class MultiChoiceResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
     xml_factory_class = MultipleChoiceResponseXMLFactory
 
     def test_multiple_choice_grade(self):
@@ -99,7 +115,6 @@ class MultiChoiceResponseTest(ResponseTest):
 
 
 class TrueFalseResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import TrueFalseResponseXMLFactory
     xml_factory_class = TrueFalseResponseXMLFactory
 
     def test_true_false_grade(self):
@@ -139,7 +154,6 @@ class TrueFalseResponseTest(ResponseTest):
 
 
 class ImageResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import ImageResponseXMLFactory
     xml_factory_class = ImageResponseXMLFactory
 
     def test_rectangle_grade(self):
@@ -203,7 +217,6 @@ class ImageResponseTest(ResponseTest):
 
 
 class SymbolicResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import SymbolicResponseXMLFactory
     xml_factory_class = SymbolicResponseXMLFactory
 
     def test_grade_single_input_correct(self):
@@ -321,7 +334,6 @@ class SymbolicResponseTest(ResponseTest):
 
 
 class OptionResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import OptionResponseXMLFactory
     xml_factory_class = OptionResponseXMLFactory
 
     def test_grade(self):
@@ -347,12 +359,31 @@ class OptionResponseTest(ResponseTest):
         self.assert_grade(problem, "hasn\'t", "correct")
         self.assert_grade(problem, "has'nt", "incorrect")
 
+    def test_variable_options(self):
+        """
+        Test that if variable are given in option response then correct map must contain answervariable value.
+        """
+        script = textwrap.dedent("""\
+        a = 1000
+        b = a*2
+        c = a*3
+        """)
+        problem = self.build_problem(
+            options=['$a', '$b', '$c'],
+            correct_option='$a',
+            script=script
+        )
+
+        input_dict = {'1_2_1': '1000'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        self.assertEqual(correct_map.get_property('1_2_1', 'answervariable'), '$a')
+
 
 class FormulaResponseTest(ResponseTest):
     """
     Test the FormulaResponse class
     """
-    from capa.tests.response_xml_factory import FormulaResponseXMLFactory
     xml_factory_class = FormulaResponseXMLFactory
 
     def test_grade(self):
@@ -501,7 +532,6 @@ class FormulaResponseTest(ResponseTest):
 
 
 class StringResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import StringResponseXMLFactory
     xml_factory_class = StringResponseXMLFactory
 
     def test_backward_compatibility_for_multiple_answers(self):
@@ -732,7 +762,7 @@ class StringResponseTest(ResponseTest):
             case_sensitive=False,
             hints=hints,
         )
-         # We should get a hint for Wisconsin
+        # We should get a hint for Wisconsin
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'),
@@ -851,7 +881,6 @@ class StringResponseTest(ResponseTest):
 
 
 class CodeResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import CodeResponseXMLFactory
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
@@ -1068,7 +1097,6 @@ class CodeResponseTest(ResponseTest):
 
 
 class ChoiceResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import ChoiceResponseXMLFactory
     xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
@@ -1111,7 +1139,6 @@ class ChoiceResponseTest(ResponseTest):
 
 
 class JavascriptResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import JavascriptResponseXMLFactory
     xml_factory_class = JavascriptResponseXMLFactory
 
     def test_grade(self):
@@ -1152,7 +1179,6 @@ class JavascriptResponseTest(ResponseTest):
 
 
 class NumericalResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import NumericalResponseXMLFactory
     xml_factory_class = NumericalResponseXMLFactory
 
     # We blend the line between integration (using evaluator) and exclusively
@@ -1377,7 +1403,6 @@ class NumericalResponseTest(ResponseTest):
 
 
 class CustomResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import CustomResponseXMLFactory
     xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):
@@ -1857,9 +1882,78 @@ class CustomResponseTest(ResponseTest):
         problem = self.build_problem(script=script, capa_system=capa_system)
         self.assertEqual(problem.context['num'], 17)
 
+    def test_function_code_multiple_inputs_order(self):
+        # Ensure that order must be correct according to sub-problem position
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                check4 = (int(answer_given[3]) == 4)
+                check5 = (int(answer_given[4]) == 5)
+                check6 = (int(answer_given[5]) == 6)
+                check7 = (int(answer_given[6]) == 7)
+                check8 = (int(answer_given[7]) == 8)
+                check9 = (int(answer_given[8]) == 9)
+                check10 = (int(answer_given[9]) == 10)
+                check11 = (int(answer_given[10]) == 11)
+                return {'overall_message': 'Overall message',
+                            'input_list': [
+                                { 'ok': check1, 'msg': '1'},
+                                { 'ok': check2, 'msg': '2'},
+                                { 'ok': check3, 'msg': '3'},
+                                { 'ok': check4, 'msg': '4'},
+                                { 'ok': check5, 'msg': '5'},
+                                { 'ok': check6, 'msg': '6'},
+                                { 'ok': check7, 'msg': '7'},
+                                { 'ok': check8, 'msg': '8'},
+                                { 'ok': check9, 'msg': '9'},
+                                { 'ok': check10, 'msg': '10'},
+                                { 'ok': check11, 'msg': '11'},
+                ]}
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func", num_inputs=11)
+
+        # Grade the inputs showing out of order
+        input_dict = {
+            '1_2_1': '1',
+            '1_2_2': '2',
+            '1_2_3': '3',
+            '1_2_4': '4',
+            '1_2_5': '5',
+            '1_2_6': '6',
+            '1_2_10': '10',
+            '1_2_11': '16',
+            '1_2_7': '7',
+            '1_2_8': '8',
+            '1_2_9': '9'
+        }
+
+        correct_order = [
+            '1_2_1', '1_2_2', '1_2_3', '1_2_4', '1_2_5', '1_2_6', '1_2_7', '1_2_8', '1_2_9', '1_2_10', '1_2_11'
+        ]
+
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertNotEqual(problem.student_answers.keys(), correct_order)
+
+        # euqal to correct order after sorting at get_score
+        self.assertListEqual(problem.responders.values()[0].context['idset'], correct_order)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_9'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_11'), 'incorrect')
+
+        self.assertEqual(correct_map.get_msg('1_2_1'), '1')
+        self.assertEqual(correct_map.get_msg('1_2_9'), '9')
+        self.assertEqual(correct_map.get_msg('1_2_11'), '11')
+
 
 class SchematicResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import SchematicResponseXMLFactory
+    """
+    Class containing setup and tests for Schematic responsetype.
+    """
     xml_factory_class = SchematicResponseXMLFactory
 
     def test_grade(self):
@@ -1910,7 +2004,6 @@ class SchematicResponseTest(ResponseTest):
 
 
 class AnnotationResponseTest(ResponseTest):
-    from capa.tests.response_xml_factory import AnnotationResponseXMLFactory
     xml_factory_class = AnnotationResponseXMLFactory
 
     def test_grade(self):
@@ -1952,7 +2045,6 @@ class ChoiceTextResponseTest(ResponseTest):
     Class containing setup and tests for ChoiceText responsetype.
     """
 
-    from response_xml_factory import ChoiceTextResponseXMLFactory
     xml_factory_class = ChoiceTextResponseXMLFactory
 
     # `TEST_INPUTS` is a dictionary mapping from
@@ -2122,13 +2214,6 @@ class ChoiceTextResponseTest(ResponseTest):
         """
         with self.assertRaises(Exception):
             self.build_problem(type="invalidtextgroup")
-
-    def test_valid_xml(self):
-        """
-        Test that `build_problem` builds valid xml
-        """
-        self.build_problem()
-        self.assertTrue(True)
 
     def test_unchecked_input_not_validated(self):
         """

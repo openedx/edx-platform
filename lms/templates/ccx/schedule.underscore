@@ -1,0 +1,52 @@
+  <table class="ccx-schedule">
+    <thead>
+      <tr>
+        <th><%- gettext('Unit') %></th>
+        <th><%- gettext('Start Date') %></th>
+        <th><%- gettext('Due Date') %></th>
+        <th><a href="#" id="remove-all">
+          <i class="fa fa-remove"></i> <%- gettext('remove all') %>
+        </a></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% _.each(chapters, function(chapter) { %>
+        <tr class="chapter collapsed" data-location="<%= chapter.location %>" data-depth="1">
+          <td class="unit">
+            <a href="#"><i class="fa fa-caret-right toggle-collapse"></i></a>
+            <%= chapter.display_name %>
+          </td>
+          <td class="date start-date"><a><%= chapter.start %></a></td>
+          <td class="date due-date"><a><%= chapter.due %></a></td>
+          <td><a href="#" class="remove-unit">
+            <i class="fa fa-remove"></i> <%- gettext('remove') %>
+          </a></td>
+        </tr>
+        <% _.each(chapter.children, function(child) { %>
+          <tr class="sequential collapsed" data-depth="2"
+              data-location="<%= chapter.location %> <%= child.location %>">
+            <td class="unit">
+              <a href="#"><i class="fa fa-caret-right toggle-collapse"></i></a>
+              <%= child.display_name %>
+            </td>
+            <td class="date start-date"><a><%= child.start %></a></td>
+            <td class="date due-date"><a><%= child.due %></a></td>
+            <td><a href="#" class="remove-unit">
+              <i class="fa fa-remove"></i> <%- gettext('remove') %>
+            </a></td>
+          </tr>
+          <% _.each(child.children, function(subchild) { %>
+            <tr class="vertical" data-dapth="3"
+                data-location="<%= chapter.location %> <%= child.location %> <%= subchild.location %>">
+              <td class="unit">&nbsp;<%= subchild.display_name %></td>
+              <td class="date start-date"><a><%= subchild.start %></a></td>
+              <td class="date due-date"><a><%= subchild.due %></a></td>
+              <td><a href="#" class="remove-unit">
+                <i class="fa fa-remove"></i> <%- gettext('remove') %>
+              </a></td>
+          <% }); %>
+        <% }); %>
+      <% }); %>
+    </tbody>
+  </table>
+

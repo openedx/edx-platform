@@ -45,32 +45,33 @@ ANALYTICS_DASHBOARD_URL = None
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
-MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
-                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE_CLASSES += (
+    'django_comment_client.utils.QueryCountDebugMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
-    'debug_toolbar.panels.version.VersionDebugPanel',
-    'debug_toolbar.panels.timer.TimerDebugPanel',
-    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar.panels.headers.HeaderDebugPanel',
-    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-    'debug_toolbar.panels.sql.SQLDebugPanel',
-    'debug_toolbar.panels.signals.SignalDebugPanel',
-    'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar_mongo.panel.MongoDebugPanel',
-
-    #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
-    #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
-    #  hit twice). So you can uncomment when you need to diagnose performance
-    #  problems, but you shouldn't leave it on.
-    #'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    'debug_toolbar.panels.profiling.ProfilingPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-    'SHOW_TOOLBAR_CALLBACK': lambda _: True,
+    'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar'
 }
+
+
+def should_show_debug_toolbar(_):
+    return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
+
 
 ########################### PIPELINE #################################
 
@@ -92,16 +93,47 @@ CC_PROCESSOR = {
 }
 
 ########################### External REST APIs #################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+
+########################## SECURITY #######################
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+
+
+########################### Milestones #################################
+FEATURES['MILESTONES_APP'] = True
+
+
+########################### Entrance Exams #################################
+FEATURES['ENTRANCE_EXAMS'] = True
+
+
+########################## Courseware Search #######################
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+
+########################## Certificates Web/HTML View #######################
+FEATURES['CERTIFICATES_HTML_VIEW'] = True
+
 
 #####################################################################
 # See if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *      # pylint: disable=import-error
 except ImportError:
     pass
 
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
+
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

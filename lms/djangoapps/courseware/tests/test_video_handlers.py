@@ -118,12 +118,8 @@ class TestVideo(BaseTestXmodule):
             for user in self.users
         }
 
-        self.assertEqual(
-            set([
-                response.status_code
-                for _, response in responses.items()
-                ]).pop(),
-            404)
+        status_codes = {response.status_code for response in responses.values()}
+        self.assertEqual(status_codes.pop(), 404)
 
     def test_handle_ajax(self):
 
@@ -131,6 +127,7 @@ class TestVideo(BaseTestXmodule):
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
             {'transcript_language': 'uk'},
+            {'demoo�': 'sample'}
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(
@@ -152,8 +149,12 @@ class TestVideo(BaseTestXmodule):
         self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
 
+        response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
+        self.assertEqual(json.loads(response)['success'], True)
+
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
+        super(TestVideo, self).tearDown()
 
 
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
@@ -322,6 +323,11 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='translation/ru')
         self.assertEqual(response.status, '404 Not Found')
 
+        # Youtube_id is invalid or does not exist
+        request = Request.blank('/translation/uk?videoId=9855256955511225')
+        response = self.item.transcript(request=request, dispatch='translation/uk')
+        self.assertEqual(response.status, '404 Not Found')
+
     def test_translaton_en_youtube_success(self):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
@@ -359,7 +365,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             u'end': [75],
             u'start': [9],
             u'text': [
-            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
         self.assertDictEqual(json.loads(response.body), calculated_0_75)
@@ -371,7 +377,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             u'end': [150],
             u'start': [18],
             u'text': [
-            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
         self.assertDictEqual(json.loads(response.body), calculated_1_5)
@@ -392,7 +398,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             u'end': [100],
             u'start': [12],
             u'text': [
-            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
         self.non_en_file.seek(0)
@@ -577,8 +583,10 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
             response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
 
         request = Request.blank('/translation/uk', POST={'file': ('filename.srt', SRT_content.decode('utf8').encode('cp1251'))})
-        with self.assertRaises(UnicodeDecodeError):  # Non-UTF8 file content encoding.
-            response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
+        # Non-UTF8 file content encoding.
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.body, "Invalid encoding type, transcripts should be UTF-8 encoded.")
 
         # No language is passed.
         request = Request.blank('/translation', POST={'file': ('filename', SRT_content)})

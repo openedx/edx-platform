@@ -1,25 +1,20 @@
 """
 Test for LMS courseware app.
 """
-import mock
-from mock import Mock
-from unittest import TestCase
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-
 from textwrap import dedent
+from unittest import TestCase
 
-from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore.django import modulestore
+from django.core.urlresolvers import reverse
+import mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_DIR, \
-    TEST_DATA_MONGO_MODULESTORE, \
-    TEST_DATA_MIXED_MODULESTORE
-from lms.lib.xblock.field_data import LmsFieldData
+from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE as XML_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE as TOY_MODULESTORE
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):
@@ -27,6 +22,7 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
     Test logging in and logging out.
     """
     def setUp(self):
+        super(ActivateLoginTest, self).setUp()
         self.setup_user()
 
     def test_activate_login(self):
@@ -116,11 +112,11 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from XML.
     """
+    MODULESTORE = XML_MODULESTORE
 
     def setUp(self):
         super(TestXmlCoursesLoad, self).setUp()
@@ -137,13 +133,11 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
     """
+    MODULESTORE = TOY_MODULESTORE
 
     def setUp(self):
         super(TestMongoCoursesLoad, self).setUp()
         self.setup_user()
-
-        # Import the toy course
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_toy_textbooks_loads(self, mock_get):
@@ -183,8 +177,8 @@ class TestLmsFieldData(TestCase):
         # reached on any attribute access
 
         # pylint: disable=protected-access
-        base_authored = Mock()
-        base_student = Mock()
+        base_authored = mock.Mock()
+        base_student = mock.Mock()
         first_level = LmsFieldData(base_authored, base_student)
         second_level = LmsFieldData(first_level, base_student)
         self.assertEquals(second_level._authored_data, first_level._authored_data)

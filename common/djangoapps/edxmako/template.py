@@ -12,12 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf import settings
-from mako.template import Template as MakoTemplate
-from edxmako.shortcuts import marketing_link
-
 import edxmako
-import edxmako.middleware
+
+from django.conf import settings
+from edxmako.middleware import get_template_request_context
+from edxmako.shortcuts import marketing_link
+from mako.template import Template as MakoTemplate
 
 DJANGO_VARIABLES = ['output_encoding', 'encoding_errors']
 
@@ -48,11 +48,12 @@ class Template(MakoTemplate):
         context_dictionary = {}
 
         # In various testing contexts, there might not be a current request context.
-        if getattr(edxmako.middleware.REQUEST_CONTEXT, "context", None):
-            for d in edxmako.middleware.REQUEST_CONTEXT.context:
-                context_dictionary.update(d)
-        for d in context_instance:
-            context_dictionary.update(d)
+        request_context = get_template_request_context()
+        if request_context:
+            for item in request_context:
+                context_dictionary.update(item)
+        for item in context_instance:
+            context_dictionary.update(item)
         context_dictionary['settings'] = settings
         context_dictionary['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
         context_dictionary['django_context'] = context_instance

@@ -14,7 +14,8 @@ from contentstore.utils import BulkSettingsUtil
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
-from ..access import has_course_access
+from student.auth import has_course_author_access
+from ..course import get_course_and_check_access
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ def utility_bulksettings_handler(request, course_key_string):
         if request.method == 'GET':
 
             # load data
-            course = _get_course_module(course_key, request.user, depth=3)
+            course = get_course_and_check_access(course_key, request.user, depth=3)
 
             # traverse into the course tree and extract problem settings information
             settings_data = BulkSettingsUtil.get_bulksettings_metadata(course)
@@ -63,16 +64,3 @@ def utility_bulksettings_handler(request, course_key_string):
                     'subsection_setting_map': SUBSECTION_SETTING_MAP
                 }
             )
-
-
-def _get_course_module(course_key, user, depth=0):
-    """
-    return the course module for the view functions.
-    Safety-check if the given user has permissions to access the course module.
-    """
-
-    if not has_course_access(user, course_key):
-        raise PermissionDenied()
-    course_module = modulestore().get_course(course_key, depth = depth)
-    return course_module
-

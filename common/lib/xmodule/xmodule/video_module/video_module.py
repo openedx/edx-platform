@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=W0223
+# pylint: disable=abstract-method
 """Video is ungraded Xmodule for support video content.
 It's new improved video module, which support additional feature:
-
 - Can play non-YouTube video sources via in-browser HTML5 video player.
 - YouTube defaults to HTML5 mode from the start.
 - Speed changes in both YouTube and non-YouTube videos happen via
 in-browser HTML5 video method (when in HTML5 mode).
 - Navigational subtitles can be disabled altogether via an attribute
 in XML.
-
 Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
@@ -18,7 +16,7 @@ Examples of html5 videos for manual testing:
 import copy
 import json
 import logging
-import os.path
+import random
 from collections import OrderedDict
 from operator import itemgetter
 
@@ -30,14 +28,14 @@ from django.conf import settings
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
+from xmodule.exceptions import NotFoundError
 
-from .transcripts_utils import Transcript, VideoTranscriptsMixin
+from .transcripts_utils import VideoTranscriptsMixin
 from .video_utils import create_youtube_string, get_video_from_cdn
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -75,6 +73,11 @@ try:
 except ImportError:
     edxval_api = None
 
+try:
+    from branding.models import BrandingInfoConfig
+except ImportError:
+    BrandingInfoConfig = None
+
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
@@ -82,7 +85,6 @@ _ = lambda text: text
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule):
     """
     XML source example:
-
         <video show_captions="true"
             youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
             url_name="lecture_21_3" display_name="S19V3: Vacancies"
@@ -131,12 +133,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
     def get_transcripts_for_student(self):
         """Return transcript information necessary for rendering the XModule student view.
-
         This is more or less a direct extraction from `get_html`.
-
         Returns:
             Tuple of (track_url, transcript_language, sorted_languages)
-
             track_url -> subtitle download url
             transcript_language -> default transcript language
             sorted_languages -> dictionary of available transcript languages
@@ -177,6 +176,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sources = filter(None, self.html5_sources)
 
         download_video_link = None
+        branding_info = None
         youtube_streams = ""
 
         # If we have an edx_video_id, we prefer its values over what we store
@@ -215,8 +215,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
-
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+            branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
+
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
                 if new_url:
@@ -232,9 +233,27 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
+        # CDN_VIDEO_URLS is only to be used here and will be deleted
+        # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
+        html_id = self.location.html_id()
+        if self.system.user_location == 'CN' and \
+                settings.FEATURES.get('ENABLE_VIDEO_BEACON', False) and \
+                html_id in getattr(settings, 'CDN_VIDEO_URLS', {}).keys():
+            cdn_urls = getattr(settings, 'CDN_VIDEO_URLS', {})[html_id]
+            cdn_exp_group, new_source = random.choice(zip(range(len(cdn_urls)), cdn_urls))
+            if cdn_exp_group > 0:
+                sources[0] = new_source
+            cdn_eval = True
+        else:
+            cdn_eval = False
+            cdn_exp_group = None
+
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'branding_info': branding_info,
+            'cdn_eval': cdn_eval,
+            'cdn_exp_group': cdn_exp_group,
             # This won't work when we move to data that
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
@@ -288,7 +307,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     def __init__(self, *args, **kwargs):
         """
         Mostly handles backward compatibility issues.
-
         `source` is deprecated field.
         a) If `source` exists and `source` is not `html5_sources`: show `source`
             field on front-end as not-editable but clearable. Dropdown is a new
@@ -300,18 +318,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         super(VideoDescriptor, self).__init__(*args, **kwargs)
         # For backwards compatibility -- if we've got XML data, parse it out and set the metadata fields
         if self.data:
-            field_data = self._parse_video_xml(self.data)
+            field_data = self._parse_video_xml(etree.fromstring(self.data))
             self._field_data.set_many(self, field_data)
             del self.data
 
-        editable_fields = super(VideoDescriptor, self).editable_metadata_fields
-
         self.source_visible = False
-        # Set download_video field to default value if its not explicitly set for backward compatibility.
-        download_video = editable_fields['download_video']
-        if not download_video['explicitly_set']:
-            self.download_video = self.download_video
-
         if self.source:
             # If `source` field value exist in the `html5_sources` field values,
             # then delete `source` field value and use value from `html5_sources` field.
@@ -320,34 +331,32 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.download_video = True
             else:  # Otherwise, `source` field value will be used.
                 self.source_visible = True
-                if not download_video['explicitly_set']:
+                if not self.fields['download_video'].is_set_on(self):
                     self.download_video = True
+
+        # Set download_video field to default value if its not explicitly set for backward compatibility.
+        if not self.fields['download_video'].is_set_on(self):
+            self.download_video = self.download_video
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
         # we should enable `download_track` if following is true:
-        download_track = editable_fields['download_track']
-        if not download_track['explicitly_set'] and self.track:
+        if not self.fields['download_track'].is_set_on(self) and self.track:
             self.download_track = True
 
     def editor_saved(self, user, old_metadata, old_content):
         """
         Used to update video values during `self`:save method from CMS.
-
         old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
         old_content, same as `old_metadata` but for scope=content.
-
         Due to nature of code flow in item.py::_save_item, before current function is called,
         fields of `self` instance have been already updated, but not yet saved.
-
         To obtain values, which were changed by user input,
         one should compare own_metadata(self) and old_medatada.
-
         Video player has two tabs, and due to nature of sync between tabs,
         metadata from Basic tab is always sent when video player is edited and saved first time, for example:
-        {'youtube_id_1_0': u'OEoXaMPEzfM', 'display_name': u'Video', 'sub': u'OEoXaMPEzfM', 'html5_sources': []},
+        {'youtube_id_1_0': u'3_yD_cEKoCk', 'display_name': u'Video', 'sub': u'3_yD_cEKoCk', 'html5_sources': []},
         that's why these fields will always present in old_metadata after first save. This should be fixed.
-
         At consequent save requests html5_sources are always sent too, disregard of their change by user.
         That means that html5_sources are always in list of fields that were changed (`metadata` param in save_item).
         This should be fixed too.
@@ -392,12 +401,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Creates an instance of this descriptor from the supplied xml_data.
         This may be overridden by subclasses
-
         xml_data: A string of xml that will be translated into data and children for
             this module
         system: A DescriptorSystem for interacting with external resources
-        org and course are optional strings that will be used in the generated modules
-            url identifiers
+        id_generator is used to generate course-specific urls and identifiers
         """
         xml_object = etree.fromstring(xml_data)
         url_name = xml_object.get('url_name', xml_object.get('slug'))
@@ -406,8 +413,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         usage_id = id_generator.create_usage(definition_id)
         if is_pointer_tag(xml_object):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
-            xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, usage_id))
-        field_data = cls._parse_video_xml(xml_data)
+            xml_object = cls.load_file(filepath, system.resources_fs, usage_id)
+            system.parse_asides(xml_object, definition_id, usage_id, id_generator)
+        field_data = cls._parse_video_xml(xml_object, id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
         video = system.construct_xblock_from_class(
@@ -428,7 +436,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
-        if youtube_string and youtube_string != '1.00:OEoXaMPEzfM':
+        if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
             xml.set('youtube', unicode(youtube_string))
         xml.set('url_name', self.url_name)
         attrs = {
@@ -468,6 +476,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('language', transcript_language)
             ele.set('src', self.transcripts[transcript_language])
             xml.append(ele)
+
+        if self.edx_video_id and edxval_api:
+            try:
+                xml.append(edxval_api.export_to_xml(self.edx_video_id))
+            except edxval_api.ValVideoNotFoundError:
+                pass
 
         return xml
 
@@ -543,12 +557,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         return ret
 
     @classmethod
-    def _parse_video_xml(cls, xml_data):
+    def _parse_video_xml(cls, xml, id_generator=None):
         """
         Parse video fields out of xml_data. The fields are set if they are
         present in the XML.
+
+        Arguments:
+            id_generator is used to generate course-specific urls and identifiers
         """
-        xml = etree.fromstring(xml_data)
         field_data = {}
 
         # Convert between key types for certain attributes --
@@ -613,4 +629,48 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         if 'download_track' not in field_data and track is not None:
             field_data['download_track'] = True
 
+        video_asset_elem = xml.find('video_asset')
+        if (
+                edxval_api and
+                video_asset_elem is not None and
+                'edx_video_id' in field_data
+        ):
+            # Allow ValCannotCreateError to escape
+            edxval_api.import_from_xml(
+                video_asset_elem,
+                field_data['edx_video_id'],
+                course_id=getattr(id_generator, 'target_course_id', None)
+            )
+
         return field_data
+
+    def index_dictionary(self):
+        xblock_body = super(VideoDescriptor, self).index_dictionary()
+        video_body = {
+            "display_name": self.display_name,
+        }
+
+        def _update_transcript_for_index(language=None):
+            """ Find video transcript - if not found, don't update index """
+            try:
+                transcript = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
+                transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
+                video_body.update({transcript_index_name: transcript})
+            except NotFoundError:
+                pass
+
+        if self.sub:
+            _update_transcript_for_index()
+
+        # check to see if there are transcripts in other languages besides default transcript
+        if self.transcripts:
+            for language in self.transcripts.keys():
+                _update_transcript_for_index(language)
+
+        if "content" in xblock_body:
+            xblock_body["content"].update(video_body)
+        else:
+            xblock_body["content"] = video_body
+        xblock_body["content_type"] = "Video"
+
+        return xblock_body

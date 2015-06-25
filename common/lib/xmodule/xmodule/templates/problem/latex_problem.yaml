@@ -74,7 +74,7 @@ metadata:
 
         Include image by using the edXxml macro:
 
-        \edXxml{<img src="https://courses.edx.org/static/images/mit_dome.jpg"/>}
+        \edXxml{<img src="https://courses.edx.org/static/images/placeholder-image.png"/>}
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         \subsection{Example show/hide explanation}
@@ -189,7 +189,7 @@ data: |
         <p>
     Include image by using the edXxml macro: </p>
         <p>
-          <img src="https://courses.edx.org/static/images/mit_dome.jpg"/>
+          <img src="https://courses.edx.org/static/images/placeholder-image.png"/>
         </p>
         <p>
           <h4>Example show/hide explanation</h4>

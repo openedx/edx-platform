@@ -2,6 +2,7 @@
 Management command which sets or gets the certificate whitelist for a given
 user/course
 """
+from __future__ import print_function
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from opaque_keys import InvalidKeyError
@@ -73,7 +74,7 @@ class Command(BaseCommand):
             else:
                 user = User.objects.get(username=user_str)
 
-            cert_whitelist, created = \
+            cert_whitelist, _created = \
                 CertificateWhitelist.objects.get_or_create(
                     user=user, course_id=course)
             if options['add']:
@@ -83,7 +84,8 @@ class Command(BaseCommand):
             cert_whitelist.save()
 
         whitelist = CertificateWhitelist.objects.filter(course_id=course)
-        print "User whitelist for course {0}:\n{1}".format(course_id,
-              '\n'.join(["{0} {1} {2}".format(
-                  u.user.username, u.user.email, u.whitelist)
-                  for u in whitelist]))
+        wl_users = '\n'.join(
+            "{u.user.username} {u.user.email} {u.whitelist}".format(u=u)
+            for u in whitelist
+        )
+        print("User whitelist for course {0}:\n{1}".format(course_id, wl_users))

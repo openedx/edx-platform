@@ -5,16 +5,13 @@ from datetime import timedelta, datetime
 import pytz
 
 from django.core.exceptions import ValidationError
-from django.test.utils import override_settings
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from reverification.models import MidcourseReverificationWindow
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestMidcourseReverificationWindow(ModuleStoreTestCase):
     """ Tests for MidcourseReverificationWindow objects """
 

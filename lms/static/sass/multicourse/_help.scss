@@ -1,7 +1,7 @@
 .static-container.help {
 
   section.questions {
-    @include clearfix;
+    @include clearfix();
 
     nav.categories {
       border: 1px solid rgb(220,220,220);
@@ -38,20 +38,20 @@
 
         > h2 {
           border-bottom: 1px solid rgb(220,220,220);
-          margin-bottom: 40px;
-          padding-bottom: 20px;
+          margin-bottom: ($baseline*2);
+          padding-bottom: $baseline;
         }
       }
 
       .response {
-        margin-bottom: 40px;
+        margin-bottom: ($baseline*2);
 
         h3 {
           background: url('/static/images/bullet-closed.png') no-repeat left 0.25em;
           font-family: $sans-serif;
           font-weight: 700;
-          margin-bottom: 10px;
-          padding-left: 20px;
+          margin-bottom: ($baseline/2);
+          padding-left: $baseline;
           cursor: pointer;
         }
 

@@ -36,7 +36,7 @@ YOUTUBE_API_URLS = {
 }
 
 
-@before.all  # pylint: disable=E1101
+@before.all  # pylint: disable=no-member
 def start_video_server():
     """
     Serve the HTML5 Video Sources from a local port
@@ -47,7 +47,7 @@ def start_video_server():
     setattr(world, 'video_source', video_server)
 
 
-@after.all  # pylint: disable=E1101
+@after.all  # pylint: disable=no-member
 def stop_video_server(_total):
     """
     Stop the HTML5 Video Source server after all tests have executed
@@ -57,7 +57,7 @@ def stop_video_server(_total):
         video_server.shutdown()
 
 
-@before.each_scenario  # pylint: disable=E1101
+@before.each_scenario  # pylint: disable=no-member
 def process_requires_tags(scenario):
     """
     Process the scenario tags to make sure that any
@@ -125,7 +125,7 @@ def is_youtube_available(urls):
     return True
 
 
-@after.each_scenario  # pylint: disable=E1101
+@after.each_scenario  # pylint: disable=no-member
 def stop_stubs(_scenario):
     """
     Shut down any stub services that were started up for the scenario.
@@ -136,7 +136,7 @@ def stop_stubs(_scenario):
             stub_server.shutdown()
 
 
-@after.each_scenario  # pylint: disable=E1101
+@after.each_scenario  # pylint: disable=no-member
 def clear_alerts(_scenario):
     """
     Clear any alerts that might still exist, so that

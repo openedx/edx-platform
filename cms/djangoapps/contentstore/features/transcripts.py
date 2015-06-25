@@ -1,5 +1,5 @@
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 import os
 from lettuce import world, step
@@ -59,6 +59,7 @@ def clear_fields(_step):
         $('{selector}')
             .prop('disabled', false)
             .removeClass('is-disabled')
+            .attr('aria-disabled', false)
             .val('')
             .trigger('input');
     """.format(selector=SELECTORS['url_inputs'])

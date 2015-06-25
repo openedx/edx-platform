@@ -292,6 +292,8 @@ class TextbookValidationTestCase(TestCase):
 
     def setUp(self):
         "Set some useful content for tests"
+        super(TextbookValidationTestCase, self).setUp()
+
         self.tb1 = {
             "tab_title": "Hi, mom!",
             "url": "/mom.pdf"

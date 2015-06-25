@@ -1,0 +1,27 @@
+// ------------------------------
+// Open edX Certificates: Print-Specific Styling
+
+// print - general
+@include media(print) {
+
+}
+
+// print - portrait
+@include media(print orientation portrait) {
+
+}
+
+// print - landscape
+@include media(print orientation landscape) {
+
+}
+
+// print - color
+@include media(print color) {
+
+}
+
+// print - monochrome
+@include media(print monochrome) {
+
+}

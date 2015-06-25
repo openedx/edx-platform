@@ -46,6 +46,7 @@
             'js/factories/settings_advanced',
             'js/factories/settings_graders',
             'js/factories/textbooks',
+            'js/factories/videos_index',
             'js/factories/xblock_validation'
         ]),
         /**
@@ -88,7 +89,7 @@
         shim: {
             'xmodule': {
                 deps: [
-                    'jquery', 'underscore', 'mathjax', 'codemirror', 'tinymce',
+                    'jquery', 'underscore', 'codemirror', 'tinymce',
                     'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',
                     'jquery.cookie', 'utility'
                 ]

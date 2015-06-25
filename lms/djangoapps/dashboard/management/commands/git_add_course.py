@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         if len(args) > 3:
             raise CommandError('Expected no more than three '
-                               'arguments; recieved {0}'.format(len(args)))
+                               'arguments; received {0}'.format(len(args)))
 
         rdir_arg = None
         branch = None

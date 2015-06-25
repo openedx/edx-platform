@@ -382,6 +382,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         self.setup_system_xmodule_mocks_for_lti20_request_test()
         self.xmodule.due = datetime.datetime.now(UTC())
+        self.xmodule.accept_grades_past_due = False
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         self.assertEqual(response.status_code, 404)

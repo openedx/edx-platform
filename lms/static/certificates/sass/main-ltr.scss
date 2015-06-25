@@ -1,0 +1,19 @@
+// ------------------------------
+// Open edX Certificates: Main Style Compile (LTR)
+
+// About: Sass compile for Open edX certificates. This does not contain styles for other Open edX products/experiences (e.g. account/onboarding).
+
+// ------------------------------
+// #VENDOR
+// ------------------------------
+@import '../vendor/bourbon/bourbon';
+@import '../vendor/neat/neat';
+@import '../vendor/bi-app/bi-app-ltr';   // LTR support
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import 'utilities/variables';
+
+@import 'build';
+

@@ -17,7 +17,7 @@
   }
 
   .expandable-icon {
-    @include transition(all 0.25s ease-in-out 0s);
+    @include transition(all $tmg-f2 ease-in-out 0s);
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
@@ -219,7 +219,7 @@
           @extend %t-title7;
           @extend %t-weight2;
           vertical-align: middle;
-          color: $m-gray-l1;
+          color: $m-gray-d3;
           background: $m-gray-l4;
         }
       }
@@ -451,7 +451,7 @@
   }
 
   .progress-sts {
-    @include size(($baseline/4));
+    @include size($baseline/4);
     @extend %ui-depth1;
     position: absolute;
     top: 43px;
@@ -699,7 +699,7 @@
             @extend %btn-primary-blue;
             padding: ($baseline/2) ($baseline*0.75);
 
-            *[class^="icon-"] {
+            .icon {
               @extend %t-icon4;
               padding: ($baseline*.25) ($baseline*.5);
               display: block;
@@ -732,8 +732,8 @@
           left: ($baseline/2);
         }
 
-        // control - take/do
-        .control-do {
+        // control - take/do, retake
+        .control-do, .control-retake {
           left: 45%;
         }
 
@@ -764,7 +764,7 @@
           .action-retakephotos a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
@@ -892,7 +892,7 @@
           .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
@@ -973,6 +973,11 @@
     .controls {
       height: ($baseline*4);
     }
+
+    .preview {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   // ====================
@@ -1003,11 +1008,11 @@
   // UI: nav - wizard
   .nav-wizard {
     @extend %ui-well;
-    @include clearfix;
+    @include clearfix();
     width: flex-grid(12,12);
     border-radius: ($baseline/10);
     background: $m-gray-l4;
-    padding: ($baseline*.75) $baseline;
+    padding: ($baseline*0.75) $baseline;
 
     .help-inline, .wizard-steps {
 
@@ -1226,6 +1231,17 @@
         @extend %t-copy-base;
       }
 
+      .wrapper-copy-inline {
+        @extend %t-copy-base;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .copy-inline {
+        @extend %t-copy-base;
+        display: inline-block;
+      }
+
       .action-select {
         @include fill-parent;
 
@@ -1415,7 +1431,7 @@
       }
     }
 
-    @include media( $desktop ) {
+    @include media( $edx-bp-large ) {
       .contribution-options {
         .field {
           width: auto;
@@ -1438,7 +1454,7 @@
       }
     }
 
-    @include media( $xl-desktop ) {
+    @include media( $edx-bp-huge ) {
       .register-choice {
         .list-actions {
           float: right;
@@ -1517,15 +1533,15 @@
             color: $white;
           }
 
-          .icon-over, .icon-under {
+          .fa-stack-1x, .fa-stack-2x {
             position: relative;
           }
 
-          .icon-under {
+          .fa-stack-2x {
             @extend %ui-depth1;
           }
 
-          .icon-over {
+          .fa-stack-1x {
             @extend %ui-depth2;
             @extend %t-icon5;
             position: absolute;
@@ -1533,6 +1549,26 @@
             top: 34px;
             background: $verified-color-lvl3;
             padding: 3px 5px;
+          }
+
+          .id-photo {
+            width: 23px;
+            padding: 3px 0;
+          }
+
+          &.old-id-card {
+            width: 88px;
+            height: 88px;
+
+            .fa-list-alt {
+              left: -7px;
+            }
+
+            .id-photo {
+              top: 13px;
+              left: -3px;
+              line-height: 1.1em;
+            }
           }
         }
 
@@ -1691,7 +1727,7 @@
     }
 
     .modal.edit-name .submit input {
-      color: #fff;
+      color: $white;
     }
 
     .modal {
@@ -1951,7 +1987,7 @@
 
         .item {
           box-shadow: 0 2px 5px 0 $shadow-l1 inset;
-          margin: ($baseline*.75) ($baseline*.75) ($baseline*.75) 0;
+          margin: ($baseline*0.75) ($baseline*0.75) ($baseline*0.75) 0;
           border: 1px solid $m-gray-t2;
 
           &.complete {
@@ -2014,7 +2050,7 @@
 
         .course-info {
           margin-bottom: ($baseline/2);
-          padding: ($baseline/2) ($baseline*.75);
+          padding: ($baseline/2) ($baseline*0.75);
         }
 
         .course-name {
@@ -2031,7 +2067,7 @@
 
         .reverify-status {
           background-color: $light-gray;
-          padding: ($baseline/2) ($baseline*.75);
+          padding: ($baseline/2) ($baseline*0.75);
         }
       }
 
@@ -2150,7 +2186,7 @@
               @extend %btn-primary-blue;
               padding: ($baseline/2) ($baseline*0.75);
 
-              *[class^="icon-"] {
+              .icon {
                 @extend %t-icon4;
                 padding: ($baseline*.25) ($baseline*.5);
                 display: block;
@@ -2183,8 +2219,8 @@
             left: ($baseline/2);
           }
 
-          // control - take/do
-          .control-do {
+          // control - take/do, retake
+          .control-do, .control-retake {
             left: 45%;
           }
 
@@ -2215,7 +2251,7 @@
             .action-retakephotos a {
               @extend %btn-primary-blue;
               @include font-size(14);
-              padding: ($baseline/2) ($baseline*.75);
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
@@ -2272,13 +2308,13 @@
           .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
 
       .nav-wizard {
-        padding: ($baseline*.75) $baseline;
+        padding: ($baseline*0.75) $baseline;
 
         .prompt-verify {
           float: left;
@@ -2388,6 +2424,10 @@
     @include font-size(16);
     margin-top: 18px;
     color: $m-blue-d1;
+  }
+
+  .title {
+    font-weight: 400;
   }
 
   // progress nav

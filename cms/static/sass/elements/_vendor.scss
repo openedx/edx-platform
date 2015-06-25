@@ -6,7 +6,7 @@
   @extend %t-copy-sub2;
   border-color: $darkGrey;
   border-radius: 2px;
-  background: #fff;
+  background: $white;
   font-family: $f-sans-serif;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
   z-index: 100000 !important;
@@ -40,20 +40,20 @@
     &.ui-state-hover {
       background: $orange;
       border-color: $orange;
-      color: #fff;
+      color: $white;
     }
   }
 
   .ui-state-highlight {
     background: $blue;
     border-color: $blue;
-    color: #fff;
+    color: $white;
   }
 
   .ui-state-active {
     background: $orange;
     border-color: $orange;
-    color: #fff;
+    color: $white;
   }
 }
 
@@ -141,7 +141,7 @@
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 
   li:first-child {
-    margin-left: 20px;
+    margin-left: $baseline;
   }
   li {
     opacity: 0.8;

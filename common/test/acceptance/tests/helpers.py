@@ -6,9 +6,18 @@ import unittest
 import functools
 import requests
 import os
+from datetime import datetime
 from path import path
+from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
+from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator
+from pymongo import MongoClient
+from xmodule.partitions.partitions import UserPartition
+from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 def skip_if_browser(browser):
@@ -49,7 +58,7 @@ def is_youtube_available():
         'metadata': 'http://gdata.youtube.com/feeds/api/videos/',
         # For transcripts, you need to check an actual video, so we will
         # just specify our default video and see if that one is available.
-        'transcript': 'http://video.google.com/timedtext?lang=en&v=OEoXaMPEzfM',
+        'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
     for url in youtube_api_urls.itervalues():
@@ -69,7 +78,7 @@ def load_data_str(rel_path):
     Load a file from the "data" directory as a string.
     `rel_path` is the path relative to the data directory.
     """
-    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=E1120
+    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
     with open(full_path) as data_file:
         return data_file.read()
 
@@ -90,6 +99,7 @@ def enable_animations(page):
     enable_css_animations(page)
 
 
+@js_defined('window.jQuery')
 def disable_jquery_animations(page):
     """
     Disable jQuery animations.
@@ -97,6 +107,7 @@ def disable_jquery_animations(page):
     page.browser.execute_script("jQuery.fx.off = true;")
 
 
+@js_defined('window.jQuery')
 def enable_jquery_animations(page):
     """
     Enable jQuery animations.
@@ -165,6 +176,183 @@ def enable_css_animations(page):
 
         head.removeChild(styles)
     """)
+
+
+def select_option_by_text(select_browser_query, option_text):
+    """
+    Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
+    """
+    select = Select(select_browser_query.first.results[0])
+    select.select_by_visible_text(option_text)
+
+
+def get_selected_option_text(select_browser_query):
+    """
+    Returns the text value for the first selected option within a select.
+    """
+    select = Select(select_browser_query.first.results[0])
+    return select.first_selected_option.text
+
+
+def get_options(select_browser_query):
+    """
+    Returns all the options for the given select.
+    """
+    return Select(select_browser_query.first.results[0]).options
+
+
+def generate_course_key(org, number, run):
+    """
+    Makes a CourseLocator from org, number and run
+    """
+    default_store = os.environ.get('DEFAULT_STORE', 'draft')
+    return CourseLocator(org, number, run, deprecated=(default_store == 'draft'))
+
+
+def select_option_by_value(browser_query, value):
+    """
+    Selects a html select element by matching value attribute
+    """
+    select = Select(browser_query.first.results[0])
+    select.select_by_value(value)
+
+    def options_selected():
+        """
+        Returns True if all options in select element where value attribute
+        matches `value`. if any option is not selected then returns False
+        and select it. if value is not an option choice then it returns False.
+        """
+        all_options_selected = True
+        has_option = False
+        for opt in select.options:
+            if opt.get_attribute('value') == value:
+                has_option = True
+                if not opt.is_selected():
+                    all_options_selected = False
+                    opt.click()
+        # if value is not an option choice then it should return false
+        if all_options_selected and not has_option:
+            all_options_selected = False
+        return all_options_selected
+
+    # Make sure specified option is actually selected
+    EmptyPromise(options_selected, "Option is selected").fulfill()
+
+
+def is_option_value_selected(browser_query, value):
+    """
+    return true if given value is selected in html select element, else return false.
+    """
+    select = Select(browser_query.first.results[0])
+    ddl_selected_value = select.first_selected_option.get_attribute('value')
+    return ddl_selected_value == value
+
+
+def element_has_text(page, css_selector, text):
+    """
+    Return true if the given text is present in the list.
+    """
+    text_present = False
+    text_list = page.q(css=css_selector).text
+
+    if len(text_list) > 0 and (text in text_list):
+        text_present = True
+
+    return text_present
+
+
+def get_modal_alert(browser):
+    """
+    Returns instance of modal alert box shown in browser after waiting
+    for 6 seconds
+    """
+    WebDriverWait(browser, 6).until(EC.alert_is_present())
+    return browser.switch_to.alert
+
+
+class EventsTestMixin(object):
+    """
+    Helpers and setup for running tests that evaluate events emitted
+    """
+    def setUp(self):
+        super(EventsTestMixin, self).setUp()
+        self.event_collection = MongoClient()["test"]["events"]
+        self.reset_event_tracking()
+
+    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted, **kwargs):
+        """
+        Tests the number of times a particular event was emitted.
+
+        Extra kwargs get passed to the mongo query in the form: "event.<key>: value".
+
+        :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
+        :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
+        :param event_user_id: user_id expected in the event
+        :param num_times_emitted: number of times the event is expected to appear since the event_time
+        """
+        find_kwargs = {
+            "name": event_name,
+            "time": {"$gt": event_time},
+            "event.user_id": int(event_user_id),
+        }
+        find_kwargs.update({"event.{}".format(key): value for key, value in kwargs.items()})
+        matching_events = self.event_collection.find(find_kwargs)
+        self.assertEqual(matching_events.count(), num_times_emitted, '\n'.join(str(event) for event in matching_events))
+
+    def reset_event_tracking(self):
+        """
+        Resets all event tracking so that previously captured events are removed.
+        """
+        self.event_collection.drop()
+        self.start_time = datetime.now()
+
+    def get_matching_events(self, username, event_type):
+        """
+        Returns a cursor for the matching browser events related emitted for the specified username.
+        """
+        return self.event_collection.find({
+            "username": username,
+            "event_type": event_type,
+            "time": {"$gt": self.start_time},
+        })
+
+    def verify_events_of_type(self, username, event_type, expected_events, expected_referers=None):
+        """Verify that the expected events of a given type were logged.
+        Args:
+            username (str): The name of the user for which events will be tested.
+            event_type (str): The type of event to be verified.
+            expected_events (list): A list of dicts representing the events that should
+                have been fired.
+            expected_referers (list): A list of strings representing the referers for each event
+                that should been fired (optional). If present, the actual referers compared
+                with this list, checking that the expected_referers are the suffixes of
+                actual_referers. For example, if one event is expected, specifying ["/account/settings"]
+                will verify that the referer for the single event ends with "/account/settings".
+        """
+        EmptyPromise(
+            lambda: self.get_matching_events(username, event_type).count() >= len(expected_events),
+            "Waiting for the minimum number of events of type {type} to have been recorded".format(type=event_type)
+        ).fulfill()
+
+        # Verify that the correct events were fired
+        cursor = self.get_matching_events(username, event_type)
+        actual_events = []
+        actual_referers = []
+        for __ in range(0, cursor.count()):
+            emitted_data = cursor.next()
+            event = emitted_data["event"]
+            if emitted_data["event_source"] == "browser":
+                event = json.loads(event)
+            actual_events.append(event)
+            actual_referers.append(emitted_data["referer"])
+        self.assertEqual(expected_events, actual_events)
+        if expected_referers is not None:
+            self.assertEqual(len(expected_referers), len(actual_referers), "Number of expected referers is incorrect")
+            for index, actual_referer in enumerate(actual_referers):
+                self.assertTrue(
+                    actual_referer.endswith(expected_referers[index]),
+                    "Refer '{0}' does not have correct suffix, '{1}'.".format(actual_referer, expected_referers[index])
+                )
 
 
 class UniqueCourseTest(WebAppTest):
@@ -276,3 +464,26 @@ class YouTubeStubConfig(object):
             return json.loads(response.content)
         else:
             return {}
+
+
+def create_user_partition_json(partition_id, name, description, groups, scheme="random"):
+    """
+    Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
+    """
+    return UserPartition(
+        partition_id, name, description, groups, MockUserPartitionScheme(scheme)
+    ).to_json()
+
+
+class TestWithSearchIndexMixin(object):
+    """ Mixin encapsulating search index creation """
+    TEST_INDEX_FILENAME = "test_root/index_file.dat"
+
+    def _create_search_index(self):
+        """ Creates search index backing file """
+        with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
+            json.dump({}, index_file)
+
+    def _cleanup_index_file(self):
+        """ Removes search index backing file """
+        os.remove(self.TEST_INDEX_FILENAME)

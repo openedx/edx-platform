@@ -1,5 +1,5 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -10,7 +10,7 @@ import random
 import os
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from nose.tools import assert_equal, assert_not_equal  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 ASSET_NAMES_CSS = 'td.name-col > span.title > a.filename'

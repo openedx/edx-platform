@@ -4,7 +4,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.test import TestCase
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import Mock, patch
 
@@ -12,7 +12,7 @@ from notification_prefs import NOTIFICATION_PREF_KEY
 from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, set_subscription, UsernameCipher
 from student.tests.factories import UserFactory
 from edxmako.tests import mako_middleware_process_request
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from util.testing import UrlResetMixin
 
 

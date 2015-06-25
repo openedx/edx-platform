@@ -5,7 +5,8 @@ define(
         "xmodule", "jquery.form", "jasmine-jquery"
     ],
 function ($, _, Utils, FileUploader) {
-    describe('Transcripts.FileUploader', function () {
+    // TODO: fix TNL-559 Intermittent failures of Transcript FileUploader JS tests
+    xdescribe('Transcripts.FileUploader', function () {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
             ),

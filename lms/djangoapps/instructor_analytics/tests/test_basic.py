@@ -2,26 +2,34 @@
 Tests for instructor.basic
 """
 
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-
 from courseware.courses import get_course
-from courseware.tests.factories import StudentModuleFactory, InstructorFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, CourseRegCodeItem
+from courseware.tests.factories import StudentModuleFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_GRADED_MODULESTORE
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 
+import json
+from student.models import CourseEnrollment
+from django.core.urlresolvers import reverse
+from mock import patch
+from student.roles import CourseSalesAdminRole
+from student.tests.factories import UserFactory, CourseModeFactory
+from shoppingcart.models import (
+    CourseRegistrationCode, RegistrationCodeRedemption, Order,
+    Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
+)
+from course_modes.models import CourseMode
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
     coupon_codes_features, student_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
 )
-from course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
+import datetime
+from django.db.models import Q
+import pytz
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -29,11 +37,17 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('robot', 'course', 'id')
+        self.course_key = self.store.make_course_key('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
         self.instructor = InstructorFactory(course_key=self.course_key)
+        for user in self.users:
+            user.profile.meta = json.dumps({
+                "position": "edX expert {}".format(user.id),
+                "company": "Open edX Inc {}".format(user.id),
+            })
+            user.profile.save()
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
@@ -56,8 +70,21 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(userreport['email'], [user.email for user in self.users])
             self.assertIn(userreport['name'], [user.profile.name for user in self.users])
 
+    def test_enrolled_students_meta_features_keys(self):
+        """
+        Assert that we can query individual fields in the 'meta' field in the UserProfile
+        """
+        query_features = ('meta.position', 'meta.company')
+        with self.assertNumQueries(1):
+            userreports = enrolled_students_features(self.course_key, query_features)
+        self.assertEqual(len(userreports), len(self.users))
+        for userreport in userreports:
+            self.assertEqual(set(userreport.keys()), set(query_features))
+            self.assertIn(userreport['meta.position'], ["edX expert {}".format(user.id) for user in self.users])
+            self.assertIn(userreport['meta.company'], ["Open edX Inc {}".format(user.id) for user in self.users])
+
     def test_enrolled_students_features_keys_cohorted(self):
-        course = CourseFactory.create(course_key=self.course_key)
+        course = CourseFactory.create(org="test", course="course1", display_name="run1")
         course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
         self.store.update_item(course, self.instructor.id)
         cohort = CohortFactory.create(name='cohort', course_id=course.id)
@@ -92,6 +119,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
 
 
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic course sale records analytics functions. """
     def setUp(self):
@@ -100,6 +128,12 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         """
         super(TestCourseSaleRecordsAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
+        self.cost = 40
+        self.course_mode = CourseMode(
+            course_id=self.course.id, mode_slug="honor",
+            mode_display_name="honor cert", min_price=self.cost
+        )
+        self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -117,10 +151,16 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             company_contact_email='test@company.com', recipient_name='Testw_1', recipient_email='test2@test.com',
             customer_reference_number='2Fwe23S', internal_reference="ABC", course_id=self.course.id
         )
+        invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=sale_invoice,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice
+                created_by=self.instructor, invoice=sale_invoice, invoice_item=invoice_item, mode_slug='honor'
             )
             course_code.save()
 
@@ -165,18 +205,43 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             ('bill_to_postalcode', 'Postal Code'),
             ('bill_to_country', 'Country'),
             ('order_type', 'Order Type'),
+            ('status', 'Order Item Status'),
+            ('coupon_code', 'Coupon Code'),
+            ('unit_cost', 'Unit Price'),
+            ('list_price', 'List Price'),
             ('codes', 'Registration Codes'),
             ('course_id', 'Course Id')
         ]
-
+        # add the coupon code for the course
+        coupon = Coupon(
+            code='test_code',
+            description='test_description',
+            course_id=self.course.id,
+            percentage_discount='10',
+            created_by=self.instructor,
+            is_active=True
+        )
+        coupon.save()
         order = Order.get_cart_for_user(self.instructor)
         order.order_type = 'business'
         order.save()
-        order.add_billing_details(company_name='Test Company', company_contact_name='Test',
-                                  company_contact_email='test@123', recipient_name='R1',
-                                  recipient_email='', customer_reference_number='PO#23')
+        order.add_billing_details(
+            company_name='Test Company',
+            company_contact_name='Test',
+            company_contact_email='test@123',
+            recipient_name='R1', recipient_email='',
+            customer_reference_number='PO#23'
+        )
         CourseRegCodeItem.add_to_order(order, self.course.id, 4)
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        self.assertEqual(resp.status_code, 200)
         order.purchase()
+
+        # get the updated item
+        item = order.orderitem_set.all().select_subclasses()[0]
+        # get the redeemed coupon information
+        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order=order)
 
         db_columns = [x[0] for x in query_features]
         sale_order_records_list = sale_order_record_features(self.course.id, db_columns)
@@ -188,8 +253,10 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(sale_order_record['company_contact_name'], order.company_contact_name)
             self.assertEqual(sale_order_record['company_contact_email'], order.company_contact_email)
             self.assertEqual(sale_order_record['customer_reference_number'], order.customer_reference_number)
-            self.assertEqual(sale_order_record['total_used_codes'], order.registrationcoderedemption_set.all().count())
-            self.assertEqual(sale_order_record['total_codes'], len(CourseRegistrationCode.objects.filter(order=order)))
+            self.assertEqual(sale_order_record['unit_cost'], item.unit_cost)
+            self.assertEqual(sale_order_record['list_price'], item.list_price)
+            self.assertEqual(sale_order_record['status'], item.status)
+            self.assertEqual(sale_order_record['coupon_code'], coupon_redemption[0].coupon.code)
 
 
 class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
@@ -203,12 +270,19 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        CourseSalesAdminRole(self.course.id).add_users(self.instructor)
+
+        # Create a paid course mode.
+        mode = CourseModeFactory.create()
+        mode.course_id = self.course.id
+        mode.min_price = 1
+        mode.save()
 
         url = reverse('generate_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
+            'total_registration_codes': 12, 'company_name': 'Test Group', 'unit_price': 122.45,
             'company_contact_name': 'TestName', 'company_contact_email': 'test@company.com', 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
@@ -220,14 +294,14 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
     def test_course_registration_features(self):
         query_features = [
-            'code', 'course_id', 'company_name', 'created_by',
+            'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
             'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
         ]
         order = Order(user=self.instructor, status='purchased')
         order.save()
 
         registration_code_redemption = RegistrationCodeRedemption(
-            order=order, registration_code_id=1, redeemed_by=self.instructor
+            registration_code_id=1, redeemed_by=self.instructor
         )
         registration_code_redemption.save()
         registration_codes = CourseRegistrationCode.objects.all()
@@ -242,42 +316,64 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             )
             self.assertIn(
                 course_registration['company_name'],
-                [getattr(registration_code.invoice, 'company_name') for registration_code in registration_codes]
+                [
+                    getattr(registration_code.invoice_item.invoice, 'company_name')
+                    for registration_code in registration_codes
+                ]
             )
             self.assertIn(
                 course_registration['invoice_id'],
-                [registration_code.invoice_id for registration_code in registration_codes]
+                [
+                    registration_code.invoice_item.invoice_id
+                    for registration_code in registration_codes
+                ]
             )
 
     def test_coupon_codes_features(self):
         query_features = [
-            'course_id', 'percentage_discount', 'code_redeemed_count', 'description'
+            'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date'
         ]
         for i in range(10):
             coupon = Coupon(
-                code='test_code{0}'.format(i), description='test_description', course_id=self.course.id,
-                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True
+                code='test_code{0}'.format(i),
+                description='test_description',
+                course_id=self.course.id, percentage_discount='{0}'.format(i),
+                created_by=self.instructor,
+                is_active=True
             )
             coupon.save()
-        active_coupons = Coupon.objects.filter(course_id=self.course.id, is_active=True)
+        #now create coupons with the expiration dates
+        for i in range(5):
+            coupon = Coupon(
+                code='coupon{0}'.format(i), description='test_description', course_id=self.course.id,
+                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True,
+                expiration_date=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+            )
+            coupon.save()
+
+        active_coupons = Coupon.objects.filter(
+            Q(course_id=self.course.id),
+            Q(is_active=True),
+            Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
+            Q(expiration_date__isnull=True)
+        )
         active_coupons_list = coupon_codes_features(query_features, active_coupons)
         self.assertEqual(len(active_coupons_list), len(active_coupons))
         for active_coupon in active_coupons_list:
             self.assertEqual(set(active_coupon.keys()), set(query_features))
             self.assertIn(active_coupon['percentage_discount'], [coupon.percentage_discount for coupon in active_coupons])
             self.assertIn(active_coupon['description'], [coupon.description for coupon in active_coupons])
+            if active_coupon['expiration_date']:
+                self.assertIn(active_coupon['expiration_date'], [coupon.display_expiry_date for coupon in active_coupons])
             self.assertIn(
                 active_coupon['course_id'],
                 [coupon.course_id.to_deprecated_string() for coupon in active_coupons]
             )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
+class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic student responses analytics function. """
-    def load_course(self, course_id):
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        self.course = get_course(course_key)
+    MODULESTORE = TEST_DATA_MIXED_GRADED_MODULESTORE
 
     def create_student(self):
         self.student = UserFactory()
@@ -291,13 +387,13 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(datarows, [])
 
     def test_full_course_no_students(self):
-        self.load_course('edX/simple/2012_Fall')
+        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
 
         datarows = list(student_responses(self.course))
         self.assertEqual(datarows, [])
 
     def test_invalid_module_state(self):
-        self.load_course('edX/graded/2012_Fall')
+        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
         self.problem_location = Location("edX", "graded", "2012_Fall", "problem", "H1P2")
 
         self.create_student()

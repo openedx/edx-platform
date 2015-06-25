@@ -33,7 +33,8 @@ if Backbone?
     convertMath: ->
       body = @$el.find(".response-body")
       body.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight body.text()
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, body[0]]
+      if MathJax?
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub, body[0]]
 
     _delete: (event) =>
         @trigger "comment:_delete", event

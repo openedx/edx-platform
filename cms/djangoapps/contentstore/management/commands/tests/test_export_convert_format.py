@@ -16,16 +16,15 @@ class ConvertExportFormat(TestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ConvertExportFormat, self).setUp()
+
         self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
         self.data_dir = path(__file__).realpath().parent / 'data'
         self.version0 = self.data_dir / "Version0_drafts.tar.gz"
         self.version1 = self.data_dir / "Version1_drafts.tar.gz"
 
         self.command = Command()
-
-    def tearDown(self):
-        """ Common cleanup. """
-        shutil.rmtree(self.temp_dir)
 
     def test_no_args(self):
         """ Test error condition of no arguments. """

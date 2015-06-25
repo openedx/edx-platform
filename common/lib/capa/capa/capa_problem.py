@@ -439,7 +439,7 @@ class LoncapaProblem(object):
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
-        self.has_targeted = True  # pylint: disable=W0201
+        self.has_targeted = True  # pylint: disable=attribute-defined-outside-init
 
         for mult_choice_response in tree.xpath('//multiplechoiceresponse[@targeted-feedback]'):
             show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
@@ -694,7 +694,7 @@ class LoncapaProblem(object):
             return
 
         if (problemtree.tag == 'script' and problemtree.get('type')
-            and 'javascript' in problemtree.get('type')):
+                and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
             return deepcopy(problemtree)
 
@@ -710,12 +710,14 @@ class LoncapaProblem(object):
             hint = ''
             hintmode = None
             input_id = problemtree.get('id')
+            answervariable = None
             if problemid in self.correct_map:
                 pid = input_id
                 status = self.correct_map.get_correctness(pid)
                 msg = self.correct_map.get_msg(pid)
                 hint = self.correct_map.get_hint(pid)
                 hintmode = self.correct_map.get_hintmode(pid)
+                answervariable = self.correct_map.get_property(pid, 'answervariable')
 
             value = ""
             if self.student_answers and problemid in self.student_answers:
@@ -730,6 +732,7 @@ class LoncapaProblem(object):
                 'status': status,
                 'id': input_id,
                 'input_state': self.input_state[input_id],
+                'answervariable': answervariable,
                 'feedback': {
                     'message': msg,
                     'hint': hint,

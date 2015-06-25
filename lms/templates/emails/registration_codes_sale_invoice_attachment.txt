@@ -1,5 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-
 ${_("INVOICE")}
 
 ———————————————————————————————————————————
@@ -24,13 +23,13 @@ ${invoice.city}, ${invoice.state}, ${invoice.zip}
 ${invoice.country}
 ${_("Customer Reference Number: {reference_number}").format(reference_number=invoice.customer_reference_number if invoice.customer_reference_number else "")}
 
-                                        ${_("Balance Due: ${sale_price}").format(sale_price=sale_price)}
+                                        ${_("Balance Due: {currency_symbol}{sale_price}").format(currency_symbol=currency_symbol, sale_price=sale_price)}
 
 ———————————————————————————————————————————
 
 ${_("Course: {course_name}").format(course_name=course.display_name)}
- ${_("Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    ${sub_total}  Discount:  ${discount}").format(course_price=course_price, quantity=quantity, sub_total=sub_total, discount=discount)}
-${_("Total:      ${sale_price}").format(sale_price=sale_price)}
+ ${_("Price:        {currency_symbol}{course_price}  Quantity:      {quantity}  Sub-Total:    {currency_symbol}{sub_total}  Discount:  {currency_symbol}{discount}").format(course_price=course_price, quantity=quantity, sub_total=sub_total, discount=discount, currency_symbol=currency_symbol)}
+${_("Total:      {currency_symbol}{sale_price}").format(sale_price=sale_price, currency_symbol=currency_symbol)}
 
 ———————————————————————————————————————————
 

@@ -113,14 +113,21 @@
           background: $pink-u3;
         }
 
-        &.flag-role-admin {
+        &.flag-role-admin,
+        &.flag-role-instructor {
           background: $pink;
+        }
+
+        &.flag-role-user,
+        &.flag-role-library_user {
+          background: $yellow-d1;
+          .msg-you { color: $yellow-l1; }
         }
       }
 
       // ELEM: item - metadata
       .item-metadata {
-        width: flex-grid(5, 9);
+        width: flex-grid(4, 9);
         @include margin-right(flex-gutter());
 
         .user-username, .user-email {
@@ -143,7 +150,7 @@
 
       // ELEM: item - actions
       .item-actions {
-        width: flex-grid(4, 9);
+        width: flex-grid(5, 9);
         position: static; // nasty reset needed due to base.scss
         text-align: right;
 
@@ -153,12 +160,34 @@
         }
 
         .action-role {
-          width: flex-grid(3, 4);
+          width: flex-grid(7, 8);
           margin-right: flex-gutter();
+
+          .add-admin-role {
+            @include blue-button;
+            @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+          }
+
+          .remove-admin-role {
+            @include grey-button;
+            @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+          }
+          .notoggleforyou {
+            @extend %t-copy-sub1;
+            color: $gray-l2;
+          }
         }
 
         .action-delete {
-          width: flex-grid(1, 4);
+          width: flex-grid(1, 8);
 
           // STATE: disabled
           &.is-disabled {
@@ -177,33 +206,6 @@
           margin-right: 0;
           float: none;
           color: inherit;
-        }
-
-        // ELEM: admin role controls
-        .toggle-admin-role {
-
-          &.add-admin-role {
-            @include blue-button;
-            @include transition(all .15s);
-            @extend %t-action2;
-            @extend %t-strong;
-            display: inline-block;
-            padding: ($baseline/5) $baseline;
-          }
-
-          &.remove-admin-role {
-            @include grey-button;
-            @include transition(all .15s);
-            @extend %t-action2;
-            @extend %t-strong;
-            display: inline-block;
-            padding: ($baseline/5) $baseline;
-          }
-        }
-
-        .notoggleforyou {
-          @extend %t-copy-sub1;
-          color: $gray-l2;
         }
       }
 

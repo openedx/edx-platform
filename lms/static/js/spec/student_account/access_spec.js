@@ -5,27 +5,14 @@ define([
     'js/student_account/views/AccessView',
     'js/student_account/views/FormView',
     'js/student_account/enrollment',
-    'js/student_account/shoppingcart'
+    'js/student_account/shoppingcart',
+    'js/student_account/emailoptin'
 ], function($, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface, ShoppingCartInterface) {
         describe('edx.student.account.AccessView', function() {
             'use strict';
 
             var requests = null,
                 view = null,
-                AJAX_INFO = {
-                    register: {
-                        url: '/user_api/v1/account/registration/',
-                        requestIndex: 1
-                    },
-                    login: {
-                        url: '/user_api/v1/account/login_session/',
-                        requestIndex: 0
-                    },
-                    password_reset: {
-                        url: '/user_api/v1/account/password_reset/',
-                        requestIndex: 1
-                    }
-                },
                 FORM_DESCRIPTION = {
                     method: 'post',
                     submit_url: '/submit',
@@ -57,16 +44,6 @@ define([
                 FORWARD_URL = '/courseware/next',
                 COURSE_KEY = 'edx/DemoX/Fall';
 
-            var ajaxAssertAndRespond = function(url, requestIndex) {
-                // Verify that the client contacts the server as expected
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url, null, requestIndex);
-
-                /* Simulate a response from the server containing
-                /* a dummy form description
-                 */
-                AjaxHelpers.respondWithJson(requests, FORM_DESCRIPTION);
-            };
-
             var ajaxSpyAndInitialize = function(that, mode) {
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(that);
@@ -78,7 +55,10 @@ define([
                         currentProvider: null,
                         providers: []
                     },
-                    platformName: 'edX'
+                    platformName: 'edX',
+                    loginFormDesc: FORM_DESCRIPTION,
+                    registrationFormDesc: FORM_DESCRIPTION,
+                    passwordResetFormDesc: FORM_DESCRIPTION
                 });
 
                 // Mock the redirect call
@@ -87,26 +67,21 @@ define([
                 // Mock the enrollment and shopping cart interfaces
                 spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
                 spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
-
-                // Initialize the subview
-                ajaxAssertAndRespond(AJAX_INFO[mode].url);
             };
 
             var assertForms = function(visibleType, hiddenType) {
                 expect($(visibleType)).not.toHaveClass('hidden');
                 expect($(hiddenType)).toHaveClass('hidden');
-                expect($('#password-reset-wrapper')).toBeEmpty();
+                expect($('#password-reset-form')).toHaveClass('hidden');
             };
 
             var selectForm = function(type) {
                 // Create a fake change event to control form toggling
                 var changeEvent = $.Event('change');
-                changeEvent.currentTarget = $('#' + type + '-option');
+                changeEvent.currentTarget = $('.form-toggle[data-type="' + type + '"]');
 
                 // Load form corresponding to the change event
                 view.toggleForm(changeEvent);
-
-                ajaxAssertAndRespond(AJAX_INFO[type].url, AJAX_INFO[type].requestIndex);
             };
 
             /**
@@ -132,9 +107,7 @@ define([
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
 
                 // Stub analytics tracking
-                // TODO: use RequireJS to ensure that this is loaded correctly
-                window.analytics = window.analytics || {};
-                window.analytics.track = window.analytics.track || function() {};
+                window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'pageview', 'trackLink']);
             });
 
             it('can initially display the login form', function() {
@@ -158,6 +131,9 @@ define([
             it('toggles between the login and registration forms', function() {
                 ajaxSpyAndInitialize(this, 'login');
 
+                // Prevent URL from updating
+                spyOn(history, 'pushState').andCallFake( function() {} );
+
                 // Simulate selection of the registration form
                 selectForm('register');
                 assertForms('#register-form', '#login-form');
@@ -172,11 +148,6 @@ define([
 
                 // Simulate a click on the reset password link
                 view.resetPassword();
-
-                ajaxAssertAndRespond(
-                    AJAX_INFO.password_reset.url,
-                    AJAX_INFO.password_reset.requestIndex
-                );
 
                 // Verify that the password reset wrapper is populated
                 expect($('#password-reset-wrapper')).not.toBeEmpty();
@@ -195,7 +166,52 @@ define([
                 view.subview.login.trigger('auth-complete');
 
                 // Expect that the view tried to enroll the student
-                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith( COURSE_KEY );
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
+                    COURSE_KEY,
+                    '/course_modes/choose/' + COURSE_KEY + '/'
+                );
+            });
+
+            it('sends the user to the payment flow when the course mode is not honor', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate providing enrollment query string params
+                // AND specifying a course mode.
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY,
+                    '?course_mode': 'verified'
+                });
+
+                // Trigger auth complete on the login view
+                view.subview.login.trigger('auth-complete');
+
+                // Expect that the view tried to auto-enroll the student
+                // with a redirect into the payment flow.
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(
+                    COURSE_KEY,
+                    '/verify_student/start-flow/' + COURSE_KEY + '/'
+                );
+            });
+
+            it('sends the user to the student dashboard when the course mode is honor', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate providing enrollment query string params
+                // AND specifying a course mode.
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY,
+                    '?course_mode': 'honor'
+                });
+
+                // Trigger auth complete on the login view
+                view.subview.login.trigger('auth-complete');
+
+                // Expect that the view tried auto-enrolled the student
+                // and sent the student to the dashboard
+                // (skipping the payment flow).
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith(COURSE_KEY, '/dashboard');
             });
 
             it('adds a white-label course to the shopping cart on auth complete', function() {
@@ -251,26 +267,6 @@ define([
                 expect( view.redirect ).toHaveBeenCalledWith( "/dashboard" );
             });
 
-            it('displays an error if a form definition could not be loaded', function() {
-                // Spy on AJAX requests
-                requests = AjaxHelpers.requests(this);
-
-                // Init AccessView
-                view = new AccessView({
-                    mode: 'login',
-                    thirdPartyAuth: {
-                        currentProvider: null,
-                        providers: []
-                    },
-                    platformName: 'edX'
-                });
-
-                // Simulate an error from the LMS servers
-                AjaxHelpers.respondWithError(requests);
-
-                // Error message should be displayed
-                expect( $('#form-load-fail').hasClass('hidden') ).toBe(false);
-            });
         });
     }
 );

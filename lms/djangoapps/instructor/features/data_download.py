@@ -3,11 +3,11 @@ Define steps for instructor dashboard - data download tab
 acceptance tests.
 """
 
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=E0611
+from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 from django.utils import http
 

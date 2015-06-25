@@ -49,7 +49,7 @@
           <ol class="list-input">
             <li class="field" id="field-course-grading-range">
               <div class="grade-controls course-grading-range well">
-                <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
+                <a href="#" class="new-grade-button"><span class="icon fa fa-plus"></span></a>
                 <div class="grade-slider" dir="ltr">
                   <div class="grade-bar">
                     <ol class="increments">
@@ -105,7 +105,7 @@
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i> ${_("New Assignment Type")}
+              <i class="icon fa fa-plus"></i> ${_("New Assignment Type")}
             </a>
           </div>
         </section>
@@ -130,14 +130,12 @@
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
-        <nav class="nav-related">
+        <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
             <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-          % endif
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif

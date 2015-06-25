@@ -4,6 +4,7 @@
 %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
+<%! from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%def name="course_name()">
@@ -25,13 +26,22 @@ ${page_title_breadcrumbs(course_name())}
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
+
+% for template_name in ["search_item", "search_item_seq", "search_list", "search_loading", "search_error"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="courseware_search/${template_name}.underscore" />
+</script>
+% endfor
+
 </%block>
 
-
 <%block name="headextra">
-
-  <%static:css group='style-course-vendor'/>
-  <%static:css group='style-course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+## Utility: Notes
+% if is_edxnotes_enabled(course):
+<%static:css group='style-student-notes'/>
+% endif
 
 <%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
@@ -139,7 +149,10 @@ ${page_title_breadcrumbs(course_name())}
   </script>
 % endif
 
-% if settings.FEATURES.get("ENABLE_CHAT") and course.show_chat:
+% if show_chat:
+  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
+
   <script type="text/javascript">
     $(function() {
       // show/hide the chat widget
@@ -169,17 +182,6 @@ ${fragment.foot_html()}
 
 </%block>
 
-% if timer_expiration_duration:
-<div class="timer-main">
-  <div id="timer_wrapper">
-    % if timer_navigation_return_url:
-    <a href="${timer_navigation_return_url}" class="timer_return_url">${_("Return to Exam")}</a>
-    % endif
-    <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
-  </div>
-</div>
-% endif
-
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
@@ -196,6 +198,21 @@ ${fragment.foot_html()}
         <a href="#">${_("close")}</a>
       </header>
 
+      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+        <div id="courseware-search-bar" class="courseware-search-bar" role="search" aria-label="Course">
+          <form>
+            <label for="course-search-input" class="sr">${_('Course Search')}</label>
+            <input id="course-search-input" type="text" class="search-field"/>
+            <button type="submit" class="search-button">
+              ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+              <i class="icon fa fa-remove" aria-hidden="true"></i>
+            </button>
+          </form>
+        </div>
+      % endif
+
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
@@ -207,10 +224,33 @@ ${fragment.foot_html()}
       </div>
     </div>
 % endif
-
     <section class="course-content" id="course-content">
+        % if getattr(course, 'entrance_exam_enabled') and \
+           getattr(course, 'entrance_exam_minimum_score_pct') and \
+           entrance_exam_current_score is not UNDEFINED:
+            % if not entrance_exam_passed:
+            <p class="sequential-status-message">
+                ${_('To access course materials, you must score {required_score}% or higher on this \
+                exam. Your current score is {current_score}%.').format(
+                    required_score=int(course.entrance_exam_minimum_score_pct * 100),
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % else:
+              <p class="sequential-status-message">
+                ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % endif
+      % endif
+
       ${fragment.body_html()}
     </section>
+    % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+      <section class="courseware-search-results" id="courseware-search-results" data-course-id="${course.id}" data-course-name="${course.display_name_with_default}">
+      </section>
+    % endif
   </div>
   % if course and user.is_authenticated() and not UserProfile.has_registered(user):
     <div class="unauth-tos">
@@ -222,129 +262,21 @@ ${fragment.foot_html()}
   % endif
 </div>
 
-% if course.show_calculator:
-    <div class="calc-main">
-        <a title="${_('Open Calculator')}" href="#" role="button" aria-controls="calculator_wrapper" aria-expanded="false" class="calc">${_("Open Calculator")}</a>
-        <div id="calculator_wrapper">
-            <form id="calculator">
-                <div class="input-wrapper">
-                    <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" tabindex="-1" />
+<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+  ## Utility: Chat
+  % if show_chat:
+    <%include file="/chat/toggle_chat.html" />
+  % endif
 
-                    <div class="help-wrapper">
-                        <p class="sr" id="hint-instructions">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
-                        <a id="calculator_hint" href="#" role="button" aria-haspopup="true" tabindex="-1" aria-describedby="hint-instructions">${_("Hints")}</a>
-                        <ul id="calculator_input_help" class="help" aria-activedescendant="hint-integers" role="tooltip" aria-hidden="true">
-                          <li class="hint-item" id="hint-integers" tabindex="-1"><p><span class="bold">${_("Integers")}:</span> 2520</p></li>
-                          <li class="hint-item" id="hint-decimals" tabindex="-1"><p><span class="bold">${_("Decimals")}:</span> 3.14 or .98</p></li>
-                          <li class="hint-item" id="hint-scientific-notation" tabindex="-1"><p><span class="bold">${_("Scientific notation")}:</span> 1.2e-2 (=0.012), -4.4e+5 = -4.4e5 (=-440,000)</p></li>
-                          <li class="hint-item" id="hint-appending-postfixes" tabindex="-1"><p><span class="bold">${_("Appending SI postfixes")}:</span> 2.25k (=2,250)</p></li>
-                          <li class="hint-item" id="hint-supported-postfixes" tabindex="-1"><p><span class="bold">${_("Supported SI postfixes")}:</span></p>
-                            <table class="calc-postfixes">
-                              <tbody>
-                                <tr>
-                                  <td>%</td>
-                                  <td>percent</td>
-                                  <td>0.01 = 1e-2</td>
-                                </tr>
-                                <tr>
-                                  <td>T</td>
-                                  <td>tera</td>
-                                  <td>1e12</td>
-                                </tr>
-                                <tr>
-                                  <td>G</td>
-                                  <td>giga</td>
-                                  <td>1e9</td>
-                                </tr>
-                                <tr>
-                                  <td>M</td>
-                                  <td>mega</td>
-                                  <td>1e6</td>
-                                </tr>
-                                <tr>
-                                  <td>k</td>
-                                  <td>kilo</td>
-                                  <td>1000 = 1e3</td>
-                                </tr>
-                                <tr>
-                                  <td>c</td>
-                                  <td>centi</td>
-                                  <td>0.01 = 1e-2</td>
-                                </tr>
-                                <tr>
-                                  <td>m</td>
-                                  <td>milli</td>
-                                  <td>0.001 = 1e-3</td>
-                                </tr>
-                                <tr>
-                                  <td>u</td>
-                                  <td>micro</td>
-                                  <td>1e-6</td>
-                                </tr>
-                                <tr>
-                                  <td>n</td>
-                                  <td>nano</td>
-                                  <td>1e-9</td>
-                                </tr>
-                                <tr>
-                                  <td>p</td>
-                                  <td>pico</td>
-                                  <td>1e-12</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </li>
-                          <li class="hint-item" id="hint-operators" tabindex="-1"><p><span class="bold">${_("Operators")}:</span> + - * / ^ and || (${_("parallel resistors function")})</p></li>
-                          <li class="hint-item" id="hint-functions" tabindex="-1"><p><span class="bold">${_("Functions")}:</span> sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs, fact/factorial</p></li>
-                          <li class="hint-item" id="hint-constants" tabindex="-1"><p><span class="bold">${_("Constants")}:</span></p>
-                            <table>
-                              <tbody>
-                              <tr>
-                                <td>j</td>
-                                <td>=</td>
-                                <td>sqrt(-1)</td>
-                              </tr>
-                              <tr>
-                                <td>e</td>
-                                <td>=</td>
-                                <td>${_("Euler's number")}</td>
-                              </tr>
-                              <tr>
-                                <td>pi</td>
-                                <td>=</td>
-                                <td>${_("ratio of a circle's circumference to it's diameter")}</td>
-                              </tr>
-                              <tr>
-                                <td>k</td>
-                                <td>=</td>
-                                <td>${_("Boltzmann constant")}</td>
-                              </tr>
-                              <tr>
-                                <td>c</td>
-                                <td>=</td>
-                                <td>${_("speed of light")}</td>
-                              </tr>
-                              <tr>
-                                <td>T</td>
-                                <td>=</td>
-                                <td>${_("Typical room temperature: 298.15 (Kelvin), same as 25C/77F")}</td>
-                              </tr>
-                              <tr>
-                                <td>q</td>
-                                <td>=</td>
-                                <td>${_("fundamental charge")}</td>
-                              </tr>
-                              </tbody>
-                            </table>
-                          </li>
-                        </ul>
-                    </div>
-                </div>
-                <input id="calculator_button" type="submit" title="${_('Calculate')}" value="=" aria-label="${_('Calculate')}" value="=" tabindex="-1" />
-                <input type="text" id="calculator_output" title="${_('Calculator Output Field')}" readonly tabindex="-1" />
-            </form>
+  ## Utility: Notes
+  % if is_edxnotes_enabled(course):
+    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+  % endif
 
-        </div>
-    </div>
-% endif
+  ## Utility: Calc
+  % if course.show_calculator:
+    <%include file="/calculator/toggle_calculator.html" />
+  % endif
+</nav>
+
 <%include file="../modal/accessible_confirm.html" />
