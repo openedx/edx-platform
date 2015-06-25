@@ -37,7 +37,6 @@
 
             this.listenTo( this.model, 'sync', _.bind( this.handleSubmitPhotoSuccess, this ));
             this.listenTo( this.model, 'error', _.bind( this.handleSubmissionError, this ));
-            this.render();
         },
 
         render: function() {
