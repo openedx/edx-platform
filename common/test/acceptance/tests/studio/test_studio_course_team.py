@@ -42,7 +42,7 @@ class CourseTeamPageTest(StudioCourseTest):
     def _go_to_course_team_page(self):
         """ Opens Course Team page """
         self.page.visit()
-        self.page.wait_until_backbone_rendered()
+        self.page.wait_until_no_loading_indicator()
 
     def _refresh_page(self):
         """

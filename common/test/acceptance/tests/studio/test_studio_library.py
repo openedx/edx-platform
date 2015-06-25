@@ -523,7 +523,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         """
         self.page = LibraryUsersPage(self.browser, self.library_key)
         self.page.visit()
-        self.page.wait_until_ready()
+        self.page.wait_until_no_loading_indicator()
 
     def test_user_management(self):
         """

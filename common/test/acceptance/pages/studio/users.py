@@ -107,7 +107,7 @@ class UsersPageMixin(PageObject):
         """ Gets modal dialog text """
         return self.q(css='.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
 
-    def wait_until_backbone_rendered(self):
+    def wait_until_no_loading_indicator(self):
         """
         When the page first loads, there is a loading indicator and most
         functionality is not yet available. This waits for that loading to finish
