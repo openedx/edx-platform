@@ -76,19 +76,27 @@
 
     jasmine.stubbedMetadata = {
         '7tqY6eQzVhE': {
-            id: '7tqY6eQzVhE',
-            duration: 300
+            contentDetails : {
+                id: '7tqY6eQzVhE',
+                duration: 300
+            }
         },
         'cogebirgzzM': {
-            id: 'cogebirgzzM',
-            duration: 200
+            contentDetails : {
+                id: 'cogebirgzzM',
+                duration: 200
+            }
         },
         'abcdefghijkl': {
-            id: 'abcdefghijkl',
-            duration: 400
+            contentDetails : {
+                id: 'abcdefghijkl',
+                duration: 400
+            }
         },
         bogus: {
-            duration: 100
+            contentDetails : {
+                duration: 100
+            }
         }
     };
 
@@ -122,7 +130,7 @@
         }
         return spy.andCallFake(function (settings) {
             var match = settings.url
-                    .match(/googleapis\.com\/youtube\/v3\/videos\/(.+)\?part=contentDetails/),
+                    .match(/googleapis.com\/.+\/videos\/\?id=(.+)&part=contentDetails/),
                 status, callCallback;
             if (match) {
                 status = match[1].split('_');
@@ -138,7 +146,7 @@
                     };
                 } else if (settings.success) {
                     return settings.success({
-                        data: jasmine.stubbedMetadata[match[1]]
+                        items: jasmine.stubbedMetadata[match[1]]
                     });
                 } else {
                     return {
