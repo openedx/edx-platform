@@ -122,7 +122,7 @@
         }
         return spy.andCallFake(function (settings) {
             var match = settings.url
-                    .match(/youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/),
+                    .match(/googleapis\.com\/youtube\/v3\/videos\/(.+)\?part=contentDetails/),
                 status, callCallback;
             if (match) {
                 status = match[1].split('_');

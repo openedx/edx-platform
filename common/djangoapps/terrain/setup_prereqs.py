@@ -29,7 +29,7 @@ SERVICES = {
 YOUTUBE_API_URLS = {
     'main': 'https://www.youtube.com/',
     'player': 'http://www.youtube.com/iframe_api',
-    'metadata': 'http://gdata.youtube.com/feeds/api/videos/',
+    'metadata': 'http://www.googleapis.com/youtube/v3/videos/',
     # For transcripts, you need to check an actual video, so we will
     # just specify our default video and see if that one is available.
     'transcript': 'http://video.google.com/timedtext?lang=en&v=OEoXaMPEzfM',
