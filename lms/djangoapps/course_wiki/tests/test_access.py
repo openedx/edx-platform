@@ -7,9 +7,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from django.test.utils import override_settings
 from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from wiki.models import URLPath
 from course_wiki.views import get_or_create_root
@@ -17,10 +15,10 @@ from course_wiki.utils import user_is_article_course_staff, course_wiki_slug
 from course_wiki import settings
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestWikiAccessBase(ModuleStoreTestCase):
     """Base class for testing wiki access."""
     def setUp(self):
+        super(TestWikiAccessBase, self).setUp()
 
         self.wiki = get_or_create_root()
 
@@ -141,7 +139,7 @@ class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
         wiki_200_page_page = self.create_urlpath(wiki_200_page, 'Grandchild')
         self.wiki_200_pages = [wiki_200, wiki_200_page, wiki_200_page_page]
 
-    def test_course_staff_is_course_wiki_staff_for_numerical_course_number(self):  # pylint: disable=C0103
+    def test_course_staff_is_course_wiki_staff_for_numerical_course_number(self):  # pylint: disable=invalid-name
         for page in self.wiki_200_pages:
             for course_staff in self.course_200_staff:
                 self.assertTrue(user_is_article_course_staff(course_staff, page.article))

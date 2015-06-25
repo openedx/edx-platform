@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 import requests
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 from django.conf import settings
 from common import upload_file, attach_file
@@ -142,7 +142,7 @@ def correct_video_settings(_step):
     expected_entries = [
         # basic
         [DISPLAY_NAME, 'Video', False],
-        ['Default Video URL', 'http://youtu.be/OEoXaMPEzfM, , ', False],
+        ['Default Video URL', 'http://youtu.be/3_yD_cEKoCk, , ', False],
 
         # advanced
         [DISPLAY_NAME, 'Video', False],
@@ -152,11 +152,12 @@ def correct_video_settings(_step):
         ['Show Transcript', 'True', False],
         ['Transcript Languages', '', False],
         ['Upload Handout', '', False],
+        ['Video Available on Web Only', 'False', False],
         ['Video Download Allowed', 'False', False],
         ['Video File URLs', '', False],
         ['Video Start Time', '00:00:00', False],
         ['Video Stop Time', '00:00:00', False],
-        ['YouTube ID', 'OEoXaMPEzfM', False],
+        ['YouTube ID', '3_yD_cEKoCk', False],
         ['YouTube ID for .75x speed', '', False],
         ['YouTube ID for 1.25x speed', '', False],
         ['YouTube ID for 1.5x speed', '', False]

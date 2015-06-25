@@ -32,7 +32,8 @@ if Backbone?
     convertMath: ->
       element = @$(".post-body")
       element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.text()
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
+      if MathJax?
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
     edit: (event) ->
       @trigger "thread:edit", event

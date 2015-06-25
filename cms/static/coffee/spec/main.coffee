@@ -15,6 +15,8 @@ requirejs.config({
         "jquery.cookie": "xmodule_js/common_static/js/vendor/jquery.cookie",
         "jquery.qtip": "xmodule_js/common_static/js/vendor/jquery.qtip.min",
         "jquery.fileupload": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload",
+        "jquery.fileupload-process": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process",
+        "jquery.fileupload-validate": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate",
         "jquery.iframe-transport": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill",
         "jquery.immediateDescendents": "xmodule_js/common_static/coffee/src/jquery.immediateDescendents",
@@ -30,6 +32,7 @@ requirejs.config({
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
         "xblock/cms.runtime.v1": "coffee/src/xblock/cms.runtime.v1",
+        "xblock/core": "xmodule_js/common_static/js/xblock/core",
         "xblock": "xmodule_js/common_static/coffee/src/xblock",
         "utility": "xmodule_js/common_static/js/src/utility",
         "accessibility": "xmodule_js/common_static/js/src/accessibility_tools",
@@ -42,10 +45,11 @@ requirejs.config({
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
+        "mock-ajax": "xmodule_js/common_static/js/vendor/mock-ajax",
 
-        "mathjax": "//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+        "mathjax": "//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
-        "tender": "//edxedge.tenderapp.com/tender_widget",
+        "tender": "//api.tenderapp.com/tender_widget",
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix",
         "js/spec/test_utils": "js/spec/test_utils",
@@ -94,8 +98,14 @@ requirejs.config({
             exports: "jQuery.fn.qtip"
         },
         "jquery.fileupload": {
-            deps: ["jquery.iframe-transport"],
+            deps: ["jquery.ui", "jquery.iframe-transport"],
             exports: "jQuery.fn.fileupload"
+        },
+        "jquery.fileupload-process": {
+            deps: ["jquery.fileupload"]
+        },
+        "jquery.fileupload-validate": {
+            deps: ["jquery.fileupload"]
         },
         "jquery.inputnumber": {
             deps: ["jquery"],
@@ -181,6 +191,9 @@ requirejs.config({
             exports: "XBlock",
             deps: ["xblock/core"]
         },
+        "mock-ajax": {
+            deps: ["jasmine", "jquery"]
+        }
 
         "coffee/src/main": {
             deps: ["coffee/src/ajax_prefix"]
@@ -219,10 +232,14 @@ define([
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
 
+    "js/spec/views/active_video_upload_list_spec",
+    "js/spec/views/previous_video_upload_spec",
+    "js/spec/views/previous_video_upload_list_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/assets_spec",
     "js/spec/views/baseview_spec",
     "js/spec/views/container_spec",
+    "js/spec/views/paged_container_spec",
     "js/spec/views/group_configuration_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/unit_outline_spec",
@@ -239,6 +256,7 @@ define([
     "js/spec/views/pages/course_outline_spec",
     "js/spec/views/pages/course_rerun_spec",
     "js/spec/views/pages/index_spec",
+    "js/spec/views/pages/library_users_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",

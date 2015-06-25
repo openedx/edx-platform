@@ -3,7 +3,7 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from .helpers import BaseDiscussionMixin
+from .helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -36,10 +36,10 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
     """
     def setup_cohorts(self):
         """
-        Sets up the course to use cohorting with a single defined cohort group.
+        Sets up the course to use cohorting with a single defined cohort.
         """
         self.setup_cohort_config(self.course_fixture)
-        self.cohort_1_name = "Cohort Group 1"
+        self.cohort_1_name = "Cohort 1"
         self.cohort_1_id = self.add_manual_cohort(self.course_fixture, self.cohort_1_name)
 
     def test_cohort_visibility_label(self):
@@ -57,23 +57,20 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
-class DiscussionTabSingleThreadTest(UniqueCourseTest):
+class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page displaying a single thread.
     """
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        # Create a course to register for
-        self.course_fixture = CourseFixture(**self.course_info).install()
         self.setup_cohorts()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
     def setup_thread_page(self, thread_id):
-        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
+        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, self.discussion_id, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
-    # pylint:disable=W0613
+    # pylint: disable=unused-argument
     def refresh_thread_page(self, thread_id):
         self.browser.refresh()
         self.thread_page.wait_for_page()
@@ -129,7 +126,7 @@ class InlineDiscussionTest(UniqueCourseTest):
         discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         discussion_page.expand_discussion()
         self.assertEqual(discussion_page.get_num_displayed_threads(), 1)
-        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint:disable=W0201
+        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.expand()
 
     def refresh_thread_page(self, thread_id):

@@ -26,13 +26,14 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from pymongo import ASCENDING, DESCENDING
-from .access import has_course_access
+from student.auth import has_course_author_access
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 __all__ = ['assets_handler']
 
-
 # pylint: disable=unused-argument
+
+
 @login_required
 @ensure_csrf_cookie
 def assets_handler(request, course_key_string=None, asset_key_string=None):
@@ -57,7 +58,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
         json: delete an asset
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
@@ -83,6 +84,9 @@ def _asset_index(request, course_key):
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
+        'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
+        'chunk_size_in_mbs': settings.UPLOAD_CHUNK_SIZE_IN_MB,
+        'max_file_size_redirect_url': settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
         'asset_callback_url': reverse_course_url('assets_handler', course_key)
     })
 
@@ -96,6 +100,29 @@ def _assets_json(request, course_key):
     requested_page = int(request.REQUEST.get('page', 0))
     requested_page_size = int(request.REQUEST.get('page_size', 50))
     requested_sort = request.REQUEST.get('sort', 'date_added')
+    requested_filter = request.REQUEST.get('asset_type', '')
+    requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(
+        requested_filter, None)
+    filter_params = None
+    if requested_filter:
+        if requested_filter == 'OTHER':
+            all_filters = settings.FILES_AND_UPLOAD_TYPE_FILTERS
+            where = []
+            for all_filter in all_filters:
+                extension_filters = all_filters[all_filter]
+                where.extend(
+                    ["JSON.stringify(this.contentType).toUpperCase() != JSON.stringify('{}').toUpperCase()".format(
+                        extension_filter) for extension_filter in extension_filters])
+            filter_params = {
+                "$where": ' && '.join(where),
+            }
+        else:
+            where = ["JSON.stringify(this.contentType).toUpperCase() == JSON.stringify('{}').toUpperCase()".format(
+                req_filter) for req_filter in requested_file_types]
+            filter_params = {
+                "$where": ' || '.join(where),
+            }
+
     sort_direction = DESCENDING
     if request.REQUEST.get('direction', '').lower() == 'asc':
         sort_direction = ASCENDING
@@ -109,26 +136,42 @@ def _assets_json(request, course_key):
 
     current_page = max(requested_page, 0)
     start = current_page * requested_page_size
-    assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort)
+    options = {
+        'current_page': current_page,
+        'page_size': requested_page_size,
+        'sort': sort,
+        'filter_params': filter_params
+    }
+    assets, total_count = _get_assets_for_page(request, course_key, options)
     end = start + len(assets)
 
-    # If the query is beyond the final page, then re-query the final page so that at least one asset is returned
+    # If the query is beyond the final page, then re-query the final page so
+    # that at least one asset is returned
     if requested_page > 0 and start >= total_count:
-        current_page = int(math.floor((total_count - 1) / requested_page_size))
+        options['current_page'] = current_page = int(math.floor((total_count - 1) / requested_page_size))
         start = current_page * requested_page_size
-        assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort)
+        assets, total_count = _get_assets_for_page(request, course_key, options)
         end = start + len(assets)
 
     asset_json = []
     for asset in assets:
         asset_location = asset['asset_key']
-        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        # note, due to the schema change we may not have a 'thumbnail_location'
+        # in the result set
         thumbnail_location = asset.get('thumbnail_location', None)
         if thumbnail_location:
-            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
+            thumbnail_location = course_key.make_asset_key(
+                'thumbnail', thumbnail_location[4])
 
         asset_locked = asset.get('locked', False)
-        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
+        asset_json.append(_get_asset_json(
+            asset['displayname'],
+            asset['contentType'],
+            asset['uploadDate'],
+            asset_location,
+            thumbnail_location,
+            asset_locked
+        ))
 
     return JsonResponse({
         'start': start,
@@ -141,15 +184,27 @@ def _assets_json(request, course_key):
     })
 
 
-def _get_assets_for_page(request, course_key, current_page, page_size, sort):
+def _get_assets_for_page(request, course_key, options):
     """
     Returns the list of assets for the specified page and page size.
     """
+    current_page = options['current_page']
+    page_size = options['page_size']
+    sort = options['sort']
+    filter_params = options['filter_params'] if options['filter_params'] else None
     start = current_page * page_size
 
     return contentstore().get_all_content_for_course(
-        course_key, start=start, maxresults=page_size, sort=sort
+        course_key, start=start, maxresults=page_size, sort=sort, filter_params=filter_params
     )
+
+
+def get_file_size(upload_file):
+    """
+    Helper method for getting file size of an upload file.
+    Can be used for mocking test file sizes.
+    """
+    return upload_file.size
 
 
 @require_POST
@@ -176,6 +231,27 @@ def _upload_asset(request, course_key):
     upload_file = request.FILES['file']
     filename = upload_file.name
     mime_type = upload_file.content_type
+    size = get_file_size(upload_file)
+
+    # If file is greater than a specified size, reject the upload
+    # request and send a message to the user. Note that since
+    # the front-end may batch large file uploads in smaller chunks,
+    # we validate the file-size on the front-end in addition to
+    # validating on the backend. (see cms/static/js/views/assets.js)
+    max_file_size_in_bytes = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
+    if size > max_file_size_in_bytes:
+        return JsonResponse({
+            'error': _(
+                'File {filename} exceeds maximum size of '
+                '{size_mb} MB. Please follow the instructions here '
+                'to upload a file elsewhere and link to it instead: '
+                '{faq_url}'
+            ).format(
+                filename=filename,
+                size_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
+                faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
+            )
+        }, status=413)
 
     content_loc = StaticContent.compute_location(course_key, filename)
 
@@ -190,8 +266,8 @@ def _upload_asset(request, course_key):
 
     # first let's see if a thumbnail can be created
     (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
-            content,
-            tempfile_path=tempfile_path
+        content,
+        tempfile_path=tempfile_path,
     )
 
     # delete cached thumbnail even if one couldn't be created this time (else
@@ -207,10 +283,16 @@ def _upload_asset(request, course_key):
 
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
-
     locked = getattr(content, 'locked', False)
     response_payload = {
-        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location, locked),
+        'asset': _get_asset_json(
+            content.name,
+            content.content_type,
+            readback.last_modified_at,
+            content.location,
+            content.thumbnail_location,
+            locked
+        ),
         'msg': _('Upload completed')
     }
 
@@ -273,7 +355,7 @@ def _update_asset(request, course_key, asset_key):
             return JsonResponse(modified_asset, status=201)
 
 
-def _get_asset_json(display_name, date, location, thumbnail_location, locked):
+def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
     """
     Helper method for formatting the asset information to send to client.
     """
@@ -281,6 +363,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
+        'content_type': content_type,
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,

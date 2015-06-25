@@ -238,6 +238,7 @@ class S3ReportStore(ReportStore):
             settings.AWS_ACCESS_KEY_ID,
             settings.AWS_SECRET_ACCESS_KEY
         )
+
         self.bucket = conn.get_bucket(bucket_name)
 
     @classmethod
@@ -334,17 +335,9 @@ class S3ReportStore(ReportStore):
         can be plugged straight into an href
         """
         course_dir = self.key_for(course_id, '')
-        sorted_link_data = sorted(
-            [
-                # each element in the array is a list with the following format: ('date, 'filename', 'url')
-                (key.key.split('/')[-1].split('_')[-1].split('.csv')[0], key.key.split('/')[-1], key.generate_url(expires_in=300))
-                for key in self.bucket.list(prefix=course_dir.key)
-            ],
-            reverse=True
-        )
         return [
-            (link_data[1], link_data[2])
-            for link_data in sorted_link_data
+            (key.key.split("/")[-1], key.generate_url(expires_in=300))
+            for key in sorted(self.bucket.list(prefix=course_dir.key), reverse=True, key=lambda k: k.last_modified)
         ]
 
 
@@ -429,15 +422,10 @@ class LocalFSReportStore(ReportStore):
         course_dir = self.path_to(course_id, '')
         if not os.path.exists(course_dir):
             return []
-        sorted_link_data = sorted(
-            [
-                # each element in the array is a list with the following format: ('date, 'filename', 'url')
-                (filename.split('_')[-1].split('.csv')[0], filename, ('file://' + urllib.quote(os.path.join(course_dir, filename))))
-                for filename in os.listdir(course_dir)
-            ],
-            reverse=True
-        )
+        files = [(filename, os.path.join(course_dir, filename)) for filename in os.listdir(course_dir)]
+        files.sort(key=lambda (filename, full_path): os.path.getmtime(full_path), reverse=True)
+
         return [
-            (link_data[1], link_data[2])
-            for link_data in sorted_link_data
+            (filename, ("file://" + urllib.quote(full_path)))
+            for filename, full_path in files
         ]

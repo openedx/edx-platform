@@ -6,19 +6,33 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
+    // Bind to StateChange Event
+    History.Adapter.bind( window, 'statechange', function() {
+        /* Note: We are using History.getState() for legacy browser (IE) support
+         * using History.js plugin instead of the native event.state
+         */
+        var State = History.getState();
+    });
+
     edx.student.account.AccessView = Backbone.View.extend({
         el: '#login-and-registration-container',
 
         tpl: '#access-tpl',
 
         events: {
-            'change .form-toggle': 'toggleForm'
+            'click .form-toggle': 'toggleForm'
         },
 
         subview: {
             login: {},
             register: {},
             passwordHelp: {}
+        },
+
+        urls: {
+            dashboard: '/dashboard',
+            payment: '/verify_student/start-flow/',
+            trackSelection: '/course_modes/choose/'
         },
 
         // The form currently loaded
@@ -32,12 +46,27 @@ var edx = edx || {};
             _.mixin( _s.exports() );
 
             this.tpl = $(this.tpl).html();
+
             this.activeForm = obj.mode || 'login';
+
             this.thirdPartyAuth = obj.thirdPartyAuth || {
                 currentProvider: null,
                 providers: []
             };
+
+            this.formDescriptions = {
+                login: obj.loginFormDesc,
+                register: obj.registrationFormDesc,
+                reset: obj.passwordResetFormDesc
+            };
+
             this.platformName = obj.platformName;
+
+            // The login view listens for 'sync' events from the reset model
+            this.resetModel = new edx.student.account.PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
 
             this.render();
         },
@@ -55,82 +84,74 @@ var edx = edx || {};
         postRender: function() {
             // Load the default form
             this.loadForm( this.activeForm );
-            this.$header = $(this.el).find('.js-login-register-header');
         },
 
         loadForm: function( type ) {
-            this.getFormData( type, this );
+            var loadFunc = _.bind( this.load[type], this );
+            loadFunc( this.formDescriptions[type] );
         },
 
         load: {
-            login: function( data, context ) {
+            login: function( data ) {
                 var model = new edx.student.account.LoginModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
 
-                context.subview.login =  new edx.student.account.LoginView({
+                this.subview.login =  new edx.student.account.LoginView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth,
-                    platformName: context.platformName
+                    resetModel: this.resetModel,
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName
                 });
 
                 // Listen for 'password-help' event to toggle sub-views
-                context.listenTo( context.subview.login, 'password-help', context.resetPassword );
+                this.listenTo( this.subview.login, 'password-help', this.resetPassword );
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                context.listenTo( context.subview.login, 'auth-complete', context.authComplete );
+                this.listenTo( this.subview.login, 'auth-complete', this.authComplete );
 
             },
 
-            reset: function( data, context ) {
-                var model = new edx.student.account.PasswordResetModel({}, {
-                    method: data.method,
-                    url: data.submit_url
-                });
+            reset: function( data ) {
+                this.resetModel.ajaxType = data.method;
+                this.resetModel.urlRoot = data.submit_url;
 
-                context.subview.passwordHelp = new edx.student.account.PasswordResetView({
+                this.subview.passwordHelp = new edx.student.account.PasswordResetView({
                     fields: data.fields,
-                    model: model
+                    model: this.resetModel
                 });
+
+                // Listen for 'password-email-sent' event to toggle sub-views
+                this.listenTo( this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent );
+
+                // Focus on the form
+                $('.password-reset-form').focus();
             },
 
-            register: function( data, context ) {
+            register: function( data ) {
                 var model = new edx.student.account.RegisterModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
 
-                context.subview.register =  new edx.student.account.RegisterView({
+                this.subview.register =  new edx.student.account.RegisterView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth,
-                    platformName: context.platformName
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName
                 });
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                context.listenTo( context.subview.register, 'auth-complete', context.authComplete );
+                this.listenTo( this.subview.register, 'auth-complete', this.authComplete );
             }
         },
 
-        getFormData: function( type, context ) {
-            var urls = {
-                login: 'login_session',
-                register: 'registration',
-                reset: 'password_reset'
-            };
-
-            $.ajax({
-                url: '/user_api/v1/account/' + urls[type] + '/',
-                type: 'GET',
-                dataType: 'json',
-                context: this,
-                success: function( data ) {
-                    this.load[type]( data, context );
-                },
-                error: this.showFormError
-            });
+        passwordEmailSent: function() {
+            this.element.hide( $(this.el).find('#password-reset-anchor') );
+            this.element.show( $('#login-anchor') );
+            this.element.scrollTop( $('#login-anchor') );
         },
 
         resetPassword: function() {
@@ -138,20 +159,19 @@ var edx = edx || {};
                 category: 'user-engagement'
             });
 
-            this.element.hide( this.$header );
-            this.element.hide( $(this.el).find('.form-type') );
+            this.element.hide( $(this.el).find('#login-anchor') );
             this.loadForm('reset');
-            this.element.scrollTop( $('#password-reset-wrapper') );
-        },
-
-        showFormError: function() {
-            this.element.show( $('#form-load-fail') );
+            this.element.scrollTop( $('#password-reset-anchor') );
         },
 
         toggleForm: function( e ) {
-            var type = $(e.currentTarget).val(),
+            var type = $(e.currentTarget).data('type'),
                 $form = $('#' + type + '-form'),
-                $anchor = $('#' + type + '-anchor');
+                $anchor = $('#' + type + '-anchor'),
+                queryParams = url('?'),
+                queryStr = queryParams.length > 0 ? '?' + queryParams : '';
+
+            e.preventDefault();
 
             window.analytics.track('edx.bi.' + type + '_form.toggled', {
                 category: 'user-engagement'
@@ -161,13 +181,48 @@ var edx = edx || {};
                 this.loadForm( type );
             }
 
+            this.element.hide( $(this.el).find('.submission-success') );
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
             this.element.scrollTop( $anchor );
+
+            // Update url without reloading page
+            History.pushState( null, document.title, '/' + type + queryStr );
+            analytics.page( 'login_and_registration', type );
+
+            // Focus on the form
+            document.getElementById(type).focus();
         },
 
         /**
          * Once authentication has completed successfully, a user may need to:
+         *
+         * - Enroll in a course.
+         * - Update email opt-in preferences
+         *
+         * These actions are delegated from the authComplete function to additional
+         * functions requiring authentication.
+         *
+         */
+        authComplete: function() {
+            var emailOptIn = edx.student.account.EmailOptInInterface,
+                queryParams = this.queryParams();
+
+            // Set the email opt in preference.
+            if (!_.isUndefined(queryParams.emailOptIn) && queryParams.enrollmentAction) {
+                emailOptIn.setPreference(
+                    decodeURIComponent(queryParams.courseId),
+                    queryParams.emailOptIn,
+                    this
+                ).always(this.enrollment);
+            } else {
+                this.enrollment();
+            }
+        },
+
+        /**
+         * Designed to be invoked after authentication has completed. This function enrolls
+         * the student as requested.
          *
          * - Enroll in a course.
          * - Add a course to the shopping cart.
@@ -191,18 +246,40 @@ var edx = edx || {};
          * ?course_id: The slash-separated course ID to enroll in or add to the cart.
          *
          */
-        authComplete: function() {
+        enrollment: function() {
             var enrollment = edx.student.account.EnrollmentInterface,
                 shoppingcart = edx.student.account.ShoppingCartInterface,
-                redirectUrl = '/dashboard',
+                redirectUrl = this.urls.dashboard,
                 queryParams = this.queryParams();
 
-            if ( queryParams.enrollmentAction === 'enroll' && queryParams.courseId) {
-                /*
-                If we need to enroll in a course, mark as enrolled.
-                The enrollment interface will redirect the student once enrollment completes.
-                */
-                enrollment.enroll( decodeURIComponent( queryParams.courseId ) );
+            if ( queryParams.enrollmentAction === 'enroll' && queryParams.courseId ) {
+                var courseId = decodeURIComponent( queryParams.courseId );
+
+                // Determine where to redirect the user after auto-enrollment.
+                if ( !queryParams.courseMode ) {
+                    /* Backwards compatibility with the original course details page.
+                    The old implementation did not specify the course mode for enrollment,
+                    so we'd always send the user to the "track selection" page.
+                    The track selection page would allow the user to select the course mode
+                    ("verified", "honor", etc.) -- or, if the only course mode was "honor",
+                    it would redirect the user to the dashboard. */
+                    redirectUrl = this.urls.trackSelection + courseId + '/';
+                } else if ( queryParams.courseMode === 'honor' || queryParams.courseMode === 'audit' ) {
+                    /* The newer version of the course details page allows the user
+                    to specify which course mode to enroll as.  If the student has
+                    chosen "honor", we send them immediately to the dashboard
+                    rather than the payment flow.  The user may decide to upgrade
+                    from the dashboard later. */
+                    redirectUrl = this.urls.dashboard;
+                } else {
+                    /* If the user selected any other kind of course mode, send them
+                    to the payment/verification flow. */
+                    redirectUrl = this.urls.payment + courseId + '/';
+                }
+
+                /* Attempt to auto-enroll the user in a free mode of the course,
+                then redirect to the next location. */
+                enrollment.enroll( courseId, redirectUrl );
             } else if ( queryParams.enrollmentAction === 'add_to_cart' && queryParams.courseId) {
                 /*
                 If this is a paid course, add it to the shopping cart and redirect
@@ -248,7 +325,9 @@ var edx = edx || {};
             return {
                 next: $.url( '?next' ),
                 enrollmentAction: $.url( '?enrollment_action' ),
-                courseId: $.url( '?course_id' )
+                courseId: $.url( '?course_id' ),
+                courseMode: $.url( '?course_mode' ),
+                emailOptIn: $.url( '?email_opt_in')
             };
         },
 
@@ -263,8 +342,7 @@ var edx = edx || {};
          */
         element: {
             hide: function( $el ) {
-                $el.addClass('hidden')
-                   .attr('aria-hidden', true);
+                $el.addClass('hidden');
             },
 
             scrollTop: function( $el ) {
@@ -275,8 +353,7 @@ var edx = edx || {};
             },
 
             show: function( $el ) {
-                $el.removeClass('hidden')
-                   .attr('aria-hidden', false);
+                $el.removeClass('hidden');
             }
         }
     });

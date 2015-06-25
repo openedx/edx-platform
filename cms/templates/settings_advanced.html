@@ -73,7 +73,7 @@
         <h3 class="title-3">${_("What do advanced settings do?")}</h3>
         <p>${_("Advanced settings control specific course functionality. On this page, you can edit manual policies, which are JSON-based key and value pairs that control specific course settings.")}</p>
 
-        <p>${_("Any policies you modify here override all other information you've defined elsewhere in Studio. Do not edit policies unless you are familiar with both their purpose and syntax.")}</p>
+        <p>${_("Any policies you modify here override all other information you've defined elsewhere in {studio_name}. Do not edit policies unless you are familiar with both their purpose and syntax.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
         <p>${_("{em_start}Note:{em_end} When you enter strings as policy values, ensure that you use double quotation marks (&quot;) around the string. Do not use single quotation marks (&apos;).").format(em_start='<strong>', em_end="</strong>")}</p>
       </div>
@@ -86,14 +86,12 @@
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
         %>
       <h3 class="title-3">${_("Other Course Settings")}</h3>
-        <nav class="nav-related">
+        <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
             <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-          % endif
           </ul>
         </nav>
       % endif

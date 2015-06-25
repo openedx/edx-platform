@@ -60,3 +60,8 @@ class ConfigurationModel(models.Model):
 
         cache.set(cls.cache_key_name(), current, cls.cache_timeout)
         return current
+
+    @classmethod
+    def is_enabled(cls):
+        """Returns True if this feature is configured as enabled, else False."""
+        return cls.current().enabled

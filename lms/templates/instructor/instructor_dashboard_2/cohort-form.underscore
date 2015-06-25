@@ -1,0 +1,146 @@
+<% var isNewCohort = cohort.id == null; %>
+<div class="cohort-management-settings">
+    <form action="" method="post" name="" id="cohort-management-settings-form" class="cohort-management-settings-form">
+        <% if (isNewCohort) { %>
+            <h3 class="form-title"><%- gettext('Add a New Cohort') %></h3>
+            <div class="tab-content is-visible new-cohort-form">
+        <% } %>
+        <div class="form-fields">
+
+            <%
+            var foundSelected = false;
+            var selectedContentGroupId = cohort.get('group_id');
+            var selectedUserPartitionId = cohort.get('user_partition_id');
+            var hasSelectedContentGroup = selectedContentGroupId != null;
+            var hasContentGroups = contentGroups.length > 0;
+            var assignment_type = cohort.get('assignment_type');
+            var cohort_name = cohort.get('name');
+            var cohort_name_value = isNewCohort ? '' : cohort_name;
+            var placeholder_value = isNewCohort ? gettext('Enter the name of the cohort') : '';
+
+            %>
+            <div class="form-field">
+                <div class="cohort-management-settings-form-name field field-text">
+                    <label for="cohort-name" class="form-label">
+                            <%- gettext('Cohort Name') %> *
+                            <span class="sr"><%- gettext('(Required Field)')%></span>
+                    </label>
+                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name" id="cohort-name"
+                           placeholder="<%- placeholder_value %>" required="required" type="text">
+                </div>
+                <hr class="divider divider-lv1">
+                <% if (isDefaultCohort) { %>
+                    <div class="cohort-management-assignment-type-settings field field-radio is-disabled" aria-disabled="true">
+                <% } else {  %>
+                    <div class="cohort-management-assignment-type-settings field field-radio">
+                <% } %>
+                    <h4 class="form-label">
+                        <%- gettext('Cohort Assignment Method') %>
+                    </h4>
+                    <label>
+                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Automatic") %>
+                    </label>
+                    <label>
+                        <input type="radio" class="type-manual" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manual") %>
+                    </label>
+                </div>
+                <% if (isDefaultCohort) { %>
+                    <p class="copy-error">
+                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <%- gettext("There must be one cohort to which students can automatically be assigned.") %>
+                    </p>
+                <% } %>
+                <hr class="divider divider-lv1">
+                <div class="cohort-management-details-association-course field field-radio">
+                    <h4 class="form-label">
+                        <%- gettext('Associated Content Group') %>
+                    </h4>
+                    <label><input type="radio" class="radio-no" name="cohort-association-course" value="no"  <%- !hasSelectedContentGroup ? 'checked="checked"' : '' %>/> <%- gettext("No Content Group") %></label>
+                    <div class="input-group has-other-input-text">
+                        <label><input type="radio" class="radio-yes" name="cohort-association-course" value="yes" <%- !hasContentGroups ? 'disabled="disabled"' : '' %> <%- hasSelectedContentGroup ? 'checked="checked"' : '' %> /> <%- gettext("Select a Content Group") %></label>
+                        <% if (hasContentGroups) { %>
+                            <div class="input-group-other">
+                                <label class="sr" for="cohort-group-association"><%- gettext("Choose a content group to associate") %></label>
+                                <select name="cohort-group-association" class="input input-lg has-option-unavailable input-cohort-group-association" <%- !hasSelectedContentGroup ? 'disabled="disabled"' : '' %>>
+                                    <option value="None" <%- !hasSelectedContentGroup ? 'selected="selected"' : '' %> disabled="disabled"><%- gettext("Not selected") %></option>
+
+                                    <%
+                                    var orderedContentGroups = _.sortBy(
+                                        contentGroups,
+                                        function(group) { return group.get('name'); }
+                                    );
+                                    for (var i=0; i < orderedContentGroups.length; i++) {
+                                        var contentGroup = orderedContentGroups[i],
+                                            contentGroupUserPartitionId = contentGroup.get('user_partition_id'),
+                                            contentGroupId = contentGroup.get('id'),
+                                            isSelected = contentGroupId == selectedContentGroupId;
+                                        if (isSelected) {
+                                            foundSelected = true;
+                                        }
+                                    %>
+                                        <option value="<%- contentGroupId %>:<%- contentGroupUserPartitionId %>" <%- isSelected ? 'selected="selected"' : '' %>><%- contentGroup.get('name') %></option>
+                                    <%
+                                    }
+                                    %>
+
+                                    <% if (hasSelectedContentGroup && !foundSelected) { %>
+                                        <option value="<%- selectedContentGroupId %>:<%- selectedUserPartitionId %>" class="option-unavailable" selected="selected"><%- gettext("Deleted Content Group") %></option>
+                                    <% } %>
+                                </select>
+
+                                <% if (hasSelectedContentGroup && !foundSelected) { %>
+                                    <div class="msg-inline">
+                                        <p class="copy-error">
+                                            <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <%=
+                                            interpolate(
+                                                // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
+                                                '%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected content group was deleted. Select another content group.',
+                                                {
+                                                    screen_reader_start: '<span class="sr">',
+                                                    screen_reader_end: '</span>'
+                                                },
+                                                true
+                                            )
+                                            %>
+                                        </p>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } else { // no content groups available %>
+                            <div class="input-group-other">
+                                <div class="msg-inline">
+                                    <p class="copy-error">
+                                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                        <%=
+                                        interpolate(
+                                            // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
+                                            '%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups exist.',
+                                            {
+                                                screen_reader_start: '<span class="sr">',
+                                                screen_reader_end: '</span>'
+                                            },
+                                            true
+                                        )
+                                        %>
+                                        <a class="link-to-group-settings" href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a>
+                                    </p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% if (isNewCohort) { %>
+        </div>
+        <% } %>
+
+        <div class="form-actions <% if (isNewCohort) { %>new-cohort-form<% } %>">
+            <button class="form-submit button action-primary action-save">
+                <%- gettext('Save') %>
+            </button>
+            <a href="" class="form-cancel action-secondary action-cancel"><%- gettext('Cancel') %></a>
+        </div>
+    </form>
+</div>

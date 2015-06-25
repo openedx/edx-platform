@@ -254,27 +254,6 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
 
-class SymbolicResponseXMLFactory(ResponseXMLFactory):
-    """ Factory for creating <symbolicresponse> XML trees """
-
-    def create_response_element(self, **kwargs):
-        cfn = kwargs.get('cfn', None)
-        answer = kwargs.get('answer', None)
-        options = kwargs.get('options', None)
-
-        response_element = etree.Element("symbolicresponse")
-        if cfn:
-            response_element.set('cfn', str(cfn))
-        if answer:
-            response_element.set('answer', str(answer))
-        if options:
-            response_element.set('options', str(options))
-        return response_element
-
-    def create_input_element(self, **kwargs):
-        return ResponseXMLFactory.textline_input_xml(**kwargs)
-
-
 class SchematicResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <schematicresponse> XML trees """
 
@@ -844,7 +823,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         choice_inputs = []
         # Ensure that the first element of choices is an ordered
         # collection. It will start as a list, a tuple, or not a Container.
-        if type(choices[0]) not in [list, tuple]:
+        if not isinstance(choices[0], (list, tuple)):
             choices = [choices]
 
         for choice in choices:
@@ -859,7 +838,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
 
                 # Make sure that `answers` is an ordered collection for
                 # convenience.
-                if type(answers) not in [list, tuple]:
+                if not isinstance(answers, (list, tuple)):
                     answers = [answers]
 
                 numtolerance_inputs = [

@@ -41,4 +41,4 @@ CoffeeScript is compiled when you update assets using the command:
 Testing
 -------
 
-We use Jasmine to unit-test the JavaScript files.  See `docs/internal/testing.md` for details.
+We use Jasmine to unit-test the JavaScript files.  See `docs/en_us/internal/testing.rst` for details.

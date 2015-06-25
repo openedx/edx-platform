@@ -4,10 +4,8 @@ Tests of various instructor dashboard features that include lists of students
 
 from django.conf import settings
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from markupsafe import escape
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -15,12 +13,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from instructor.views import legacy
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestXss(ModuleStoreTestCase):
     def setUp(self):
+        super(TestXss, self).setUp()
+
         self._request_factory = RequestFactory()
         self._course = CourseFactory.create()
         self._evil_student = UserFactory.create(
@@ -63,6 +62,3 @@ class TestXss(ModuleStoreTestCase):
 
     def test_dump_list_of_enrolled(self):
         self._test_action("Dump list of enrolled students")
-
-    def test_dump_grades(self):
-        self._test_action("Dump Grades for all students in this course")

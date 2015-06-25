@@ -2,7 +2,7 @@
 Tests capa util
 """
 import unittest
-import textwrap
+
 from . import test_capa_system
 from capa.util import compare_with_tolerance, sanitize_html
 
@@ -36,7 +36,7 @@ class UtilTest(unittest.TestCase):
         self.assertTrue(result)
         result = compare_with_tolerance(110.1, 100.0, '10.0', False)
         self.assertFalse(result)
-         # Test relative tolerance (string)
+        # Test relative tolerance (string)
         result = compare_with_tolerance(111.0, 100.0, '0.1', True)
         self.assertTrue(result)
         result = compare_with_tolerance(112.0, 100.0, '0.1', True)
@@ -46,7 +46,7 @@ class UtilTest(unittest.TestCase):
         self.assertTrue(result)
         result = compare_with_tolerance(110.1, 100.0, 10.0, False)
         self.assertFalse(result)
-         # Test relative tolerance (float)
+        # Test relative tolerance (float)
         result = compare_with_tolerance(111.0, 100.0, 0.1, True)
         self.assertTrue(result)
         result = compare_with_tolerance(112.0, 100.0, 0.1, True)

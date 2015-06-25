@@ -68,7 +68,7 @@ class DataDownload
 
       # Dynamically generate slickgrid table for displaying student profile information
       @clear_display()
-      @$download_display_table.text gettext('Loading...')
+      @$download_display_table.text gettext('Loading')
 
       # fetch user list
       $.ajax
@@ -201,11 +201,11 @@ class ReportDownloads
         formatter: (row, cell, value, columnDef, dataContext) ->
           data_link ='<a class="course-forums-data" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
           if dataContext['name'].indexOf("course_forums") > -1
-            graph_button = _.template('<a class="graph-forums"><i class="icon-bar-chart"></i> <%= label %></a>',
+            graph_button = _.template('<a class="graph-forums"><i class="fa fa-bar-chart"></i> <%= label %></a>',
                 {label: 'Graph This'})
           else
             graph_button = ""
-          delete_button = _.template('<a class="delete-report"><i class="icon-remove-sign"></i> <%= label %></a>',
+          delete_button = _.template('<a class="delete-report"><i class="fa fa-times-circle"></i> <%= label %></a>',
               {label: 'Delete Report'})
           return data_link +  delete_button+ graph_button
       ),

@@ -49,8 +49,10 @@ class SplitTestFields(object):
         # Add "No selection" value if there is not a valid selected user partition.
         if not selected_user_partition:
             SplitTestFields.user_partition_values.append(SplitTestFields.no_partition_selected)
-        for user_partition in all_user_partitions:
-            SplitTestFields.user_partition_values.append({"display_name": user_partition.name, "value": user_partition.id})
+        for user_partition in get_split_user_partitions(all_user_partitions):
+            SplitTestFields.user_partition_values.append(
+                {"display_name": user_partition.name, "value": user_partition.id}
+            )
         return SplitTestFields.user_partition_values
 
     display_name = String(
@@ -80,14 +82,18 @@ class SplitTestFields(object):
     # location needs to actually match one of the children of this
     # Block.  (expected invariant that we'll need to test, and handle
     # authoring tools that mess this up)
-
-    # TODO: is there a way to add some validation around this, to
-    # be run on course load or in studio or ....
-
     group_id_to_child = ReferenceValueDict(
         help=_("Which child module students in a particular group_id should see"),
         scope=Scope.content
     )
+
+
+def get_split_user_partitions(user_partitions):
+    """
+    Helper method that filters a list of user_partitions and returns just the
+    ones that are suitable for the split_test module.
+    """
+    return [user_partition for user_partition in user_partitions if user_partition.scheme.name == "random"]
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
@@ -188,7 +194,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         partitions_service = self.runtime.service(self, 'partitions')
         if not partitions_service:
             return None
-        return partitions_service.get_user_group_for_partition(self.user_partition_id)
+        return partitions_service.get_user_group_id_for_partition(self.user_partition_id)
 
     @property
     def is_configured(self):
@@ -570,23 +576,35 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                     )
                 )
             else:
-                [active_children, inactive_children] = self.active_and_inactive_children()
-                if len(active_children) < len(user_partition.groups):
+                # If the user_partition selected is not valid for the split_test module, error.
+                # This can only happen via XML and import/export.
+                if not get_split_user_partitions([user_partition]):
                     split_validation.add(
                         StudioValidationMessage(
                             StudioValidationMessage.ERROR,
-                            _(u"The experiment does not contain all of the groups in the configuration."),
-                            action_runtime_event='add-missing-groups',
-                            action_label=_(u"Add Missing Groups")
+                            _(u"The experiment uses a group configuration that is not supported for experiments. "
+                              u"Select a valid group configuration or delete this experiment.")
                         )
                     )
-                if len(inactive_children) > 0:
-                    split_validation.add(
-                        StudioValidationMessage(
-                            StudioValidationMessage.WARNING,
-                            _(u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.")
+                else:
+                    [active_children, inactive_children] = self.active_and_inactive_children()
+                    if len(active_children) < len(user_partition.groups):
+                        split_validation.add(
+                            StudioValidationMessage(
+                                StudioValidationMessage.ERROR,
+                                _(u"The experiment does not contain all of the groups in the configuration."),
+                                action_runtime_event='add-missing-groups',
+                                action_label=_(u"Add Missing Groups")
+                            )
                         )
-                    )
+                    if len(inactive_children) > 0:
+                        split_validation.add(
+                            StudioValidationMessage(
+                                StudioValidationMessage.WARNING,
+                                _(u"The experiment has an inactive group. "
+                                  u"Move content into active groups, then delete the inactive group.")
+                            )
+                        )
         return split_validation
 
     def general_validation_message(self, validation=None):
@@ -613,13 +631,17 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         Called from Studio view.
         """
+        user_service = self.runtime.service(self, 'user')
+        if user_service is None:
+            return Response()
+
         user_partition = self.get_selected_partition()
 
         changed = False
         for group in user_partition.groups:
             str_group_id = unicode(group.id)
             if str_group_id not in self.group_id_to_child:
-                user_id = self.runtime.service(self, 'user').user_id
+                user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs['edx-platform.user_id']
                 self._create_vertical_for_group(group, user_id)
                 changed = True
 

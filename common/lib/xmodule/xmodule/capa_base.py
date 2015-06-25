@@ -17,22 +17,18 @@ except ImportError:
     # pylint: disable=invalid-name
     dog_stats_api = None
 
-from pkg_resources import resource_string
-
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.exceptions import NotFoundError
-from xmodule.exceptions import ProcessingError
 from xmodule.exceptions import TimeExpiredError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from xblock.fields import JSONField
 from .fields import Timedelta, Date
 from .fields import IntegerWithWarningField
 from django.utils.timezone import UTC
-from .util.duedate import get_extended_due_date
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from django.conf import settings
 from types import MethodType
@@ -101,7 +97,7 @@ class CapaFields(object):
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default="Blank Advanced Problem"
+        default=_("Blank Advanced Problem")
     )
     attempts = Integer(
         help=_("Number of attempts taken by the student on this problem"),
@@ -122,14 +118,6 @@ class CapaFields(object):
         scope=Scope.settings,
     )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
-    extended_due = Date(
-        help=_("Date that this problem is due by for a particular student. This "
-               "can be set by an instructor, and will override the global due "
-               "date if it is set to a date that is later than the global due "
-               "date."),
-        default=None,
-        scope=Scope.user_state,
-    )
     graceperiod = Timedelta(
         help=_("Amount of time after the due date that submissions will be accepted"),
         scope=Scope.settings
@@ -240,7 +228,7 @@ class CapaMixin(CapaFields):
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
 
-        due_date = get_extended_due_date(self)
+        due_date = self.due
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod
@@ -283,8 +271,11 @@ class CapaMixin(CapaFields):
                 msg += u'<p><pre>{tb}</pre></p>'.format(
                     # just the traceback, no message - it is already present above
                     tb=cgi.escape(
-                        u''.join(['Traceback (most recent call last):\n'] +
-                        traceback.format_tb(sys.exc_info()[2])))
+                        u''.join(
+                            ['Traceback (most recent call last):\n'] +
+                            traceback.format_tb(sys.exc_info()[2])
+                        )
+                    )
                 )
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
@@ -342,9 +333,9 @@ class CapaMixin(CapaFields):
         )
 
         ### @jbau 2-21-14 edx-west HACK for deanonymized email HERE ###
-        if hasattr(self.runtime, 'send_users_emailaddr_with_coderesponse'):
+        if getattr(self.runtime, 'send_users_emailaddr_with_coderesponse', False) is True:
             capa_system.send_users_emailaddr_with_coderesponse = self.runtime.send_users_emailaddr_with_coderesponse
-        if hasattr(self.runtime, 'deanonymized_user_email'):
+        if isinstance(getattr(self.runtime, 'deanonymized_user_email', False), basestring):
             capa_system.deanonymized_user_email = self.runtime.deanonymized_user_email
         ###############################################################
 
@@ -457,9 +448,9 @@ class CapaMixin(CapaFields):
 
         # Apply customizations if present
         if 'custom_check' in self.text_customization:
-            check = _(self.text_customization.get('custom_check'))
+            check = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
         if 'custom_final_check' in self.text_customization:
-            final_check = _(self.text_customization.get('custom_final_check'))
+            final_check = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
         # TODO: need a way to get the customized words into the list of
         # words to be translated
 
@@ -1093,8 +1084,8 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-             # pylint: disable=maybe-no-member
-             # pylint is unable to verify that .total_seconds() exists
+            # pylint: disable=maybe-no-member
+            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
@@ -1232,7 +1223,7 @@ class CapaMixin(CapaFields):
 
             if permutation_option is not None:
                 # Add permutation record tuple: (one of:'shuffle'/'answerpool', [as-displayed list])
-                if not 'permutation' in event_info:
+                if 'permutation' not in event_info:
                     event_info['permutation'] = {}
                 event_info['permutation'][response.answer_id] = (permutation_option, response.unmask_order())
 

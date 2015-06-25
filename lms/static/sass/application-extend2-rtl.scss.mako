@@ -44,8 +44,12 @@
 @import 'elements/system-feedback';
 
 // base - specific views
+@import "views/account-settings";
+@import "views/learner-profile";
 @import 'views/verification';
 @import 'views/shoppingcart';
+@import 'views/login-register';
+@import 'views/homepage';
 
 // applications
 @import "discussion/utilities/variables";

@@ -31,6 +31,8 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         """
             Makes sure that the Module is declared and mocked with the sample xml above.
         """
+        super(TextAnnotationModuleTestCase, self).setUp()
+
         # return anything except None to test LMS
         def test_real_user(useless):
             useless_user = Mock(email='fake@fake.com', id=useless)
@@ -60,12 +62,12 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Test Instructions.</p></div>"
-        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=protected-access
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=protected-access
         self.assertIsNone(actual)
 
     def test_student_view(self):

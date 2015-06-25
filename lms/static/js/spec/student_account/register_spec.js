@@ -33,13 +33,13 @@ define([
                 providers: [
                     {
                         name: 'Google',
-                        iconClass: 'icon-google-plus',
+                        iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
                         name: 'Facebook',
-                        iconClass: 'icon-facebook',
+                        iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
                         registerUrl: '/auth/login/facebook/?auth_entry=account_register'
                     }
@@ -50,16 +50,17 @@ define([
                 submit_url: '/user_api/v1/account/registration/',
                 fields: [
                     {
+                        placeholder: 'username@domain.com',
                         name: 'email',
                         label: 'Email',
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
                         instructions: 'Enter your email.',
                         restrictions: {}
                     },
                     {
+                        placeholder: 'Jane Doe',
                         name: 'name',
                         label: 'Full Name',
                         defaultValue: '',
@@ -69,6 +70,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: 'JaneDoe',
                         name: 'username',
                         label: 'Username',
                         defaultValue: '',
@@ -78,6 +80,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'password',
                         label: 'Password',
                         defaultValue: '',
@@ -87,6 +90,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'level_of_education',
                         label: 'Highest Level of Education Completed',
                         defaultValue: '',
@@ -95,13 +99,14 @@ define([
                             {value: "", name: "--"},
                             {value: "p", name: "Doctorate"},
                             {value: "m", name: "Master's or professional degree"},
-                            {value: "b", name: "Bachelor's degree"},
+                            {value: "b", name: "Bachelor's degree"}
                         ],
                         required: false,
                         instructions: 'Select your education level.',
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'gender',
                         label: 'Gender',
                         defaultValue: '',
@@ -110,13 +115,14 @@ define([
                             {value: "", name: "--"},
                             {value: "m", name: "Male"},
                             {value: "f", name: "Female"},
-                            {value: "o", name: "Other"},
+                            {value: "o", name: "Other"}
                         ],
                         required: false,
                         instructions: 'Select your gender.',
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'year_of_birth',
                         label: 'Year of Birth',
                         defaultValue: '',
@@ -125,13 +131,14 @@ define([
                             {value: "", name: "--"},
                             {value: 1900, name: "1900"},
                             {value: 1950, name: "1950"},
-                            {value: 2014, name: "2014"},
+                            {value: 2014, name: "2014"}
                         ],
                         required: false,
                         instructions: 'Select your year of birth.',
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'mailing_address',
                         label: 'Mailing Address',
                         defaultValue: '',
@@ -141,15 +148,17 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'goals',
                         label: 'Goals',
                         defaultValue: '',
                         type: 'textarea',
                         required: false,
-                        instructions: "If you'd like, tell us why you're interested in edX.",
+                        instructions: "If you'd like, tell us why you're interested in taking online courses.",
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'honor_code',
                         label: 'I agree to the <a href="/honor">Terms of Service and Honor Code</a>',
                         defaultValue: '',
@@ -228,7 +237,7 @@ define([
             createRegisterView(this);
 
             // Submit the form, with successful validation
-            submitForm( true );
+            submitForm(true);
 
             // Verify that the client contacts the server with the expected data
             AjaxHelpers.expectRequest(
@@ -247,7 +256,7 @@ define([
         });
 
         it('sends analytics info containing the enrolled course ID', function() {
-            createRegisterView( this );
+            createRegisterView(this);
 
             // Simulate that the user is attempting to enroll in a course
             // by setting the course_id query string param.
@@ -261,12 +270,8 @@ define([
             submitForm( true );
 
             // Verify that the client sent the course ID for analytics
-            var expectedData = {};
-            $.extend(expectedData, USER_DATA, {
-                analytics: JSON.stringify({
-                    enroll_course_id: COURSE_ID
-                })
-            });
+            var expectedData = {course_id: COURSE_ID};
+            $.extend(expectedData, USER_DATA);
 
             AjaxHelpers.expectRequest(
                 requests, 'POST',

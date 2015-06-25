@@ -1,4 +1,7 @@
-from nose.tools import assert_equals  # pylint: disable=E0611
+"""
+Tests stringify functions used in xmodule html
+"""
+from nose.tools import assert_equals  # pylint: disable=no-name-in-module
 from lxml import etree
 from xmodule.stringify import stringify_children
 

@@ -23,6 +23,7 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="path_prefix" content="${EDX_ROOT_URL}">
     <title>${current_chapter['title'] if current_chapter else '' |h}</title>
 
     <link rel="stylesheet" href="${static.url('/static/css/vendor/pdfjs/viewer.css')}"/>
@@ -411,8 +412,6 @@ http://sourceforge.net/adobe/cmap/wiki/License/
   </div>
 </div>
     <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/viewer.js')}"></script>
-    <!-- TODO: fix PDF analytics
-        <script type="text/javascript" src="${static.url('/static/js/pdf-analytics.js')}"></script>
-    -->
+    <script type="text/javascript" src="${static.url('/static/js/pdf-analytics.js')}"></script>
   </body>
 </html>

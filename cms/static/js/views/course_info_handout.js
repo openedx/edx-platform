@@ -52,11 +52,11 @@ define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js
 
         onSave: function(event) {
             $('#handout_error').removeClass('is-shown');
-            $('.save-button').removeClass('is-disabled');
+            $('.save-button').removeClass('is-disabled').attr('aria-disabled', false);
             if ($('.CodeMirror-lines').find('.cm-error').length == 0){
                 this.model.set('data', this.$codeMirror.getValue());
                 var saving = new NotificationView.Mini({
-                    title: gettext('Saving&hellip;')
+                    title: gettext('Saving')
                 });
                 saving.show();
                 this.model.save({}, {
@@ -73,21 +73,21 @@ define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js
                 });
             }else{
                 $('#handout_error').addClass('is-shown');
-                $('.save-button').addClass('is-disabled');
+                $('.save-button').addClass('is-disabled').attr('aria-disabled', true);
                 event.preventDefault();
             }
         },
 
         onCancel: function(event) {
             $('#handout_error').removeClass('is-shown');
-            $('.save-button').removeClass('is-disabled');
+            $('.save-button').removeClass('is-disabled').attr('aria-disabled', false);
             this.$form.hide();
             this.closeEditor();
         },
 
         closeEditor: function() {
             $('#handout_error').removeClass('is-shown');
-            $('.save-button').removeClass('is-disabled');
+            $('.save-button').removeClass('is-disabled').attr('aria-disabled', false);
             this.$form.hide();
             ModalUtils.hideModalCover();
             this.$form.find('.CodeMirror').remove();

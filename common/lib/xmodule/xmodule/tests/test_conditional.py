@@ -8,7 +8,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationGenerator
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
 from xmodule.x_module import STUDENT_VIEW
@@ -23,14 +23,13 @@ class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
-        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
+        xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
             course_id=SlashSeparatedCourseKey(ORG, COURSE, 'test_run'),
             course_dir='test_dir',
             error_tracker=Mock(),
-            parent_tracker=Mock(),
             load_error_modules=load_error_modules,
         )
 
@@ -60,18 +59,18 @@ class ConditionalFactory(object):
             source_descriptor = NonStaffErrorDescriptor.from_xml(
                 'some random xml data',
                 system,
-                id_generator=CourseLocationGenerator(SlashSeparatedCourseKey('edX', 'conditional_test', 'test_run')),
+                id_generator=CourseLocationManager(source_location.course_key),
                 error_msg='random error message'
             )
         else:
-            source_descriptor = Mock()
+            source_descriptor = Mock(name='source_descriptor')
             source_descriptor.location = source_location
 
         source_descriptor.runtime = descriptor_system
         source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
 
         # construct other descriptors:
-        child_descriptor = Mock()
+        child_descriptor = Mock(name='child_descriptor')
         child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
@@ -84,6 +83,8 @@ class ConditionalFactory(object):
             child_descriptor.location: child_descriptor,
             source_location: source_descriptor
         }.get
+
+        system.descriptor_runtime = descriptor_system
 
         # construct conditional module:
         cond_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
@@ -115,6 +116,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
+        super(ConditionalModuleBasicTest, self).setUp()
         self.test_system = get_test_system()
 
     def test_icon_class(self):
@@ -177,13 +179,14 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
+        super(ConditionalModuleXmlTest, self).setUp()
         self.test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
         print "Importing {0}".format(name)
 
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
         self.assertEquals(len(courses), 1)
@@ -203,6 +206,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
                 location = descriptor
                 descriptor = self.modulestore.get_item(location, depth=None)
             descriptor.xmodule_runtime = get_test_system()
+            descriptor.xmodule_runtime.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.xmodule_runtime.get_module = inner_get_module
             return descriptor
 

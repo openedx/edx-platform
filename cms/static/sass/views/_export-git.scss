@@ -37,7 +37,7 @@
 
     dd {
       @extend %t-copy-base;
-      margin-bottom: 20px;
+      margin-bottom: $baseline;
     }
 
     .course_text {
@@ -76,7 +76,7 @@
 
     .action {
 
-      [class^="icon"] {
+      .icon {
         @extend %t-icon2;
         display: inline-block;
         vertical-align: middle;

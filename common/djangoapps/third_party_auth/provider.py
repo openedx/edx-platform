@@ -6,7 +6,7 @@ invoke the Django armature.
 
 from social.backends import google, linkedin, facebook
 
-_DEFAULT_ICON_CLASS = 'icon-signin'
+_DEFAULT_ICON_CLASS = 'fa-signin'
 
 
 class BaseProvider(object):
@@ -114,8 +114,8 @@ class GoogleOauth2(BaseProvider):
     """Provider for Google's Oauth2 auth system."""
 
     BACKEND_CLASS = google.GoogleOAuth2
+    ICON_CLASS = 'fa-google-plus'
     BACKEND_CLASS.DEFAULT_SCOPE =  ['https://www.googleapis.com/auth/userinfo.email']
-    ICON_CLASS = 'icon-google-plus'
     NAME = 'Google'
     SETTINGS = {
         'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY': None,
@@ -135,7 +135,7 @@ class LinkedInOauth2(BaseProvider):
     """Provider for LinkedIn's Oauth2 auth system."""
 
     BACKEND_CLASS = linkedin.LinkedinOAuth2
-    ICON_CLASS = 'icon-linkedin'
+    ICON_CLASS = 'fa-linkedin'
     NAME = 'LinkedIn'
     SETTINGS = {
         'SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY': None,
@@ -155,7 +155,7 @@ class FacebookOauth2(BaseProvider):
     """Provider for LinkedIn's Oauth2 auth system."""
 
     BACKEND_CLASS = facebook.FacebookOAuth2
-    ICON_CLASS = 'icon-facebook'
+    ICON_CLASS = 'fa-facebook'
     NAME = 'Facebook'
     SETTINGS = {
         'SOCIAL_AUTH_FACEBOOK_KEY': None,

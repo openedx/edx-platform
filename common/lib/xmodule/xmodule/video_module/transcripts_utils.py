@@ -19,19 +19,19 @@ from xmodule.contentstore.django import contentstore
 log = logging.getLogger(__name__)
 
 
-class TranscriptException(Exception):  # pylint disable=C0111
+class TranscriptException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
-class TranscriptsGenerationException(Exception):  # pylint disable=C0111
+class TranscriptsGenerationException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
-class GetTranscriptsFromYouTubeException(Exception):  # pylint disable=C0111
+class GetTranscriptsFromYouTubeException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
-class TranscriptsRequestValidationException(Exception):  # pylint disable=C0111
+class TranscriptsRequestValidationException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
@@ -398,10 +398,11 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     if not lang:
         lang = item.transcript_language
 
+    # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
     generate_subs_from_source(
         result_subs_dict,
         os.path.splitext(user_filename)[1][1:],
-        srt_transcripts.data.decode('utf8'),
+        srt_transcripts.data.decode('utf-8-sig'),
         item,
         lang
     )
@@ -532,10 +533,10 @@ class VideoTranscriptsMixin(object):
 
         # If we're not verifying the assets, we just trust our field values
         if not verify_assets:
-            if self.sub:
-                translations = ['en']
-            translations += list(self.transcripts)
-            return translations
+            translations = list(self.transcripts)
+            if not translations or self.sub:
+                translations += ['en']
+            return set(translations)
 
         # If we've gotten this far, we're going to verify that the transcripts
         # being referenced are actually in the contentstore.

@@ -2,10 +2,12 @@
 unit tests for course_info views and models.
 """
 import json
+from mock import patch
+from django.test.utils import override_settings
 
+from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 
@@ -235,18 +237,19 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == 1)
 
-    def test_post_course_update(self):
+    def post_course_update(self, send_push_notification=False):
         """
-        Test that a user can successfully post on course updates and handouts of a course
+        Posts an update to the course
         """
         course_update_url = self.create_update_url(course_key=self.course.id)
 
         # create a course via the view handler
         self.client.ajax_post(course_update_url)
 
-        block = u'updates'
         content = u"Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
+        if send_push_notification:
+            payload['push_notification_selected'] = True
         resp = self.client.ajax_post(course_update_url, payload)
 
         # check that response status is 200 not 400
@@ -255,9 +258,19 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertHTMLEqual(payload['content'], content)
 
+    @patch("contentstore.push_notification.send_push_course_update")
+    def test_post_course_update(self, mock_push_update):
+        """
+        Test that a user can successfully post on course updates and handouts of a course
+        """
+        self.post_course_update()
+
+        # check that push notifications are not sent
+        self.assertFalse(mock_push_update.called)
+
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, UsageKey))
-        self.assertEqual(updates_location.name, block)
+        self.assertEqual(updates_location.name, u'updates')
 
         # check posting on handouts
         handouts_location = self.course.id.make_usage_key('course_info', 'handouts')
@@ -266,8 +279,28 @@ class CourseUpdateTest(CourseTestCase):
         content = u"Sample handout"
         payload = {'data': content}
         resp = self.client.ajax_post(course_handouts_url, payload)
+
         # check that response status is 200 not 500
         self.assertEqual(resp.status_code, 200)
 
         payload = json.loads(resp.content)
         self.assertHTMLEqual(payload['data'], content)
+
+    @patch("contentstore.push_notification.send_push_course_update")
+    def test_notifications_enabled_but_not_requested(self, mock_push_update):
+        PushNotificationConfig(enabled=True).save()
+        self.post_course_update()
+        self.assertFalse(mock_push_update.called)
+
+    @patch("contentstore.push_notification.send_push_course_update")
+    def test_notifications_enabled_and_sent(self, mock_push_update):
+        PushNotificationConfig(enabled=True).save()
+        self.post_course_update(send_push_notification=True)
+        self.assertTrue(mock_push_update.called)
+
+    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
+    @patch("contentstore.push_notification.Push")
+    def test_notifications_sent_to_parse(self, mock_parse_push):
+        PushNotificationConfig(enabled=True).save()
+        self.post_course_update(send_push_notification=True)
+        self.assertTrue(mock_parse_push.alert.called)

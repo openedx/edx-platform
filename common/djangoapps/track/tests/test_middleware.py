@@ -53,6 +53,8 @@ class TrackMiddlewareTestCase(TestCase):
     def test_default_request_context(self):
         context = self.get_context_for_path('/courses/')
         self.assertEquals(context, {
+            'accept_language': '',
+            'referer': '',
             'user_id': '',
             'session': '',
             'username': '',

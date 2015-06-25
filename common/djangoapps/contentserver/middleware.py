@@ -15,6 +15,7 @@ from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
 from cache_toolbox.core import get_cached_content, set_cached_content
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
@@ -30,6 +31,8 @@ class StaticContentServer(object):
             request.path.startswith('/' + XASSET_LOCATION_TAG + '/') or
             request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
         ):
+            if AssetLocator.CANONICAL_NAMESPACE in request.path:
+                request.path = request.path.replace('block/', 'block@', 1)
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except (InvalidLocationError, InvalidKeyError):
@@ -44,7 +47,7 @@ class StaticContentServer(object):
                 # nope, not in cache, let's fetch from DB
                 try:
                     content = AssetManager.find(loc, as_stream=True)
-                except NotFoundError:
+                except (ItemNotFoundError, NotFoundError):
                     response = HttpResponse()
                     response.status_code = 404
                     return response

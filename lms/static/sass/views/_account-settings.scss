@@ -1,0 +1,80 @@
+// lms - application - account settings
+// ====================
+
+// Table of Contents 
+// * +Container - Account Settings
+// * +Main - Header
+// * +Settings Section
+
+
+// +Container - Account Settings
+.wrapper-account-settings {
+    @extend .container;
+    padding-top: ($baseline*2);
+
+    .account-settings-container {
+        padding: 0; 
+    }
+
+    .ui-loading-indicator,
+    .ui-loading-error {
+         @extend .ui-loading-base;
+         // center horizontally
+         @include margin-left(auto);
+         @include margin-right(auto);
+         padding: ($baseline*3);
+
+         text-align: center;
+
+        .message-error {
+            color: $alert-color;
+        }
+    }
+}
+
+// +Main - Header
+.wrapper-account-settings {
+
+    .wrapper-header {
+
+        .header-title {
+            @extend %t-title4;
+            margin-bottom: ($baseline/2);
+        }
+
+        .header-subtitle {
+            color: $gray-l2;
+        }
+    }
+}
+
+// +Settings Section
+.account-settings-sections {
+
+    .section-header {
+        @extend %t-title6;
+        @extend %t-strong;
+        padding-bottom: ($baseline/2);
+        border-bottom: 1px solid $gray-l4;
+    }
+
+    .section {
+        background-color: $white;
+        padding: $baseline;
+        margin-top: $baseline;
+        border: 1px solid $gray-l4;
+        box-shadow: 0 0 1px 1px $shadow-l2;
+        border-radius: 5px;
+    }
+
+    a span {
+        color: $link-color;
+    }
+
+    a span {
+        &:hover, &:focus {
+            color: $pink;
+            text-decoration: none !important;
+        }
+    }
+}

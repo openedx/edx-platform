@@ -4,6 +4,7 @@ Unit tests for course import and export
 import copy
 import json
 import logging
+import lxml
 import os
 import shutil
 import tarfile
@@ -13,16 +14,22 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 from django.conf import settings
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.xml_exporter import export_library_to_xml
+from xmodule.modulestore.xml_importer import import_library_from_xml
+from xmodule.modulestore import LIBRARY_ROOT
 from contentstore.utils import reverse_course_url
 
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
 
 from contentstore.tests.utils import CourseTestCase
+from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 log = logging.getLogger(__name__)
 
@@ -30,12 +37,13 @@ log = logging.getLogger(__name__)
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
     """
-    Unit tests for importing a course
+    Unit tests for importing a course or Library
     """
     def setUp(self):
         super(ImportTestCase, self).setUp()
         self.url = reverse_course_url('import_handler', self.course.id)
         self.content_dir = path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.content_dir)
 
         def touch(name):
             """ Equivalent to shell's 'touch'"""
@@ -66,9 +74,6 @@ class ImportTestCase(CourseTestCase):
             btar.add(bad_dir)
 
         self.unsafe_common_dir = path(tempfile.mkdtemp(dir=self.content_dir))
-
-    def tearDown(self):
-        shutil.rmtree(self.content_dir)
 
     def test_no_coursexml(self):
         """
@@ -241,6 +246,81 @@ class ImportTestCase(CourseTestCase):
         import_status = json.loads(resp_status.content)["ImportStatus"]
         self.assertIn(import_status, (0, 3))
 
+    def test_library_import(self):
+        """
+        Try importing a known good library archive, and verify that the
+        contents of the library have completely replaced the old contents.
+        """
+        # Create some blocks to overwrite
+        library = LibraryFactory.create(modulestore=self.store)
+        lib_key = library.location.library_key
+        test_block = ItemFactory.create(
+            category="vertical",
+            parent_location=library.location,
+            user_id=self.user.id,
+            publish_item=False,
+        )
+        test_block2 = ItemFactory.create(
+            category="vertical",
+            parent_location=library.location,
+            user_id=self.user.id,
+            publish_item=False
+        )
+        # Create a library and blocks that should remain unmolested.
+        unchanged_lib = LibraryFactory.create()
+        unchanged_key = unchanged_lib.location.library_key
+        test_block3 = ItemFactory.create(
+            category="vertical",
+            parent_location=unchanged_lib.location,
+            user_id=self.user.id,
+            publish_item=False
+        )
+        test_block4 = ItemFactory.create(
+            category="vertical",
+            parent_location=unchanged_lib.location,
+            user_id=self.user.id,
+            publish_item=False
+        )
+        # Refresh library.
+        library = self.store.get_library(lib_key)
+        children = [self.store.get_item(child).url_name for child in library.children]
+        self.assertEqual(len(children), 2)
+        self.assertIn(test_block.url_name, children)
+        self.assertIn(test_block2.url_name, children)
+
+        unchanged_lib = self.store.get_library(unchanged_key)
+        children = [self.store.get_item(child).url_name for child in unchanged_lib.children]
+        self.assertEqual(len(children), 2)
+        self.assertIn(test_block3.url_name, children)
+        self.assertIn(test_block4.url_name, children)
+
+        extract_dir = path(tempfile.mkdtemp())
+        try:
+            tar = tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz')
+            safetar_extractall(tar, extract_dir)
+            library_items = import_library_from_xml(
+                self.store, self.user.id,
+                settings.GITHUB_REPO_ROOT, [extract_dir / 'library'],
+                load_error_modules=False,
+                static_content_store=contentstore(),
+                target_id=lib_key
+            )
+        finally:
+            shutil.rmtree(extract_dir)
+
+        self.assertEqual(lib_key, library_items[0].location.library_key)
+        library = self.store.get_library(lib_key)
+        children = [self.store.get_item(child).url_name for child in library.children]
+        self.assertEqual(len(children), 3)
+        self.assertNotIn(test_block.url_name, children)
+        self.assertNotIn(test_block2.url_name, children)
+
+        unchanged_lib = self.store.get_library(unchanged_key)
+        children = [self.store.get_item(child).url_name for child in unchanged_lib.children]
+        self.assertEqual(len(children), 2)
+        self.assertIn(test_block3.url_name, children)
+        self.assertIn(test_block4.url_name, children)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ExportTestCase(CourseTestCase):
@@ -315,3 +395,35 @@ class ExportTestCase(CourseTestCase):
         self.assertIsNone(resp.get('Content-Disposition'))
         self.assertContains(resp, 'Unable to create xml for module')
         self.assertContains(resp, expected_text)
+
+    def test_library_export(self):
+        """
+        Verify that useable library data can be exported.
+        """
+        youtube_id = "qS4NO9MNC6w"
+        library = LibraryFactory.create(modulestore=self.store)
+        video_block = ItemFactory.create(
+            category="video",
+            parent_location=library.location,
+            user_id=self.user.id,
+            publish_item=False,
+            youtube_id_1_0=youtube_id
+        )
+        name = library.url_name
+        lib_key = library.location.library_key
+        root_dir = path(tempfile.mkdtemp())
+        try:
+            export_library_to_xml(self.store, contentstore(), lib_key, root_dir, name)
+            # pylint: disable=no-member
+            lib_xml = lxml.etree.XML(open(root_dir / name / LIBRARY_ROOT).read())
+            self.assertEqual(lib_xml.get('org'), lib_key.org)
+            self.assertEqual(lib_xml.get('library'), lib_key.library)
+            block = lib_xml.find('video')
+            self.assertIsNotNone(block)
+            self.assertEqual(block.get('url_name'), video_block.url_name)
+            # pylint: disable=no-member
+            video_xml = lxml.etree.XML(open(root_dir / name / 'video' / video_block.url_name + '.xml').read())
+            self.assertEqual(video_xml.tag, 'video')
+            self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)
+        finally:
+            shutil.rmtree(root_dir / name)

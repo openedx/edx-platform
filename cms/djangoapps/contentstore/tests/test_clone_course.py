@@ -6,7 +6,7 @@ from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from contentstore.tests.utils import CourseTestCase
 from contentstore.tasks import rerun_course
-from contentstore.views.access import has_course_access
+from student.auth import has_course_author_access
 from course_action_state.models import CourseRerunState
 from course_action_state.managers import CourseRerunUIStateManager
 from mock import patch, Mock
@@ -62,7 +62,7 @@ class CloneCourseTest(CourseTestCase):
         result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id,
                                     json.dumps(fields, cls=EdxJSONEncoder))
         self.assertEqual(result.get(), "succeeded")
-        self.assertTrue(has_course_access(self.user, split_course3_id), "Didn't grant access")
+        self.assertTrue(has_course_author_access(self.user, split_course3_id), "Didn't grant access")
         rerun_state = CourseRerunState.objects.find_first(course_key=split_course3_id)
         self.assertEqual(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
 

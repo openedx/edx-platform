@@ -2,14 +2,14 @@
 
 from django.conf import settings
 from django.core.cache import cache
+from xmodule.modulestore.django import modulestore
 
 from courseware.access import has_access
+from openedx.core.djangoapps.user_api.models import UserPreference
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
-from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
+from student.roles import GlobalStaff, CourseStaffRole, CourseInstructorRole
 
 
 class OpenIDHandler(object):
@@ -34,6 +34,21 @@ class OpenIDHandler(object):
         return value
 
 
+class PermissionsHandler(object):
+    """ Permissions scope handler """
+
+    def scope_permissions(self, _data):
+        return ['administrator']
+
+    def claim_administrator(self, data):
+        """
+        Return boolean indicating user's administrator status.
+
+        For our purposes an administrator is any user with is_staff set to True.
+        """
+        return data['user'].is_staff
+
+
 class ProfileHandler(object):
     """ Basic OpenID Connect `profile` scope handler with `locale` claim. """
 
@@ -51,10 +66,10 @@ class ProfileHandler(object):
         """
         Return the locale for the users based on their preferences.
         Does not return a value if the users have not set their locale preferences.
-
         """
 
-        language = UserPreference.get_preference(data['user'], LANGUAGE_KEY)
+        # Calling UserPreference directly because it is not clear which user made the request.
+        language = UserPreference.get_value(data['user'], LANGUAGE_KEY)
 
         # If the user has no language specified, return the default one.
         if not language:
@@ -119,7 +134,7 @@ class CourseAccessHandler(object):
         # TODO: unfortunately there is not a faster and still correct way to
         # check if a user is instructor of at least one course other than
         # checking the access type against all known courses.
-        course_ids = self.find_courses(data['user'], 'instructor')
+        course_ids = self.find_courses(data['user'], CourseInstructorRole.ROLE)
         return ['instructor_courses'] if course_ids else None
 
     def scope_course_staff(self, data):
@@ -129,7 +144,7 @@ class CourseAccessHandler(object):
 
         """
         # TODO: see :method:CourseAccessHandler.scope_course_instructor
-        course_ids = self.find_courses(data['user'], 'staff')
+        course_ids = self.find_courses(data['user'], CourseStaffRole.ROLE)
 
         return ['staff_courses'] if course_ids else None
 
@@ -140,7 +155,7 @@ class CourseAccessHandler(object):
 
         """
 
-        return self.find_courses(data['user'], 'instructor', data.get('values'))
+        return self.find_courses(data['user'], CourseInstructorRole.ROLE, data.get('values'))
 
     def claim_staff_courses(self, data):
         """
@@ -149,7 +164,7 @@ class CourseAccessHandler(object):
 
         """
 
-        return self.find_courses(data['user'], 'staff', data.get('values'))
+        return self.find_courses(data['user'], CourseStaffRole.ROLE, data.get('values'))
 
     def find_courses(self, user, access_type, values=None):
         """
@@ -177,24 +192,30 @@ class CourseAccessHandler(object):
 
     # pylint: disable=missing-docstring
     def _get_courses_with_access_type(self, user, access_type):
-
         # Check the application cache and update if not present. The application
         # cache is useful since there are calls to different endpoints in close
-        # succession, for example the id_token and user_info endpoins.
+        # succession, for example the id_token and user_info endpoints.
 
         key = '-'.join([str(self.__class__), str(user.id), access_type])
         course_ids = cache.get(key)
 
-        if course_ids is None:
-            course_ids = [unicode(course.id) for course in _get_all_courses()
-                          if has_access(user, access_type, course)]
+        if not course_ids:
+            courses = _get_all_courses()
+
+            # Global staff have access to all courses. Filter courses for non-global staff.
+            if not GlobalStaff().has_user(user):
+                courses = [course for course in courses if has_access(user, access_type, course)]
+
+            course_ids = [unicode(course.id) for course in courses]
+
             cache.set(key, course_ids, self.COURSE_CACHE_TIMEOUT)
 
         return course_ids
 
 
-class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
+class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, PermissionsHandler):
     """ Configure the ID Token handler for the LMS. """
+
     def claim_instructor_courses(self, data):
         # Don't return list of courses unless they are requested as essential.
         if data.get('essential'):
@@ -210,16 +231,15 @@ class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
             return None
 
 
-class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
+class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, PermissionsHandler):
     """ Configure the UserInfo handler for the LMS. """
     pass
 
 
 def _get_all_courses():
-    """
-    Utitilty function to list all available courses.
+    """ Utility function to list all available courses. """
 
-    """
     ms_courses = modulestore().get_courses()
-    courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
+    courses = [course for course in ms_courses if course.scope_ids.block_type == 'course']
+
     return courses

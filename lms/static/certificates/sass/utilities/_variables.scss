@@ -1,0 +1,181 @@
+// ------------------------------
+// Open edX Certificates: Variables (LTR)
+
+// units
+$baseline-v: 20px;                                                  // vertical baseline
+$baseline-h: 20px;                                                  // horizontal baseline
+
+// colors - basic
+$black: rgb(10,10,10);                                              // system black
+$black-t: rgb(0,0,0);
+$black-t0: rgba($black,0.125);
+$black-t1: rgba($black,0.25);
+$black-t2: rgba($black,0.50);
+$black-t3: rgba($black,0.75);
+
+$white: rgb(250,250,250);                                          // system white
+$white-t: rgb(255,255,255);
+$white-t0: rgba($white,0.125);
+$white-t1: rgba($white,0.25);
+$white-t2: rgba($white,0.50);
+$white-t3: rgba($white,0.75);
+
+$gray: rgb(53, 58, 61);
+$gray-l1: tint($gray,20%);
+$gray-l2: tint($gray,40%);
+$gray-l3: tint($gray,60%);
+$gray-l4: tint($gray,80%);
+$gray-l5: tint($gray,90%);
+$gray-l6: tint($gray,95%);
+$gray-d1: shade($gray,20%);
+$gray-d2: shade($gray,40%);
+$gray-d3: shade($gray,60%);
+$gray-d4: shade($gray,80%);
+$gray-d5: shade($gray,90%);
+$gray-d6: shade($gray,95%);
+$gray-t0: rgba($gray,0.125);
+$gray-t1: rgba($gray,0.25);
+$gray-t2: rgba($gray,0.50);
+$gray-t3: rgba($gray,0.75);
+
+// shadows
+$shadow: rgba($black-t,0.2);
+$shadow-l1: rgba($black-t,0.1);
+$shadow-l2: rgba($black-t,0.05);
+$shadow-d1: rgba($black-t,0.4);
+$shadow-d2: rgba($black-t,0.6);
+
+// colors - default
+$blue: rgb(58, 162, 224);
+$blue-l1: tint($blue,20%);
+$blue-l2: tint($blue,40%);
+$blue-l3: tint($blue,60%);
+$blue-l4: tint($blue,80%);
+$blue-l5: tint($blue,90%);
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d3: shade($blue,60%);
+$blue-d4: shade($blue,80%);
+$blue-d5: shade($blue,90%);
+$blue-s1: saturate($blue,15%);
+$blue-s2: saturate($blue,30%);
+$blue-s3: saturate($blue,45%);
+$blue-u1: desaturate($blue,15%);
+$blue-u2: desaturate($blue,30%);
+$blue-u3: desaturate($blue,45%);
+$blue-t0: rgba($blue,0.125);
+$blue-t1: rgba($blue,0.25);
+$blue-t2: rgba($blue,0.50);
+$blue-t3: rgba($blue,0.75);
+
+$pink: rgb(182,37,104);
+$pink-l1: tint($pink,20%);
+$pink-l2: tint($pink,40%);
+$pink-l3: tint($pink,60%);
+$pink-l4: tint($pink,80%);
+$pink-l5: tint($pink,90%);
+$pink-d1: shade($pink,20%);
+$pink-d2: shade($pink,40%);
+$pink-d3: shade($pink,60%);
+$pink-d4: shade($pink,80%);
+$pink-d5: shade($pink,90%);
+$pink-s1: saturate($pink,15%);
+$pink-s2: saturate($pink,30%);
+$pink-s3: saturate($pink,45%);
+$pink-u1: desaturate($pink,15%);
+$pink-u2: desaturate($pink,30%);
+$pink-u3: desaturate($pink,45%);
+$pink-t0: rgba($pink,0.125);
+$pink-t1: rgba($pink,0.25);
+$pink-t2: rgba($pink,0.50);
+$pink-t3: rgba($pink,0.75);
+
+// colors - achievement branding
+$color-basic-achievement: $blue-l2;
+$color-greater-achievement: $blue;
+$color-greatest-achievement: $blue-s1;
+
+// fonts
+$f-serif: 'PT Serif', Cambria, Georgia, 'Times New Roman', Times, serif;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// grid
+@import "neat/neat-helpers";
+
+$default-layout-direction: LTR !global;
+$max-width: 1280px;
+$grid-columns: 12;                                                  // make grid 12 columns
+$column: ($baseline-v*4.25);                                               // columns
+$gutter: $baseline-v;                                               // gutter b/t columns
+
+// grid (neat-based) - responsive
+$bp-small: new-breakpoint(max-width 499px 4);                           // mobile devices - make grid 4 columns
+$bp-medium: new-breakpoint(min-width 500px max-width 759px 6);          // small displays - make grid 6 columns
+$bp-large: new-breakpoint(min-width 760px max-width 899px 12);        // medium displays - make grid 12 columns
+$bp-xlarge: new-breakpoint(min-width 900px 12);                        // large displays - make grid 12 columns
+
+// timing - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
+
+// application: general actions
+$color-primary: $blue-d1;
+$color-secondary: $blue-l1;
+$color-tertiary: $gray-l1;
+$color-quarternary: $gray-l2;
+
+// application: general links
+$color-link: $blue-d1;
+$color-link-focus: $blue;
+$color-link-active: $blue;
+$color-link-visited: $blue-d2;
+
+// application: actions & links (button-focused)
+$bg-action-primary: $color-primary;
+$bg-action-primary-focus: saturate($color-primary, 35%);
+$bordercolor-action-primary: saturate($color-primary, 15%);
+$bordercolor-action-primary-focus: saturate($color-primary, 35%);
+$color-action-primary: tint($color-primary, 90%);
+$color-action-primary-focus: tint($color-primary, 95%);
+
+$bg-action-secondary: $color-secondary;
+$bg-action-secondary-focus: saturate($color-secondary, 35%);
+$bordercolor-action-secondary: saturate($color-secondary, 15%);
+$bordercolor-action-secondary-focus: saturate($color-secondary, 35%);
+$color-action-secondary: tint($color-secondary, 90%);
+$color-action-secondary-focus: tint($color-secondary, 95%);
+
+// application: copy & headings
+
+$color-heading: $gray-d3;
+$color-heading-secondary: $gray-d1;
+$color-heading-tertiary: $gray;
+
+$color-copy: $gray-l1;
+$color-copy-lead: $gray-d2;
+$color-copy-supplemental: $gray-l1;
+
+// application: states
+$bg-selected: $blue-t1;
+$color-selected: $blue-s1;
+
+// application: view elements
+$bg-view: $gray-l6;
+
+$bg-header-main: $white;
+$color-header-main: $black;
+
+$bg-content: $gray-l6;
+$color-content: $gray-d1;
+
+$bg-content-main: $gray-l5;
+$color-content-main: $gray-d1;
+
+$bg-footer-main: transparent;
+$color-footer-main: $gray;

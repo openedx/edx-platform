@@ -60,7 +60,7 @@ define(["js/views/baseview", "underscore", "jquery", "js/views/edit_chapter", "j
             this.setValues();
             if(!this.model.isValid()) { return; }
             var saving = new NotificationView.Mini({
-                title: gettext("Saving") + "&hellip;"
+                title: gettext("Saving")
             }).show();
             var that = this;
             this.model.save({}, {

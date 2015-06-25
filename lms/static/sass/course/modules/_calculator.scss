@@ -1,0 +1,180 @@
+// LMS -- modules -- calculator
+// ====================
+
+div.calc-main {
+  bottom: -126px;
+  left: 0;
+  position: fixed;
+  @include transition(bottom $tmg-avg linear 0s);
+  -webkit-appearance: none;
+  width: 100%;
+
+  &.open {
+    bottom: -36px;
+  }
+
+  .calc {
+    @include transition(background-color $tmg-f2 ease-in-out 0s);
+    background: url("../images/calc-icon.png") $black-t1 no-repeat center;
+    border-bottom: 0;
+    color: $white;
+    float: right;
+    height: $baseline;
+    margin-right: ($baseline*0.75);
+    padding: $baseline;
+    position: relative;
+    top: -42px;
+    width: ($baseline*0.75);
+
+    &:hover, &:focus {
+      background-color: $gray-d1;
+    }
+
+    &.closed {
+      background-image: url("../images/close-calc-icon.png");
+      background-color: $black;
+      top: -36px;
+    }
+  }
+
+  div#calculator_wrapper {
+    background: $black;
+    clear: both;
+    max-height: 90px;
+    position: relative;
+    top: -36px;
+
+    // UI: input help table
+    .calculator-input-help-table {
+      margin: ($baseline/2) 0;
+
+      tr th, tr td {
+        vertical-align: top;
+        border: 1px solid $gray-l4;
+        padding: ($baseline/2);
+      }
+    }
+
+    form {
+      @extend .clearfix;
+      @include box-sizing(border-box);
+      padding: lh();
+
+      input#calculator_button {
+        background: #111;
+        border: 1px solid $black;
+        border-radius: 0;
+        box-shadow: none;
+        @include box-sizing(border-box);
+        color: $white;
+        float: left;
+        font-size: 30px;
+        font-weight: bold;
+        height: 35px;
+        margin: 0 (flex-gutter() / 2);
+        padding: 0;
+        text-shadow: none;
+        -webkit-appearance: none;
+        width: flex-grid(.5) + flex-gutter();
+
+        &:hover, &:focus {
+          color: #333;
+        }
+      }
+
+      input#calculator_output {
+        background: #111;
+        border: 0;
+        box-shadow: none;
+        @include box-sizing(border-box);
+        color: $white;
+        float: left;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 1px 0 0;
+        padding: 10px;
+        -webkit-appearance: none;
+        width: flex-grid(4);
+      }
+
+      div.input-wrapper {
+        @extend .clearfix;
+        float: left;
+        margin: 0;
+        position: relative;
+        width: flex-grid(7.5);
+
+        input#calculator_input {
+          border: none;
+          box-shadow: none;
+          @include box-sizing(border-box);
+          font-size: 16px;
+          padding: 10px;
+          -webkit-appearance: none;
+          width: 100%;
+
+          &:focus {
+            border: none;
+          }
+        }
+
+        div.help-wrapper {
+          position: absolute;
+          right: 0;
+          top: 0;
+
+          #calculator_hint {
+            background: url("../images/info-icon.png") center center no-repeat;
+            height: 35px;
+            @include hide-text;
+            width: 35px;
+            display: block;
+
+            &:focus {
+              outline: 5px auto #5b9dd9;
+            }
+          }
+
+          .help {
+            @include transition(none);
+            background: $white;
+            border-radius: 3px;
+            box-shadow: 0 0 3px #999;
+            color: #333;
+            padding: 10px;
+            position: absolute;
+            right: -40px;
+            bottom: 57px;
+            width: 600px;
+            overflow: hidden;
+            pointer-events: none;
+            display: none;
+            margin: 0;
+            list-style: none;
+
+            &.shown {
+              display: block;
+              pointer-events: auto;
+            }
+
+            .bold {
+              font-weight: bold;
+            }
+
+            p, p+p {
+              margin: 0;
+            }
+
+            .calc-postfixes {
+              margin: 10px auto;
+
+              td, th {
+                padding: 2px 15px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

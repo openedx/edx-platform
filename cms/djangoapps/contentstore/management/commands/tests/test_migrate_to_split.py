@@ -60,7 +60,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestMigrateToSplit, self).setUp(create_user=True)
-        self.course = CourseFactory()
+        self.course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
 
     def test_user_email(self):
         """
@@ -81,7 +81,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         # default mapping in mixed modulestore. I left the test here so we can debate what it ought to do.
 #         self.assertEqual(
 #             ModuleStoreEnum.Type.split,
-#             modulestore()._get_modulestore_for_courseid(new_key).get_modulestore_type(),
+#             modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type(),
 #             "Split is not the new default for the course"
 #         )
 

@@ -1,26 +1,49 @@
 define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging", "js/views/asset",
-    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal", "js/views/utils/view_utils"],
-    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils, ViewUtils) {
+    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal", "js/views/utils/view_utils",
+    "js/views/feedback_notification", "jquery.fileupload-process", "jquery.fileupload-validate"],
+    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils, ViewUtils, NotificationView) {
+
+        var CONVERSION_FACTOR_MBS_TO_BYTES = 1000 * 1000;
 
         var AssetsView = PagingView.extend({
             // takes AssetCollection as model
 
             events : {
                 "click .column-sort-link": "onToggleColumn",
-                "click .upload-button": "showUploadModal"
+                "click .upload-button": "showUploadModal",
+                "click .filterable-column .nav-item": "onFilterColumn",
+                "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
 
-            initialize : function() {
+            typeData: ['Images', 'Documents'],
+
+            allLabel: 'ALL',
+
+
+            initialize : function(options) {
+                options = options || {};
+
                 PagingView.prototype.initialize.call(this);
                 var collection = this.collection;
                 this.template = this.loadTemplate("asset-library");
                 this.listenTo(collection, 'destroy', this.handleDestroy);
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
+                this.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 ViewUtils.showLoadingIndicator();
                 this.setPage(0);
+                // set default file size for uploads via template var,
+                // and default to static old value if none exists
+                this.uploadChunkSizeInMBs = options.uploadChunkSizeInMBs || 10;
+                this.maxFileSizeInMBs = options.maxFileSizeInMBs || 10;
+                this.uploadChunkSizeInBytes = this.uploadChunkSizeInMBs * CONVERSION_FACTOR_MBS_TO_BYTES;
+                this.maxFileSizeInBytes = this.maxFileSizeInMBs * CONVERSION_FACTOR_MBS_TO_BYTES;
+                this.maxFileSizeRedirectUrl = options.maxFileSizeRedirectUrl || '';
                 assetsView = this;
+                // error message modal for large file uploads
+                this.largeFileErrorMsg = null;
             },
 
             render: function() {
@@ -42,7 +65,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({typeData: this.typeData}));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
@@ -51,7 +74,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     this.pagingFooter.render();
 
                     // Hide the contents until the collection has loaded the first time
-                    this.$('.asset-library').hide();
+                    this.$('.assets-library').hide();
                     this.$('.no-asset-content').hide();
                 }
                 return tableBody;
@@ -60,7 +83,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             renderPageItems: function() {
                 var self = this,
                 assets = this.collection,
-                hasAssets = assets.length > 0,
+                hasAssets = this.collection.assetType !== '' || assets.length > 0,
                 tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
@@ -71,7 +94,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                         }
                     );
                 }
-                self.$('.asset-library').toggle(hasAssets);
+                self.$('.assets-library').toggle(hasAssets);
                 self.$('.no-asset-content').toggle(!hasAssets);
                 return this;
             },
@@ -92,6 +115,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 // Switch the sort column back to the default (most recent date added) and show the first page
                 // so that the new asset is shown at the top of the page.
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 this.setPage(0);
 
                 analytics.track('Uploaded a File', {
@@ -105,12 +129,20 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.toggleSortOrder(columnName);
             },
 
+            onFilterColumn: function(event) {
+                this.openFilterColumn($(event.currentTarget));
+                event.stopPropagation();
+            },
+
             hideModal: function (event) {
                 if (event) {
                     event.preventDefault();
                 }
                 $('.file-input').unbind('change.startUpload');
                 ModalUtils.hideModal();
+                if (assetsView.largeFileErrorMsg) {
+                  assetsView.largeFileErrorMsg.hide();
+                }
             },
 
             showUploadModal: function (event) {
@@ -118,42 +150,68 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 event.preventDefault();
                 self.resetUploadModal();
                 ModalUtils.showModal();
+                $('.modal-cover').on('click', self.hideModal);
                 $('.file-input').bind('change', self.startUpload);
                 $('.upload-modal .file-chooser').fileupload({
                     dataType: 'json',
                     type: 'POST',
-                    maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+                    maxChunkSize: self.uploadChunkSizeInBytes,
                     autoUpload: true,
                     progressall: function(event, data) {
                         var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
                         self.showUploadFeedback(event, percentComplete);
                     },
-                    maxFileSize: 100 * 1000 * 1000,   // 100 MB
+                    maxFileSize: self.maxFileSizeInBytes,
                     maxNumberofFiles: 100,
-                    add: function(event, data) {
-                        data.process().done(function () {
-                            data.submit();
-                        });
-                    },
                     done: function(event, data) {
                         self.displayFinishedUpload(data.result);
-                    }
+                    },
+                    processfail: function(event, data) {
+                        var filename = data.files[data.index].name;
+                        var error = gettext("File {filename} exceeds maximum size of {maxFileSizeInMBs} MB")
+                                    .replace("{filename}", filename)
+                                    .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
 
+                        // disable second part of message for any falsy value,
+                        // which can be null or an empty string
+                        if(self.maxFileSizeRedirectUrl) {
+                            var instructions = gettext("Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}")
+                                    .replace("{maxFileSizeRedirectUrl}", self.maxFileSizeRedirectUrl);
+                            error = error + " " + instructions;
+                        }
+
+                        assetsView.largeFileErrorMsg = new NotificationView.Error({
+                            "title": gettext("Your file could not be uploaded"),
+                            "message": error
+                        });
+                        assetsView.largeFileErrorMsg.show();
+
+                        assetsView.displayFailedUpload({
+                            "msg": gettext("Max file size exceeded")
+                        });
+                    },
+                    processdone: function(event, data) {
+                        assetsView.largeFileErrorMsg = null;
+                    }
                 });
             },
 
             showFileSelectionMenu: function(event) {
                 event.preventDefault();
+                if (assetsView.largeFileErrorMsg) {
+                  assetsView.largeFileErrorMsg.hide();
+                }
                 $('.file-input').click();
             },
 
             startUpload: function (event) {
                 var file = event.target.value;
-
-                $('.upload-modal h1').text(gettext('Uploading…'));
-                $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
-                $('.upload-modal .choose-file-button').hide();
-                $('.upload-modal .progress-bar').removeClass('loaded').show();
+                if (!assetsView.largeFileErrorMsg) {
+                    $('.upload-modal h1').text(gettext('Uploading'));
+                    $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
+                    $('.upload-modal .choose-file-button').hide();
+                    $('.upload-modal .progress-bar').removeClass('loaded').show();
+                }
             },
 
             resetUploadModal: function () {
@@ -169,6 +227,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .choose-file-button').text(gettext('Choose File'));
                 $('.upload-modal .embeddable-xml-input').val('');
                 $('.upload-modal .embeddable').hide();
+
+                assetsView.largeFileErrorMsg = null;
             },
 
             showUploadFeedback: function (event, percentComplete) {
@@ -177,11 +237,70 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .progress-fill').html(percentVal);
             },
 
+            openFilterColumn: function($this) {
+                this.toggleFilterColumnState($this);
+            },
+
+            toggleFilterColumnState: function(menu, selected) {
+                var $subnav = menu.find('.wrapper-nav-sub');
+                var $title = menu.find('.title');
+                var titleText = $title.find('.type-filter');
+                var assettype = selected ? selected.data('assetfilter'): false;
+                if(assettype) {
+                    if(assettype === this.allLabel) {
+                        titleText.text(titleText.data('alllabel'));
+                    }
+                    else {
+                        titleText.text(assettype);
+                    }
+                }
+                if ($subnav.hasClass('is-shown')) {
+                    $subnav.removeClass('is-shown');
+                    $title.removeClass('is-selected');
+                } else {
+                    $title.addClass('is-selected');
+                    $subnav.addClass('is-shown');
+                }
+            },
+
+            toggleFilterColumn: function(event) {
+                event.preventDefault();
+                var $filterColumn = $(event.currentTarget);
+                this._toggleFilterColumn($filterColumn.data('assetfilter'), $filterColumn.text());
+            },
+
+            _toggleFilterColumn: function(assettype, assettypeLabel) {
+                var collection = this.collection;
+                var filterColumn = this.$el.find('.filterable-column');
+                var resetFilter = filterColumn.find('.reset-filter');
+                var title = filterColumn.find('.title');
+                if(assettype === this.allLabel) {
+                    collection.assetType = '';
+                    resetFilter.hide();
+                    title.removeClass('column-selected-link');
+                }
+                else {
+                    collection.assetType = assettype;
+                    resetFilter.show();
+                    title.addClass('column-selected-link');
+                }
+
+                this.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
+                this.selectFilter('js-asset-type-col');
+                this.closeFilterPopup(this.$el.find(
+                    '.column-filter-link[data-assetfilter="' + assettype + '"]'));
+            },
+
+            closeFilterPopup: function(element){
+                var $menu = element.parents('.nav-dd > .nav-item');
+                this.toggleFilterColumnState($menu, element);
+            },
+
             displayFinishedUpload: function (resp) {
                 var asset = resp.asset;
 
                 $('.upload-modal h1').text(gettext('Upload New File'));
-                $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
+                $('.upload-modal .embeddable-xml-input').val(asset.portable_url).show();
                 $('.upload-modal .embeddable').show();
                 $('.upload-modal .file-name').hide();
                 $('.upload-modal .progress-fill').html(resp.msg);
@@ -189,6 +308,16 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .progress-fill').width('100%');
 
                 assetsView.addAsset(new AssetModel(asset));
+            },
+
+            displayFailedUpload: function (resp) {
+                $('.upload-modal h1').text(gettext('Upload New File'));
+                $('.upload-modal .embeddable-xml-input').hide();
+                $('.upload-modal .embeddable').hide();
+                $('.upload-modal .file-name').hide();
+                $('.upload-modal .progress-fill').html(resp.msg);
+                $('.upload-modal .choose-file-button').text(gettext('Load Another File')).show();
+                $('.upload-modal .progress-fill').width('0%');
             }
         });
 

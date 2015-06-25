@@ -8,9 +8,17 @@ define(['jquery.cookie', 'utility'], function() {
                 dataType: 'json',
                 data: data,
                 success: callback,
-                headers : {'X-CSRFToken':$.cookie('csrftoken')}
             });
         }
+
+        // Clear the login error message when credentials are edited
+        $('input#email').on('input',function() {
+            $('#login_error').removeClass('is-shown');
+        });
+
+        $('input#password').on('input',function() {
+            $('#login_error').removeClass('is-shown');
+        });
 
         $('form#login_form').submit(function(event) {
             event.preventDefault();

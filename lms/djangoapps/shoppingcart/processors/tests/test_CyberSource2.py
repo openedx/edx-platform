@@ -37,9 +37,12 @@ class CyberSource2Test(TestCase):
 
     COST = "10.00"
     CALLBACK_URL = "/test_callback_url"
+    FAILED_DECISIONS = ["DECLINE", "CANCEL", "ERROR"]
 
     def setUp(self):
         """ Create a user and an order. """
+        super(CyberSource2Test, self).setUp()
+
         self.user = UserFactory()
         self.order = Order.get_cart_for_user(self.user)
         self.order_item = OrderItem.objects.create(
@@ -118,10 +121,26 @@ class CyberSource2Test(TestCase):
         self.assertEqual(params['signature'], self._signature(params))
 
     # We patch the purchased callback because
+    # we're using the OrderItem base class, which throws an exception
+    # when item doest not have a course id associated
+    @patch.object(OrderItem, 'purchased_callback')
+    def test_process_payment_raises_exception(self, purchased_callback):  # pylint: disable=unused-argument
+        self.order.clear()
+        OrderItem.objects.create(
+            order=self.order,
+            user=self.user,
+            unit_cost=self.COST,
+            line_cost=self.COST,
+        )
+        params = self._signed_callback_params(self.order.id, self.COST, self.COST)
+        process_postpay_callback(params)
+
+    # We patch the purchased callback because
     # (a) we're using the OrderItem base class, which doesn't implement this method, and
     # (b) we want to verify that the method gets called on success.
     @patch.object(OrderItem, 'purchased_callback')
-    def test_process_payment_success(self, purchased_callback):
+    @patch.object(OrderItem, 'pdf_receipt_display_name')
+    def test_process_payment_success(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         # Simulate a callback from CyberSource indicating that payment was successful
         params = self._signed_callback_params(self.order.id, self.COST, self.COST)
         result = process_postpay_callback(params)
@@ -142,7 +161,7 @@ class CyberSource2Test(TestCase):
 
     def test_process_payment_rejected(self):
         # Simulate a callback from CyberSource indicating that the payment was rejected
-        params = self._signed_callback_params(self.order.id, self.COST, self.COST, accepted=False)
+        params = self._signed_callback_params(self.order.id, self.COST, self.COST, decision='REJECT')
         result = process_postpay_callback(params)
 
         # Expect that we get an error message
@@ -200,7 +219,8 @@ class CyberSource2Test(TestCase):
         self.assertIn(u"you have cancelled this transaction", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
-    def test_process_no_credit_card_digits(self, callback):
+    @patch.object(OrderItem, 'pdf_receipt_display_name')
+    def test_process_no_credit_card_digits(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         # Use a credit card number with no digits provided
         params = self._signed_callback_params(
             self.order.id, self.COST, self.COST,
@@ -237,7 +257,8 @@ class CyberSource2Test(TestCase):
         self.assertIn(u"did not return a required parameter", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
-    def test_sign_then_verify_unicode(self, purchased_callback):
+    @patch.object(OrderItem, 'pdf_receipt_display_name')
+    def test_sign_then_verify_unicode(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         params = self._signed_callback_params(
             self.order.id, self.COST, self.COST,
             first_name=u'\u2699'
@@ -263,7 +284,7 @@ class CyberSource2Test(TestCase):
 
     def _signed_callback_params(
         self, order_id, order_amount, paid_amount,
-        accepted=True, signature=None, card_number='xxxxxxxxxxxx1111',
+        decision='ACCEPT', signature=None, card_number='xxxxxxxxxxxx1111',
         first_name='John'
     ):
         """
@@ -281,7 +302,7 @@ class CyberSource2Test(TestCase):
 
         Keyword Args:
 
-            accepted (bool): Whether the payment was accepted or rejected.
+            decision (string): Whether the payment was accepted or rejected or declined.
             signature (string): If provided, use this value instead of calculating the signature.
             card_numer (string): If provided, use this value instead of the default credit card number.
             first_name (string): If provided, the first name of the user.
@@ -292,9 +313,51 @@ class CyberSource2Test(TestCase):
         """
         # Parameters sent from CyberSource to our callback implementation
         # These were captured from the CC test server.
+
+        signed_field_names = ["transaction_id",
+                              "decision",
+                              "req_access_key",
+                              "req_profile_id",
+                              "req_transaction_uuid",
+                              "req_transaction_type",
+                              "req_reference_number",
+                              "req_amount",
+                              "req_currency",
+                              "req_locale",
+                              "req_payment_method",
+                              "req_override_custom_receipt_page",
+                              "req_bill_to_forename",
+                              "req_bill_to_surname",
+                              "req_bill_to_email",
+                              "req_bill_to_address_line1",
+                              "req_bill_to_address_city",
+                              "req_bill_to_address_state",
+                              "req_bill_to_address_country",
+                              "req_bill_to_address_postal_code",
+                              "req_card_number",
+                              "req_card_type",
+                              "req_card_expiry_date",
+                              "message",
+                              "reason_code",
+                              "auth_avs_code",
+                              "auth_avs_code_raw",
+                              "auth_response",
+                              "auth_amount",
+                              "auth_code",
+                              "auth_trans_ref_no",
+                              "auth_time",
+                              "bill_trans_ref_no",
+                              "signed_field_names",
+                              "signed_date_time"]
+
+        # if decision is in FAILED_DECISIONS list then remove  auth_amount from
+        # signed_field_names list.
+        if decision in self.FAILED_DECISIONS:
+            signed_field_names.remove("auth_amount")
+
         params = {
             # Parameters that change based on the test
-            "decision": "ACCEPT" if accepted else "REJECT",
+            "decision": decision,
             "req_reference_number": str(order_id),
             "req_amount": order_amount,
             "auth_amount": paid_amount,
@@ -307,43 +370,7 @@ class CyberSource2Test(TestCase):
             "req_card_expiry_date": "01-2018",
             "bill_trans_ref_no": "85080648RYI23S6I",
             "req_bill_to_address_state": "MA",
-            "signed_field_names": ",".join([
-                "transaction_id",
-                "decision",
-                "req_access_key",
-                "req_profile_id",
-                "req_transaction_uuid",
-                "req_transaction_type",
-                "req_reference_number",
-                "req_amount",
-                "req_currency",
-                "req_locale",
-                "req_payment_method",
-                "req_override_custom_receipt_page",
-                "req_bill_to_forename",
-                "req_bill_to_surname",
-                "req_bill_to_email",
-                "req_bill_to_address_line1",
-                "req_bill_to_address_city",
-                "req_bill_to_address_state",
-                "req_bill_to_address_country",
-                "req_bill_to_address_postal_code",
-                "req_card_number",
-                "req_card_type",
-                "req_card_expiry_date",
-                "message",
-                "reason_code",
-                "auth_avs_code",
-                "auth_avs_code_raw",
-                "auth_response",
-                "auth_amount",
-                "auth_code",
-                "auth_trans_ref_no",
-                "auth_time",
-                "bill_trans_ref_no",
-                "signed_field_names",
-                "signed_date_time"
-            ]),
+            "signed_field_names": ",".join(signed_field_names),
             "req_payment_method": "card",
             "req_transaction_type": "sale",
             "auth_code": "888888",
@@ -369,6 +396,11 @@ class CyberSource2Test(TestCase):
             "req_override_custom_receipt_page": "http://localhost:8000/shoppingcart/postpay_callback/",
             "req_access_key": "abcd12345",
         }
+
+        # if decision is in FAILED_DECISIONS list then remove the auth_amount from params dict
+
+        if decision in self.FAILED_DECISIONS:
+            del params["auth_amount"]
 
         # Calculate the signature
         params['signature'] = signature if signature is not None else self._signature(params)
@@ -398,3 +430,12 @@ class CyberSource2Test(TestCase):
                 in params['signed_field_names'].split(u",")
             ])
         )
+
+    def test_process_payment_declined(self):
+        # Simulate a callback from CyberSource indicating that the payment was declined
+        params = self._signed_callback_params(self.order.id, self.COST, self.COST, decision='DECLINE')
+        result = process_postpay_callback(params)
+
+        # Expect that we get an error message
+        self.assertFalse(result['success'])
+        self.assertIn(u"payment was declined", result['error_html'])

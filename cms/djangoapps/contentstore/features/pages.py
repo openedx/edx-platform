@@ -1,9 +1,9 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
-# pylint: disable=W0613
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 from lettuce import world, step
-from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 
 
 CSS_FOR_TAB_ELEMENT = "li[data-tab-id='{0}'] input.toggle-checkbox"
@@ -27,7 +27,7 @@ def add_page(step):
 def see_a_static_page_named_foo(step, name):
     pages_css = 'div.xmodule_StaticTabModule'
     page_name_html = world.css_html(pages_css)
-    assert_equal(page_name_html, '\n    {name}\n'.format(name=name))
+    assert_equal(page_name_html.strip(), name)
 
 
 @step(u'I should not see any static pages$')

@@ -1,0 +1,10 @@
+<form class="file-upload-form">
+    <div class="file-drop-area">
+        <%- gettext("Drag and drop or click here to upload video files.") %>
+    </div>
+    <input type="file" class="sr js-file-input" name="file" multiple>
+</form>
+<section class="active-video-upload-container">
+    <h3 class="sr">Active Uploads</h3>
+    <ul class="active-video-upload-list"></ul>
+</section>

@@ -58,7 +58,9 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI",
             initialize : function() {
                 this.registerSortableColumn('name-col', 'Name', 'name', 'asc');
                 this.registerSortableColumn('date-col', 'Date', 'date', 'desc');
+                this.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 this.setInitialSortColumn('date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
             }
         });
 
@@ -183,6 +185,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI",
 
                     it('returns the registered info for a column', function () {
                         pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
+                        pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                         var sortInfo = pagingView.sortableColumnInfo('test-col');
                         expect(sortInfo.displayName).toBe('Test Column');
                         expect(sortInfo.fieldName).toBe('testField');

@@ -4,9 +4,8 @@ Tests for Shibboleth Authentication
 @jbau
 """
 import unittest
-from mock import patch
-from ddt import ddt, data
 
+from ddt import ddt, data
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.test import TestCase
@@ -15,22 +14,21 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
 from django.utils.importlib import import_module
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
+from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
-from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii, _safe_postlogin_redirect
+from external_auth.views import _safe_postlogin_redirect
+from external_auth.views import (
+    shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
+)
+from mock import patch
 
 from student.views import create_account, change_enrollment
-from student.models import UserProfile, Registration, CourseEnrollment
+from student.models import UserProfile, CourseEnrollment
 from student.tests.factories import UserFactory
-from edxmako.tests import mako_middleware_process_request
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
 
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 # Shib is supposed to provide 'REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider'
 # attributes via request.META.  We can count on 'Shib-Identity-Provider', and 'REMOTE_USER' being present
@@ -75,7 +73,7 @@ def gen_all_identities():
 
 
 @ddt
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, SESSION_ENGINE='django.contrib.sessions.backends.cache')
+@override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
 class ShibSPTest(ModuleStoreTestCase):
     """
     Tests for the Shibboleth SP, which communicates via request.META
@@ -378,7 +376,7 @@ class ShibSPTest(ModuleStoreTestCase):
             self.assertEqual(profile.name, identity.get('displayName').decode('utf-8'))
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @data("", "shib:https://idp.stanford.edu/")
+    @data(None, "", "shib:https://idp.stanford.edu/")
     def test_course_specific_login_and_reg(self, domain):
         """
         Tests that the correct course specific login and registration urls work for shib
@@ -409,7 +407,7 @@ class ShibSPTest(ModuleStoreTestCase):
         login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
         reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
 
-        if "shib" in domain:
+        if domain and "shib" in domain:
             self.assertIsInstance(login_response, HttpResponseRedirect)
             self.assertEqual(login_response['Location'],
                              reverse('shib-login') +
@@ -582,9 +580,9 @@ class ShibUtilFnTest(TestCase):
     Tests util functions in shib module
     """
     def test__flatten_to_ascii(self):
-        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
-        STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
-        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=C0103
+        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
+        STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
+        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=invalid-name
         self.assertEqual(_flatten_to_ascii('jasön'), 'jason')  # umlaut
         self.assertEqual(_flatten_to_ascii('Jason包'), 'Jason')  # mandarin, so it just gets dropped
         self.assertEqual(_flatten_to_ascii('abc'), 'abc')  # pass through

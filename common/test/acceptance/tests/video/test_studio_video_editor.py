@@ -25,7 +25,7 @@ class VideoEditorTest(CMSVideoBaseTest):
 
         """
         if subtitles:
-            self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
 
         self.navigate_to_course_unit()
 
@@ -345,7 +345,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         And I open tab "Advanced"
         And I click button "Add"
         And I choose "uk" language code
-        And I try to upload transcript file "subs_OEoXaMPEzfM.srt.sjson"
+        And I try to upload transcript file "subs_3_yD_cEKoCk.srt.sjson"
         Then I see validation error "Only SRT files can be uploaded. Please select a file ending in .srt to upload."
         """
         self._create_video_component()
@@ -353,7 +353,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.video.click_button('translation_add')
         self.video.select_translation_language('uk')
-        self.video.upload_asset('subs_OEoXaMPEzfM.srt.sjson', asset_type='transcript')
+        self.video.upload_asset('subs_3_yD_cEKoCk.srt.sjson', asset_type='transcript')
         error_msg = 'Only SRT files can be uploaded. Please select a file ending in .srt to upload.'
         self.assertEqual(self.video.upload_status_message, error_msg)
 
@@ -489,3 +489,66 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertIn(unicode_text, self.video.captions_text)
         self.assertEqual(self.video.caption_languages.keys(), [u'table', u'uk'])
         self.assertEqual(self.video.caption_languages.keys()[0], 'table')
+
+    def test_upload_transcript_with_BOM(self):
+        """
+        Scenario: User can upload transcript file with BOM(Byte Order Mark) in it.
+        Given I have created a Video component
+        And I edit the component
+        And I open tab "Advanced"
+        And I upload transcript file "chinese_transcripts_with_BOM.srt" for "zh" language code
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "莎拉·佩林 (Sarah Palin)" text in the captions
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.open_advanced_tab()
+        self.video.upload_translation('chinese_transcripts_with_BOM.srt', 'zh')
+        self.save_unit_settings()
+        self.assertTrue(self.video.is_captions_visible())
+        unicode_text = "莎拉·佩林 (Sarah Palin)".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_lines())
+
+    def test_simplified_and_traditional_chinese_transcripts_uploading(self):
+        """
+        Scenario: Translations uploading works correctly
+
+        Given I have created a Video component
+        And I edit the component
+        And I open tab "Advanced"
+        And I upload transcript file "simplified_chinese.srt" for "zh_HANS" language code
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "在线学习是革" text in the captions
+
+        And I edit the component
+        And I open tab "Advanced"
+        And I upload transcript file "traditional_chinese.srt" for "zh_HANT" language code
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "在線學習是革" text in the captions
+
+        And video subtitle menu has 'zh_HANS', 'zh_HANT' translations for 'Simplified Chinese'
+        and 'Traditional Chinese' respectively
+        """
+        self._create_video_component()
+
+        langs_info = [
+            ('zh_HANS', 'simplified_chinese.srt', '在线学习是革'),
+            ('zh_HANT', 'traditional_chinese.srt', '在線學習是革')
+        ]
+
+        for lang_code, lang_file, lang_text in langs_info:
+            self.edit_component()
+            self.open_advanced_tab()
+            self.video.upload_translation(lang_file, lang_code)
+            self.save_unit_settings()
+            self.assertTrue(self.video.is_captions_visible())
+            # If there is only one language then there will be no subtitle/captions menu
+            if lang_code == 'zh_HANT':
+                self.video.select_language(lang_code)
+            unicode_text = lang_text.decode('utf-8')
+            self.assertIn(unicode_text, self.video.captions_text)
+
+        self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})

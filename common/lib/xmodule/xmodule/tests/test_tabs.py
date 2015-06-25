@@ -8,6 +8,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 class TabTestCase(unittest.TestCase):
     """Base class for Tab-related test cases."""
     def setUp(self):
+        super(TabTestCase, self).setUp()
 
         self.course = MagicMock()
         self.course.id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
@@ -412,10 +413,45 @@ class InstructorTestCase(TabTestCase):
         self.check_can_display_results(tab, for_staff_only=True)
 
 
+class EdxNotesTestCase(TabTestCase):
+    """
+    Test cases for Notes Tab.
+    """
+
+    def check_edxnotes_tab(self):
+        """
+        Helper function for verifying the edxnotes tab.
+        """
+        return self.check_tab(
+            tab_class=tabs.EdxNotesTab,
+            dict_tab={'type': tabs.EdxNotesTab.type, 'name': 'same'},
+            expected_link=self.reverse('edxnotes', args=[self.course.id.to_deprecated_string()]),
+            expected_tab_id=tabs.EdxNotesTab.type,
+            invalid_dict_tab=self.fake_dict_tab,
+        )
+
+    def test_edxnotes_tabs_enabled(self):
+        """
+        Tests that edxnotes tab is shown when feature is enabled.
+        """
+        self.settings.FEATURES['ENABLE_EDXNOTES'] = True
+        tab = self.check_edxnotes_tab()
+        self.check_can_display_results(tab, for_authenticated_users_only=True)
+
+    def test_edxnotes_tabs_disabled(self):
+        """
+        Tests that edxnotes tab is not shown when feature is disabled.
+        """
+        self.settings.FEATURES['ENABLE_EDXNOTES'] = False
+        tab = self.check_edxnotes_tab()
+        self.check_can_display_results(tab, expected_value=False)
+
+
 class KeyCheckerTestCase(unittest.TestCase):
     """Test cases for KeyChecker class"""
 
     def setUp(self):
+        super(KeyCheckerTestCase, self).setUp()
 
         self.valid_keys = ['a', 'b']
         self.invalid_keys = ['a', 'v', 'g']
@@ -433,6 +469,7 @@ class NeedNameTestCase(unittest.TestCase):
     """Test cases for NeedName validator"""
 
     def setUp(self):
+        super(NeedNameTestCase, self).setUp()
 
         self.valid_dict1 = {'a': 1, 'name': 2}
         self.valid_dict2 = {'name': 1}
@@ -473,6 +510,7 @@ class TabListTestCase(TabTestCase):
             tabs.TextbookTabs.type,
             tabs.PDFTextbookTabs.type,
             tabs.HtmlTextbookTabs.type,
+            tabs.EdxNotesTab.type,
         ]
 
         for unique_tab_type in unique_tab_types:
@@ -505,6 +543,7 @@ class TabListTestCase(TabTestCase):
                 {'type': tabs.OpenEndedGradingTab.type},
                 {'type': tabs.NotesTab.type, 'name': 'fake_name'},
                 {'type': tabs.SyllabusTab.type},
+                {'type': tabs.EdxNotesTab.type, 'name': 'fake_name'},
             ],
             # with external discussion
             [
@@ -565,6 +604,7 @@ class CourseTabListTestCase(TabListTestCase):
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
         self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
         self.settings.FEATURES['ENABLE_STUDENT_NOTES'] = True
+        self.settings.FEATURES['ENABLE_EDXNOTES'] = True
         self.course.hide_progress_tab = False
 
         # create 1 book per textbook type
@@ -580,7 +620,7 @@ class CourseTabListTestCase(TabListTestCase):
         )):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
-       # enumerate the tabs and verify textbooks and the instructor tab
+        # enumerate the tabs and verify textbooks and the instructor tab
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
             self.course,
             self.settings,

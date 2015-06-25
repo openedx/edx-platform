@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 from lettuce import world, step, before, after
 import json

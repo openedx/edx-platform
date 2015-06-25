@@ -70,12 +70,21 @@
       <b>${_("No")}</b>
       %endif
     </li>
-
     <li class="field text is-not-editable" id="field-grade-cutoffs">
       <label for="start-date">${_("Grade Cutoffs:")}</label>
       <b>${ section_data['grade_cutoffs'] }</b>
     </li>
   </ul>
+
+  %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', ''):
+      <p>
+        ## Translators: git is a version-control system; see http://git-scm.com/about
+        ${_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.").format(
+            link_start='<a href="{}">'.format(section_data['detailed_gitlogs_url']),
+            link_end='</a>'
+        )}
+      </p>
+  %endif
 </div>
 
 

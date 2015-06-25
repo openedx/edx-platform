@@ -26,7 +26,7 @@ from xmodule.video_module.transcripts_utils import (
 from xmodule.video_module import manage_video_subtitles_save
 
 from ..transcripts_ajax import get_transcripts_presence
-from ..course import _get_course_module
+from ..course import get_course_and_check_access
 
 
 log = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ def captions_index(request, course_key):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    course = _get_course_module(
+    course = get_course_and_check_access(
         course_key,
         request.user,
         depth=2,
