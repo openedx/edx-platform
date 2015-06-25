@@ -377,6 +377,19 @@ class EditInfo(object):
             source_version="UNSET" if self.source_version is None else self.source_version,
         )  # pylint: disable=bad-continuation
 
+    def __eq__(self, edit_info):
+        """
+        Two EditInfo instances are equal iff their storable representations
+        are equal.
+        """
+        return self.to_storable() == edit_info.to_storable()
+
+    def __neq__(self, edit_info):
+        """
+        Two EditInfo instances are not equal if they're not equal.
+        """
+        return not self == edit_info
+
 
 class BlockData(object):
     """
@@ -433,6 +446,19 @@ class BlockData(object):
             self=self,
             classname=self.__class__.__name__,
         )  # pylint: disable=bad-continuation
+
+    def __eq__(self, block_data):
+        """
+        Two BlockData objects are equal iff all their attributes are equal.
+        """
+        attrs = ['fields', 'block_type', 'definition', 'defaults', 'edit_info']
+        return all(getattr(self, attr) == getattr(block_data, attr) for attr in attrs)
+
+    def __neq__(self, block_data):
+        """
+        Just define this as not self.__eq__(block_data)
+        """
+        return not self == block_data
 
 
 new_contract('BlockData', BlockData)

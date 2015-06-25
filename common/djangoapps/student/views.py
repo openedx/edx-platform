@@ -306,11 +306,14 @@ def _cert_info(user, course, cert_status, course_mode):
         # showing the certificate web view button if certificate is ready state and feature flags are enabled.
         if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
             if get_active_web_certificate(course) is not None:
+                certificate_url = get_certificate_url(
+                    user_id=user.id,
+                    course_id=unicode(course.id),
+                    verify_uuid=None
+                )
                 status_dict.update({
                     'show_cert_web_view': True,
-                    'cert_web_view_url': u'{url}'.format(
-                        url=get_certificate_url(user_id=user.id, course_id=unicode(course.id))
-                    )
+                    'cert_web_view_url': u'{url}'.format(url=certificate_url)
                 })
             else:
                 # don't show download certificate button if we don't have an active certificate for course

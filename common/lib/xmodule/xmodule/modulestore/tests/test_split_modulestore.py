@@ -12,6 +12,7 @@ import uuid
 
 from contracts import contract
 from nose.plugins.attrib import attr
+from django.core.cache import get_cache, InvalidCacheBackendError
 
 from openedx.core.lib import tempdir
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
@@ -29,6 +30,7 @@ from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import mock_tab_from_json
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -769,6 +771,79 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
+
+
+class TestCourseStructureCache(SplitModuleTest):
+    """Tests for the CourseStructureCache"""
+
+    def setUp(self):
+        # use the default cache, since the `course_structure_cache`
+        # is a dummy cache during testing
+        self.cache = get_cache('default')
+
+        # make sure we clear the cache before every test...
+        self.cache.clear()
+        # ... and after
+        self.addCleanup(self.cache.clear)
+
+        # make a new course:
+        self.user = random.getrandbits(32)
+        self.new_course = modulestore().create_course(
+            'org', 'course', 'test_run', self.user, BRANCH_NAME_DRAFT,
+        )
+
+        super(TestCourseStructureCache, self).setUp()
+
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache(self, mock_get_cache):
+        # force get_cache to return the default cache so we can test
+        # its caching behavior
+        mock_get_cache.return_value = self.cache
+
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+
+        # when cache is warmed, we should have one fewer mongo call
+        with check_mongo_calls(0):
+            cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    def test_course_structure_cache_no_cache_configured(self, mock_get_cache):
+        mock_get_cache.side_effect = InvalidCacheBackendError
+
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+
+        # if the cache isn't configured, we expect to have to make
+        # another mongo call here if we want the same course structure
+        with check_mongo_calls(1):
+            cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    def test_dummy_cache(self):
+        with check_mongo_calls(1):
+            not_cached_structure = self._get_structure(self.new_course)
+
+        # Since the test is using the dummy cache, it's not actually caching
+        # anything
+        with check_mongo_calls(1):
+            cached_structure = self._get_structure(self.new_course)
+
+        # now make sure that you get the same structure
+        self.assertEqual(cached_structure, not_cached_structure)
+
+    def _get_structure(self, course):
+        """
+        Helper function to get a structure from a course.
+        """
+        return modulestore().db_connection.get_structure(
+            course.location.as_object_id(course.location.version_guid)
+        )
 
 
 class SplitModuleItemTests(SplitModuleTest):

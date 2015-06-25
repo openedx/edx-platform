@@ -12,11 +12,9 @@ the SessionMiddleware.
 """
 from django.conf import settings
 
-from dark_lang.models import DarkLangConfig
+from django.utils.translation.trans_real import parse_accept_lang_header
 
-# TODO re-import this once we're on Django 1.5 or greater. [PLAT-671]
-# from django.utils.translation.trans_real import parse_accept_lang_header
-from django_locale.trans_real import parse_accept_lang_header
+from dark_lang.models import DarkLangConfig
 
 
 def dark_parse_accept_lang_header(accept):
@@ -83,17 +81,11 @@ class DarkLangMiddleware(object):
         self._clean_accept_headers(request)
         self._activate_preview_language(request)
 
-    def _fuzzy_match(self, lang_code):
-        """Returns a fuzzy match for lang_code"""
-        if lang_code in self.released_langs:
-            return lang_code
-
-        lang_prefix = lang_code.partition('-')[0]
-        for released_lang in self.released_langs:
-            released_prefix = released_lang.partition('-')[0]
-            if lang_prefix == released_prefix:
-                return released_lang
-        return None
+    def _is_released(self, lang_code):
+        """
+        ``True`` iff one of the values in ``self.released_langs`` is a prefix of ``lang_code``.
+        """
+        return any(lang_code.lower().startswith(released_lang.lower()) for released_lang in self.released_langs)
 
     def _format_accept_value(self, lang, priority=1.0):
         """
@@ -110,13 +102,12 @@ class DarkLangMiddleware(object):
         if accept is None or accept == '*':
             return
 
-        new_accept = []
-        for lang, priority in dark_parse_accept_lang_header(accept):
-            fuzzy_code = self._fuzzy_match(lang.lower())
-            if fuzzy_code:
-                new_accept.append(self._format_accept_value(fuzzy_code, priority))
-
-        new_accept = ", ".join(new_accept)
+        new_accept = ", ".join(
+            self._format_accept_value(lang, priority)
+            for lang, priority
+            in dark_parse_accept_lang_header(accept)
+            if self._is_released(lang)
+        )
 
         request.META['HTTP_ACCEPT_LANGUAGE'] = new_accept
 
