@@ -60,7 +60,7 @@ DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
 
-class ReferenceTestXBlock(XBlock, XModuleMixin):
+class ReferenceTestXBlock(XModuleMixin):
     """
     Test xblock type to test the reference field types
     """

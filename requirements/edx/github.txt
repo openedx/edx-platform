@@ -32,7 +32,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 
 # Our libraries:
--e git+https://github.com/cpennington/XBlock.git@64f6bdaf6c987cdea4798d8b1a1fa8e471c20a21#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@74fdc5a361f48e5596acf3846ca3790a33a05253#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
