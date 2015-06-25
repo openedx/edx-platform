@@ -81,15 +81,29 @@
 
         .message-actions .action {
             display: block;
+            width: 100%;
             margin: 0 auto spacing-vertical(small) auto;
 
             &:last-child {
                 margin-bottom: 0;
             }
 
+            // CASE: icon display only
+            &.icon-only {
+
+                @include susy-breakpoint($bp-medium, $susy) {
+                    padding: spacing-vertical(x-small) spacing-horizontal(base);
+
+                    .icon {
+                        @include margin-right(0);
+                    }
+                }
+            }
+
             @include susy-breakpoint($bp-medium, $susy) {
                 display: inline-block;
                 vertical-align: middle;
+                width: auto;
                 margin-bottom: 0;
                 margin-right: spacing-horizontal(mid-small);
 
