@@ -72,6 +72,11 @@
                        expect(view.$('.nav-item[data-index=0]')).toHaveAttr('aria-selected', 'false');
                        expect(view.$('.nav-item[data-index=1]')).toHaveAttr('aria-selected', 'true');
                    });
+
+                   it('updates the page URL on tab switches without adding to browser history', function () {
+                       view.$('.nav-item[data-index=1]').click();
+                       expect(Backbone.history.navigate).toHaveBeenCalledWith('test 2', {replace: true});
+                   });
                });
            }
           );
