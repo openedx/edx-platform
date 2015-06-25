@@ -274,7 +274,7 @@ def require_sales_admin(func):
             log.error(u"Unable to find course with course key %s", course_id)
             return HttpResponseNotFound()
 
-        access = auth.has_access(request.user, CourseSalesAdminRole(course_key))
+        access = auth.has_role(request.user, CourseSalesAdminRole(course_key))
 
         if access:
             return func(request, course_id)
@@ -299,7 +299,7 @@ def require_finance_admin(func):
             log.error(u"Unable to find course with course key %s", course_id)
             return HttpResponseNotFound()
 
-        access = auth.has_access(request.user, CourseFinanceAdminRole(course_key))
+        access = auth.has_role(request.user, CourseFinanceAdminRole(course_key))
 
         if access:
             return func(request, course_id)

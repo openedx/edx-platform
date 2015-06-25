@@ -583,7 +583,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, 'staff', descriptor, course_id):
-            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            has_instructor_access = bool(has_access(user, 'instructor', descriptor, course_id))
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access, disable_staff_debug_info))
 
     # These modules store data using the anonymous_student_id as a key.
@@ -602,7 +602,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
     field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
-    user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
+    user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -676,7 +676,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         )
 
     system.set(u'user_is_staff', user_is_staff)
-    system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
+    system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
 

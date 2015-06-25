@@ -617,7 +617,7 @@ def _create_or_rerun_course(request):
     Returns the destination course_key and overriding fields for the new course.
     Raises DuplicateCourseError and InvalidKeyError
     """
-    if not auth.has_access(request.user, CourseCreatorRole()):
+    if not auth.has_role(request.user, CourseCreatorRole()):
         raise PermissionDenied()
 
     try:
