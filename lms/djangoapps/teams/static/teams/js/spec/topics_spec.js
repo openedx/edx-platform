@@ -1,6 +1,7 @@
 define([
     'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic', 'teams/js/views/topics'
 ], function (AjaxHelpers, TopicCollection, TopicsView) {
+    'use strict';
     describe('TopicsView', function () {
         var initialTopics, topicCollection, topicsView;
 
