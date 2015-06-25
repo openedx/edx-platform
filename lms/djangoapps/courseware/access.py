@@ -168,16 +168,16 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
             or in_preview_mode()):
                 return ACCESS_GRANTED
 
-        start_message = None
-        if isinstance(descriptor, CourseDescriptor):
-            if descriptor.advertised_start is not None:
-                start_message = _(descriptor.advertised_start)
-            elif descriptor.start != DEFAULT_START_DATE:
-                start_message = descriptor.start
-            else:
-                start_message = _("coming soon")
+    start_message = None
+    if hasattr(descriptor, 'advertised_start'):
+        if descriptor.advertised_start is not None:
+            start_message = _(descriptor.advertised_start)
+        elif descriptor.start != DEFAULT_START_DATE:
+            start_message = descriptor.start
+        else:
+            start_message = _("coming soon")
 
-        return StartDateError(start_message)
+    return StartDateError(start_message)
 
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
     """
