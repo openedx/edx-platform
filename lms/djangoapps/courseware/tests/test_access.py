@@ -27,8 +27,6 @@ from util.milestones_helpers import (
     seed_milestone_relationship_types,
 )
 
-from django.utils.timezone import UTC
-
 # pylint: disable=missing-docstring
 # pylint: disable=protected-access
 
@@ -69,7 +67,8 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def verify_start_message(self, mock_unit, expected_start_message):
         self.assertEquals(
-            access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key).user_message,
+            access._has_access_descriptor(
+                self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key).user_message,
             expected_start_message)
 
     def test_has_access_to_course(self):
@@ -390,7 +389,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         user = Mock(is_staff=True)
         descriptor = Mock(user_partitions=[])
         descriptor.mobile_available = False
-        self.assertTrue(access.is_mobile_available_for_user(user, descriptor))
+        self.assertTrue(access._has_access_course_desc(user, 'load_mobile', descriptor))
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_courseware_page_unfulfilled_prereqs(self):

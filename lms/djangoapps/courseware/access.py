@@ -50,7 +50,8 @@ from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
-from access_response import AccessResponse, StartDateError, MilestoneError, VisibilityError, MobileAvailabilityError
+from courseware.access_response import AccessResponse, StartDateError, MilestoneError, \
+    VisibilityError, MobileAvailabilityError
 
 DEBUG_ACCESS = False
 ACCESS_GRANTED = AccessResponse(True)
@@ -171,7 +172,7 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
     start_message = None
     if hasattr(descriptor, 'advertised_start'):
         if descriptor.advertised_start is not None:
-            start_message = _(descriptor.advertised_start)
+            start_message = _(descriptor.advertised_start)  # pylint: disable=translation-of-non-string
         elif descriptor.start != DEFAULT_START_DATE:
             start_message = descriptor.start
         else:
@@ -450,7 +451,7 @@ def _has_group_access(descriptor, user, course_key):
     # if a referenced partition could not be found, access will be denied.
     try:
         partitions = [
-            descriptor._get_user_partition(partition_id)  # pylint:disable=protected-access
+            descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
             for partition_id, group_ids in merged_access.items()
             if group_ids is not None
         ]
@@ -521,7 +522,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             return access_response
 
         access_response = _can_access_descriptor_with_start_date(user, descriptor, course_key)
-        if 'detached' not in descriptor._class_tags and not access_response:
+        if 'detached' not in descriptor._class_tags and not access_response:  # pylint: disable=protected-access
             return access_response
 
         return ACCESS_GRANTED

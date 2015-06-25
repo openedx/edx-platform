@@ -52,7 +52,8 @@ class StartDateError(AccessError):
     """Access denied because the course has not started yet and the user is not staff"""
     def __init__(self, start_message):
         error_code = "course_not_started"
-        developer_message = "Course does not start until {start} and user does not have staff access".format(start=start_message)
+        developer_message = "Course does not start until {start}  \
+                            and user does not have staff access".format(start=start_message)
         user_message = start_message
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
