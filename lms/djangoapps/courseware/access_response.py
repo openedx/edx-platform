@@ -1,6 +1,8 @@
 """
 This file contains all the classes used by has_access for error handling
 """
+
+
 class AccessResponse(object):
     """Class that represents a response from a has_access permission check."""
     def __init__(self, has_access, error_code=None, developer_message=None, user_message=None):
