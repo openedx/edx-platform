@@ -1419,7 +1419,7 @@ class CouponRedemption(models.Model):
         """
         return cls.objects.filter(order__status='purchased', coupon__course_id=course_id).values(
             'coupon__code', 'coupon__percentage_discount'
-        ).annotate(coupon__used_count=Count('coupon__code'))
+        ).annotate(coupon__used_count=Count('coupon__code')).order_by('-coupon__used_count')
 
     @classmethod
     def get_total_coupon_code_purchases(cls, course_id):
