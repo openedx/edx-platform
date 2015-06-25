@@ -13,6 +13,7 @@ from django.http import (
     Http404
 )
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
@@ -127,6 +128,7 @@ def create_credit_request(request, provider_id):
 
 
 @require_POST
+@csrf_exempt
 def credit_provider_callback(request, provider_id):
     """
     Callback end-point used by credit providers to approve or reject
