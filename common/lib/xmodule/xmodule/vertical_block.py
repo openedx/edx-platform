@@ -70,12 +70,21 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             self.render_children(context, fragment, can_reorder=True, can_add=True)
         return fragment
 
+    def unfulfilled_credit_requirements(self, usage_key):
+        """Check dynamically that the provided 'usage_key' is a failed or
+        skipped credit requirement XBlock's location.
+        """
+        # pylint: disable=protected-access
+        return self.runtime._services['reverification'].display_unfulfilled_credit_requirement(
+            self.runtime.user_id, self.runtime.course_id, usage_key
+        )
+
     def get_progress(self):
         """
         Returns the progress on this block and all children.
         """
         # TODO: Cache progress or children array?
-        children = self.get_children()  # pylint: disable=no-member
+        children = self.get_children(usage_key_filter=self.unfulfilled_credit_requirements)  # pylint: disable=no-member
         progresses = [child.get_progress() for child in children]
         progress = reduce(Progress.add_counts, progresses, None)
         return progress

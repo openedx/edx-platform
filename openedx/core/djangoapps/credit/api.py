@@ -447,6 +447,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
     Returns:
         list of requirement statuses
     """
+    course_key = CourseKey.from_string(unicode(course_key))
     requirements = CreditRequirement.get_course_requirements(course_key, namespace=namespace, name=name)
     requirement_statuses = CreditRequirementStatus.get_statuses(requirements, username)
     requirement_statuses = dict((o.requirement, o) for o in requirement_statuses)

@@ -35,10 +35,11 @@ from ecommerce_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
 from embargo import api as embargo_api
 from microsite_configuration import microsite
+from openedx.core.djangoapps.credit.api import get_credit_requirement, set_credit_requirement_status
+from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
-from openedx.core.djangoapps.credit.api import set_credit_requirement_status
 from student.models import CourseEnrollment
 from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors import (
@@ -886,30 +887,45 @@ def _send_email(user_id, subject, message):
     user.email_user(subject, message, from_address)
 
 
-def _set_user_requirement_status(attempt, namespace, status, reason=None):
+def set_user_requirement_status(attempt, namespace, status, reason=None):
     """Sets the status of a credit requirement for the user,
     based on a verification checkpoint.
     """
-    checkpoint = None
     try:
         checkpoint = VerificationCheckpoint.objects.get(photo_verification=attempt)
     except VerificationCheckpoint.DoesNotExist:
         log.error("Unable to find checkpoint for user with id %d", attempt.user.id)
+        return
 
-    if checkpoint is not None:
-        try:
-            set_credit_requirement_status(
-                attempt.user.username,
-                checkpoint.course_id,
-                namespace,
-                checkpoint.checkpoint_location,
-                status=status,
-                reason=reason,
-            )
-        except Exception:  # pylint: disable=broad-except
-            # Catch exception if unable to add credit requirement
-            # status for user
-            log.error("Unable to add Credit requirement status for user with id %d", attempt.user.id)
+    course_key = checkpoint.course_id
+    credit_requirement = get_credit_requirement(
+        course_key, namespace, checkpoint.checkpoint_location
+    )
+    if credit_requirement is None:
+        log.error(
+            u"Failed to find credit requirement with course_key '%s', namespace '%s', location '%s'.",
+            course_key,
+            namespace,
+            checkpoint.checkpoint_location
+        )
+        return
+
+    try:
+        set_credit_requirement_status(
+            attempt.user.username,
+            checkpoint.course_id,
+            namespace,
+            checkpoint.checkpoint_location,
+            status=status,
+            reason=reason,
+        )
+    except InvalidCreditRequirements:
+        # log exception if unable to add credit requirement status for user
+        log.error(
+            u"Failed to add credit requirement status for user with id '%d'.",
+            attempt.user.id,
+            exc_info=True
+        )
 
 
 @require_POST
@@ -969,13 +985,13 @@ def results_callback(request):
         log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
-        _set_user_requirement_status(attempt, 'reverification', 'satisfied')
+        set_user_requirement_status(attempt, 'reverification', 'satisfied')
 
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
-        _set_user_requirement_status(
+        set_user_requirement_status(
             attempt, 'reverification', 'failed', json.dumps(reason)
         )
     elif result == "SYSTEM FAIL":
