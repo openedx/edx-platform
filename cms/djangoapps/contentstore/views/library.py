@@ -30,7 +30,7 @@ from .component import get_component_templates, CONTAINER_TEMPLATES
 from student.auth import (
     STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
 )
-from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from student import auth
 from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
 
@@ -115,9 +115,6 @@ def _create_library(request):
     """
     Helper method for creating a new library.
     """
-    if not auth.has_access(request.user, CourseCreatorRole()):
-        log.exception(u"User %s tried to create a library without permission", request.user.username)
-        raise PermissionDenied()
     display_name = None
     try:
         display_name = request.json['display_name']
