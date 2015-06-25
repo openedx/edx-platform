@@ -1152,9 +1152,7 @@ MIDDLEWARE_CLASSES = (
     'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
-    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
-    # 'django.middleware.locale.LocaleMiddleware',
-    'django_locale.middleware.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -2094,6 +2092,9 @@ REGISTRATION_EXTRA_FIELDS = {
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
+
+############ CERTIFICATE VERIFICATION URL (STATIC FILES) ###########
+CERTIFICATES_STATIC_VERIFY_URL = "https://verify-test.edx.org/cert/"
 
 #################### Badgr OpenBadges generation #######################
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
