@@ -531,8 +531,17 @@
         padding: 0;
       }
 
+      .credit-eligibility-msg {
+        @include float(left);
+        margin-top: 10px;
+      }
+
       .purchase_credit {
-        float: right;
+        @include float(right);
+      }
+
+      .purchase-credit-btn {
+        @extend %btn-pl-yellow-base;
       }
 
       .message {

@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, credit_message" />
+<%page args="course, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings" />
 
 <%!
 import urllib
@@ -275,9 +275,9 @@ from student.helpers import (
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 
-      % if credit_message:
-          <%include file='_dashboard_credit_information.html' args='credit_message=credit_message'/>
-      % endif
+      % if credit_status is not None:
+        <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
+      % endif 
 
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">

@@ -51,7 +51,7 @@ from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
     Registration, UserProfile, PendingNameChange,
-    PendingEmailChange, CourseEnrollment, unique_id_for_user,
+    PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
@@ -124,7 +124,6 @@ from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.credit.api import get_credit_eligibility, get_purchased_credit_courses
 
 
 log = logging.getLogger("edx.student")
@@ -531,8 +530,6 @@ def dashboard(request):
     for course, __ in course_enrollment_pairs:
         enrolled_courses_dict[unicode(course.id)] = course
 
-    credit_messages = _create_credit_availability_message(enrolled_courses_dict, user)
-
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
@@ -638,7 +635,6 @@ def dashboard(request):
 
     context = {
         'enrollment_message': enrollment_message,
-        'credit_messages': credit_messages,
         'course_enrollment_pairs': course_enrollment_pairs,
         'course_optouts': course_optouts,
         'message': message,
@@ -647,6 +643,7 @@ def dashboard(request):
         'show_courseware_links_for': show_courseware_links_for,
         'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
+        'credit_statuses': _credit_statuses(user, course_enrollment_pairs),
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
         'verification_status': verification_status,
@@ -703,47 +700,6 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
         )
 
 
-def _create_credit_availability_message(enrolled_courses_dict, user):  # pylint: disable=invalid-name
-    """Builds a dict of credit availability for courses.
-
-    Construct a for courses user has completed and has not purchased credit
-    from the credit provider yet.
-
-    Args:
-        course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
-        user (User): User object.
-
-    Returns:
-        A dict of courses user is eligible for credit.
-
-    """
-    user_eligibilities = get_credit_eligibility(user.username)
-    user_purchased_credit = get_purchased_credit_courses(user.username)
-
-    eligibility_messages = {}
-    for course_id, eligibility in user_eligibilities.iteritems():
-        if course_id not in user_purchased_credit:
-            duration = eligibility["seconds_good_for_display"]
-            curr_time = timezone.now()
-            validity_till = eligibility["created_at"] + timedelta(seconds=duration)
-            if validity_till > curr_time:
-                diff = validity_till - curr_time
-                urgent = diff.days <= 30
-                eligibility_messages[course_id] = {
-                    "user_id": user.id,
-                    "course_id": course_id,
-                    "course_name": enrolled_courses_dict[course_id].display_name,
-                    "providers": eligibility["providers"],
-                    "status": eligibility["status"],
-                    "provider": eligibility.get("provider"),
-                    "urgent": urgent,
-                    "user_full_name": user.get_full_name(),
-                    "expiry": validity_till
-                }
-
-    return eligibility_messages
-
-
 def _get_recently_enrolled_courses(course_enrollment_pairs):
     """Checks to see if the student has recently enrolled in courses.
 
@@ -791,6 +747,124 @@ def _update_email_opt_in(request, org):
     if email_opt_in is not None:
         email_opt_in_boolean = email_opt_in == 'true'
         preferences_api.update_email_opt_in(request.user, org, email_opt_in_boolean)
+
+
+def _credit_statuses(user, course_enrollment_pairs):
+    """
+    Retrieve the status for credit courses.
+
+    A credit course is a course for which a user can purchased
+    college credit.  The current flow is:
+
+    1. User becomes eligible for credit (submits verifications, passes the course, etc.)
+    2. User purchases credit from a particular credit provider.
+    3. User requests credit from the provider, usually creating an account on the provider's site.
+    4. The credit provider notifies us whether the user's request for credit has been accepted or rejected.
+
+    The dashboard is responsible for communicating the user's state in this flow.
+
+    Arguments:
+        user (User): The currently logged-in user.
+        course_enrollment_pairs (list): List of (Course, CourseEnrollment) tuples.
+
+    Returns: dict
+
+    The returned dictionary has keys that are `CourseKey`s and values that
+    are dictionaries with:
+
+        * eligible (bool): True if the user is eligible for credit in this course.
+        * deadline (datetime): The deadline for purchasing and requesting credit for this course.
+        * purchased (bool): Whether the user has purchased credit for this course.
+        * provider_name (string): The display name of the credit provider.
+        * provider_status_url (string): A URL the user can visit to check on their credit request status.
+        * request_status (string): Either "pending", "approved", or "rejected"
+        * error (bool): If true, an unexpected error occurred when retrieving the credit status,
+            so the user should contact the support team.
+
+    Example:
+    >>> _credit_statuses(user, course_enrollment_pairs)
+    {
+        CourseKey.from_string("edX/DemoX/Demo_Course"): {
+            "course_key": "edX/DemoX/Demo_Course",
+            "eligible": True,
+            "deadline": 2015-11-23 00:00:00 UTC,
+            "purchased": True,
+            "provider_name": "Hogwarts",
+            "provider_status_url": "http://example.com/status",
+            "request_status": "pending",
+            "error": False
+        }
+    }
+
+    """
+    from openedx.core.djangoapps.credit import api as credit_api
+
+    request_status_by_course = {
+        request["course_key"]: request["status"]
+        for request in credit_api.get_credit_requests_for_user(user.username)
+    }
+
+    credit_enrollments = {
+        course.id: enrollment
+        for course, enrollment in course_enrollment_pairs
+        if enrollment.mode == "credit"
+    }
+
+    # When a user purchases credit in a course, the user's enrollment
+    # mode is set to "credit" and an enrollment attribute is set
+    # with the ID of the credit provider.  We retrieve *all* such attributes
+    # here to minimize the number of database queries.
+    purchased_credit_providers = {
+        attribute.enrollment.course_id: attribute.value
+        for attribute in CourseEnrollmentAttribute.objects.filter(
+            namespace="credit",
+            name="provider_id",
+            enrollment__in=credit_enrollments.values()
+        ).select_related("enrollment")
+    }
+
+    provider_info_by_id = {
+        provider["id"]: provider
+        for provider in credit_api.get_credit_providers()
+    }
+
+    statuses = {}
+    for eligibility in credit_api.get_eligibilities_for_user(user.username):
+        course_key = eligibility["course_key"]
+        status = {
+            "course_key": unicode(course_key),
+            "eligible": True,
+            "deadline": eligibility["deadline"],
+            "purchased": course_key in credit_enrollments,
+            "provider_name": None,
+            "provider_status_url": None,
+            "request_status": request_status_by_course.get(course_key),
+            "error": False,
+        }
+
+        # If the user has purchased credit, then include information about the credit
+        # provider from which the user purchased credit.
+        # We retrieve the provider's ID from the an "enrollment attribute" set on the user's
+        # enrollment when the user's order for credit is fulfilled by the E-Commerce service.
+        if status["purchased"]:
+            provider_id = purchased_credit_providers.get(course_key)
+            if provider_id is None:
+                status["error"] = True
+                log.error(
+                    u"Could not find credit provider associated with credit enrollment "
+                    u"for user %s in course %s.  The user will not be able to see his or her "
+                    u"credit request status on the student dashboard.  This attribute should "
+                    u"have been set when the user purchased credit in the course.",
+                    user.id, course_key
+                )
+            else:
+                provider_info = provider_info_by_id.get(provider_id, {})
+                status["provider_name"] = provider_info.get("display_name")
+                status["provider_status_url"] = provider_info.get("status_url")
+
+        statuses[course_key] = status
+
+    return statuses
 
 
 @require_POST
