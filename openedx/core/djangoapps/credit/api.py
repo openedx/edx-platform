@@ -274,12 +274,12 @@ def create_credit_request(course_key, provider_id, username):
 
     # Retrieve the final grade from the eligibility table
     try:
-        final_grade = CreditRequirementStatus.objects.filter(
+        final_grade = CreditRequirementStatus.objects.get(
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
             status="satisfied"
-        ).latest().reason["final_grade"]
+        ).reason["final_grade"]
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
         log.exception(
             "Could not retrieve final grade from the credit eligibility table "
@@ -410,7 +410,7 @@ def get_credit_requests_for_user(username):
     return CreditRequest.credit_requests_for_user(username)
 
 
-def get_credit_requirement_status(course_key, username):
+def get_credit_requirement_status(course_key, username, namespace=None, name=None):
     """ Retrieve the user's status for each credit requirement in the course.
 
     Args:
@@ -447,7 +447,7 @@ def get_credit_requirement_status(course_key, username):
     Returns:
         list of requirement statuses
     """
-    requirements = CreditRequirement.get_course_requirements(course_key)
+    requirements = CreditRequirement.get_course_requirements(course_key, namespace=namespace, name=name)
     requirement_statuses = CreditRequirementStatus.get_statuses(requirements, username)
     requirement_statuses = dict((o.requirement, o) for o in requirement_statuses)
     statuses = []
@@ -511,35 +511,79 @@ def get_credit_requirement(course_key, namespace, name):
     } if requirement else None
 
 
-def set_credit_requirement_status(username, requirement, status="satisfied", reason=None):
-    """Update Credit Requirement Status for given username and requirement
-        if exists else add new.
+def set_credit_requirement_status(username, course_key, req_namespace, req_name, status="satisfied", reason=None):
+    """
+    Update the user's requirement status.
+
+    This will record whether the user satisfied or failed a particular requirement
+    in a course.  If the user has satisfied all requirements, the user will be marked
+    as eligible for credit in the course.
 
     Args:
-        username(str): Username of the user
-        requirement(dict): requirement dict
-        status(str): Status of the requirement
-        reason(dict): Reason of the status
+        username (str): Username of the user
+        course_key (CourseKey): Identifier for the course associated with the requirement.
+        req_namespace (str): Namespace of the requirement (e.g. "grade" or "reverification")
+        req_name (str): Name of the requirement (e.g. "grade" or the location of the ICRV XBlock)
+
+    Keyword Arguments:
+        status (str): Status of the requirement (either "satisfied" or "failed")
+        reason (dict): Reason of the status
 
     Example:
         >>> set_credit_requirement_status(
-            "staff",
-            {
-                "course_key": "course-v1-edX-DemoX-1T2015"
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-            },
-            "satisfied",
-            {}
+                "staff",
+                CourseKey.from_string("course-v1-edX-DemoX-1T2015"),
+                "reverification",
+                "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                status="satisfied",
+                reason={}
             )
 
     """
-    credit_requirement = CreditRequirement.get_course_requirement(
-        requirement['course_key'], requirement['namespace'], requirement['name']
-    )
+    # Check if we're already eligible for credit.
+    # If so, short-circuit this process.
+    if CreditEligibility.is_user_eligible_for_credit(course_key, username):
+        return
+
+    # Retrieve all credit requirements for the course
+    # We retrieve all of them to avoid making a second query later when
+    # we need to check whether all requirements have been satisfied.
+    reqs = CreditRequirement.get_course_requirements(course_key)
+
+    # Find the requirement we're trying to set
+    req_to_update = next((
+        req for req in reqs
+        if req.namespace == req_namespace
+        and req.name == req_name
+    ), None)
+
+    # If we can't find the requirement, then the most likely explanation
+    # is that there was a lag updating the credit requirements after the course
+    # was published.  We *could* attempt to create the requirement here,
+    # but that could cause serious performance issues if many users attempt to
+    # lock the row at the same time.
+    # Instead, we skip updating the requirement and log an error.
+    if req_to_update is None:
+        log.error(
+            (
+                u'Could not update credit requirement in course "%s" '
+                u'with namespace "%s" and name "%s" '
+                u'because the requirement does not exist. '
+                u'The user "%s" should have had his/her status updated to "%s".'
+            ),
+            unicode(course_key), req_namespace, req_name, username, status
+        )
+        return
+
+    # Update the requirement status
     CreditRequirementStatus.add_or_update_requirement_status(
-        username, credit_requirement, status, reason
+        username, req_to_update, status=status, reason=reason
     )
+
+    # If we're marking this requirement as "satisfied", there's a chance
+    # that the user has met all eligibility requirements.
+    if status == "satisfied":
+        CreditEligibility.update_eligibility(reqs, username, course_key)
 
 
 def _get_requirements_to_disable(old_requirements, new_requirements):
