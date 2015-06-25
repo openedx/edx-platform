@@ -66,6 +66,7 @@ urlpatterns = (
 
     url(r'^notifier_api/', include('notifier_api.urls')),
 
+    # TODO: why is this also here?
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     # Feedback Form endpoint
@@ -136,6 +137,7 @@ js_info_dict = {
 
 urlpatterns += (
     # Serve catalog of localized strings to be rendered by Javascript
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
     url(r'^i18n.js/$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 

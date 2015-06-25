@@ -36,7 +36,7 @@ import json
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
-  <%block name="view_notes"></%block>
+    <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#content">${_("Skip to main content")}</a>
 
@@ -46,7 +46,7 @@ import json
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
-    <script type="text/javascript" src="${static.url("require-config.js")}"></script>
+    <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
 
     ## js templates
     <script id="system-feedback-tpl" type="text/template">

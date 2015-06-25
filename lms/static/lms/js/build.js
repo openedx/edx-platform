@@ -22,6 +22,7 @@
     };
 
     return {
+        namespace: "RequireJS",
         /**
          * List the modules that will be optimized. All their immediate and deep
          * dependencies will be included in the module's file when the build is
@@ -55,7 +56,8 @@
          * file should be skipped because it has no dependencies.
          */
         paths: {
-            'gettext': 'empty:'
+            'gettext': 'empty:',
+            'coffee/src/ajax_prefix': 'empty:'
         },
         /**
          * If shim config is used in the app during runtime, duplicate the config

@@ -1,3 +1,6 @@
+;(function (require) {
+
+
 require.config({
     // NOTE: baseUrl has been previously set in lms/templates/main.html
     waitSeconds: 60,
@@ -17,6 +20,7 @@ require.config({
         "jquery.url": "js/vendor/url.min",
         "jquery-Watch": "js/vendor/ova/jquery-Watch",
         "URI": "js/vendor/URI.min",
+        "string_utils": "js/src/string_utils",
 
         // Files needed by OVA
         "annotator": "js/vendor/ova/annotator-full",
@@ -72,7 +76,12 @@ require.config({
             deps: ["backbone"]
         },
         "logger": {
-            exports: "Logger"
+            exports: "Logger",
+            deps: ["coffee/src/ajax_prefix"]
+        },
+        "string_utils": {
+            deps: ["underscore"],
+            exports: "interpolate_text"
         },
         // Needed by OVA
         "video.dev": {
@@ -131,3 +140,4 @@ require.config({
         // End of needed by OVA
     }
 });
+}).call(this, require || RequireJS.require);
