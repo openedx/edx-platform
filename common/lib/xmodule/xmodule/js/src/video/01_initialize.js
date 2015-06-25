@@ -9,6 +9,7 @@
  *
  * @module Initialize
  */
+// TODO this is temporary hack to run the jasmine tests
 (function(requirejs, define) {
     requirejs.config({
         paths: {

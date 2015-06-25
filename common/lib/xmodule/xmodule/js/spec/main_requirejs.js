@@ -1,7 +1,7 @@
 (function(requirejs, define) {
     requirejs.config({
         paths: {
-            'moment': 'xmodule/include/common_static/js/vendor/moment.min'
+            'moment': 'common_static/js/vendor/moment.min'
         }
     });
 
