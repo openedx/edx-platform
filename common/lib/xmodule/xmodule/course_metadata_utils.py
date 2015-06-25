@@ -157,12 +157,13 @@ def course_start_datetime_text(start_date, advertised_start, format_string, uget
         try:
             # from_json either returns a Date, returns None, or raises a ValueError
             parsed_advertised_start = Date().from_json(advertised_start)
+            if parsed_advertised_start is not None:
+                # In the Django implementation of strftime_localized, if
+                # the year is <1900, _datetime_to_string will raise a ValueError.
+                return _datetime_to_string(parsed_advertised_start, format_string, strftime_localized)
         except ValueError:
-            parsed_advertised_start = None
-        return (
-            _datetime_to_string(parsed_advertised_start, format_string, strftime_localized) if parsed_advertised_start
-            else advertised_start.title()
-        )
+            pass
+        return advertised_start.title()
     elif start_date != DEFAULT_START_DATE:
         return _datetime_to_string(start_date, format_string, strftime_localized)
     else:
