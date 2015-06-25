@@ -190,6 +190,15 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp)
         self.assertEqual(response.status_code, 403)
 
+    def test_credit_provider_callback_handles_string_timestamp(self):
+        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
+
+        # Simulate a callback from the credit provider with a timestamp
+        # encoded as a string instead of an integer.
+        timestamp = str(to_timestamp(datetime.datetime.now(pytz.UTC)))
+        response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp)
+        self.assertEqual(response.status_code, 200)
+
     def test_credit_provider_callback_is_idempotent(self):
         request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
 

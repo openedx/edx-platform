@@ -152,8 +152,9 @@ def credit_provider_callback(request, provider_id):
 
         * status (string): Either "approved" or "rejected".
 
-        * timestamp (int): The datetime at which the POST request was made, represented
+        * timestamp (int or string): The datetime at which the POST request was made, represented
             as the number of seconds since January 1, 1970 00:00:00 UTC.
+            If the timestamp is a string, it will be converted to an integer.
 
         * signature (string): A digital signature of the request parameters,
             created using a secret key shared with the credit provider.
@@ -259,7 +260,8 @@ def _validate_timestamp(timestamp_value, provider_id):
     Check that the timestamp of the request is recent.
 
     Arguments:
-        timestamp (int): Number of seconds since Jan. 1, 1970 UTC.
+        timestamp (int or string): Number of seconds since Jan. 1, 1970 UTC.
+            If specified as a string, it will be converted to an integer.
         provider_id (unicode): Identifier for the credit provider.
 
     Returns:
