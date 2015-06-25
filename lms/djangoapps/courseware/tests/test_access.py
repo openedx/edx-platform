@@ -19,6 +19,7 @@ from xmodule.course_module import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.course_module import DEFAULT_START_DATE
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -26,7 +27,6 @@ from util.milestones_helpers import (
     seed_milestone_relationship_types,
 )
 
-from xmodule.course_module import DEFAULT_START_DATE
 from django.utils.timezone import UTC
 
 # pylint: disable=missing-docstring
@@ -53,15 +53,10 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         self.assertEqual(
             student_should_have_access,
-            bool(access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key))
+            bool(access._has_access_descriptor(
+                self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key))
         )
 
-        """
-        self.assertEqual(
-            student_should_have_access,
-            access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key)
-        )
-        """
         self.assertTrue(
             access._has_access_descriptor(self.course_staff, 'load', mock_unit, course_key=self.course.course_key)
         )
@@ -243,15 +238,13 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test__has_access_descriptor_start_message(self):
+        """
+        Tests that the correct start message is returned in the case the course has not started
+        """
         # All start dates in the future
         mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
-
-         # Start date default and advertised start set
-        mock_unit.start = datetime.datetime(2030, 1, 1, tzinfo = UTC())
-        self.verify_error_type(mock_unit, access_response.StartDateError)
-        self.verify_start_message(mock_unit, DEFAULT_START_DATE)
 
         # Start date not default and advertised start set
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
@@ -259,15 +252,21 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.verify_error_type(mock_unit, access_response.StartDateError)
         self.verify_start_message(mock_unit, mock_unit.advertised_start)
 
+        # Start date default and advertised start set
+        mock_unit.start = DEFAULT_START_DATE
+        self.verify_error_type(mock_unit, access_response.StartDateError)
+        self.verify_start_message(mock_unit, "Spring 2016")
+
         # Start date not default and no advertised start
+        mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         mock_unit.advertised_start = None
         self.verify_error_type(mock_unit, access_response.StartDateError)
         self.verify_start_message(mock_unit, mock_unit.start)
 
         # Start date default and no advertised start
-        mock_unit.start = datetime.datetime(2030, 1, 1, tzinfo = UTC())
+        mock_unit.start = DEFAULT_START_DATE
         self.verify_error_type(mock_unit, access_response.StartDateError)
-        self.verify_start_message(mock_unit, None)
+        self.verify_start_message(mock_unit, "coming soon")
 
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
