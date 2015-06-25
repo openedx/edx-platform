@@ -1,0 +1,54 @@
+---
+metadata:
+    display_name: Text Input with Hints and Feedback
+    markdown: | 
+
+        You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.
+
+        Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.
+
+        Be sure to select Settings to specify a Display Name and other values that apply.
+
+        Use the following example problem as a model.
+
+        >>Which U.S. state has the largest land area?<<
+
+        =Alaska {{Alaska is 576,400 square miles, more than double the land area
+        of the second largest state, Texas.}}
+
+        not=Texas {{While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.}}
+
+        not=California {{California is the third largest state, with 155,959 square miles.}}
+
+        ||Consider the square miles, not population.||
+        ||Consider all 50 states, not just the continental United States.||
+
+tab: hint
+data: |
+  <problem>
+
+    <p>You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.</p>
+
+    <p>Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.</p>
+
+    <p>Use the following example problem as a model.</p>
+ 
+    <p>Which U.S. state has the largest land area?</p>
+
+    <stringresponse answer="Alaska" type="ci" >
+
+    <correcthint>Alaska is 576,400 square miles, more than double the land area of the second largest state, Texas.</correcthint>
+
+    <stringequalhint answer="Texas">While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.</stringequalhint>
+
+    <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.</stringequalhint>
+
+    <textline label="Which U.S. state has the largest land area?" size="20"/>
+    </stringresponse>
+
+    <demandhint>
+      <hint>Consider the square miles, not population.</hint>
+      <hint>Consider all 50 states, not just the continental United States.</hint>
+    </demandhint>
+
+  </problem>
