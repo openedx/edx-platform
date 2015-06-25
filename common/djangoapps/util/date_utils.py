@@ -89,7 +89,7 @@ def from_timestamp(timestamp):
     If the timestamp cannot be converted, returns None instead.
     """
     try:
-        return datetime.utcfromtimestamp(timestamp).replace(tzinfo=UTC)
+        return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=UTC)
     except (ValueError, TypeError):
         return None
 
