@@ -12,8 +12,6 @@ as they are for devstack. Instead, update_assets must be invoked each time
 that changes have been made.
 """
 
-from path import path  # pylint: no-name-in-module
-
 ########################## Devstack settings ###################################
 
 from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
