@@ -192,7 +192,8 @@ var edx = edx || {};
                 category: 'user-engagement'
             });
 
-            if ( !this.form.isLoaded( $form ) ) {
+            // Load the form. Institution login is always refreshed since it changes based on the previous form.
+            if ( !this.form.isLoaded( $form ) || type == "institution_login") {
                 this.loadForm( type );
             }
             this.activeForm = type;
