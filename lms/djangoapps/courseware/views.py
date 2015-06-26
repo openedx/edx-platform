@@ -1153,14 +1153,9 @@ def _credit_course_requirements(course_key, student):
     else:
         eligibility_status = "partial_eligible"
 
-    paired_requirements = {}
-    for requirement in requirement_statuses:
-        namespace = requirement.pop("namespace")
-        paired_requirements.setdefault(namespace, []).append(requirement)
-
     return {
         'eligibility_status': eligibility_status,
-        'requirements': OrderedDict(sorted(paired_requirements.items(), reverse=True))
+        'requirements': requirement_statuses,
     }
 
 

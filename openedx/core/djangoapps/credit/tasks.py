@@ -59,7 +59,7 @@ def _get_course_credit_requirements(course):
     """
     credit_xblock_requirements = _get_credit_course_requirement_xblocks(course)
     min_grade_requirement = _get_min_grade_requirement(course)
-    credit_requirements = credit_xblock_requirements + min_grade_requirement
+    credit_requirements = min_grade_requirement + credit_xblock_requirements
     return credit_requirements
 
 
@@ -85,7 +85,7 @@ def _get_min_grade_requirement(course):
                 "display_name": "Grade",
                 "criteria": {
                     "min_grade": getattr(course, "minimum_grade_credit")
-                }
+                },
             }
         ]
     except AttributeError:
@@ -113,7 +113,7 @@ def _get_credit_course_requirement_xblocks(course):  # pylint: disable=invalid-n
                 "namespace": curr_block.get_credit_requirement_namespace(),
                 "name": curr_block.get_credit_requirement_name(),
                 "display_name": curr_block.get_credit_requirement_display_name(),
-                "criteria": ""
+                "criteria": "",
             }
             requirements_blocks.append(block)
 
