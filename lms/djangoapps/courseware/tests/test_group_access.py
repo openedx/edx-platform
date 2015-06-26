@@ -185,7 +185,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         DRY helper.
         """
         self.assertIs(
-            access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id),
+            bool(access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id)),
             is_accessible
         )
 

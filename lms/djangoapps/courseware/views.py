@@ -382,7 +382,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     user = request.user
     course = get_course_with_access(user, 'load', course_key, depth=2)
 
-    staff_access = has_access(user, 'staff', course)
+    staff_access = bool(has_access(user, 'staff', course))
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -693,7 +693,7 @@ def course_info(request, course_id):
         if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-        staff_access = has_access(request.user, 'staff', course)
+        staff_access = bool(has_access(request.user, 'staff', course))
         masquerade = setup_masquerade(request, course_key, staff_access)  # allow staff to masquerade on the info page
         studio_url = get_studio_url(course, 'course_info')
 
@@ -771,7 +771,7 @@ def syllabus(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     return render_to_response('courseware/syllabus.html', {
         'course': course,
@@ -833,7 +833,7 @@ def course_about(request, course_id):
 
         registered = registered_for_course(course, request.user)
 
-        staff_access = has_access(request.user, 'staff', course)
+        staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
@@ -870,7 +870,7 @@ def course_about(request, course_id):
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
 
         # Used to provide context to message to student if enrollment not allowed
-        can_enroll = has_access(request.user, 'enroll', course)
+        can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -936,7 +936,7 @@ def mktg_course_about(request, course_id):
     else:
         course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
-    allow_registration = has_access(request.user, 'enroll', course)
+    allow_registration = bool(has_access(request.user, 'enroll', course))
 
     show_courseware_link = (has_access(request.user, 'load', course) or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
@@ -1033,7 +1033,7 @@ def _progress(request, course_key, student_id):
     if survey.utils.must_answer_survey(course, request.user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
@@ -1181,7 +1181,7 @@ def submission_history(request, course_id, student_username, location):
         return HttpResponse(escape(_(u'Invalid location.')))
 
     course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
+    staff_access = bool(has_access(request.user, 'staff', course))
 
     # Permission Denied if they don't have staff access and are trying to see
     # somebody else's submission history.
@@ -1481,7 +1481,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_header': True,
             'disable_window_wrap': True,
             'disable_preview_menu': True,
-            'staff_access': has_access(request.user, 'staff', course),
+            'staff_access': bool(has_access(request.user, 'staff', course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
