@@ -3,13 +3,13 @@
         url: '/api/edx_proctoring/v1/proctored_exam/attempt',
 
         defaults: {
-            in_timed_exam: null,
-            is_proctored: null,
+            in_timed_exam: false,
+            is_proctored: false,
             exam_display_name: '',
             exam_url_path: '',
-            time_remaining_seconds: null,
-            low_threshold: null,
-            critically_low_threshold: null,
+            time_remaining_seconds: 0,
+            low_threshold: 0,
+            critically_low_threshold: 0,
             lastFetched: new Date()
         },
         getRemainingSeconds: function () {
