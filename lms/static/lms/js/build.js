@@ -7,6 +7,9 @@
         });
     };
 
+    var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined ?
+        process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
+
     return {
         namespace: "RequireJS",
         /**
@@ -108,7 +111,7 @@
          * mode to minify the code. Only available if REQUIRE_ENVIRONMENT is "rhino" (the default).
          * - "none": No minification will be done.
          */
-        optimize: 'none',
+        optimize: jsOptimize,
         /**
          * Sets the logging level. It is a number:
          * TRACE: 0,
