@@ -1,9 +1,13 @@
 import json
 import logging
 import warnings
+import pytz
+
+from datetime import datetime, timedelta
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -95,6 +99,8 @@ class SequenceFields(object):
     )
 
 
+@XBlock.wants('proctoring')
+@XBlock.wants('user')
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -145,7 +151,71 @@ class SequenceModule(SequenceFields, XModule):
             else:
                 self.position = 1
             return json.dumps({'success': True})
+        elif dispatch == 'start_gated_exam':
+            # callback when user chooses to enter into a gated
+            # (e.g. timed or proctored exam)
+
+            proctoring_service = self.runtime.service(self, 'proctoring')
+            user_service = self.runtime.service(self, 'user')
+            user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
+            course_id = self.runtime.course_id
+            location = self.location
+            exam = proctoring_service.get_exam_by_content_id(course_id, location)
+            exam_id = exam['id']
+
+            self.runtime.service(self, 'proctoring').start_exam_attempt(exam_id, user_id, None)
+
+            return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
+
+    def _get_proctoring_context(self):
+        """
+        Interface with the proctoring subsystem to get
+        information about the students state with respect
+        to timed examinations/proctoring
+        """
+        has_started_exam = False
+        has_finished_exam = False
+        has_time_expired = False
+
+        if self.is_time_limited:
+            proctoring_service = self.runtime.service(self, 'proctoring')
+            user_service = self.runtime.service(self, 'user')
+            user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
+            course_id = self.runtime.course_id
+            location = self.location
+            if proctoring_service and user_service:
+                user_attempt = None
+                exam_id = None
+                try:
+                    exam = proctoring_service.get_exam_by_content_id(course_id, location)
+                    exam_id = exam['id']
+                except:
+                    exam_id = proctoring_service.create_exam(
+                        course_id=course_id,
+                        content_id=unicode(location),
+                        exam_name=self.display_name,
+                        time_limit_mins=self.default_time_limit_mins
+                    )
+
+                attempt = proctoring_service.get_exam_attempt(exam_id, user_id)
+                has_started_exam = attempt is not None
+                if attempt:
+                    now_utc = datetime.now(pytz.UTC)
+                    expires_at = attempt['started_at'] + timedelta(minutes=self.default_time_limit_mins)
+                    has_time_expired = now_utc > expires_at
+
+        context = {
+            'in_timed_exam': self.is_time_limited,
+            'in_proctored_exam': self.is_proctored_enabled,
+            'has_started_exam': has_started_exam,
+            'has_finished_exam': has_finished_exam,
+            'has_time_expired': has_time_expired
+        }
+
+        print '***** context = {}'.format(context)
+
+        return context
 
     def student_view(self, context):
         # If we're rendering this sequence, but no position is set yet,
@@ -153,8 +223,10 @@ class SequenceModule(SequenceFields, XModule):
         if self.position is None:
             self.position = 1
 
-        if self.is_time_limited:
-            print '**** Time limited!'
+        context = context if context else {}
+        context.update({
+            'proctoring_context': self._get_proctoring_context()
+        })
 
         ## Returns a set of all types of all sub-children
         contents = []
@@ -186,6 +258,7 @@ class SequenceModule(SequenceFields, XModule):
                   'position': self.position,
                   'tag': self.location.category,
                   'ajax_url': self.system.ajax_url,
+                  'proctoring_context': context['proctoring_context']
                   }
 
         fragment.add_content(self.system.render_template('seq_module.html', params))
