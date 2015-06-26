@@ -1,82 +1,84 @@
 """Unit tests for provider.py."""
 
+from mock import Mock, patch
 from third_party_auth import provider
 from third_party_auth.tests import testutil
+import unittest
 
 
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
 class RegistryTest(testutil.TestCase):
     """Tests registry discovery and operation."""
 
-    # Allow access to protected methods (or module-protected methods) under
-    # test. pylint: disable-msg=protected-access
-
-    def test_calling_configure_once_twice_raises_value_error(self):
-        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
-
-        with self.assertRaisesRegexp(ValueError, '^.*already configured$'):
-            provider.Registry.configure_once([provider.GoogleOauth2.NAME])
-
     def test_configure_once_adds_gettable_providers(self):
-        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
-        self.assertIs(provider.GoogleOauth2, provider.Registry.get(provider.GoogleOauth2.NAME))
+        facebook_provider = self.configure_facebook_provider(enabled=True)
+        # pylint: disable=no-member
+        self.assertEqual(facebook_provider.id, provider.Registry.get(facebook_provider.provider_id).id)
 
-    def test_configuring_provider_with_no_implementation_raises_value_error(self):
-        with self.assertRaisesRegexp(ValueError, '^.*no_implementation$'):
-            provider.Registry.configure_once(['no_implementation'])
+    def test_no_providers_by_default(self):
+        enabled_providers = provider.Registry.enabled()
+        self.assertEqual(len(enabled_providers), 0, "By default, no providers are enabled.")
 
-    def test_configuring_single_provider_twice_raises_value_error(self):
-        provider.Registry._enable(provider.GoogleOauth2)
+    def test_runtime_configuration(self):
+        self.configure_google_provider(enabled=True)
+        enabled_providers = provider.Registry.enabled()
+        self.assertEqual(len(enabled_providers), 1)
+        self.assertEqual(enabled_providers[0].name, "Google")
+        self.assertEqual(enabled_providers[0].secret, "opensesame")
 
-        with self.assertRaisesRegexp(ValueError, '^.*already enabled'):
-            provider.Registry.configure_once([provider.GoogleOauth2.NAME])
+        self.configure_google_provider(enabled=False)
+        enabled_providers = provider.Registry.enabled()
+        self.assertEqual(len(enabled_providers), 0)
 
-    def test_custom_provider_can_be_enabled(self):
-        name = 'CustomProvider'
+        self.configure_google_provider(enabled=True, secret="alohomora")
+        enabled_providers = provider.Registry.enabled()
+        self.assertEqual(len(enabled_providers), 1)
+        self.assertEqual(enabled_providers[0].secret, "alohomora")
 
-        with self.assertRaisesRegexp(ValueError, '^No implementation.*$'):
-            provider.Registry.configure_once([name])
-
-        class CustomProvider(provider.BaseProvider):
-            """Custom class to ensure BaseProvider children outside provider can be enabled."""
-
-            NAME = name
-
-        provider.Registry._reset()
-        provider.Registry.configure_once([CustomProvider.NAME])
-        self.assertEqual([CustomProvider], provider.Registry.enabled())
-
-    def test_enabled_raises_runtime_error_if_not_configured(self):
-        with self.assertRaisesRegexp(RuntimeError, '^.*not configured$'):
-            provider.Registry.enabled()
+    def test_cannot_load_arbitrary_backends(self):
+        """ Test that only backend_names listed in settings.AUTHENTICATION_BACKENDS can be used """
+        self.configure_oauth_provider(enabled=True, name="Disallowed", backend_name="disallowed")
+        self.enable_saml()
+        self.configure_saml_provider(enabled=True, name="Disallowed", idp_slug="test", backend_name="disallowed")
+        self.assertEqual(len(provider.Registry.enabled()), 0)
 
     def test_enabled_returns_list_of_enabled_providers_sorted_by_name(self):
-        all_providers = provider.Registry._get_all()
-        provider.Registry.configure_once(all_providers.keys())
-        self.assertEqual(
-            sorted(all_providers.values(), key=lambda provider: provider.NAME), provider.Registry.enabled())
+        provider_names = ["Stack Overflow", "Google", "LinkedIn", "GitHub"]
+        backend_names = []
+        for name in provider_names:
+            backend_name = name.lower().replace(' ', '')
+            backend_names.append(backend_name)
+            self.configure_oauth_provider(enabled=True, name=name, backend_name=backend_name)
 
-    def test_get_raises_runtime_error_if_not_configured(self):
-        with self.assertRaisesRegexp(RuntimeError, '^.*not configured$'):
-            provider.Registry.get('anything')
+        with patch('third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
+            self.assertEqual(sorted(provider_names), [prov.name for prov in provider.Registry.enabled()])
 
     def test_get_returns_enabled_provider(self):
-        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
-        self.assertIs(provider.GoogleOauth2, provider.Registry.get(provider.GoogleOauth2.NAME))
+        google_provider = self.configure_google_provider(enabled=True)
+        # pylint: disable=no-member
+        self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
 
     def test_get_returns_none_if_provider_not_enabled(self):
-        provider.Registry.configure_once([])
-        self.assertIsNone(provider.Registry.get(provider.LinkedInOauth2.NAME))
+        linkedin_provider_id = "oa2-linkedin-oauth2"
+        # At this point there should be no configuration entries at all so no providers should be enabled
+        self.assertEqual(provider.Registry.enabled(), [])
+        self.assertIsNone(provider.Registry.get(linkedin_provider_id))
+        # Now explicitly disabled this provider:
+        self.configure_linkedin_provider(enabled=False)
+        self.assertIsNone(provider.Registry.get(linkedin_provider_id))
+        self.configure_linkedin_provider(enabled=True)
+        self.assertEqual(provider.Registry.get(linkedin_provider_id).provider_id, linkedin_provider_id)
 
-    def test_get_by_backend_name_raises_runtime_error_if_not_configured(self):
-        with self.assertRaisesRegexp(RuntimeError, '^.*not configured$'):
-            provider.Registry.get_by_backend_name('')
+    def test_get_from_pipeline_returns_none_if_provider_not_enabled(self):
+        self.assertEqual(provider.Registry.enabled(), [], "By default, no providers are enabled.")
+        self.assertIsNone(provider.Registry.get_from_pipeline(Mock()))
 
-    def test_get_by_backend_name_returns_enabled_provider(self):
-        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
-        self.assertIs(
-            provider.GoogleOauth2,
-            provider.Registry.get_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
+    def test_get_enabled_by_backend_name_returns_enabled_provider(self):
+        google_provider = self.configure_google_provider(enabled=True)
+        found = list(provider.Registry.get_enabled_by_backend_name(google_provider.backend_name))
+        self.assertEqual(found, [google_provider])
 
-    def test_get_by_backend_name_returns_none_if_provider_not_enabled(self):
-        provider.Registry.configure_once([])
-        self.assertIsNone(provider.Registry.get_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
+    def test_get_enabled_by_backend_name_returns_none_if_provider_not_enabled(self):
+        google_provider = self.configure_google_provider(enabled=False)
+        found = list(provider.Registry.get_enabled_by_backend_name(google_provider.backend_name))
+        self.assertEqual(found, [])

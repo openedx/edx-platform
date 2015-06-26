@@ -1271,9 +1271,11 @@ student_account_js = [
     'js/student_account/models/PasswordResetModel.js',
     'js/student_account/views/FormView.js',
     'js/student_account/views/LoginView.js',
+    'js/student_account/views/HintedLoginView.js',
     'js/student_account/views/RegisterView.js',
     'js/student_account/views/PasswordResetView.js',
     'js/student_account/views/AccessView.js',
+    'js/student_account/views/InstitutionLoginView.js',
     'js/student_account/accessApp.js',
 ]
 
@@ -2384,10 +2386,6 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
-
-# Stub for third_party_auth options.
-# See common/djangoapps/third_party_auth/settings.py for configuration details.
-THIRD_PARTY_AUTH = {}
 
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default

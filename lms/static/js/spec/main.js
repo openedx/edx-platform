@@ -84,11 +84,13 @@
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
             'js/student_account/views/LoginView': 'js/student_account/views/LoginView',
+            'js/student_account/views/InstitutionLoginView': 'js/student_account/views/InstitutionLoginView',
             'js/student_account/models/PasswordResetModel': 'js/student_account/models/PasswordResetModel',
             'js/student_account/views/PasswordResetView': 'js/student_account/views/PasswordResetView',
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
+            'js/student_account/views/HintedLoginView': 'js/student_account/views/HintedLoginView',
             'js/student_profile/profile': 'js/student_profile/profile',
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
@@ -410,6 +412,14 @@
                     'js/student_account/views/FormView'
                 ]
             },
+            'js/student_account/views/InstitutionLoginView': {
+                exports: 'edx.student.account.InstitutionLoginView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone'
+                ]
+            },
             'js/student_account/models/PasswordResetModel': {
                 exports: 'edx.student.account.PasswordResetModel',
                 deps: ['jquery', 'jquery.cookie', 'backbone']
@@ -439,6 +449,15 @@
                     'js/student_account/views/FormView'
                 ]
             },
+            'js/student_account/views/HintedLoginView': {
+                exports: 'edx.student.account.HintedLoginView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext'
+                ]
+            },
             'js/student_account/views/AccessView': {
                 exports: 'edx.student.account.AccessView',
                 deps: [
@@ -450,6 +469,7 @@
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',
                     'js/student_account/views/RegisterView',
+                    'js/student_account/views/InstitutionLoginView',
                     'js/student_account/models/LoginModel',
                     'js/student_account/models/PasswordResetModel',
                     'js/student_account/models/RegisterModel',
@@ -612,7 +632,9 @@
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/finish_auth_spec.js',
+        'lms/include/js/spec/student_account/hinted_login_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
+        'lms/include/js/spec/student_account/institution_login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
         'lms/include/js/spec/student_account/enrollment_spec.js',

@@ -1,13 +1,11 @@
 """
-DummyProvider: A fake Third Party Auth provider for testing & development purposes.
+DummyBackend: A fake Third Party Auth provider for testing & development purposes.
 """
-from social.backends.base import BaseAuth
+from social.backends.oauth import BaseOAuth2
 from social.exceptions import AuthFailed
 
-from .provider import BaseProvider
 
-
-class DummyBackend(BaseAuth):  # pylint: disable=abstract-method
+class DummyBackend(BaseOAuth2):  # pylint: disable=abstract-method
     """
     python-social-auth backend that doesn't actually go to any third party site
     """
@@ -47,12 +45,3 @@ class DummyBackend(BaseAuth):  # pylint: disable=abstract-method
         kwargs.update({'response': response, 'backend': self})
 
         return self.strategy.authenticate(*args, **kwargs)
-
-
-class DummyProvider(BaseProvider):
-    """ Dummy Provider for testing and development """
-
-    BACKEND_CLASS = DummyBackend
-    ICON_CLASS = 'fa-cube'
-    NAME = 'Dummy'
-    SETTINGS = {}

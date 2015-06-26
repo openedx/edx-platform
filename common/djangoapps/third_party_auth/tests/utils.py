@@ -9,9 +9,11 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from student.tests.factories import UserFactory
 
+from .testutil import ThirdPartyAuthTestMixin
+
 
 @httpretty.activate
-class ThirdPartyOAuthTestMixin(object):
+class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
     """
     Mixin with tests for third party oauth views. A TestCase that includes
     this must define the following:
@@ -32,6 +34,10 @@ class ThirdPartyOAuthTestMixin(object):
         if create_user:
             self.user = UserFactory()
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
+        if self.BACKEND == 'google-oauth2':
+            self.configure_google_provider(enabled=True)
+        elif self.BACKEND == 'facebook':
+            self.configure_facebook_provider(enabled=True)
 
     def _setup_provider_response(self, success=False, email=''):
         """

@@ -32,15 +32,8 @@ from third_party_auth.tests import testutil
 class IntegrationTest(testutil.TestCase, test.TestCase):
     """Abstract base class for provider integration tests."""
 
-    # Configuration. You will need to override these values in your test cases.
-
-    # Class. The third_party_auth.provider.BaseProvider child we are testing.
-    PROVIDER_CLASS = None
-
-    # Dict of string -> object. Settings that will be merged onto Django's
-    # settings object before test execution. In most cases, this is
-    # PROVIDER_CLASS.SETTINGS with test values.
-    PROVIDER_SETTINGS = {}
+    # Override setUp and set this:
+    provider = None
 
     # Methods you must override in your children.
 
@@ -94,10 +87,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         """
         self.assertEqual(200, response.status_code)
         # Check that the correct provider was selected.
-        self.assertIn('successfully signed in with <strong>%s</strong>' % self.PROVIDER_CLASS.NAME, response.content)
+        self.assertIn('successfully signed in with <strong>%s</strong>' % self.provider.name, response.content)
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
-        for prepopulated_form_value in self.PROVIDER_CLASS.get_register_form_data(pipeline_kwargs).values():
+        for prepopulated_form_value in self.provider.get_register_form_data(pipeline_kwargs).values():
             if prepopulated_form_value:
                 self.assertIn(prepopulated_form_value, response.content)
 
@@ -106,27 +99,30 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
     def setUp(self):
         super(IntegrationTest, self).setUp()
-        self.configure_runtime()
-        self.backend_name = self.PROVIDER_CLASS.BACKEND_CLASS.name
-        self.client = test.Client()
         self.request_factory = test.RequestFactory()
 
-    def assert_account_settings_context_looks_correct(self, context, user, duplicate=False, linked=None):
+    @property
+    def backend_name(self):
+        """ Shortcut for the backend name """
+        return self.provider.backend_name
+
+    # pylint: disable=invalid-name
+    def assert_account_settings_context_looks_correct(self, context, _user, duplicate=False, linked=None):
         """Asserts the user's account settings page context is in the expected state.
 
         If duplicate is True, we expect context['duplicate_provider'] to contain
-        the duplicate provider object. If linked is passed, we conditionally
+        the duplicate provider backend name. If linked is passed, we conditionally
         check that the provider is included in context['auth']['providers'] and
         its connected state is correct.
         """
         if duplicate:
-            self.assertEqual(context['duplicate_provider'].NAME, self.PROVIDER_CLASS.NAME)
+            self.assertEqual(context['duplicate_provider'], self.provider.backend_name)
         else:
             self.assertIsNone(context['duplicate_provider'])
 
         if linked is not None:
             expected_provider = [
-                provider for provider in context['auth']['providers'] if provider['name'] == self.PROVIDER_CLASS.NAME
+                provider for provider in context['auth']['providers'] if provider['name'] == self.provider.name
             ][0]
             self.assertIsNotNone(expected_provider)
             self.assertEqual(expected_provider['connected'], linked)
@@ -197,7 +193,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(403, response.status_code)
-        self.assertIn("successfully logged into your %s account, but this account isn't linked" % self.PROVIDER_CLASS.NAME, response.content)
+        self.assertIn(
+            "successfully logged into your %s account, but this account isn't linked" % self.provider.name,
+            response.content
+        )
 
     def assert_json_failure_response_is_username_collision(self, response):
         """Asserts the json response indicates a username collision."""
@@ -211,7 +210,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(200, response.status_code)
         payload = json.loads(response.content)
         self.assertTrue(payload.get('success'))
-        self.assertEqual(pipeline.get_complete_url(self.PROVIDER_CLASS.BACKEND_CLASS.name), payload.get('redirect_url'))
+        self.assertEqual(pipeline.get_complete_url(self.provider.backend_name), payload.get('redirect_url'))
 
     def assert_login_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /login not in the pipeline looks correct."""
@@ -219,7 +218,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # The combined login/registration page dynamically generates the login button,
         # but we can still check that the provider name is passed in the data attribute
         # for the container element.
-        self.assertIn(self.PROVIDER_CLASS.NAME, response.content)
+        self.assertIn(self.provider.name, response.content)
 
     def assert_login_response_in_pipeline_looks_correct(self, response):
         """Asserts a GET of /login in the pipeline looks correct."""
@@ -258,27 +257,20 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # The combined login/registration page dynamically generates the register button,
         # but we can still check that the provider name is passed in the data attribute
         # for the container element.
-        self.assertIn(self.PROVIDER_CLASS.NAME, response.content)
+        self.assertIn(self.provider.name, response.content)
 
     def assert_social_auth_does_not_exist_for_user(self, user, strategy):
         """Asserts a user does not have an auth with the expected provider."""
         social_auths = strategy.storage.user.get_social_auth_for_user(
-            user, provider=self.PROVIDER_CLASS.BACKEND_CLASS.name)
+            user, provider=self.provider.backend_name)
         self.assertEqual(0, len(social_auths))
 
     def assert_social_auth_exists_for_user(self, user, strategy):
         """Asserts a user has a social auth with the expected provider."""
         social_auths = strategy.storage.user.get_social_auth_for_user(
-            user, provider=self.PROVIDER_CLASS.BACKEND_CLASS.name)
+            user, provider=self.provider.backend_name)
         self.assertEqual(1, len(social_auths))
         self.assertEqual(self.backend_name, social_auths[0].provider)
-
-    def configure_runtime(self):
-        """Configures settings details."""
-        auth_settings.apply_settings({self.PROVIDER_CLASS.NAME: self.PROVIDER_SETTINGS}, django_settings)
-        # Force settings to propagate into cached members on
-        # social.apps.django_app.utils.
-        reload(social_utils)
 
     def create_user_models_for_existing_account(self, strategy, email, password, username, skip_social_auth=False):
         """Creates user, profile, registration, and (usually) social auth.
@@ -296,7 +288,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         registration.save()
 
         if not skip_social_auth:
-            social_utils.Storage.user.create_social_auth(user, uid, self.PROVIDER_CLASS.BACKEND_CLASS.name)
+            social_utils.Storage.user.create_social_auth(user, uid, self.provider.backend_name)
 
         return user
 
@@ -370,7 +362,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             response["Location"],
-            pipeline.get_complete_url(self.PROVIDER_CLASS.BACKEND_CLASS.name)
+            pipeline.get_complete_url(self.provider.backend_name)
         )
         self.assertEqual(response.cookies[django_settings.EDXMKTG_LOGGED_IN_COOKIE_NAME].value, 'true')
         self.assertIn(django_settings.EDXMKTG_USER_INFO_COOKIE_NAME, response.cookies)
@@ -417,7 +409,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Instrument the pipeline to get to the dashboard with the full
         # expected state.
         self.client.get(
-            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
+            pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
         actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         mako_middleware_process_request(strategy.request)
@@ -465,7 +457,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Instrument the pipeline to get to the dashboard with the full
         # expected state.
         self.client.get(
-            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
+            pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
         actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         mako_middleware_process_request(strategy.request)
@@ -524,7 +516,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_social_auth_exists_for_user(user, strategy)
 
         self.client.get('/login')
-        self.client.get(pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
+        self.client.get(pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
         actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
 
         mako_middleware_process_request(strategy.request)
@@ -536,7 +528,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         request._messages = fallback.FallbackStorage(request)
         middleware.ExceptionMiddleware().process_exception(
             request,
-            exceptions.AuthAlreadyAssociated(self.PROVIDER_CLASS.BACKEND_CLASS.name, 'account is already in use.'))
+            exceptions.AuthAlreadyAssociated(self.provider.backend_name, 'account is already in use.'))
 
         self.assert_account_settings_context_looks_correct(
             account_settings_context(request), user, duplicate=True, linked=True)
@@ -561,7 +553,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Synthesize that request and check that it redirects to the correct
         # provider page.
         self.assert_redirect_to_provider_looks_correct(self.client.get(
-            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN)))
+            pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN)))
 
         # Next, the provider makes a request against /auth/complete/<provider>
         # to resume the pipeline.
@@ -641,7 +633,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Synthesize that request and check that it redirects to the correct
         # provider page.
         self.assert_redirect_to_provider_looks_correct(self.client.get(
-            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN)))
+            pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN)))
 
         # Next, the provider makes a request against /auth/complete/<provider>.
         # pylint: disable=protected-access

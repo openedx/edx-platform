@@ -1,0 +1,24 @@
+<div class="wrapper-other-login">
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("Sign in") %></span>
+        </h2>
+    </div>
+
+    <p class="instructions"><%- _.sprintf( gettext("Would you like to sign in using your %(providerName)s credentials?"), { providerName: hintedProvider.name } ) %></p>
+
+    <button class="action action-primary action-update proceed-button button-<%- hintedProvider.id %> hinted-login-<%- hintedProvider.id %>">
+        <div class="icon fa <%- hintedProvider.iconClass %>" aria-hidden="true"></div>
+        <%- _.sprintf( gettext("Sign in using %(providerName)s"), { providerName: hintedProvider.name } ) %>
+    </button>
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("or") %></span>
+        </h2>
+    </div>
+
+    <div class="toggle-form">
+        <button class="nav-btn form-toggle" data-type="login"><%- gettext("Show me other ways to sign in or register") %></button>
+    </div>
+</div>

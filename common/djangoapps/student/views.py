@@ -368,7 +368,7 @@ def signin_user(request):
     for msg in messages.get_messages(request):
         if msg.extra_tags.split()[0] == "social-auth":
             # msg may or may not be translated. Try translating [again] in case we are able to:
-            third_party_auth_error = _(msg)  # pylint: disable=translation-of-non-string
+            third_party_auth_error = _(unicode(msg))  # pylint: disable=translation-of-non-string
             break
 
     context = {
@@ -424,10 +424,10 @@ def register_user(request, extra_context=None):
     # selected provider.
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
-        current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
         overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
         overrides['running_pipeline'] = running_pipeline
-        overrides['selected_provider'] = current_provider.NAME
+        overrides['selected_provider'] = current_provider.name
         context.update(overrides)
 
     return render_to_response('register.html', context)
@@ -952,10 +952,11 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         running_pipeline = pipeline.get(request)
         username = running_pipeline['kwargs'].get('username')
         backend_name = running_pipeline['backend']
-        requested_provider = provider.Registry.get_by_backend_name(backend_name)
+        third_party_uid = running_pipeline['kwargs']['uid']
+        requested_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
         try:
-            user = pipeline.get_authenticated_user(username, backend_name)
+            user = pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
@@ -963,12 +964,12 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                     username=username, backend_name=backend_name))
             return HttpResponse(
                 _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
-                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
+                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
+                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
@@ -1497,6 +1498,13 @@ def create_account_with_params(request, params):
 
     dog_stats_api.increment("common.student.account_created")
 
+    # If the user is registering via 3rd party auth, track which provider they use
+    third_party_provider = None
+    running_pipeline = None
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        running_pipeline = pipeline.get(request)
+        third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+
     # Track the user's registration
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
@@ -1505,20 +1513,13 @@ def create_account_with_params(request, params):
             'username': user.username,
         })
 
-        # If the user is registering via 3rd party auth, track which provider they use
-        provider_name = None
-        if third_party_auth.is_enabled() and pipeline.running(request):
-            running_pipeline = pipeline.get(request)
-            current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
-            provider_name = current_provider.NAME
-
         analytics.track(
             user.id,
             "edx.bi.user.account.registered",
             {
                 'category': 'conversion',
                 'label': params.get('course_id'),
-                'provider': provider_name
+                'provider': third_party_provider.name if third_party_provider else None
             },
             context={
                 'Google Analytics': {
@@ -1535,6 +1536,7 @@ def create_account_with_params(request, params):
     # 2. Random user generation for other forms of testing.
     # 3. External auth bypassing activation.
     # 4. Have the platform configured to not require e-mail activation.
+    # 5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
     #
     # Note that this feature is only tested as a flag set one way or
     # the other for *new* systems. we need to be careful about
@@ -1543,7 +1545,11 @@ def create_account_with_params(request, params):
     send_email = (
         not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
         not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
-        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'))
+        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
+        not (
+            third_party_provider and third_party_provider.skip_email_verification and
+            user.email == running_pipeline['kwargs'].get('details', {}).get('email')
+        )
     )
     if send_email:
         context = {
