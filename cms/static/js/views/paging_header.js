@@ -1,4 +1,4 @@
-define(["underscore", "backbone", "gettext", "text!common/templates/components/paging-header.underscore"],
+define(["underscore", "backbone", "gettext", "text!templates/paging-header.underscore"],
     function(_, Backbone, gettext, paging_header_template) {
 
         var PagingHeader = Backbone.View.extend({

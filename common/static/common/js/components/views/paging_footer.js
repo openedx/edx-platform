@@ -1,7 +1,7 @@
 ;(function (define) {
     'use strict';
-    define(["underscore", "backbone", "text!common/templates/components/paging-footer.underscore"],
-        function(_, Backbone, paging_footer_template) {
+    define(["underscore", "gettext", "backbone", "text!common/templates/components/paging-footer.underscore"],
+        function(_, gettext, Backbone, paging_footer_template) {
 
             var PagingFooter = Backbone.View.extend({
                 events : {
@@ -12,6 +12,7 @@
 
                 initialize: function(options) {
                     this.collection = options.collection;
+                    this.hideWhenOnePage = options.hideWhenOnePage || false;
                     this.collection.bind('add', _.bind(this.render, this));
                     this.collection.bind('remove', _.bind(this.render, this));
                     this.collection.bind('reset', _.bind(this.render, this));
@@ -19,6 +20,13 @@
                 },
 
                 render: function() {
+                    if (this.hideWhenOnePage) {
+                        if (this.collection.totalPages <= 1) {
+                            this.$el.addClass('hidden');
+                        } else if (this.$el.hasClass('hidden')) {
+                            this.$el.removeClass('hidden');
+                        }
+                    }
                     this.$el.html(_.template(paging_footer_template, {
                         current_page: this.collection.currentOneIndexPage(),
                         total_pages: this.collection.totalPages

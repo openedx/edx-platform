@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/asset", "common/js/components/views/paging",
-        "js/views/asset", "common/js/components/views/paging_header", "common/js/components/views/paging_footer",
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/models/asset", "js/views/paging",
+        "js/views/asset", "js/views/paging_header", "common/js/components/views/paging_footer",
         "js/utils/modal", "js/views/utils/view_utils", "js/views/feedback_notification",
         "text!templates/asset-library.underscore",
         "jquery.fileupload-process", "jquery.fileupload-validate"],
