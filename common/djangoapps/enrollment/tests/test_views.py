@@ -75,21 +75,31 @@ class EnrollmentTestMixin(object):
         if as_server:
             extra['HTTP_X_EDX_API_KEY'] = self.API_KEY
 
-        url = reverse('courseenrollments')
-        response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
-        self.assertEqual(response.status_code, expected_status)
+        with patch('enrollment.views.audit_log') as mock_audit_log:
+            url = reverse('courseenrollments')
+            response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
+            self.assertEqual(response.status_code, expected_status)
 
-        if expected_status == status.HTTP_200_OK:
-            data = json.loads(response.content)
-            self.assertEqual(course_id, data['course_details']['course_id'])
+            if expected_status == status.HTTP_200_OK:
+                data = json.loads(response.content)
+                self.assertEqual(course_id, data['course_details']['course_id'])
 
-            if mode is not None:
-                self.assertEqual(mode, data['mode'])
+                if mode is not None:
+                    self.assertEqual(mode, data['mode'])
 
-            if is_active is not None:
-                self.assertEqual(is_active, data['is_active'])
-            else:
-                self.assertTrue(data['is_active'])
+                if is_active is not None:
+                    self.assertEqual(is_active, data['is_active'])
+                else:
+                    self.assertTrue(data['is_active'])
+
+                if as_server:
+                    # Verify that an audit message was logged.
+                    self.assertTrue(mock_audit_log.called)
+
+                    # If multiple enrollment calls are made in the scope of a
+                    # single test, we want to validate that audit messages are
+                    # logged for each call.
+                    mock_audit_log.reset_mock()
 
         return response
 
