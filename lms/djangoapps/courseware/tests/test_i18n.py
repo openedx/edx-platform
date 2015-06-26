@@ -186,6 +186,9 @@ class I18nLangPrefTests(BaseI18nTestCase):
         # Verify preview-lang takes precedence
         response = self.client.get('{}?preview-lang=eo'.format(self.url))
         self.assert_tag_has_attr(response.content, "html", "lang", 'eo')
+        # Hitting another page should keep the dark language set.
+        response = self.client.get(reverse('courses'))
+        self.assert_tag_has_attr(response.content, "html", "lang", "eo")
 
         # Clearing language must set language back to preference language
         response = self.client.get('{}?clear-lang'.format(self.url))
