@@ -10,8 +10,8 @@ from .course_page import CoursePage
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
 TOPIC_CARD_CSS = 'div.card-core-wrapper'
 PAGE_NUMBER_INPUT_CSS = 'input#page-number-input'
-NEXT_PAGE_BUTTON_CSS = 'a.next-page-link'
-PREVIOUS_PAGE_BUTTON_CSS = 'a.previous-page-link'
+NEXT_PAGE_BUTTON_CSS = 'button.next-page-link'
+PREVIOUS_PAGE_BUTTON_CSS = 'button.previous-page-link'
 PAGINATION_HEADER_TEXT_CSS = 'div.search-tools'
 CURRENT_PAGE_NUMBER_CSS = 'span.current-page'
 
