@@ -5,7 +5,7 @@
         </h2>
     </div>
 
-    <p><%- _.sprintf( gettext("Would you like to sign in using your %(providerName)s credentials?"), { providerName: hintedProvider.name } ) %></p>
+    <p class="instructions"><%- _.sprintf( gettext("Would you like to sign in using your %(providerName)s credentials?"), { providerName: hintedProvider.name } ) %></p>
 
     <button class="action action-primary action-update proceed-button button-<%- hintedProvider.id %> hinted-login-<%- hintedProvider.id %>">
         <div class="icon fa <%- hintedProvider.iconClass %>" aria-hidden="true"></div>
