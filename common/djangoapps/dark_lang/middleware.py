@@ -12,8 +12,12 @@ the SessionMiddleware.
 """
 from django.conf import settings
 
+from dark_lang import DARK_LANGUAGE_KEY
 from dark_lang.models import DarkLangConfig
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.user_api.preferences.api import (
+    delete_user_preference, get_user_preference, set_user_preference
+)
+from openedx.core.djangoapps.user_api.errors import UserNotFound
 from lang_pref import LANGUAGE_KEY
 
 # TODO re-import this once we're on Django 1.5 or greater. [PLAT-671]
@@ -130,6 +134,8 @@ class DarkLangMiddleware(object):
         then set the session LANGUAGE_SESSION_KEY to that language.
         """
         if 'clear-lang' in request.GET:
+            # Reset dark lang
+            delete_user_preference(request.user, DARK_LANGUAGE_KEY)
             # Reset user's language to their language preference, if they have one
             user_pref = get_user_preference(request.user, LANGUAGE_KEY)
             if user_pref:
@@ -139,8 +145,15 @@ class DarkLangMiddleware(object):
             return
 
         preview_lang = request.GET.get('preview-lang', None)
+        if not preview_lang:
+            try:
+                # Try to get the request user's preference (might not have a user, though)
+                preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
+            except UserNotFound:
+                return
 
         if not preview_lang:
             return
 
         request.session[LANGUAGE_SESSION_KEY] = preview_lang
+        set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
