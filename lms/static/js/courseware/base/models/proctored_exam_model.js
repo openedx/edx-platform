@@ -1,6 +1,6 @@
 (function(Backbone) {
     var ProctoredExamModel = Backbone.Model.extend({
-        url: '/api/edx_proctoring/v1/proctored_exam/status',
+        url: '/api/edx_proctoring/v1/proctored_exam/attempt',
 
         defaults: {
             in_timed_exam: null,

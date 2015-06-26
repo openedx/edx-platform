@@ -153,6 +153,9 @@ class SequenceModule(SequenceFields, XModule):
         if self.position is None:
             self.position = 1
 
+        if self.is_time_limited:
+            print '**** Time limited!'
+
         ## Returns a set of all types of all sub-children
         contents = []
 
