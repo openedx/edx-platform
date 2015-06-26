@@ -32,5 +32,5 @@ STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
 )
 STATICFILES_DIRS = (
-    (TEST_ROOT / "staticfiles").abspath(),
+    (TEST_ROOT / "staticfiles" / "lms").abspath(),
 )

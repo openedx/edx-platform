@@ -37,9 +37,10 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  # pylint: disable=no-
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
 # Stores the static files under test root so that they don't overwrite existing static assets
-STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
+STATIC_ROOT = (TEST_ROOT / "staticfiles" / "cms").abspath()
 
 # Disables uglify when tests are running (used by build.js).
 # 1. Uglify is by far the slowest part of the build process
 # 2. Having full source code makes debugging tests easier for developers
 os.environ['REQUIRE_BUILD_PROFILE_OPTIMIZE'] = 'none'
+PIPELINE_JS_COMPRESSOR = None
