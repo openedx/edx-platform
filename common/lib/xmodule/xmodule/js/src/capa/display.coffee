@@ -98,19 +98,11 @@ class @Problem
     if @num_queued_items > 0
       if window.queuePollerID # Only one poller 'thread' per Problem
         window.clearTimeout(window.queuePollerID)
-      queuelen = @get_queuelen()
-      window.queuePollerID = window.setTimeout(@poll, queuelen*10)
+      window.queuePollerID = window.setTimeout(
+        => @poll(1000),
+        1000)
 
-  # Retrieves the minimum queue length of all queued items
-  get_queuelen: =>
-    minlen = Infinity
-    @queued_items.each (index, qitem) ->
-      len = parseInt($.text(qitem))
-      if len < minlen
-        minlen = len
-    return minlen
-
-  poll: =>
+  poll: (prev_timeout) =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
       # If queueing status changed, then render
       @new_queued_items = $(response.html).find(".xqueue")
@@ -125,8 +117,16 @@ class @Problem
         @forceUpdate response
         delete window.queuePollerID
       else
-        # TODO: Some logic to dynamically adjust polling rate based on queuelen
-        window.queuePollerID = window.setTimeout(@poll, 1000)
+        new_timeout = prev_timeout * 2
+        # if the timeout is greather than 1 minute
+        if new_timeout >= 60000
+          delete window.queuePollerID
+          @gentle_alert gettext("The grading process is still running. Refresh the page to see updates.")
+        else
+          window.queuePollerID = window.setTimeout(
+            => @poll(new_timeout),
+            new_timeout
+          )
 
 
   # Use this if you want to make an ajax call on the input type object
