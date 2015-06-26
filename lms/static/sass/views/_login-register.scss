@@ -358,28 +358,31 @@ $sm-btn-linkedin: #0077b5;
 
     .login-provider {
         @extend %btn-secondary-grey-outline;
-        width: $baseline*6.5;
+        @extend %t-action4;
+
         @include padding(0, 0, 0, $baseline*2);
+        @include text-align(left);
+
+        position: relative;
         margin-right: ($baseline/4);
         margin-bottom: $baseline;
+        border-color: $lightGrey1;
+        width: $baseline*6.5;
         height: $third-party-button-height;
-        @include text-align(left);
         text-shadow: none;
         text-transform: none;
-        position: relative;
-        @extend %t-action4;
-        border-color: $lightGrey1;
 
         .icon {
-            color: $white;
+            @include left(0);
+
             position: absolute;
             top: -1px;
-            @include left(0);
             width: 30px;
             bottom: -1px;
+            background: $m-blue-d3;
             line-height: $third-party-button-height;
             text-align: center;
-            background: $m-blue-d3;
+            color: $white;
         }
 
         &:hover,
