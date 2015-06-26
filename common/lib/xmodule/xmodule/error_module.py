@@ -80,7 +80,18 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         return u''
 
     @classmethod
-    def _construct(cls, system, contents, error_msg, location):
+    def _construct(cls, system, contents, error_msg, location, for_parent=None):
+        """
+        Build a new ErrorDescriptor. using ``system``.
+
+        Arguments:
+            system (:class:`DescriptorSystem`): The :class:`DescriptorSystem` used
+                to construct the XBlock that had an error.
+            contents (unicode): An encoding of the content of the xblock that had an error.
+            error_msg (unicode): A message describing the error.
+            location (:class:`UsageKey`): The usage key of the XBlock that had an error.
+            for_parent (:class:`XBlock`): Optional. The parent of this error block.
+        """
 
         if error_msg is None:
             # this string is not marked for translation because we don't have
@@ -110,6 +121,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             # real scope keys
             ScopeIds(None, 'error', location, location),
             field_data,
+            for_parent=for_parent,
         )
 
     def get_context(self):
@@ -139,6 +151,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             str(descriptor),
             error_msg,
             location=descriptor.location,
+            for_parent=descriptor.get_parent() if descriptor.has_cached_parent else None
         )
 
     @classmethod

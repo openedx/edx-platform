@@ -12,7 +12,7 @@ from xmodule.mixin import LicenseMixin
 _ = lambda text: text
 
 
-class VideoFields(LicenseMixin):
+class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
         help=_("The name students see. This name appears in the course ribbon and as a header for the video."),

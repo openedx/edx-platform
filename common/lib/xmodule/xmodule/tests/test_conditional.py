@@ -79,10 +79,14 @@ class ConditionalFactory(object):
         child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
         child_descriptor.location = source_location.replace(category='html', name='child')
 
-        descriptor_system.load_item = {
-            child_descriptor.location: child_descriptor,
-            source_location: source_descriptor
-        }.get
+        def load_item(usage_id, for_parent=None):  # pylint: disable=unused-argument
+            """Test-only implementation of load_item that simply returns static xblocks."""
+            return {
+                child_descriptor.location: child_descriptor,
+                source_location: source_descriptor
+            }.get(usage_id)
+
+        descriptor_system.load_item = load_item
 
         system.descriptor_runtime = descriptor_system
 
