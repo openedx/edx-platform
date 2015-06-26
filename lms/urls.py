@@ -89,10 +89,13 @@ urlpatterns = (
     # Video Abstraction Layer used to allow video teams to manage video assets
     # independently of courseware. https://github.com/edx/edx-val
     url(r'^api/val/v0/', include('edxval.urls')),
-
-    # Full Course/Library Import/Export API
-    url(r'^api/import_export/v1/', include('openedx.core.djangoapps.import_export.urls')),
 )
+
+# Full Course/Library Import/Export API
+if settings.FEATURES["ENABLE_IMPORT_EXPORT_LMS"]:
+    urlpatterns += (
+        url(r'^api/import_export/v1/', include('openedx.core.djangoapps.import_export.urls')),
+    )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views

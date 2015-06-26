@@ -408,6 +408,9 @@ FEATURES = {
 
     # Credit course API
     'ENABLE_CREDIT_API': False,
+
+    # Full Course/Library Import/Export API
+    'ENABLE_IMPORT_EXPORT_LMS': False,
 }
 
 # Ignore static asset files on import which match this pattern

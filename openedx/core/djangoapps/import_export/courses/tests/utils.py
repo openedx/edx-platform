@@ -3,16 +3,16 @@ Utilities for contentstore tests
 '''
 
 from datetime import timedelta
-
+from django.conf import settings
 from django.utils import timezone
+
+from provider.oauth2.models import AccessToken, Client as OAuth2Client
+from provider import constants
 from rest_framework.test import APIClient
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from django.conf import settings
 
-from provider.oauth2.models import AccessToken, Client as OAuth2Client
-from provider import constants
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
