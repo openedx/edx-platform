@@ -1,6 +1,7 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import httpretty
 from mock import patch
@@ -62,8 +63,6 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('Authentication with TestShib is currently unavailable.', response.content)
 
-    # Note: the following patch is only needed until https://github.com/edx/edx-platform/pull/8262 is merged
-    @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def test_register(self):
         self._configure_testshib_provider()
         self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
@@ -107,6 +106,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
 
         # Now check that we can login again:
         self.client.logout()
+        self._verify_user_email('myself@testshib.org')
         self._test_return_login()
 
     def test_login(self):
@@ -222,3 +222,9 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
             content_type='application/x-www-form-urlencoded',
             data=self._read_data_file('testshib_response.txt'),
         )
+
+    def _verify_user_email(self, email):
+        """ Mark the user with the given email as verified """
+        user = User.objects.get(email=email)
+        user.is_active = True
+        user.save()

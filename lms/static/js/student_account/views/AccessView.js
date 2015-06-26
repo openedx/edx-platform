@@ -18,7 +18,8 @@ var edx = edx || {};
         subview: {
             login: {},
             register: {},
-            passwordHelp: {}
+            passwordHelp: {},
+            institutionLogin: {}
         },
 
         nextUrl: '/dashboard',
@@ -52,7 +53,8 @@ var edx = edx || {};
             this.formDescriptions = {
                 login: obj.loginFormDesc,
                 register: obj.registrationFormDesc,
-                reset: obj.passwordResetFormDesc
+                reset: obj.passwordResetFormDesc,
+                institution_login: null
             };
 
             this.platformName = obj.platformName;
@@ -148,6 +150,16 @@ var edx = edx || {};
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
                 this.listenTo( this.subview.register, 'auth-complete', this.authComplete );
+            },
+
+            institution_login: function ( unused ) {
+                this.subview.institutionLogin =  new edx.student.account.InstitutionLoginView({
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName,
+                    mode: this.activeForm
+                });
+
+                this.subview.institutionLogin.render();
             }
         },
 
@@ -180,9 +192,11 @@ var edx = edx || {};
                 category: 'user-engagement'
             });
 
-            if ( !this.form.isLoaded( $form ) ) {
+            // Load the form. Institution login is always refreshed since it changes based on the previous form.
+            if ( !this.form.isLoaded( $form ) || type == "institution_login") {
                 this.loadForm( type );
             }
+            this.activeForm = type;
 
             this.element.hide( $(this.el).find('.submission-success') );
             this.element.hide( $(this.el).find('.form-wrapper') );
@@ -190,11 +204,13 @@ var edx = edx || {};
             this.element.scrollTop( $anchor );
 
             // Update url without reloading page
-            History.pushState( null, document.title, '/' + type + queryStr );
+            if (type != "institution_login") {
+                History.pushState( null, document.title, '/' + type + queryStr );
+            }
             analytics.page( 'login_and_registration', type );
 
             // Focus on the form
-            document.getElementById(type).focus();
+            $("#" + type).focus();
         },
 
         /**
