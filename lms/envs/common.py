@@ -1142,17 +1142,23 @@ MIDDLEWARE_CLASSES = (
 
     'splash.middleware.SplashMiddleware',
 
-    # Allows us to dark-launch particular languages
-    'dark_lang.middleware.DarkLangMiddleware',
+
     'geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
-    # should be after DarkLangMiddleware
     'lang_pref.middleware.LanguagePreferenceMiddleware',
 
-    # Detects user-requested locale from 'accept-language' header in http request
-    'django.middleware.locale.LocaleMiddleware',
+    # Allows us to dark-launch particular languages.
+    # Must be after LangPrefMiddleware, so ?preview-lang query params can override
+    # user's language preference. ?clear-lang resets to user's language preference.
+    'dark_lang.middleware.DarkLangMiddleware',
+
+    # Detects user-requested locale from 'accept-language' header in http request.
+    # Must be after DarkLangMiddleware.
+    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
+    # 'django.middleware.locale.LocaleMiddleware',
+    'django_locale.middleware.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
