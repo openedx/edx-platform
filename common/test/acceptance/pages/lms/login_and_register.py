@@ -341,5 +341,5 @@ class CombinedLoginAndRegisterPage(PageObject):
     @property
     def hinted_login_prompt(self):
         """Get the message displayed to the user on the hinted-login form"""
-        if self.q(css=".hint-wrapper p").visible:
-            return self.q(css=".hint-wrapper p").text[0]
+        if self.q(css=".wrapper-other-login .instructions").visible:
+            return self.q(css=".wrapper-other-login .instructions").text[0]
