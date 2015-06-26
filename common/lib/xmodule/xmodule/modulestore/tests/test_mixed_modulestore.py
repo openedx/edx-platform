@@ -523,6 +523,75 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         component = self.store.publish(component.location, self.user_id)
         self.assertFalse(self.store.has_changes(component))
 
+    @ddt.data('draft', 'split')
+    def test_unit_stuck_in_draft_mode(self, default_ms):
+        """
+        After revert_to_published() the has_changes() should return false if draft has no changes
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+
+        # Create a dummy component to test against
+        xblock = self.store.create_item(
+            self.user_id,
+            test_course.id,
+            'vertical',
+            block_id='test_vertical'
+        )
+
+        # Not yet published, so changes are present
+        self.assertTrue(self.store.has_changes(xblock))
+
+        # Publish and verify that there are no unpublished changes
+        component = self.store.publish(xblock.location, self.user_id)
+        self.assertFalse(self.store.has_changes(component))
+
+        self.store.revert_to_published(component.location, self.user_id)
+        component = self.store.get_item(component.location)
+        self.assertFalse(self.store.has_changes(component))
+
+        # Publish and verify again
+        component = self.store.publish(component.location, self.user_id)
+        self.assertFalse(self.store.has_changes(component))
+
+    @ddt.data('draft', 'split')
+    def test_unit_stuck_in_published_mode(self, default_ms):
+        """
+        After revert_to_published() the has_changes() should return true if draft has changes
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+
+        # Create a dummy component to test against
+        xblock = self.store.create_item(
+            self.user_id,
+            test_course.id,
+            'vertical',
+            block_id='test_vertical'
+        )
+
+        # Not yet published, so changes are present
+        self.assertTrue(self.store.has_changes(xblock))
+
+        # Publish and verify that there are no unpublished changes
+        component = self.store.publish(xblock.location, self.user_id)
+        self.assertFalse(self.store.has_changes(component))
+
+        # Discard changes and verify that there are no changes
+        self.store.revert_to_published(component.location, self.user_id)
+        component = self.store.get_item(component.location)
+        self.assertFalse(self.store.has_changes(component))
+
+        # Change the component, then check that there now are changes
+        component = self.store.get_item(component.location)
+        component.display_name = 'Changed Display Name'
+        self.store.update_item(component, self.user_id)
+
+        # Verify that changes are present
+        self.assertTrue(self.store.has_changes(component))
+
     def setup_has_changes(self, default_ms):
         """
         Common set up for has_changes tests below.
