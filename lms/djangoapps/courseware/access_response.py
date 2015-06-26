@@ -1,6 +1,11 @@
+"""
+This file contains all the classes used by has_access for error handling
+"""
+
+
 class AccessResponse(object):
     """Class that represents a response from a has_access permission check."""
-    def __init__(self, has_access, error_code = None, developer_message = None, user_message = None):
+    def __init__(self, has_access, error_code=None, developer_message=None, user_message=None):
         """
         :param has_access (bool): if the user is granted access or not
         :param error_code (String): optional - default is None. unique identifier for the specific type of error
@@ -27,6 +32,7 @@ class AccessResponse(object):
             "user_message": self.user_message
         }
 
+
 class AccessError(AccessResponse):
     """
     Class that holds information about the error in the case of an access denial in has_access.
@@ -41,11 +47,13 @@ class AccessError(AccessResponse):
         """
         super(AccessError, self).__init__(False, error_code, developer_message, user_message)
 
+
 class StartDateError(AccessError):
     """Access denied because the course has not started yet and the user is not staff"""
     def __init__(self, start_message):
         error_code = "course_not_started"
-        developer_message = "Course does not start until {start} and user does not have staff access".format(start=start_message)
+        developer_message = "Course does not start until {start}  \
+                            and user does not have staff access".format(start=start_message)
         user_message = start_message
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
