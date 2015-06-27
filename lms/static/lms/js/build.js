@@ -3,7 +3,7 @@
 
     var getModulesList = function (modules) {
         return modules.map(function (moduleName) {
-            return { name: moduleName};
+            return { name: moduleName, exclude: ["text"]};
         });
     };
 
