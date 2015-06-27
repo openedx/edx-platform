@@ -395,7 +395,7 @@ FEATURES = {
     'ENABLE_SOFTWARE_SECURE_FAKE': False,
 
     # Teams feature
-    'ENABLE_TEAMS': False,
+    'ENABLE_TEAMS': True,
 
     # Show video bumper in LMS
     'ENABLE_VIDEO_BUMPER': False,
@@ -1612,8 +1612,14 @@ PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
-    "sass/*",
-    "coffee/*",
+    "sass/*.scss",
+    "sass/*/*.scss",
+    "sass/*/*/*.scss",
+    "sass/*/*/*/*.scss",
+    "coffee/*.coffee",
+    "coffee/*/*.coffee",
+    "coffee/*/*/*.coffee",
+    "coffee/*/*/*/*.coffee",
 
     # Symlinks used by js-test-tool
     "xmodule_js",

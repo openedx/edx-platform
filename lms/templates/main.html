@@ -75,9 +75,6 @@ from pipeline_mako import render_require_js_path_overrides
     <%static:js group='base_vendor'/>
   % else:
     <%static:js group='main_vendor'/>
-  % endif
-
-   % if not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
   % endif
