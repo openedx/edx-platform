@@ -3,8 +3,8 @@
 define([
     'jquery', 'underscore', 'backbone', 'gettext',
     'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation'
-], function($, _, Backbone, gettext, Annotator, EdxnotesVisibilityDecorator) {
-    var ToggleNotesView = Backbone.View.extend({
+], function($, _, Backbone, gettext, Annotator, VisibilityDecorator) {
+    var ToggleVisibilityView = Backbone.View.extend({
         events: {
             'click .action-toggle-notes': 'toggleHandler'
         },
@@ -52,14 +52,14 @@ define([
         },
 
         enableNotes: function () {
-            _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
+            _.each($('.edx-notes-wrapper'), VisibilityDecorator.enableNote);
             this.actionLink.addClass('is-active');
             this.label.text(gettext('Hide notes'));
             this.actionToggleMessage.text(gettext('Notes visible'));
         },
 
         disableNotes: function () {
-            EdxnotesVisibilityDecorator.disableNotes();
+            VisibilityDecorator.disableNotes();
             this.actionLink.removeClass('is-active');
             this.label.text(gettext('Show notes'));
             this.actionToggleMessage.text(gettext('Notes hidden'));
@@ -93,12 +93,16 @@ define([
         }
     });
 
-    return function (visibility, visibilityUrl) {
-        return new ToggleNotesView({
-            el: $('.edx-notes-visibility').get(0),
-            visibility: visibility,
-            visibilityUrl: visibilityUrl
-        });
+    return {
+        ToggleVisibilityView: function (visibility, visibilityUrl) {
+            return new ToggleVisibilityView({
+                el: $('.edx-notes-visibility').get(0),
+                visibility: visibility,
+                visibilityUrl: visibilityUrl
+            });
+        },
+        VisibilityDecorator: VisibilityDecorator
     };
+
 });
 }).call(this, define || RequireJS.define);

@@ -19,6 +19,8 @@
          */
         modules: getModulesList([
             'js/discovery/discovery_factory',
+            'js/edxnotes/views/notes_visibility_factory',
+            'js/edxnotes/views/page_factory',
             'js/groups/views/cohorts_dashboard_factory',
             'js/search/course/course_search_factory',
             'js/search/dashboard/dashboard_search_factory',
