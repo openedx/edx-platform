@@ -18,7 +18,9 @@
          * done.
          */
         modules: getModulesList([
-            'teams/js/teams_tab_factory'
+            'teams/js/teams_tab_factory',
+            'js/edxnotes/views/page_factory',
+            'js/edxnotes/views/toggle_notes_factory'
         ]),
 
         /**
