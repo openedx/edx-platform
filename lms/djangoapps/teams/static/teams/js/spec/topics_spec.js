@@ -41,30 +41,38 @@ define([
         }
 
         /**
-         * Verify that the topics list view and footer reflects the page and topics states.
-         * @param options a parameters hash containing:
-         *  - expectedTopics: an array of topic objects we expect to see
-         *  - currentPage: the one-indexed page we expect to be viewing
-         *  - totalPages: the total number of pages to page through
+         * Verify that the topics list view renderes the expected topics
+         * @param expectedTopics an array of topic objects we expect to see
          */
-        function expectViewReflectsState(options) {
+        function expectTopics(expectedTopics) {
             var topicCards;
-            // Verify the topics list
             topicCards = topicsView.$('.topic-card');
-            _.each(options.expectedTopics, function (topic, index) {
+            _.each(expectedTopics, function (topic, index) {
                 var currentCard = topicCards.eq(index);
                 expect(currentCard.text()).toMatch(topic.name);
                 expect(currentCard.text()).toMatch(topic.description);
                 expect(currentCard.text()).toMatch(topic.team_count + ' Teams');
             });
-            // Verify the footer
-            expect(topicsView.$('.topics-paging-footer').text())
+        }
+
+        /**
+         * Verify that the topics footer reflects the current pagination
+         * @param options a parameters hash containing:
+         *  - currentPage: the one-indexed page we expect to be viewing
+         *  - totalPages: the total number of pages to page through
+         *  - isHidden: whether the footer is expected to be visible
+         */
+        function expectFooter(options) {
+            var footerEl = topicsView.$('.topics-paging-footer');
+            expect(footerEl.text())
                 .toMatch(new RegExp(options.currentPage + '\\s+out of\\s+\/\\s+' + topicCollection.totalPages));
+            expect(footerEl.hasClass('hidden')).toBe(options.isHidden);
         }
 
         it('can render the first of many pages', function () {
             expectHeader('Currently viewing 1 through 5 of 6 topics');
-            expectViewReflectsState({expectedTopics: initialTopics, currentPage: 1, totalPages: 2});
+            expectTopics(initialTopics);
+            expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
         });
 
         it('can render the only page', function () {
@@ -80,14 +88,16 @@ define([
                 {parse: true}
             );
             expectHeader('Currently viewing 1 topic');
-            expectViewReflectsState({expectedTopics: initialTopics, currentPage: 1, totalPages: 1});
+            expectTopics(initialTopics);
+            expectFooter({currentPage: 1, totalPages: 1, isHidden: true});
         });
 
         it('can change to the next page', function () {
             var requests = AjaxHelpers.requests(this),
                 newTopics = generateTopics(1, 1);
             expectHeader('Currently viewing 1 through 5 of 6 topics');
-            expectViewReflectsState({expectedTopics: initialTopics, currentPage: 1, totalPages: 2});
+            expectTopics(initialTopics);
+            expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
             expect(requests.length).toBe(0);
             topicsView.$('.next-page-link').click();
             expect(requests.length).toBe(1);
@@ -99,11 +109,13 @@ define([
                 "results": newTopics
             });
             expectHeader('Currently viewing 6 through 6 of 6 topics');
-            expectViewReflectsState({expectedTopics: newTopics, currentPage: 2, totalPages: 2});
+            expectTopics(newTopics);
+            expectFooter({currentPage: 2, totalPages: 2, isHidden: false});
         });
 
         it('can change to the previous page', function () {
-            var requests = AjaxHelpers.requests(this);
+            var requests = AjaxHelpers.requests(this),
+                previousPageTopics;
             initialTopics = generateTopics(1, 1);
             topicCollection.set(
                 {
@@ -116,9 +128,10 @@ define([
                 {parse: true}
             );
             expectHeader('Currently viewing 6 through 6 of 6 topics');
-            expectViewReflectsState({currentPage: 2, totalPages: 2});
+            expectTopics(initialTopics);
+            expectFooter({currentPage: 2, totalPages: 2, isHidden: false});
             topicsView.$('.previous-page-link').click();
-            var previousPageTopics = generateTopics(1, 5);
+            previousPageTopics = generateTopics(1, 5);
             AjaxHelpers.respondWithJson(requests, {
                 "count": 6,
                 "num_pages": 2,
@@ -127,7 +140,8 @@ define([
                 "results": previousPageTopics
             });
             expectHeader('Currently viewing 1 through 5 of 6 topics');
-            expectViewReflectsState({currentPage: 1, totalPages: 2});
+            expectTopics(previousPageTopics);
+            expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
         });
 
         it('sets focus for screen readers', function () {

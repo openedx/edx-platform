@@ -139,7 +139,7 @@ class BrowseTopicsTest(TeamsTabTest):
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.get_topic_cards()), 2)
         self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing all 2 topics')
-        self.assertEqual(self.topics_page.get_current_page_number(), 1)
+        self.assertFalse(self.topics_page.pagination_controls_visible())
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertFalse(self.topics_page.is_next_page_button_enabled())
 
@@ -155,6 +155,7 @@ class BrowseTopicsTest(TeamsTabTest):
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.get_topic_cards()), 12)
         self.assertEqual(self.topics_page.get_pagination_header_text(), 'Currently viewing 1 through 12 of 20 topics')
+        self.assertTrue(self.topics_page.pagination_controls_visible())
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertTrue(self.topics_page.is_next_page_button_enabled())
 
@@ -183,9 +184,9 @@ class BrowseTopicsTest(TeamsTabTest):
         And I enter an invalid page number in the page number input
         Then I should stay on the current page
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(5)})
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(13)})
         self.topics_page.visit()
-        self.topics_page.go_to_page(2)
+        self.topics_page.go_to_page(3)
         self.assertEqual(self.topics_page.get_current_page_number(), 1)
 
     def test_page_navigation_buttons(self):
