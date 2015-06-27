@@ -19,7 +19,9 @@
             initialize: function() {
                 this.listView = new TopicsListView({collection: this.collection});
                 this.headerView = new TopicHeader({collection: this.collection});
-                this.pagingFooterView = new PagingFooterView({collection: this.collection});
+                this.pagingFooterView = new PagingFooterView({
+                    collection: this.collection, hideWhenOnePage: true
+                });
                 // Focus top of view for screen readers
                 this.collection.on('page_changed', function () {
                     this.$('.sr-is-focusable.sr-topics-view').focus();
