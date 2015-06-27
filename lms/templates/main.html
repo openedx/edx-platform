@@ -77,6 +77,11 @@ from pipeline_mako import render_require_js_path_overrides
     <%static:js group='main_vendor'/>
   % endif
 
+   % if not disable_courseware_js:
+    <%static:js group='application'/>
+    <%static:js group='module-js'/>
+  % endif
+
   <script>
     window.baseUrl = "${settings.STATIC_URL}";
     (function (require) {
@@ -165,11 +170,6 @@ from pipeline_mako import render_require_js_path_overrides
 % if not disable_window_wrap:
   </div>
 % endif
-
-  % if not disable_courseware_js:
-    <%static:js group='application'/>
-    <%static:js group='module-js'/>
-  % endif
 
   <%block name="js_extra"/>
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>

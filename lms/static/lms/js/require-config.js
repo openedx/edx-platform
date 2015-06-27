@@ -109,10 +109,6 @@
             "backbone-super": {
                 deps: ["backbone"]
             },
-            "logger": {
-                exports: "Logger",
-                deps: ["coffee/src/ajax_prefix"]
-            },
             "string_utils": {
                 deps: ["underscore"],
                 exports: "interpolate_text"
