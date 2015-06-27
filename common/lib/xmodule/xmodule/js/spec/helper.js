@@ -36,7 +36,7 @@
             return f();
         }
     };
-
+    jasmine.YT = stubbedYT;
     // Stub YouTube API.
     window.YT = stubbedYT;
 
@@ -176,15 +176,6 @@
                 return;
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
-            } else if (settings.url.match(/youtube\.com\/iframe_api$/)) {
-                // Stub YouTube API.
-                window.YT = stubbedYT;
-
-                // Call the callback that must be called when YouTube API is
-                // loaded. By specification.
-                window.onYouTubeIframeAPIReady();
-
-                return {success: true};
             } else {
                 throw 'External request attempted for ' +
                     settings.url +
@@ -258,6 +249,19 @@
         }
 
         jasmine.stubRequests();
+
+        if (!window.Video.loadYouTubeIFrameAPI) {
+            spyOn(window.Video, 'loadYouTubeIFrameAPI').andCallFake(function (scriptTag) {
+                var event = document.createEvent('Event');
+                if (fixture === "video.html") {
+                    event.initEvent('load', false, false);
+                } else {
+                    event.initEvent('error', false, false);
+                }
+                scriptTag.dispatchEvent(event);
+            });
+        }
+
         state = new window.Video('#example');
 
         state.resizer = (function () {
