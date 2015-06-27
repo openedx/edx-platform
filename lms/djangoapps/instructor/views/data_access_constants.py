@@ -26,6 +26,7 @@ class QueryOrigin:
 QUERYORIGIN_MAP = {QueryOrigin.EMAIL: 'E',
                    QueryOrigin.WIDGET: 'W'}
 
+
 class Inclusion:
     """
     Options for combining queries

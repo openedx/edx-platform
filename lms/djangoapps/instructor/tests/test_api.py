@@ -529,7 +529,6 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(len(TemporaryQuery.objects.all()), queries_left)
         self.assertEquals(len(StudentsForQuery.objects.all()), students_left)
 
-
     def test_purge(self):
         """
         Ensures the deletion of old temporary queries

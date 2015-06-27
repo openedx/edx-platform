@@ -1128,7 +1128,7 @@ def get_single_query(request, course_id, inclusion, query_type, state_type, stat
         }
         return JsonResponse(response_payload)
     else:
-       # 500 on all other unexpected status codes.
+        # 500 on all other unexpected status codes.
         log.error(
             "Error parsing query-course id:{}, inclusion:{}, query_type:{}, state_type_id:{}, filtering:{},"
             "entity_name:{}".format(

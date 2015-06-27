@@ -17,11 +17,16 @@ class Command(BaseCommand):
 
     help = ("Usage: collect_ora2_data <course_id> --output-dir=<output_dir>")
     args = "<course_id>"
-    
+
     option_list = BaseCommand.option_list + (
-        optparse.make_option('-o', '--output-dir',
-                    action='store', dest='output_dir', default=None,
-                    help="Write output to a directory rather than stdout"),
+        optparse.make_option(
+            '-o',
+            '--output-dir',
+            action='store',
+            dest='output_dir',
+            default=None,
+            help='Write output to a directory rather than stdout',
+        ),
     )
 
     def handle(self, *args, **options):
@@ -33,7 +38,10 @@ class Command(BaseCommand):
         except InvalidKeyError:
             raise CommandError("The course ID given was invalid")
 
-        file_name = ("%s-ora2.csv" % course_id).replace("/","-")
+        file_name = "{course_id}-ora2.csv".format(
+            course_id=course_id,
+        )
+        file_name = file_name.replace('/', '-')
 
         if options['output_dir']:
             csv_file = open(os.path.join(options['output_dir'], file_name), 'wb')
@@ -48,6 +56,7 @@ class Command(BaseCommand):
         for row in rows:
             writer.writerow(_preprocess(row))
 
+
 def _preprocess(data_list):
     """
     Properly encode ora2 responses for transcription into a .csv
@@ -56,7 +65,7 @@ def _preprocess(data_list):
 
     for item in data_list:
         new_item = unicode(item).encode('utf-8').encode('string_escape')
-        new_item = new_item.replace("\"","\\\"")
+        new_item = new_item.replace("\"", "\\\"")
         processed_data.append(new_item)
 
     return processed_data

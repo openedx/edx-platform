@@ -310,7 +310,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                     xml,
                     "//div[@class='capa_alert']",
                     self.context['submitted_message'],
-                 )
+                )
 
     def test_no_message_before_submission(self):
         """

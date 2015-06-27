@@ -99,6 +99,7 @@ def save_group_name(group_id, group_name):
     group.save()
     return True
 
+
 # todo: this is needed for django versions < 1.6
 @transaction.commit_manually
 def flush_transactions():
@@ -187,8 +188,6 @@ def make_total_query(course_id, existing_queries):
         for row in queryset:
             aggregate_existing.add((row[0], row[1], row[2]))
     return aggregate_existing
-
-
 
 
 def make_existing_query(course_id, existing_queries):

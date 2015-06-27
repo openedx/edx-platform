@@ -2304,9 +2304,9 @@ FORUM_MONGO_PARAMS = {
 INSTALLED_APPS += ('branding_stanford',)
 DISPLAY_COURSE_TILES = True
 
- # Set to True for systems where students are auto-registered on login
+# Set to True for systems where students are auto-registered on login
 DISABLE_REGISTER_BUTTON = False
-#date format the api will be formatting the datetime values
+# date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
 # Enrollment API Cache Timeout

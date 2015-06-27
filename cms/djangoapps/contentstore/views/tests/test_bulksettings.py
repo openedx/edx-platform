@@ -10,6 +10,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from datetime import datetime
 import random
 
+
 @unittest.skip("Bulk Settings are currently disabled")
 class BulkSettingsTests(CourseTestCase):
     """
@@ -38,7 +39,6 @@ class BulkSettingsTests(CourseTestCase):
         """
         super(BulkSettingsTests, self).setUp()
 
-
     def populate_course_with_seed_data(self):
         """
         Populates the given course hierarchy with initial settings data
@@ -47,15 +47,13 @@ class BulkSettingsTests(CourseTestCase):
 
         self.do_recursive_population(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
 
-
-    def do_recursive_population(self,parent, stack):
+    def do_recursive_population(self, parent, stack):
         block_category = stack.pop(0)
         for _ in range(2):
             child = self.create_item_of_category(block_category, parent)
             stack_copy = list(stack)
             if stack_copy:
                 self.do_recursive_population(child, stack_copy)
-
 
     def create_item_of_category(self, category, parent):
         """
@@ -69,12 +67,11 @@ class BulkSettingsTests(CourseTestCase):
             metadata[setting_type] = self.generate_random_value_for(setting_type)
 
         item = ItemFactory.create(
-            parent_location = parent.location,
-            category = category,
-            metadata = metadata
+            parent_location=parent.location,
+            category=category,
+            metadata=metadata,
         )
         return item
-
 
     def generate_random_value_for(self, setting_type):
         """
@@ -84,7 +81,7 @@ class BulkSettingsTests(CourseTestCase):
 
         randomization_values = ["Always", "On Reset", "Never", "Per Student"]
         show_answer_values = ["Always", "Answered", "Attempted", "Closed",
-                                "Finished", "Past Due", "Never"]
+                              "Finished", "Past Due", "Never"]
         format_values = ["Quiz", "Homework"]
 
         if setting_type == "start" or setting_type == "due":
@@ -101,37 +98,37 @@ class BulkSettingsTests(CourseTestCase):
         elif setting_type == "showanswer":
             return show_answer_values[random.randint(0, 6)]
         else:
-            return format_values[random.randint(0,1)]
-
+            return format_values[random.randint(0, 1)]
 
     def test_empty_course(self):
         """
         Test that the computed settings data is empty when the course is empty.
         """
         empty_course = CourseFactory.create(
-            org = 'edx',
-            number = '999',
-            display_name = 'test_course'
+            org='edx',
+            number='999',
+            display_name='test_course',
         )
 
         computed_settings_data = BulkSettingsUtil.get_bulksettings_metadata(empty_course)
         self.assertEqual(len(computed_settings_data), 0, msg="empty course should contain no settings")
-
 
     def test_empty_problem(self):
         """
         Test with no problems. If no unit holds any problems, the list should be empty.
         """
         empty_problem_course = CourseFactory.create(
-            org = 'edx',
-            number = '999',
-            display_name = 'no_problem_course'
+            org='edx',
+            number='999',
+            display_name='no_problem_course',
         )
         self.do_recursive_population(empty_problem_course, ['chapter', 'sequential', 'vertical'])
         computed_settings_data = BulkSettingsUtil.get_bulksettings_metadata(empty_problem_course)
-        self.assertEqual(len(computed_settings_data), 0,
-                        msg="course with no problem should yield no bulksettings")
-
+        self.assertEqual(
+            len(computed_settings_data),
+            0,
+            msg='course with no problem should yield no bulksettings',
+        )
 
     def test_multiple_bulksettings(self):
         """
@@ -147,7 +144,6 @@ class BulkSettingsTests(CourseTestCase):
 
         for i in range(self.NUM_RANDOM_TESTS):
             self.test_bulksettings_data_correctness()
-
 
     def test_bulksettings_data_correctness(self):
         """
@@ -203,7 +199,6 @@ class BulkSettingsTests(CourseTestCase):
                         self.assertTrue(self.do_values_match(self.PROBLEM_SETTING_TYPES,
                                         component, computed_component_settings))
 
-
     def do_values_match(self, setting_types, child, computed_settings):
         """
         Checks if the actual settings of the given child matches
@@ -211,18 +206,22 @@ class BulkSettingsTests(CourseTestCase):
         """
 
         for setting_type in setting_types:
-            setting= getattr(child, setting_type)
+            setting = getattr(child, setting_type)
 
             if setting_type == 'start' or setting_type == 'due':
                 setting = setting.strftime('%m/%d/%Y')
 
-            self.assertEqual(setting, computed_settings[setting_type],
-                            msg="setting_type" + str(setting_type) + "does not match")
+                self.assertEqual(
+                    setting,
+                    computed_settings[setting_type],
+                    msg="setting_type {setting_type} does not match".format(
+                        setting_type=setting_type,
+                    ),
+                )
             if setting != computed_settings[setting_type]:
                 return False
 
         return True
-
 
     def populate_settings(self):
 
@@ -252,4 +251,3 @@ class BulkSettingsTests(CourseTestCase):
                             setattr(component, setting_type, self.generate_random_value_for(setting_type))
                         component.save()
         self.save_course()
-

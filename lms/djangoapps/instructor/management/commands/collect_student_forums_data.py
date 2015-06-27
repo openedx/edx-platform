@@ -21,9 +21,14 @@ class Command(BaseCommand):
     help = ('Usage: collect_course_forums_data <course_id> --output-dir=<output_dir>')
     args = '<course_id>'
     option_list = BaseCommand.option_list + (
-        optparse.make_option('-o', '--output-dir',
-        action='store', dest='output_dir', default=None,
-        help='Write output to a directory rather than stdout'),
+        optparse.make_option(
+            '-o',
+            '--output-dir',
+            action='store',
+            dest='output_dir',
+            default=None,
+            help='Write output to a directory rather than stdout',
+        ),
     )
 
     def handle(self, *args, **options):
