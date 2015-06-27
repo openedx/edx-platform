@@ -1,0 +1,12 @@
+dependencies:
+  override:
+    - pip install setuptools==0.6c11
+    - pip install distribute==0.6.49
+    - pip install pbr==0.9.0
+
+    - paver install_prereqs
+
+test:
+  override:
+    - ./scripts/circle.sh:
+        parallel: true
