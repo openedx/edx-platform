@@ -730,7 +730,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=['non/existent/course']))
         self.assertEqual(resp.status_code, 404)
-        self.assertIn(_("The course you requested does not exist."), resp.content)
+        self.assertIn("The course you requested does not exist.", resp.content)
 
     def test_add_course_to_cart_success(self):
         self.login_user()
@@ -1924,7 +1924,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertFalse(context['date_fmt_error'])
-        self.assertIn(_("Download CSV Reports"), response.content.decode('UTF-8'))
+        self.assertIn("Download CSV Reports", response.content.decode('UTF-8'))
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_report_csv_bad_date(self):
@@ -1936,7 +1936,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertTrue(context['date_fmt_error'])
-        self.assertIn(_("There was an error in your date input.  It should be formatted as YYYY-MM-DD"),
+        self.assertIn("There was an error in your date input.  It should be formatted as YYYY-MM-DD",
                       response.content.decode('UTF-8'))
 
     CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
