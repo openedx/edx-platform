@@ -629,7 +629,6 @@
         'lms/include/teams/js/spec/teams_factory_spec.js',
         'lms/include/teams/js/spec/topic_card_spec.js',
         'lms/include/teams/js/spec/topic_collection_spec.js',
-        'lms/include/teams/js/spec/topic_header_spec.js',
         'lms/include/teams/js/spec/topics_spec.js',
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
