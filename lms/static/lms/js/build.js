@@ -22,9 +22,12 @@
             'js/edxnotes/views/toggle_notes_factory',
             'js/student_profile/views/learner_profile_factory',
             'js/student_account/views/account_settings_factory',
-            'teams/js/teams_tab_factory'
-            // 'js/search/course/main' NOT WORKING
+            'teams/js/teams_tab_factory',
+            'js/discovery/main',
+            'js/search/course/main',
+            'js/search/dashboard/main'
         ]),
+
         /**
          * By default all the configuration for optimization happens from the command
          * line or by properties in the config file, and configuration that was
@@ -56,7 +59,8 @@
             'logger': 'empty:',
             'URI': 'empty:',
             'tinymce': 'empty:',
-            'jquery.tinymce': 'empty:'
+            'jquery.tinymce': 'empty:',
+            'course_discovery_meanings': 'empty:'
         },
         /**
          * If shim config is used in the app during runtime, duplicate the config

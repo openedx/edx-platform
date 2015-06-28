@@ -66,7 +66,13 @@ ${page_title_breadcrumbs(course_name())}
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    <%static:js group='courseware_search'/>
+    <script type="text/javascript">(function (require) {
+      'use strict';
+      require(['js/search/course/main'], function(setupCoursewareSearch) {
+          setupCoursewareSearch();
+      });
+    })(require || RequireJS.require);
+    </script>
   % endif
 
   <%include file="../discussion/_js_body_dependencies.html" />
