@@ -45,7 +45,13 @@ from django.core.urlresolvers import reverse
     });
   </script>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-    <%static:js group='dashboard_search'/>
+    <script type="text/javascript">(function (require) {
+      'use strict';
+      require(['js/search/dashboard/main'], function(setupDashboardSearch) {
+          setupDashboardSearch();
+      });
+    })(require || RequireJS.require);
+    </script>
   % endif
 </%block>
 
