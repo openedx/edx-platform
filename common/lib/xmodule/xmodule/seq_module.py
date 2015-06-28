@@ -168,65 +168,11 @@ class SequenceModule(SequenceFields, XModule):
             return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
 
-    def _get_proctoring_context(self):
-        """
-        Interface with the proctoring subsystem to get
-        information about the students state with respect
-        to timed examinations/proctoring
-        """
-        has_started_exam = False
-        has_finished_exam = False
-        has_time_expired = False
-
-        if self.is_time_limited:
-            proctoring_service = self.runtime.service(self, 'proctoring')
-            user_service = self.runtime.service(self, 'user')
-            user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
-            course_id = self.runtime.course_id
-            location = self.location
-            if proctoring_service and user_service:
-                user_attempt = None
-                exam_id = None
-                try:
-                    exam = proctoring_service.get_exam_by_content_id(course_id, location)
-                    exam_id = exam['id']
-                except:
-                    exam_id = proctoring_service.create_exam(
-                        course_id=course_id,
-                        content_id=unicode(location),
-                        exam_name=self.display_name,
-                        time_limit_mins=self.default_time_limit_mins
-                    )
-
-                attempt = proctoring_service.get_exam_attempt(exam_id, user_id)
-                has_started_exam = attempt is not None
-                if attempt:
-                    now_utc = datetime.now(pytz.UTC)
-                    expires_at = attempt['started_at'] + timedelta(minutes=self.default_time_limit_mins)
-                    has_time_expired = now_utc > expires_at
-
-        context = {
-            'in_timed_exam': self.is_time_limited,
-            'in_proctored_exam': self.is_proctored_enabled,
-            'has_started_exam': has_started_exam,
-            'has_finished_exam': has_finished_exam,
-            'has_time_expired': has_time_expired
-        }
-
-        print '***** context = {}'.format(context)
-
-        return context
-
     def student_view(self, context):
         # If we're rendering this sequence, but no position is set yet,
         # default the position to the first element
         if self.position is None:
             self.position = 1
-
-        context = context if context else {}
-        context.update({
-            'proctoring_context': self._get_proctoring_context()
-        })
 
         ## Returns a set of all types of all sub-children
         contents = []
@@ -261,7 +207,24 @@ class SequenceModule(SequenceFields, XModule):
                   'proctoring_context': context['proctoring_context']
                   }
 
-        fragment.add_content(self.system.render_template('seq_module.html', params))
+        template_name = 'seq_module.html'
+        if self.is_time_limited:
+            proctoring_service = self.runtime.service(self, 'proctoring')
+            user_service = self.runtime.service(self, 'user')
+            if proctoring_service and user_service:
+                user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
+                course_id = self.runtime.course_id
+                content_id = self.location
+
+                proctoring_template_name = proctoring_service.get_student_view_template(
+                    user_id,
+                    course_id,
+                    content_id
+                )
+
+                template_name = proctoring_template_name if proctoring_template_name else template_name
+
+        fragment.add_content(self.system.render_template(template_name, params))
 
         return fragment
 
