@@ -3,12 +3,13 @@
     define([
         'backbone',
         'underscore',
+        'gettext',
         'common/js/components/views/list',
-        'teams/js/views/topic_header',
+        'common/js/components/views/paging_header',
         'common/js/components/views/paging_footer',
         'teams/js/views/topic_card',
         'text!teams/templates/topics.underscore'
-    ], function (Backbone, _, ListView, TopicHeader, PagingFooterView, TopicCardView, topics_template) {
+    ], function (Backbone, _, gettext, ListView, PagingHeader, PagingFooterView, TopicCardView, topics_template) {
         var TopicsListView = ListView.extend({
             tagName: 'div',
             className: 'topics-container',
@@ -18,7 +19,11 @@
         var TopicsView = Backbone.View.extend({
             initialize: function() {
                 this.listView = new TopicsListView({collection: this.collection});
-                this.headerView = new TopicHeader({collection: this.collection});
+                this.headerView = new PagingHeader({
+                    collection: this.collection,
+                    itemDisplayNameSingular: gettext('topic'),
+                    itemDisplayNamePlural: gettext('topics')
+                });
                 this.pagingFooterView = new PagingFooterView({
                     collection: this.collection, hideWhenOnePage: true
                 });
