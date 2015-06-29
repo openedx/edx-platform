@@ -3,7 +3,7 @@
     <div class="nav-item page">
         <div class="pagination-form">
             <label class="page-number-label" for="page-number-input"><%= gettext("Page number") %></label>
-            <input id="page-number-input" class="page-number-input" name="page-number" type="text" size="4" />
+            <input id="page-number-input" class="page-number-input" name="page-number" type="text" size="4" autocomplete="off" />
         </div>
 
         <span class="current-page"><%= current_page %></span>
