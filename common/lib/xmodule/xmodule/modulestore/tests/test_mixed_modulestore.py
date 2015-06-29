@@ -592,6 +592,49 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # Verify that changes are present
         self.assertTrue(self.store.has_changes(component))
 
+    @ddt.data('draft', 'split')
+    def test_unit_stuck_in_published_mode_after_delete(self, default_ms):
+        """
+        Test that a unit does not get stuck in published mode
+        after discarding a component changes and deleting a component
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+
+        # Create a dummy vertical & html component to test against
+        vertical = self.store.create_item(
+            self.user_id,
+            test_course.id,
+            'vertical',
+            block_id='test_vertical'
+        )
+        component = self.store.create_child(
+            self.user_id,
+            vertical.location,
+            'html',
+            block_id='html_component'
+        )
+
+        # publish vertical changes
+        self.store.publish(vertical.location, self.user_id)
+        self.assertFalse(self._has_changes(vertical.location))
+
+        # Change a component, then check that there now are changes
+        component = self.store.get_item(component.location)
+        component.display_name = 'Changed Display Name'
+        self.store.update_item(component, self.user_id)
+        self.assertTrue(self._has_changes(vertical.location))
+
+        # Discard changes and verify that there are no changes
+        self.store.revert_to_published(vertical.location, self.user_id)
+        self.assertFalse(self._has_changes(vertical.location))
+
+        # Delete the component and verify that the unit has changes
+        self.store.delete_item(component.location, self.user_id)
+        vertical = self.store.get_item(vertical.location)
+        self.assertTrue(self._has_changes(vertical.location))
+
     def setup_has_changes(self, default_ms):
         """
         Common set up for has_changes tests below.
