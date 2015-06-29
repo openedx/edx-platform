@@ -381,9 +381,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 if not self.fields['download_video'].is_set_on(self):
                     self.download_video = True
 
-        # Set download_video field to default value if its not explicitly set for backward compatibility.
+        # Force download_video field to default value if it's not explicitly set for backward compatibility.
         if not self.fields['download_video'].is_set_on(self):
             self.download_video = self.download_video
+            self.force_save_fields(['download_video'])
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
