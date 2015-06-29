@@ -81,15 +81,14 @@
             setPage: function (page) {
                 var oldPage = this.currentPage,
                     self = this;
-                this.goTo(page - (this.isZeroIndexed ? 1 : 0), {
-                    reset: true,
-                    success: function () {
+                this.goTo(page - (this.isZeroIndexed ? 1 : 0), {reset: true}).then(
+                    function () {
                         self.trigger('page_changed');
                     },
-                    error: function () {
+                    function () {
                         self.currentPage = oldPage;
                     }
-                });
+                );
             },
 
             /**
