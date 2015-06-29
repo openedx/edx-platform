@@ -462,6 +462,24 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         )
         self.assertEqual(saved["id"], "test_id")
 
+    def test_create_all_fields(self):
+        self.register_post_thread_response({"id": "test_id"})
+        data = self.minimal_data.copy()
+        data["group_id"] = 42
+        self.save_and_reserialize(data)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["test_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Test Title"],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+                "group_id": ["42"],
+            }
+        )
+
     def test_create_missing_field(self):
         for field in self.minimal_data:
             data = self.minimal_data.copy()
@@ -637,6 +655,27 @@ class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStore
         )
         self.assertEqual(saved["id"], "test_comment")
         self.assertEqual(saved["parent_id"], parent_id)
+
+    def test_create_all_fields(self):
+        data = self.minimal_data.copy()
+        data["parent_id"] = "test_parent"
+        data["endorsed"] = True
+        self.register_get_comment_response({"thread_id": "test_thread", "id": "test_parent"})
+        self.register_post_comment_response(
+            {"id": "test_comment"},
+            thread_id="test_thread",
+            parent_id="test_parent"
+        )
+        self.save_and_reserialize(data)
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "body": ["Test body"],
+                "user_id": [str(self.user.id)],
+                "endorsed": ["True"],
+            }
+        )
 
     def test_create_parent_id_nonexistent(self):
         self.register_get_comment_error_response("bad_parent", 404)
