@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:46+0000\n"
-"PO-Revision-Date: 2015-06-19 13:47:59.519977\n"
+"POT-Creation-Date: 2015-06-29 12:35+0000\n"
+"PO-Revision-Date: 2015-06-29 12:36:50.361468\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -88,13 +88,6 @@ msgstr "ÖK Ⱡ'σя#"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
-
-#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
-#: cms/templates/js/checklist.underscore
-msgid "This link will open in a new browser window/tab"
-msgstr ""
-"Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
@@ -236,6 +229,12 @@ msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
 msgstr[0] "(%(num_points)s pöïnt pössïßlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 msgstr[1] "(%(num_points)s pöïnts pössïßlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "The grading process is still running. Refresh the page to see updates."
+msgstr ""
+"Thé grädïng pröçéss ïs stïll rünnïng. Réfrésh thé pägé tö séé üpdätés. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
@@ -4163,6 +4162,19 @@ msgstr ""
 "Çöüld nöt rétrïévé päýmént ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Take a photo of your ID"
+msgstr "Täké ä phötö öf ýöür ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Review your info"
+msgstr "Révïéw ýöür ïnfö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/static/js/verify_student/views/reverify_view.js
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "Çönfïrm Ⱡ'σяєм ιρѕυм #"
+
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr ""
@@ -4381,6 +4393,12 @@ msgstr "Délétïng Ⱡ'σяєм ιρѕυм ∂#"
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/base.js cms/templates/js/checklist.underscore
+msgid "This link will open in a new browser window/tab"
+msgstr ""
+"Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -4724,6 +4742,9 @@ msgstr ""
 "<%= fileExtensions %> tö üplöäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/models/uploads.js
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "ör Ⱡ'σя#"
 
@@ -6058,6 +6079,55 @@ msgstr ""
 msgid "Forgot password?"
 msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Sign in"
+msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Would you like to sign in using your %(providerName)s credentials?"
+msgstr ""
+"Wöüld ýöü lïké tö sïgn ïn üsïng ýöür %(providerName)s çrédéntïäls? Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Sign in using %(providerName)s"
+msgstr "Sïgn ïn üsïng %(providerName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Show me other ways to sign in or register"
+msgstr ""
+"Shöw mé öthér wäýs tö sïgn ïn ör régïstér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Sign in with Institution/Campus Credentials"
+msgstr ""
+"Sïgn ïn wïth Ìnstïtütïön/Çämpüs Çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "Choose your institution from the list below:"
+msgstr ""
+"Çhöösé ýöür ïnstïtütïön fröm thé lïst ßélöw: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Back to sign in"
+msgstr "Bäçk tö sïgn ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register with Institution/Campus Credentials"
+msgstr ""
+"Régïstér wïth Ìnstïtütïön/Çämpüs Çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register through edX"
+msgstr "Régïstér thröügh édX Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -6097,13 +6167,15 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Sign in"
-msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "ör sïgn ïn wïth Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Use my institution/campus credentials"
+msgstr ""
+"Ûsé mý ïnstïtütïön/çämpüs çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: lms/templates/student_account/login.underscore
 msgid "New to %(platformName)s?"
@@ -6635,6 +6707,31 @@ msgstr ""
 "À drïvér's lïçénsé, pässpört, ör gövérnmént-ïssüéd ÌD wïth ýöür nämé änd "
 "phötö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Identity Verification In Progress"
+msgstr ""
+"Ìdéntïtý Vérïfïçätïön Ìn Prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid ""
+"We have received your information and are verifying your identity. You will "
+"see a message on your dashboard when the verification process is complete "
+"(usually within 1-2 days). In the meantime, you can still access all "
+"available course content."
+msgstr ""
+"Wé hävé réçéïvéd ýöür ïnförmätïön änd äré vérïfýïng ýöür ïdéntïtý. Ýöü wïll "
+"séé ä méssägé ön ýöür däshßöärd whén thé vérïfïçätïön pröçéss ïs çömplété "
+"(üsüällý wïthïn 1-2 däýs). Ìn thé méäntïmé, ýöü çän stïll äççéss äll "
+"äväïläßlé çöürsé çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє#"
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Return to Your Dashboard"
+msgstr "Rétürn tö Ýöür Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr "Révïéw Ýöür Phötös Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -6707,10 +6804,6 @@ msgid "Before proceeding, please confirm that your details match"
 msgstr ""
 "Béföré pröçéédïng, pléäsé çönfïrm thät ýöür détäïls mätçh Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "Çönfïrm Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid ""

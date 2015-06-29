@@ -176,7 +176,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:36+0000\n"
+"POT-Creation-Date: 2015-06-29 12:25+0000\n"
 "PO-Revision-Date: 2015-06-01 16:30+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
@@ -798,13 +798,28 @@ msgstr "Учётная запись с таким адресом электро�
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Name required"
-msgstr "Имя - обязательное поле"
+#: common/djangoapps/third_party_auth/models.py
+msgid "Authentication with {} is currently unavailable."
+msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Invalid ID"
-msgstr "Неверный идентификатор"
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Secondary providers are displayed less prominently, in a separate list of "
+"\"Institution\" login providers."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is enabled, users will not be asked to confirm their details "
+"(name, email, etc.) during the registration process. Only select this option"
+" for trusted providers that are known to provide accurate user information."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is selected, users will not be required to confirm their "
+"email, and their account will be activated immediately upon registration."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/pipeline.py
 msgid ""
@@ -1251,6 +1266,24 @@ msgstr ""
 #: common/lib/capa/capa/inputtypes.py
 msgid "processing"
 msgstr "обработка"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is correct."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is incorrect."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is unanswered."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is being processed."
+msgstr ""
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -2069,6 +2102,16 @@ msgstr ""
 msgid ""
 "ORA1 is no longer supported. To use this assessment, replace this ORA1 "
 "component with an ORA2 component."
+msgstr ""
+
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#: common/lib/xmodule/xmodule/course_metadata_utils.py
+#: common/lib/xmodule/xmodule/tests/test_course_metadata_utils.py
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2916,13 +2959,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
-msgstr ""
-
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/discussion_module.py
@@ -5860,7 +5896,6 @@ msgstr ""
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
 msgstr "Полное имя"
@@ -6648,6 +6683,7 @@ msgid "Verified Enrollment"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Gross Revenue"
 msgstr ""
 
@@ -6688,7 +6724,6 @@ msgid "You must be logged-in to add to a shopping cart"
 msgstr "Вы должны войти на сайт для того, чтобы добавлять курсы в корзину"
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course you requested does not exist."
 msgstr ""
 
@@ -7291,15 +7326,6 @@ msgid ""
 "            "
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/tests/test_views.py
-msgid "Download CSV Reports"
-msgstr "Скачать отчёты в формате CSV"
-
-#: lms/djangoapps/shoppingcart/tests/test_views.py
-msgid ""
-"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
-msgstr "Ошибка при вводе даты. Дата должна быть указана в формате ГГГГ-ММ-ДД"
-
 #: lms/djangoapps/student_account/views.py
 msgid "No user with the provided email address exists."
 msgstr ""
@@ -7403,7 +7429,6 @@ msgid "Payment confirmation"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-#: lms/templates/verify_student/photo_reverification.html
 msgid "Take photo"
 msgstr ""
 
@@ -8545,6 +8570,14 @@ msgid "Invalid prerequisite course key"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
+msgid "An error occurred while trying to save your tabs"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "Tabs Exception"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
 msgstr ""
 
@@ -8800,7 +8833,6 @@ msgid "Loading"
 msgstr ""
 
 #: cms/templates/asset_index.html lms/templates/courseware/courseware.html
-#: lms/templates/verify_student/_modal_editname.html
 msgid "close"
 msgstr "закрыть"
 
@@ -8942,11 +8974,6 @@ msgstr "Помощь"
 msgid "Sign Out"
 msgstr ""
 
-#: cms/templates/widgets/tabs-aggregator.html
-#: lms/templates/courseware/progress.html
-msgid "name"
-msgstr ""
-
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr ""
@@ -8976,15 +9003,15 @@ msgid "Some Rights Reserved"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Upgrade Your Enrollment for {} | Choose Your Track"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
 msgid "Enroll In {} | Choose Your Track"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to enroll you"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Congratulations!  You are now enrolled in {course_name}"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -11695,15 +11722,19 @@ msgid "You have met the requirements for credit in this course."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
+msgid "{link} to purchase course credit."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Go to your dashboard"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "to purchase course credit."
+msgid "You have not yet met the requirements for credit."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
+msgid "display_name"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11719,8 +11750,7 @@ msgid "Upcoming"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
+msgid "Less"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11991,6 +12021,37 @@ msgid ""
 "received. You can {contact_link_start}contact the account "
 "holder{contact_link_end} to request payment, or you can "
 "{unenroll_link_start}unenroll{unenroll_link_end} from this course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"{username}, your eligibility for credit expires on {expiry}. Don't miss out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid "{congrats} {username}, You have meet requirements for credit."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid "Purchase Credit"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"Thank you, your payment is complete, your credit is processing. Please see "
+"{provider_link} for more information."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"Thank you, your credit is approved. Please see {provider_link} for more "
+"information."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"Your credit has been denied. Please contact {provider_link} for more "
+"information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -12462,6 +12523,10 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Open"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "More"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -14989,7 +15054,16 @@ msgid "Payment"
 msgstr ""
 
 #: lms/templates/shoppingcart/download_report.html
+msgid "Download CSV Reports"
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html
+msgid ""
+"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
 msgstr ""
 
 #: lms/templates/shoppingcart/download_report.html
@@ -15310,14 +15384,10 @@ msgid "{platform_name} -  Shopping Cart"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
 msgid "Review"
 msgstr "Просмотреть"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
 msgid "Confirmation"
 msgstr "Подтверждение"
 
@@ -15490,99 +15560,12 @@ msgstr ""
 "Если у вас возникнут вопросы относительно курса или этой анкеты, свяжитесь с"
 "  <a href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/_modal_editname.html
-msgid "Edit Your Name"
-msgstr ""
-
-#: lms/templates/verify_student/_modal_editname.html
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr ""
-
-#: lms/templates/verify_student/_modal_editname.html
-msgid ""
-"To uphold the credibility of {platform} certificates, all name changes will "
-"be logged and recorded."
-msgstr ""
-
-#: lms/templates/verify_student/_modal_editname.html
-msgid "Reason for name change:"
-msgstr "Причина смены имени:"
-
-#: lms/templates/verify_student/_modal_editname.html
-msgid "Change my name"
-msgstr "Изменить моё имя"
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid "Why Do I Need to Re-Verify My Identity?"
-msgstr ""
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid ""
-"You may need to re-verify your identity if an error occurs with your "
-"verification or if your verification has expired. All verifications expire "
-"after one year.  The re-verification process is the same as the original "
-"verification process. You need a webcam and a government-issued photo ID."
-msgstr ""
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid "Having Technical Trouble?"
-msgstr "Есть технические проблемы?"
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid ""
-"Please make sure your browser is updated to the <strong>{a_start}most recent"
-" version possible{a_end}</strong>. Also, please make sure your "
-"<strong>webcam is plugged in, turned on, and allowed to function in your web"
-" browser (commonly adjustable in your browser settings)</strong>"
-msgstr ""
-
-#: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Have questions?"
-msgstr "Есть вопросы?"
-
-#: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please read {a_start}our FAQs to view common questions about our "
-"certificates{a_end}."
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "You are upgrading your enrollment for: {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "You are re-verifying for: {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "You are enrolling in: {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "Congratulations! You are now enrolled in {course_display}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Technical Requirements"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
-"turned on, and allowed to function in your web browser (commonly adjustable "
-"in your browser settings).</strong>"
-msgstr ""
-
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
+msgstr ""
+
+#: lms/templates/verify_student/face_upload.html
+msgid "The following error occurred while editing your name:"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.html
@@ -15615,335 +15598,49 @@ msgstr ""
 msgid "Enroll In {course_name}"
 msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Have questions?"
+msgstr "Есть вопросы?"
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid ""
+"Please read {a_start}our FAQs to view common questions about our "
+"certificates{a_end}."
+msgstr ""
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Technical Requirements"
+msgstr ""
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid ""
+"Please make sure your browser is updated to the {a_start}most recent version"
+" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
+"turned on, and allowed to function in your web browser (commonly adjustable "
+"in your browser settings).</strong>"
+msgstr ""
+
+#: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
 msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
-msgid "No Webcam Detected"
-msgstr "Вебкамера не обнаружена"
+#: lms/templates/verify_student/reverify_not_allowed.html
+msgid "Identity Verification"
+msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/reverify_not_allowed.html
 msgid ""
-"You don't seem to have a webcam connected. Double-check that your webcam is "
-"connected and working to continue."
+"You have already submitted your verification information. You will see a "
+"message on your dashboard when the verification process is complete (usually"
+" within 1-2 days)."
 msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
-msgid "No Flash Detected"
-msgstr "Flash не обнаружен"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
-"continue your registration."
+#: lms/templates/verify_student/reverify_not_allowed.html
+msgid "You cannot verify your identity at this time."
 msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Error submitting your images"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Oops! Something went wrong. Please confirm your details and try again."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verify Your Identity"
-msgstr ""
-
-#. Translators: {start_bold} and {end_bold} will be replaced with HTML tags.
-#. Please do not translate these variables.
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"To verify your identity and continue as a verified student in this course, "
-"complete the following steps {start_bold}before the course verification "
-"deadline{end_bold}. If you do not verify your identity, you can still "
-"receive an honor code certificate for the course."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Your Progress"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Current Step: "
-msgstr "Текущий шаг: "
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Take Photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Take ID Photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Re-Take Your Photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Use your webcam to take a picture of your face so we can match it with the "
-"picture on your ID."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Don't see your picture? Make sure to allow your browser to use your camera "
-"when it asks for permission."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Retake"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Looks good"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Tips on taking a successful photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Make sure your face is well-lit"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be sure your entire face is inside the frame"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Can we match the photo you took with the one on your ID?"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Once in position, use the camera button {btn_icon} to capture your picture"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Use the checkmark button {btn_icon} once you are happy with the photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Common Questions"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Why do you need my photo?"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"As part of the verification process, we need your photo to confirm that you "
-"are you."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "What do you do with this picture?"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "We only use it to verify your identity.  It is not displayed anywhere."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verification"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Once you verify your photo looks good, you can move on to step 2."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Go to Step 2: Re-Take ID Photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Show Us Your ID"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Use your webcam to take a picture of your ID so we can match it with your "
-"photo and the name on your account."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Make sure your ID is well-lit"
-msgstr "Убедитесь, что Ваш документ хорошо освещён"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Acceptable IDs include driver's licenses, passports, or other goverment-"
-"issued IDs that include your name and photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Check that there isn't any glare"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Ensure that you can see your photo and read your name"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Try to keep your fingers at the edge to avoid covering important information"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Once in position, use the camera button {btn_icon} to capture your ID"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Why do you need a photo of my ID?"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"We need to match your ID with your photo and name to confirm that you are "
-"you."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"We encrypt it and send it to our secure authorization service for review. We"
-" use the highest levels of security and do not save the photo or information"
-" anywhere once the match has been completed."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Once you verify your ID photo looks good, you can move on to step 3."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Go to Step 3: Review Your Info"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verify Your Submission"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Make sure we can verify your identity with the photos and information below."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Review the Photos You've Re-Taken"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Please review the photos and verify that they meet the requirements listed "
-"below."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "The photo above needs to meet the following requirements:"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be well lit"
-msgstr "Освещение должно быть достаточно хорошим"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Show your whole face"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "The photo on your ID must match the photo of your face"
-msgstr "Фото в Вашем документе должно совпадать с фото Вашего лица"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be readable (not too far away, no glare)"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "The name on your ID must match the name on your account below"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Photos don't meet the requirements?"
-msgstr "Фото не соответствуют требованиям?"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Retake Your Photos"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Check Your Name"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Make sure your full name on your {platform_name} account ({full_name}) "
-"matches your ID. We will also use this as the name on your certificate."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Edit your name"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Once you verify your details match the requirements, you can move onto to "
-"confirm your re-verification submisssion."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Yes! My details all match."
-msgstr "Да! Все мои данные совпадают."
-
-#: lms/templates/verify_student/prompt_midcourse_reverify.html
-msgid "You need to re-verify to continue"
-msgstr ""
-
-#: lms/templates/verify_student/prompt_midcourse_reverify.html
-msgid ""
-"To continue in the ID Verified track in {course}, you need to re-verify your"
-" identity by {date}.  Go to URL."
-msgstr ""
-
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Verification Submission Confirmation"
-msgstr ""
-
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Your Credentials Have Been Updated"
-msgstr ""
-
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid ""
-"We've captured your re-submitted information and will review it to verify "
-"your identity shortly. You should receive an update to your veriication "
-"status within 1-2 days. In the meantime, you still have access to all of "
-"your course content."
-msgstr ""
-
-#: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/reverification_window_expired.html
+#: lms/templates/verify_student/reverify_not_allowed.html
 msgid "Return to Your Dashboard"
-msgstr ""
-
-#: lms/templates/verify_student/reverification_window_expired.html
-msgid "Re-Verification Failed"
-msgstr ""
-
-#: lms/templates/verify_student/reverification_window_expired.html
-msgid ""
-"Your re-verification was submitted after the re-verification deadline, and "
-"you can no longer be re-verified."
-msgstr ""
-
-#: lms/templates/verify_student/reverification_window_expired.html
-msgid "Please contact support if you believe this message to be in error."
 msgstr ""
 
 #: lms/templates/wiki/includes/article_menu.html
@@ -17450,11 +17147,11 @@ msgid "New Course"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "New Library"
+msgid "Email staff to create course"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Email staff to create course"
+msgid "New Library"
 msgstr ""
 
 #: cms/templates/index.html
@@ -18079,8 +17776,6 @@ msgstr ""
 msgid "The nuts and bolts of your course"
 msgstr ""
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "This field is disabled: this information cannot be changed."
 msgstr ""
@@ -18140,7 +17835,17 @@ msgid "Successful Proctored Exam"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Successful In Course Reverification"
+msgid "Proctored Exam {number}"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Successful In-Course Reverification"
+msgstr ""
+
+#. Translators: 'Access to Assessment 1' means the access for a requirement
+#. with name 'Assessment 1'
+#: cms/templates/settings.html
+msgid "In-Course Reverification {number}"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -18858,6 +18563,10 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about {studio_name}?"
+msgstr ""
+
+#: cms/templates/widgets/tabs-aggregator.html
+msgid "name"
 msgstr ""
 
 # empty

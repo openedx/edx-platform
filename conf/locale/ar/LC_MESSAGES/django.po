@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:36+0000\n"
+"POT-Creation-Date: 2015-06-29 12:25+0000\n"
 "PO-Revision-Date: 2015-05-28 20:00+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -205,13 +205,8 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/receipt.html
-#, fuzzy
 msgid "Status"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"الحالة\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"حالة"
+msgstr "الحالة"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -292,13 +287,8 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
-#, fuzzy
 msgid "Honor Code"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"ميثاق الشرف \n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"ميثاق الشرف"
+msgstr "ميثاق الشرف"
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're auditing this course"
@@ -537,13 +527,8 @@ msgstr "المدرسة الابتدائية"
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-#, fuzzy
 msgid "None"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"لا شيء\n"
-"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
-"غير مذكور"
+msgstr "لا شيء"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -670,13 +655,8 @@ msgid "Too many failed login attempts. Try again later."
 msgstr "محاولات فاشلة كثيرة لتسجيل الدخول. يُرجى إعادة المحاولة لاحقًا. "
 
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
-#, fuzzy
 msgid "Email or password is incorrect."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"يوجد خطأ إمّا في عنوان البريد الإلكتروني أو في كلمة السر.\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"البريد الإلكتروني أو كلمة السر غير صحيحين"
+msgstr "يوجد خطأ إمّا في عنوان البريد الإلكتروني أو في كلمة السر."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -823,13 +803,28 @@ msgstr ""
 "نأسف لتعذّر إمكانية إرسال رابط تفعيل البريد الإلكتروني. يُرجى إعادة المحاولة"
 " لاحقًا. "
 
-#: common/djangoapps/student/views.py
-msgid "Name required"
-msgstr "يُرجى إدخال الاسم"
+#: common/djangoapps/third_party_auth/models.py
+msgid "Authentication with {} is currently unavailable."
+msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Invalid ID"
-msgstr "الرقم التعريفي غير صحيح"
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Secondary providers are displayed less prominently, in a separate list of "
+"\"Institution\" login providers."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is enabled, users will not be asked to confirm their details "
+"(name, email, etc.) during the registration process. Only select this option"
+" for trusted providers that are known to provide accurate user information."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is selected, users will not be required to confirm their "
+"email, and their account will be activated immediately upon registration."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/pipeline.py
 msgid ""
@@ -1281,6 +1276,24 @@ msgstr "لا توجد إجابة "
 msgid "processing"
 msgstr "جاري العمل"
 
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is correct."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is incorrect."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is unanswered."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is being processed."
+msgstr ""
+
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
 msgid "ChoiceGroup: unexpected tag {tag_name}"
@@ -1433,13 +1446,8 @@ msgstr "القائمة المنسدلة "
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
-#, fuzzy
 msgid "Numerical Input"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"مُدخَل رقمي\n"
-"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
-"مدخلات رقمية"
+msgstr "مُدخَل رقمي"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
@@ -1488,13 +1496,8 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
-#, fuzzy
 msgid "Text Input"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"مُدخَل نصّي\n"
-"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
-"مدخلات النصّ"
+msgstr "مُدخَل نصّي"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error"
@@ -1661,13 +1664,8 @@ msgstr "بيانات XML للملاحظات التوضيحية"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: cms/templates/container.html cms/templates/library.html
-#, fuzzy
 msgid "Display Name"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"اسم العرض\n"
-"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
-"إظهار الاسم "
+msgstr "اسم العرض"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
@@ -2057,13 +2055,8 @@ msgstr " الخطوة التي يعمل عليها الطالب ضمن المه�
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 #: lms/templates/peer_grading/peer_grading.html
-#, fuzzy
 msgid "Graded"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"جرى التقييم\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"تم تقييمه"
+msgstr "جرى التقييم"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
@@ -2180,6 +2173,16 @@ msgid ""
 "ORA1 is no longer supported. To use this assessment, replace this ORA1 "
 "component with an ORA2 component."
 msgstr ""
+
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#: common/lib/xmodule/xmodule/course_metadata_utils.py
+#: common/lib/xmodule/xmodule/tests/test_course_metadata_utils.py
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
+msgstr "سيُحدَّد لاحقًا "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -3119,13 +3122,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "عام"
-
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "سيُحدَّد لاحقًا "
 
 #: common/lib/xmodule/xmodule/discussion_module.py
 msgid "Discussion Id"
@@ -5525,13 +5521,8 @@ msgstr "الأخطاء في المساق {course_name} الذي جرى تحمي�
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
-#, fuzzy
 msgid "Course Name"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"اسم المساق \n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"اسم المساق"
+msgstr "اسم المساق"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Directory/ID"
@@ -5804,13 +5795,8 @@ msgstr "رقم المستخدم"
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#, fuzzy
 msgid "Email"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"عنوان البريد الإلكتروني\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"البريد الإلكتروني"
+msgstr "عنوان البريد الإلكتروني"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py lms/envs/devstack.py
@@ -6216,13 +6202,8 @@ msgstr "البيانات غير مكتملة"
 
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-#, fuzzy
 msgid "Course Statistics At A Glance"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"لمحة سريعة عن إحصاءات المساق\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"لمحة سريعة عن إحصائيات المساق"
+msgstr "لمحة سريعة عن إحصاءات المساق"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of students enrolled in {course_key}"
@@ -6314,15 +6295,9 @@ msgstr "الرقم التعريفي"
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
-#, fuzzy
 msgid "Full Name"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"الاسم الكامل\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"الإسم الكامل"
+msgstr "الاسم الكامل"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
@@ -6407,13 +6382,8 @@ msgstr "إعادة الضبط"
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 #: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
-#, fuzzy
 msgid "deleted"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"الحذف\n"
-"#-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#\n"
-"محذوف"
+msgstr "الحذف"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -7210,7 +7180,6 @@ msgid "You must be logged-in to add to a shopping cart"
 msgstr "يجب أن تكون مسجَّل الدخول لتتمكّن من الإضافة إلى سلّة التسوّق"
 
 #: lms/djangoapps/shoppingcart/views.py
-#: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course you requested does not exist."
 msgstr "المساق الذي طلبته غير موجود."
 
@@ -7922,27 +7891,6 @@ msgid ""
 "            "
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/tests/test_views.py
-#: lms/templates/shoppingcart/download_report.html
-#, fuzzy
-msgid "Download CSV Reports"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"تنزيل تقارير CSV \n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"تنزيل الإبلاغات بصيغة CSV "
-
-#: lms/djangoapps/shoppingcart/tests/test_views.py
-#: lms/templates/shoppingcart/download_report.html
-#, fuzzy
-msgid ""
-"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"نأسف لحدوث خطأ في عملية إدخال التاريخ التي قمت بها. يجب صياغته بهذا الشكل YYYY-MM-DD\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"حدث خطأ في عملية إدخال التاريخ التي قمت بها. يجب أن يتم إدخاله على الشكل YYYY-MM-DD"
-
 #: lms/djangoapps/student_account/views.py
 msgid "No user with the provided email address exists."
 msgstr "لا يوجد مستخدم يمتلك عنوان البريد الإلكتروني المحدَّد."
@@ -8046,14 +7994,8 @@ msgid "Payment confirmation"
 msgstr "تأكيد الدفعة"
 
 #: lms/djangoapps/verify_student/views.py
-#: lms/templates/verify_student/photo_reverification.html
-#, fuzzy
 msgid "Take photo"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"التقاط صورة  \n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"قم بأخذ صورة  "
+msgstr "التقاط صورة  "
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Take a photo of your ID"
@@ -8784,13 +8726,8 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
-#, fuzzy
 msgid "Attachments"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"المرفقات\n"
-"#-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#\n"
-"الملفّات المرفقة"
+msgstr "المرفقات"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
@@ -9277,6 +9214,14 @@ msgid "Invalid prerequisite course key"
 msgstr "رقم المساق الأساسي غير صالح"
 
 #: cms/djangoapps/contentstore/views/course.py
+msgid "An error occurred while trying to save your tabs"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "Tabs Exception"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
 msgstr "إنّ إعدادات هذه المجموعة قيد الاستخدام ولا يمكن حذفها."
 
@@ -9471,13 +9416,8 @@ msgstr "تاريخ الإضافة "
 #. duration is determined.
 #: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#, fuzzy
 msgid "Pending"
-msgstr ""
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"مُعلَّق\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"معلَّق"
+msgstr "مُعلَّق"
 
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
@@ -9545,7 +9485,6 @@ msgid "Loading"
 msgstr "جاري التحميل"
 
 #: cms/templates/asset_index.html lms/templates/courseware/courseware.html
-#: lms/templates/verify_student/_modal_editname.html
 msgid "close"
 msgstr "إغلاق "
 
@@ -9687,11 +9626,6 @@ msgstr "المساعدة"
 msgid "Sign Out"
 msgstr ""
 
-#: cms/templates/widgets/tabs-aggregator.html
-#: lms/templates/courseware/progress.html
-msgid "name"
-msgstr ""
-
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr ""
@@ -9721,16 +9655,16 @@ msgid "Some Rights Reserved"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Upgrade Your Enrollment for {} | Choose Your Track"
-msgstr "يُرجى تحديث تسجيلك في {} | واختر مسارك"
-
-#: common/templates/course_modes/choose.html
 msgid "Enroll In {} | Choose Your Track"
 msgstr "سجّل في {} | اختر مسارك"
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to enroll you"
 msgstr "نأسف لحدوث خطأ ما عند محاولة تسجيلك"
+
+#: common/templates/course_modes/choose.html
+msgid "Congratulations!  You are now enrolled in {course_name}"
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
@@ -12594,15 +12528,19 @@ msgid "You have met the requirements for credit in this course."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
+msgid "{link} to purchase course credit."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Go to your dashboard"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "to purchase course credit."
+msgid "You have not yet met the requirements for credit."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
+msgid "display_name"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12618,9 +12556,8 @@ msgid "Upcoming"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
-msgstr "المزيد"
+msgid "Less"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -12919,6 +12856,37 @@ msgstr ""
 "يمكنك {contact_link_start}الاتصال بصاحب الحساب{contact_link_end} لطلب "
 "الدفعة، أو يمكنك {unenroll_link_start}إلغاء التسجيل{unenroll_link_end} في "
 "هذا المساق."
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"{username}, your eligibility for credit expires on {expiry}. Don't miss out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid "{congrats} {username}, You have meet requirements for credit."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid "Purchase Credit"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"Thank you, your payment is complete, your credit is processing. Please see "
+"{provider_link} for more information."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"Thank you, your credit is approved. Please see {provider_link} for more "
+"information."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_information.html
+msgid ""
+"Your credit has been denied. Please contact {provider_link} for more "
+"information."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -13404,6 +13372,10 @@ msgstr "إلغاء التثبيت"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Open"
 msgstr "فتح"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "More"
+msgstr "المزيد"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_profile_thread.mustache
@@ -16159,8 +16131,19 @@ msgid "Payment"
 msgstr "الدفعة"
 
 #: lms/templates/shoppingcart/download_report.html
+msgid "Download CSV Reports"
+msgstr "تنزيل الإبلاغات بصيغة CSV "
+
+#: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
 msgstr "تنزيل البيانات بصيغة CSV"
+
+#: lms/templates/shoppingcart/download_report.html
+msgid ""
+"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
+msgstr ""
+"حدث خطأ في عملية إدخال التاريخ التي قمت بها. يجب أن يتم إدخاله على الشكل "
+"YYYY-MM-DD"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "These reports are delimited by start and end dates."
@@ -16497,14 +16480,10 @@ msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} - عربة التسوق"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
 msgid "Review"
 msgstr "مراجعة "
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
 msgid "Confirmation"
 msgstr "تأكيد "
 
@@ -16690,112 +16669,13 @@ msgstr ""
 "إذا كان لديك أي أسئلة حول المساق أو هذه الاستمارة، يُرجى الاتصال بـ <a "
 "href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/_modal_editname.html
-msgid "Edit Your Name"
-msgstr "تعديل اسمك "
-
-#: lms/templates/verify_student/_modal_editname.html
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "حدث الخاطئ التالي أثناء تعديل إسمك:"
-
-#: lms/templates/verify_student/_modal_editname.html
-msgid ""
-"To uphold the credibility of {platform} certificates, all name changes will "
-"be logged and recorded."
-msgstr ""
-"حرصاً على مصداقية شهادات {platform}، سيتم تدوين وتسجيل جميع التغييرات في "
-"الأسماء."
-
-#: lms/templates/verify_student/_modal_editname.html
-msgid "Reason for name change:"
-msgstr "أسباب تغيير الاسم:"
-
-#: lms/templates/verify_student/_modal_editname.html
-msgid "Change my name"
-msgstr "تغيير اسمي:"
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid "Why Do I Need to Re-Verify My Identity?"
-msgstr ""
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid ""
-"You may need to re-verify your identity if an error occurs with your "
-"verification or if your verification has expired. All verifications expire "
-"after one year.  The re-verification process is the same as the original "
-"verification process. You need a webcam and a government-issued photo ID."
-msgstr ""
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid "Having Technical Trouble?"
-msgstr "هل تواجه مشكلة تقنية؟ "
-
-#: lms/templates/verify_student/_reverification_support.html
-msgid ""
-"Please make sure your browser is updated to the <strong>{a_start}most recent"
-" version possible{a_end}</strong>. Also, please make sure your "
-"<strong>webcam is plugged in, turned on, and allowed to function in your web"
-" browser (commonly adjustable in your browser settings)</strong>"
-msgstr ""
-"يرجى التأكد من تحديث متصفحك إلى <strong>{a_start}أحدث نسخة "
-"متاحة{a_end}</strong>، كما يرجى التأكد من أن <strong>كاميرا الكومبيوتر لديك "
-"متصلة ومشغّلة ومسموح بتشغيلها على متصفح الإنترنت لديك (عادة ما يمكن تنسيق "
-"هذه الإعدادات من خلال إعدادات المتصفح لديك) </strong>"
-
-#: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Have questions?"
-msgstr "هل لديك أسئلة؟ "
-
-#: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please read {a_start}our FAQs to view common questions about our "
-"certificates{a_end}."
-msgstr ""
-"الرجاء قراءة {a_start}الأسئلة الأكثر تكراراً الخاصة بموقعنا للاطلاع على "
-"الأسئلة الشائعة لما يتعلق بشهاداتنا{a_end}."
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "You are upgrading your enrollment for: {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "You are re-verifying for: {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "You are enrolling in: {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-msgid "Congratulations! You are now enrolled in {course_display}"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Technical Requirements"
-msgstr "المتطلّبات التقنيّة"
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
-"turned on, and allowed to function in your web browser (commonly adjustable "
-"in your browser settings).</strong>"
-msgstr ""
-"يرجى التأكد من تحديث متصفحك إلى {a_start}أحدث نسخة متاحة{a_end}، كما يرجى "
-"التأكد من أن <strong>كاميرا الكومبيوتر لديك متصلة ومشغّلة ومسموح بتشغيلها "
-"على متصفح الإنترنت لديك (عادة ما يمكن تنسيق هذه الإعدادات من خلال إعدادات "
-"المتصفح لديك).</strong>"
-
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
 msgstr "قم بتعديل اسمك الكامل  "
+
+#: lms/templates/verify_student/face_upload.html
+msgid "The following error occurred while editing your name:"
+msgstr "حدث الخاطئ التالي أثناء تعديل إسمك:"
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
@@ -16827,361 +16707,56 @@ msgstr "إجراء عملية التحقّق الخاصة بالمساق {course
 msgid "Enroll In {course_name}"
 msgstr "التسجيل في {course_name}"
 
-#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Have questions?"
+msgstr "هل لديك أسئلة؟ "
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid ""
+"Please read {a_start}our FAQs to view common questions about our "
+"certificates{a_end}."
+msgstr ""
+"الرجاء قراءة {a_start}الأسئلة الأكثر تكراراً الخاصة بموقعنا للاطلاع على "
+"الأسئلة الشائعة لما يتعلق بشهاداتنا{a_end}."
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Technical Requirements"
+msgstr "المتطلّبات التقنيّة"
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid ""
+"Please make sure your browser is updated to the {a_start}most recent version"
+" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
+"turned on, and allowed to function in your web browser (commonly adjustable "
+"in your browser settings).</strong>"
+msgstr ""
+"يرجى التأكد من تحديث متصفحك إلى {a_start}أحدث نسخة متاحة{a_end}، كما يرجى "
+"التأكد من أن <strong>كاميرا الكومبيوتر لديك متصلة ومشغّلة ومسموح بتشغيلها "
+"على متصفح الإنترنت لديك (عادة ما يمكن تنسيق هذه الإعدادات من خلال إعدادات "
+"المتصفح لديك).</strong>"
+
+#: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
 msgstr "إعادة التحقّق"
 
-#: lms/templates/verify_student/photo_reverification.html
-msgid "No Webcam Detected"
-msgstr "لم يتم التعرف على كاميرا الويب "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"You don't seem to have a webcam connected. Double-check that your webcam is "
-"connected and working to continue."
-msgstr ""
-"يبدو أنه لا توجد كاميرا ويب متّصلة بالكمبيوتر. الرجاء إعادة التحقّق من توصيل"
-" الكاميرا وبأنها تعمل للمتابعة."
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "No Flash Detected"
-msgstr "لم يتم التحقق من وجود ذاكرة فلاش "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
-"continue your registration."
-msgstr ""
-"يبدو أنه لا يوجد لديك ذاكرة فلاش مركّبة.  {a_start} احصل على ذاكرة فلاش  "
-"{a_end} للاستمرار في عملية التسجيل. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Error submitting your images"
-msgstr "حدث خطأ أثناء تقديم الصور الخاصة بك."
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Oops! Something went wrong. Please confirm your details and try again."
-msgstr ""
-"عذراً! يبدو أنه قد حدث خطأٌ ما. الرجاء تأكيد التفاصيل الخاصة بك وإعادة "
-"المحاولة."
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verify Your Identity"
+#: lms/templates/verify_student/reverify_not_allowed.html
+msgid "Identity Verification"
 msgstr ""
 
-#. Translators: {start_bold} and {end_bold} will be replaced with HTML tags.
-#. Please do not translate these variables.
-#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/reverify_not_allowed.html
 msgid ""
-"To verify your identity and continue as a verified student in this course, "
-"complete the following steps {start_bold}before the course verification "
-"deadline{end_bold}. If you do not verify your identity, you can still "
-"receive an honor code certificate for the course."
+"You have already submitted your verification information. You will see a "
+"message on your dashboard when the verification process is complete (usually"
+" within 1-2 days)."
 msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Your Progress"
-msgstr "تطورك "
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Current Step: "
-msgstr "الخطوة الحالية: "
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Take Photo"
-msgstr "إعادة التقاط صورة "
-
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Take ID Photo"
-msgstr "إعادة التقاط صورة الهوية"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Re-Take Your Photo"
-msgstr "إعادة التقاط صورة لك"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Use your webcam to take a picture of your face so we can match it with the "
-"picture on your ID."
-msgstr ""
-"استخدم كاميرا الويب الخاصة بك لأخذ صورة لوجهك حتى نتمكن من مطابقتها مع "
-"الصورة على بطاقتك الشخصية. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Don't see your picture? Make sure to allow your browser to use your camera "
-"when it asks for permission."
-msgstr ""
-"لا يمكنك رؤية صورتك؟ قم بالتحقق من إمكانية استخدام متصفحك للكاميرا الخاصة بك"
-" عندما يطلب الإذن منك.  "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Retake"
-msgstr "إعادة التصوير "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Looks good"
-msgstr "تم بشكلٍ جيد "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Tips on taking a successful photo"
-msgstr "نصائح حول كيفية أخذ صورة ناجحة"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Make sure your face is well-lit"
-msgstr "قم بالتأكد من الإضاءة الجيدة على وجهك "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be sure your entire face is inside the frame"
-msgstr "قم بالتأكد من أن وجهك بالكامل داخل الإطار "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Can we match the photo you took with the one on your ID?"
-msgstr "هل يمكننا مطابقة الصورة التي أخذتها مع الصورة على بطاقتك الشخصية؟ "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Once in position, use the camera button {btn_icon} to capture your picture"
+#: lms/templates/verify_student/reverify_not_allowed.html
+msgid "You cannot verify your identity at this time."
 msgstr ""
 
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Use the checkmark button {btn_icon} once you are happy with the photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Common Questions"
-msgstr "أسئلة شائعة "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Why do you need my photo?"
-msgstr "لماذا تحتاجون صورتي؟ "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"As part of the verification process, we need your photo to confirm that you "
-"are you."
-msgstr "نحتاج صورتك كجزء من عملية التحقق وذلك للتأكد من هويتك. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "What do you do with this picture?"
-msgstr "ماذا تفعلون بهذه الصورة؟ "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "We only use it to verify your identity.  It is not displayed anywhere."
-msgstr "نقوم باستعمالها فقط للتحقق من هويتك، ولن يتم عرضها في أي مكان آخر. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verification"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Once you verify your photo looks good, you can move on to step 2."
-msgstr "بمجرد رضاك عن جودة صورتك يمكنك الانتقال لخطوة 2. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Go to Step 2: Re-Take ID Photo"
-msgstr "العودة إلى الخطوة 2: إعادة التقاط صورة الهوية"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Show Us Your ID"
-msgstr "أرنا بطاقتك الشخصية "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Use your webcam to take a picture of your ID so we can match it with your "
-"photo and the name on your account."
-msgstr ""
-"استخدم كاميرا الويب الخاصة بك لأخذ صورة لبطاقتك الشخصية حتى نستطيع مطابقتها "
-"مع صورتك والاسم المستخدم على حسابك.  "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Make sure your ID is well-lit"
-msgstr "قم بالتأكد من أن بطاقة هويتك مضاءة بشكل جيد  "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Acceptable IDs include driver's licenses, passports, or other goverment-"
-"issued IDs that include your name and photo"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Check that there isn't any glare"
-msgstr "تحقق من عدم وجود أي لمعان أو وهج"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Ensure that you can see your photo and read your name"
-msgstr "تأكد من قدرتك على رؤية صورتك وقراءة اسمك "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Try to keep your fingers at the edge to avoid covering important information"
-msgstr "حاول إبقاء أصابعك على الحافة لتفادي تغطية معلومات مهمة "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Once in position, use the camera button {btn_icon} to capture your ID"
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Why do you need a photo of my ID?"
-msgstr "لماذا تحتاجون صورة عن بطاقة هويتي؟ "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"We need to match your ID with your photo and name to confirm that you are "
-"you."
-msgstr "نحتاج لمطابقة هويتك مع صورتك وإسمك بالبطاقة الشخصية للتحقق من شخصك. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"We encrypt it and send it to our secure authorization service for review. We"
-" use the highest levels of security and do not save the photo or information"
-" anywhere once the match has been completed."
-msgstr ""
-"نقوم بتشفيرها وإرسالها للمراجعة في خدمة التوثيق الآمنة التابعة لنا. نحن "
-"نستعمل أقصى مستويات حماية المعلومات ولا نقوم بحفظ الصورة أو المعلومات في أي "
-"مكان بمجرد استكمال عملية المطابقة. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Once you verify your ID photo looks good, you can move on to step 3."
-msgstr "يمكنك الانتقال لخطوة 3 حال تأكدك من جودة صورة بطاقة هويتك.  "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Go to Step 3: Review Your Info"
-msgstr "انتقل للخطوة 3: مراجعة معلوماتك "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Verify Your Submission"
-msgstr "التحقق من المادة المقدّمة"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Make sure we can verify your identity with the photos and information below."
-msgstr "التأكد من أننا نستطيع تأكيد هويتك من الصور والمعلومات أدناه. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Review the Photos You've Re-Taken"
-msgstr "معاينة الصور التي أعدت التقاطها"
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Please review the photos and verify that they meet the requirements listed "
-"below."
-msgstr "الرجاء مراجعة الصور والتأكد من مطابقتها المتطلبات المذكورة أدناه. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "The photo above needs to meet the following requirements:"
-msgstr "يجب أن تطابق الصورة أعلاه المتطلبات التالية: "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be well lit"
-msgstr "أن تكون مضاءة جيداً "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Show your whole face"
-msgstr "أن تظهر وجهك بالكامل "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "The photo on your ID must match the photo of your face"
-msgstr "أن تطابق الصورة على بطاقتك الشخصية صورة وجهك. "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Be readable (not too far away, no glare)"
-msgstr "أن تكون مقروءة (ليست بعيدة جداً، ودون وهج) "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "The name on your ID must match the name on your account below"
-msgstr "يجب أن يطابق الاسم على بطاقتك الاسم المسجّل على حسابك أدناه "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Photos don't meet the requirements?"
-msgstr "ماذا لو كانت الصور لا تطابق المتطلبات؟ "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Retake Your Photos"
-msgstr "يجب إعادة أخذ الصور مرة أخرى "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Check Your Name"
-msgstr "ينبغي التحقق من إسمك "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Make sure your full name on your {platform_name} account ({full_name}) "
-"matches your ID. We will also use this as the name on your certificate."
-msgstr ""
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Edit your name"
-msgstr "تعديل إسمك "
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid ""
-"Once you verify your details match the requirements, you can move onto to "
-"confirm your re-verification submisssion."
-msgstr ""
-"بمجرد التحقّق من كون تفاصيلك تطابق المتطلبات، بإمكانك الانتقال لتأكيد تقديم "
-"متطلّبات إعادة التحقّق."
-
-#: lms/templates/verify_student/photo_reverification.html
-msgid "Yes! My details all match."
-msgstr "نعم! جميع التفاصيل مطابقة. "
-
-#: lms/templates/verify_student/prompt_midcourse_reverify.html
-msgid "You need to re-verify to continue"
-msgstr "تحتاج إلى إعادة عملية التحقّق لتتمكّن من المتابعة"
-
-#: lms/templates/verify_student/prompt_midcourse_reverify.html
-msgid ""
-"To continue in the ID Verified track in {course}, you need to re-verify your"
-" identity by {date}.  Go to URL."
-msgstr ""
-"للمتابعة ضمن مسار الهويّات الموثقة في المساق  {course}، يتعين عليك إعادة "
-"عملية التحقق من هويتك قبل تاريخ {date}. الرجاء الذهاب إلى الرابط."
-
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Re-Verification Submission Confirmation"
-msgstr "تأكيد تقديم متطلّبات إعادة التحقّق"
-
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid "Your Credentials Have Been Updated"
-msgstr "تم تحديث بيانات التحقق من الهويَّة الخاصّة بك"
-
-#: lms/templates/verify_student/reverification_confirmation.html
-msgid ""
-"We've captured your re-submitted information and will review it to verify "
-"your identity shortly. You should receive an update to your veriication "
-"status within 1-2 days. In the meantime, you still have access to all of "
-"your course content."
-msgstr ""
-"لقد حصلنا على معلوماتك التي قمت بإعادة تقديمها وسنقوم بمراجعتها من أجل "
-"التحقّق من هويّتك في أقرب وقت. سيصلك تحديث خاص بحالة تصديق شهادتك خلال يومٍ "
-"أو يومين. في هذه الأثناء يمكنك الوصول إلى كافة عناصر محتوى مساقك."
-
-#: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/reverification_window_expired.html
+#: lms/templates/verify_student/reverify_not_allowed.html
 msgid "Return to Your Dashboard"
 msgstr "العودة إلى لوحة المعلومات"
-
-#: lms/templates/verify_student/reverification_window_expired.html
-msgid "Re-Verification Failed"
-msgstr "لم تنجح عملية إعادة التحقق"
-
-#: lms/templates/verify_student/reverification_window_expired.html
-msgid ""
-"Your re-verification was submitted after the re-verification deadline, and "
-"you can no longer be re-verified."
-msgstr ""
-"تم تقديم بيانات إعادة التحقق الخاصة بك بعد الموعد النهائي المحدد لإعادة "
-"التحقق، ولم يعد بالتالي بإمكانك إعادة عملية التحقق."
-
-#: lms/templates/verify_student/reverification_window_expired.html
-msgid "Please contact support if you believe this message to be in error."
-msgstr ""
-"الرجاء الاتصال بقسم الدعم إذا كنت تعتقد بحدوث خطأ يتعلق بهذه الرسالة. "
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
@@ -18866,12 +18441,12 @@ msgid "New Course"
 msgstr "مساق جديد"
 
 #: cms/templates/index.html
-msgid "New Library"
-msgstr "مكتبة جديدة"
-
-#: cms/templates/index.html
 msgid "Email staff to create course"
 msgstr "مراسلة فريق العمل عبر البريد الإكتروني لإنشاء مساق"
+
+#: cms/templates/index.html
+msgid "New Library"
+msgstr "مكتبة جديدة"
 
 #: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
@@ -19583,8 +19158,6 @@ msgstr "معلومات أساسية"
 msgid "The nuts and bolts of your course"
 msgstr "مكوِّنات العمل الأساسية لمساقك"
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "This field is disabled: this information cannot be changed."
 msgstr "عذرًا، لم يعد هذا الحقل مفعّلًا: لا يمكن تغيير هذه المعلومات."
@@ -19647,7 +19220,17 @@ msgid "Successful Proctored Exam"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Successful In Course Reverification"
+msgid "Proctored Exam {number}"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Successful In-Course Reverification"
+msgstr ""
+
+#. Translators: 'Access to Assessment 1' means the access for a requirement
+#. with name 'Assessment 1'
+#: cms/templates/settings.html
+msgid "In-Course Reverification {number}"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -20442,6 +20025,10 @@ msgstr "كيفية استخدام {studio_name} لتبني مساقك"
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about {studio_name}?"
 msgstr "هل لديك أي مشاكل، أو أسئلة، أو اقتراحات بشأن {studio_name}؟  "
+
+#: cms/templates/widgets/tabs-aggregator.html
+msgid "name"
+msgstr ""
 
 # empty
 msgid "This is a key string."
