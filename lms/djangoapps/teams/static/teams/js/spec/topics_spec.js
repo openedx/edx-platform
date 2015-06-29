@@ -72,7 +72,7 @@ define([
         }
 
         it('can render the first of many pages', function () {
-            expectHeader('Currently viewing 1 through 5 of 6 topics');
+            expectHeader('Showing 1-5 out of 6 total');
             expectTopics(initialTopics);
             expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
         });
@@ -89,7 +89,7 @@ define([
                 },
                 {parse: true}
             );
-            expectHeader('Currently viewing 1 topic');
+            expectHeader('Showing 1 out of 1 total');
             expectTopics(initialTopics);
             expectFooter({currentPage: 1, totalPages: 1, isHidden: true});
         });
@@ -97,7 +97,7 @@ define([
         it('can change to the next page', function () {
             var requests = AjaxHelpers.requests(this),
                 newTopics = generateTopics(1, 1);
-            expectHeader('Currently viewing 1 through 5 of 6 topics');
+            expectHeader('Showing 1-5 out of 6 total');
             expectTopics(initialTopics);
             expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
             expect(requests.length).toBe(0);
@@ -110,7 +110,7 @@ define([
                 "start": 5,
                 "results": newTopics
             });
-            expectHeader('Currently viewing 6 through 6 of 6 topics');
+            expectHeader('Showing 6-6 out of 6 total');
             expectTopics(newTopics);
             expectFooter({currentPage: 2, totalPages: 2, isHidden: false});
         });
@@ -129,7 +129,7 @@ define([
                 },
                 {parse: true}
             );
-            expectHeader('Currently viewing 6 through 6 of 6 topics');
+            expectHeader('Showing 6-6 out of 6 total');
             expectTopics(initialTopics);
             expectFooter({currentPage: 2, totalPages: 2, isHidden: false});
             topicsView.$('.previous-page-link').click();
@@ -141,7 +141,7 @@ define([
                 "start": 0,
                 "results": previousPageTopics
             });
-            expectHeader('Currently viewing 1 through 5 of 6 topics');
+            expectHeader('Showing 1-5 out of 6 total');
             expectTopics(previousPageTopics);
             expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
         });
@@ -163,7 +163,7 @@ define([
         it('does not change on server error', function () {
             var requests = AjaxHelpers.requests(this),
                 expectInitialState = function () {
-                    expectHeader('Currently viewing 1 through 5 of 6 topics');
+                    expectHeader('Showing 1-5 out of 6 total');
                     expectTopics(initialTopics);
                     expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
                 };

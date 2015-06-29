@@ -28,7 +28,7 @@ define([
                     collection: newCollection(20, 5)
                 }).render();
                 expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Currently viewing 1 through 5 of 20 items');
+                    .toContain('Showing 1-5 out of 20 total');
             });
 
             it('reports that all items are on the current page', function () {
@@ -36,7 +36,7 @@ define([
                     collection: newCollection(5, 5)
                 }).render();
                 expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Currently viewing all 5 items');
+                    .toContain('Showing 1-5 out of 5 total');
             });
 
             it('reports that the page contains a single item', function () {
@@ -44,24 +44,7 @@ define([
                     collection: newCollection(1, 1)
                 }).render();
                 expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Currently viewing 1 item');
-            });
-
-            it('supports different display names', function () {
-                pagingHeader = new PagingHeader({
-                    collection: newCollection(1, 1),
-                    itemDisplayNameSingular: 'thing',
-                    itemDisplayNamePlural: 'things'
-                }).render();
-                expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Currently viewing 1 thing');
-                pagingHeader = new PagingHeader({
-                    collection: newCollection(2, 2),
-                    itemDisplayNameSingular: 'thing',
-                    itemDisplayNamePlural: 'things'
-                }).render();
-                expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Currently viewing all 2 things');
+                    .toContain('Showing 1 out of 1 total');
             });
         });
     });

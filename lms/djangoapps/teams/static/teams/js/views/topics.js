@@ -19,11 +19,7 @@
         var TopicsView = Backbone.View.extend({
             initialize: function() {
                 this.listView = new TopicsListView({collection: this.collection});
-                this.headerView = new PagingHeader({
-                    collection: this.collection,
-                    itemDisplayNameSingular: gettext('topic'),
-                    itemDisplayNamePlural: gettext('topics')
-                });
+                this.headerView = new PagingHeader({collection: this.collection});
                 this.pagingFooterView = new PagingFooterView({
                     collection: this.collection, hideWhenOnePage: true
                 });
