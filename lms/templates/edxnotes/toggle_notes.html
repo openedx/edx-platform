@@ -20,10 +20,7 @@ from django.core.urlresolvers import reverse
     % endif
   </button>
 </div>
-<script type="text/javascript">
-  (function (require) {
-      require(['js/edxnotes/views/toggle_notes_factory'], function(ToggleNotesFactory) {
-          ToggleNotesFactory(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
-      });
-  }).call(this, require || RequireJS.require);
-</script>
+
+<%static:require_module module_name="toggle_notes_factoryjs/edxnotes/views/toggle_notes_factory" class_name="ToggleNotesFactory">
+    ToggleNotesFactory(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
+</%static:require_module>
