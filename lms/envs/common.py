@@ -1595,10 +1595,7 @@ PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
-    "sass/*.scss",
-    "sass/*/*.scss",
-    "sass/*/*/*.scss",
-    "sass/*/*/*/*.scss",
+    "sass/*",
     "coffee/*.coffee",
     "coffee/*/*.coffee",
     "coffee/*/*/*.coffee",
