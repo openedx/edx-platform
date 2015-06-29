@@ -1,3 +1,6 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
 $title-left-margin: grid-width(2) + $gw-gutter;
 $button-size: ($baseline*2.75);
 $course-search-input-height: ($button-size);
@@ -29,13 +32,12 @@ $course-search-input-height: ($button-size);
       position: relative;
       margin: 0 auto ($baseline);
       padding: ($baseline*5) ($baseline/2);
-      min-width: ($baseline*38);
       max-width: ($baseline*60);
     }
 
     .title {
-      @include margin-left($title-left-margin);
-      @include float(left);
+      @include span-columns(8);
+      @include shift(2);
       @include box-sizing(border-box);
       @include transition(all 0.2s linear 0s);
       position: relative;
@@ -51,6 +53,24 @@ $course-search-input-height: ($button-size);
         .actions {
           display: none;
         }
+      }
+
+      // 8 column layout
+      @include media($bp-medium) {
+        @include span-columns(6);
+        @include shift(1);
+      }
+
+      // 4 column layout
+      @include media($bp-small) {
+        @include fill-parent();
+        @include shift(0);
+      }
+
+      // 4 column layout
+      @include media($bp-tiny) {
+        @include fill-parent();
+        @include shift(0);
       }
 
       > hgroup {

@@ -13,9 +13,7 @@
   footer#footer-openedx {
     @include clearfix();
     @include box-sizing(border-box);
-    max-width: grid-width(12);
-    min-width: 760px;
-    width: flex-grid(12);
+    @include outer-container;
     margin: 0 auto;
 
     p, ol, ul {
@@ -40,9 +38,16 @@
 
     // colophon
     .colophon {
-      @include margin-right(flex-gutter());
-      width: flex-grid(8,12);
-      @include float(left);
+      @include span-columns(8);
+
+      @include media($bp-small) {
+        @include fill-parent();
+      }
+
+      @include media($bp-tiny) {
+        @include fill-parent();
+      }
+
 
       .nav-colophon {
         @include clearfix();
@@ -159,13 +164,20 @@
 
     // platform Open edX logo and link
     .footer-about-openedx {
-      @include float(right);
-      width: flex-grid(3,12);
-      display: inline-block;
-      vertical-align: bottom;
+      @include span-columns(4);
       @include text-align(right);
+      vertical-align: bottom;
+
+      @include media($bp-small) {
+        @include fill-parent();
+      }
+
+      @include media($bp-tiny) {
+        @include fill-parent();
+      }
 
       a {
+        @include float(right);
         display: inline-block;
 
         &:hover {
