@@ -946,6 +946,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
             grade_cutoffs={'cutoff': 0.75, 'Pass': self.SUCCESS_CUTOFF}
         )
         self.request = RequestFactory()
+        self.request.user = self.student
 
     def test_user_fails_if_not_clear_exam(self):
         # If user has not grade then false will return
