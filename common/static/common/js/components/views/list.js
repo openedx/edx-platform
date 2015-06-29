@@ -12,6 +12,9 @@
 
             initialize: function (options) {
                 this.itemViewClass = options.itemViewClass || this.itemViewClass;
+                // TODO: at some point we will want 'add' and 'remove'
+                // not to re-render the whole collection, but this is
+                // not currently required.
                 this.collection.on('add', this.render, this);
                 this.collection.on('remove', this.render, this);
                 this.collection.on('reset', this.render, this);
@@ -21,10 +24,6 @@
                 this.itemViews = [];
             },
 
-            /**
-             * Naive render.  Any time the collection changes at all we
-             * re-render the entire list due to ordering
-             */
             render: function () {
                 // Remove old children views
                 _.each(this.itemViews, function (childView) {

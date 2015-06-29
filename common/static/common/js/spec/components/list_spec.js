@@ -40,23 +40,41 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
             });
 
             it('renders itself', function () {
-                expect(listView.$('.my-view').length).toBe(3);
-                expect($(listView.$('.my-view')[0]).text()).toContain('first model');
-                expect($(listView.$('.my-view')[1]).text()).toContain('second model');
-                expect($(listView.$('.my-view')[2]).text()).toContain('third model');
+                expectListNames(['first model', 'second model', 'third model']);
             });
 
             it('re-renders itself when the collection changes', function () {
-                var model = new Model({name: 'fourth model'});
-                expectListNames(['first model', 'second model', 'third model']);
-                listView.collection.add([model]);
-                expectListNames(['first model', 'second model', 'third model', 'fourth model']);
-                listView.collection.remove(model);
                 expectListNames(['first model', 'second model', 'third model']);
                 listView.collection.set([{name: 'foo'}, {name: 'bar'}, {name: 'third model'}]);
                 expectListNames(['foo', 'bar', 'third model']);
                 listView.collection.reset([{name: 'baz'}, {name: 'bar'}, {name: 'quux'}]);
                 expectListNames(['baz', 'bar', 'quux']);
+            });
+
+            it('re-renders itself when items are added to the collection', function () {
+                expectListNames(['first model', 'second model', 'third model']);
+                listView.collection.add({name: 'fourth model'});
+                expectListNames(['first model', 'second model', 'third model', 'fourth model']);
+                listView.collection.add({name: 'zeroth model'}, {at: 0});
+                expectListNames(['zeroth model', 'first model', 'second model', 'third model', 'fourth model']);
+                listView.collection.add({name: 'second-and-a-half model'}, {at: 3});
+                expectListNames([
+                    'zeroth model', 'first model', 'second model',
+                    'second-and-a-half model', 'third model', 'fourth model'
+                ]);
+            });
+
+            it('re-renders itself when items are removed from the collection', function () {
+                listView.collection.reset([{name: 'one'}, {name: 'two'}, {name: 'three'}, {name: 'four'}]);
+                expectListNames(['one', 'two', 'three', 'four']);
+                listView.collection.remove(listView.collection.at(0));
+                expectListNames(['two', 'three', 'four']);
+                listView.collection.remove(listView.collection.at(1));
+                expectListNames(['two', 'four']);
+                listView.collection.remove(listView.collection.at(1));
+                expectListNames(['two']);
+                listView.collection.remove(listView.collection.at(0));
+                expectListNames([]);
             });
 
             it('removes old views', function () {

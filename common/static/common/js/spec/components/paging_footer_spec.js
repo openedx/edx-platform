@@ -34,7 +34,7 @@ define([
             }).render();
         });
 
-        describe('when hideWhenOnepage is true', function () {
+        describe('when hideWhenOnePage is true', function () {
             beforeEach(function () {
                 pagingFooter.hideWhenOnePage = true;
             });

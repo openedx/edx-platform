@@ -3,7 +3,9 @@ define([
 ], function (AjaxHelpers, TopicCollection, TopicsView) {
     'use strict';
     describe('TopicsView', function () {
-        var initialTopics, topicCollection, topicsView;
+        var initialTopics, topicCollection, topicsView, nextPageButtonCss;
+
+        nextPageButtonCss = '.next-page-link';
 
         function generateTopics(startIndex, stopIndex) {
             return _.map(_.range(startIndex, stopIndex + 1), function (i) {
@@ -41,7 +43,7 @@ define([
         }
 
         /**
-         * Verify that the topics list view renderes the expected topics
+         * Verify that the topics list view renders the expected topics
          * @param expectedTopics an array of topic objects we expect to see
          */
         function expectTopics(expectedTopics) {
@@ -99,7 +101,7 @@ define([
             expectTopics(initialTopics);
             expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
             expect(requests.length).toBe(0);
-            topicsView.$('.next-page-link').click();
+            topicsView.$(nextPageButtonCss).click();
             expect(requests.length).toBe(1);
             AjaxHelpers.respondWithJson(requests, {
                 "count": 6,
@@ -147,7 +149,7 @@ define([
         it('sets focus for screen readers', function () {
             var requests = AjaxHelpers.requests(this);
             spyOn($.fn, 'focus');
-            topicsView.$('.next-page-link').click();
+            topicsView.$(nextPageButtonCss).click();
             AjaxHelpers.respondWithJson(requests, {
                 "count": 6,
                 "num_pages": 2,
@@ -156,6 +158,19 @@ define([
                 "results": generateTopics(1, 1)
             });
             expect(topicsView.$('.sr-is-focusable').focus).toHaveBeenCalled();
+        });
+
+        it('does not change on server error', function () {
+            var requests = AjaxHelpers.requests(this),
+                expectInitialState = function () {
+                    expectHeader('Currently viewing 1 through 5 of 6 topics');
+                    expectTopics(initialTopics);
+                    expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
+                };
+            expectInitialState();
+            topicsView.$(nextPageButtonCss).click();
+            requests[0].respond(500);
+            expectInitialState();
         });
     });
 });

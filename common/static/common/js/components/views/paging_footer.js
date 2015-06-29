@@ -20,6 +20,8 @@
                 },
 
                 render: function() {
+                    var onFirstPage = !this.collection.hasPreviousPage(),
+                        onLastPage = !this.collection.hasNextPage();
                     if (this.hideWhenOnePage) {
                         if (this.collection.totalPages <= 1) {
                             this.$el.addClass('hidden');
@@ -31,8 +33,6 @@
                         current_page: this.collection.getPage(),
                         total_pages: this.collection.totalPages
                     }));
-                    var onFirstPage = !this.collection.hasPreviousPage();
-                    var onLastPage = !this.collection.hasNextPage();
                     this.$(".previous-page-link").toggleClass("is-disabled", onFirstPage).attr('aria-disabled', onFirstPage);
                     this.$(".next-page-link").toggleClass("is-disabled", onLastPage).attr('aria-disabled', onLastPage);
                     return this;
