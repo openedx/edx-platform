@@ -67,6 +67,7 @@
 # Translators:
 # Abdallah Nassif <abdoosh00@gmail.com>, 2014
 # may <may@qordoba.com>, 2014
+# Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
@@ -74,8 +75,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:34+0000\n"
-"PO-Revision-Date: 2015-06-19 13:38+0000\n"
+"POT-Creation-Date: 2015-06-29 12:24+0000\n"
+"PO-Revision-Date: 2015-06-26 19:41+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -134,23 +135,8 @@ msgstr "موافق"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, fuzzy
 msgid "Cancel"
-msgstr ""
-"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"إلغاء \n"
-"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
-"إلغاء"
-
-#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
-#: cms/templates/js/checklist.underscore
-#, fuzzy
-msgid "This link will open in a new browser window/tab"
-msgstr ""
-"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"سيفتح هذا الرابط في نافذة متصفّح جديدة/تبويبة جديدة\n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"سيُفتح هذا الرابط في نافذة متصفّح جديدة/تبويبة جديدة"
+msgstr "إلغاء"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
@@ -239,13 +225,8 @@ msgstr "خطأ"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, fuzzy
 msgid "Save"
-msgstr ""
-"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"حفظ \n"
-"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
-"حفظ"
+msgstr "حفظ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -303,6 +284,10 @@ msgstr[2] "(%(num_points)s نقطة محتملة)"
 msgstr[3] "(%(num_points)s نقطة محتملة)"
 msgstr[4] "(%(num_points)s نقطة محتملة)"
 msgstr[5] "(%(num_points)s نقاط محتملة) "
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "The grading process is still running. Refresh the page to see updates."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
@@ -2381,13 +2366,8 @@ msgstr "تاريخ النشر"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/edxnotes/note-item.underscore
-#, fuzzy
 msgid "More"
-msgstr ""
-"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"المزيد\n"
-"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
-"أكثر"
+msgstr "المزيد"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "My Notes"
@@ -3920,6 +3900,18 @@ msgstr "عذرًا، لم يمكن تقديم الطلب."
 msgid "Could not retrieve payment information"
 msgstr "عذرًا، لم يمكن استرجاع معلومات الدفع."
 
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Take a photo of your ID"
+msgstr ""
+
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Review your info"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "تأكيد"
+
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr "نأسف لحدوث خطأ. يُرجى محاولة إعادة تحميل الصفحة."
@@ -4116,6 +4108,10 @@ msgstr "جاري الحذف"
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "نأسف لحدوث خطأ في حفظ التقييم المفتوح."
+
+#: cms/templates/js/checklist.underscore
+msgid "This link will open in a new browser window/tab"
+msgstr "سيُفتح هذا الرابط في نافذة متصفّح جديدة/تبويبة جديدة"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -4773,13 +4769,8 @@ msgstr "تعديل تاريخ إصدار القسم"
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/grading-editor.underscore
-#, fuzzy
 msgid "Not Graded"
-msgstr ""
-"#-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#\n"
-"غير مقيَّم \n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"غير مقيَّم"
+msgstr "غير مقيَّم"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
@@ -4807,13 +4798,8 @@ msgstr ""
 #: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
-#, fuzzy
 msgid "Upload"
-msgstr ""
-"#-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#\n"
-"حمّل الملف\n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"تحميل "
+msgstr "حمّل الملف"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
@@ -4885,13 +4871,8 @@ msgstr "انشر كلّ التعديلات غير المنشورة لهذه %(it
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
-#, fuzzy
 msgid "Publish"
-msgstr ""
-"#-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#\n"
-"انشر\n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"نشر"
+msgstr "انشر"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
@@ -5577,6 +5558,45 @@ msgstr ""
 msgid "Forgot password?"
 msgstr "هل نسيت كلمة المرور؟"
 
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Would you like to sign in using your %(providerName)s credentials?"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Sign in using %(providerName)s"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Show me other ways to sign in or register"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Sign in with Institution/Campus Credentials"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "Choose your institution from the list below:"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Back to sign in"
+msgstr ""
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register with Institution/Campus Credentials"
+msgstr ""
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register through edX"
+msgstr ""
+
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -5605,13 +5625,13 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Sign in"
-msgstr "تسجيل الدخول"
-
-#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "أو تسجيل الدخول من خلال"
+
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Use my institution/campus credentials"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "New to %(platformName)s?"
@@ -6055,6 +6075,22 @@ msgstr ""
 "رخصة القيادة، أو جواز السفر، أو بطاقة شخصية صادرة عن الحكومة، بحيث تحمل أي "
 "واحدة من هذه الوثائق اسمك وصورتك "
 
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Identity Verification In Progress"
+msgstr ""
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid ""
+"We have received your information and are verifying your identity. You will "
+"see a message on your dashboard when the verification process is complete "
+"(usually within 1-2 days). In the meantime, you can still access all "
+"available course content."
+msgstr ""
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Return to Your Dashboard"
+msgstr ""
+
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr "مراجعة صورك"
@@ -6118,10 +6154,6 @@ msgstr "إعادة التقاط صورك"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Before proceeding, please confirm that your details match"
 msgstr "قبل المتابعة، يُرجى التأكّد من تطابق بياناتك"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "تأكيد"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid ""

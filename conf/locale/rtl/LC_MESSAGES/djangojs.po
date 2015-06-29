@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:46+0000\n"
-"PO-Revision-Date: 2015-06-19 13:47:59.519977\n"
+"POT-Creation-Date: 2015-06-29 12:35+0000\n"
+"PO-Revision-Date: 2015-06-29 12:36:50.361468\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -88,11 +88,6 @@ msgstr "خن"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "ذشرذثم"
-
-#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
-#: cms/templates/js/checklist.underscore
-msgid "This link will open in a new browser window/tab"
-msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهريخص/فشز"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
@@ -234,6 +229,11 @@ msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
 msgstr[0] "(%(num_points)s حخهرف حخسسهزمث)"
 msgstr[1] "(%(num_points)s حخهرفس حخسسهزمث)"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "The grading process is still running. Refresh the page to see updates."
+msgstr ""
+"فاث لقشيهرل حقخذثسس هس سفهمم قعررهرل. قثبقثسا فاث حشلث فخ سثث عحيشفثس."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
@@ -3806,6 +3806,19 @@ msgstr "ذخعمي رخف سعزوهف خقيثق"
 msgid "Could not retrieve payment information"
 msgstr "ذخعمي رخف قثفقهثدث حشغوثرف هربخقوشفهخر"
 
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Take a photo of your ID"
+msgstr "فشنث ش حاخفخ خب غخعق هي"
+
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Review your info"
+msgstr "قثدهثص غخعق هربخ"
+
+#: lms/static/js/verify_student/views/reverify_view.js
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "ذخربهقو"
+
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ قثمخشيهرل فاث حشلث."
@@ -3994,6 +4007,10 @@ msgstr "يثمثفهرل"
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "خحثرشسسثسسوثرف سشدث ثققخق"
+
+#: cms/static/js/base.js cms/templates/js/checklist.underscore
+msgid "This link will open in a new browser window/tab"
+msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهريخص/فشز"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -4279,6 +4296,9 @@ msgstr ""
 "<%= fileExtensions %> فخ عحمخشي."
 
 #: cms/static/js/models/uploads.js
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "خق"
 
@@ -5449,6 +5469,45 @@ msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حش�
 msgid "Forgot password?"
 msgstr "بخقلخف حشسسصخقي?"
 
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Sign in"
+msgstr "سهلر هر"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Would you like to sign in using your %(providerName)s credentials?"
+msgstr "صخعمي غخع مهنث فخ سهلر هر عسهرل غخعق %(providerName)s ذقثيثرفهشمس?"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Sign in using %(providerName)s"
+msgstr "سهلر هر عسهرل %(providerName)s"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Show me other ways to sign in or register"
+msgstr "ساخص وث خفاثق صشغس فخ سهلر هر خق قثلهسفثق"
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Sign in with Institution/Campus Credentials"
+msgstr "سهلر هر صهفا هرسفهفعفهخر/ذشوحعس ذقثيثرفهشمس"
+
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "Choose your institution from the list below:"
+msgstr "ذاخخسث غخعق هرسفهفعفهخر بقخو فاث مهسف زثمخص:"
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Back to sign in"
+msgstr "زشذن فخ سهلر هر"
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register with Institution/Campus Credentials"
+msgstr "قثلهسفثق صهفا هرسفهفعفهخر/ذشوحعس ذقثيثرفهشمس"
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register through edX"
+msgstr "قثلهسفثق فاقخعلا ثيط"
+
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -5480,13 +5539,13 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr "شر ثققخق خذذعققثي صاثر سهلرهرل غخع هر فخ %(platformName)s."
 
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Sign in"
-msgstr "سهلر هر"
-
-#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "خق سهلر هر صهفا"
+
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Use my institution/campus credentials"
+msgstr "عسث وغ هرسفهفعفهخر/ذشوحعس ذقثيثرفهشمس"
 
 #: lms/templates/student_account/login.underscore
 msgid "New to %(platformName)s?"
@@ -5940,6 +5999,26 @@ msgstr ""
 "ش يقهدثق'س مهذثرسث, حشسسحخقف, خق لخدثقروثرف-هسسعثي هي صهفا غخعق رشوث شري "
 "حاخفخ."
 
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Identity Verification In Progress"
+msgstr "هيثرفهفغ دثقهبهذشفهخر هر حقخلقثسس"
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid ""
+"We have received your information and are verifying your identity. You will "
+"see a message on your dashboard when the verification process is complete "
+"(usually within 1-2 days). In the meantime, you can still access all "
+"available course content."
+msgstr ""
+"صث اشدث قثذثهدثي غخعق هربخقوشفهخر شري شقث دثقهبغهرل غخعق هيثرفهفغ. غخع صهمم "
+"سثث ش وثسسشلث خر غخعق يشسازخشقي صاثر فاث دثقهبهذشفهخر حقخذثسس هس ذخوحمثفث "
+"(عسعشممغ صهفاهر 1-2 يشغس). هر فاث وثشرفهوث, غخع ذشر سفهمم شذذثسس شمم "
+"شدشهمشزمث ذخعقسث ذخرفثرف."
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Return to Your Dashboard"
+msgstr "قثفعقر فخ غخعق يشسازخشقي"
+
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr "قثدهثص غخعق حاخفخس"
@@ -6001,10 +6080,6 @@ msgstr "قثفشنث غخعق حاخفخس"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Before proceeding, please confirm that your details match"
 msgstr "زثبخقث حقخذثثيهرل, حمثشسث ذخربهقو فاشف غخعق يثفشهمس وشفذا"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "ذخربهقو"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid ""
