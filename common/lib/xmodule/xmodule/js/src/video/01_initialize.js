@@ -85,8 +85,7 @@ function (VideoPlayer, i18n, moment) {
         setSpeed: setSpeed,
         speedToString: speedToString,
         trigger: trigger,
-        youtubeId: youtubeId,
-        isYoutubeAvailable: isYoutubeAvailable
+        youtubeId: youtubeId
     },
 
         _youtubeApiDeferred = null,
@@ -689,16 +688,6 @@ function (VideoPlayer, i18n, moment) {
                 '&part=contentDetails&key=', this.config.ytKey ,'&referrer=*.edx.org/*'].join(''),
             timeout: this.config.ytTestTimeout,
             success: _.isFunction(callback) ? callback : null
-        });
-    }
-
-    function isYoutubeAvailable() {
-        // Todo, Change this mechanism, this has false positives.
-        return $.ajax({
-            url: ['https:', '//', 'www.youtube.com/'].join(''),
-            timeout: this.config.ytTestTimeout,
-            type: 'HEAD',
-            headers: {"Access-Control-Allow-Origin": "*"}
         });
     }
 
