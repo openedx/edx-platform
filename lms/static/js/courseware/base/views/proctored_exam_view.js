@@ -32,11 +32,13 @@ var edx = edx || {};
         },
         render: function () {
             if (this.template !== null) {
-                var html = this.template(this.model.toJSON());
-                this.$el.html(html);
-                this.$el.show();
-                this.updateRemainingTime(this);
-                this.timerId = setInterval(this.updateRemainingTime, 1000, this);
+                if (this.model.get('in_timed_exam') && this.model.get('time_remaining_seconds') > 0) {
+                    var html = this.template(this.model.toJSON());
+                    this.$el.html(html);
+                    this.$el.show();
+                    this.updateRemainingTime(this);
+                    this.timerId = setInterval(this.updateRemainingTime, 1000, this);
+                }
             }
             return this;
         },
