@@ -1120,7 +1120,7 @@ TEMPLATE_LOADERS = (
     'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
-    # 'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.app_directories.Loader',
 
 )
 
@@ -1219,10 +1219,13 @@ courseware_js = (
 courseware_search_js = ['js/search/course/main.js']
 
 proctoring_js = (
-    ['js/courseware/base/**/*.js'] +
-    ['js/courseware/proctored_exam/proctored_app.js']
+    ['proctoring/js/*.js']
 )
 
+#proctoring_js = (
+#    ['proctoring/js/courseware/base/**/*.js'] +
+#    ['proctoring/js/courseware/proctored_exam/proctored_app.js']
+#)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
