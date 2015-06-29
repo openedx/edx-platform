@@ -91,7 +91,6 @@
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
             'js/student_account/views/HintedLoginView': 'js/student_account/views/HintedLoginView',
-            'js/student_profile/profile': 'js/student_profile/profile',
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
@@ -279,10 +278,6 @@
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
-            },
-            'js/student_profile/profile': {
-                exports: 'js/student_profile/profile',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
             'js/staff_debug_actions': {
@@ -643,7 +638,6 @@
         'lms/include/js/spec/student_account/account_settings_factory_spec.js',
         'lms/include/js/spec/student_account/account_settings_fields_spec.js',
         'lms/include/js/spec/student_account/account_settings_view_spec.js',
-        'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/views/fields_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',

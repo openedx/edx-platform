@@ -1279,8 +1279,6 @@ student_account_js = [
     'js/student_account/accessApp.js',
 ]
 
-student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
-
 verify_student_js = [
     'js/form.ext.js',
     'js/my_courses_dropdown.js',
@@ -1549,10 +1547,6 @@ PIPELINE_JS = {
     'student_account': {
         'source_filenames': student_account_js,
         'output_filename': 'js/student_account.js'
-    },
-    'student_profile': {
-        'source_filenames': student_profile_js,
-        'output_filename': 'js/student_profile.js'
     },
     'verify_student': {
         'source_filenames': verify_student_js,
