@@ -1,5 +1,7 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+%>
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
@@ -19,11 +21,7 @@
 </div>
 
 <%block name="js_extra">
-<script type="text/javascript">
-    (function (require) {
-        require(['teams/js/teams_tab_factory'], function (TeamsTabFactory) {
-            var pageView = new TeamsTabFactory();
-        });
-    }).call(this, require || RequireJS.require);
-</script>
+<%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
+    TeamsTabFactory($('.teams-content'));
+</%static:require_module>
 </%block>
