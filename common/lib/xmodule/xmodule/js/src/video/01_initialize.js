@@ -532,12 +532,9 @@ function (VideoPlayer, VideoStorage, i18n) {
 
             this.youtubeXhr
                 .always(function (json, status) {
-                    var err = $.isPlainObject(json.error) ||
-                                (
-                                    status !== 'success' &&
-                                    status !== 'notmodified'
-                                );
-                    if (err) {
+                    // It will work for both if statusCode is 200 or 410.
+                    var didSucceed = (json.error && json.error.code === 410) || status === 'success' || status === 'notmodified';
+                    if (!didSucceed) {
                         console.log(
                             '[Video info]: YouTube returned an error for ' +
                             'video with id "' + id + '".'
