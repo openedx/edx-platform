@@ -51,17 +51,17 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
 
         nextPage: function () {
             if (this.currentPage < this.totalPages - 1) {
-                this.setPage(this.currentOneIndexPage() + 1);
+                this.setPage(this.getPage() + 1);
             }
         },
 
         previousPage: function () {
             if (this.currentPage > 0) {
-                this.setPage(this.currentOneIndexPage() - 1);
+                this.setPage(this.getPage() - 1);
             }
         },
 
-        currentOneIndexPage: function () {
+        getPage: function () {
             return this.currentPage + 1;
         },
 

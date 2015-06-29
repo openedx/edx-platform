@@ -42,7 +42,7 @@ define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container
                         self.previousPage();
                     },
 
-                    currentOneIndexPage: function () {
+                    getPage: function () {
                         return self.collection.currentPage + 1;
                     },
 

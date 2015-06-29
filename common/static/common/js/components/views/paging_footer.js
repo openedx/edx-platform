@@ -28,7 +28,7 @@
                         }
                     }
                     this.$el.html(_.template(paging_footer_template, {
-                        current_page: this.collection.currentOneIndexPage(),
+                        current_page: this.collection.getPage(),
                         total_pages: this.collection.totalPages
                     }));
                     var onFirstPage = !this.collection.hasPreviousPage();
@@ -40,7 +40,7 @@
 
                 changePage: function() {
                     var collection = this.collection,
-                        currentPage = collection.currentOneIndexPage(),
+                        currentPage = collection.getPage(),
                         pageInput = this.$("#page-number-input"),
                         pageNumber = parseInt(pageInput.val(), 10),
                         validInput = true;

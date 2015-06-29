@@ -10,38 +10,37 @@ define(['jquery',
         'use strict';
 
         describe('PagingCollection', function () {
-            var collection,
-                requests,
-                server = {
-                    isZeroIndexed: false,
-                    count: 43,
-                    respond: function () {
-                        var params = (new URI(requests[requests.length - 1].url)).query(true),
-                            page = parseInt(params['page'], 10),
-                            page_size = parseInt(params['page_size'], 10),
-                            page_count = Math.ceil(this.count / page_size);
+            var collection, requests, server, assertQueryParams;
+            server = {
+                isZeroIndexed: false,
+                count: 43,
+                respond: function () {
+                    var params = (new URI(requests[requests.length - 1].url)).query(true),
+                        page = parseInt(params['page'], 10),
+                        page_size = parseInt(params['page_size'], 10),
+                        page_count = Math.ceil(this.count / page_size);
 
-                        // Make zeroPage consistently start at zero for ease of calculation
-                        var zeroPage = page - (this.isZeroIndexed ? 0 : 1);
-                        if (zeroPage < 0 || zeroPage > page_count) {
-                            AjaxHelpers.respondWithError(requests, 404, {}, requests.length - 1);
-                        } else {
-                            AjaxHelpers.respondWithJson(requests, {
-                                'count': this.count,
-                                'current_page': page,
-                                'num_pages': page_count,
-                                'start': zeroPage * page_size,
-                                'results': []
-                            }, requests.length - 1);
-                        }
+                    // Make zeroPage consistently start at zero for ease of calculation
+                    var zeroPage = page - (this.isZeroIndexed ? 0 : 1);
+                    if (zeroPage < 0 || zeroPage > page_count) {
+                        AjaxHelpers.respondWithError(requests, 404, {}, requests.length - 1);
+                    } else {
+                        AjaxHelpers.respondWithJson(requests, {
+                            'count': this.count,
+                            'current_page': page,
+                            'num_pages': page_count,
+                            'start': zeroPage * page_size,
+                            'results': []
+                        }, requests.length - 1);
                     }
-                },
-                assertQueryParams = function (params) {
-                    var urlParams = (new URI(requests[requests.length - 1].url)).query(true);
-                    _.each(params, function (value, key) {
-                        expect(urlParams[key]).toBe(value);
-                    });
-                };
+                }
+            };
+            assertQueryParams = function (params) {
+                var urlParams = (new URI(requests[requests.length - 1].url)).query(true);
+                _.each(params, function (value, key) {
+                    expect(urlParams[key]).toBe(value);
+                });
+            };
 
             beforeEach(function () {
                 collection = new PagingCollection();
@@ -63,7 +62,7 @@ define(['jquery',
                 expect(collection.filterableFields['test_field'].displayName).toBe('Test Field');
             });
 
-            it('can set the sort field and get the display name', function () {
+            it('can set the sort field', function () {
                 collection.registerSortableField('test_field', 'Test Field');
                 collection.setSortField('test_field', false);
                 expect(requests.length).toBe(1);
@@ -72,7 +71,7 @@ define(['jquery',
                 expect(collection.sortDisplayName()).toBe('Test Field');
             });
 
-            it('can set the filter field and get the display name', function () {
+            it('can set the filter field', function () {
                 collection.registerFilterableField('test_field', 'Test Field');
                 collection.setFilterField('test_field');
                 expect(requests.length).toBe(1);
@@ -142,20 +141,24 @@ define(['jquery',
                     it('triggers an error event if the server responds with a 500', function () {
                         var errorTriggered = false;
                         collection.on('error', function () { errorTriggered = true; });
+                        collection.setPage(2);
+                        expect(collection.getPage()).toBe(2);
+                        server.respond();
                         collection.setPage(3);
                         AjaxHelpers.respondWithError(requests, 500, {}, requests.length - 1);
                         expect(errorTriggered).toBe(true);
+                        expect(collection.getPage()).toBe(2);
                     });
                 });
 
-                describe('currentOneIndexPage', function () {
+                describe('getPage', function () {
                     it('returns the correct page', function () {
                         collection.setPage(1);
                         server.respond();
-                        expect(collection.currentOneIndexPage()).toBe(1);
+                        expect(collection.getPage()).toBe(1);
                         collection.setPage(3);
                         server.respond();
-                        expect(collection.currentOneIndexPage()).toBe(3);
+                        expect(collection.getPage()).toBe(3);
                     });
                 });
 
@@ -203,12 +206,12 @@ define(['jquery',
                             server.count = count;
                             collection.setPage(page);
                             server.respond();
-                            expect(collection.currentOneIndexPage()).toBe(page);
+                            expect(collection.getPage()).toBe(page);
                             collection.nextPage();
                             if (requests.length > 1) {
                                 server.respond();
                             }
-                            expect(collection.currentOneIndexPage()).toBe(newPage);
+                            expect(collection.getPage()).toBe(newPage);
                         }
                     );
                 });
@@ -223,12 +226,12 @@ define(['jquery',
                             server.count = count;
                             collection.setPage(page);
                             server.respond();
-                            expect(collection.currentOneIndexPage()).toBe(page);
+                            expect(collection.getPage()).toBe(page);
                             collection.previousPage();
                             if (requests.length > 1) {
                                 server.respond();
                             }
-                            expect(collection.currentOneIndexPage()).toBe(newPage);
+                            expect(collection.getPage()).toBe(newPage);
                         }
                     )
                 });

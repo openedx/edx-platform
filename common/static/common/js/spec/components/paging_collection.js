@@ -60,7 +60,7 @@ define(["backbone.paginator", "backbone"], function(BackbonePaginator, Backbone)
             }
         },
 
-        currentOneIndexPage: function () {
+        getPage: function () {
             return this.currentPage + 1;
         },
 
