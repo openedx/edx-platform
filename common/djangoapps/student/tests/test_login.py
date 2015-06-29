@@ -6,6 +6,7 @@ import unittest
 
 from django.test import TestCase
 from django.test.client import Client
+from django.test.utils import override_settings
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -194,6 +195,20 @@ class LoginTest(TestCase):
         for cookie_name in [settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, settings.EDXMKTG_USER_INFO_COOKIE_NAME]:
             cookie = self.client.cookies[cookie_name]
             self.assertIn("01-Jan-1970", cookie.get('expires'))
+
+    @override_settings(
+        EDXMKTG_LOGGED_IN_COOKIE_NAME=u"unicode-logged-in",
+        EDXMKTG_USER_INFO_COOKIE_NAME=u"unicode-user-info",
+    )
+    def test_unicode_mktg_cookie_names(self):
+        # When logged in cookie names are loaded from JSON files, they may
+        # have type `unicode` instead of `str`, which can cause errors
+        # when calling Django cookie manipulation functions.
+        response, _ = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=True)
+
+        response = self.client.post(reverse('logout'))
+        self.assertRedirects(response, "/")
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):
