@@ -71,24 +71,6 @@ class SequenceFields(object):
         scope=Scope.settings,
     )
 
-    time_student_started = Date(
-        display_name=_("Time Student Started"),
-        help=_("The time at which the student began interacting with the time limited content."),
-        default=None,
-        scope=Scope.user_state,  # pylint: disable=no-member
-    )
-
-    student_time_limit_mins = Integer(
-        display_name=_("Student Time Limit in Minutes"),
-        help=_(
-            "The number of minutes available to this student for viewing or interacting with this courseware component."
-            " If specified, this time limit overrides the default time limit. "
-            "(Is this correct? is a particular student specified somehow?)"
-        ),
-        default=None,
-        scope=Scope.user_state,  # pylint: disable=no-member
-    )
-
     is_proctored_enabled = Boolean(
         display_name=_("Is Proctoring Enabled"),
         help=_(
@@ -99,8 +81,8 @@ class SequenceFields(object):
     )
 
 
-@XBlock.wants('proctoring')
-@XBlock.wants('user')
+@XBlock.needs('proctoring')
+@XBlock.needs('user')
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -179,6 +161,28 @@ class SequenceModule(SequenceFields, XModule):
 
         fragment = Fragment()
 
+        if self.is_time_limited:
+            proctoring_service = self.runtime.service(self, 'proctoring')
+            user_service = self.runtime.service(self, 'user')
+            user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
+            course_id = self.runtime.course_id
+            content_id = self.location
+
+            view_html = proctoring_service.get_student_view(
+                user_id,
+                course_id,
+                content_id,
+                {
+                    'display_name': self.display_name,
+                    'default_time_limit_mins': self.default_time_limit_mins,
+                }
+            )
+
+            if view_html:
+                # Are we blocking content for any reason
+                fragment.add_content(view_html)
+                return fragment
+
         for child in self.get_display_items():
             progress = child.get_progress()
             rendered_child = child.render(STUDENT_VIEW, context)
@@ -204,27 +208,9 @@ class SequenceModule(SequenceFields, XModule):
                   'position': self.position,
                   'tag': self.location.category,
                   'ajax_url': self.system.ajax_url,
-                  'proctoring_context': context['proctoring_context']
                   }
 
-        template_name = 'seq_module.html'
-        if self.is_time_limited:
-            proctoring_service = self.runtime.service(self, 'proctoring')
-            user_service = self.runtime.service(self, 'user')
-            if proctoring_service and user_service:
-                user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
-                course_id = self.runtime.course_id
-                content_id = self.location
-
-                proctoring_template_name = proctoring_service.get_student_view_template(
-                    user_id,
-                    course_id,
-                    content_id
-                )
-
-                template_name = proctoring_template_name if proctoring_template_name else template_name
-
-        fragment.add_content(self.system.render_template(template_name, params))
+        fragment.add_content(self.system.render_template("seq_module.html", params))
 
         return fragment
 
