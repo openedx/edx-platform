@@ -74,6 +74,12 @@ def setup_masquerade(request, course_key, staff_access=False):
         return None
 
     masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+    if not masquerade_settings:
+        masquerade_settings[course_key] = CourseMasquerade(
+            course_key,
+            role='staff',
+        )
+        request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
 
     # Store the masquerade settings on the user so it can be accessed without the request
     request.user.masquerade_settings = masquerade_settings
