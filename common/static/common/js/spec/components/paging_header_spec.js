@@ -23,21 +23,6 @@ define([
                     return collection;
                 };
 
-            it('can load templates', function () {
-                pagingHeader = new PagingHeader({
-                    collection: new PagingCollection(
-                        {
-                            count: 0,
-                            num_pages: 1,
-                            current_page: 1,
-                            start: 0,
-                            results: []
-                        }
-                    )
-                }).render();
-                expect(pagingHeader.$el.find('.search-count').text()).toContain('Currently viewing');
-            });
-
             it('correctly displays which items are being viewed', function () {
                 pagingHeader = new PagingHeader({
                     collection: newCollection(20, 5)
