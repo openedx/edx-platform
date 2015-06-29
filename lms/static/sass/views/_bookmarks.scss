@@ -57,7 +57,7 @@
 
 // Rules for Bookmarks Results
 .bookmarks-results-list {
-  padding-top: $baseline;
+  padding-top: ($baseline/2);
 
   .bookmarks-results-list-item {
     @include padding(($baseline/4), $baseline, ($baseline/2), $baseline);
@@ -180,4 +180,10 @@ i.bookmarked {
   @include base-style($light-gray, $black);
   @include icon-style("\f097", $black);
   @include hover-style($m-blue, $m-blue, "\f02e");
+}
+
+.paging-header {
+  .search-tools {
+    margin: 0;
+  }
 }

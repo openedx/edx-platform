@@ -149,16 +149,6 @@
     @extend %t-weight4;
   }
 
-  .search-tools {
-    @extend %t-copy-sub1;
-    margin: ($baseline/10) $baseline;
-    color: $gray-l1;
-
-    p, span { // override
-      color: inherit;
-    }
-  }
-
   .card {
     @extend .clearfix;
     position: relative;
