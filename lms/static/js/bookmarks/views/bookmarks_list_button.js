@@ -16,8 +16,10 @@
             },
 
             initialize: function () {
+                this.courseId = $('.courseware-results').data('courseId');
+
                 var bookmarksCollection = new BookmarksCollection(
-                    {course_id: $('.courseware-results').data('courseId')}
+                    {course_id: this.courseId}
                 );
                 bookmarksCollection.bootstrap();
                 this.bookmarksListView = new BookmarksListView(

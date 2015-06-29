@@ -9,7 +9,7 @@
 
                     this.course_id = options.course_id;
                     this.server_api.course_id = function () { return encodeURIComponent(this.course_id); };
-                    this.server_api.fields = 'display_name,path';
+                    this.server_api.fields = function () { return encodeURIComponent('display_name,path') };
                     delete this.server_api.sort_order; // Sort order is not specified for the Bookmark API
                 },
 

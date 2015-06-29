@@ -28,7 +28,11 @@
                 this.loadingMessageView = options.loadingMessageView;
                 this.errorMessageView = options.errorMessageView;
                 this.langCode = $(this.el).data('langCode');
-                this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
+                this.pagingHeaderView = new PagingHeaderView({
+                    collection: this.collection,
+                    itemDisplayNameSingular: gettext('bookmark'),
+                    itemDisplayNamePlural: gettext('bookmarks')
+                });
                 this.pagingFooterView = new PagingFooterView({collection: this.collection});
                 this.listenTo(this.collection, 'page_changed', this.render);
                 _.bindAll(this, 'render', 'humanFriendlyDate');
