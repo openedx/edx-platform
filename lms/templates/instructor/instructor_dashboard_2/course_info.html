@@ -7,7 +7,7 @@
 
     %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
       ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
-      <span class="tip">${_("Number of enrollees (instructors, staff members, and students) by track")}</span>
+      <span class="tip">${_("Number of enrollees (admins, staff, and students) by track")}</span>instructors
       <br/><br/>
       <% modes = section_data['enrollment_count'] %>
       <table>
@@ -94,7 +94,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h2> ${_("Pending Tasks")} </h2>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />
