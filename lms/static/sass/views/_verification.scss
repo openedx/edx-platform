@@ -113,6 +113,11 @@
     padding-bottom: ($baseline +1);
   }
 
+  // HACK: fix global header height in verification flow ECOM-1808
+  header.global {
+    height: 76px;
+  }
+
   // HACK: nasty override due to our bad input/button styling
   button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
