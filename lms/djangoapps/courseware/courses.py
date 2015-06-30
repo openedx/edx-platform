@@ -17,6 +17,7 @@ from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 from microsite_configuration import microsite
+from util.date_utils import get_default_time_display
 from util.keyword_substitution import substitute_keywords_with_data
 
 from courseware.access import has_access
@@ -297,8 +298,8 @@ def get_course_info_section(request, course, section_key):
                 'name': request.user.profile.name,
                 'course_title': course.display_name,
                 'course_id': course.id,
-                'course_start_date': course.start,
-                'course_end_date': course.end,
+                'course_start_date': get_default_time_display(course.start),
+                'course_end_date': get_default_time_display(course.end),
             }
             html = substitute_keywords_with_data(html, context)
         except Exception:  # pylint: disable=broad-except
