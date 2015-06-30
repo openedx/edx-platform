@@ -3,9 +3,10 @@ Courseware Boomarks
 """
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
+from ..common.paging import PaginatedUIMixin
 
 
-class BookmarksPage(CoursePage):
+class BookmarksPage(CoursePage, PaginatedUIMixin):
     """
     Courseware Bookmarks Page.
     """
