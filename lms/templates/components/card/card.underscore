@@ -1,14 +1,14 @@
-<div class="card-core-wrapper">
+<div class="wrapper-card-core">
     <div class="card-core">
         <% if (pennant) { %>
-            <p class="card-type pennant"><%- pennant %></p>
+            <small class="card-type"><%- pennant %></small>
         <% } %>
         <h3 class="card-title"><%- title %></h3>
-        <p class="card-description"><%- description %></p>
+        <div class="card-description"><p><%- description %></p></div>
     </div>
 </div>
-<div class="card-meta-wrapper has-actions">
-    <div class="card-meta-details">
+<div class="wrapper-card-meta has-actions">
+    <div class="card-meta">
     </div>
     <div class="card-actions">
         <a class="action <%= action_class %>" href="<%= action_url %>"><%= action_content %></a>

@@ -12,20 +12,20 @@
                 it('can render itself as a square card', function () {
                     var view = new CardView({ configuration: 'square_card' });
                     expect(view.$el).toHaveClass('square-card');
-                    expect(view.$el.find('.card-meta-wrapper .action').length).toBe(1);
+                    expect(view.$el.find('.wrapper-card-meta .action').length).toBe(1);
                 });
 
                 it('can render itself as a list card', function () {
                     var view = new CardView({ configuration: 'list_card' });
                     expect(view.$el).toHaveClass('list-card');
-                    expect(view.$el.find('.card-meta-wrapper .action').length).toBe(1);
+                    expect(view.$el.find('.wrapper-card-meta .action').length).toBe(1);
                 });
 
                 it('renders a pennant only if the pennant value is truthy', function () {
                     var view = new (CardView.extend({ pennant: '' }))();
-                    expect(view.$el.find('.pennant').length).toBe(0);
+                    expect(view.$el.find('.card-type').length).toBe(0);
                     view = new (CardView.extend({ pennant: 'Test Pennant' }))();
-                    expect(view.$el.find('.pennant').length).toBe(1);
+                    expect(view.$el.find('.card-type').length).toBe(1);
                 });
 
                 it('can render child views', function () {
@@ -45,7 +45,7 @@
 
                 var verifyContent = function (view) {
                     expect(view.$el).toHaveClass('test-card');
-                    expect(view.$el.find('.pennant').text()).toContain('Pennant');
+                    expect(view.$el.find('.card-type').text()).toContain('Pennant');
                     expect(view.$el.find('.card-title').text()).toContain('A test title');
                     expect(view.$el.find('.card-description').text()).toContain('A test description');
                     expect(view.$el.find('.action')).toHaveClass('test-action');

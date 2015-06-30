@@ -208,3 +208,26 @@ class BrowseTopicsTest(TeamsTabTest):
         self.topics_page.press_previous_page_button()
         self.assertEqual(len(self.topics_page.get_topic_cards()), 12)
         self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-12 out of 13 total')
+
+    def test_topic_description_truncation(self):
+        """
+        Scenario: excessively long topic descriptions should be truncated so
+            as to fit within a topic card.
+        Given I am enrolled in a course with a team configuration and a topic
+            with a long description
+        When I visit the Teams page
+        And I browse topics
+        Then I should see a truncated topic description
+        """
+        self.set_team_configuration({
+            u"max_team_size": 1,  u"topics": [
+                {"name": "", "id": "",
+                 "description": "A really really really really really really "
+                 "really really really really really really really really "
+                 "really really really really really really long description"
+                }
+            ]
+        })
+        self.topics_page.visit()
+        from nose.tools import set_trace; set_trace()
+        self.assertEqual(1, 1)

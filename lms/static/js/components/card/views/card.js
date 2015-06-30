@@ -23,7 +23,9 @@
         function ($, Backbone, cardTemplate) {
             var CardView = Backbone.View.extend({
                 events: {
-                    'click .action' : 'action'
+                    'click .action' : 'action',
+                    'DOMNodeInsertedIntoDocument': 'truncateDescription',
+                    'DOMSubtreeModified': 'truncateDescription'
                 },
 
                 /**
@@ -77,7 +79,7 @@
                         action_url: this.callIfFunction(this.actionUrl),
                         action_content: this.callIfFunction(this.actionContent)
                     }));
-                    var detailsEl = this.$el.find('.card-meta-details');
+                    var detailsEl = this.$el.find('.card-meta');
                     _.each(this.callIfFunction(this.details), function (detail) {
                         // Call setElement to rebind event handlers
                         detail.setElement(detail.el).render();
@@ -85,6 +87,17 @@
                         detailsEl.append(detail.el);
                     });
                     return this;
+                },
+
+                truncateDescription: function () {
+                    var descriptionContainer = this.$('.card-description'),
+                        descriptionEl = descriptionContainer.find('p'),
+                        truncateLastWord = function (index, text) {
+                            return text.replace(/\W*\s(\S)*$/, '...');
+                        };
+                    while (descriptionEl.outerHeight() > descriptionContainer.height()) {
+                        descriptionEl.text(truncateLastWord);
+                    }
                 },
 
                 action: function () { },

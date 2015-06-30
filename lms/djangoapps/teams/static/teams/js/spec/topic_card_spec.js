@@ -21,10 +21,9 @@ define(['jquery',
 
             it('can render itself', function () {
                 expect(view.$el).toHaveClass('square-card');
-                expect(view.$el.find('.pennant').text()).toContain('Topic');
                 expect(view.$el.find('.card-title').text()).toContain('Renewable Energy');
                 expect(view.$el.find('.card-description').text()).toContain('changes in <ⓡⓔⓝⓔⓦⓐⓑⓛⓔ> ʎƃɹǝuǝ');
-                expect(view.$el.find('.card-meta-details').text()).toContain('34 Teams');
+                expect(view.$el.find('.card-meta').text()).toContain('34 Teams');
                 expect(view.$el.find('.action .sr').text()).toContain('View Teams in the Renewable Energy Topic');
             });
 
