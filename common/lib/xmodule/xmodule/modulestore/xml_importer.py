@@ -1182,9 +1182,7 @@ def _update_module_location(module, new_location):
     # in which one component of the key is the XBlock's location (equivalent to "scope_ids").
     # Since we've changed the XBlock's location, we need to re-save
     # all the XBlock's fields so they will be stored using the new location in the key.
-    # However, since XBlocks only save "dirty" fields, we need to first
-    # explicitly set each field to its current value before triggering the save.
+    # However, since XBlocks only save "dirty" fields, we need to call
+    # XBlock's `force_save_fields_method`
     if len(rekey_fields) > 0:
-        for rekey_field_name in rekey_fields:
-            setattr(module, rekey_field_name, getattr(module, rekey_field_name))
-        module.save()
+        module.force_save_fields(rekey_fields)

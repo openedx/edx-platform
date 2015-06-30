@@ -1875,6 +1875,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_data.fields = settings
 
                 new_id = new_structure['_id']
+
+                # source_version records which revision a block was copied from. In this method, we're updating
+                # the block, so it's no longer a direct copy, and we can remove the source_version reference.
+                block_data.edit_info.source_version = None
+
                 self.version_block(block_data, user_id, new_id)
                 self.update_structure(course_key, new_structure)
                 # update the index entry if appropriate
@@ -2969,8 +2974,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 if getattr(destination_block.edit_info, key) is None:
                     setattr(destination_block.edit_info, key, val)
 
-        # introduce new edit info field for tracing where copied/published blocks came
-        destination_block.edit_info.source_version = new_block.edit_info.update_version
+        # If the block we are copying from was itself a copy, then just
+        # reference the original source, rather than the copy.
+        destination_block.edit_info.source_version = (
+            new_block.edit_info.source_version or new_block.edit_info.update_version
+        )
 
         if blacklist != EXCLUDE_ALL:
             for child in destination_block.fields.get('children', []):
