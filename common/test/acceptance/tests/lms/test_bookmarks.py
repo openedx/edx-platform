@@ -329,7 +329,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.assertTrue(self.bookmarks_page.results_present())
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
-            header_text='Currently viewing all 2 bookmarks',
+            header_text='Showing 1-2 out of 2 total',
             previous_button_enabled=False,
             next_button_enabled=False,
             current_page_number=1,
