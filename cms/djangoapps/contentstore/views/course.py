@@ -27,6 +27,7 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
+from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -48,6 +49,7 @@ from contentstore.utils import (
     get_lms_link_for_item,
     reverse_course_url,
     reverse_library_url,
+    reverse_usage_url,
     reverse_url,
     remove_all_instructors,
 )
@@ -473,6 +475,44 @@ def _get_rerun_link_for_item(course_key):
     return reverse_course_url('course_rerun_handler', course_key)
 
 
+def _deprecated_blocks_info(course_module, deprecated_block_types):
+    """
+    Returns deprecation information about `deprecated_block_types`
+
+    Arguments:
+        course_module (CourseDescriptor): course object
+        deprecated_block_types (list): list of deprecated blocks types
+
+    Returns:
+        Dict with following keys:
+        block_types (list): list containing types of all deprecated blocks
+        block_types_enabled (bool): True if any or all `deprecated_blocks` present in Advanced Module List else False
+        blocks (list): List of `deprecated_block_types` component names and their parent's url
+        advance_settings_url (str): URL to advance settings page
+    """
+    data = {
+        'block_types': deprecated_block_types,
+        'block_types_enabled': any(
+            block_type in course_module.advanced_modules for block_type in deprecated_block_types
+        ),
+        'blocks': [],
+        'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id)
+    }
+
+    try:
+        structure_data = api.course_structure(course_module.id, block_types=deprecated_block_types)
+    except errors.CourseStructureNotAvailableError:
+        return data
+
+    blocks = []
+    for block in structure_data['blocks'].values():
+        blocks.append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
+
+    data['blocks'].extend(blocks)
+
+    return data
+
+
 @login_required
 @ensure_csrf_cookie
 def course_index(request, course_key):
@@ -500,6 +540,8 @@ def course_index(request, course_key):
         except (ItemNotFoundError, CourseActionStateItemNotFoundError):
             current_action = None
 
+        deprecated_blocks_info = _deprecated_blocks_info(course_module, settings.DEPRECATED_BLOCK_TYPES)
+
         return render_to_response('course_outline.html', {
             'context_course': course_module,
             'lms_link': lms_link,
@@ -513,6 +555,7 @@ def course_index(request, course_key):
             'course_release_date': course_release_date,
             'settings_url': settings_url,
             'reindex_link': reindex_link,
+            'deprecated_blocks_info': deprecated_blocks_info,
             'notification_dismiss_url': reverse_course_url(
                 'course_notifications_handler',
                 current_action.course_key,
