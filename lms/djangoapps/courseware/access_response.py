@@ -7,10 +7,13 @@ class AccessResponse(object):
     """Class that represents a response from a has_access permission check."""
     def __init__(self, has_access, error_code=None, developer_message=None, user_message=None):
         """
-        :param has_access (bool): if the user is granted access or not
-        :param error_code (String): optional - default is None. unique identifier for the specific type of error
-        :param developer_message (String): optional - default is None. message to show the developer
-        :param user_message (String): optional - default is None. message to show the user
+        Creates an AccessResponse object.
+
+        Arguments:
+            has_access (bool): if the user is granted access or not
+            error_code (String): optional - default is None. unique identifier for the specific type of error
+            developer_message (String): optional - default is None. message to show the developer
+            user_message (String): optional - default is None. message to show the user
         """
         self.has_access = has_access
         self.error_code = error_code
@@ -20,11 +23,25 @@ class AccessResponse(object):
             assert error_code is None
 
     def __nonzero__(self):
-        """Overrides bool() to correct truth value testing"""
+        """
+        Overrides bool().
+
+        Allows for truth value testing of AccessResponse objects, so callers who do not need the
+        specific error information can check if access is granted.
+
+        Returns:
+            bool: whether or not access is granted
+
+        """
         return self.has_access
 
     def to_json(self):
-        """Returns json representation of this AccessResponse"""
+        """
+        Creates a serializable JSON representation of an AccessResponse object.
+
+        Returns:
+            dict: JSON representation
+        """
         return {
             "has_access": self.has_access,
             "error_code": self.error_code,
@@ -40,46 +57,58 @@ class AccessError(AccessResponse):
     """
     def __init__(self, error_code, developer_message, user_message):
         """
-        :param: error_code (String): unique identifier for the specific type of error
-        :param: developer_message (String): message to show the developer
-        :param: user_message (String): message to show the user
+        Creates an AccessError object.
+
+        An AccessError object is represents an AccessResponse where access is denied (has_access is False).
+
+        Arguments:
+            error_code (String): unique identifier for the specific type of error
+            developer_message (String): message to show the developer
+            user_message (String): message to show the user
 
         """
         super(AccessError, self).__init__(False, error_code, developer_message, user_message)
 
 
 class StartDateError(AccessError):
-    """Access denied because the course has not started yet and the user is not staff"""
+    """
+    Access denied because the course has not started yet and the user is not staff
+    """
     def __init__(self, start_message):
         error_code = "course_not_started"
-        developer_message = "Course does not start until {start}  \
-                            and user does not have staff access".format(start=start_message)
-        user_message = start_message
+        developer_message = "Course has not started"
+        user_message = start_message.encode('utf-8') if start_message is not None else None
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
 
 class MilestoneError(AccessError):
-    """Access denied because the user hasn't completed the needed milestones (pre-reqs/entrance exams)."""
+    """
+    Access denied because the user hasn't completed the needed milestones (pre-reqs/entrance exams).
+    """
     def __init__(self):
-        error_code = "unfulfilled milestones"
+        error_code = "unfulfilled_milestones"
         developer_message = "User has not completed the necessary milestones"
-        user_message = "You have uncompleted milestones"
+        user_message = "You must complete the entrance exam or course prerequisites"
         super(MilestoneError, self).__init__(error_code, developer_message, user_message)
 
 
 class VisibilityError(AccessError):
-    """Access denied because the course is only visible to staff and the user is not staff"""
+    """
+    Access denied because the user does have the correct role to view this course.
+    """
     def __init__(self):
-        error_code = "visible_to_staff_only"
-        developer_message = "Course is only visible to staff and user is not staff"
-        user_message = "Course is not visible to you"
+        error_code = "not_visible_to_user"
+        developer_message = "Course is not visible to this user"
+        user_message = "You do not have access to this course"
         super(VisibilityError, self).__init__(error_code, developer_message, user_message)
 
 
 class MobileAvailabilityError(AccessError):
-    """Access denied because the course is not available on mobile and the user is not a beta tester or staff"""
+    """
+    Access denied because the course is not available on mobile for the user
+    """
     def __init__(self):
         error_code = "mobile_unavailable"
         developer_message = "Course is not available on mobile for this user"
-        user_message = "You cannot view this course on mobile"
+        user_message = "You do not have access to this course on a mobile device"
         super(MobileAvailabilityError, self).__init__(error_code, developer_message, user_message)

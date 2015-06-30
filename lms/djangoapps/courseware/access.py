@@ -16,6 +16,7 @@ import pytz
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.template import defaultfilters
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
 
@@ -25,13 +26,12 @@ from xblock.core import XBlock
 
 from xmodule.course_module import (
     CourseDescriptor, CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
-    CATALOG_VISIBILITY_ABOUT)
+    CATALOG_VISIBILITY_ABOUT, DEFAULT_START_DATE)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 from xmodule.util.django import get_current_request_hostname
-from xmodule.course_module import DEFAULT_START_DATE
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
@@ -50,8 +50,13 @@ from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
-from courseware.access_response import AccessResponse, StartDateError, MilestoneError, \
-    VisibilityError, MobileAvailabilityError
+from courseware.access_response import (
+    AccessResponse,
+    MilestoneError,
+    MobileAvailabilityError,
+    StartDateError,
+    VisibilityError,
+)
 
 DEBUG_ACCESS = False
 ACCESS_GRANTED = AccessResponse(True)
@@ -151,11 +156,15 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
 
     Arguments:
         user (User): the user whose descriptor access we are checking.
-        descriptor (AType): the descriptor for which we are checking access.
-    where AType is CourseDescriptor, CourseOverview, or any other class that
-        represents a descriptor and has the attributes .location, .id, .start,
-        and .days_early_for_beta.
+        descriptor (AType): the descriptor for which we are checking access,
+            where AType is CourseDescriptor, CourseOverview, or any other class that
+            represents a descriptor and has the attributes .location, .id, .start,
+            and .days_early_for_beta.
+
+    Returns:
+        AccessResponse: The result of this access check. Possible results are access granted or a StartDateError.
     """
+    # pylint: disable=translation-of-non-string
     start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
     masquerading = is_masquerading_as_student(user, course_key)
     if start_dates_disabled and not masquerading:
@@ -173,9 +182,10 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
     start_message = None
     if hasattr(descriptor, 'advertised_start'):
         if descriptor.advertised_start is not None:
-            start_message = _(descriptor.advertised_start)  # pylint: disable=translation-of-non-string
+            start_message = _(descriptor.advertised_start)
+
         elif descriptor.start != DEFAULT_START_DATE:
-            start_message = descriptor.start
+            start_message = defaultfilters.date(descriptor.start, "DATE_FORMAT")
         else:
             start_message = _("coming soon")
 
@@ -243,8 +253,8 @@ def _has_access_course_desc(user, action, course):
         if not access_response:
             return access_response
 
-        if any_unfulfilled_milestones(course.id, user.id) \
-                and not _has_staff_access_to_descriptor(user, course, course.id):
+        if (any_unfulfilled_milestones(course.id, user.id)
+                and not _has_staff_access_to_descriptor(user, course, course.id)):
             return MilestoneError()
 
         return ACCESS_GRANTED
@@ -375,13 +385,17 @@ def _has_access_course_overview(user, action, course_overview):
     Arguments:
         user (User): the user whose course access we are checking.
         action (str): the action the user is trying to perform. Valid values:
-            * 'load' -- load the courseware, see inside the coursecourse catalog.
+            * 'load' -- load the courseware, see inside the course catalog.
             * 'view_courseware_with_prerequisites'
         course_overview (CourseOverview): overview of the course in question.
     """
     def can_load():
         """
         Can this user load this course?
+
+        Returns:
+            AccessResponse: The result of this access check. Possible results are access granted,
+                a visibility error, or a start date error.
 
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
@@ -511,7 +525,6 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-
         if _has_staff_access_to_descriptor(user, descriptor, course_key):
             return ACCESS_GRANTED
 
@@ -714,7 +727,6 @@ def _has_access_to_course(user, access_level, course_key):
         CourseStaffRole(course_key).has_user(user) or
         OrgStaffRole(course_key.org).has_user(user)
     )
-
     if staff_access and access_level == 'staff':
         debug("Allow: user has course staff access")
         return ACCESS_GRANTED
