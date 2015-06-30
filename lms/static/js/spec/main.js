@@ -69,18 +69,6 @@
             'js/models/notification': 'js/models/notification',
             'js/views/file_uploader': 'js/views/file_uploader',
             'js/views/notification': 'js/views/notification',
-            'js/groups/models/cohort': 'js/groups/models/cohort',
-            'js/groups/models/content_group': 'js/groups/models/content_group',
-            'js/groups/models/course_cohort_settings': 'js/groups/models/course_cohort_settings',
-            'js/groups/models/cohort_discussions': 'js/groups/models/cohort_discussions',
-            'js/groups/views/cohort_discussions': 'js/groups/views/cohort_discussions',
-            'js/groups/views/cohort_discussions_course_wide': 'js/groups/views/cohort_discussions_course_wide',
-            'js/groups/views/cohort_discussions_inline': 'js/groups/views/cohort_discussions_inline',
-            'js/groups/views/course_cohort_settings_notification': 'js/groups/views/course_cohort_settings_notification',
-            'js/groups/collections/cohort': 'js/groups/collections/cohort',
-            'js/groups/views/cohort_editor': 'js/groups/views/cohort_editor',
-            'js/groups/views/cohort_form': 'js/groups/views/cohort_form',
-            'js/groups/views/cohorts': 'js/groups/views/cohorts',
             'js/student_account/account': 'js/student_account/account',
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
@@ -302,63 +290,6 @@
             'js/instructor_dashboard/ecommerce': {
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
-            },
-            'js/groups/models/cohort': {
-                exports: 'edx.groups.CohortModel',
-                deps: ['backbone']
-            },
-            'js/groups/models/content_group': {
-                exports: 'edx.groups.ContentGroupModel',
-                deps: ['backbone']
-            },
-            'js/groups/models/course_cohort_settings': {
-                exports: 'edx.groups.CourseCohortSettingsModel',
-                deps: ['backbone']
-            },
-            'js/groups/models/cohort_discussions': {
-                exports: 'edx.groups.DiscussionTopicsSettingsModel',
-                deps: ['backbone']
-            },
-            'js/groups/views/cohort_discussions': {
-                exports: 'edx.groups.CohortDiscussionConfigurationView',
-                deps: ['backbone']
-            },
-            'js/groups/views/cohort_discussions_course_wide': {
-                exports: 'edx.groups.CourseWideDiscussionsView',
-                deps: ['backbone', 'js/groups/views/cohort_discussions']
-            },
-            'js/groups/views/cohort_discussions_inline': {
-                exports: 'edx.groups.InlineDiscussionsView',
-                deps: ['backbone', 'js/groups/views/cohort_discussions', 'js/vendor/jquery.qubit']
-            },
-            'js/groups/views/course_cohort_settings_notification': {
-                exports: 'edx.groups.CourseCohortSettingsNotificationView',
-                deps: ['backbone']
-            },
-            'js/groups/collections/cohort': {
-                exports: 'edx.groups.CohortCollection',
-                deps: ['backbone', 'js/groups/models/cohort']
-            },
-            'js/groups/views/cohort_form': {
-                exports: 'edx.groups.CohortFormView',
-                deps: [
-                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
-                    'string_utils'
-                ]
-            },
-            'js/groups/views/cohort_editor': {
-                exports: 'edx.groups.CohortEditorView',
-                deps: [
-                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
-                    'string_utils', 'js/groups/views/cohort_form'
-                ]
-            },
-            'js/groups/views/cohorts': {
-                exports: 'edx.groups.CohortsView',
-                deps: [
-                    'jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/groups/views/cohort_editor',
-                    'js/views/notification', 'js/models/notification', 'js/views/file_uploader'
-                ]
             },
             'js/models/notification': {
                 exports: 'NotificationModel',
