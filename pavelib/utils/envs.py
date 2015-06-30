@@ -22,6 +22,9 @@ class Env(object):
     REPORT_DIR = REPO_ROOT / 'reports'
     METRICS_DIR = REPORT_DIR / 'metrics'
 
+    # Python unittest dirs
+    PYTHON_COVERAGERC = REPO_ROOT / ".coveragerc"
+
     # Bok_choy dirs
     BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"
     BOK_CHOY_LOG_DIR = REPO_ROOT / "test_root" / "log"
