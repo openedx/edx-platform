@@ -9,6 +9,8 @@
                     correctness = 'correct'
                 elif status == 'incorrect':
                     correctness = 'incorrect'
+                elif status == 'partially-correct':
+                    correctness = 'partialcorrect'   #Yes, this is different from how it's named elsewhere. :(
                 else:
                     correctness = None
             %>
@@ -31,7 +33,7 @@
             /> ${choice_description}
 
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-            % if status in ('correct', 'incorrect') and not show_correctness=='never':
+            % if status in ('correct', 'incorrect', 'partially-correct') and not show_correctness=='never':
             <span class="sr status">${choice_description|h} - ${status.display_name}</span>
             % endif
             % endif
