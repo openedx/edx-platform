@@ -3,8 +3,10 @@
 
 <% if (bookmarks.length) { %>
 
+    <div class="paging-header"></div>
+
     <div class='bookmarks-results-list'>
-        <% _.each(bookmarks, function(bookmark, index) { %>
+        <% bookmarks.each(function(bookmark, index) { %>
              <a class="bookmarks-results-list-item" href="<%= bookmark.blockUrl() %>" aria-labelledby="bookmark-link-<%= index %>" data-bookmark-id="<%= bookmark.get('id') %>" data-component-type="<%= bookmark.get('block_type') %>" data-usage-id="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>">
                 <div class="list-item-content">
                     <div class="list-item-left-section">
@@ -20,6 +22,8 @@
             </a>
         <% }); %>
     </div>
+
+    <div class="paging-footer"></div>
 
 <% } else {%>
 
