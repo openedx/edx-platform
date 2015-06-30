@@ -114,7 +114,7 @@ from django.utils.http import urlquote_plus
                 %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
                     <span>${student.get_full_name()}, ${_("You have not yet met the requirements for credit.")}</span>
                 %endif
-                <button class="credit-help"><i class="fa fa-question"></i><span class="sr">Help regarding credit requirement</span></button><br>
+                <a href="${settings.CREDIT_HELP_LINK_URL}" class="credit-help"><i class="fa fa-question"></i><span class="sr">Help regarding course credit requirements</span></a><br>
                 <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
                 %for requirement in credit_course_requirements['requirements']:
                     <div class="requirement">
