@@ -16,6 +16,7 @@
 // * +Problem - Rubric
 // * +Problem - Annotation
 // * +Problem - Choice Text Group
+// * +Problem - Image Input Overrides
 
 // +Variables - Capa
 // ==================== 
@@ -1348,5 +1349,26 @@ div.problem {
     span.mock_label {
       cursor : default;
     }
+  }
+}
+
+// +Problem - Image Input Overrides
+// ====================
+
+// NOTE: temporary override until image inputs use same base html structure as other common capa input types.
+div.problem .imageinput.capa_inputtype {
+
+  .status {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px;
+  }
+  .correct {
+    background: url('../images/correct-icon.png') center center no-repeat;
+  }
+  .incorrect {
+    background: url('../images/incorrect-icon.png') center center no-repeat;
   }
 }
