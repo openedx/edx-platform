@@ -102,7 +102,34 @@ div.course-wrapper {
     h1 {
       margin: 0 0 lh();
     }
-
+    div.sequence {
+      h3 {
+        margin-bottom: 12px;
+        font-size: 22px;
+        font-weight: 600;
+      }
+      p {
+        color: #797676;
+      }
+      .gated-sequence {
+        color: #147ABA;
+        font-weight: 600;
+        a {
+          cursor: pointer;
+          color: #147ABA;
+          font-weight: 600;
+          position: relative;
+          top: ($baseline/10);
+          i.fa-arrow-circle-right {
+            font-size: $baseline;
+          }
+        }
+      }
+      background-color: #F2F4F5;
+      padding: 30px;
+      box-shadow: inset 1px 1px 2px rgba(0,0,0,.1);
+      border: 1px solid #ddd;
+    }
     p {
       margin-bottom: lh();
 
