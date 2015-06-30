@@ -1,7 +1,7 @@
 # .gitignore for edx-platform.
 # There's a lot here, please try to keep it organized.
 
-### Files private to developers
+### Files private to developers 
 
 requirements/private.txt
 lms/envs/private.py
