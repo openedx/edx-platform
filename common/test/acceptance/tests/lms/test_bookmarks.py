@@ -167,6 +167,25 @@ class BookmarksTest(BookmarksTestMixin):
         self.bookmarks_page.click_bookmarks_button()
         self.assertEqual(self.bookmarks_page.count(), bookmarked_count)
 
+    def _verify_pagination_info(
+            self,
+            bookmark_count_on_current_page,
+            header_text,
+            previous_button_enabled,
+            next_button_enabled,
+            current_page_number,
+            total_pages
+    ):
+        """
+        Verify pagination info
+        """
+        self.assertEqual(self.bookmarks_page.count(), bookmark_count_on_current_page)
+        self.assertEqual(self.bookmarks_page.paging_header_text, header_text)
+        self.assertEqual(self.bookmarks_page.paging_footer_button_state('previous'), previous_button_enabled)
+        self.assertEqual(self.bookmarks_page.paging_footer_button_state('next'), next_button_enabled)
+        self.assertEqual(self.bookmarks_page.paging_footer_button_value('current'), current_page_number)
+        self.assertEqual(self.bookmarks_page.paging_footer_button_value('total'), total_pages)
+
     def test_bookmark_button(self):
         """
         Scenario: Bookmark unit button toggles correctly
@@ -276,24 +295,146 @@ class BookmarksTest(BookmarksTestMixin):
 
     def test_page_size_limit(self):
         """
-        Scenario: We can get more bookmarks if page size is greater than default page size.
-        Note:
-            * Current Bookmarks API page_size value is 10.
-            * page_size value in bookmarks client side is set to 500.
+        Scenario: We can't get bookmarks more than default page size.
 
         Given that I am a registered user
         And I visit my courseware page
-        And I have bookmarked all the units available
+        And I have bookmarked all the 11 units available
         Then I click on Bookmarks button
         And I should see a bookmarked list
-        And bookmark list contains 11 bookmarked items
+        And bookmark list contains 10 bookmarked items
         """
         self._test_setup(11)
         self._bookmark_units(11)
 
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.count(), 11)
+        self.assertEqual(self.bookmarks_page.count(), 10)
+
+    def test_pagination_with_single_page(self):
+        """
+        Scenario: Bookmarks list pagination is working as expected for single page
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked all the 2 units available
+        Then I click on Bookmarks button
+        And I should see a bookmarked list with 2 bookmarked items
+        And I should see paging header and footer with correct data
+        And previous and next buttons are disabled
+        """
+        self._test_setup(num_chapters=2)
+        self._bookmark_units(num_units=2)
+
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=2,
+            header_text='Currently viewing all 2 bookmarks',
+            previous_button_enabled=False,
+            next_button_enabled=False,
+            current_page_number=1,
+            total_pages=1
+        )
+
+    def test_pagination_with_multiple_pages(self):
+        """
+        Scenario: Bookmarks list pagination is working as expected for multiple pages
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked all the 12 units available
+        Then I click on Bookmarks button
+        And I should see a bookmarked list of 10 items
+        And I should see paging header and footer with correct data
+        And previous page button is disabled in footer
+        And next page button is enabled in footer
+        Then I click on next page button in footer
+        And I should be navigated to second page
+        And I should see a bookmarked list with 2 items
+        And I should see paging header and footer with correct data
+        And next page button is disabled in footer
+        And previous page button is enabled in footer
+        Then I click on previous page button
+        And I should be navigated to first page
+        And I should see paging header and footer with correct data
+        """
+        self._test_setup(num_chapters=12)
+        self._bookmark_units(num_units=12)
+
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=10,
+            header_text='Showing 1-10 out of 12 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+        self.bookmarks_page.click_paging_footer_button('next')
+
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=2,
+            header_text='Showing 11-12 out of 12 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+
+        self.bookmarks_page.click_paging_footer_button('previous')
+
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=10,
+            header_text='Showing 1-10 out of 12 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
+
+    def test_pagination_with_page_number(self):
+        """
+        Scenario: Bookmarks list pagination navigation works as expected by page
+            number for valid and invalid values
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked all the 121 units available
+        Then I click on Bookmarks button
+        And I should see a bookmarked list
+        And I should see total page value is 2
+        Then I enter 2 in the page number input
+        And I should be navigated to page 2
+        Then I enter 3 in the page number input
+        And I should stay at page 2
+        """
+        self._test_setup(num_chapters=11)
+        self._bookmark_units(num_units=11)
+
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self.assertEqual(self.bookmarks_page.paging_footer_button_value('total'), 2)
+
+        self.bookmarks_page.goto_page_number(2)
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+
+        self.bookmarks_page.goto_page_number(3, wait_for_page_change=False)
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=1,
+            header_text='Showing 11-11 out of 11 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
 
     def test_bookmarked_unit_accessed_event(self):
         """
