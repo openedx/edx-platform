@@ -134,26 +134,44 @@ class DarkLangMiddleware(object):
         then set the session LANGUAGE_SESSION_KEY to that language.
         """
         if 'clear-lang' in request.GET:
-            # Reset dark lang
-            delete_user_preference(request.user, DARK_LANGUAGE_KEY)
-            # Reset user's language to their language preference, if they have one
-            user_pref = get_user_preference(request.user, LANGUAGE_KEY)
-            if user_pref:
-                request.session[LANGUAGE_SESSION_KEY] = user_pref
-            elif LANGUAGE_SESSION_KEY in request.session:
+            # delete the session language key (if one is set)
+            if LANGUAGE_SESSION_KEY in request.session:
                 del request.session[LANGUAGE_SESSION_KEY]
-            return
 
-        preview_lang = request.GET.get('preview-lang', None)
-        if not preview_lang:
             try:
-                # Try to get the request user's preference (might not have a user, though)
-                preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
+                # Reset user's dark lang preference to null
+                delete_user_preference(request.user, DARK_LANGUAGE_KEY)
+                # Get user's preferred language
+                user_pref = get_user_preference(request.user, LANGUAGE_KEY)
             except UserNotFound:
                 return
 
-        if not preview_lang:
+            # We did find a user object, so set their session key back to
+            # their preference
+            if user_pref:
+                request.session[LANGUAGE_SESSION_KEY] = user_pref
             return
 
+        # Get the user's preview lang - this is either going to be set from a query
+        # param `?preview-lang=xx`, or we may have one already set as a dark lang preference.
+        preview_lang = request.GET.get('preview-lang', None)
+        if not preview_lang:
+            # Try to get the request user's dark lang preference
+            try:
+                preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
+            except UserNotFound:
+                # No query param and no user set, so just return
+                return
+            # User doesn't have a dark lang preference, so just return
+            if not preview_lang:
+                return
+
+        # Set the session key to the requested preview lang
         request.session[LANGUAGE_SESSION_KEY] = preview_lang
-        set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
+
+        # Make sure that we set the requested preview lang as the dark lang preference for the
+        # user, so that the lang_pref middleware doesn't clobber away the dark lang preview.
+        try:
+            set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
+        except UserNotFound:
+            return

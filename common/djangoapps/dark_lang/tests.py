@@ -6,7 +6,7 @@ from django.http import HttpRequest
 
 import ddt
 from django.test import TestCase
-from mock import Mock
+from mock import Mock, patch
 import unittest
 
 from dark_lang.middleware import DarkLangMiddleware
@@ -15,6 +15,7 @@ from dark_lang.models import DarkLangConfig
 # from django.utils.translation import LANGUAGE_SESSION_KEY
 from django_locale.trans_real import LANGUAGE_SESSION_KEY
 from student.tests.factories import UserFactory
+from openedx.core.djangoapps.user_api.errors import UserNotFound
 
 
 UNSET = object()
@@ -315,4 +316,49 @@ class DarkLangMiddlewareTests(TestCase):
         self.assertAcceptEquals(
             'zh-cn;q=1.0, zh-tw;q=0.5, zh-hk;q=0.3',
             self.process_request(accept='zh-Hans;q=1.0, zh-Hant-TW;q=0.5, zh-HK;q=0.3')
+        )
+
+    @patch('dark_lang.middleware.get_user_preference', Mock(side_effect=UserNotFound))
+    @patch('dark_lang.middleware.set_user_preference', Mock(side_effect=UserNotFound))
+    def test_preview_lang_with_no_user(self):
+        # Test that all the preview language stuff works without error when there's no user
+        # (ie when visitor is on homepage without being logged in)
+        self.assertSessionLangEquals(
+            'rel',
+            self.process_request(preview_lang='rel')
+        )
+
+        self.assertSessionLangEquals(
+            'rel',
+            self.process_request(preview_lang='rel', language_session_key='notrel')
+        )
+
+        self.assertSessionLangEquals(
+            'unrel',
+            self.process_request(preview_lang='unrel')
+        )
+
+        self.assertSessionLangEquals(
+            'unrel',
+            self.process_request(preview_lang='unrel', language_session_key='notrel')
+        )
+
+    @patch('dark_lang.middleware.get_user_preference', Mock(side_effect=UserNotFound))
+    @patch('dark_lang.middleware.set_user_preference', Mock(side_effect=UserNotFound))
+    def test_clear_lang_with_no_user(self):
+        # Test that all the clear language stuff works without error when there's no user
+        # (ie when visitor is on homepage without being logged in)
+        self.assertSessionLangEquals(
+            UNSET,
+            self.process_request(clear_lang=True)
+        )
+
+        self.assertSessionLangEquals(
+            UNSET,
+            self.process_request(clear_lang=True, language_session_key='rel')
+        )
+
+        self.assertSessionLangEquals(
+            UNSET,
+            self.process_request(clear_lang=True, language_session_key='unrel')
         )
