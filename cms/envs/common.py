@@ -922,6 +922,8 @@ ADVANCED_COMPONENT_TYPES = [
     'edx_sga',
     'problem-builder',
     'pb-dashboard',
+    'poll',
+    'survey',
     # XBlocks from pmitros repos are prototypes. They should not be used
     # except for edX Learning Sciences experiments on edge.edx.org without
     # further work to make them robust, maintainable, finalize data formats,
