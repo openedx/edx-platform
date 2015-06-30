@@ -16,11 +16,20 @@
             },
 
             initialize: function () {
-                this.bookmarksListView = new BookmarksListView({
-                    collection: new BookmarksCollection(),
-                    loadingMessageView: new MessageView({el: $(this.loadingMessageElement)}),
-                    errorMessageView: new MessageView({el: $(this.errorMessageElement)})
-                });
+                var bookmarksCollection = new BookmarksCollection(
+                    {
+                        course_id: $('.courseware-results').data('courseId'),
+                        url: $(".courseware-bookmarks-button").data('bookmarksApiUrl')
+                    }
+                );
+                bookmarksCollection.bootstrap();
+                this.bookmarksListView = new BookmarksListView(
+                    {
+                        collection: bookmarksCollection,
+                        loadingMessageView: new MessageView({el: $(this.loadingMessageElement)}),
+                        errorMessageView: new MessageView({el: $(this.errorMessageElement)})
+                    }
+                );
             },
 
             toggleBookmarksListView: function () {
