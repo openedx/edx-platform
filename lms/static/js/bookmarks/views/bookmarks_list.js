@@ -17,7 +17,7 @@
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
 
-            DEFAULT_PAGE: 1,
+            defaultPage: 1,
 
             events : {
                 'click .bookmarks-results-list-item': 'visitBookmark'
@@ -53,7 +53,7 @@
                 this.showBookmarksContainer();
                 this.showLoadingMessage();
 
-                this.collection.goTo(this.DEFAULT_PAGE).done(function () {
+                this.collection.goTo(this.defaultPage).done(function () {
                     view.hideLoadingMessage();
                     view.render();
                     view.focusBookmarksElement();

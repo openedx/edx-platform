@@ -1,5 +1,5 @@
-define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_helpers',
-        'js/common_helpers/template_helpers', 'js/bookmarks/views/bookmarks_list_button'
+define(['backbone', 'jquery', 'underscore', 'logger', 'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers', 'js/bookmarks/views/bookmarks_list_button'
        ],
     function (Backbone, $, _, Logger, AjaxHelpers, TemplateHelpers, BookmarksListButtonView) {
         'use strict';
@@ -26,6 +26,15 @@ define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_he
 
                 bookmarksButtonView = new BookmarksListButtonView();
             });
+
+            var verifyUrl = function (requests) {
+                var request = requests[0];
+
+                expect(request.url).toContain(BOOKMARKS_API_URL);
+                expect(request.url).toContain('course_id=a%2Fb%2F');
+                expect(request.url).toContain('page_size=10');
+                expect(request.url).toContain('fields=display_name%2Cpath');
+            };
 
             var createBookmarksData = function (count) {
                 var data = {
@@ -125,25 +134,29 @@ define(['backbone', 'jquery', 'underscore', 'logger', 'js/common_helpers/ajax_he
 
                 expect(bookmarksButtonView.bookmarksListView.$('.bookmarks-empty-detail-title').text().trim()).
                     toBe(emptyListText);
+
+                expect(bookmarksButtonView.bookmarksListView.$('.paging-header').length).toBe(0);
+                expect(bookmarksButtonView.bookmarksListView.$('.paging-footer').length).toBe(0);
             });
 
             it("has rendered bookmarked list correctly", function () {
                 var requests = AjaxHelpers.requests(this);
-                var url = BOOKMARKS_API_URL + '?course_id=COURSE_ID&page_size=500&fields=display_name%2Cpath';
                 var expectedData = createBookmarksData(3);
 
-                spyOn(bookmarksButtonView.bookmarksListView, 'courseId').andReturn('COURSE_ID');
                 bookmarksButtonView.$('.bookmarks-list-button').click();
                 expect($('#loading-message').text().trim()).
                     toBe(bookmarksButtonView.bookmarksListView.loadingMessage);
 
-                AjaxHelpers.expectRequest(requests, 'GET', url);
+                verifyUrl(requests);
                 AjaxHelpers.respondWithJson(requests, expectedData);
 
                 expect(bookmarksButtonView.bookmarksListView.$('.bookmarks-results-header').text().trim()).
                     toBe('My Bookmarks');
 
                 verifyBookmarkedData(bookmarksButtonView.bookmarksListView, expectedData);
+
+                expect(bookmarksButtonView.bookmarksListView.$('.paging-header').length).toBe(1);
+                expect(bookmarksButtonView.bookmarksListView.$('.paging-footer').length).toBe(1);
             });
 
             it("can navigate to correct url", function () {
