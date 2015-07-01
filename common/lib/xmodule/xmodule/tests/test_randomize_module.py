@@ -16,9 +16,6 @@ class RandomizeModuleTestCase(unittest.TestCase):
 
         system = DummyImportSystem(load_error_modules=True)
 
-        def to_attrb(n, v):
-            return '' if v is None else '{0}="{1}"'.format(n, v).lower()
-
         start_xml = '''
          <course org="{org}" course="{course}"
                 graceperiod="1 day" url_name="test"
@@ -39,7 +36,7 @@ class RandomizeModuleTestCase(unittest.TestCase):
         """
         Just make sure descriptor loads without error
         """
-        descriptor = self.get_dummy_course(START)
+        self.get_dummy_course(START)
 
     # TODO: add tests that create a module and check.  Passing state is a good way to
     # check that child access works...
