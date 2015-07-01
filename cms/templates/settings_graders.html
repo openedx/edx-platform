@@ -5,6 +5,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
+  import json
   from contentstore import utils
   from django.utils.translation import ugettext as _
 %>
@@ -22,7 +23,7 @@
 </%block>
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
-        SettingsGradersFactory(${course_details|n}, "${grading_url}");
+        SettingsGradersFactory(_.extend(${course_details|n}, {is_credit_course: ${json.dumps(is_credit_course)}}), "${grading_url}");
     });
 </%block>
 
