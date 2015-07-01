@@ -37,21 +37,16 @@ from microsite_configuration import microsite
 
 <%block name="headextra">
     <%static:css group='style-course'/>
+</%block>
 
-    <script>
-          (function (require) {
-            require(['js/student_account/views/account_settings_factory'], function(setupAccountSettingsSection) {
+<%block name="js_extra">
+<%static:require_module module_name="js/student_account/views/account_settings_factory" class_name="AccountSettingsFactory">
+    var fieldsData = ${ json.dumps(fields) };
+    var authData = ${ json.dumps(auth) };
+    var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
 
-                var fieldsData = ${ json.dumps(fields) };
-                var authData = ${ json.dumps(auth) };
-                var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
-
-                setupAccountSettingsSection(
-                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id},
-                        platformName
-                );
-            });
-          }).call(this, require || RequireJS.require);
-    </script>
-
+    AccountSettingsFactory(
+        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id}, platformName
+    );
+</%static:require_module>
 </%block>
