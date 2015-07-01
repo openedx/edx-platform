@@ -15,10 +15,15 @@
 
 // page set up - only available to modern browsers now
 @page {
-    size : landscape;
+    size: landscape; // sets the printer page size
+    margin: 0mm; // affects the margin in the printer settings
 }
 
 @media print {
+
+    body {
+        margin: 0px; // the margin on the content before printing
+    }
 
     // helpers
     %print-no-background {
@@ -93,6 +98,11 @@
 // #LAYOUT
 // ------------------------------
 @media print {
+
+    html,
+    body {
+        page-break-after: avoid; // avoids a line break after the content if possible
+    }
 
     // hide elements not needed for print rendering
     .wrapper-banner-user,
