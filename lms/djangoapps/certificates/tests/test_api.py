@@ -148,7 +148,7 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
             'edx.certificate.created',
             user_id=self.student.id,
             course_id=unicode(self.course.id),
-            certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id, cert.verify_uuid),
+            certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id),
             certificate_id=cert.verify_uuid,
             enrollment_mode=cert.mode,
             generation_mode='batch'
@@ -176,6 +176,14 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
         # Verify that the certificate has status 'downloadable'
         cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
         self.assertEqual(cert.status, CertificateStatuses.downloadable)
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})
+    def test_cert_url_empty_with_invalid_certificate(self):
+        """
+        Test certificate url is empty if html view is not enabled and certificate is not yet generated
+        """
+        url = certs_api.get_certificate_url(self.student.id, self.course.id)
+        self.assertEqual(url, "")
 
     @contextmanager
     def _mock_passing_grade(self):

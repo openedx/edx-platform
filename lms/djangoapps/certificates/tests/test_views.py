@@ -308,8 +308,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertEquals(config.configuration, test_configuration_string)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
@@ -319,6 +318,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('Microsite title', response.content)
 
     @patch("microsite_configuration.microsite.get_value", fakemicrosite)
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_microsite_configuration_missing(self):
         test_configuration_string = """{
             "default": {
@@ -342,8 +342,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertEquals(config.configuration, test_configuration_string)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
@@ -379,6 +378,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=self.course_id,
             verify_uuid=uuid4(),
             download_uuid=uuid4(),
+            download_url="http://www.example.com/certificates/download",
             grade="0.95",
             key='the_key',
             distinction=True,
@@ -429,8 +429,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_valid_certificate(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
@@ -452,8 +451,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_with_valid_signatories(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
@@ -469,8 +467,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         # if certificate in descriptor has not course_title then course name should not be overridden with this title.
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         test_certificates = [
             {
@@ -493,8 +490,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_certificate_view_without_org_logo(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         test_certificates = [
             {
@@ -516,8 +512,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_without_signatories(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course)
         )
         self._add_course_certificates(count=1, signatory_count=0)
         response = self.client.get(test_url)
@@ -528,17 +523,15 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_disabled_feature_flag_returns_static_url(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
-        self.assertIn(str(self.cert.verify_uuid), test_url)
+        self.assertIn(str(self.cert.download_url), test_url)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_course_id(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id='az/23423/4vs',
-            verify_uuid=self.cert.verify_uuid
+            course_id='az/23423/4vs'
         )
 
         response = self.client.get(test_url)
@@ -548,8 +541,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_invalid_course(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id='missing/course/key',
-            verify_uuid=self.cert.verify_uuid
+            course_id='missing/course/key'
         )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -558,8 +550,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_invalid_user(self):
         test_url = get_certificate_url(
             user_id=111,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -570,8 +561,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -587,8 +577,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url + '?preview=honor')
         self.assertNotIn(self.course.display_name, response.content)
@@ -606,8 +595,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_render_html_view_invalid_certificate_configuration(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
         self.assertIn("Invalid Certificate", response.content)
@@ -619,8 +607,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.recreate_tracker()
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid=self.cert.verify_uuid
+            course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
@@ -642,8 +629,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     def test_evidence_event_sent(self):
         cert_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=self.course_id,
-            verify_uuid=self.cert.verify_uuid
+            course_id=self.course_id
         )
         test_url = '{}?evidence_visit=1'.format(cert_url)
         self.recreate_tracker()

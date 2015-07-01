@@ -439,8 +439,7 @@ def _update_certificate_context(context, course, user, user_certificate):
             user_certificate.mode,
             get_certificate_url(
                 user_id=user.id,
-                course_id=unicode(course.id),
-                verify_uuid=user_certificate.verify_uuid
+                course_id=unicode(course.id)
             )
         )
 
