@@ -862,8 +862,8 @@ def send_test_enrollment_email(request, course_key_string):
         'name': user.profile.name,
         'course_title': course.display_name,
         'course_id': course_key,
-        'course_start_date': course.start,
-        'course_end_date': course.end,
+        'course_start_date': get_default_time_display(course.start),
+        'course_end_date': get_default_time_display(course.end),
     }
     message = substitute_keywords_with_data(message, context)
 

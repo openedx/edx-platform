@@ -1,0 +1,46 @@
+---
+metadata:
+    display_name: Multiple Choice with Hints and Feedback
+    markdown: |
+
+       You can provide feedback for each option in a multiple choice problem.
+
+       You can also add hints for learners.
+
+       Be sure to select Settings to specify a Display Name and other values that apply.
+
+       Use the following example problem as a model.
+
+       >>Which of the following is a vegetable?<<
+       ( ) apple {{An apple is the fertilized ovary that comes from an apple tree and contains seeds, meaning it is a fruit.}}
+       ( ) pumpkin {{A pumpkin is the fertilized ovary of a squash plant and contains seeds, meaning it is a fruit.}}
+       (x) potato {{A potato is an edible part of a plant in tuber form and is a vegetable.}}
+       ( ) tomato {{Many people mistakenly think a tomato is a vegetable. However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.}}
+
+       ||A fruit is the fertilized ovary from a flower.||
+       ||A fruit contains seeds of the plant.||
+
+tab: hint
+data: |
+   <problem>
+     
+     <p>You can provide feedback for each option in a multiple choice problem.</p>
+
+     <p>You can also add hints for learners.</p>
+
+     <p>Use the following example problem as a model.</p>
+
+     <p>Which of the following is a vegetable?</p>
+     <multiplechoiceresponse>
+       <choicegroup type="MultipleChoice">
+         <choice correct="false">apple <choicehint>An apple is the fertilized ovary that comes from an apple tree and contains seeds, meaning it is a fruit.</choicehint></choice>
+         <choice correct="false">pumpkin <choicehint>A pumpkin is the fertilized ovary of a squash plant and contains seeds, meaning it is a fruit.</choicehint></choice>
+         <choice correct="true">potato <choicehint>A potato is an edible part of a plant in tuber form and is a vegetable.</choicehint></choice>
+         <choice correct="false">tomato <choicehint>Many people mistakenly think a tomato is a vegetable. However, because a tomato is the fertilized ovary of a tomato plant and contains seeds, it is a fruit.</choicehint></choice>
+       </choicegroup>
+     </multiplechoiceresponse>
+     <demandhint>
+       <hint>A fruit is the fertilized ovary from a flower.</hint>
+       <hint>A fruit contains seeds of the plant.</hint>
+     </demandhint>
+     </problem>

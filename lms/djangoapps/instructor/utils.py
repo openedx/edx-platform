@@ -319,10 +319,10 @@ def collect_student_forums_data(course_id):
         [
             result['_id'],
             result['posts'],
-            result['points'],
+            result['votes'],
         ] for result in results
     ]
-    header = ['Username', 'Posts', 'Points']
+    header = ['Username', 'Posts', 'Votes']
     return header, parsed_results
 
 
@@ -344,7 +344,7 @@ def generate_student_forums_query(course_id):
             "$group": {
                 "_id": "$author_username",
                 "posts": {"$sum": 1},
-                "points": {"$sum": "$votes.point"}
+                "votes": {"$sum": "$votes.point"}
             }
         },
     ]

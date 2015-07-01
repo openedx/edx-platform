@@ -28,6 +28,20 @@ class ProblemPage(PageObject):
         """
         return self.q(css="div.problem p").text
 
+    @property
+    def message_text(self):
+        """
+        Return the "message" text of the question of the problem.
+        """
+        return self.q(css="div.problem span.message").text[0]
+
+    @property
+    def hint_text(self):
+        """
+        Return the "hint" text of the problem from its div.
+        """
+        return self.q(css="div.problem div.problem-hint").text[0]
+
     def fill_answer(self, text):
         """
         Fill in the answer to the problem.
@@ -39,6 +53,13 @@ class ProblemPage(PageObject):
         Click the Check button!
         """
         self.q(css='div.problem button.check').click()
+        self.wait_for_ajax()
+
+    def click_hint(self):
+        """
+        Click the Hint button.
+        """
+        self.q(css='div.problem button.hint-button').click()
         self.wait_for_ajax()
 
     def is_correct(self):

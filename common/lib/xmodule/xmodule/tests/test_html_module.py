@@ -1,6 +1,6 @@
 import unittest
 
-from mock import Mock
+from mock import Mock, patch
 
 from xblock.field_data import DictFieldData
 from xmodule.html_module import HtmlModule, HtmlDescriptor
@@ -35,7 +35,9 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         module_system = get_test_system()
         module_system.substitute_keywords_with_data = Mock(return_value=anon_id)
         module = HtmlModule(self.descriptor, module_system, field_data, Mock())
-        self.assertEqual(module.get_html(), anon_id)
+        with patch('xmodule.html_module.get_default_time_display') as mock_get_default_time_display:
+            mock_get_default_time_display.return_value = u''
+            self.assertEqual(module.get_html(), anon_id)
 
 
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):

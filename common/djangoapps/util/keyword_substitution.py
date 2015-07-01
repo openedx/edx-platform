@@ -29,7 +29,6 @@ from collections import namedtuple
 
 from django.contrib.auth.models import User
 from student.models import anonymous_id_for_user
-from date_utils import get_default_time_display
 
 Keyword = namedtuple('Keyword', 'func desc')
 
@@ -52,11 +51,11 @@ KEYWORD_FUNCTION_MAP = {
         'course identifier'
     ),
     '%%COURSE_START_DATE%%': Keyword(
-        lambda context: get_default_time_display(context.get('course_start_date')),
+        lambda context: context.get('course_start_date'),
         'start date of the course'
     ),
     '%%COURSE_END_DATE%%': Keyword(
-        lambda context: get_default_time_display(context.get('course_end_date')),
+        lambda context: context.get('course_end_date'),
         'end date of the course'
     ),
 }

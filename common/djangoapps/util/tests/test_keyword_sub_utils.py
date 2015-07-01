@@ -9,6 +9,7 @@ from ddt import ddt, file_data
 from mock import patch
 
 
+from util.date_utils import get_default_time_display
 from util import keyword_substitution as Ks
 
 
@@ -33,7 +34,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             'user_id': self.user.id,
             'course_title': self.course.display_name,
             'name': self.user.profile.name,
-            'course_end_date': self.course.end,
+            'course_end_date': get_default_time_display(self.course.end),
         }
 
     @file_data('fixtures/test_keyword_coursename_sub.json')
