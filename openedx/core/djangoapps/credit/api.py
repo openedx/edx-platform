@@ -92,8 +92,9 @@ def set_credit_requirements(course_key, requirements):
     if requirements_to_disable:
         CreditRequirement.disable_credit_requirements(requirements_to_disable)
 
-    for requirement in requirements:
-        CreditRequirement.add_or_update_course_requirement(credit_course, requirement)
+    # update requirement with new order
+    for order, requirement in enumerate(requirements):
+        CreditRequirement.add_or_update_course_requirement(credit_course, requirement, order)
 
 
 def get_credit_requirements(course_key, namespace=None):
@@ -427,6 +428,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "display_name": "In Course Reverification",
                         "criteria": {},
                         "status": "failed",
+                        "status_date": "2015-06-26 07:49:13",
                     },
                     {
                         "namespace": "proctored_exam",
@@ -434,6 +436,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "display_name": "Proctored Mid Term Exam",
                         "criteria": {},
                         "status": "satisfied",
+                        "status_date": "2015-06-26 11:07:42",
                     },
                     {
                         "namespace": "grade",
@@ -441,6 +444,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "display_name": "Minimum Passing Grade",
                         "criteria": {"min_grade": 0.8},
                         "status": "failed",
+                        "status_date": "2015-06-26 11:07:44",
                     },
                 ]
 

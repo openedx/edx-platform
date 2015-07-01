@@ -142,6 +142,7 @@ class CreditRequirement(TimeStampedModel):
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, default="")
+    order = models.PositiveIntegerField(default=0)
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
@@ -152,7 +153,7 @@ class CreditRequirement(TimeStampedModel):
         unique_together = ('namespace', 'name', 'course')
 
     @classmethod
-    def add_or_update_course_requirement(cls, credit_course, requirement):
+    def add_or_update_course_requirement(cls, credit_course, requirement, order):
         """
         Add requirement to a given course.
 
@@ -171,12 +172,15 @@ class CreditRequirement(TimeStampedModel):
             defaults={
                 "display_name": requirement["display_name"],
                 "criteria": requirement["criteria"],
+                "order": order,
                 "active": True
             }
         )
         if not created:
             credit_requirement.criteria = requirement["criteria"]
             credit_requirement.active = True
+            credit_requirement.order = order
+            credit_requirement.display_name = requirement["display_name"]
             credit_requirement.save()
 
         return credit_requirement, created
@@ -197,7 +201,8 @@ class CreditRequirement(TimeStampedModel):
             QuerySet of CreditRequirement model
 
         """
-        requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True)
+        # order credit requirements according to their appearance in courseware
+        requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True).order_by("-order")
 
         if namespace is not None:
             requirements = requirements.filter(namespace=namespace)
