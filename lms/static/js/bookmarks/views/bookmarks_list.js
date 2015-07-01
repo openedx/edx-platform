@@ -36,7 +36,7 @@
 
             render: function () {
                 var data = {
-                    bookmarks: this.collection,
+                    bookmarksCollection: this.collection,
                     humanFriendlyDate: this.humanFriendlyDate
                 };
                 this.$el.html(this.template(data));
