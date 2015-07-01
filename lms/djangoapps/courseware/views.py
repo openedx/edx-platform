@@ -23,6 +23,7 @@ from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from opaque_keys.edx.keys import CourseKey
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -561,6 +562,20 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
     return result
 
+def item_finder(request, course_key, module_id):
+    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
+
+    if len(items) == 0:
+        raise Http404(
+            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
+                module_id, course_key, request.META.get("HTTP_REFERER", "")
+            ))
+    if len(items) > 1:
+        log.warning(
+            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
+                module_id, course_key, request.META.get("HTTP_REFERER", ""), unicode(items[0])
+            ))
+    return items
 
 @ensure_csrf_cookie
 @ensure_valid_course_key
@@ -569,21 +584,10 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
+    course_key = CourseKey.from_string(course_id)
+    items = item_finder(request, course_key, module_id)
 
-    if len(items) == 0:
-        raise Http404(
-            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", "")
-            ))
-    if len(items) > 1:
-        log.warning(
-            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
-            ))
-
-    return jump_to(request, course_id, items[0].location.to_deprecated_string())
+    return jump_to(request, course_id, unicode(items[0].location))
 
 
 @ensure_csrf_cookie
@@ -602,7 +606,7 @@ def jump_to(request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        (course_key, chapter, section, position, final_target_id) = path_to_location(modulestore(), usage_key)
+        (course_key, chapter, section, vertical, position, final_target_id) = path_to_location(modulestore(), usage_key)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
