@@ -1,8 +1,8 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'js/views/fields'
-    ], function (gettext, $, _, Backbone, RequireMustache, FieldViews) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields'
+    ], function (gettext, $, _, Backbone, FieldViews) {
 
         var AccountSettingsFieldViews = {};
 
