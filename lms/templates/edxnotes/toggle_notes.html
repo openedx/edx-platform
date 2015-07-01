@@ -22,6 +22,6 @@ from django.core.urlresolvers import reverse
   </button>
 </div>
 
-<%static:require_module module_name="toggle_notes_factoryjs/edxnotes/views/toggle_notes_factory" class_name="ToggleNotesFactory">
+<%static:require_module module_name="js/edxnotes/views/toggle_notes_factory" class_name="ToggleNotesFactory">
     ToggleNotesFactory(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
 </%static:require_module>
