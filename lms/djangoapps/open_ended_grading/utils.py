@@ -43,7 +43,7 @@ def generate_problem_url(problem_url_parts, base_course_url):
             # This is placed between the course id and the rest of the url.
             if i == 1:
                 problem_url += "courseware/"
-            problem_url += part + "/"
+            problem_url += unicode(part) + "/"
     return problem_url
 
 

@@ -20,7 +20,10 @@ def get_redirect_url(course_key, usage_key):
         Redirect url string
     """
 
-    (course_key, chapter, section, position) = path_to_location(modulestore(), usage_key)
+    (
+        course_key, chapter, section, vertical_unused,
+        position, final_target_id
+    ) = path_to_location(modulestore(), usage_key)
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -43,4 +46,8 @@ def get_redirect_url(course_key, usage_key):
             'courseware_position',
             args=(unicode(course_key), chapter, section, navigation_index(position))
         )
+
+    if final_target_id:
+        redirect_url += "?activate_block_id={final_target_id}".format(final_target_id=final_target_id)
+
     return redirect_url
