@@ -22,6 +22,7 @@
             'js/edxnotes/views/toggle_notes_factory',
             'js/student_profile/views/learner_profile_factory',
             'js/student_account/views/account_settings_factory',
+            'js/student_account/views/finish_auth_factory',
             'teams/js/teams_tab_factory',
             'js/discovery/main',
             'js/search/course/main',
