@@ -133,21 +133,7 @@ class SequenceModule(SequenceFields, XModule):
             else:
                 self.position = 1
             return json.dumps({'success': True})
-        elif dispatch == 'start_gated_exam':
-            # callback when user chooses to enter into a gated
-            # (e.g. timed or proctored exam)
 
-            proctoring_service = self.runtime.service(self, 'proctoring')
-            user_service = self.runtime.service(self, 'user')
-            user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
-            course_id = self.runtime.course_id
-            location = self.location
-            exam = proctoring_service.get_exam_by_content_id(course_id, location)
-            exam_id = exam['id']
-
-            self.runtime.service(self, 'proctoring').start_exam_attempt(exam_id, user_id, None)
-
-            return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
