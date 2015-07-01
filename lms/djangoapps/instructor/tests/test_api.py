@@ -2553,7 +2553,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Tasks' section.".format(report_type=report_type)
+        success_status = "Your {report_type} report is being generated!" \
+                         " You can view the status of the generation task" \
+                         " in the 'Pending Tasks' section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
