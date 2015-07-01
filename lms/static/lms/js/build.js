@@ -18,7 +18,9 @@
          * done.
          */
         modules: getModulesList([
-            'teams/js/teams_tab_factory'
+            'teams/js/teams_tab_factory',
+            'js/student_profile/views/learner_profile_factory',
+            'js/student_account/views/account_settings_factory'
         ]),
 
         /**
