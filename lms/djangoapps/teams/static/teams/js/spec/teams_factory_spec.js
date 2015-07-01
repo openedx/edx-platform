@@ -2,12 +2,12 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
     function($, Backbone, TeamsTabFactory) {
         'use strict';
        
-        describe("teams django app", function() {
+        describe("Teams tab", function() {
             var teamsTab;
 
             beforeEach(function() {
                 setFixtures('<section class="teams-content"></section>');
-                teamsTab = new TeamsTabFactory();
+                teamsTab = new TeamsTabFactory($(".teams-content"));
             });
 
             afterEach(function() {
