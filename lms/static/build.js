@@ -20,8 +20,6 @@
         modules: getModulesList([
             'js/edxnotes/views/page_factory',
             'js/edxnotes/views/toggle_notes_factory',
-            'js/student_profile/views/learner_profile_factory',
-            'js/student_account/views/account_settings_factory',
             'teams/js/teams_tab_factory',
             'js/discovery/main',
             'js/search/course/main',
