@@ -50,7 +50,7 @@ class BookmarksService(object):
         bookmarks_cache = RequestCache.get_request_cache().data.get(cache_key, None)
         if bookmarks_cache is None and fetch is True:
             bookmarks_cache = api.get_bookmarks(
-                self._user, course_key=course_key, fields=DEFAULT_FIELDS + OPTIONAL_FIELDS
+                self._user, course_key=course_key, fields=DEFAULT_FIELDS
             )
             RequestCache.get_request_cache().data[cache_key] = bookmarks_cache
 
