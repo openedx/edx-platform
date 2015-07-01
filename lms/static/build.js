@@ -1,60 +1,34 @@
 (function () {
     'use strict';
-    var getModule = function (moduleName, excludeCommonDeps) {
-        var module = {
-            name: moduleName
-        };
-
-        if (excludeCommonDeps) {
-            module.exclude = ['js/factories/common_deps'];
-        }
-
-        return module;
-    };
 
     var getModulesList = function (modules) {
-        var result = [getModule('js/factories/common_deps')];
-        return result.concat(modules.map(function (moduleName) {
-            return getModule(moduleName, true);
-        }));
+        return modules.map(function (moduleName) {
+            return { name: moduleName, exclude: ["text"]};
+        });
     };
-
 
     var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined ?
         process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
 
     return {
+        namespace: "RequireJS",
         /**
          * List the modules that will be optimized. All their immediate and deep
          * dependencies will be included in the module's file when the build is
          * done.
          */
         modules: getModulesList([
-            'js/factories/asset_index',
-            'js/factories/base',
-            'js/factories/checklists',
-            'js/factories/container',
-            'js/factories/course',
-            'js/factories/course_create_rerun',
-            'js/factories/course_info',
-            'js/factories/edit_tabs',
-            'js/factories/export',
-            'js/factories/group_configurations',
-            'js/certificates/factories/certificates_page_factory',
-            'js/factories/import',
-            'js/factories/index',
-            'js/factories/library',
-            'js/factories/login',
-            'js/factories/manage_users',
-            'js/factories/outline',
-            'js/factories/register',
-            'js/factories/settings',
-            'js/factories/settings_advanced',
-            'js/factories/settings_graders',
-            'js/factories/textbooks',
-            'js/factories/videos_index',
-            'js/factories/xblock_validation'
+            'js/edxnotes/views/page_factory',
+            'js/edxnotes/views/toggle_notes_factory',
+            'js/student_profile/views/learner_profile_factory',
+            'js/student_account/views/account_settings_factory',
+            'js/student_account/views/finish_auth_factory',
+            'teams/js/teams_tab_factory',
+            'js/discovery/main',
+            'js/search/course/main',
+            'js/search/dashboard/main'
         ]),
+
         /**
          * By default all the configuration for optimization happens from the command
          * line or by properties in the config file, and configuration that was
@@ -79,10 +53,15 @@
          */
         paths: {
             'gettext': 'empty:',
-            'xmodule': 'empty:',
-            'mathjax': 'empty:',
-            'tender': 'empty:',
-            'youtube': 'empty:'
+            'coffee/src/ajax_prefix': 'empty:',
+            'jquery': 'empty:',
+            'backbone': 'empty:',
+            'underscore': 'empty:',
+            'logger': 'empty:',
+            'URI': 'empty:',
+            'tinymce': 'empty:',
+            'jquery.tinymce': 'empty:',
+            'course_discovery_meanings': 'empty:'
         },
         /**
          * If shim config is used in the app during runtime, duplicate the config
@@ -92,15 +71,7 @@
          * However, if mainConfigFile is not an option, the shim config can be
          * inlined in the build config.
          */
-        shim: {
-            'xmodule': {
-                deps: [
-                    'jquery', 'underscore', 'codemirror', 'tinymce',
-                    'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',
-                    'jquery.cookie', 'utility'
-                ]
-            }
-        },
+        shim: {},
         /**
          * Introduced in 2.1.2: If using "dir" for an output directory, normally the
          * optimize setting is used to optimize the build bundles (the "modules"
@@ -158,6 +129,6 @@
          * SILENT: 4
          * Default is 0.
          */
-        logLevel: 1
+        logLevel: 0
     };
 } ())

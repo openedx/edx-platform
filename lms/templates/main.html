@@ -57,7 +57,13 @@ from branding import api as branding_api
       </script>
   % endif
 
-  <script type="text/javascript" src="/jsi18n/"></script>
+  ## TODO: DO WE HAVE BOTH WAYS WORKING NOW?
+  ## RequireJS-enabled pages should include the "i18n" module as a requirement.
+  ## If RequireJS is not enabled, then we will need to load i18n explicitly
+  ## so that JavaScript on the page can use internationalization functions.
+##  % if not enable_require_js:
+   <script type="text/javascript" src="/jsi18n/"></script>
+##  % endif
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
@@ -68,24 +74,19 @@ from branding import api as branding_api
     <%static:js group='base_vendor'/>
   % else:
     <%static:js group='main_vendor'/>
+    <%static:js group='application'/>
+    <%static:js group='module-js'/>
   % endif
 
   <script>
     window.baseUrl = "${settings.STATIC_URL}";
     (function (require) {
-    % if settings.DEBUG is True:
-        ## Using what amounts to a random number in the Development environment for cache-busting
-        var urlArgs = "bust=" + (new Date()).getTime();
-    % else:
-        var urlArgs = "v=${settings.EDX_PLATFORM_REVISION}";
-    % endif
       require.config({
-          baseUrl: baseUrl,
-          urlArgs: urlArgs
+          baseUrl: window.baseUrl
       });
     }).call(this, require || RequireJS.require);
   </script>
-  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  <script type="text/javascript" src="${static.url("require-config.js")}"></script>
 
   <%block name="headextra"/>
 
@@ -159,11 +160,6 @@ from branding import api as branding_api
 % if not disable_window_wrap:
   </div>
 % endif
-
-  % if not disable_courseware_js:
-    <%static:js group='application'/>
-    <%static:js group='module-js'/>
-  % endif
 
   <%block name="js_extra"/>
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>

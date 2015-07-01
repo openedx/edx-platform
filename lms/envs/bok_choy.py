@@ -48,6 +48,20 @@ update_module_store_settings(
 )
 
 ############################ STATIC FILES #############################
+
+# Enable debug so that static assets are served by Django
+DEBUG = True
+
+# Serve static files at /static directly from the staticfiles directory under test root
+# Note: optimized files for testing are generated with settings from test_static_optimized
+STATIC_URL = "/static/"
+STATICFILES_FINDERS = (
+    'staticfiles.finders.FileSystemFinder',
+)
+STATICFILES_DIRS = (
+    (TEST_ROOT / "staticfiles" / "lms").abspath(),
+)
+
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
@@ -105,9 +119,6 @@ FEATURES['ENABLE_TEAMS'] = True
 
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
-
-# Unfortunately, we need to use debug mode to serve staticfiles
-DEBUG = True
 
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True

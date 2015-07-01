@@ -395,7 +395,7 @@ FEATURES = {
     'ENABLE_SOFTWARE_SECURE_FAKE': False,
 
     # Teams feature
-    'ENABLE_TEAMS': False,
+    'ENABLE_TEAMS': True,
 
     # Show video bumper in LMS
     'ENABLE_VIDEO_BUMPER': False,
@@ -1191,7 +1191,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### Pipeline #######################################
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -1203,8 +1203,6 @@ courseware_js = (
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
-
-courseware_search_js = ['js/search/course/main.js']
 
 
 # Before a student accesses courseware, we do not
@@ -1237,7 +1235,6 @@ main_vendor_js = base_vendor_js + [
 dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
-dashboard_search_js = ['js/search/dashboard/main.js']
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 rwd_header_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/utils/rwd_header.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
@@ -1329,8 +1326,6 @@ incourse_reverify_js = [
 ]
 
 ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
-
-discovery_js = ['js/discovery/main.js']
 
 certificates_web_view_js = [
     'js/vendor/jquery.min.js',
@@ -1492,10 +1487,6 @@ PIPELINE_JS = {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
     },
-    'courseware_search': {
-        'source_filenames': courseware_search_js,
-        'output_filename': 'js/lms-courseware-search.js',
-    },
     'base_vendor': {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/lms-base-vendor.js',
@@ -1536,10 +1527,6 @@ PIPELINE_JS = {
         'source_filenames': dashboard_js,
         'output_filename': 'js/dashboard.js'
     },
-    'dashboard_search': {
-        'source_filenames': dashboard_search_js,
-        'output_filename': 'js/dashboard-search.js',
-    },
     'rwd_header': {
         'source_filenames': rwd_header_js,
         'output_filename': 'js/rwd_header.js'
@@ -1567,10 +1554,6 @@ PIPELINE_JS = {
     'footer_edx': {
         'source_filenames': ['js/footer-edx.js'],
         'output_filename': 'js/footer-edx.js'
-    },
-    'discovery': {
-        'source_filenames': discovery_js,
-        'output_filename': 'js/discovery.js'
     },
     'certificates_wv': {
         'source_filenames': certificates_web_view_js,
@@ -1613,17 +1596,49 @@ PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
-    "coffee/*",
+    "coffee/*.coffee",
+    "coffee/*/*.coffee",
+    "coffee/*/*/*.coffee",
+    "coffee/*/*/*/*.coffee",
 
     # Symlinks used by js-test-tool
     "xmodule_js",
-    "common",
 )
 
 PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
+
+
+################################# DJANGO-REQUIRE ###############################
+
+# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
+REQUIRE_BASE_URL = "./"
+
+# The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
+# A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
+# Set to False to disable running the default profile (e.g. if only using it to build Standalone
+# Modules)
+REQUIRE_BUILD_PROFILE = "build.js"
+
+# The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
+REQUIRE_JS = "js/vendor/require.js"
+
+# A dictionary of standalone modules to build with almond.js.
+REQUIRE_STANDALONE_MODULES = {}
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = False
+
+# A tuple of files to exclude from the compilation result of r.js.
+REQUIRE_EXCLUDE = ("build.txt",)
+
+# The execution environment in which to run r.js: auto, node or rhino.
+# auto will autodetect the environment and make use of node if available and rhino if not.
+# It can also be a path to a custom class that subclasses require.environments.Environment
+# and defines some "args" function that returns a list with the command arguments to execute.
+REQUIRE_ENVIRONMENT = "node"
 
 
 ################################# CELERY ######################################

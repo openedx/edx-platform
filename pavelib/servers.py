@@ -13,13 +13,13 @@ DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = 'devstack'
 
 
-def run_server(system, settings=None, port=None, skip_assets=False, contracts=False):
+def run_server(system, settings=None, asset_settings=None, collect_static=False, port=None, contracts=False):
     """
     Start the server for the specified `system` (lms or studio).
     `settings` is the Django settings module to use; if not provided, use the default.
+    `collect_static` defaults to False, but if True then static files will be collected.
+    `asset_settings` is the settings to use when generating assets; if not provided, assets are not generated.
     `port` is the port to run the server on; if not provided, use the default port for the system.
-
-    If `skip_assets` is True, skip the asset compilation step.
     """
     if system not in ['lms', 'studio']:
         print("System must be either lms or studio", file=sys.stderr)
@@ -28,9 +28,10 @@ def run_server(system, settings=None, port=None, skip_assets=False, contracts=Fa
     if not settings:
         settings = DEFAULT_SETTINGS
 
-    if not skip_assets:
-        # Local dev settings use staticfiles to serve assets, so we can skip the collecstatic step
-        args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
+    if asset_settings:
+        args = [system, '--settings={}'.format(asset_settings), '--skip-collect', '--watch']
+        if not collect_static:
+            args.append('--skip-collect')
         call_task('pavelib.assets.update_assets', args=args)
 
     if port is None:
@@ -58,7 +59,7 @@ def lms(options):
     settings = getattr(options, 'settings', None)
     port = getattr(options, 'port', None)
     fast = getattr(options, 'fast', False)
-    run_server('lms', settings=settings, port=port, skip_assets=fast)
+    run_server('lms', settings=settings, asset_settings=None if fast else settings, port=port)
 
 
 @task
@@ -75,7 +76,7 @@ def studio(options):
     settings = getattr(options, 'settings', None)
     port = getattr(options, 'port', None)
     fast = getattr(options, 'fast', False)
-    run_server('studio', settings=settings, port=port, skip_assets=fast)
+    run_server('studio', settings=settings, asset_settings=None if fast else settings, port=port)
 
 
 @task
@@ -89,6 +90,8 @@ def devstack(args):
     parser = argparse.ArgumentParser(prog='paver devstack')
     parser.add_argument('system', type=str, nargs=1, help="lms or studio")
     parser.add_argument('--fast', action='store_true', default=False, help="Skip updating assets")
+    parser.add_argument('--optimized', action='store_true', default=False, help="Run with optimized assets")
+    parser.add_argument('--settings', type=str, default="devstack", help="Settings file")
     parser.add_argument(
         '--no-contracts',
         action='store_true',
@@ -96,7 +99,20 @@ def devstack(args):
         help="Disable contracts. By default, they're enabled in devstack."
     )
     args = parser.parse_args(args)
-    run_server(args.system[0], settings='devstack', skip_assets=args.fast, contracts=(not args.no_contracts))
+    settings = args.settings
+    asset_settings = settings
+    collect_static = False
+    if args.optimized:
+        settings = "devstack_optimized"
+        asset_settings = "test_static_optimized"
+        collect_static = not args.fast
+    run_server(
+        args.system[0],
+        settings=settings,
+        asset_settings=asset_settings,
+        collect_static=collect_static,
+        contracts=(not args.no_contracts),
+    )
 
 
 @task
