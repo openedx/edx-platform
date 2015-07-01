@@ -480,27 +480,6 @@ class UserStateCache(object):
             kvs_key.field_name in self._cache[cache_key]
         )
 
-    # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
-    def set_score(self, user_id, usage_key, score, max_score):
-        """
-        UNSUPPORTED METHOD
-
-        Set the score and max_score for the specified user and xblock usage.
-        """
-        student_module, created = StudentModule.objects.get_or_create(
-            student_id=user_id,
-            module_state_key=usage_key,
-            course_id=usage_key.course_key,
-            defaults={
-                'grade': score,
-                'max_grade': max_score,
-            }
-        )
-        if not created:
-            student_module.grade = score
-            student_module.max_grade = max_score
-            student_module.save()
-
     def __len__(self):
         return len(self._cache)
 
@@ -923,18 +902,6 @@ class FieldDataCache(object):
 
         return self.cache[key.scope].has(key)
 
-    # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
-    def set_score(self, user_id, usage_key, score, max_score):
-        """
-        UNSUPPORTED METHOD
-
-        Set the score and max_score for the specified user and xblock usage.
-        """
-        assert not self.user.is_anonymous()
-        assert user_id == self.user.id
-        assert usage_key.course_key == self.course_id
-        self.cache[Scope.user_state].set_score(user_id, usage_key, score, max_score)
-
     @contract(key=DjangoKeyValueStore.Key, returns="datetime|None")
     def last_modified(self, key):
         """
@@ -1017,3 +984,23 @@ class ScoresClient(object):
         client = cls(fd_cache.course_id, fd_cache.user.id)
         client.fetch_scores(fd_cache.scorable_locations)
         return client
+
+
+# @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+def set_score(user_id, usage_key, score, max_score):
+    """
+    Set the score and max_score for the specified user and xblock usage.
+    """
+    student_module, created = StudentModule.objects.get_or_create(
+        student_id=user_id,
+        module_state_key=usage_key,
+        course_id=usage_key.course_key,
+        defaults={
+            'grade': score,
+            'max_grade': max_score,
+        }
+    )
+    if not created:
+        student_module.grade = score
+        student_module.max_grade = max_score
+        student_module.save()

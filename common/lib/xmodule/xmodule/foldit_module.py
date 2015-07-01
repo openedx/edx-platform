@@ -188,6 +188,8 @@ class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
 
     has_score = True
 
+    show_in_read_only_mode = True
+
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
 

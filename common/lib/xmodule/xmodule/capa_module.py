@@ -119,6 +119,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     module_class = CapaModule
 
     has_score = True
+    show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}

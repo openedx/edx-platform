@@ -139,7 +139,7 @@ def courses(request):
     )
 
 
-def render_accordion(request, course, chapter, section, field_data_cache):
+def render_accordion(user, request, course, chapter, section, field_data_cache):
     """
     Draws navigation bar. Takes current position in accordion as
     parameter.
@@ -151,7 +151,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     Returns the html string
     """
     # grab the table of contents
-    toc = toc_for_course(request, course, chapter, section, field_data_cache)
+    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
 
     context = dict([
         ('toc', toc),
@@ -378,10 +378,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         except ValueError:
             raise Http404(u"Position {} is not an integer!".format(position))
 
-    user = request.user
-    course = get_course_with_access(user, 'load', course_key, depth=2)
+    course = get_course_with_access(request.user, 'load', course_key, depth=2)
+    staff_access = has_access(request.user, 'staff', course)
+    masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
-    staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -413,8 +413,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if survey.utils.must_answer_survey(course, user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-    masquerade = setup_masquerade(request, course_key, staff_access)
-
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
@@ -431,7 +429,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section, field_data_cache),
+            'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default,
             'course': course,
             'init': '',
@@ -475,7 +473,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         # settings.
         show_chat = course.show_chat and settings.FEATURES['ENABLE_CHAT']
         if show_chat:
-            context['chat'] = chat_settings(course, user)
+            context['chat'] = chat_settings(course, request.user)
             # If we couldn't load the chat settings, then don't show
             # the widget in the courseware.
             if context['chat'] is None:
@@ -536,7 +534,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             )
 
             section_module = get_module_for_descriptor(
-                request.user,
+                user,
                 request,
                 section_descriptor,
                 field_data_cache,
@@ -550,7 +548,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 # they don't have access to.
                 raise Http404
 
-            # Save where we are in the chapter
+            # Save where we are in the chapter.
             save_child_position(chapter_module, section)
             context['fragment'] = section_module.render(STUDENT_VIEW)
             context['section_title'] = section_descriptor.display_name_with_default
@@ -598,12 +596,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             raise
         else:
             log.exception(
-                u"Error in index view: user=%s, course=%s, chapter=%s, section=%s, position=%s",
-                user,
-                course,
-                chapter,
-                section,
-                position
+                u"Error in index view: user=%s, effective_user=%s, course=%s, chapter=%s section=%s position=%s",
+                request.user, user, course, chapter, section, position
             )
             try:
                 result = render_to_response('courseware/courseware-error.html', {
@@ -683,19 +677,19 @@ def course_info(request, course_id):
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
+        staff_access = has_access(request.user, 'staff', course)
+        masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
-        if user_must_complete_entrance_exam(request, request.user, course):
+        if user_must_complete_entrance_exam(request, user, course):
             return redirect(reverse('courseware', args=[unicode(course.id)]))
 
         # check to see if there is a required survey that must be taken before
         # the user can access the course.
-        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-        staff_access = has_access(request.user, 'staff', course)
-        masquerade = setup_masquerade(request, course_key, staff_access)  # allow staff to masquerade on the info page
         studio_url = get_studio_url(course, 'course_info')
 
         # link to where the student should go to enroll in the course:
@@ -704,7 +698,7 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
+        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
 
         context = {
             'request': request,
@@ -719,7 +713,7 @@ def course_info(request, course_id):
         }
 
         now = datetime.now(UTC())
-        effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
+        effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
         if not in_preview_mode() and staff_access and now < effective_start:
             # Disable student view button if user is staff and
             # course is not yet visible to students.

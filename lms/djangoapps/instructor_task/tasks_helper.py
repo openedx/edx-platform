@@ -31,6 +31,7 @@ from shoppingcart.models import (
 
 from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
+from xblock.runtime import KvsFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
 from django.utils.translation import ugettext as _
@@ -43,7 +44,7 @@ from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
-from courseware.model_data import FieldDataCache
+from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
 from instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from instructor_analytics.csvs import format_dictlist
@@ -422,6 +423,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     """
     # reconstitute the problem's corresponding XModule:
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
+    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
 
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
@@ -444,7 +446,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     return get_module_for_descriptor_internal(
         user=student,
         descriptor=module_descriptor,
-        field_data_cache=field_data_cache,
+        student_data=student_data,
         course_id=course_id,
         track_function=make_track_function(),
         xqueue_callback_url_prefix=xqueue_callback_url_prefix,

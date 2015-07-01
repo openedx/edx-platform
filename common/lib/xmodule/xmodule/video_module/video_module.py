@@ -339,6 +339,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     module_class = VideoModule
     transcript = module_attr('transcript')
 
+    show_in_read_only_mode = True
+
     tabs = [
         {
             'name': _("Basic"),
