@@ -6,6 +6,7 @@ Run these tests @ Devstack:
 from datetime import datetime
 import json
 import uuid
+from django.utils import timezone
 import mock
 from random import randint
 from urllib import urlencode
@@ -23,6 +24,7 @@ from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
 from courseware.model_data import FieldDataCache
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from gradebook.models import StudentGradebook
 from instructor.access import allow_access
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -92,7 +94,6 @@ class CoursesApiTests(ModuleStoreTestCase):
         )
         return module
 
-
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
         self.base_courses_uri = '/api/server/courses'
@@ -141,11 +142,32 @@ class CoursesApiTests(ModuleStoreTestCase):
             display_name="Video_Sequence"
         )
 
+        self.course_content2 = ItemFactory.create(
+            category="sequential",
+            parent_location=self.chapter.location,
+            data=self.test_data,
+            display_name="Sequential",
+        )
+
         self.content_child = ItemFactory.create(
             category="video",
             parent_location=self.course_content.location,
             data=self.test_data,
-            display_name="Video_Resources"
+            display_name="Video"
+        )
+
+        self.content_child2 = ItemFactory.create(
+            category="vertical",
+            parent_location=self.course_content2.location,
+            data=self.test_data,
+            display_name="Vertical Sequence"
+        )
+
+        self.content_subchild = ItemFactory.create(
+            category="video",
+            parent_location=self.content_child2.location,
+            data=self.test_data,
+            display_name="Child Video",
         )
 
         self.overview = ItemFactory.create(
@@ -330,7 +352,6 @@ class CoursesApiTests(ModuleStoreTestCase):
                 self.assertIsNotNone(course['course_image_url'])
         self.assertItemsEqual(courses, courses_in_result)
 
-
     def test_course_detail_without_date_values(self):
         create_course_with_out_date_values = CourseFactory.create()  # pylint: disable=C0103
         test_uri = self.base_courses_uri + '/' + unicode(create_course_with_out_date_values.id)
@@ -387,7 +408,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         chapter = response.data['content'][0]
         self.assertEqual(chapter['category'], 'chapter')
         self.assertEqual(chapter['name'], 'Overview')
-        self.assertEqual(len(chapter['children']), 5)
+        self.assertEqual(len(chapter['children']), 6)
 
         sequence = chapter['children'][0]
         self.assertEqual(sequence['category'], 'videosequence')
@@ -2456,3 +2477,21 @@ class CoursesApiTests(ModuleStoreTestCase):
         delete_uri = '{}invalid_role/users/{}'.format(test_uri, self.users[0].id)
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_course_navigation(self):
+        test_uri = '{}/{}/navigation/{}'.format(
+            self.base_courses_uri, unicode(self.course.id), self.content_subchild.location.block_id
+        )
+        response = self.do_get(test_uri)
+        self.maxDiff = None
+        self.assertEqual(
+            {
+                'chapter': unicode(self.chapter.location),
+                'vertical': unicode(self.content_child2.location),
+                'section': unicode(self.course_content2.location),
+                'course_key': unicode(self.course.id),
+                'final_target_id': unicode(self.content_subchild.location),
+                'position': '1',
+            },
+            response.data
+        )
