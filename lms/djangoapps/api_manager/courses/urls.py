@@ -40,6 +40,7 @@ urlpatterns = patterns(
     url(r'^{0}/users/(?P<user_id>[0-9]+)$'.format(COURSE_ID_PATTERN), courses_views.CoursesUsersDetail.as_view()),
     url(r'^{0}/users/*$'.format(COURSE_ID_PATTERN), courses_views.CoursesUsersList.as_view()),
     url(r'^{0}/workgroups/*$'.format(COURSE_ID_PATTERN), courses_views.CoursesWorkgroupsList.as_view()),
+    url(r'^{0}/navigation/{1}$'.format(COURSE_ID_PATTERN, settings.USAGE_KEY_PATTERN), courses_views.CourseNavView.as_view()),
     url(r'^{0}$'.format(COURSE_ID_PATTERN), courses_views.CoursesDetail.as_view()),
     url(r'/*$^', courses_views.CoursesList.as_view()),
 )
