@@ -23,7 +23,9 @@
             'js/edxnotes/views/toggle_notes_factory',
             'js/discovery/main',
             'js/search/course/main',
-            'js/search/dashboard/main'
+            'js/search/dashboard/main',
+            'js/student_profile/views/learner_profile_factory',
+            'js/student_account/views/account_settings_factory'
         ]),
 
         /**
