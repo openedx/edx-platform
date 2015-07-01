@@ -2553,7 +2553,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
+        success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Tasks' section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2573,7 +2573,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
         success_status = "Your {report_type} report is being created." \
-                         " To view the status of the report, see the 'Pending Instructor Tasks'" \
+                         " To view the status of the report, see the 'Pending Tasks'" \
                          " section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
@@ -2595,7 +2595,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
         already_running_status = "An {report_type} report is currently in progress." \
-                                 " To view the status of the report, see the 'Pending Instructor Tasks' section." \
+                                 " To view the status of the report, see the 'Pending Tasks' section." \
                                  " When completed, the report will be available for download in the table below." \
                                  " You will be able to download the" \
                                  " report when it is complete.".format(report_type=report_type)
