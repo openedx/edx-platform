@@ -17,7 +17,6 @@ from dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.user_api.preferences.api import (
     delete_user_preference, get_user_preference, set_user_preference
 )
-from openedx.core.djangoapps.user_api.errors import UserNotFound
 from lang_pref import LANGUAGE_KEY
 
 # TODO re-import this once we're on Django 1.5 or greater. [PLAT-671]
@@ -133,27 +132,36 @@ class DarkLangMiddleware(object):
         and that language doesn't appear in ``self.released_langs``,
         then set the session LANGUAGE_SESSION_KEY to that language.
         """
+        auth_user = request.user.is_authenticated()
         if 'clear-lang' in request.GET:
-            # Reset dark lang
-            delete_user_preference(request.user, DARK_LANGUAGE_KEY)
-            # Reset user's language to their language preference, if they have one
-            user_pref = get_user_preference(request.user, LANGUAGE_KEY)
-            if user_pref:
-                request.session[LANGUAGE_SESSION_KEY] = user_pref
-            elif LANGUAGE_SESSION_KEY in request.session:
+            # delete the session language key (if one is set)
+            if LANGUAGE_SESSION_KEY in request.session:
                 del request.session[LANGUAGE_SESSION_KEY]
+
+            if auth_user:
+                # Reset user's dark lang preference to null
+                delete_user_preference(request.user, DARK_LANGUAGE_KEY)
+                # Get & set user's preferred language
+                user_pref = get_user_preference(request.user, LANGUAGE_KEY)
+                if user_pref:
+                    request.session[LANGUAGE_SESSION_KEY] = user_pref
             return
 
+        # Get the user's preview lang - this is either going to be set from a query
+        # param `?preview-lang=xx`, or we may have one already set as a dark lang preference.
         preview_lang = request.GET.get('preview-lang', None)
-        if not preview_lang:
-            try:
-                # Try to get the request user's preference (might not have a user, though)
-                preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
-            except UserNotFound:
-                return
+        if not preview_lang and auth_user:
+            # Get the request user's dark lang preference
+            preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
 
+        # User doesn't have a dark lang preference, so just return
         if not preview_lang:
             return
 
+        # Set the session key to the requested preview lang
         request.session[LANGUAGE_SESSION_KEY] = preview_lang
-        set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
+
+        # Make sure that we set the requested preview lang as the dark lang preference for the
+        # user, so that the lang_pref middleware doesn't clobber away the dark lang preview.
+        if auth_user:
+            set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
