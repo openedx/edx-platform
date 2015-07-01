@@ -142,11 +142,6 @@ div.course-wrapper {
       list-style: none;
 
       > div {
-        @extend .clearfix;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: ($baseline*0.75);
-        padding: 0 0 15px;
-
         .collapsible {
           header {
             margin-bottom: 0;
@@ -211,6 +206,19 @@ div.course-wrapper {
           padding: 0;
           }
         }
+      }
+
+      .vert > .xblock-student_view {
+        @extend .clearfix;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: ($baseline*0.75);
+        padding: 0 0 15px;
+      }
+
+      .vert > .xblock-student_view.is-hidden {
+          display: none;
+          border-bottom: 0px;
+          margin-bottom: 0px;
       }
     }
 

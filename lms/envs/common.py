@@ -413,6 +413,9 @@ FEATURES = {
 
     # Full Course/Library Import/Export API
     'ENABLE_IMPORT_EXPORT_LMS': False,
+
+    # The block types to disable need to be specified in "x block disable config" in django admin.
+    'ENABLE_DISABLING_XBLOCK_TYPES': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1929,6 +1932,8 @@ INSTALLED_APPS = (
 
     # Import/Export API
     'openedx.core.djangoapps.import_export',
+
+    'xblock_django',
 )
 
 ######################### CSRF #########################################

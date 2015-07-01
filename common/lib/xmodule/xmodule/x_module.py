@@ -1298,9 +1298,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
-
+    # pylint: disable=bad-continuation
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=(), **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1358,9 +1358,19 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         else:
             self.get_policy = lambda u: {}
 
+        self.disabled_xblock_types = disabled_xblock_types
+
     def get_block(self, usage_id, for_parent=None):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
         return self.load_item(usage_id, for_parent=for_parent)
+
+    def load_block_type(self, block_type):
+        """
+        Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type`.
+        """
+        if block_type in self.disabled_xblock_types:
+            return self.default_class
+        return super(DescriptorSystem, self).load_block_type(block_type)
 
     def get_field_provenance(self, xblock, field):
         """
