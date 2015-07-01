@@ -102,7 +102,7 @@ div.course-wrapper {
     h1 {
       margin: 0 0 lh();
     }
-    div.sequence {
+    div.timed-exam {
       h3 {
         margin-bottom: 12px;
         font-size: 22px;
@@ -114,7 +114,7 @@ div.course-wrapper {
       .gated-sequence {
         color: #147ABA;
         font-weight: 600;
-        a {
+        a.start-timed-exam {
           cursor: pointer;
           color: #147ABA;
           font-weight: 600;
