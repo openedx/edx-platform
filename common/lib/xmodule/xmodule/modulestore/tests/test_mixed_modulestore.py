@@ -1222,15 +1222,16 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
             should_work = (
                 (self.problem_x1a_2,
-                 (course_key, u"Chapter_x", u"Sequential_x1", '1')),
+                 (course_key, u"Chapter_x", u"Sequential_x1", u'Vertical_x1a', '1', self.problem_x1a_2)),
                 (self.chapter_x,
-                 (course_key, "Chapter_x", None, None)),
+                 (course_key, "Chapter_x", None, None, None, self.chapter_x)),
             )
 
             for location, expected in should_work:
                 # each iteration has different find count, pop this iter's find count
                 with check_mongo_calls(num_finds.pop(0), num_sends):
-                    self.assertEqual(path_to_location(self.store, location), expected)
+                    path = path_to_location(self.store, location)
+                    self.assertEqual(path, expected)
 
         not_found = (
             course_key.make_usage_key('video', 'WelcomeX'),
@@ -1260,11 +1261,13 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # only needs course_locations set
         self.initdb('draft')
         course_key = self.course_locations[self.XML_COURSEID1].course_key
+        video_key = course_key.make_usage_key('video', 'Welcome')
+        chapter_key = course_key.make_usage_key('chapter', 'Overview')
         should_work = (
-            (course_key.make_usage_key('video', 'Welcome'),
-             (course_key, "Overview", "Welcome", None)),
-            (course_key.make_usage_key('chapter', 'Overview'),
-             (course_key, "Overview", None, None)),
+            (video_key,
+             (course_key, "Overview", "Welcome", None, None, video_key)),
+            (chapter_key,
+             (course_key, "Overview", None, None, None, chapter_key)),
         )
 
         for location, expected in should_work:
