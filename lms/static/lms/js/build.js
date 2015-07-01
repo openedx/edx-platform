@@ -26,7 +26,8 @@
             'js/search/dashboard/main',
             'js/student_profile/views/learner_profile_factory',
             'js/student_account/views/account_settings_factory',
-            'js/groups/views/cohorts_dashboard_factory'
+            'js/groups/views/cohorts_dashboard_factory',
+            'js/student_account/views/finish_auth_factory'
         ]),
 
         /**

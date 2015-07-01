@@ -304,18 +304,6 @@
                     'js/models/notification', 'jquery.fileupload'
                 ]
             },
-            'js/student_account/enrollment': {
-                exports: 'edx.student.account.EnrollmentInterface',
-                deps: ['jquery', 'jquery.cookie']
-            },
-            'js/student_account/emailoptin': {
-                exports: 'edx.student.account.EmailOptInInterface',
-                deps: ['jquery', 'jquery.cookie']
-            },
-            'js/student_account/shoppingcart': {
-                exports: 'edx.student.account.ShoppingCartInterface',
-                deps: ['jquery', 'jquery.cookie', 'underscore']
-            },
             // Student account registration/login
             // Loaded explicitly until these are converted to RequireJS
             'js/student_account/views/FormView': {
