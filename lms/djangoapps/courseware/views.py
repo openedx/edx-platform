@@ -623,6 +623,23 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     return result
 
 
+def item_finder(request, course_key, module_id):
+    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
+
+    if len(items) == 0:
+        raise Http404(
+            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
+                module_id, course_key, request.META.get("HTTP_REFERER", "")
+            ))
+    if len(items) > 1:
+        log.warning(
+            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
+                module_id, course_key, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
+            ))
+
+    return items
+
+
 @ensure_csrf_cookie
 @ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
@@ -630,21 +647,10 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
+    course_key = CourseKey.from_string(course_id)
+    items = item_finder(request, course_key, module_id)
 
-    if len(items) == 0:
-        raise Http404(
-            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", "")
-            ))
-    if len(items) > 1:
-        log.warning(
-            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
-            ))
-
-    return jump_to(request, course_id, items[0].location.to_deprecated_string())
+    return jump_to(request, course_id, unicode(items[0].location))
 
 
 @ensure_csrf_cookie
