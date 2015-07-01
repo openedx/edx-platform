@@ -63,7 +63,7 @@ def fetch_saml_metadata():
 
             try:
                 parser = etree.XMLParser(remove_comments=True)
-                xml = etree.fromstring(response.text, parser)
+                xml = etree.fromstring(response.content, parser)
             except etree.XMLSyntaxError:
                 raise
             # TODO: Can use OneLogin_Saml2_Utils to validate signed XML if anyone is using that
@@ -80,7 +80,7 @@ def fetch_saml_metadata():
         except Exception as err:  # pylint: disable=broad-except
             log.exception(err.message)
             num_failed += 1
-        return (num_changed, num_failed, len(url_map))
+    return (num_changed, num_failed, len(url_map))
 
 
 def _parse_metadata_xml(xml, entity_id):
