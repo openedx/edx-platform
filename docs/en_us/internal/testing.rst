@@ -120,7 +120,7 @@ You can run all of the unit-level tests using the command
 This includes python, javascript, and documentation tests. It does not,
 however, run any acceptance tests.
 
-Note - 
+Note -
 `paver` is a scripting tool. To get information about various options, you can run the following command -
 ::
 	paver -h
@@ -278,6 +278,7 @@ console::
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
     paver test_js_run -s common
+    paver test_js_run -s common-requirejs
 
 To run JavaScript tests in your default browser::
 
@@ -287,6 +288,7 @@ To run JavaScript tests in your default browser::
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule
     paver test_js_dev -s common
+    paver test_js_dev -s common-requirejs
 
 These paver commands call through to a custom test runner. For more
 info, see `js-test-tool <https://github.com/edx/js-test-tool>`__.
@@ -534,7 +536,7 @@ More specific options are below.
 
    ``system`` is an optional argument here. It defaults to
    ``cms,lms,common``.
-   
+
 
 JavaScript Code Style Quality
 ------------------
@@ -542,7 +544,7 @@ JavaScript Code Style Quality
 To view JavaScript code style quality::
 
     paver run_jshint
-    
+
 -  This command also comes with a ``--limit`` switch, for example::
 
 	paver run_jshint --limit=700
@@ -608,4 +610,3 @@ Acceptance Test Techniques
    and "LMS" when they follow this convention: name your feature in the
    .feature file CMS or LMS with a single period and then no other
    periods in the name. The name can contain spaces. E.g. "CMS.Sign Up"
-
