@@ -20,10 +20,7 @@
         modules: getModulesList([
             'js/edxnotes/views/page_factory',
             'js/edxnotes/views/toggle_notes_factory',
-            'teams/js/teams_tab_factory',
-            'js/discovery/main',
-            'js/search/course/main',
-            'js/search/dashboard/main'
+            'teams/js/teams_tab_factory'
         ]),
 
         /**
@@ -57,8 +54,7 @@
             'logger': 'empty:',
             'URI': 'empty:',
             'tinymce': 'empty:',
-            'jquery.tinymce': 'empty:',
-            'course_discovery_meanings': 'empty:'
+            'jquery.tinymce': 'empty:'
         },
         /**
          * If shim config is used in the app during runtime, duplicate the config

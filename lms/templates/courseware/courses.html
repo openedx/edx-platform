@@ -7,25 +7,28 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
-% if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
 <%block name="header_extras">
+  % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
   % for template_name in ["result_item", "filter_bar", "filter", "search_facets_list", "search_facets_section", "search_facet", "more_less_links"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
   % endfor
-  <script type="text/javascript">(function (define) {
-      'use strict';
-      define('course_discovery_meanings', function() {
+  <script type="text/javascript">;(function (define) {{
+      define('course_discovery_meanings', function() {{
+          'use strict';
           return ${json.dumps(course_discovery_meanings)};
-      });
-  })(define || RequireJS.define);
+        }});
+      }})(define || RequireJS.define);
   </script>
-  <%static:require_module module_name="js/discovery/main" class_name="setupDiscovery">
-      setupDiscovery();
-  </%static:require_module>
+  % endif
 </%block>
-% endif
+
+<%block name="js_extra">
+  % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+  <%static:js group='discovery'/>
+  % endif
+</%block>
 
 <%block name="pagetitle">${_("Courses")}</%block>
 <%
