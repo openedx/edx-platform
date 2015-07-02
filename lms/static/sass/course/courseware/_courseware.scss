@@ -135,12 +135,17 @@ div.course-wrapper {
       }
       background-color: #F2F4F5;
       padding: 30px;
+      font-size: 16px;
       box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .1);
       border: 1px solid #ddd;
+      &.critical-time {
+        border-left: 4px solid #b30101 !important;
+        margin: 0 auto;
+      }
     }
     div.proctored-exam {
       @extend .timed-exam;
-      .exam-code {
+      .proctored-exam-message {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
         padding-top: 25px;
       }
@@ -198,7 +203,7 @@ div.course-wrapper {
         margin-bottom: ($baseline/20);
         color: #797676;
       }
-      .new{
+      .proctored-exam-option{
         border-top: 2px solid rgb(207, 216, 220);
         padding: ($baseline/2) 0;
         border-bottom: 2px solid rgb(207, 216, 220);
