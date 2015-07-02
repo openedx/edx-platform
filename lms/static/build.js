@@ -18,8 +18,6 @@
          * done.
          */
         modules: getModulesList([
-            'js/edxnotes/views/page_factory',
-            'js/edxnotes/views/toggle_notes_factory',
             'teams/js/teams_tab_factory'
         ]),
 
