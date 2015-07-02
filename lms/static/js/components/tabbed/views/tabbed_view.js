@@ -8,7 +8,7 @@
            function (Backbone, _, $, tabbedViewTemplate, tabTemplate) {
                var TabbedView = Backbone.View.extend({
                    events: {
-                       'click .nav-item': 'switchTab'
+                       'click .nav-item[role="tab"]': 'switchTab'
                    },
 
                    template: _.template(tabbedViewTemplate),
@@ -45,9 +45,8 @@
                            view = tab.view;
                        this.$('a.is-active').removeClass('is-active').attr('aria-selected', 'false');
                        this.$('a[data-index='+index+']').addClass('is-active').attr('aria-selected', 'true');
-                       view.render();
-                       this.$('.page-content-main').html(view.$el.html());
-                       this.$('.sr-is-focusable').focus();
+                       view.setElement(this.$('.page-content-main')).render();
+                       this.$('.sr-is-focusable.sr-tab').focus();
                        this.router.navigate(tab.url, {replace: true});
                    },
 
