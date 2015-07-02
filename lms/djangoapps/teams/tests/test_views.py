@@ -531,18 +531,19 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power']),
-        ('name', 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power']),
-        ('no_such_field', 400, []),
+        (None, 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
+        ('no_such_field', 400, [], None),
     )
     @ddt.unpack
-    def test_order_by(self, field, status, names):
+    def test_order_by(self, field, status, names, expected_ordering):
         data = {'course_id': self.test_course_1.id}
         if field:
             data['order_by'] = field
         topics = self.get_topics_list(status, data)
         if status == 200:
             self.assertEqual(names, [topic['name'] for topic in topics['results']])
+            self.assertEqual(topics['sort_order'], expected_ordering)
 
     def test_pagination(self):
         response = self.get_topics_list(data={
@@ -555,6 +556,10 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.assertIn('previous', response)
         self.assertIsNone(response['previous'])
         self.assertIsNotNone(response['next'])
+
+    def test_default_ordering(self):
+        response = self.get_topics_list(data={'course_id': self.test_course_1.id})
+        self.assertEqual(response['sort_order'], 'name')
 
 
 @ddt.ddt

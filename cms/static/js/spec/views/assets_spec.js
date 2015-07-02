@@ -1,10 +1,10 @@
-define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset", "js/views/assets",
-    "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers"],
-    function ($, AjaxHelpers, URI, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
+define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/assets",
+         "js/collections/asset", "js/spec_helpers/view_helpers"],
+    function ($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
 
         describe("Assets", function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse, mockFileUpload,
-                assetLibraryTpl, assetTpl, pagingFooterTpl, pagingHeaderTpl, uploadModalTpl;
+                assetLibraryTpl, assetTpl, uploadModalTpl;
 
             assetLibraryTpl = readFixtures('asset-library.underscore');
             assetTpl = readFixtures('asset.underscore');
@@ -356,6 +356,96 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                     $('.choose-file-button').click();
                     $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
                     expect(assetsView.largeFileErrorMsg).toBeNull();
+                });
+
+                describe('Paging footer', function () {
+                    var firstPageAssets = {
+                        sort: "uploadDate",
+                        end: 1,
+                        assets: [
+                            {
+                                "display_name": "test.jpg",
+                                "url": "/c4x/A/CS102/asset/test.jpg",
+                                "date_added": "Nov 07, 2014 at 17:47 UTC",
+                                "id": "/c4x/A/CS102/asset/test.jpg",
+                                "portable_url": "/static/test.jpg",
+                                "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
+                                "locked": false,
+                                "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
+                            },
+                            {
+                                "display_name": "test.pdf",
+                                "url": "/c4x/A/CS102/asset/test.pdf",
+                                "date_added": "Oct 20, 2014 at 11:00 UTC",
+                                "id": "/c4x/A/CS102/asset/test.pdf",
+                                "portable_url": "/static/test.pdf",
+                                "thumbnail": null,
+                                "locked": false,
+                                "external_url": "localhost:8000/c4x/A/CS102/asset/test.pdf"
+                            }
+                        ],
+                        pageSize: 2,
+                        totalCount: 3,
+                        start: 0,
+                        page: 0
+                    }, secondPageAssets = {
+                        sort: "uploadDate",
+                        end: 2,
+                        assets: [
+                            {
+                                "display_name": "test.odt",
+                                "url": "/c4x/A/CS102/asset/test.odt",
+                                "date_added": "Oct 20, 2014 at 11:00 UTC",
+                                "id": "/c4x/A/CS102/asset/test.odt",
+                                "portable_url": "/static/test.odt",
+                                "thumbnail": null,
+                                "locked": false,
+                                "external_url": "localhost:8000/c4x/A/CS102/asset/test.odt"
+                            }
+                        ],
+                        pageSize: 2,
+                        totalCount: 3,
+                        start: 2,
+                        page: 1
+                    };
+
+                    it('can move forward a page using the next page button', function () {
+                        var requests = AjaxHelpers.requests(this);
+                        assetsView.pagingView.setPage(0);
+                        AjaxHelpers.respondWithJson(requests, firstPageAssets);
+                        expect(assetsView.pagingView.pagingFooter).toBeDefined();
+                        expect(assetsView.pagingView.pagingFooter.$('button.next-page-link'))
+                            .not.toHaveClass('is-disabled');
+                        assetsView.pagingView.pagingFooter.$('button.next-page-link').click();
+                        AjaxHelpers.respondWithJson(requests, secondPageAssets);
+                        expect(assetsView.pagingView.pagingFooter.$('button.next-page-link'))
+                            .toHaveClass('is-disabled');
+                    });
+
+                    it('can move back a page using the previous page button', function () {
+                        var requests = AjaxHelpers.requests(this);
+                        assetsView.pagingView.setPage(1);
+                        AjaxHelpers.respondWithJson(requests, secondPageAssets);
+                        expect(assetsView.pagingView.pagingFooter).toBeDefined();
+                        expect(assetsView.pagingView.pagingFooter.$('button.previous-page-link'))
+                            .not.toHaveClass('is-disabled');
+                        assetsView.pagingView.pagingFooter.$('button.previous-page-link').click();
+                        AjaxHelpers.respondWithJson(requests, firstPageAssets);
+                        expect(assetsView.pagingView.pagingFooter.$('button.previous-page-link'))
+                            .toHaveClass('is-disabled');
+                    });
+
+                    it('can set the current page using the page number input', function () {
+                        var requests = AjaxHelpers.requests(this);
+                        assetsView.pagingView.setPage(0);
+                        AjaxHelpers.respondWithJson(requests, firstPageAssets);
+                        assetsView.pagingView.pagingFooter.$('#page-number-input').val('2');
+                        assetsView.pagingView.pagingFooter.$('#page-number-input').trigger('change');
+                        AjaxHelpers.respondWithJson(requests, secondPageAssets);
+                        expect(assetsView.collection.currentPage).toBe(1);
+                        expect(assetsView.pagingView.pagingFooter.$('button.previous-page-link'))
+                            .not.toHaveClass('is-disabled');
+                    });
                 });
             });
         });

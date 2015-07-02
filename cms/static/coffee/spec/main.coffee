@@ -252,6 +252,7 @@ define([
     "js/spec/views/xblock_string_field_editor_spec",
     "js/spec/views/xblock_validation_spec",
     "js/spec/views/license_spec",
+    "js/spec/views/paging_spec",
 
     "js/spec/views/utils/view_utils_spec",
 
@@ -284,4 +285,3 @@ define([
     # isolation issues with Squire.js
     # "coffee/spec/views/assets_spec"
     ])
-

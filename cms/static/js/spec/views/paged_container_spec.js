@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "js/models/xblock_info",
-        "js/views/paged_container", "common/js/components/views/paging_header",
+        "js/views/paged_container", "js/views/paging_header",
         "common/js/components/views/paging_footer", "js/views/xblock"],
     function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
 
