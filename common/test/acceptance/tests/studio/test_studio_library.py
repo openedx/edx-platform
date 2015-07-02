@@ -525,6 +525,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         self.page.visit()
         self.page.wait_until_ready()
 
+    @flaky  # TODO fix this; see TNL-2647
     def test_user_management(self):
         """
         Scenario: Ensure that we can edit the permissions of users.
@@ -534,7 +535,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         Then there should be one user listed (myself), and I must
         not be able to remove myself or my instructor privilege.
 
-        When I click Add Intructor
+        When I click Add Instructor
         Then I see a form to complete
         When I complete the form and submit it
         Then I can see the new user is listed as a "User" of the library
