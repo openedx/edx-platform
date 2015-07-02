@@ -90,7 +90,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase)
         self.assertRedirects(
             response,
             u"{url}?next={redirect_url}".format(
-                url=reverse("accounts_login"),
+                url=reverse("signin_user"),
                 redirect_url=self.courseware_url
             )
         )
