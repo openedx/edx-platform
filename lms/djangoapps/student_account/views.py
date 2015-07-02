@@ -2,6 +2,7 @@
 
 import logging
 import json
+import urlparse
 
 from django.conf import settings
 from django.contrib import messages
@@ -77,12 +78,26 @@ def login_and_registration_form(request, initial_mode="login"):
     if ext_auth_response is not None:
         return ext_auth_response
 
+    # Our ?next= URL may itself contain a parameter 'tpa_hint=x' that we need to check.
+    # If present, we display a login page focused on third-party auth with that provider.
+    third_party_auth_hint = None
+    if '?' in redirect_to:
+        try:
+            next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
+            provider_id = next_args['tpa_hint'][0]
+            if third_party_auth.provider.Registry.get(provider_id=provider_id):
+                third_party_auth_hint = provider_id
+                initial_mode = "hinted_login"
+        except (KeyError, ValueError, IndexError):
+            pass
+
     # Otherwise, render the combined login/registration page
     context = {
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
         'disable_courseware_js': True,
         'initial_mode': initial_mode,
         'third_party_auth': json.dumps(_third_party_auth_context(request, redirect_to)),
+        'third_party_auth_hint': third_party_auth_hint or '',
         'platform_name': settings.PLATFORM_NAME,
         'responsive': True,
 
@@ -164,41 +179,45 @@ def _third_party_auth_context(request, redirect_to):
     context = {
         "currentProvider": None,
         "providers": [],
+        "secondaryProviders": [],
         "finishAuthUrl": None,
         "errorMessage": None,
     }
 
     if third_party_auth.is_enabled():
-        context["providers"] = [
-            {
-                "name": enabled.NAME,
-                "iconClass": enabled.ICON_CLASS,
+        for enabled in third_party_auth.provider.Registry.enabled():
+            info = {
+                "id": enabled.provider_id,
+                "name": enabled.name,
+                "iconClass": enabled.icon_class,
                 "loginUrl": pipeline.get_login_url(
-                    enabled.NAME,
+                    enabled.provider_id,
                     pipeline.AUTH_ENTRY_LOGIN,
                     redirect_url=redirect_to,
                 ),
                 "registerUrl": pipeline.get_login_url(
-                    enabled.NAME,
+                    enabled.provider_id,
                     pipeline.AUTH_ENTRY_REGISTER,
                     redirect_url=redirect_to,
                 ),
             }
-            for enabled in third_party_auth.provider.Registry.enabled()
-        ]
+            context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
 
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
-            current_provider = third_party_auth.provider.Registry.get_by_backend_name(
-                running_pipeline.get('backend')
-            )
-            context["currentProvider"] = current_provider.NAME
-            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.BACKEND_CLASS.name)
+            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            context["currentProvider"] = current_provider.name
+            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
+
+            if current_provider.skip_registration_form:
+                # As a reliable way of "skipping" the registration form, we just submit it automatically
+                context["autoSubmitRegForm"] = True
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
             if msg.extra_tags.split()[0] == "social-auth":
-                context['errorMessage'] = unicode(msg)
+                # msg may or may not be translated. Try translating [again] in case we are able to:
+                context['errorMessage'] = _(unicode(msg))  # pylint: disable=translation-of-non-string
                 break
 
     return context
@@ -370,19 +389,20 @@ def account_settings_context(request):
         auth_states = pipeline.get_provider_user_states(user)
 
         context['auth']['providers'] = [{
-            'name': state.provider.NAME,  # The name of the provider e.g. Facebook
+            'id': state.provider.provider_id,
+            'name': state.provider.name,  # The name of the provider e.g. Facebook
             'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
             # If the user is not connected, they should be directed to this page to authenticate
             # with the particular provider.
             'connect_url': pipeline.get_login_url(
-                state.provider.NAME,
+                state.provider.provider_id,
                 pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
                 # The url the user should be directed to after the auth process has completed.
                 redirect_url=reverse('account_settings'),
             ),
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
-            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
         } for state in auth_states]
 
     return context

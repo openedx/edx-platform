@@ -193,4 +193,8 @@ header.global.slim {
     font-weight: bold;
     letter-spacing: 0;
   }
+
+  @media print {
+    background: transparent !important;
+  }
 }

@@ -535,11 +535,6 @@ AUTHENTICATION_BACKENDS = (
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
-# FIXME:
-# We should have separate S3 staged URLs in case we need to make changes to
-# these assets and test them.
-LIB_URL = '/static/js/'
-
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
@@ -1147,17 +1142,23 @@ MIDDLEWARE_CLASSES = (
 
     'splash.middleware.SplashMiddleware',
 
-    # Allows us to dark-launch particular languages
-    'dark_lang.middleware.DarkLangMiddleware',
+
     'geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
-    # should be after DarkLangMiddleware
     'lang_pref.middleware.LanguagePreferenceMiddleware',
 
-    # Detects user-requested locale from 'accept-language' header in http request
-    'django.middleware.locale.LocaleMiddleware',
+    # Allows us to dark-launch particular languages.
+    # Must be after LangPrefMiddleware, so ?preview-lang query params can override
+    # user's language preference. ?clear-lang resets to user's language preference.
+    'dark_lang.middleware.DarkLangMiddleware',
+
+    # Detects user-requested locale from 'accept-language' header in http request.
+    # Must be after DarkLangMiddleware.
+    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
+    # 'django.middleware.locale.LocaleMiddleware',
+    'django_locale.middleware.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -1270,9 +1271,11 @@ student_account_js = [
     'js/student_account/models/PasswordResetModel.js',
     'js/student_account/views/FormView.js',
     'js/student_account/views/LoginView.js',
+    'js/student_account/views/HintedLoginView.js',
     'js/student_account/views/RegisterView.js',
     'js/student_account/views/PasswordResetView.js',
     'js/student_account/views/AccessView.js',
+    'js/student_account/views/InstitutionLoginView.js',
     'js/student_account/accessApp.js',
 ]
 
@@ -1308,6 +1311,20 @@ reverify_js = [
     'js/verify_student/views/error_view.js',
     'js/verify_student/views/image_input_view.js',
     'js/verify_student/views/webcam_photo_view.js',
+    'js/verify_student/views/step_view.js',
+    'js/verify_student/views/face_photo_step_view.js',
+    'js/verify_student/views/id_photo_step_view.js',
+    'js/verify_student/views/review_photos_step_view.js',
+    'js/verify_student/views/reverify_success_step_view.js',
+    'js/verify_student/models/verification_model.js',
+    'js/verify_student/views/reverify_view.js',
+    'js/verify_student/reverify.js',
+]
+
+incourse_reverify_js = [
+    'js/verify_student/views/error_view.js',
+    'js/verify_student/views/image_input_view.js',
+    'js/verify_student/views/webcam_photo_view.js',
     'js/verify_student/models/reverification_model.js',
     'js/verify_student/views/incourse_reverify_view.js',
     'js/verify_student/incourse_reverify.js',
@@ -1318,6 +1335,12 @@ ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
 discovery_js = ['js/discovery/main.js']
 
 certificates_web_view_js = [
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/src/logger.js',
+]
+
+credit_web_view_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
     'js/src/logger.js',
@@ -1539,6 +1562,10 @@ PIPELINE_JS = {
         'source_filenames': reverify_js,
         'output_filename': 'js/reverify.js'
     },
+    'incourse_reverify': {
+        'source_filenames': incourse_reverify_js,
+        'output_filename': 'js/incourse_reverify.js'
+    },
     'ccx': {
         'source_filenames': ccx_js,
         'output_filename': 'js/ccx.js'
@@ -1558,6 +1585,10 @@ PIPELINE_JS = {
     'utility': {
         'source_filenames': ['js/src/utility.js'],
         'output_filename': 'js/utility.js'
+    },
+    'credit_wv': {
+        'source_filenames': credit_web_view_js,
+        'output_filename': 'js/credit/web_view.js'
     }
 }
 
@@ -1869,6 +1900,7 @@ INSTALLED_APPS = (
 
     'lms.djangoapps.lms_xblock',
 
+    'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
 
@@ -1895,7 +1927,10 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 
 
 ######################### MARKETING SITE ###############################
-EDXMKTG_COOKIE_NAME = 'edxloggedin'
+EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
+EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
+EDXMKTG_USER_INFO_COOKIE_VERSION = 1
+
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about',
@@ -2018,6 +2053,10 @@ VERIFY_STUDENT = {
 FEATURES['CLASS_DASHBOARD'] = False
 if FEATURES.get('CLASS_DASHBOARD'):
     INSTALLED_APPS += ('class_dashboard',)
+
+################ Enable credit eligibility feature ####################
+ENABLE_CREDIT_ELIGIBILITY = False
+FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 ######################## CAS authentication ###########################
 
@@ -2348,10 +2387,6 @@ for app_name in OPTIONAL_APPS:
             continue
     INSTALLED_APPS += (app_name,)
 
-# Stub for third_party_auth options.
-# See common/djangoapps/third_party_auth/settings.py for configuration details.
-THIRD_PARTY_AUTH = {}
-
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
@@ -2512,3 +2547,9 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 # when a credit provider notifies us that a student has been approved
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
+
+# Default domain for the e-mail address associated with users who are created
+# via the LTI Provider feature. Note that the generated e-mail addresses are
+# not expected to be active; this setting simply allows administrators to
+# route any messages intended for LTI users to a common domain.
+LTI_USER_EMAIL_DOMAIN = 'lti.example.com'

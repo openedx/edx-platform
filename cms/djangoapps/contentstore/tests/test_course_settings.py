@@ -19,6 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.fields import Date
+from xmodule.tabs import InvalidTabsException
 
 from .utils import CourseTestCase
 from xmodule.modulestore.django import modulestore
@@ -617,6 +618,7 @@ class CourseGradingTest(CourseTestCase):
         self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
 
 
+@ddt.ddt
 class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
@@ -626,6 +628,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
+        self.notes_tab = {"type": "notes", "name": "My Notes"}
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
@@ -930,12 +933,11 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         open_ended_tab = {"type": "open_ended", "name": "Open Ended Panel"}
         peer_grading_tab = {"type": "peer_grading", "name": "Peer grading"}
-        notes_tab = {"type": "notes", "name": "My Notes"}
 
         # First ensure that none of the tabs are visible
         self.assertNotIn(open_ended_tab, self.course.tabs)
         self.assertNotIn(peer_grading_tab, self.course.tabs)
-        self.assertNotIn(notes_tab, self.course.tabs)
+        self.assertNotIn(self.notes_tab, self.course.tabs)
 
         # Now add the "combinedopenended" component and verify that the tab has been added
         self.client.ajax_post(self.course_setting_url, {
@@ -944,7 +946,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         self.assertIn(open_ended_tab, course.tabs)
         self.assertIn(peer_grading_tab, course.tabs)
-        self.assertNotIn(notes_tab, course.tabs)
+        self.assertNotIn(self.notes_tab, course.tabs)
 
         # Now enable student notes and verify that the "My Notes" tab has also been added
         self.client.ajax_post(self.course_setting_url, {
@@ -953,7 +955,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         self.assertIn(open_ended_tab, course.tabs)
         self.assertIn(peer_grading_tab, course.tabs)
-        self.assertIn(notes_tab, course.tabs)
+        self.assertIn(self.notes_tab, course.tabs)
 
         # Now remove the "combinedopenended" component and verify that the tab is gone
         self.client.ajax_post(self.course_setting_url, {
@@ -962,7 +964,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(open_ended_tab, course.tabs)
         self.assertNotIn(peer_grading_tab, course.tabs)
-        self.assertIn(notes_tab, course.tabs)
+        self.assertIn(self.notes_tab, course.tabs)
 
         # Finally disable student notes and verify that the "My Notes" tab is gone
         self.client.ajax_post(self.course_setting_url, {
@@ -971,25 +973,40 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(open_ended_tab, course.tabs)
         self.assertNotIn(peer_grading_tab, course.tabs)
-        self.assertNotIn(notes_tab, course.tabs)
+        self.assertNotIn(self.notes_tab, course.tabs)
 
-    def mark_wiki_as_hidden(self, tabs):
-        """ Mark the wiki tab as hidden. """
-        for tab in tabs:
-            if tab.type == 'wiki':
-                tab['is_hidden'] = True
-        return tabs
+    def test_advanced_components_munge_tabs_validation_failure(self):
+        with patch('contentstore.views.course._refresh_course_tabs', side_effect=InvalidTabsException):
+            resp = self.client.ajax_post(self.course_setting_url, {
+                ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
+            })
+            self.assertEqual(resp.status_code, 400)
 
-    def test_advanced_components_munge_tabs_hidden_tabs(self):
-        updated_tabs = self.mark_wiki_as_hidden(self.course.tabs)
-        self.course.tabs = updated_tabs
+            error_msg = [
+                {
+                    'message': 'An error occurred while trying to save your tabs',
+                    'model': {'display_name': 'Tabs Exception'}
+                }
+            ]
+            self.assertEqual(json.loads(resp.content), error_msg)
+
+            # verify that the course wasn't saved into the modulestore
+            course = modulestore().get_course(self.course.id)
+            self.assertNotIn("notes", course.advanced_modules)
+
+    @ddt.data(
+        [{'type': 'courseware'}, {'type': 'course_info'}, {'type': 'wiki', 'is_hidden': True}],
+        [{'type': 'courseware', 'name': 'Courses'}, {'type': 'course_info', 'name': 'Info'}],
+    )
+    def test_course_tab_configurations(self, tab_list):
+        self.course.tabs = tab_list
         modulestore().update_item(self.course, self.user.id)
         self.client.ajax_post(self.course_setting_url, {
             ADVANCED_COMPONENT_POLICY_KEY: {"value": ["notes"]}
         })
         course = modulestore().get_course(self.course.id)
-        notes_tab = {"type": "notes", "name": "My Notes"}
-        self.assertIn(notes_tab, course.tabs)
+        tab_list.append(self.notes_tab)
+        self.assertEqual(tab_list, course.tabs)
 
 
 class CourseGraderUpdatesTest(CourseTestCase):

@@ -11,7 +11,7 @@ import pytz
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
@@ -53,7 +53,7 @@ class InstructorDashboardTab(CourseTab):
     """
 
     type = "instructor"
-    title = _('Instructor')
+    title = ugettext_noop('Instructor')
     view_name = "instructor_dashboard"
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 

@@ -94,6 +94,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "page_size": 13,
                 "topic_id": [],
                 "text_search": "",
+                "following": None,
             }
         )
 
@@ -125,12 +126,20 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.form_data.setlist("topic_id", ["", "not empty"])
         self.assert_error("topic_id", "This field cannot be empty.")
 
-    @ddt.data(*itertools.combinations(["topic_id", "text_search"], 2))
+    def test_following_true(self):
+        self.form_data["following"] = "True"
+        self.assert_field_value("following", True)
+
+    def test_following_false(self):
+        self.form_data["following"] = "False"
+        self.assert_error("following", "The value of the 'following' parameter must be true.")
+
+    @ddt.data(*itertools.combinations(["topic_id", "text_search", "following"], 2))
     def test_mutually_exclusive(self, params):
-        self.form_data.update({param: "dummy" for param in params})
+        self.form_data.update({param: "True" for param in params})
         self.assert_error(
             "__all__",
-            "The following query parameters are mutually exclusive: topic_id, text_search"
+            "The following query parameters are mutually exclusive: topic_id, text_search, following"
         )
 
 

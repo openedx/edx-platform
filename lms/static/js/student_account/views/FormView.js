@@ -215,7 +215,9 @@ var edx = edx || {};
         submitForm: function( event ) {
             var data = this.getFormData();
 
-            event.preventDefault();
+            if (!_.isUndefined(event)) {
+                event.preventDefault();
+            }
 
             this.toggleDisableButton(true);
 

@@ -28,7 +28,7 @@ h1.top-header {
 
 .light-button, a.light-button, // only used in askbot as classes
 .gray-button {
-  @include button(simple, #eee);
+  @include button(simple, $gray-l5);
   @extend .button-reset;
   font-size: em(13);
 }

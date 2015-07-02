@@ -86,7 +86,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule):
+class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule, LicenseMixin):
     """
     XML source example:
         <video show_captions="true"
@@ -332,7 +332,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 @XBlock.wants("request_cache")
 @XBlock.wants("settings")
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
-                      TabsEditingDescriptor, EmptyDataRawDescriptor):
+                      TabsEditingDescriptor, EmptyDataRawDescriptor, LicenseMixin):
     """
     Descriptor for `VideoModule`.
     """

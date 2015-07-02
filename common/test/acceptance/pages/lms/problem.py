@@ -66,7 +66,7 @@ class ProblemPage(PageObject):
         """
         Is there a "correct" status showing?
         """
-        return self.q(css="div.problem div.capa_inputtype.textline div.correct p.status").is_present()
+        return self.q(css="div.problem div.capa_inputtype.textline div.correct span.status").is_present()
 
     def click_clarification(self, index=0):
         """

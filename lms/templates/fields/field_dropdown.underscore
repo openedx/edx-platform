@@ -4,6 +4,12 @@
     </label>
 <% } %>
 
+<% if (!titleVisible) { %>
+    <label class="sr" for="u-field-select-<%- id %>">
+        <%- screenReaderTitle %>
+    </label>
+<% } %>
+
 <% if (iconName) { %>
     <i class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true"></i>
 <% } %>
@@ -17,11 +23,11 @@
             <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
         <% }); %>
     </select>
-    <a href="#" class="u-field-value-display">
-        <span class="sr"><%- screenReaderTitle %></span>
+    <button class="u-field-value-display">
+        <span class="sr"><%- screenReaderTitle %> &nbsp;</span>
         <span class="u-field-value-readonly"></span>
-        <span class="sr"><%- gettext('Click to edit') %></span>
-    </a>
+        <span class="sr">&nbsp; <%- gettext('Click to edit') %></span>
+    </button>
 </span>
 
 <span class="u-field-message" id="u-field-message-<%- id %>">

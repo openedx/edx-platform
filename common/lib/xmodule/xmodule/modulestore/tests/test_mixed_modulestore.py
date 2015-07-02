@@ -2084,8 +2084,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     course_key = course.id
 
                     def _clear_bulk_ops_record(course_key):  # pylint: disable=unused-argument
-                        """ Check if the signal has been fired. """
-                        self.assertEqual(receiver.call_count, 0)
+                        """
+                        Check if the signal has been fired.
+                        The course_published signal fires before the _clear_bulk_ops_record.
+                        """
+                        self.assertEqual(receiver.call_count, 1)
 
                     with patch.object(
                         self.store.thread_cache.default_store, '_clear_bulk_ops_record', wraps=_clear_bulk_ops_record

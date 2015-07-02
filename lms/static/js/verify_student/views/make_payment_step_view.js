@@ -10,6 +10,8 @@ var edx = edx || {};
 
     edx.verify_student.MakePaymentStepView = edx.verify_student.StepView.extend({
 
+        templateName: "make_payment_step",
+
         defaultContext: function() {
             return {
                 isActive: true,
@@ -68,6 +70,9 @@ var edx = edx || {};
                     templateContext.requirements,
                     function( isVisible ) { return isVisible; }
                 ),
+                // This a hack to appease /lms/static/js/spec/verify_student/pay_and_verify_view_spec.js,
+                // which does not load an actual template context.
+                processors = templateContext.processors || [],
                 self = this;
 
             // Track a virtual pageview, for easy funnel reconstruction.
@@ -100,7 +105,7 @@ var edx = edx || {};
             );
 
             // create a button for each payment processor
-            _.each(templateContext.processors, function(processorName) {
+            _.each(processors.reverse(), function(processorName) {
                 $( 'div.payment-buttons' ).append( self._getPaymentButtonHtml(processorName) );
             });
 

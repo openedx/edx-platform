@@ -7,11 +7,14 @@ from third_party_auth.tests.specs import base
 class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
     """Integration tests for provider.GoogleOauth2."""
 
-    PROVIDER_CLASS = provider.GoogleOauth2
-    PROVIDER_SETTINGS = {
-        'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY': 'google_oauth2_key',
-        'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET': 'google_oauth2_secret',
-    }
+    def setUp(self):
+        super(GoogleOauth2IntegrationTest, self).setUp()
+        self.provider = self.configure_google_provider(
+            enabled=True,
+            key='google_oauth2_key',
+            secret='google_oauth2_secret',
+        )
+
     TOKEN_RESPONSE_DATA = {
         'access_token': 'access_token_value',
         'expires_in': 'expires_in_value',

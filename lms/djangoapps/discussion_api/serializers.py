@@ -12,6 +12,7 @@ from rest_framework import serializers
 
 from discussion_api.permissions import get_editable_fields
 from discussion_api.render import render_body
+from django_comment_client.utils import is_comment_too_deep
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -46,6 +47,8 @@ def get_context(course, request, thread=None):
         for user in role.users.all()
     }
     requester = request.user
+    cc_requester = CommentClientUser.from_django_user(requester).retrieve()
+    cc_requester["course_id"] = course.id
     return {
         "course": course,
         "request": request,
@@ -55,7 +58,7 @@ def get_context(course, request, thread=None):
         "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,
-        "cc_requester": CommentClientUser.from_django_user(requester).retrieve(),
+        "cc_requester": cc_requester,
     }
 
 
@@ -297,11 +300,12 @@ class CommentSerializer(_ContentSerializer):
     def validate(self, attrs):
         """
         Ensure that parent_id identifies a comment that is actually in the
-        thread identified by thread_id.
+        thread identified by thread_id and does not violate the configured
+        maximum depth.
         """
+        parent = None
         parent_id = attrs.get("parent_id")
         if parent_id:
-            parent = None
             try:
                 parent = Comment(id=parent_id).retrieve()
             except CommentClientRequestError:
@@ -310,6 +314,8 @@ class CommentSerializer(_ContentSerializer):
                 raise ValidationError(
                     "parent_id does not identify a comment in the thread identified by thread_id."
                 )
+        if is_comment_too_deep(parent):
+            raise ValidationError({"parent_id": ["Comment level is too deep."]})
         return attrs
 
     def restore_object(self, attrs, instance=None):

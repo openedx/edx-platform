@@ -290,13 +290,11 @@ function () {
                 var PlayerState = HTML5Video.PlayerState;
 
                 if (_this.playerState === PlayerState.PLAYING) {
-                    _this.pauseVideo();
                     _this.playerState = PlayerState.PAUSED;
-                    _this.callStateChangeCallback();
+                    _this.pauseVideo();
                 } else {
-                    _this.playVideo();
                     _this.playerState = PlayerState.PLAYING;
-                    _this.callStateChangeCallback();
+                    _this.playVideo();
                 }
             });
 

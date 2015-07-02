@@ -480,6 +480,7 @@ class TabListTestCase(TabTestCase):
             [{'type': CoursewareTab.type}, {'type': 'discussion', 'name': 'fake_name'}],
             # incorrect order
             [{'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
+            [{'type': 'unknown_type'}]
         ]
 
         # tab types that should appear only once

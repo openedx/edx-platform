@@ -2,7 +2,7 @@
 Convenience methods for working with datetime objects
 """
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import re
 
 from pytz import timezone, UTC, UnknownTimeZoneError
@@ -71,6 +71,27 @@ def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):
     :param dt2:
     """
     return abs(dt1 - dt2) < allowed_delta
+
+
+def to_timestamp(datetime_value):
+    """
+    Convert a datetime into a timestamp, represented as the number
+    of seconds since January 1, 1970 UTC.
+    """
+    return int((datetime_value - datetime(1970, 1, 1, tzinfo=UTC)).total_seconds())
+
+
+def from_timestamp(timestamp):
+    """
+    Convert a timestamp (number of seconds since Jan 1, 1970 UTC)
+    into a timezone-aware datetime.
+
+    If the timestamp cannot be converted, returns None instead.
+    """
+    try:
+        return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=UTC)
+    except (ValueError, TypeError):
+        return None
 
 
 DEFAULT_SHORT_DATE_FORMAT = "%b %d, %Y"

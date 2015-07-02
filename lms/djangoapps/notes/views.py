@@ -13,7 +13,7 @@ from courseware.tabs import EnrolledTab
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
 from xmodule.annotator_token import retrieve_token
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 
 
 @login_required
@@ -45,7 +45,7 @@ class NotesTab(EnrolledTab):
     A tab for the course notes.
     """
     type = 'notes'
-    title = _("My Notes")
+    title = ugettext_noop("My Notes")
     view_name = "notes"
 
     @classmethod

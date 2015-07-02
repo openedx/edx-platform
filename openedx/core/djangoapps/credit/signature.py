@@ -16,17 +16,30 @@ we receive from the credit provider.
 
 """
 
+import logging
 import hashlib
 import hmac
 
 from django.conf import settings
 
 
+log = logging.getLogger(__name__)
+
+
 def get_shared_secret_key(provider_id):
     """
     Retrieve the shared secret key for a particular credit provider.
     """
-    return getattr(settings, "CREDIT_PROVIDER_SECRET_KEYS", {}).get(provider_id)
+    secret = getattr(settings, "CREDIT_PROVIDER_SECRET_KEYS", {}).get(provider_id)
+
+    if isinstance(secret, unicode):
+        try:
+            secret = str(secret)
+        except UnicodeEncodeError:
+            secret = None
+            log.error(u'Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
+
+    return secret
 
 
 def signature(params, shared_secret):
@@ -35,6 +48,7 @@ def signature(params, shared_secret):
 
     Arguments:
         params (dict): Parameters to sign.  Ignores the "signature" key if present.
+        shared_secret (str): The shared secret string.
 
     Returns:
         str: The 32-character signature.

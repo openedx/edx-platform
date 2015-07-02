@@ -2,7 +2,7 @@
 Registers the "edX Notes" feature for the edX platform.
 """
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 
 from courseware.tabs import EnrolledTab
 
@@ -13,7 +13,7 @@ class EdxNotesTab(EnrolledTab):
     """
 
     type = "edxnotes"
-    title = _("Notes")
+    title = ugettext_noop("Notes")
     view_name = "edxnotes"
 
     @classmethod

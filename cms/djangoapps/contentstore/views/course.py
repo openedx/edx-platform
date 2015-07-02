@@ -5,6 +5,7 @@ import copy
 from django.shortcuts import redirect
 import json
 import random
+import logging
 import string  # pylint: disable=deprecated-module
 from django.utils.translation import ugettext as _
 import django.utils
@@ -22,7 +23,7 @@ from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-from xmodule.tabs import CourseTab
+from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
@@ -86,6 +87,8 @@ from util.milestones_helpers import (
     set_prerequisite_courses,
     is_valid_course_key
 )
+
+log = logging.getLogger(__name__)
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
@@ -455,6 +458,7 @@ def course_listing(request):
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [format_library_for_view(lib) for lib in libraries],
+        'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -1024,6 +1028,9 @@ def grading_handler(request, course_key_string, grader_index=None):
 def _refresh_course_tabs(request, course_module):
     """
     Automatically adds/removes tabs if changes to the course require them.
+
+    Raises:
+        InvalidTabsException: raised if there's a problem with the new version of the tabs.
     """
 
     def update_tab(tabs, tab_type, tab_enabled):
@@ -1046,6 +1053,8 @@ def _refresh_course_tabs(request, course_module):
         if not tab_type.is_dynamic and tab_type.is_default:
             tab_enabled = tab_type.is_enabled(course_module, user=request.user)
             update_tab(course_tabs, tab_type, tab_enabled)
+
+    CourseTabList.validate_tabs(course_tabs)
 
     # Save the tabs into the course if they have been changed
     if course_tabs != course_module.tabs:
@@ -1090,8 +1099,18 @@ def advanced_settings_handler(request, course_key_string):
                     )
 
                     if is_valid:
-                        # update the course tabs if required by any setting changes
-                        _refresh_course_tabs(request, course_module)
+                        try:
+                            # update the course tabs if required by any setting changes
+                            _refresh_course_tabs(request, course_module)
+                        except InvalidTabsException as err:
+                            log.exception(err.message)
+                            response_message = [
+                                {
+                                    'message': _('An error occurred while trying to save your tabs'),
+                                    'model': {'display_name': _('Tabs Exception')}
+                                }
+                            ]
+                            return JsonResponseBadRequest(response_message)
 
                         # now update mongo
                         modulestore().update_item(course_module, request.user.id)
@@ -1101,7 +1120,7 @@ def advanced_settings_handler(request, course_key_string):
                         return JsonResponseBadRequest(errors)
 
                 # Handle all errors that validation doesn't catch
-                except (TypeError, ValueError) as err:
+                except (TypeError, ValueError, InvalidTabsException) as err:
                     return HttpResponseBadRequest(
                         django.utils.html.escape(err.message),
                         content_type="text/plain"

@@ -523,13 +523,13 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
         self.client.logout()
         self._assert_cannot_create_library(expected_code=302)  # 302 redirect to login expected
 
-        # Now create a non-staff user with no permissions:
+        # Now check that logged-in users without CourseCreator role can still create libraries
         self._login_as_non_staff_user(logout_first=False)
         self.assertFalse(CourseCreatorRole().has_user(self.non_staff_user))
-
-        # Now check that logged-in users without any permissions cannot create libraries
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
-            self._assert_cannot_create_library()
+            lib_key2 = self._create_library(library="lib2", display_name="Test Library 2")
+            library2 = modulestore().get_library(lib_key2)
+            self.assertIsNotNone(library2)
 
     @ddt.data(
         CourseInstructorRole,

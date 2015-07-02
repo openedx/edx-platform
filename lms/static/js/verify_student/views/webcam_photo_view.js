@@ -212,15 +212,11 @@
         },
 
         initialize: function( obj ) {
-            this.mainContainer = $('#pay-and-verify-container');
-            if (!this.mainContainer){
-                this.mainContainer = $('#incourse-reverify-container');
-            }
             this.submitButton = obj.submitButton || "";
             this.modelAttribute = obj.modelAttribute || "";
             this.errorModel = obj.errorModel || null;
             this.backend = this.backends[obj.backendName] || obj.backend;
-            this.captureSoundPath =  this.mainContainer.data('capture-sound');
+            this.captureSoundPath =  obj.captureSoundPath || "";
 
             this.backend.initialize({
                 wrapper: "#camera",

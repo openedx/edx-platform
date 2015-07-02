@@ -41,9 +41,8 @@ from student.models import CourseEnrollment
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 from verify_student.views import (
-    checkout_with_ecommerce_service,
-    render_to_response, PayAndVerifyView, EVENT_NAME_USER_ENTERED_INCOURSE_REVERIFY_VIEW,
-    EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY, _send_email, _compose_message_reverification_email
+    checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
+    _send_email, _compose_message_reverification_email
 )
 from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationCheckpoint,
@@ -1584,52 +1583,84 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         VerificationStatus.add_verification_status(checkpoint, self.user, "submitted")
 
 
-class TestReverifyView(ModuleStoreTestCase):
+class TestReverifyView(TestCase):
     """
-    Tests for the reverification views.
+    Tests for the reverification view.
+
+    Reverification occurs when a verification attempt is denied or expired,
+    and the student is given the option to resubmit.
     """
+
+    USERNAME = "shaftoe"
+    PASSWORD = "detachment-2702"
+
     def setUp(self):
         super(TestReverifyView, self).setUp()
+        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.assertTrue(success, msg="Could not log in")
 
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.user.profile.name = u"Røøsty Bøøgins"
-        self.user.profile.save()
-        self.client.login(username="rusty", password="test")
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        self.course_key = self.course.id
+    def test_reverify_view_can_reverify_denied(self):
+        # User has a denied attempt, so can reverify
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.deny("error")
+        self._assert_can_reverify()
 
-    @patch('verify_student.views.render_to_response', render_mock)
-    def test_reverify_get(self):
-        url = reverse('verify_student_reverify')
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
-        ((_template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertFalse(context['error'])
+    def test_reverify_view_can_reverify_expired(self):
+        # User has a verification attempt, but it's expired
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
 
-    @patch('verify_student.views.render_to_response', render_mock)
-    def test_reverify_post_failure(self):
-        url = reverse('verify_student_reverify')
-        response = self.client.post(url, {'face_image': '',
-                                          'photo_id_image': ''})
-        self.assertEquals(response.status_code, 200)
-        ((template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertIn('photo_reverification', template)
-        self.assertTrue(context['error'])
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
+        attempt.save()
 
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_reverify_post_success(self):
-        url = reverse('verify_student_reverify')
-        response = self.client.post(url, {'face_image': ',',
-                                          'photo_id_image': ','})
-        self.assertEquals(response.status_code, 302)
-        try:
-            verification_attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
-            self.assertIsNotNone(verification_attempt)
-        except ObjectDoesNotExist:
-            self.fail('No verification object generated')
-        ((template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertIn('photo_reverification', template)
-        self.assertTrue(context['error'])
+        # Allow the student to reverify
+        self._assert_can_reverify()
+
+    def test_reverify_view_cannot_reverify_pending(self):
+        # User has submitted a verification attempt, but Software Secure has not yet responded
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+
+        # Cannot reverify because an attempt has already been submitted.
+        self._assert_cannot_reverify()
+
+    def test_reverify_view_cannot_reverify_approved(self):
+        # Submitted attempt has been approved
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
+
+        # Cannot reverify because the user is already verified.
+        self._assert_cannot_reverify()
+
+    def _get_reverify_page(self):
+        """
+        Retrieve the reverification page and return the response.
+        """
+        url = reverse("verify_student_reverify")
+        return self.client.get(url)
+
+    def _assert_can_reverify(self):
+        """
+        Check that the reverification flow is rendered.
+        """
+        response = self._get_reverify_page()
+        self.assertContains(response, "reverify-container")
+
+    def _assert_cannot_reverify(self):
+        """
+        Check that the user is blocked from reverifying.
+        """
+        response = self._get_reverify_page()
+        self.assertContains(response, "reverify-blocked")
 
 
 class TestInCourseReverifyView(ModuleStoreTestCase):
@@ -1727,7 +1758,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         # submitting the photo verification
         self.mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
             self.user.id,  # pylint: disable=no-member
-            EVENT_NAME_USER_ENTERED_INCOURSE_REVERIFY_VIEW,
+            'edx.bi.reverify.started',
             {
                 'category': "verification",
                 'label': unicode(self.course_key),
@@ -1781,7 +1812,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         # photo verification
         self.mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
             self.user.id,
-            EVENT_NAME_USER_SUBMITTED_INCOURSE_REVERIFY,
+            'edx.bi.reverify.submitted',
             {
                 'category': "verification",
                 'label': unicode(self.course_key),
@@ -1934,7 +1965,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
             "We could not verify your identity for the {assessment} assessment "
             "in the {course_name} course. You have used "
             "{used_attempts} out of {allowed_attempts} attempts to "
-            "verify your identity.".format(
+            "verify your identity".format(
                 course_name=self.course.display_name_with_default,
                 assessment=self.assessment,
                 used_attempts=1,
@@ -1992,8 +2023,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
 
     def test_denied_email_message_with_close_verification_dates(self):
         # Due date given and expired
-
-        return_value = datetime(2016, 1, 1, tzinfo=timezone.utc)
+        return_value = datetime.now(tz=pytz.UTC) + timedelta(days=22)
         with patch.object(timezone, 'now', return_value=return_value):
             __, body = _compose_message_reverification_email(
                 self.course.id, self.user.id, self.reverification_location, "denied", self.request

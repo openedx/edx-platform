@@ -127,7 +127,16 @@
         display: none;
     }
 
-    &.mode-edit a.u-field-value-display {
+    button.u-field-value-display, button.u-field-value-display:active, button.u-field-value-display:focus, button.u-field-value-display:hover{
+        border-color: transparent;
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+        font-size: inherit;
+    }
+
+
+    &.mode-edit button.u-field-value-display {
         display: none;
     }
 }

@@ -23,7 +23,7 @@ def get_editable_fields(cc_content, context):
     Return the set of fields that the requester can edit on the given content
     """
     # Shared fields
-    ret = {"voted"}
+    ret = {"abuse_flagged", "voted"}
     if _is_author_or_privileged(cc_content, context):
         ret |= {"raw_body"}
 

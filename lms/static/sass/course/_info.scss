@@ -236,9 +236,14 @@ div.info-wrapper {
         }
       }
     }
+
+    @media print {
+      background: transparent !important;
+    }
   }
 
   @media print {
+    background: transparent !important;
     border: 0;
   }
 }

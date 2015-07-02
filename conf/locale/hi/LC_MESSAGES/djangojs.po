@@ -46,8 +46,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:34+0000\n"
-"PO-Revision-Date: 2015-06-19 13:38+0000\n"
+"POT-Creation-Date: 2015-06-29 12:24+0000\n"
+"PO-Revision-Date: 2015-06-28 20:21+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
@@ -108,10 +108,6 @@ msgstr "ठीक"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "रद्द करें"
-
-#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
-msgid "This link will open in a new browser window/tab"
-msgstr "यह लिंक एक नए ब्राउज़र विंडो / टैब में खुलेगी"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
@@ -251,6 +247,10 @@ msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
 msgstr[0] "(%(num_points)s संभव अंक)"
 msgstr[1] "(%(num_points)s संभव अंक)"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "The grading process is still running. Refresh the page to see updates."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
@@ -3706,6 +3706,19 @@ msgstr ""
 msgid "Could not retrieve payment information"
 msgstr ""
 
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Take a photo of your ID"
+msgstr ""
+
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Review your info"
+msgstr ""
+
+#: lms/static/js/verify_student/views/reverify_view.js
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr ""
+
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr ""
@@ -3887,6 +3900,10 @@ msgstr "नष्ट हो रहा है"
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "खुले मूल्‍यांकन को जमा करने में त्रुटि प्राप्‍त हुई"
+
+#: cms/static/js/base.js cms/templates/js/checklist.underscore
+msgid "This link will open in a new browser window/tab"
+msgstr ""
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -5280,6 +5297,45 @@ msgstr ""
 msgid "Forgot password?"
 msgstr ""
 
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Sign in"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Would you like to sign in using your %(providerName)s credentials?"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Sign in using %(providerName)s"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Show me other ways to sign in or register"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Sign in with Institution/Campus Credentials"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "Choose your institution from the list below:"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Back to sign in"
+msgstr ""
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register with Institution/Campus Credentials"
+msgstr ""
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register through edX"
+msgstr ""
+
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -5306,12 +5362,12 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Sign in"
+msgid "or sign in with"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-msgid "or sign in with"
+#: lms/templates/student_account/register.underscore
+msgid "Use my institution/campus credentials"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -5718,6 +5774,22 @@ msgid ""
 "photo."
 msgstr ""
 
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Identity Verification In Progress"
+msgstr ""
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid ""
+"We have received your information and are verifying your identity. You will "
+"see a message on your dashboard when the verification process is complete "
+"(usually within 1-2 days). In the meantime, you can still access all "
+"available course content."
+msgstr ""
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Return to Your Dashboard"
+msgstr ""
+
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr ""
@@ -5775,10 +5847,6 @@ msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Before proceeding, please confirm that your details match"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
 msgstr ""
 
 #: lms/templates/verify_student/webcam_photo.underscore

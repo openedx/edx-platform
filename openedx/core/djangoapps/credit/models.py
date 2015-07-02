@@ -6,13 +6,12 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
+from collections import defaultdict
 import logging
 
-from django.db import models
-from django.db import transaction
+from django.db import models, transaction, IntegrityError
 from django.core.validators import RegexValidator
 from simple_history.models import HistoricalRecords
-
 
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
@@ -169,8 +168,11 @@ class CreditRequirement(TimeStampedModel):
             course=credit_course,
             namespace=requirement["namespace"],
             name=requirement["name"],
-            display_name=requirement["display_name"],
-            defaults={"criteria": requirement["criteria"], "active": True}
+            defaults={
+                "display_name": requirement["display_name"],
+                "criteria": requirement["criteria"],
+                "active": True
+            }
         )
         if not created:
             credit_requirement.criteria = requirement["criteria"]
@@ -180,20 +182,29 @@ class CreditRequirement(TimeStampedModel):
         return credit_requirement, created
 
     @classmethod
-    def get_course_requirements(cls, course_key, namespace=None):
+    def get_course_requirements(cls, course_key, namespace=None, name=None):
         """
         Get credit requirements of a given course.
 
         Args:
-            course_key(CourseKey): The identifier for a course
-            namespace(str): Namespace of credit course requirements
+            course_key (CourseKey): The identifier for a course
+
+        Keyword Arguments
+            namespace (str): Optionally filter credit requirements by namespace.
+            name (str): Optionally filter credit requirements by name.
 
         Returns:
             QuerySet of CreditRequirement model
+
         """
         requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True)
-        if namespace:
+
+        if namespace is not None:
             requirements = requirements.filter(namespace=namespace)
+
+        if name is not None:
+            requirements = requirements.filter(name=name)
+
         return requirements
 
     @classmethod
@@ -262,8 +273,11 @@ class CreditRequirementStatus(TimeStampedModel):
     # the grade to users later and to send the information to credit providers.
     reason = JSONField(default={})
 
+    # Maintain a history of requirement status updates for auditing purposes
+    history = HistoricalRecords()
+
     class Meta(object):  # pylint: disable=missing-docstring
-        get_latest_by = "created"
+        unique_together = ('username', 'requirement')
 
     @classmethod
     def get_statuses(cls, requirements, username):
@@ -308,10 +322,56 @@ class CreditEligibility(TimeStampedModel):
     """
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities")
-    provider = models.ForeignKey(CreditProvider, related_name="eligibilities")
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('username', 'course')
+
+    @classmethod
+    def get_user_eligibility(cls, username):
+        """Returns the eligibilities of given user.
+
+        Args:
+            username(str): Username of the user
+
+        Returns:
+            CreditEligibility queryset for the user
+
+        """
+        return cls.objects.filter(username=username).select_related('course').prefetch_related('course__providers')
+
+    @classmethod
+    def update_eligibility(cls, requirements, username, course_key):
+        """
+        Update the user's credit eligibility for a course.
+
+        A user is eligible for credit when the user has satisfied
+        all requirements for credit in the course.
+
+        Arguments:
+            requirements (Queryset): Queryset of `CreditRequirement`s to check.
+            username (str): Identifier of the user being updated.
+            course_key (CourseKey): Identifier of the course.
+
+        """
+        # Check all requirements for the course to determine if the user
+        # is eligible.  We need to check all the *requirements*
+        # (not just the *statuses*) in case the user doesn't yet have
+        # a status for a particular requirement.
+        status_by_req = defaultdict(lambda: False)
+        for status in CreditRequirementStatus.get_statuses(requirements, username):
+            status_by_req[status.requirement.id] = status.status
+
+        is_eligible = all(status_by_req[req.id] == "satisfied" for req in requirements)
+
+        # If we're eligible, then mark the user as being eligible for credit.
+        if is_eligible:
+            try:
+                CreditEligibility.objects.create(
+                    username=username,
+                    course=CreditCourse.objects.get(course_key=course_key),
+                )
+            except IntegrityError:
+                pass
 
     @classmethod
     def is_user_eligible_for_credit(cls, course_key, username):
@@ -343,7 +403,6 @@ class CreditRequest(TimeStampedModel):
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="credit_requests")
     provider = models.ForeignKey(CreditProvider, related_name="credit_requests")
-    timestamp = models.DateTimeField(auto_now_add=True)
     parameters = JSONField()
 
     REQUEST_STATUS_PENDING = "pending"
@@ -363,6 +422,12 @@ class CreditRequest(TimeStampedModel):
 
     history = HistoricalRecords()
 
+    class Meta(object):  # pylint: disable=missing-docstring
+        # Enforce the constraint that each user can have exactly one outstanding
+        # request to a given provider.  Multiple requests use the same UUID.
+        unique_together = ('username', 'course', 'provider')
+        get_latest_by = 'created'
+
     @classmethod
     def credit_requests_for_user(cls, username):
         """
@@ -378,7 +443,7 @@ class CreditRequest(TimeStampedModel):
         [
             {
                 "uuid": "557168d0f7664fe59097106c67c3f847",
-                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "timestamp": 1434631630,
                 "course_key": "course-v1:HogwartsX+Potions101+1T2015",
                 "provider": {
                     "id": "HogwartsX",
@@ -393,7 +458,7 @@ class CreditRequest(TimeStampedModel):
         return [
             {
                 "uuid": request.uuid,
-                "timestamp": request.modified,
+                "timestamp": request.parameters.get("timestamp"),
                 "course_key": request.course.course_key,
                 "provider": {
                     "id": request.provider.provider_id,
@@ -404,7 +469,21 @@ class CreditRequest(TimeStampedModel):
             for request in cls.objects.select_related('course', 'provider').filter(username=username)
         ]
 
-    class Meta(object):  # pylint: disable=missing-docstring
-        # Enforce the constraint that each user can have exactly one outstanding
-        # request to a given provider.  Multiple requests use the same UUID.
-        unique_together = ('username', 'course', 'provider')
+    @classmethod
+    def get_user_request_status(cls, username, course_key):
+        """Returns the latest credit request of user against the given course.
+
+        Args:
+            username(str): The username of requesting user
+            course_key(CourseKey): The course identifier
+
+        Returns:
+            CreditRequest if any otherwise None
+
+        """
+        try:
+            return cls.objects.filter(
+                username=username, course__course_key=course_key
+            ).select_related('course', 'provider').latest()
+        except cls.DoesNotExist:
+            return None

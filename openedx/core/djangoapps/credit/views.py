@@ -4,8 +4,6 @@ Views for the credit Django app.
 import json
 import datetime
 import logging
-
-import dateutil
 import pytz
 
 from django.http import (
@@ -15,12 +13,14 @@ from django.http import (
     Http404
 )
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 
 from util.json_request import JsonResponse
+from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
 from openedx.core.djangoapps.credit.exceptions import CreditApiBadRequest, CreditRequestNotFound
@@ -57,7 +57,7 @@ def create_credit_request(request, provider_id):
             "method": "POST",
             "parameters": {
                 request_uuid: "557168d0f7664fe59097106c67c3f847"
-                timestamp: "2015-05-04T20:57:57.987119+00:00"
+                timestamp: 1434631630,
                 course_org: "ASUx"
                 course_num: "DemoX"
                 course_run: "1T2015"
@@ -128,6 +128,7 @@ def create_credit_request(request, provider_id):
 
 
 @require_POST
+@csrf_exempt
 def credit_provider_callback(request, provider_id):
     """
     Callback end-point used by credit providers to approve or reject
@@ -139,7 +140,7 @@ def credit_provider_callback(request, provider_id):
         {
             "request_uuid": "557168d0f7664fe59097106c67c3f847",
             "status": "approved",
-            "timestamp": "2015-05-04T20:57:57.987119+00:00",
+            "timestamp": 1434631630,
             "signature": "cRCNjkE4IzY+erIjRwOQCpRILgOvXx4q2qvx141BCqI="
         }
 
@@ -151,8 +152,9 @@ def credit_provider_callback(request, provider_id):
 
         * status (string): Either "approved" or "rejected".
 
-        * timestamp (string): The datetime at which the POST request was made, in ISO 8601 format.
-            This will always include time-zone information.
+        * timestamp (int or string): The datetime at which the POST request was made, represented
+            as the number of seconds since January 1, 1970 00:00:00 UTC.
+            If the timestamp is a string, it will be converted to an integer.
 
         * signature (string): A digital signature of the request parameters,
             created using a secret key shared with the credit provider.
@@ -253,29 +255,22 @@ def _validate_signature(parameters, provider_id):
         return HttpResponseForbidden("Invalid signature.")
 
 
-def _validate_timestamp(timestamp_str, provider_id):
+def _validate_timestamp(timestamp_value, provider_id):
     """
     Check that the timestamp of the request is recent.
 
     Arguments:
-        timestamp_str (str): ISO-8601 datetime formatted string.
+        timestamp (int or string): Number of seconds since Jan. 1, 1970 UTC.
+            If specified as a string, it will be converted to an integer.
         provider_id (unicode): Identifier for the credit provider.
 
     Returns:
         HttpResponse or None
 
     """
-    # If we can't parse the datetime string, reject the request.
-    try:
-        # dateutil's parser has some counter-intuitive behavior:
-        # for example, given an empty string or "a" it always returns the current datetime.
-        # It is the responsibility of the credit provider to send a valid ISO-8601 datetime
-        # so we can validate it; otherwise, this check might not take effect.
-        # (Note that the signature check ensures that the timestamp we receive hasn't
-        # been tampered with after being issued by the credit provider).
-        timestamp = dateutil.parser.parse(timestamp_str)
-    except ValueError:
-        msg = u'"{timestamp}" is not an ISO-8601 formatted datetime'.format(timestamp=timestamp_str)
+    timestamp = from_timestamp(timestamp_value)
+    if timestamp is None:
+        msg = u'"{timestamp}" is not a valid timestamp'.format(timestamp=timestamp_value)
         log.warning(msg)
         return HttpResponseBadRequest(msg)
 
@@ -287,6 +282,6 @@ def _validate_timestamp(timestamp_str, provider_id):
                 u'Timestamp %s is too far in the past (%s seconds), '
                 u'so we are rejecting the notification from the credit provider "%s".'
             ),
-            timestamp_str, elapsed_seconds, provider_id,
+            timestamp_value, elapsed_seconds, provider_id,
         )
         return HttpResponseForbidden(u"Timestamp is too far in the past.")

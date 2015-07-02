@@ -1,0 +1,54 @@
+---
+metadata:
+    display_name: Numerical Input with Hints and Feedback
+    markdown: |
+        
+        You can provide feedback for correct answers in numerical input problems. You cannot provide feedback for incorrect answers.
+
+        Use feedback for the correct answer to reinforce the process for arriving at the numerical value.
+
+        You can also add hints for learners.
+
+        Be sure to select Settings to specify a Display Name and other values that apply.
+
+        Use the following example problem as a model.
+
+        >>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)<<
+
+        = 4 {{The mean for this set of numbers is 20 / 5, which equals 4.}}
+
+        ||The mean is calculated by summing the set of numbers and dividing by n.||
+        ||n is the count of items in the set.||
+
+        [explanation]
+        The mean is calculated by summing the set of numbers and dividing by n. In this case: (1 + 5 + 6 + 3 + 5) / 5 = 20 / 5 = 4.
+        [explanation]
+
+tab: hint
+data: |
+    <problem>
+    
+    <p>You can provide feedback for correct answers in numerical input problems. You cannot provide feedback for incorrect answers.</p>
+
+    <p>Use feedback for the correct answer to reinforce the process for arriving at the numerical value.</p>
+
+    <p>Use the following example problem as a model.</p>
+
+    <p>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)</p>
+    <numericalresponse answer="4">
+      <formulaequationinput label="What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)" />
+      <correcthint>The mean for this set of numbers is 20 / 5, which equals 4.</correcthint>
+    </numericalresponse>
+
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>The mean is calculated by summing the set of numbers and dividing by n. In this case: (1 + 5 + 6 + 3 + 5) / 5 = 20 / 5 = 4.</p>
+      </div>
+    </solution>
+
+    <demandhint>
+      <hint>The mean is calculated by summing the set of numbers and dividing by n.</hint>
+      <hint>n is the count of items in the set.</hint>
+    </demandhint>
+    </problem>

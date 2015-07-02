@@ -61,7 +61,6 @@
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
             'js/mustache': 'js/mustache',
-            'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
 
@@ -85,11 +84,13 @@
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
             'js/student_account/views/LoginView': 'js/student_account/views/LoginView',
+            'js/student_account/views/InstitutionLoginView': 'js/student_account/views/InstitutionLoginView',
             'js/student_account/models/PasswordResetModel': 'js/student_account/models/PasswordResetModel',
             'js/student_account/views/PasswordResetView': 'js/student_account/views/PasswordResetView',
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
+            'js/student_account/views/HintedLoginView': 'js/student_account/views/HintedLoginView',
             'js/student_profile/profile': 'js/student_profile/profile',
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
@@ -284,9 +285,6 @@
                 exports: 'js/student_profile/profile',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
-            'js/verify_student/photocapture': {
-                exports: 'js/verify_student/photocapture'
-            },
             'js/staff_debug_actions': {
                 exports: 'js/staff_debug_actions',
                 deps: ['gettext']
@@ -414,6 +412,14 @@
                     'js/student_account/views/FormView'
                 ]
             },
+            'js/student_account/views/InstitutionLoginView': {
+                exports: 'edx.student.account.InstitutionLoginView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone'
+                ]
+            },
             'js/student_account/models/PasswordResetModel': {
                 exports: 'edx.student.account.PasswordResetModel',
                 deps: ['jquery', 'jquery.cookie', 'backbone']
@@ -443,6 +449,15 @@
                     'js/student_account/views/FormView'
                 ]
             },
+            'js/student_account/views/HintedLoginView': {
+                exports: 'edx.student.account.HintedLoginView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext'
+                ]
+            },
             'js/student_account/views/AccessView': {
                 exports: 'edx.student.account.AccessView',
                 deps: [
@@ -454,6 +469,7 @@
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',
                     'js/student_account/views/RegisterView',
+                    'js/student_account/views/InstitutionLoginView',
                     'js/student_account/models/LoginModel',
                     'js/student_account/models/PasswordResetModel',
                     'js/student_account/models/RegisterModel',
@@ -501,6 +517,7 @@
                     'gettext',
                     'jquery.cookie',
                     'jquery.url',
+                    'string_utils',
                     'js/verify_student/views/step_view',
                 ]
             },
@@ -550,6 +567,13 @@
                     'js/verify_student/views/step_view',
                 ]
             },
+            'js/verify_student/views/reverify_success_step_view': {
+                exports: 'edx.verify_student.ReverifySuccessStepView',
+                deps: [
+                    'jquery',
+                    'js/verify_student/views/step_view',
+                ]
+            },
             'js/verify_student/views/pay_and_verify_view': {
                 exports: 'edx.verify_student.PayAndVerifyView',
                 deps: [
@@ -565,6 +589,20 @@
                     'js/verify_student/views/id_photo_step_view',
                     'js/verify_student/views/review_photos_step_view',
                     'js/verify_student/views/enrollment_confirmation_step_view'
+                ]
+            },
+            'js/verify_student/views/reverify_view': {
+                exports: 'edx.verify_student.ReverifyView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'js/verify_student/models/verification_model',
+                    'js/verify_student/views/face_photo_step_view',
+                    'js/verify_student/views/id_photo_step_view',
+                    'js/verify_student/views/enrollment_confirmation_step_view',
+                    'js/verify_student/views/reverify_success_step_view'
                 ]
             },
             // Student Notes
@@ -583,7 +621,6 @@
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
-        'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
@@ -595,7 +632,9 @@
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/finish_auth_spec.js',
+        'lms/include/js/spec/student_account/hinted_login_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
+        'lms/include/js/spec/student_account/institution_login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
         'lms/include/js/spec/student_account/enrollment_spec.js',
@@ -610,6 +649,7 @@
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
+        'lms/include/js/spec/verify_student/reverify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/image_input_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',

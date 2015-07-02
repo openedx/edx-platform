@@ -13,12 +13,13 @@
     </select>
 
   <span id="answer_${id}"></span>  
-  <span class="status ${status.classname}"
-      id="status_${id}"
-      aria-describedby="input_${id}">
-    <span class="sr">${value|h} - ${status.display_name}</span>
-  </span>
-
+  <div class="indicator-container">
+    <span class="status ${status.classname}"
+        id="status_${id}"
+        aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
+      <span class="sr">${value|h} - ${status.display_name}</span>
+    </span>
+  </div>
   % if msg:
       <span class="message">${msg|n}</span>
   % endif

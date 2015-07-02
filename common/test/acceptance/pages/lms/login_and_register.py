@@ -232,7 +232,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         Only the "Dummy" provider is used for bok choy because it is the only
         one that doesn't send traffic to external servers.
         """
-        self.q(css="button.{}-Dummy".format(self.current_form)).click()
+        self.q(css="button.{}-oa2-dummy".format(self.current_form)).click()
 
     def password_reset(self, email):
         """Navigates to, fills in, and submits the password reset form.
@@ -281,6 +281,8 @@ class CombinedLoginAndRegisterPage(PageObject):
             return "login"
         elif self.q(css=".js-reset").visible:
             return "password-reset"
+        elif self.q(css=".proceed-button").visible:
+            return "hinted-login"
 
     @property
     def email_value(self):
@@ -335,3 +337,9 @@ class CombinedLoginAndRegisterPage(PageObject):
                     return (True, msg_element.text[0])
             return (False, None)
         return Promise(_check_func, "Result of third party auth is visible").fulfill()
+
+    @property
+    def hinted_login_prompt(self):
+        """Get the message displayed to the user on the hinted-login form"""
+        if self.q(css=".wrapper-other-login .instructions").visible:
+            return self.q(css=".wrapper-other-login .instructions").text[0]

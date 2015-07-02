@@ -13,7 +13,7 @@ except ImportError:
 
 from django.contrib.auth.models import User
 from xblock.fields import Scope, ScopeBase
-from xblock_user_state.interface import XBlockUserStateClient
+from edx_user_state_client.interface import XBlockUserStateClient
 from courseware.models import StudentModule, StudentModuleHistory
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import UsageKey

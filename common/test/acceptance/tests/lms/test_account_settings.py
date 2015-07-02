@@ -437,9 +437,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         Currently there is no way to test the whole authentication process
         because that would require accounts with the providers.
         """
-        for field_id, title, link_title in [
-            ['auth-facebook', 'Facebook', 'Link'],
-            ['auth-google', 'Google', 'Link'],
-        ]:
+        providers = (
+            ['auth-oa2-facebook', 'Facebook', 'Link'],
+            ['auth-oa2-google-oauth2', 'Google', 'Link'],
+        )
+        for field_id, title, link_title in providers:
             self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)

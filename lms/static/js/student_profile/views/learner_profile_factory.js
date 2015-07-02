@@ -78,6 +78,7 @@
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Country'),
+                    titleVisible: false,
                     required: true,
                     editable: editable,
                     showMessages: false,
@@ -90,6 +91,7 @@
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Preferred Language'),
+                    titleVisible: false,
                     required: false,
                     editable: editable,
                     showMessages: false,

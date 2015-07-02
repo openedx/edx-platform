@@ -16,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission
+from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
 from courseware.access import has_access
@@ -568,3 +569,17 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         # Never pass a group_id to the comments service for a non-cohorted
         # commentable
         return None
+
+
+def is_comment_too_deep(parent):
+    """
+    Determine whether a comment with the given parent violates MAX_COMMENT_DEPTH
+
+    parent can be None to determine whether root comments are allowed
+    """
+    return (
+        MAX_COMMENT_DEPTH is not None and (
+            MAX_COMMENT_DEPTH < 0 or
+            (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
+        )
+    )

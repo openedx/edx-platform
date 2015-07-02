@@ -21,7 +21,7 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
-# laurentFUN <laurent.at.fun@gmail.com>, 2014
+# laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # moocit-france <contact@moocit.fr>, 2015
 # Manjari <mringuet@gmail.com>, 2014
 # Olivier Lebon <oliv.lebon@wanadoo.fr>, 2015
@@ -40,7 +40,7 @@
 # SLOG90 <slog90@gmail.com>, 2014
 # Tahar <taharbrahmi@hotmail.fr>, 2015
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
-# yepelboin <yves.epelboin@impmc.upmc.fr>, 2014
+# yepelboin <yves.epelboin@impmc.upmc.fr>, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2015 EdX
@@ -103,13 +103,14 @@
 # moocit-france <contact@moocit.fr>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014-2015
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
+# yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-19 13:34+0000\n"
-"PO-Revision-Date: 2015-06-19 13:38+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-06-29 12:24+0000\n"
+"PO-Revision-Date: 2015-06-29 09:46+0000\n"
+"Last-Translator: yepelboin <yves.epelboin@impmc.upmc.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -170,13 +171,6 @@ msgstr "OK"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
-#: cms/templates/js/checklist.underscore
-msgid "This link will open in a new browser window/tab"
-msgstr ""
-"Ce lien s'ouvrira dans une nouvelle fenêtre ou un nouvel onglet de votre "
-"navigateur"
-
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
@@ -200,7 +194,7 @@ msgstr "Supprimer"
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: lms/static/js/views/fields.js
 msgid "Uploading"
-msgstr "Envoi en cours"
+msgstr "Chargement en cours"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -317,6 +311,10 @@ msgstr[0] "(%(num_points)s point possible)"
 msgstr[1] "(%(num_points)s points possibles)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "The grading process is still running. Refresh the page to see updates."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
 msgstr "Réponse:"
 
@@ -338,7 +336,7 @@ msgstr "Réponse cachée"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr "État : non soumis"
+msgstr ""
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
@@ -2531,7 +2529,7 @@ msgstr "Nom d'utilisateur"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Email"
-msgstr "E-mail"
+msgstr "Email"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Revoke access"
@@ -2539,11 +2537,11 @@ msgstr "Retirer l'accès"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr "Veuillez saisir un nom d'utilisateur ou un e-mail."
+msgstr "Veuillez saisir un nom d'utilisateur ou un email."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
-msgstr "Veuillez saisir un nom d'utilisateur ou un e-mail."
+msgstr "Veuillez saisir un nom d'utilisateur ou un email."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
@@ -3127,7 +3125,7 @@ msgstr "Nom de l'exercice"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
-msgstr "Evalué"
+msgstr "Noté"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Available to Grade"
@@ -3673,7 +3671,7 @@ msgid ""
 "The name that appears on your certificates. Other learners never see your "
 "full name."
 msgstr ""
-"Le nom complet visible sur vos certificats. Les autres étudiants ne pourrons"
+"Le nom complet visible sur vos certificats. Les autres étudiants ne pourront"
 " pas voir votre nom complet."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3934,6 +3932,18 @@ msgstr ""
 msgid "Could not retrieve payment information"
 msgstr "Impossible de récupérer les informations de paiement"
 
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Take a photo of your ID"
+msgstr ""
+
+#: lms/static/js/verify_student/views/reverify_view.js
+msgid "Review your info"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr "Confirmer"
+
 #: lms/static/js/verify_student/views/step_view.js
 msgid "An error has occurred. Please try reloading the page."
 msgstr "Une erreur est survenue. Essayez de rafraîchir la page."
@@ -4006,13 +4016,8 @@ msgstr "Modifier l'image"
 
 #: lms/static/js/views/fields.js
 #: cms/templates/js/video/metadata-translations-item.underscore
-#, fuzzy
 msgid "Remove"
-msgstr ""
-"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"Supprimer\n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"Enlever"
+msgstr "Supprimer"
 
 #: lms/static/js/views/fields.js
 msgid "Removing"
@@ -4127,6 +4132,12 @@ msgstr "Suppression en cours"
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
 msgstr "Erreur de la sauvegarde d'OpenAssessment"
+
+#: cms/templates/js/checklist.underscore
+msgid "This link will open in a new browser window/tab"
+msgstr ""
+"Ce lien s'ouvrira dans une nouvelle fenêtre ou un nouvel onglet de votre "
+"navigateur"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -4356,7 +4367,7 @@ msgstr "Mis en file d'attente"
 #. completed successfully
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload completed"
-msgstr "Téléversement terminé"
+msgstr "Chargement terminé"
 
 #. Translators: This is the status of a video upload that has failed
 #: cms/static/js/models/active_video_upload.js
@@ -4535,13 +4546,8 @@ msgstr "Choisir le fichier"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
-#, fuzzy
 msgid "Upload New File"
-msgstr ""
-"#-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#\n"
-"Envoyer un nouveau fichier\n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"Téléversez un nouveau fichier"
+msgstr "Charger un nouveau fichier"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
@@ -4599,7 +4605,7 @@ msgstr "Traitement de la demande de relance"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Uploader un nouveau PDF appelé \"<%= name %>”"
+msgstr "Charger un nouveau PDF appelé \"<%= name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -4816,13 +4822,8 @@ msgstr ""
 #: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
-#, fuzzy
 msgid "Upload"
-msgstr ""
-"#-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#\n"
-"Envoyer\n"
-"#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"Charger"
+msgstr "Charger"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
@@ -5580,6 +5581,45 @@ msgstr "Une erreur est survenue. Merci de rafraîchir la page."
 msgid "Forgot password?"
 msgstr "Mot de passe oublié?"
 
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Sign in"
+msgstr "Se connecter"
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Would you like to sign in using your %(providerName)s credentials?"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Sign in using %(providerName)s"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+msgid "Show me other ways to sign in or register"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Sign in with Institution/Campus Credentials"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "Choose your institution from the list below:"
+msgstr ""
+
+#: lms/templates/student_account/institution_login.underscore
+msgid "Back to sign in"
+msgstr ""
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register with Institution/Campus Credentials"
+msgstr ""
+
+#: lms/templates/student_account/institution_register.underscore
+msgid "Register through edX"
+msgstr ""
+
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -5608,13 +5648,13 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Sign in"
-msgstr "Se connecter"
-
-#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "ou se connecter avec"
+
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Use my institution/campus credentials"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "New to %(platformName)s?"
@@ -6043,6 +6083,22 @@ msgstr ""
 "Un permis de conduire, un passeport ou toute pièce d'identité avec votre nom"
 " et photo."
 
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Identity Verification In Progress"
+msgstr ""
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid ""
+"We have received your information and are verifying your identity. You will "
+"see a message on your dashboard when the verification process is complete "
+"(usually within 1-2 days). In the meantime, you can still access all "
+"available course content."
+msgstr ""
+
+#: lms/templates/verify_student/reverify_success_step.underscore
+msgid "Return to Your Dashboard"
+msgstr ""
+
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr ""
@@ -6104,10 +6160,6 @@ msgstr ""
 msgid "Before proceeding, please confirm that your details match"
 msgstr ""
 
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr "Confirmer"
-
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
@@ -6132,7 +6184,7 @@ msgstr "Glisser déposer ou cliquer ici pour importer des fichiers vidéo."
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "status"
-msgstr "état"
+msgstr "statut"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
@@ -6378,7 +6430,7 @@ msgstr "Glissez pour modifier l'ordre"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Release Status:"
-msgstr "État de la diffusion :"
+msgstr "Statut de la diffusion :"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -6521,7 +6573,7 @@ msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Upload PDF"
-msgstr "Téléverser un PDF"
+msgstr "Envoyer un PDF"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "delete chapter"
@@ -7025,12 +7077,12 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Upload New Transcript"
-msgstr "Téléverser une nouvelle transcription"
+msgstr "Envoyer une nouvelle transcription"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid "Upload New .srt Transcript"
-msgstr "Téléverser une nouvelle transcription .srt"
+msgstr "Envoyer une nouvelle transcription .srt"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore

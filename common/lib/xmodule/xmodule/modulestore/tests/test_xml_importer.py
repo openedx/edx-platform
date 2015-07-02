@@ -101,7 +101,7 @@ def render_to_template_mock(*args):
     pass
 
 
-class StubXBlock(XBlock, XModuleMixin, InheritanceMixin):
+class StubXBlock(XModuleMixin, InheritanceMixin):
     """
     Stub XBlock used for testing.
     """

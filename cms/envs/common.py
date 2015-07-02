@@ -42,6 +42,9 @@ from lms.envs.common import (
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
+    # The following setting is included as it is used to check whether to
+    # display credit eligibility table on the CMS or not.
+    ENABLE_CREDIT_ELIGIBILITY
 )
 from path import path
 from warnings import simplefilter
@@ -174,7 +177,7 @@ FEATURES = {
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
     # Enable credit eligibility feature
-    'ENABLE_CREDIT_ELIGIBILITY': False,
+    'ENABLE_CREDIT_ELIGIBILITY': ENABLE_CREDIT_ELIGIBILITY,
 
     # Can the visibility of the discussion tab be configured on a per-course basis?
     'ALLOW_HIDING_DISCUSSION_TAB': False,
@@ -248,7 +251,6 @@ from lms.envs.common import (
     COURSE_KEY_PATTERN, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
 )
 
-
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7
@@ -306,7 +308,9 @@ MIDDLEWARE_CLASSES = (
     'embargo.middleware.EmbargoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
-    'django.middleware.locale.LocaleMiddleware',
+    # TODO: Re-import the Django version once we upgrade to Django 1.8 [PLAT-671]
+    # 'django.middleware.locale.LocaleMiddleware',
+    'django_locale.middleware.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # needs to run after locale middleware (or anything that modifies the request context)
@@ -750,6 +754,7 @@ INSTALLED_APPS = (
     # Additional problem types
     'edx_jsme',    # Molecular Structure
 
+    'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
 
     # Credit courses
@@ -759,7 +764,10 @@ INSTALLED_APPS = (
 
 ################# EDX MARKETING SITE ##################################
 
-EDXMKTG_COOKIE_NAME = 'edxloggedin'
+EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
+EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
+EDXMKTG_USER_INFO_COOKIE_VERSION = 1
+
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
 

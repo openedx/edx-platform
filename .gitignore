@@ -33,6 +33,7 @@ codekit-config.json
 *.mo
 *.po
 *.prob
+*.dup
 !django.po
 !django.mo
 !djangojs.po
@@ -90,6 +91,9 @@ log/
 logs
 chromedriver.log
 ghostdriver.log
+
+### Celery artifacts ###
+celerybeat-schedule
 
 ### Unknown artifacts
 database.sqlite

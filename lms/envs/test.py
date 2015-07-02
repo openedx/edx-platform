@@ -238,18 +238,13 @@ PASSWORD_COMPLEXITY = {}
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
-THIRD_PARTY_AUTH = {
-    "Google": {
-        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
-        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
-    },
-    "Facebook": {
-        "SOCIAL_AUTH_FACEBOOK_KEY": "test",
-        "SOCIAL_AUTH_FACEBOOK_SECRET": "test",
-    },
-}
-
-FEATURES['ENABLE_DUMMY_THIRD_PARTY_AUTH_PROVIDER'] = True
+AUTHENTICATION_BACKENDS = (
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.linkedin.LinkedinOAuth2',
+    'social.backends.facebook.FacebookOAuth2',
+    'third_party_auth.dummy.DummyBackend',
+    'third_party_auth.saml.SAMLAuthBackend',
+) + AUTHENTICATION_BACKENDS
 
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
@@ -459,7 +454,7 @@ FEATURES['ENABLE_EDXNOTES'] = True
 FEATURES['ENABLE_TEAMS'] = True
 
 # Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', )
+INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
@@ -495,3 +490,4 @@ PROFILE_IMAGE_MIN_BYTES = 100
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
+AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)

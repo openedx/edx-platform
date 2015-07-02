@@ -92,6 +92,9 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "id": unicode(self.course.id),
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
+                "following_thread_list_url": (
+                    "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True"
+                ),
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
             }
         )
@@ -204,7 +207,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["following", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "voted"],
         }]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id)})
@@ -270,6 +273,28 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "text": ["test search string"],
         })
 
+    def test_following(self):
+        self.register_get_user_response(self.user)
+        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=1)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": unicode(self.course.id),
+                "page": "1",
+                "page_size": "4",
+                "following": "True",
+            }
+        )
+        self.assert_response_correct(
+            response,
+            200,
+            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+        )
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/users/{}/subscribed_threads".format(self.user.id)
+        )
+
 
 @httpretty.activate
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -318,7 +343,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         response = self.client.post(
             self.url,
@@ -409,7 +434,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
-            "editable_fields": ["following", "raw_body", "title", "topic_id", "type", "voted"],
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "title", "topic_id", "type", "voted"],
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,
@@ -553,7 +578,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": True,
             "vote_count": 4,
             "children": [],
-            "editable_fields": ["voted"],
+            "editable_fields": ["abuse_flagged", "voted"],
         }]
         self.register_get_thread_response({
             "id": self.thread_id,
@@ -707,7 +732,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
         }
         response = self.client.post(
             self.url,
@@ -791,7 +816,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
         }
         response = self.client.patch(  # pylint: disable=no-member
             self.url,

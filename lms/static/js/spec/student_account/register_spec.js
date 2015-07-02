@@ -32,12 +32,14 @@ define([
                 currentProvider: null,
                 providers: [
                     {
+                        id: 'oa2-google-oauth2',
                         name: 'Google',
                         iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
+                        id: 'oa2-facebook',
                         name: 'Facebook',
                         iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
@@ -284,8 +286,8 @@ define([
             createRegisterView(this);
 
             // Verify that Google and Facebook registration buttons are displayed
-            expect($('.button-Google')).toBeVisible();
-            expect($('.button-Facebook')).toBeVisible();
+            expect($('.button-oa2-google-oauth2')).toBeVisible();
+            expect($('.button-oa2-facebook')).toBeVisible();
         });
 
         it('validates registration form fields', function() {

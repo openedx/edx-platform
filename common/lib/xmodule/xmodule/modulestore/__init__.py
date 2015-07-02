@@ -272,11 +272,19 @@ class BulkOperationsMixin(object):
 
         dirty = self._end_outermost_bulk_operation(bulk_ops_record, structure_key)
 
-        self._clear_bulk_ops_record(structure_key)
+        # The bulk op has ended. However, the signal tasks below still need to use the
+        # built-up bulk op information (if the signals trigger tasks in the same thread).
+        # So re-nest until the signals are sent.
+        bulk_ops_record.nest()
 
         if emit_signals and dirty:
             self.send_bulk_published_signal(bulk_ops_record, structure_key)
             self.send_bulk_library_updated_signal(bulk_ops_record, structure_key)
+
+        # Signals are sent. Now unnest and clear the bulk op for good.
+        bulk_ops_record.unnest()
+
+        self._clear_bulk_ops_record(structure_key)
 
     def _is_in_bulk_operation(self, course_key, ignore_case=False):
         """

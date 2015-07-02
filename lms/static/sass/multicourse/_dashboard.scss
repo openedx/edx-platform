@@ -531,6 +531,10 @@
         padding: 0;
       }
 
+      .purchase_credit {
+        float: right;
+      }
+
       .message {
         @extend %ui-depth1;
         border-radius: 3px;

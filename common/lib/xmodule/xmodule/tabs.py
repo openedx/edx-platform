@@ -28,7 +28,8 @@ class CourseTab(object):
     # subclass, shared by all instances of the subclass.
     type = ''
 
-    # The title of the tab, which should be internationalized
+    # The title of the tab, which should be internationalized using
+    # ugettext_noop since the user won't be available in this context.
     title = None
 
     # Class property that specifies whether the tab can be hidden for a particular course

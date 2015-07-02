@@ -72,7 +72,6 @@ class CourseDiscoveryTest(WebAppTest):
         """
         self.page.visit()
 
-    @flaky  # TODO: fix this. See SOL-975
     def test_search(self):
         """
         Make sure you can search for courses.

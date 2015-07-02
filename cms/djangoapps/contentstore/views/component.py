@@ -282,8 +282,8 @@ def get_component_templates(courselike, library=False):
                     tab = 'common'
                     if template['metadata'].get('markdown') is None:
                         tab = 'advanced'
-                    # Then the problem can override that with a tab: setting
-                    tab = template['metadata'].get('tab', tab)
+                    # Then the problem can override that with a tab: attribute (note: not nested in metadata)
+                    tab = template.get('tab', tab)
 
                     templates_for_category.append(
                         create_template_dict(

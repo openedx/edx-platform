@@ -84,7 +84,8 @@ td { vertical-align: top; }
 .clearfix { *zoom: 1; }
 
 @media print {
-  * { background: transparent !important; color: black !important; box-shadow:none !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
+  * { background: transparent; color: black !important; box-shadow:none !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
+  html, body { background: transparent !important; }
   a, a:visited { text-decoration: underline; }
   abbr[title]:after { content: " (" attr(title) ")"; }
   .ir a:after { content: ""; }

@@ -119,7 +119,6 @@ class ChooseModeView(View):
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
-            "can_audit": "audit" in modes,
             "responsive": True
         }
         if "verified" in modes:

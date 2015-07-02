@@ -4,9 +4,13 @@ Contains the APIs for course credit requirements.
 
 import logging
 import uuid
+import datetime
+
+import pytz
 
 from django.db import transaction
 
+from util.date_utils import to_timestamp
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -22,12 +26,14 @@ from .exceptions import (
 )
 from .models import (
     CreditCourse,
+    CreditProvider,
     CreditRequirement,
     CreditRequirementStatus,
     CreditRequest,
     CreditEligibility,
 )
 from .signature import signature, get_shared_secret_key
+
 
 log = logging.getLogger(__name__)
 
@@ -191,7 +197,7 @@ def create_credit_request(course_key, provider_id, username):
             "method": "POST",
             "parameters": {
                 "request_uuid": "557168d0f7664fe59097106c67c3f847",
-                "timestamp": "2015-05-04T20:57:57.987119+00:00",
+                "timestamp": 1434631630,
                 "course_org": "HogwartsX",
                 "course_num": "Potions101",
                 "course_run": "1T2015",
@@ -207,14 +213,13 @@ def create_credit_request(course_key, provider_id, username):
 
     """
     try:
-        user_eligibility = CreditEligibility.objects.select_related('course', 'provider').get(
+        user_eligibility = CreditEligibility.objects.select_related('course').get(
             username=username,
-            course__course_key=course_key,
-            provider__provider_id=provider_id
+            course__course_key=course_key
         )
         credit_course = user_eligibility.course
-        credit_provider = user_eligibility.provider
-    except CreditEligibility.DoesNotExist:
+        credit_provider = credit_course.providers.get(provider_id=provider_id)
+    except (CreditEligibility.DoesNotExist, CreditProvider.DoesNotExist):
         log.warning(u'User tried to initiate a request for credit, but the user is not eligible for credit')
         raise UserIsNotEligible
 
@@ -269,12 +274,12 @@ def create_credit_request(course_key, provider_id, username):
 
     # Retrieve the final grade from the eligibility table
     try:
-        final_grade = CreditRequirementStatus.objects.filter(
+        final_grade = CreditRequirementStatus.objects.get(
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
             status="satisfied"
-        ).latest().reason["final_grade"]
+        ).reason["final_grade"]
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
         log.exception(
             "Could not retrieve final grade from the credit eligibility table "
@@ -285,7 +290,7 @@ def create_credit_request(course_key, provider_id, username):
 
     parameters = {
         "request_uuid": credit_request.uuid,
-        "timestamp": credit_request.timestamp.isoformat(),
+        "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),
         "course_org": course_key.org,
         "course_num": course_key.course,
         "course_run": course_key.run,
@@ -391,7 +396,7 @@ def get_credit_requests_for_user(username):
     [
         {
             "uuid": "557168d0f7664fe59097106c67c3f847",
-            "timestamp": "2015-05-04T20:57:57.987119+00:00",
+            "timestamp": 1434631630,
             "course_key": "course-v1:HogwartsX+Potions101+1T2015",
             "provider": {
                 "id": "HogwartsX",
@@ -405,7 +410,7 @@ def get_credit_requests_for_user(username):
     return CreditRequest.credit_requests_for_user(username)
 
 
-def get_credit_requirement_status(course_key, username):
+def get_credit_requirement_status(course_key, username, namespace=None, name=None):
     """ Retrieve the user's status for each credit requirement in the course.
 
     Args:
@@ -419,33 +424,30 @@ def get_credit_requirement_status(course_key, username):
                     {
                         "namespace": "reverification",
                         "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                        "display_name": "In Course Reverification",
                         "criteria": {},
-                        "status": "satisfied",
-                    },
-                    {
-                        "namespace": "reverification",
-                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                        "criteria": {},
-                        "status": "Not satisfied",
+                        "status": "failed",
                     },
                     {
                         "namespace": "proctored_exam",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "display_name": "Proctored Mid Term Exam",
                         "criteria": {},
-                        "status": "error",
+                        "status": "satisfied",
                     },
                     {
                         "namespace": "grade",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
+                        "display_name": "Minimum Passing Grade",
                         "criteria": {"min_grade": 0.8},
-                        "status": None,
+                        "status": "failed",
                     },
                 ]
 
     Returns:
         list of requirement statuses
     """
-    requirements = CreditRequirement.get_course_requirements(course_key)
+    requirements = CreditRequirement.get_course_requirements(course_key, namespace=namespace, name=name)
     requirement_statuses = CreditRequirementStatus.get_statuses(requirements, username)
     requirement_statuses = dict((o.requirement, o) for o in requirement_statuses)
     statuses = []
@@ -454,6 +456,7 @@ def get_credit_requirement_status(course_key, username):
         statuses.append({
             "namespace": requirement.namespace,
             "name": requirement.name,
+            "display_name": requirement.display_name,
             "criteria": requirement.criteria,
             "status": requirement_status.status if requirement_status else None,
             "status_date": requirement_status.modified if requirement_status else None,
@@ -473,18 +476,6 @@ def is_user_eligible_for_credit(username, course_key):
         True if user is eligible for the course else False
     """
     return CreditEligibility.is_user_eligible_for_credit(course_key, username)
-
-
-def is_credit_course(course_key):
-    """Check if the given course is a credit course
-
-    Arg:
-        course_key (CourseKey): The identifier for course
-
-    Returns:
-        True if course is credit course else False
-    """
-    return CreditCourse.is_credit_course(course_key)
 
 
 def get_credit_requirement(course_key, namespace, name):
@@ -520,35 +511,79 @@ def get_credit_requirement(course_key, namespace, name):
     } if requirement else None
 
 
-def set_credit_requirement_status(username, requirement, status="satisfied", reason=None):
-    """Update Credit Requirement Status for given username and requirement
-        if exists else add new.
+def set_credit_requirement_status(username, course_key, req_namespace, req_name, status="satisfied", reason=None):
+    """
+    Update the user's requirement status.
+
+    This will record whether the user satisfied or failed a particular requirement
+    in a course.  If the user has satisfied all requirements, the user will be marked
+    as eligible for credit in the course.
 
     Args:
-        username(str): Username of the user
-        requirement(dict): requirement dict
-        status(str): Status of the requirement
-        reason(dict): Reason of the status
+        username (str): Username of the user
+        course_key (CourseKey): Identifier for the course associated with the requirement.
+        req_namespace (str): Namespace of the requirement (e.g. "grade" or "reverification")
+        req_name (str): Name of the requirement (e.g. "grade" or the location of the ICRV XBlock)
+
+    Keyword Arguments:
+        status (str): Status of the requirement (either "satisfied" or "failed")
+        reason (dict): Reason of the status
 
     Example:
         >>> set_credit_requirement_status(
-            "staff",
-            {
-                "course_key": "course-v1-edX-DemoX-1T2015"
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-            },
-            "satisfied",
-            {}
+                "staff",
+                CourseKey.from_string("course-v1-edX-DemoX-1T2015"),
+                "reverification",
+                "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                status="satisfied",
+                reason={}
             )
 
     """
-    credit_requirement = CreditRequirement.get_course_requirement(
-        requirement['course_key'], requirement['namespace'], requirement['name']
-    )
+    # Check if we're already eligible for credit.
+    # If so, short-circuit this process.
+    if CreditEligibility.is_user_eligible_for_credit(course_key, username):
+        return
+
+    # Retrieve all credit requirements for the course
+    # We retrieve all of them to avoid making a second query later when
+    # we need to check whether all requirements have been satisfied.
+    reqs = CreditRequirement.get_course_requirements(course_key)
+
+    # Find the requirement we're trying to set
+    req_to_update = next((
+        req for req in reqs
+        if req.namespace == req_namespace
+        and req.name == req_name
+    ), None)
+
+    # If we can't find the requirement, then the most likely explanation
+    # is that there was a lag updating the credit requirements after the course
+    # was published.  We *could* attempt to create the requirement here,
+    # but that could cause serious performance issues if many users attempt to
+    # lock the row at the same time.
+    # Instead, we skip updating the requirement and log an error.
+    if req_to_update is None:
+        log.error(
+            (
+                u'Could not update credit requirement in course "%s" '
+                u'with namespace "%s" and name "%s" '
+                u'because the requirement does not exist. '
+                u'The user "%s" should have had his/her status updated to "%s".'
+            ),
+            unicode(course_key), req_namespace, req_name, username, status
+        )
+        return
+
+    # Update the requirement status
     CreditRequirementStatus.add_or_update_requirement_status(
-        username, credit_requirement, status, reason
+        username, req_to_update, status=status, reason=reason
     )
+
+    # If we're marking this requirement as "satisfied", there's a chance
+    # that the user has met all eligibility requirements.
+    if status == "satisfied":
+        CreditEligibility.update_eligibility(reqs, username, course_key)
 
 
 def _get_requirements_to_disable(old_requirements, new_requirements):
@@ -624,3 +659,132 @@ def is_credit_course(course_key):
         return False
 
     return CreditCourse.is_credit_course(course_key=course_key)
+
+
+def get_credit_request_status(username, course_key):
+    """Get the credit request status.
+
+    This function returns the status of credit request of user for given course.
+    It returns the latest request status for the any credit provider.
+    The valid status are 'pending', 'approved' or 'rejected'.
+
+    Args:
+        username(str): The username of user
+        course_key(CourseKey): The course locator key
+
+    Returns:
+        A dictionary of credit request user has made if any
+
+    """
+    credit_request = CreditRequest.get_user_request_status(username, course_key)
+    if credit_request:
+        credit_status = {
+            "uuid": credit_request.uuid,
+            "timestamp": credit_request.modified,
+            "course_key": credit_request.course.course_key,
+            "provider": {
+                "id": credit_request.provider.provider_id,
+                "display_name": credit_request.provider.display_name
+            },
+            "status": credit_request.status
+        }
+    else:
+        credit_status = {}
+    return credit_status
+
+
+def _get_duration_and_providers(credit_course):
+    """Returns the credit providers and eligibility durations.
+
+    The eligibility_duration is the max of the credit duration of
+    all the credit providers of given course.
+
+    Args:
+        credit_course(CreditCourse): The CreditCourse object
+
+    Returns:
+        Tuple of eligibility_duration and credit providers of given course
+
+    """
+    providers = credit_course.providers.all()
+    seconds_good_for_display = 0
+    providers_list = []
+    for provider in providers:
+        providers_list.append(
+            {
+                "id": provider.provider_id,
+                "display_name": provider.display_name,
+                "eligibility_duration": provider.eligibility_duration,
+                "provider_url": provider.provider_url
+            }
+        )
+        eligibility_duration = int(provider.eligibility_duration) if provider.eligibility_duration else 0
+        seconds_good_for_display = max(eligibility_duration, seconds_good_for_display)
+
+    return seconds_good_for_display, providers_list
+
+
+def get_credit_eligibility(username):
+    """
+    Returns the all the eligibility the user has meet.
+
+    Args:
+        username(str): The username of user
+
+    Example:
+        >> get_credit_eligibility('Aamir'):
+            {
+                "edX/DemoX/Demo_Course": {
+                    "created_at": "2015-12-21",
+                    "providers": [
+                        "id": 12,
+                        "display_name": "Arizona State University",
+                        "eligibility_duration": 60,
+                        "provider_url": "http://arizona/provideere/link"
+                    ],
+                    "seconds_good_for_display": 90
+                }
+            }
+
+    Returns:
+        A dict of eligibilities
+    """
+    eligibilities = CreditEligibility.get_user_eligibility(username)
+    user_credit_requests = get_credit_requests_for_user(username)
+    request_dict = {}
+    # Change the list to dict for iteration
+    for request in user_credit_requests:
+        request_dict[unicode(request["course_key"])] = request
+    user_eligibilities = {}
+    for eligibility in eligibilities:
+        course_key = eligibility.course.course_key
+        duration, providers_list = _get_duration_and_providers(eligibility.course)
+        user_eligibilities[unicode(course_key)] = {
+            "created_at": eligibility.created,
+            "seconds_good_for_display": duration,
+            "providers": providers_list,
+        }
+
+        # Default status is requirements_meet
+        user_eligibilities[unicode(course_key)]["status"] = "requirements_meet"
+        # If there is some request user has made for this eligibility then update the status
+        if unicode(course_key) in request_dict:
+            user_eligibilities[unicode(course_key)]["status"] = request_dict[unicode(course_key)]["status"]
+            user_eligibilities[unicode(course_key)]["provider"] = request_dict[unicode(course_key)]["provider"]
+
+    return user_eligibilities
+
+
+def get_purchased_credit_courses(username):  # pylint: disable=unused-argument
+    """
+    Returns the purchased credit courses.
+
+    Args:
+        username(str): Username of the student
+
+    Returns:
+        A dict of courses user has purchased from the credit provider after completion
+
+    """
+    # TODO: How to track the purchased courses. It requires Will's work for credit provider integration
+    return {}

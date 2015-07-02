@@ -15,6 +15,7 @@ from django.conf import settings
 
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
+from util.date_utils import to_timestamp
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.signature import signature
@@ -98,7 +99,6 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         CreditEligibility.objects.create(
             username=self.USERNAME,
             course=credit_course,
-            provider=credit_provider,
         )
 
     def test_credit_request_and_response(self):
@@ -186,9 +186,18 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         # Simulate a callback from the credit provider with a timestamp too far in the past
         # (slightly more than 15 minutes)
         # Since the message isn't timely, respond with a 403.
-        timestamp = datetime.datetime.now(pytz.UTC) - datetime.timedelta(0, 60 * 15 + 1)
-        response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp.isoformat())
+        timestamp = to_timestamp(datetime.datetime.now(pytz.UTC) - datetime.timedelta(0, 60 * 15 + 1))
+        response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp)
         self.assertEqual(response.status_code, 403)
+
+    def test_credit_provider_callback_handles_string_timestamp(self):
+        request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
+
+        # Simulate a callback from the credit provider with a timestamp
+        # encoded as a string instead of an integer.
+        timestamp = str(to_timestamp(datetime.datetime.now(pytz.UTC)))
+        response = self._credit_provider_callback(request_uuid, "approved", timestamp=timestamp)
+        self.assertEqual(response.status_code, 200)
 
     def test_credit_provider_callback_is_idempotent(self):
         request_uuid = self._create_credit_request_and_get_uuid(self.USERNAME, self.COURSE_KEY)
@@ -311,7 +320,7 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         """
         provider_id = kwargs.get("provider_id", self.PROVIDER_ID)
         secret_key = kwargs.get("secret_key", TEST_CREDIT_PROVIDER_SECRET_KEY)
-        timestamp = kwargs.get("timestamp", datetime.datetime.now(pytz.UTC).isoformat())
+        timestamp = kwargs.get("timestamp", to_timestamp(datetime.datetime.now(pytz.UTC)))
 
         url = reverse("credit:provider_callback", args=[provider_id])
 

@@ -137,7 +137,7 @@
                                 screenReaderTitle: interpolate_text(
                                     gettext("Connect your {accountName} account"), {accountName: provider['name']}
                                 ),
-                                valueAttribute: 'auth-' + provider.name.toLowerCase(),
+                                valueAttribute: 'auth-' + provider.id,
                                 helpMessage: '',
                                 connected: provider.connected,
                                 connectUrl: provider.connect_url,

@@ -25,7 +25,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from django_comment_common import models
 from student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import simulate_running_pipeline
+from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
@@ -800,7 +800,7 @@ class PasswordResetViewTest(ApiTestCase):
 
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegistrationViewTest(ApiTestCase):
+class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     """Tests for the registration end-points of the User API. """
 
     maxDiff = None
@@ -907,6 +907,7 @@ class RegistrationViewTest(ApiTestCase):
     def test_register_form_third_party_auth_running(self):
         no_extra_fields_setting = {}
 
+        self.configure_google_provider(enabled=True)
         with simulate_running_pipeline(
             "openedx.core.djangoapps.user_api.views.third_party_auth.pipeline",
             "google-oauth2", email="bob@example.com",
@@ -1264,7 +1265,8 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertHttpOK(response)
-        self.assertIn(settings.EDXMKTG_COOKIE_NAME, self.client.cookies)
+        self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
+        self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
         user = User.objects.get(username=self.USERNAME)
         account_settings = get_account_settings(user)

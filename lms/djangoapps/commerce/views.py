@@ -20,6 +20,7 @@ from course_modes.models import CourseMode
 from courseware import courses
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
+from embargo import api as embargo_api
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
@@ -75,6 +76,11 @@ class BasketsView(APIView):
         valid, course_key, error = self._is_data_valid(request)
         if not valid:
             return DetailResponse(error, status=HTTP_406_NOT_ACCEPTABLE)
+
+        embargo_response = embargo_api.get_embargo_response(request, course_key, user)
+
+        if embargo_response:
+            return embargo_response
 
         # Don't do anything if an enrollment already exists
         course_id = unicode(course_key)

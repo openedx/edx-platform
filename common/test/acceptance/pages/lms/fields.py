@@ -211,6 +211,15 @@ class FieldsMixin(object):
         query = self.q(css='.u-field-link-title-{}'.format(field_id))
         return query.text[0] if query.present else None
 
+    def wait_for_link_title_for_link_field(self, field_id, expected_title):
+        """
+        Wait until the title of the specified link field equals expected_title.
+        """
+        return EmptyPromise(
+            lambda: self.link_title_for_link_field(field_id) == expected_title,
+            "Link field with link title \"{0}\" is visible.".format(expected_title)
+        ).fulfill()
+
     def click_on_link_in_link_field(self, field_id):
         """
         Click the link in a link field.

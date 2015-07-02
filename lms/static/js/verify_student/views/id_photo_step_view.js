@@ -10,6 +10,8 @@ var edx = edx || {};
 
     edx.verify_student.IDPhotoStepView = edx.verify_student.StepView.extend({
 
+        templateName: "id_photo_step",
+
         defaultContext: function() {
             return {
                 platformName: ''
@@ -22,7 +24,8 @@ var edx = edx || {};
                 model: this.model,
                 modelAttribute: 'identificationImage',
                 submitButton: '#next_step_button',
-                errorModel: this.errorModel
+                errorModel: this.errorModel,
+                captureSoundPath: this.stepData.captureSoundPath
             }).render();
 
             // Track a virtual pageview, for easy funnel reconstruction.

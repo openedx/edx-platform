@@ -1,0 +1,47 @@
+[
+  {
+    "pk": 1,
+    "model": "third_party_auth.oauth2providerconfig",
+    "fields": {
+      "enabled": true,
+      "change_date": "2001-02-03T04:05:06Z",
+      "changed_by": null,
+      "name": "Google",
+      "icon_class": "fa-google-plus",
+      "backend_name": "google-oauth2",
+      "key": "test",
+      "secret": "test",
+      "other_settings": "{}"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "third_party_auth.oauth2providerconfig",
+    "fields": {
+      "enabled": true,
+      "change_date": "2001-02-03T04:05:06Z",
+      "changed_by": null,
+      "name": "Facebook",
+      "icon_class": "fa-facebook",
+      "backend_name": "facebook",
+      "key": "test",
+      "secret": "test",
+      "other_settings": "{}"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "third_party_auth.oauth2providerconfig",
+    "fields": {
+      "enabled": true,
+      "change_date": "2001-02-03T04:05:06Z",
+      "changed_by": null,
+      "name": "Dummy",
+      "icon_class": "fa-sign-in",
+      "backend_name": "dummy",
+      "key": "",
+      "secret": "",
+      "other_settings": "{}"
+    }
+  }
+]

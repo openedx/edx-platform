@@ -30,7 +30,7 @@ class GetEditableFieldsTest(TestCase):
         thread = Thread(user_id="5" if is_author else "6", type="thread")
         context = _get_context(requester_id="5", is_requester_privileged=is_privileged)
         actual = get_editable_fields(thread, context)
-        expected = {"following", "voted"}
+        expected = {"abuse_flagged", "following", "voted"}
         if is_author or is_privileged:
             expected |= {"topic_id", "type", "title", "raw_body"}
         self.assertEqual(actual, expected)
@@ -45,7 +45,7 @@ class GetEditableFieldsTest(TestCase):
             thread=Thread(user_id="5" if is_thread_author else "6", thread_type=thread_type)
         )
         actual = get_editable_fields(comment, context)
-        expected = {"voted"}
+        expected = {"abuse_flagged", "voted"}
         if is_author or is_privileged:
             expected |= {"raw_body"}
         if (is_thread_author and thread_type == "question") or is_privileged:

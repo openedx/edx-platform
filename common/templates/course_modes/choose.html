@@ -4,13 +4,9 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
 
-<%block name="bodyclass">register verification-process step-select-track ${'is-upgrading' if upgrade else ''}</%block>
+<%block name="bodyclass">register verification-process step-select-track</%block>
 <%block name="pagetitle">
-    % if upgrade:
-        ${_("Upgrade Your Enrollment for {} | Choose Your Track").format(course_name)}
-    % else:
-        ${_("Enroll In {} | Choose Your Track").format(course_name)}
-    %endif
+    ${_("Enroll In {} | Choose Your Track").format(course_name)}
 </%block>
 
 <%block name="js_extra">
@@ -65,7 +61,11 @@ from django.core.urlresolvers import reverse
         <section class="wrapper">
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
-                    <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
+                    <header class="page-header content-main">
+                        <h3 class="title">
+                            ${_("Congratulations!  You are now enrolled in {course_name}").format(course_name=course_name)}
+                        </h3>
+                    </header>
 
                     <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
                         % if "verified" in modes:
@@ -129,36 +129,32 @@ from django.core.urlresolvers import reverse
                             </div>
                         % endif
 
-                        % if not upgrade:
-                            % if "honor" in modes:
-                                <span class="deco-divider">
-                                    <span class="copy">${_("or")}</span>
-                                </span>
+                        % if "honor" in modes:
+                            <span class="deco-divider">
+                                <span class="copy">${_("or")}</span>
+                            </span>
 
-                                <div class="register-choice register-choice-audit">
-                                    <div class="wrapper-copy">
-                                        <span class="deco-ribbon"></span>
-                                        <h4 class="title">${_("Audit This Course")}</h4>
-                                        <div class="copy">
-                                            <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums. If your work is satisfactory and you abide by the Honor Code, you'll receive a personalized Honor Code Certificate to showcase your achievement.")}</p>
-                                        </div>
+                            <div class="register-choice register-choice-audit">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course")}</h4>
+                                    <div class="copy">
+                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums. If your work is satisfactory and you abide by the Honor Code, you'll receive a personalized Honor Code Certificate to showcase your achievement.")}</p>
                                     </div>
-
-                                    <ul class="list-actions">
-                                        <li class="action action-select">
-                                            <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
-                                        </li>
-                                    </ul>
                                 </div>
-                            % endif
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
+                                    </li>
+                                </ul>
+                            </div>
                         % endif
 
                         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                     </form>
                 </article>
             </div> <!-- /wrapper-content-main -->
-
-            <%include file="/verify_student/_verification_support.html" />
         </section>
     </div>
 </%block>

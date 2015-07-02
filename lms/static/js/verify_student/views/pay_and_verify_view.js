@@ -83,7 +83,6 @@ var edx = edx || {};
 
                     subviewConfig = {
                         errorModel: this.errorModel,
-                        templateName: this.displaySteps[i].templateName,
                         nextStepTitle: nextStepTitle,
                         stepData: stepData
                     };
@@ -121,8 +120,6 @@ var edx = edx || {};
             }
 
             // Render the subview
-            // Note that this will trigger a GET request for the
-            // underscore template.
             // When the view is rendered, it will overwrite the existing
             // step in the DOM.
             stepName = this.displaySteps[ this.currentStepIndex ].name;
