@@ -3210,6 +3210,11 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             # can't be properly parsed
             self.duration_sec = 'unknown'
 
+        def task_output_integer_response(self):
+            """Mock task_output to contain integer"""
+            self.task_output = '1500000'
+            self.duration_sec = 1500000 / 1000.0
+
         def to_dict(self):
             """ Convert fake task to dictionary representation. """
             attr_dict = {key: getattr(self, key) for key in self.FEATURES}
@@ -3242,6 +3247,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_factory = MockCompletionInfo()
         self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(7)]
         self.tasks[-1].make_invalid_output()
+        self.tasks[-2].task_output_integer_response()
 
     @patch.object(instructor_task.api, 'get_running_instructor_tasks')
     def test_list_instructor_tasks_running(self, act):
