@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ Commerce app tests package. """
-import json
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -11,7 +10,7 @@ import mock
 from commerce import ecommerce_api_client
 from student.tests.factories import UserFactory
 
-
+JSON = 'application/json'
 TEST_PUBLIC_URL_ROOT = 'http://www.example.com'
 TEST_API_URL = 'http://www-internal.example.com/api'
 TEST_API_SIGNING_KEY = 'edx'
@@ -48,7 +47,7 @@ class EcommerceApiClientTest(TestCase):
             httpretty.POST,
             '{}/baskets/1/'.format(TEST_API_URL),
             status=200, body='{}',
-            adding_headers={'Content-Type': 'application/json'}
+            adding_headers={'Content-Type': JSON}
         )
         mock_tracker = mock.Mock()
         mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID})
@@ -82,7 +81,7 @@ class EcommerceApiClientTest(TestCase):
             httpretty.GET,
             '{}/baskets/1/order/'.format(TEST_API_URL),
             status=200, body=expected_content,
-            adding_headers={'Content-Type': 'application/json'},
+            adding_headers={'Content-Type': JSON},
         )
         actual_object = ecommerce_api_client(self.user).baskets(1).order.get()
         self.assertEqual(actual_object, {u"result": u"Préparatoire"})
