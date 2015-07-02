@@ -20,9 +20,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecif
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.keys import UsageKey
 from xmodule.video_module.transcripts_utils import (
-                                    GetTranscriptsFromYouTubeException,
-                                    TranscriptsRequestValidationException,
-                                    download_youtube_subs)
+    GetTranscriptsFromYouTubeException,
+    TranscriptsRequestValidationException,
+    download_youtube_subs,
+)
 from xmodule.video_module import manage_video_subtitles_save
 
 from ..transcripts_ajax import get_transcripts_presence
@@ -125,7 +126,8 @@ def captions_index(request, course_key):
         depth=2,
     )
 
-    return render_to_response('captions.html',
+    return render_to_response(
+        'captions.html',
         {
             'videos': get_videos(course),
             'context_course': course,

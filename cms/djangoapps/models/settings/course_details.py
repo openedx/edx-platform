@@ -37,7 +37,7 @@ class CourseDetails(object):
     def __init__(self, org, course_id, run):
         # still need these for now b/c the client's screen shows these 3 fields
         self.org = org
-        self.course_id = course_id # This actually holds the course number.
+        self.course_id = course_id  # This actually holds the course number.
         self.run = run
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
@@ -46,7 +46,7 @@ class CourseDetails(object):
         self.syllabus = None  # a pdf file asset
         self.short_description = ""
         self.overview = ""  # html to render as the overview
-        self.about_sidebar_html = "" # html to render as the about_sidebar_html
+        self.about_sidebar_html = ''
         self.pre_enrollment_email = render_to_string('emails/default_pre_enrollment_message.txt', {})
         self.post_enrollment_email = render_to_string('emails/default_post_enrollment_message.txt', {})
         self.pre_enrollment_email_subject = "Thanks for Enrolling in {}".format(self.course_id)
@@ -145,7 +145,7 @@ class CourseDetails(object):
         # Added to allow admins to enable/disable enrollment emails
         if 'enable_enrollment_email' in jsondict:
             descriptor.enable_enrollment_email = jsondict['enable_enrollment_email']
-            dirty=True
+            dirty = True
 
         if 'start_date' in jsondict:
             converted = date.from_json(jsondict['start_date'])

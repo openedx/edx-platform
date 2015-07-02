@@ -40,15 +40,17 @@ def not_open_query(course_id, query):
     """
     Specific db query for sections or problems that have not been opened
     """
-    ids_in_course = CourseEnrollment.objects.filter(course_id=course_id,
-                                                    is_active=1,
-                                                    ).values_list(DatabaseFields.USER_ID)
+    ids_in_course = CourseEnrollment.objects.filter(
+        course_id=course_id,
+        is_active=1,
+    ).values_list(DatabaseFields.USER_ID)
     total_students = User.objects.filter(id__in=ids_in_course)
-    without_open = total_students.exclude(id__in=
-                                          StudentModule.objects.filter(
-                                              module_state_key=query.entity_id,
-                                              course_id=course_id).values_list(DatabaseFields.STUDENT_ID),
-                                          )
+    without_open = total_students.exclude(
+        id__in=StudentModule.objects.filter(
+            module_state_key=query.entity_id,
+            course_id=course_id,
+        ).values_list(DatabaseFields.STUDENT_ID),
+    )
     return process_results(course_id, without_open, DatabaseFields.ID, DatabaseFields.EMAIL)
 
 
@@ -56,17 +58,18 @@ def not_completed_query(course_id, query):
     """
     Specific db query for sections or problems that are not completed
     """
-    ids_in_course = CourseEnrollment.objects.filter(course_id=course_id,
-                                                    is_active=1,
-                                                    ).values_list(DatabaseFields.USER_ID)
+    ids_in_course = CourseEnrollment.objects.filter(
+        course_id=course_id,
+        is_active=1,
+    ).values_list(DatabaseFields.USER_ID)
     total_students = User.objects.filter(id__in=ids_in_course)
 
-    without_completed = total_students.exclude(id__in=
-                                               StudentModule.objects.filter(
-                                                   module_state_key=query.entity_id,
-                                                   course_id=course_id).filter(~Q(grade=None))
-                                               .values_list(DatabaseFields.STUDENT_ID),
-                                               )
+    without_completed = total_students.exclude(
+        id__in=StudentModule.objects.filter(
+            module_state_key=query.entity_id,
+            course_id=course_id,
+        ).filter(~Q(grade=None)).values_list(DatabaseFields.STUDENT_ID),
+    )
     return process_results(course_id, without_completed, DatabaseFields.ID, DatabaseFields.EMAIL)
 
 

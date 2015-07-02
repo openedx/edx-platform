@@ -55,10 +55,11 @@ def utility_bulksettings_handler(request, course_key_string):
 
             # traverse into the course tree and extract problem settings information
             settings_data = BulkSettingsUtil.get_bulksettings_metadata(course)
-            return render_to_response('bulksettings.html',
+            return render_to_response(
+                'bulksettings.html',
                 {
-                    'context_course':course,
-                    'settings_data':settings_data,
+                    'context_course': course,
+                    'settings_data': settings_data,
                     'setting_type_list_map': SETTING_TYPE_LIST_MAP,
                     'section_setting_map': SECTION_SETTING_MAP,
                     'subsection_setting_map': SUBSECTION_SETTING_MAP

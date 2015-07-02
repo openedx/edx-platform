@@ -106,10 +106,11 @@ class CapaFields(object):
         scope=Scope.user_state)
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Defines the number of times a student can try to answer this problem. "
-               "If the value is not set, infinite attempts are allowed. "
-               "NOTE: If a problem is timed, we only allow a single attempt, and ignore "
-               "the value in this field."
+        help=_(
+            'Defines the number of times a student can try to answer this problem. '
+            'If the value is not set, infinite attempts are allowed. '
+            'NOTE: If a problem is timed, we only allow a single attempt, and ignore '
+            'the value in this field.'
         ),
         values={"min": 0}, scope=Scope.settings
     )
@@ -174,19 +175,27 @@ class CapaFields(object):
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
-    minutes_allowed = IntegerWithWarningField(display_name=("Minutes Allowed"),
-                              help=_("Number of minutes allowed to finish this assessment. Set 0 for no time-limit. "
-                                     "If there is a time-limit, the student will only be given one attempt."),
-                              warning=_("Setting minutes allowed means that this question can only have one attempt, "
-                                     "regardless of the value of the maximum attempts field."),
-                              default=0, scope=Scope.settings)
+    minutes_allowed = IntegerWithWarningField(
+        display_name=('Minutes Allowed'),
+        help=_(
+            'Number of minutes allowed to finish this assessment. Set 0 for no time-limit. '
+            'If there is a time-limit, the student will only be given one attempt.'
+        ),
+        warning=_(
+            'Setting minutes allowed means that this question can only have one attempt, '
+            'regardless of the value of the maximum attempts field.'
+        ),
+        default=0,
+        scope=Scope.settings,
+    )
     time_started = Date(help=_("time student started this assessment"), scope=Scope.user_state)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(
         display_name=_("Timer Between Attempts"),
         help=_("Seconds a student must wait between submissions for a problem with multiple attempts."),
         scope=Scope.settings,
-        default=0)
+        default=0,
+    )
     weight = Float(
         display_name=_("Problem Weight"),
         help=_("Defines the number of points each problem is worth. "
@@ -701,14 +710,11 @@ class CapaMixin(CapaFields):
         total_seconds_left = -1
         end_time_to_display = now + datetime.timedelta(minutes=self.minutes_allowed)
 
-
         if self.is_timed_problem() and self.time_started:
             end_time_to_display = self.time_started + datetime.timedelta(minutes=self.minutes_allowed)
             problem_has_finished = end_time_to_display >= now
             time_left = end_time_to_display - now
             total_seconds_left = (time_left).total_seconds()
-
-
 
         # because we use self.due and not self.close_date below, this is not the actual end_time, but the
         # end_time we want to display to the user

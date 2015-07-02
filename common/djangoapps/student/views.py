@@ -998,6 +998,7 @@ def change_enrollment(request, check_access=True):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
+
 def notify_enrollment_by_email(course, user, request):
     """
     Updates the user about the course enrollment by email.
@@ -1031,9 +1032,16 @@ def notify_enrollment_by_email(course, user, request):
             user.email_user(subject, message, from_address)
 
         except Exception:
-            log.error('unable to send course enrollment verification email to user from "{from_address}"'.format(
-                        from_address=from_address), exc_info = True)
-            return JsonResponse({"is_success": False, "error": _("Could not send enrollment email to the user"),})
+            log.error(
+                "unable to send course enrollment verification email to user from '{from_address}'".format(
+                    from_address=from_address,
+                ),
+                exc_info=True,
+            )
+            return JsonResponse({
+                'is_success': False,
+                'error': _('Could not send enrollment email to the user'),
+            })
 
         return JsonResponse({"is_success": True, "subject": subject, "message": message})
 

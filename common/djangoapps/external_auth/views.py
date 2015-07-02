@@ -547,7 +547,7 @@ def shib_login(request):
 def _safe_postlogin_redirect(redirect_to, localhost, default_redirect='/'):
     """
     If redirect_to param is safe (not off this host), then perform the redirect.
-    If a redirect whitelist is defined, check that redirect_to is safe to a host 
+    If a redirect whitelist is defined, check that redirect_to is safe to a host
     in that list or localhost (you don't need to include the host itself in the whitelist).
     Otherwise just redirect to '/'.
     @param redirect_to: user-supplied redirect url

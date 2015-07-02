@@ -507,7 +507,6 @@ ORA2_RESPONSES_DOWNLOAD = ENV_TOKENS.get("ORA2_RESPONSES_DOWNLOAD", ORA2_RESPONS
 ORA2_FILE_PREFIX = ENV_TOKENS.get("ORA2_FILE_PREFIX", ORA2_FILE_PREFIX)
 
 
-
 # TODO: Get Course Forums Download and Student Forums download from env_tokens instead of common
 # Course Forums Download
 COURSE_FORUMS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE

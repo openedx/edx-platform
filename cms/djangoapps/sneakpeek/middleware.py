@@ -5,6 +5,7 @@ from student.models import UserProfile
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 
+
 class SneakPeekLogoutMiddleware(object):
     """
     Middleware that logs out all sneakpeek users and then retries (redirects) the same URL
@@ -23,4 +24,3 @@ class SneakPeekLogoutMiddleware(object):
 
         logout(request)
         return redirect(request.get_full_path())
-
