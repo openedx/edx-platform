@@ -2457,6 +2457,8 @@ SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearch
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
 # Use the LMS specific filter generator
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
+# Override to skip enrollment start date filtering in course search
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
 
 ### PERFORMANCE EXPERIMENT SETTINGS ###
 # CDN experiment/monitoring flags
