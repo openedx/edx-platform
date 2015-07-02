@@ -108,6 +108,11 @@ div.course-wrapper {
         font-size: 22px;
         font-weight: 600;
       }
+      h1 {
+        margin-bottom: ($baseline/2);
+        font-size: 26px;
+        font-weight: 600;
+      }
       p {
         color: #797676;
         strong {
@@ -135,6 +140,10 @@ div.course-wrapper {
     }
     div.proctored-exam {
       @extend .timed-exam;
+      .exam-code {
+        border-top: ($baseline/10) solid rgb(207, 216, 220);
+        padding-top: 25px;
+      }
       .gated-sequence {
         border-bottom: 2px solid rgb(207, 216, 220);
         padding: 15px ($baseline*5) 15px 50px;
@@ -173,7 +182,6 @@ div.course-wrapper {
           border-bottom: none;
         }
       }
-
     }
     .footer-sequence {
       padding: 30px 0px 20px 0px;
@@ -183,9 +191,24 @@ div.course-wrapper {
         font-size: 22px;
         font-weight: 400;
       }
+      span {
+        font-weight: 600;
+      }
       p {
+        margin-bottom: ($baseline/20);
         color: #797676;
       }
+      .new{
+        border-top: 2px solid rgb(207, 216, 220);
+        padding: ($baseline/2) 0;
+        border-bottom: 2px solid rgb(207, 216, 220);
+      }
+    }
+    .border-b-0 {
+      border-bottom: none;
+    }
+    .padding-b-0 {
+      padding-bottom: ($baseline/20);
     }
     .faq-proctoring-exam {
       @extend .footer-sequence;
