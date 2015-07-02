@@ -2,12 +2,17 @@
 This file contains receivers of course publication signals.
 """
 
+import logging
+
 from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import SignalHandler
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
+
+
+log = logging.getLogger(__name__)
 
 
 @receiver(SignalHandler.course_published)
@@ -18,9 +23,11 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Import here, because signal is registered at startup, but items in tasks
     # are not yet able to be loaded
-    from .tasks import update_credit_course_requirements
+    from openedx.core.djangoapps.credit import api, tasks
 
-    update_credit_course_requirements.delay(unicode(course_key))
+    if api.is_credit_course(course_key):
+        tasks.update_credit_course_requirements.delay(unicode(course_key))
+        log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
 
 
 @receiver(GRADES_UPDATED)
