@@ -345,7 +345,7 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, status_code)
 
-        url = '/import_status/{course_key}/{filename}'.format(
+        url = '/api/import_export/v1/courses/{course_key}/import_status/{filename}'.format(
             course_key=course_key,
             filename='xyz.tar.gz'
         )

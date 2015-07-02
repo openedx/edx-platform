@@ -493,3 +493,6 @@ PROFILE_IMAGE_MIN_BYTES = 100
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
 AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
+
+# Enable the Full Course/Library Import/Export API
+FEATURES['ENABLE_IMPORT_EXPORT_LMS'] = True
