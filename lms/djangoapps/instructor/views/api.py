@@ -1113,8 +1113,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             return JsonResponse({"status": success_status})
         except AlreadyRunningError:
             already_running_status = _(
-                "An enrolled student profile report generation task is already in progress. " 
-                "Check the 'Pending Tasks' table for the status of the task. When completed, " 
+                "An enrolled student profile report generation task is already in progress. "
+                "Check the 'Pending Tasks' table for the status of the task. When completed, "
                 "the report will be available for download in the table below.")
             return JsonResponse({"status": already_running_status})
 
