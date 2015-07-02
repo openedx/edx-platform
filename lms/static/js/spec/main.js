@@ -98,9 +98,7 @@
             'js/ccx/schedule': 'js/ccx/schedule',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
-
-            'course_discovery_meanings': 'js/spec/discovery/course_discovery_meanings'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
