@@ -65,7 +65,12 @@ def set_logged_in_cookies(request, response, user):
     # is logged in.  This is just a boolean value, so it's not very useful.
     # In the future, we should be able to replace this with the "user info"
     # cookie set below.
-    response.set_cookie(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, 'true', secure=None, **cookie_settings)
+    response.set_cookie(
+        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME.encode('utf-8'),
+        'true',
+        secure=None,
+        **cookie_settings
+    )
 
     # Set a cookie with user info.  This can be used by external sites
     # to customize content based on user information.  Currently,
@@ -107,7 +112,7 @@ def set_logged_in_cookies(request, response, user):
     user_info_cookie_is_secure = request.is_secure()
 
     response.set_cookie(
-        settings.EDXMKTG_USER_INFO_COOKIE_NAME,
+        settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
         json.dumps(user_info),
         secure=user_info_cookie_is_secure,
         **cookie_settings
@@ -128,7 +133,11 @@ def delete_logged_in_cookies(response):
 
     """
     for cookie_name in [settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, settings.EDXMKTG_USER_INFO_COOKIE_NAME]:
-        response.delete_cookie(cookie_name, path='/', domain=settings.SESSION_COOKIE_DOMAIN)
+        response.delete_cookie(
+            cookie_name.encode('utf-8'),
+            path='/',
+            domain=settings.SESSION_COOKIE_DOMAIN
+        )
 
     return response
 
