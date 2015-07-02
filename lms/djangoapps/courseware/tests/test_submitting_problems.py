@@ -641,13 +641,11 @@ class TestCourseGrader(TestSubmittingProblems):
         )
 
         # Configure a credit provider for the course
-        credit_provider = CreditProvider.objects.create(
+        CreditProvider.objects.create(
             provider_id="ASU",
             enable_integration=True,
             provider_url="https://credit.example.com/request",
         )
-        credit_course.providers.add(credit_provider)
-        credit_course.save()
 
         requirements = [{
             "namespace": "grade",

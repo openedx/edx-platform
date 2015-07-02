@@ -1830,20 +1830,27 @@ class LanguageProficiency(models.Model):
 
 
 class CourseEnrollmentAttribute(models.Model):
-    """Represents Student's enrollment record for Credit Course.
-
-    This is populated when the user's order for a credit seat is fulfilled.
     """
-    enrollment = models.ForeignKey(CourseEnrollment)
+    Provide additional information about the user's enrollment.
+    """
+    enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes")
     namespace = models.CharField(
         max_length=255,
-        help_text=_("Namespace of enrollment attribute e.g. credit")
+        help_text=_("Namespace of enrollment attribute")
     )
     name = models.CharField(
         max_length=255,
-        help_text=_("Name of the enrollment attribute e.g. provider_id")
+        help_text=_("Name of the enrollment attribute")
     )
     value = models.CharField(
         max_length=255,
-        help_text=_("Value of the enrollment attribute e.g. ASU")
+        help_text=_("Value of the enrollment attribute")
     )
+
+    def __unicode__(self):
+        """Unicode representation of the attribute. """
+        return u"{namespace}:{name}, {value}".format(
+            namespace=self.namespace,
+            name=self.name,
+            value=self.value,
+        )

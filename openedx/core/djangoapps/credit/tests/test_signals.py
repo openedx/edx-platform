@@ -41,19 +41,17 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user.password)
 
         # Enable the course for credit
-        credit_course = CreditCourse.objects.create(
+        CreditCourse.objects.create(
             course_key=self.course.id,
             enabled=True,
         )
 
         # Configure a credit provider for the course
-        credit_provider = CreditProvider.objects.create(
+        CreditProvider.objects.create(
             provider_id="ASU",
             enable_integration=True,
             provider_url="https://credit.example.com/request",
         )
-        credit_course.providers.add(credit_provider)
-        credit_course.save()
 
         requirements = [{
             "namespace": "grade",
