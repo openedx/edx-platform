@@ -55,4 +55,27 @@
             <button class="is-disabled" disabled>${_('Enable Student-Generated Certificates')}</button>
         % endif
     </div>
+
+    <hr />
+
+    <div class="start-certificate-generation">
+        <h2>${_("Generate Certificates")}</h2>
+        <form id="certificates-generating-form" method="post" action="${section_data['urls']['start_certificate_generation']}">
+            <input type="button" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+        </form>
+        <div class="certificate-generation-status"></div>
+    </div>
+
+    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+        <div class="running-tasks-container action-type-container">
+            <hr>
+            <h2> ${_("Pending Tasks")} </h2>
+            <div class="running-tasks-section">
+                <p>${_("The status for any active tasks appears in a table below.")} </p>
+                <br />
+                <div class="running-tasks-table" data-endpoint="${ section_data['urls']['list_instructor_tasks_url'] }"></div>
+            </div>
+            <div class="no-pending-tasks-message"></div>
+        </div>
+    %endif
 </div>
