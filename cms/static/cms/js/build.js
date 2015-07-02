@@ -1,19 +1,21 @@
 (function () {
     'use strict';
+    var commonLibrariesPath = 'common/js/common_libraries';
+
     var getModule = function (moduleName, excludeCommonDeps) {
         var module = {
             name: moduleName
         };
 
         if (excludeCommonDeps) {
-            module.exclude = ['js/factories/common_deps'];
+            module.exclude = [commonLibrariesPath];
         }
 
         return module;
     };
 
     var getModulesList = function (modules) {
-        var result = [getModule('js/factories/common_deps')];
+        var result = [getModule(commonLibrariesPath)];
         return result.concat(modules.map(function (moduleName) {
             return getModule(moduleName, true);
         }));

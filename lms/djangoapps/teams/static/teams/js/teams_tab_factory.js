@@ -3,9 +3,9 @@
 
     define(['jquery','teams/js/views/teams_tab'],
         function ($, TeamsTabView) {
-            return function () {
+            return function (element) {
                 var view = new TeamsTabView({
-                    el: $('.teams-content')
+                    el: element
                 });
                 view.render();
             };
