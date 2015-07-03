@@ -163,6 +163,9 @@ VERIFY_STUDENT["SOFTWARE_SECURE"] = {
     "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
 }
 
+# Skip enrollment start date filtering
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
+
 
 ########################## Shopping cart ##########################
 FEATURES['ENABLE_SHOPPING_CART'] = True
