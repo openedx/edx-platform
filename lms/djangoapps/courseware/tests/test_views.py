@@ -3,6 +3,7 @@
 Tests courseware views.py
 """
 import cgi
+from urllib import urlencode
 import ddt
 import json
 import unittest
@@ -83,11 +84,11 @@ class TestJumpTo(ModuleStoreTestCase):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/?activate_block_id={section_key}'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            section_key=unicode(section.location)
+            activate_block_id=urlencode({'activate_block_id': unicode(section.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -106,11 +107,11 @@ class TestJumpTo(ModuleStoreTestCase):
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?activate_block_id={module_key}'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            module_key=unicode(module1.location)
+            activate_block_id=urlencode({'activate_block_id': unicode(module1.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -120,11 +121,11 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?activate_block_id={module_key}'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            module_key=unicode(module2.location),
+            activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -148,11 +149,11 @@ class TestJumpTo(ModuleStoreTestCase):
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?activate_block_id={module_key}'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            module_key=unicode(module2.location)
+            activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
