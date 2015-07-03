@@ -131,7 +131,7 @@ class UsersPageMixin(PageObject):
         functionality is not yet available. This waits for that loading to
         finish.
 
-        This method is different from wait_until_backbone_rendered because this expects
+        This method is different from wait_until_no_loading_indicator because this expects
         the loading indicator to still exist on the page; it is just hidden.
 
         It also disables animations for improved test reliability.
