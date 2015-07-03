@@ -543,7 +543,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
         original_url = reverse(url_name, kwargs={'course_id': unicode(course.id)})
         login_url = u"{login_url}?next={original_url}".format(
-            login_url=reverse('accounts_login'),
+            login_url=reverse('signin_user'),
             original_url=original_url
         )
         self.assertRedirects(response, login_url)
