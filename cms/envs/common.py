@@ -795,6 +795,8 @@ INSTALLED_APPS = (
     # Import/Export API
     'rest_framework',
     'openedx.core.djangoapps.import_export',
+
+    'xblock_django',
 )
 
 
