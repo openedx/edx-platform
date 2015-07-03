@@ -1,6 +1,7 @@
 """
 Module to define url helpers functions
 """
+from urllib import urlencode
 from xmodule.modulestore.search import path_to_location, navigation_index
 from xmodule.modulestore.django import modulestore
 from django.core.urlresolvers import reverse
@@ -47,7 +48,6 @@ def get_redirect_url(course_key, usage_key):
             args=(unicode(course_key), chapter, section, navigation_index(position))
         )
 
-    if final_target_id:
-        redirect_url += "?activate_block_id={final_target_id}".format(final_target_id=final_target_id)
+    redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
 
     return redirect_url

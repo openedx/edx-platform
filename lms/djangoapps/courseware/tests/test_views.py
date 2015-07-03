@@ -1138,7 +1138,7 @@ class TestIndexView(ModuleStoreTestCase):
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_student_state(self, default_store, ):
+    def test_student_state(self, default_store):
         """
         Verify that saved student state is loaded for xblocks rendered in the index view.
         """
@@ -1205,6 +1205,7 @@ class TestIndexView(ModuleStoreTestCase):
 
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertIn("Activate Block ID: test_block_id", response.content)
+
 
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     """

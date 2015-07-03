@@ -44,8 +44,8 @@ def path_to_location(modulestore, usage_key):
 
         If no path exists, return None.
 
-        If a path exists, return it as a list with target location first, and
-        the starting location last.
+        If a path exists, return it as a tuple with root location first, and
+        the target location last.
         '''
         # Standard DFS
 
