@@ -128,7 +128,7 @@ from student.helpers import (
                   share_window_name = 'shareWindow'
                   share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
                 %>
-                % if share_url and share_settings.get('FACEBOOK_SHARING', False):
+                % if share_url and share_settings.get('DASHBOARD_FACEBOOK', False):
                   <% facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' + share_url %>
                     <a
                       data-tooltip="${_('Share on Facebook')}"
@@ -143,9 +143,9 @@ from student.helpers import (
                       <i class="fa fa-facebook" aria-hidden="true"></i>
                     </a>
                 % endif
-                % if share_url and share_settings.get('TWITTER_SHARING', False):
+                % if share_url and share_settings.get('DASHBOARD_TWITTER', False):
                   <% share_text_default = _("I'm learning on {platform_name}:").format(platform_name=settings.PLATFORM_NAME) %>
-                  <% share_text = urllib.quote_plus(share_settings.get('TWITTER_SHARING_TEXT', share_text_default)) %>
+                  <% share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', share_text_default)) %>
                   <% twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + share_url %>
                     <a
                       data-tooltip="${_('Share on Twitter')}"

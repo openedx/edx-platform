@@ -380,12 +380,14 @@ FEATURES = {
     'CERTIFICATES_HTML_VIEW': False,
 
     # Social Media Sharing on Student Dashboard
-    'DASHBOARD_SHARE_SETTINGS': {
+    'SOCIAL_SHARING_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
         'CUSTOM_COURSE_URLS': False,
-        'FACEBOOK_SHARING': False,
-        'TWITTER_SHARING': False,
-        'TWITTER_SHARING_TEXT': None
+        'DASHBOARD_FACEBOOK': False,
+        'CERTIFICATE_FACEBOOK': False,
+        'CERTIFICATE_FACEBOOK_TEXT': None,
+        'DASHBOARD_TWITTER': False,
+        'DASHBOARD_TWITTER_TEXT': None
     },
 
     # Course discovery feature
@@ -1347,6 +1349,7 @@ certificates_web_view_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
     'js/src/logger.js',
+    'js/utils/facebook.js',
 ]
 
 credit_web_view_js = [
