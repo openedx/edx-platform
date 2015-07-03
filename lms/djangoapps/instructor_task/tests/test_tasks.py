@@ -40,10 +40,10 @@ class TestTaskFailure(Exception):
 class TestInstructorTasks(InstructorTaskModuleTestCase):
 
     def setUp(self):
-        super(InstructorTaskModuleTestCase, self).setUp()
+        super(TestInstructorTasks, self).setUp()
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
-        self.location = InstructorTaskModuleTestCase.problem_location(PROBLEM_URL_NAME)
+        self.location = self.problem_location(PROBLEM_URL_NAME)
 
     def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None):
         """Creates a InstructorTask entry for testing."""
