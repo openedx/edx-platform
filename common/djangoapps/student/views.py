@@ -531,7 +531,10 @@ def dashboard(request):
     for course, __ in course_enrollment_pairs:
         enrolled_courses_dict[unicode(course.id)] = course
 
-    credit_messages = _create_credit_availability_message(enrolled_courses_dict, user)
+    if settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY"):
+        credit_messages = _create_credit_availability_message(enrolled_courses_dict, user)
+    else:
+        credit_messages = {}
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
