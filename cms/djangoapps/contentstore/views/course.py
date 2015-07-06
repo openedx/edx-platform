@@ -330,7 +330,8 @@ def _course_outline_json(request, course_module):
         course_module,
         include_child_info=True,
         course_outline=True,
-        include_children_predicate=lambda xblock: not xblock.category == 'vertical'
+        include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+        user=request.user
     )
 
 
