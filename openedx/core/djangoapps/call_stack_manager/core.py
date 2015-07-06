@@ -27,7 +27,7 @@ How to use-
 4. Decorator is a parameterized decorator with class name/s as argument
     How to use -
     1. Import following
-        import from openedx.core.djangoapps.call_stack_manager import donottrack
+        from openedx.core.djangoapps.call_stack_manager import donottrack
 """
 
 import logging
@@ -132,13 +132,15 @@ def donottrack(*classes_not_to_be_tracked):
                 global TRACK_FLAG  # pylint: disable=W0603
                 current_flag = TRACK_FLAG
                 TRACK_FLAG = False
-                function(*args, **kwargs)
+                return_value = function(*args, **kwargs)
                 TRACK_FLAG = current_flag
+                return return_value
             else:
                 global HALT_TRACKING  # pylint: disable=W0603
                 current_halt_track = HALT_TRACKING
                 HALT_TRACKING = classes_not_to_be_tracked
-                function(*args, **kwargs)
+                return_value = function(*args, **kwargs)
                 HALT_TRACKING = current_halt_track
+                return return_value
         return wrapper
     return real_donottrack

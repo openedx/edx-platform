@@ -25,6 +25,7 @@ from model_utils.models import TimeStampedModel
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
+from openedx.core.djangoapps.call_stack_manager import CallStackManager, CallStackMixin
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
 log = logging.getLogger(__name__)
 
@@ -68,11 +69,20 @@ class ChunkingManager(models.Manager):
         return res
 
 
-class StudentModule(models.Model):
+class ChunkingCallStackManager(CallStackManager, ChunkingManager):
+    """
+    A derived class of ChunkingManager, and CallStackManager
+    """
+    pass
+
+
+class StudentModule(CallStackMixin, models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
-    objects = ChunkingManager()
+    # uses both ChunkingManager and CallStackManager in ChuckingCallStackManager
+    objects = ChunkingCallStackManager()
+
     MODEL_TAGS = ['course_id', 'module_type']
 
     # For a homework problem, contains a JSON
@@ -84,7 +94,7 @@ class StudentModule(models.Model):
                     ('chapter', 'Section'),
                     ('sequential', 'Subsection'),
                     ('library_content', 'Library Content'))
-    ## These three are the key for the object
+    # These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
@@ -142,10 +152,13 @@ class StudentModule(models.Model):
         return unicode(repr(self))
 
 
-class StudentModuleHistory(models.Model):
+class StudentModuleHistory(CallStackMixin, models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
+
+    # Add call stack manager as default Manager
+    objects = CallStackManager()
     HISTORY_SAVING_TYPES = {'problem'}
 
     class Meta(object):  # pylint: disable=missing-docstring
