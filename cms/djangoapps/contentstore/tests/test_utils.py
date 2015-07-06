@@ -1,25 +1,25 @@
 """ Tests for utils. """
 import collections
-import copy
-import mock
 from datetime import datetime, timedelta
-from pytz import UTC
 
+import mock
+import ddt
+from pytz import UTC
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from contentstore import utils
-from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from xmodule.modulestore.django import modulestore
+
+from contentstore import utils
+from contentstore.tests.utils import CourseTestCase
 
 
 class LMSLinksTestCase(TestCase):
     """ Tests for LMS links. """
+
     def about_page_test(self):
         """ Get URL for about page, no marketing site """
         # default for ENABLE_MKTG_SITE is False.
@@ -109,6 +109,7 @@ class ExtraPanelTabTestCase(TestCase):
         return course
 
 
+@ddt.ddt
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
 
@@ -144,6 +145,16 @@ class CourseImageTestCase(ModuleStoreTestCase):
         self.verify_url(
             unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
             utils.course_image_url(course)
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_empty_image_name(self, default_store):
+        """ Verify that empty image names are cleaned """
+        course_image = u''
+        course = CourseFactory.create(course_image=course_image, default_store=default_store)
+        self.assertEquals(
+            course_image,
+            utils.course_image_url(course),
         )
 
 
@@ -386,6 +397,7 @@ class GroupVisibilityTest(CourseTestCase):
     """
     Test content group access rules.
     """
+
     def setUp(self):
         super(GroupVisibilityTest, self).setUp()
 

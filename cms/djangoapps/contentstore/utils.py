@@ -4,12 +4,12 @@ Common utility functions useful throughout the contentstore
 # pylint: disable=no-member
 
 import logging
+from opaque_keys import InvalidKeyError
 import re
 from datetime import datetime
 from pytz import UTC
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
@@ -160,7 +160,10 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
 
 def course_image_url(course):
     """Returns the image url for the course."""
-    loc = StaticContent.compute_location(course.location.course_key, course.course_image)
+    try:
+        loc = StaticContent.compute_location(course.location.course_key, course.course_image)
+    except InvalidKeyError:
+        return ''
     path = StaticContent.serialize_asset_key_with_slash(loc)
     return path
 
