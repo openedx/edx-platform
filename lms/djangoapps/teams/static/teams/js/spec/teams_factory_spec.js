@@ -7,7 +7,7 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
 
             beforeEach(function() {
                 setFixtures('<section class="teams-content"></section>');
-                teamsTab = new TeamsTabFactory();
+                teamsTab = new TeamsTabFactory({results: []}, '', 'edX/DemoX/Demo_Course');
             });
 
             afterEach(function() {

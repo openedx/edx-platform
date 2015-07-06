@@ -13,5 +13,5 @@
             }
         });
         return Topic;
-    })
+    });
 }).call(this, define || RequireJS.define);

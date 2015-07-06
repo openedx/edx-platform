@@ -41,7 +41,13 @@
                 description: function () { return this.model.get('description'); },
                 details: function () { return this.detailViews; },
                 actionClass: 'action-view',
-                actionContent: _.escape(gettext('View')) + ' <span class="icon fa-arrow-right"></span>'
+                actionContent: function () {
+                    var screenReaderText = _.escape(interpolate(
+                        gettext('View Teams in the %(topic_name)s Topic'),
+                        { topic_name: this.model.get('name') }, true
+                    ));
+                    return '<span class="sr">' + screenReaderText + '</span><i class="icon fa fa-arrow-right" aria-hidden="true"></i>';
+                }
             });
 
             return TopicCardView;

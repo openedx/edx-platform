@@ -6,6 +6,7 @@
  *      "square_card" or "list_card". Defaults to "square_card".
  * - action (function): Action to take when the action button is clicked. Defaults to a no-op.
  * - cardClass (string or function): Class name for this card's DOM element. Defaults to the empty string.
+ * - pennant (string or function): Text of the card's pennant. No pennant is displayed if this value is falsy.
  * - title (string or function): Title of the card. Defaults to the empty string.
  * - description (string or function): Description of the card. Defaults to the empty string.
  * - details (array or function): Array of child views to be rendered as details of this card. The class "meta-detail"
@@ -17,10 +18,10 @@
 ;(function (define) {
     'use strict';
     define(['jquery',
+            'underscore',
             'backbone',
-            'text!templates/components/card/square_card.underscore',
-            'text!templates/components/card/list_card.underscore'],
-        function ($, Backbone, squareCardTemplate, listCardTemplate) {
+            'text!templates/components/card/card.underscore'],
+        function ($, _, Backbone, cardTemplate) {
             var CardView = Backbone.View.extend({
                 events: {
                     'click .action' : 'action'
@@ -40,12 +41,10 @@
                 },
 
                 initialize: function () {
-                    this.template = this.switchOnConfiguration(
-                        _.template(squareCardTemplate),
-                        _.template(listCardTemplate)
-                    );
                     this.render();
                 },
+
+                template: _.template(cardTemplate),
 
                 switchOnConfiguration: function (square_result, list_result) {
                     return this.callIfFunction(this.configuration) === 'square_card' ?
@@ -61,20 +60,30 @@
                 },
 
                 className: function () {
-                    return 'card ' +
-                        this.switchOnConfiguration('square-card', 'list-card') +
-                        ' ' + this.callIfFunction(this.cardClass);
+                    var result = 'card ' +
+                                 this.switchOnConfiguration('square-card', 'list-card') + ' ' +
+                                 this.callIfFunction(this.cardClass);
+                    if (this.callIfFunction(this.pennant)) {
+                        result += ' has-pennant';
+                    }
+                    return result;
                 },
 
                 render: function () {
+                    var maxLength = 72,
+                        description = this.callIfFunction(this.description);
+                    if (description.length > maxLength) {
+                        description = description.substring(0, maxLength).trim() + '...'
+                    }
                     this.$el.html(this.template({
+                        pennant: this.callIfFunction(this.pennant),
                         title: this.callIfFunction(this.title),
-                        description: this.callIfFunction(this.description),
+                        description: description,
                         action_class: this.callIfFunction(this.actionClass),
                         action_url: this.callIfFunction(this.actionUrl),
                         action_content: this.callIfFunction(this.actionContent)
                     }));
-                    var detailsEl = this.$el.find('.card-meta-details');
+                    var detailsEl = this.$el.find('.card-meta');
                     _.each(this.callIfFunction(this.details), function (detail) {
                         // Call setElement to rebind event handlers
                         detail.setElement(detail.el).render();
@@ -86,6 +95,7 @@
 
                 action: function () { },
                 cardClass: '',
+                pennant: '',
                 title: '',
                 description: '',
                 details: [],

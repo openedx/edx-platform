@@ -1,0 +1,11 @@
+<div class="meta-wrap">
+    <div class="meta">
+        <%= messageHtml %>
+    </div>
+    <nav class="pagination pagination-compact top" aria-label="Compact Pagination">
+        <ol>
+            <li class="nav-item previous"><a class="nav-link previous-page-link" href="#"><i class="icon fa fa-angle-left"></i> <span class="nav-label"><%- gettext("Previous") %></span></a></li>
+            <li class="nav-item next"><a class="nav-link next-page-link" href="#"><span class="nav-label"><%- gettext("Next") %></span> <i class="icon fa fa-angle-right"></i></a></li>
+        </ol>
+    </nav>
+</div>
