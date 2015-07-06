@@ -348,3 +348,4 @@ if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
 
 XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})
 XBLOCK_SETTINGS.setdefault("VideoDescriptor", {})["licensing_enabled"] = FEATURES.get("LICENSING", False)
+XBLOCK_SETTINGS["VideoModule"] = {"api_key": 'AIzaSyD4Nl2sPF86nAty2TWM5hdMoKJTmqxMZoc'}
