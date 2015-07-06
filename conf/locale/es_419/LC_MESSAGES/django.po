@@ -168,8 +168,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:25+0000\n"
-"PO-Revision-Date: 2015-06-15 22:43+0000\n"
+"POT-Creation-Date: 2015-07-06 12:02+0000\n"
+"PO-Revision-Date: 2015-06-29 17:10+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -631,16 +631,16 @@ msgid "The ISO 639-1 language code for this language."
 msgstr "El código de idioma ISO 639-1 para este idioma."
 
 #: common/djangoapps/student/models.py
-msgid "Namespace of enrollment attribute e.g. credit"
-msgstr "Espacio de nombres del atributo de inscripción. ej: credit"
+msgid "Namespace of enrollment attribute"
+msgstr ""
 
 #: common/djangoapps/student/models.py
-msgid "Name of the enrollment attribute e.g. provider_id"
-msgstr "Nombre del artributo de inscripción. ej: provider_id"
+msgid "Name of the enrollment attribute"
+msgstr ""
 
 #: common/djangoapps/student/models.py
-msgid "Value of the enrollment attribute e.g. ASU"
-msgstr "Valor del atributo de inscripción. ej: ASU"
+msgid "Value of the enrollment attribute"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1303,6 +1303,10 @@ msgstr "debe contener {0} o más palabras únicas"
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
 msgstr "Demasiado similar a una palabra restringida del diccionario."
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Space-separated list of XBlocks which should not render."
+msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
@@ -6404,6 +6408,13 @@ msgstr ""
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr "Se reinició la fecha de entrega para el estudiante {0} de {1} a {2}"
 
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate generation task for all students of this course has been "
+"started. You can view the status of the generation task in the \"Pending "
+"Tasks\" section."
+msgstr ""
+
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
 msgstr "El id del cupón está vacio"
@@ -6778,6 +6789,12 @@ msgstr "generado"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "generating_enrollment_report"
 msgstr "generating_enrollment_report"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "certificates generated"
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -9383,8 +9400,27 @@ msgstr ""
 "que pueda solicitar el crédito al proveedor directamente."
 
 #: openedx/core/djangoapps/credit/models.py
-msgid "Number of seconds to show eligibility message"
-msgstr "Número de segundos para mostrar mensaje de elegibilidad."
+msgid ""
+"URL from the credit provider where the user can check the status of his or "
+"her request for credit.  This is displayed to students *after* they have "
+"requested credit."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Deadline for purchasing and requesting credit."
+msgstr ""
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "File upload corrupted. Please try again"
+msgstr ""
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "Could not find the {root_xml_file} file in the package."
+msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
@@ -9799,16 +9835,10 @@ msgid "Empty"
 msgstr "Vacío"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "We only support uploading a .tar.gz file."
-msgstr "Solo está soportado la carga de archivos .tar.gz."
-
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "File upload corrupted. Please try again"
-msgstr "La carga del archivo ha fallado. Por favor intente nuevamente."
-
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "Could not find the {0} file in the package."
-msgstr "No se ha encontrado el archivo {0} en el paquete."
+msgid ""
+"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
+" unit."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -12139,8 +12169,24 @@ msgid "Download student grades"
 msgstr "Descargar calificaciones de estudiantes"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Take this with you:"
-msgstr "Tenga con usted:"
+msgid "Print or share your certificate:"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Click the link to see my certificate."
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Post on Facebook"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Add to LinkedIn Profile"
+msgstr "Agregar al Perfil de LinkedIn"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to Mozilla Backpack"
@@ -12149,10 +12195,6 @@ msgstr "Añadir a Mozilla Backpack"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
 msgstr "Imprimir certificado"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Add to LinkedIn Profile"
-msgstr "Agregar al Perfil de LinkedIn"
 
 #: lms/templates/certificates/_accomplishment-header.html
 msgid "{platform_name} Home"
@@ -13093,17 +13135,10 @@ msgid "Your certificate is available"
 msgstr "Su certificado está disponible"
 
 #: lms/templates/courseware/progress.html
-msgid "You can now view your certificate."
-msgstr "Ahora puede ver su certificado."
-
-#: lms/templates/courseware/progress.html
 msgid ""
-"You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"You can now access your certificate. If you keep working and receive a "
+"higher grade,you can request an {link_start} updated certificate {link_end}."
 msgstr ""
-"Ahora puede descargar su certificado como PDF. Si continua trabajando y "
-"recibe una calificación superior, puede solicitar una actualización del "
-"certificado."
 
 #: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
@@ -13501,46 +13536,44 @@ msgstr ""
 "{contact_link_end} para solicitar el pago, o puede "
 "{unenroll_link_start}abular la matrícula {unenroll_link_end}  de este curso"
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"{username}, your eligibility for credit expires on {expiry}. Don't miss out!"
+"An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
-"{username}, su elegibilidad para obtener crédito expira el {expiry}. No "
-"pierda esta oportunidad!"
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid "{congrats} {username}, You have meet requirements for credit."
-msgstr ""
-"{congrats} {username}, Ha completado los requerimientos para obtener crédito"
-" por el curso."
-
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid "Purchase Credit"
-msgstr "Comprar crédito"
-
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you, your payment is complete, your credit is processing. Please see "
-"{provider_link} for more information."
+"The opportunity to purchase credit for this course expires on {deadline}. "
+"You've worked hard - don't miss out!"
 msgstr ""
-"Gracias, su pago ha sido completado, su crédito está siendo procesado. Por "
-"favor visite {provider_link} para más información."
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you, your credit is approved. Please see {provider_link} for more "
-"information."
+"Congratulations - you have met the requirements for credit in this course!"
 msgstr ""
-"Gracias, su crédito fue aprobado. Por favor visite {provider_link}  para más"
-" información."
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid ""
-"Your credit has been denied. Please contact {provider_link} for more "
-"information."
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Purchase Course Credit"
 msgstr ""
-"Su crédito ha sido negado. Por favor contacte {provider_link} para más "
-"información."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Thanks for your payment! We are currently processing your course credit. "
+"You'll see a message here when the transaction is complete. For more "
+"information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Congratulations - you have received credit for this course! For more "
+"information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"{provider_name} has declined your request for course credit. For more "
+"information, contact {provider_link}."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -15105,6 +15138,23 @@ msgstr ""
 "Debe generar exitosamente certificados de ejemplo antes de que pueda "
 "habilitar la generación de certificados por estudiantes."
 
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Generate Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Pending Tasks"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "The status for any active tasks appears in a table below."
+msgstr ""
+"El estado de cualquier tarea activa aparece en una tabla a continuación."
+
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "Información de inscripción"
@@ -15166,14 +15216,6 @@ msgid ""
 msgstr ""
 "Ver detalladamente el importe de registros Git para este curso "
 "{link_start}haciendo click aquí{link_end}."
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "The status for any active tasks appears in a table below."
-msgstr ""
-"El estado de cualquier tarea activa aparece en una tabla a continuación."
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
@@ -15661,7 +15703,7 @@ msgstr "Ingresos brutos pendientes"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Number of Enrollment Refunds"
-msgstr "Número de reenvolsos de inscripción"
+msgstr "Número de reembolsos de inscripción"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Amount Refunded"
@@ -17414,10 +17456,6 @@ msgstr "Por favor espere"
 msgid "Sign in or Register"
 msgstr "Inicie sesión o regístrese"
 
-#: lms/templates/student_profile/index.html
-msgid "Student Profile"
-msgstr "Perfil de Estudiante"
-
 #: lms/templates/student_profile/learner_profile.html
 msgid "Learner Profile"
 msgstr "Perfil de usuario"
@@ -18275,6 +18313,34 @@ msgstr ""
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
 msgstr "Descartar"
+
+#: cms/templates/course_outline.html
+msgid "Warning"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "This course uses features that are no longer supported."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "You must delete or replace the following components."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Unsupported Components"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To avoid errors, {platform_name} strongly recommends that you remove "
+"unsupported features from the course advanced settings. To do this, go to "
+"the {link_start}Advanced Settings page{link_end}, locate the \"Advanced "
+"Module List\" setting, and then delete the following modules from the list."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Unsupported Advance Modules"
+msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"

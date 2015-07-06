@@ -75,9 +75,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:24+0000\n"
-"PO-Revision-Date: 2015-06-26 19:41+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-07-06 12:00+0000\n"
+"PO-Revision-Date: 2015-06-30 04:09+0000\n"
+"Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -196,7 +196,7 @@ msgstr "تحميل الملف"
 #: lms/static/js/groups/views/cohort_discussions_inline.js
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
-msgstr ""
+msgstr "جرى حفظ التغييرات التي أجريتها. "
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -3307,7 +3307,7 @@ msgstr ""
 
 #: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
 msgid "Save changes"
-msgstr ""
+msgstr "حفظ التغييرات"
 
 #: lms/static/js/ccx/schedule.js
 msgid "Enter Due Date"
@@ -3548,6 +3548,14 @@ msgstr ""
 msgid "Prevent students from generating certificates in this course?"
 msgstr ""
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Start generating certificates for all students in this course?"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Error while generating certificates. Please try again."
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
@@ -3598,7 +3606,6 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
 
 #: lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
 msgstr "تعذّر حفظ البيانات."
 
@@ -3653,9 +3660,9 @@ msgid ""
 "your username."
 msgstr ""
 
-#: lms/templates/student_profile/profile.underscore
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Full Name"
-msgstr "الاسم الكامل"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -3721,9 +3728,10 @@ msgstr ""
 msgid "Year of Birth"
 msgstr ""
 
-#: lms/templates/student_profile/profile.underscore
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Preferred Language"
-msgstr "اللغة المفضّلة"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Connected Accounts"
@@ -3765,22 +3773,6 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
 msgstr ""
-
-#: lms/static/js/student_profile/profile.js
-msgid "Full name cannot be blank"
-msgstr "لا يمكن ترك خانة الاسم الكامل فارغة"
-
-#: lms/static/js/student_profile/profile.js
-msgid "Language cannot be blank"
-msgstr "لا يمكن ترك خانة اللغة فارغة"
-
-#: lms/static/js/student_profile/profile.js
-msgid "We couldn't populate the list of language choices."
-msgstr "عذرًا، لم نتمكّن من ملء لائحة خيارات اللغة."
-
-#: lms/static/js/student_profile/profile.js
-msgid "Saved"
-msgstr "جرى الحفظ"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
@@ -4799,7 +4791,7 @@ msgstr ""
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Upload"
-msgstr "حمّل الملف"
+msgstr "تحميل"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
@@ -4862,7 +4854,7 @@ msgstr "تغيير الإعدادات الخاصة بـ %(display_name)s "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish %(display_name)s"
-msgstr "انشر %(display_name)s"
+msgstr "نشر %(display_name)s"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this %(item)s?"
@@ -4872,7 +4864,7 @@ msgstr "انشر كلّ التعديلات غير المنشورة لهذه %(it
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publish"
-msgstr "انشر"
+msgstr "نشر"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
@@ -5238,7 +5230,7 @@ msgstr ""
 
 #: lms/templates/discovery/more_less_links.underscore
 msgid "MORE..."
-msgstr ""
+msgstr "المزيد..."
 
 #: lms/templates/discovery/more_less_links.underscore
 msgid "LESS..."
@@ -5246,7 +5238,7 @@ msgstr ""
 
 #: lms/templates/discovery/result_item.underscore
 msgid "LEARN MORE"
-msgstr ""
+msgstr "اعرف المزيد"
 
 #: lms/templates/discovery/result_item.underscore
 msgid "gettext("
@@ -5625,8 +5617,26 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+msgid ""
+"Sign in here using your email address and password, or use one of the "
+"providers listed below."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in here using your email address and password."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "If you do not yet have an account, use the button below to register."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "أو تسجيل الدخول من خلال"
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in with %(providerName)s"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
@@ -5683,6 +5693,10 @@ msgid "Create an account using"
 msgstr "إنشاء حساب باستخدام"
 
 #: lms/templates/student_account/register.underscore
+msgid "Create account using %(providerName)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "أو إنشاء حساب جديد هنا"
 
@@ -5709,10 +5723,6 @@ msgstr ""
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "This edX learner is currently sharing a limited profile."
 msgstr ""
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Update Profile"
-msgstr "تحديث الملفّ الشخصي"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Congratulations! You are now verified on %(platformName)s!"
