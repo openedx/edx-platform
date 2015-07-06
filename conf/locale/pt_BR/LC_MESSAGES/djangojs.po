@@ -102,6 +102,7 @@
 # Alan Mól <alan3df@gmail.com>, 2015
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
 # Bruno Sette <brunosette@gmail.com>, 2015
+# Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Felipe Lube de Bragança <felipe.lubra@gmail.com>, 2015
 # Fernando Nunes <fernubr@gmail.com>, 2015
@@ -145,9 +146,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:24+0000\n"
-"PO-Revision-Date: 2015-06-29 04:49+0000\n"
-"Last-Translator: Fernando Nunes <fernubr@gmail.com>\n"
+"POT-Creation-Date: 2015-07-06 12:00+0000\n"
+"PO-Revision-Date: 2015-07-01 12:26+0000\n"
+"Last-Translator: Cleomir Waiczyk <w.cleomir@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3454,6 +3455,14 @@ msgstr ""
 msgid "Prevent students from generating certificates in this course?"
 msgstr ""
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Start generating certificates for all students in this course?"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Error while generating certificates. Please try again."
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
@@ -3500,7 +3509,6 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
 
 #: lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
 msgstr ""
 
@@ -3553,7 +3561,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_profile/profile.underscore
 msgid "Full Name"
 msgstr ""
 
@@ -3625,7 +3632,6 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-#: lms/templates/student_profile/profile.underscore
 msgid "Preferred Language"
 msgstr ""
 
@@ -3668,22 +3674,6 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
-msgstr ""
-
-#: lms/static/js/student_profile/profile.js
-msgid "Full name cannot be blank"
-msgstr ""
-
-#: lms/static/js/student_profile/profile.js
-msgid "Language cannot be blank"
-msgstr ""
-
-#: lms/static/js/student_profile/profile.js
-msgid "We couldn't populate the list of language choices."
-msgstr ""
-
-#: lms/static/js/student_profile/profile.js
-msgid "Saved"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -5445,7 +5435,25 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+msgid ""
+"Sign in here using your email address and password, or use one of the "
+"providers listed below."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in here using your email address and password."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "If you do not yet have an account, use the button below to register."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in with %(providerName)s"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -5499,6 +5507,10 @@ msgid "Create an account using"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
+msgid "Create account using %(providerName)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr ""
 
@@ -5524,10 +5536,6 @@ msgstr ""
 
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "This edX learner is currently sharing a limited profile."
-msgstr ""
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Update Profile"
 msgstr ""
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore

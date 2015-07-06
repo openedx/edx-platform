@@ -70,6 +70,7 @@
 # SLOG90 <slog90@gmail.com>, 2014
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Toreador <torrent_lover@hotmail.com>, 2014
+# yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
@@ -108,8 +109,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:24+0000\n"
-"PO-Revision-Date: 2015-06-29 09:46+0000\n"
+"POT-Creation-Date: 2015-07-06 12:00+0000\n"
+"PO-Revision-Date: 2015-07-05 17:26+0000\n"
 "Last-Translator: yepelboin <yves.epelboin@impmc.upmc.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -2856,7 +2857,7 @@ msgid ""
 msgstr ""
 "Le recalcul du score de l'exercice '<%= problem_id %>' de l'étudiant '<%= "
 "student_id %>' a commencé. Cliquez sur le bouton 'Afficher l'historique des "
-"tâches de l'étudiant' pour voir le statut de la tâche."
+"tâches de l'étudiant' pour voir l'état de la tâche."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2952,7 +2953,7 @@ msgid ""
 msgstr ""
 "Démarrage de la tâche consistant à réinitialiser les tentatives pour "
 "l'exercice '<%= problem_id %>' effectué avec succès. Cliquez sur le bouton "
-"'Montrer l'historique des tâches pour l'exercice' pour voir le statut de la "
+"'Montrer l'historique des tâches pour l'exercice' pour voir l'état de la "
 "tâche."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -2979,8 +2980,8 @@ msgid ""
 msgstr ""
 "Démarrage de la tâche consistant à recalculer le score de l'exercice '<%= "
 "problem_id %>' pour tous les étudiants effectué avec succès. Cliquez sur le "
-"bouton 'Montrer l'historique des tâches pour l'exercice' pour voir le statut"
-" de la tâche."
+"bouton 'Montrer l'historique des tâches pour l'exercice' pour voir l'état de"
+" la tâche."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3557,6 +3558,14 @@ msgstr "Autoriser les étudiants à générer des certificats pour ce cours?"
 msgid "Prevent students from generating certificates in this course?"
 msgstr "Empêcher les étudiants de générer des certificats pour ce cours?"
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Start generating certificates for all students in this course?"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Error while generating certificates. Please try again."
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
@@ -3603,7 +3612,6 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr ""
 
 #: lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
 msgstr "Les données n'ont pas pu être enregistrées"
 
@@ -3662,7 +3670,6 @@ msgstr ""
 "d'utilisateur"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_profile/profile.underscore
 msgid "Full Name"
 msgstr "Nom complet"
 
@@ -3743,7 +3750,6 @@ msgstr "Année de naissance"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-#: lms/templates/student_profile/profile.underscore
 msgid "Preferred Language"
 msgstr "Langue préférée"
 
@@ -3789,22 +3795,6 @@ msgstr "Lier"
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
 msgstr "Lien supprimé."
-
-#: lms/static/js/student_profile/profile.js
-msgid "Full name cannot be blank"
-msgstr "Le nom complet ne peut pas être vide"
-
-#: lms/static/js/student_profile/profile.js
-msgid "Language cannot be blank"
-msgstr "Veuillez sélectionner un langue"
-
-#: lms/static/js/student_profile/profile.js
-msgid "We couldn't populate the list of language choices."
-msgstr "Nous n’avons pas pu afficher la liste des langues."
-
-#: lms/static/js/student_profile/profile.js
-msgid "Saved"
-msgstr "Enregistré"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
@@ -4411,9 +4401,9 @@ msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
-"Seuls les fichiers de type <%= fileTypes %> peuvent être téléchargés. Merci "
-"de sélectionner un fichier se terminant par <%= fileExtensions %> pour le "
-"télécharger."
+"Seuls les fichiers de type <%= fileTypes %> peuvent être envoyés. Merci de "
+"sélectionner un fichier se terminant par <%= fileExtensions %> pour "
+"l'envoyer."
 
 #: cms/static/js/models/uploads.js
 msgid "or"
@@ -4547,7 +4537,7 @@ msgstr "Choisir le fichier"
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr "Charger un nouveau fichier"
+msgstr "Envoyer un nouveau fichier"
 
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
@@ -4605,7 +4595,7 @@ msgstr "Traitement de la demande de relance"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Charger un nouveau PDF appelé \"<%= name %>”"
+msgstr "Envoyer un nouveau PDF appelé \"<%= name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -4823,7 +4813,7 @@ msgstr ""
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Upload"
-msgstr "Charger"
+msgstr "Envoyer"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
@@ -5648,8 +5638,26 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+msgid ""
+"Sign in here using your email address and password, or use one of the "
+"providers listed below."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in here using your email address and password."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "If you do not yet have an account, use the button below to register."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "ou se connecter avec"
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in with %(providerName)s"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
@@ -5706,6 +5714,10 @@ msgid "Create an account using"
 msgstr "Créer un compte avec"
 
 #: lms/templates/student_account/register.underscore
+msgid "Create account using %(providerName)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "ou en créer un nouveau ici"
 
@@ -5732,10 +5744,6 @@ msgstr "Vous partagez actuellement votre profil restreint."
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "This edX learner is currently sharing a limited profile."
 msgstr "Cette utilisateur partage actuellement un profil restreint."
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Update Profile"
-msgstr "Mettre à jour le profil"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Congratulations! You are now verified on %(platformName)s!"
@@ -7068,8 +7076,8 @@ msgid ""
 msgstr ""
 "EdX dispose d'une transcription synchronisée pour cette vidéo. Si vous "
 "souhaitez éditer cette transcription, vous pouvez télécharger, éditer, et "
-"re-téléverser la transcription existante. Si vous souhaitez remplacer cette "
-"transcription, téléversez un nouveau fichier srt."
+"re-envoyerr la transcription existante. Si vous souhaitez remplacer cette "
+"transcription, envoyez un nouveau fichier srt."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
@@ -7144,9 +7152,9 @@ msgid ""
 "transcript, you can download, edit, and re-upload the existing transcript."
 msgstr ""
 "EdX dispose d'une transcription synchronisée pour cette vidéo. Si vous "
-"souhaitez remplacer cette transcription, téléverser un nouveau fichier de "
+"souhaitez remplacer cette transcription, envoyer un nouveau fichier de "
 "transcription srt. Si vous souhaitez éditer cette transcription, vous pouvez"
-" télécharger, éditer et re-téléverser la transcription existante."
+" envoyer, éditer et re-réenvoyer la transcription existante."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Confirm Timed Transcript"

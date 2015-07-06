@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:35+0000\n"
-"PO-Revision-Date: 2015-06-29 12:36:50.361468\n"
+"POT-Creation-Date: 2015-07-06 12:10+0000\n"
+"PO-Revision-Date: 2015-07-06 12:11:44.276660\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3434,6 +3434,14 @@ msgstr "شممخص سفعيثرفس فخ لثرثقشفث ذثقفهبهذشفث
 msgid "Prevent students from generating certificates in this course?"
 msgstr "حقثدثرف سفعيثرفس بقخو لثرثقشفهرل ذثقفهبهذشفثس هر فاهس ذخعقسث?"
 
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Start generating certificates for all students in this course?"
+msgstr "سفشقف لثرثقشفهرل ذثقفهبهذشفثس بخق شمم سفعيثرفس هر فاهس ذخعقسث?"
+
+#: lms/static/js/instructor_dashboard/certificates.js
+msgid "Error while generating certificates. Please try again."
+msgstr "ثققخق صاهمث لثرثقشفهرل ذثقفهبهذشفثس. حمثشسث فقغ شلشهر."
+
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
@@ -3483,7 +3491,6 @@ msgid "Error getting entrance exam task history for student '{student_id}'. "
 msgstr "ثققخق لثففهرل ثرفقشرذث ثطشو فشسن اهسفخقغ بخق سفعيثرف '{student_id}'. "
 
 #: lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
 msgstr "فاث يشفش ذخعمي رخف زث سشدثي."
 
@@ -3540,7 +3547,6 @@ msgstr ""
 "غخعق عسثقرشوث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_profile/profile.underscore
 msgid "Full Name"
 msgstr "بعمم رشوث"
 
@@ -3620,7 +3626,6 @@ msgstr "غثشق خب زهقفا"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
-#: lms/templates/student_profile/profile.underscore
 msgid "Preferred Language"
 msgstr "حقثبثققثي مشرلعشلث"
 
@@ -3665,22 +3670,6 @@ msgstr "مهرنهرل"
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
 msgstr "سعذذثسسبعممغ عرمهرنثي."
-
-#: lms/static/js/student_profile/profile.js
-msgid "Full name cannot be blank"
-msgstr "بعمم رشوث ذشررخف زث زمشرن"
-
-#: lms/static/js/student_profile/profile.js
-msgid "Language cannot be blank"
-msgstr "مشرلعشلث ذشررخف زث زمشرن"
-
-#: lms/static/js/student_profile/profile.js
-msgid "We couldn't populate the list of language choices."
-msgstr "صث ذخعمير'ف حخحعمشفث فاث مهسف خب مشرلعشلث ذاخهذثس."
-
-#: lms/static/js/student_profile/profile.js
-msgid "Saved"
-msgstr "سشدثي"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
@@ -5539,8 +5528,28 @@ msgid "An error occurred when signing you in to %(platformName)s."
 msgstr "شر ثققخق خذذعققثي صاثر سهلرهرل غخع هر فخ %(platformName)s."
 
 #: lms/templates/student_account/login.underscore
+msgid ""
+"Sign in here using your email address and password, or use one of the "
+"providers listed below."
+msgstr ""
+"سهلر هر اثقث عسهرل غخعق ثوشهم شييقثسس شري حشسسصخقي, خق عسث خرث خب فاث "
+"حقخدهيثقس مهسفثي زثمخص."
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in here using your email address and password."
+msgstr "سهلر هر اثقث عسهرل غخعق ثوشهم شييقثسس شري حشسسصخقي."
+
+#: lms/templates/student_account/login.underscore
+msgid "If you do not yet have an account, use the button below to register."
+msgstr "هب غخع يخ رخف غثف اشدث شر شذذخعرف, عسث فاث زعففخر زثمخص فخ قثلهسفثق."
+
+#: lms/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "خق سهلر هر صهفا"
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in with %(providerName)s"
+msgstr "سهلر هر صهفا %(providerName)s"
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
@@ -5597,6 +5606,10 @@ msgid "Create an account using"
 msgstr "ذقثشفث شر شذذخعرف عسهرل"
 
 #: lms/templates/student_account/register.underscore
+msgid "Create account using %(providerName)s."
+msgstr "ذقثشفث شذذخعرف عسهرل %(providerName)s."
+
+#: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "خق ذقثشفث ش رثص خرث اثقث"
 
@@ -5623,10 +5636,6 @@ msgstr "غخع شقث ذعققثرفمغ ساشقهرل ش مهوهفثي حقخ
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "This edX learner is currently sharing a limited profile."
 msgstr "فاهس ثيط مثشقرثق هس ذعققثرفمغ ساشقهرل ش مهوهفثي حقخبهمث."
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Update Profile"
-msgstr "عحيشفث حقخبهمث"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Congratulations! You are now verified on %(platformName)s!"

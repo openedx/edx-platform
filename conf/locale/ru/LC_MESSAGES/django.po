@@ -169,6 +169,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
+# Natalia <agitado@gmail.com>, 2015
 # Katerina <rosemaily@gmail.com>, 2014
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Weyedide <weyedide@gmail.com>, 2014-2015
@@ -176,9 +177,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:25+0000\n"
-"PO-Revision-Date: 2015-06-01 16:30+0000\n"
-"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
+"POT-Creation-Date: 2015-07-06 12:02+0000\n"
+"PO-Revision-Date: 2015-07-03 13:39+0000\n"
+"Last-Translator: Natalia <agitado@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -606,15 +607,15 @@ msgid "The ISO 639-1 language code for this language."
 msgstr ""
 
 #: common/djangoapps/student/models.py
-msgid "Namespace of enrollment attribute e.g. credit"
+msgid "Namespace of enrollment attribute"
 msgstr ""
 
 #: common/djangoapps/student/models.py
-msgid "Name of the enrollment attribute e.g. provider_id"
+msgid "Name of the enrollment attribute"
 msgstr ""
 
 #: common/djangoapps/student/models.py
-msgid "Value of the enrollment attribute e.g. ASU"
+msgid "Value of the enrollment attribute"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -1088,7 +1089,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr ""
+msgstr "января"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -1096,7 +1097,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr ""
+msgstr "февраля"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -1104,7 +1105,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr ""
+msgstr "марта"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -1241,6 +1242,10 @@ msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
+msgstr ""
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Space-separated list of XBlocks which should not render."
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
@@ -1913,26 +1918,26 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{num_hour} час"
+msgstr[1] "{num_hour} часа"
+msgstr[2] "{num_hour} часов"
+msgstr[3] "{num_hour} часов"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{num_minute} минута"
+msgstr[1] "{num_minute} минуты"
+msgstr[2] "{num_minute} минут"
+msgstr[3] "{num_minute} минут"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{num_second} секунда"
+msgstr[1] "{num_second} секунды"
+msgstr[2] "{num_second} секунд"
+msgstr[3] "{num_second} секунд"
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -4526,7 +4531,7 @@ msgstr ""
 #. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views.py
 msgid "{month} {day}, {year}"
-msgstr ""
+msgstr "{day} {month}, {year}"
 
 #. Translators: This line appears on the certificate after the name of a
 #. course, and provides more
@@ -5657,6 +5662,13 @@ msgstr ""
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate generation task for all students of this course has been "
+"started. You can view the status of the generation task in the \"Pending "
+"Tasks\" section."
+msgstr ""
+
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
 msgstr ""
@@ -6011,6 +6023,12 @@ msgstr ""
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "generating_enrollment_report"
+msgstr ""
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "certificates generated"
 msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -6654,7 +6672,8 @@ msgstr "Курс"
 msgid "Course Announce Date"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "Дата начала курса"
 
@@ -8242,7 +8261,26 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
-msgid "Number of seconds to show eligibility message"
+msgid ""
+"URL from the credit provider where the user can check the status of his or "
+"her request for credit.  This is displayed to students *after* they have "
+"requested credit."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Deadline for purchasing and requesting credit."
+msgstr ""
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "File upload corrupted. Please try again"
+msgstr ""
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "Could not find the {root_xml_file} file in the package."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -8606,15 +8644,9 @@ msgid "Empty"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "File upload corrupted. Please try again"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "Could not find the {0} file in the package."
+msgid ""
+"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
+" unit."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
@@ -8926,7 +8958,7 @@ msgstr ""
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course End Date"
-msgstr ""
+msgstr "Дата окончания курса"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
@@ -10783,7 +10815,23 @@ msgid "Download student grades"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Take this with you:"
+msgid "Print or share your certificate:"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Click the link to see my certificate."
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Post on Facebook"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Add to LinkedIn Profile"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
@@ -10792,10 +10840,6 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
-msgstr ""
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Add to LinkedIn Profile"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-header.html
@@ -11075,7 +11119,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course_name}"
-msgstr ""
+msgstr "Регистрация на курс {course_name}"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -11661,13 +11705,9 @@ msgid "Your certificate is available"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You can now view your certificate."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
 msgid ""
-"You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"You can now access your certificate. If you keep working and receive a "
+"higher grade,you can request an {link_start} updated certificate {link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12023,35 +12063,43 @@ msgid ""
 "{unenroll_link_start}unenroll{unenroll_link_end} from this course"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"{username}, your eligibility for credit expires on {expiry}. Don't miss out!"
+"An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid "{congrats} {username}, You have meet requirements for credit."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid "Purchase Credit"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you, your payment is complete, your credit is processing. Please see "
-"{provider_link} for more information."
+"The opportunity to purchase credit for this course expires on {deadline}. "
+"You've worked hard - don't miss out!"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you, your credit is approved. Please see {provider_link} for more "
-"information."
+"Congratulations - you have met the requirements for credit in this course!"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Purchase Course Credit"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been denied. Please contact {provider_link} for more "
-"information."
+"Thanks for your payment! We are currently processing your course credit. "
+"You'll see a message here when the transaction is complete. For more "
+"information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Congratulations - you have received credit for this course! For more "
+"information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"{provider_name} has declined your request for course credit. For more "
+"information, contact {provider_link}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -13437,6 +13485,22 @@ msgid ""
 "student-generated certificates."
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Generate Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Pending Tasks"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "The status for any active tasks appears in a table below."
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr ""
@@ -13493,13 +13557,6 @@ msgstr ""
 msgid ""
 "View detailed Git import logs for this course {link_start}by clicking "
 "here{link_end}."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "The status for any active tasks appears in a table below."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -15475,10 +15532,6 @@ msgstr ""
 msgid "Sign in or Register"
 msgstr ""
 
-#: lms/templates/student_profile/index.html
-msgid "Student Profile"
-msgstr "Личные данные студента"
-
 #: lms/templates/student_profile/learner_profile.html
 msgid "Learner Profile"
 msgstr ""
@@ -16212,6 +16265,34 @@ msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Warning"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "This course uses features that are no longer supported."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "You must delete or replace the following components."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Unsupported Components"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To avoid errors, {platform_name} strongly recommends that you remove "
+"unsupported features from the course advanced settings. To do this, go to "
+"the {link_start}Advanced Settings page{link_end}, locate the \"Advanced "
+"Module List\" setting, and then delete the following modules from the list."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Unsupported Advance Modules"
 msgstr ""
 
 #: cms/templates/course_outline.html

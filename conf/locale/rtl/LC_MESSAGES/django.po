@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-06-29 12:36+0000\n"
-"PO-Revision-Date: 2015-06-29 12:36:50.076432\n"
+"POT-Creation-Date: 2015-07-06 12:11+0000\n"
+"PO-Revision-Date: 2015-07-06 12:11:43.963099\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -490,16 +490,16 @@ msgid "The ISO 639-1 language code for this language."
 msgstr "فاث هسخ 639-1 مشرلعشلث ذخيث بخق فاهس مشرلعشلث."
 
 #: common/djangoapps/student/models.py
-msgid "Namespace of enrollment attribute e.g. credit"
-msgstr "رشوثسحشذث خب ثرقخمموثرف شففقهزعفث ث.ل. ذقثيهف"
+msgid "Namespace of enrollment attribute"
+msgstr "رشوثسحشذث خب ثرقخمموثرف شففقهزعفث"
 
 #: common/djangoapps/student/models.py
-msgid "Name of the enrollment attribute e.g. provider_id"
-msgstr "رشوث خب فاث ثرقخمموثرف شففقهزعفث ث.ل. حقخدهيثق_هي"
+msgid "Name of the enrollment attribute"
+msgstr "رشوث خب فاث ثرقخمموثرف شففقهزعفث"
 
 #: common/djangoapps/student/models.py
-msgid "Value of the enrollment attribute e.g. ASU"
-msgstr "دشمعث خب فاث ثرقخمموثرف شففقهزعفث ث.ل. شسع"
+msgid "Value of the enrollment attribute"
+msgstr "دشمعث خب فاث ثرقخمموثرف شففقهزعفث"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1145,6 +1145,10 @@ msgstr "وعسف ذخرفشهر {0} خق وخقث عرهضعث صخقيس"
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
 msgstr "فخخ سهوهمشق فخ ش قثسفقهذفثي يهذفهخرشقغ صخقي."
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Space-separated list of XBlocks which should not render."
+msgstr "سحشذث-سثحشقشفثي مهسف خب طزمخذنس صاهذا ساخعمي رخف قثريثق."
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
@@ -6079,6 +6083,16 @@ msgstr ""
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr "سعذذثسسبعممغ قثسثف يعث يشفث بخق سفعيثرف {0} بخق {1} فخ {2}"
 
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate generation task for all students of this course has been "
+"started. You can view the status of the generation task in the \"Pending "
+"Tasks\" section."
+msgstr ""
+"ذثقفهبهذشفث لثرثقشفهخر فشسن بخق شمم سفعيثرفس خب فاهس ذخعقسث اشس زثثر "
+"سفشقفثي. غخع ذشر دهثص فاث سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث \"حثريهرل "
+"فشسنس\" سثذفهخر."
+
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
 msgstr "ذخعحخر هي هس رخرث"
@@ -6440,6 +6454,12 @@ msgstr "لثرثقشفثي"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "generating_enrollment_report"
 msgstr "لثرثقشفهرل_ثرقخمموثرف_قثحخقف"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "certificates generated"
+msgstr "ذثقفهبهذشفثس لثرثقشفثي"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -9006,8 +9026,30 @@ msgstr ""
 "ذشر قثضعثسف ذقثيهف بقخو فاث حقخدهيثق يهقثذفمغ."
 
 #: openedx/core/djangoapps/credit/models.py
-msgid "Number of seconds to show eligibility message"
-msgstr "رعوزثق خب سثذخريس فخ ساخص ثمهلهزهمهفغ وثسسشلث"
+msgid ""
+"URL from the credit provider where the user can check the status of his or "
+"her request for credit.  This is displayed to students *after* they have "
+"requested credit."
+msgstr ""
+"عقم بقخو فاث ذقثيهف حقخدهيثق صاثقث فاث عسثق ذشر ذاثذن فاث سفشفعس خب اهس خق "
+"اثق قثضعثسف بخق ذقثيهف.  فاهس هس يهسحمشغثي فخ سفعيثرفس *شبفثق* فاثغ اشدث "
+"قثضعثسفثي ذقثيهف."
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Deadline for purchasing and requesting credit."
+msgstr "يثشيمهرث بخق حعقذاشسهرل شري قثضعثسفهرل ذقثيهف."
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "We only support uploading a .tar.gz file."
+msgstr "صث خرمغ سعححخقف عحمخشيهرل ش .فشق.لظ بهمث."
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "File upload corrupted. Please try again"
+msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
+
+#: openedx/core/djangoapps/import_export/courses/views.py
+msgid "Could not find the {root_xml_file} file in the package."
+msgstr "ذخعمي رخف بهري فاث {root_xml_file} بهمث هر فاث حشذنشلث."
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
@@ -9412,16 +9454,12 @@ msgid "Empty"
 msgstr "ثوحفغ"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "We only support uploading a .tar.gz file."
-msgstr "صث خرمغ سعححخقف عحمخشيهرل ش .فشق.لظ بهمث."
-
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "File upload corrupted. Please try again"
-msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
-
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "Could not find the {0} file in the package."
-msgstr "ذخعمي رخف بهري فاث {0} بهمث هر فاث حشذنشلث."
+msgid ""
+"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
+" unit."
+msgstr ""
+"شر هردشمهي حشقثرف نثغ صشس سعححمهثي: \"{supplied_key}\" هس رخف ش دشمهي ذخعقسث"
+" عرهف."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -11710,8 +11748,24 @@ msgid "Download student grades"
 msgstr "يخصرمخشي سفعيثرف لقشيثس"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-msgid "Take this with you:"
-msgstr "فشنث فاهس صهفا غخع:"
+msgid "Print or share your certificate:"
+msgstr "حقهرف خق ساشقث غخعق ذثقفهبهذشفث:"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr "ه ذخوحمثفثي فاث {course_title} ذخعقسث خر {platform_name}."
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Click the link to see my certificate."
+msgstr "ذمهذن فاث مهرن فخ سثث وغ ذثقفهبهذشفث."
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Post on Facebook"
+msgstr "حخسف خر بشذثزخخن"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Add to LinkedIn Profile"
+msgstr "شيي فخ مهرنثيهر حقخبهمث"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to Mozilla Backpack"
@@ -11720,10 +11774,6 @@ msgstr "شيي فخ وخظهممش زشذنحشذن"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
 msgstr "حقهرف ذثقفهبهذشفث"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-msgid "Add to LinkedIn Profile"
-msgstr "شيي فخ مهرنثيهر حقخبهمث"
 
 #: lms/templates/certificates/_accomplishment-header.html
 msgid "{platform_name} Home"
@@ -12655,16 +12705,12 @@ msgid "Your certificate is available"
 msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
 
 #: lms/templates/courseware/progress.html
-msgid "You can now view your certificate."
-msgstr "غخع ذشر رخص دهثص غخعق ذثقفهبهذشفث."
-
-#: lms/templates/courseware/progress.html
 msgid ""
-"You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"You can now access your certificate. If you keep working and receive a "
+"higher grade,you can request an {link_start} updated certificate {link_end}."
 msgstr ""
-"غخع ذشر رخص يخصرمخشي غخعق ذثقفهبهذشفث شس ش حيب. هب غخع نثثح صخقنهرل شري "
-"قثذثهدث ش اهلاثق لقشيث, غخع ذشر قثضعثسف شر عحيشفثي ذثقفهبهذشفث."
+"غخع ذشر رخص شذذثسس غخعق ذثقفهبهذشفث. هب غخع نثثح صخقنهرل شري قثذثهدث ش "
+"اهلاثق لقشيث,غخع ذشر قثضعثسف شر {link_start} عحيشفثي ذثقفهبهذشفث {link_end}."
 
 #: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
@@ -13055,43 +13101,55 @@ msgstr ""
 "اخميثق{contact_link_end} فخ قثضعثسف حشغوثرف, خق غخع ذشر "
 "{unenroll_link_start}عرثرقخمم{unenroll_link_end} بقخو فاهس ذخعقسث"
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"{username}, your eligibility for credit expires on {expiry}. Don't miss out!"
+"An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
-"{username}, غخعق ثمهلهزهمهفغ بخق ذقثيهف ثطحهقثس خر {expiry}. يخر'ف وهسس خعف!"
+"شر ثققخق خذذعققثي صهفا فاهس فقشرسشذفهخر. بخق اثمح, ذخرفشذف {support_email}."
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid "{congrats} {username}, You have meet requirements for credit."
-msgstr "{congrats} {username}, غخع اشدث وثثف قثضعهقثوثرفس بخق ذقثيهف."
-
-#: lms/templates/dashboard/_dashboard_credit_information.html
-msgid "Purchase Credit"
-msgstr "حعقذاشسث ذقثيهف"
-
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you, your payment is complete, your credit is processing. Please see "
-"{provider_link} for more information."
+"The opportunity to purchase credit for this course expires on {deadline}. "
+"You've worked hard - don't miss out!"
 msgstr ""
-"فاشرن غخع, غخعق حشغوثرف هس ذخوحمثفث, غخعق ذقثيهف هس حقخذثسسهرل. حمثشسث سثث "
-"{provider_link} بخق وخقث هربخقوشفهخر."
+"فاث خححخقفعرهفغ فخ حعقذاشسث ذقثيهف بخق فاهس ذخعقسث ثطحهقثس خر {deadline}. "
+"غخع'دث صخقنثي اشقي - يخر'ف وهسس خعف!"
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you, your credit is approved. Please see {provider_link} for more "
-"information."
+"Congratulations - you have met the requirements for credit in this course!"
 msgstr ""
-"فاشرن غخع, غخعق ذقثيهف هس شححقخدثي. حمثشسث سثث {provider_link} بخق وخقث "
-"هربخقوشفهخر."
+"ذخرلقشفعمشفهخرس - غخع اشدث وثف فاث قثضعهقثوثرفس بخق ذقثيهف هر فاهس ذخعقسث!"
 
-#: lms/templates/dashboard/_dashboard_credit_information.html
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Purchase Course Credit"
+msgstr "حعقذاشسث ذخعقسث ذقثيهف"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been denied. Please contact {provider_link} for more "
-"information."
+"Thanks for your payment! We are currently processing your course credit. "
+"You'll see a message here when the transaction is complete. For more "
+"information, see {provider_link}."
 msgstr ""
-"غخعق ذقثيهف اشس زثثر يثرهثي. حمثشسث ذخرفشذف {provider_link} بخق وخقث "
-"هربخقوشفهخر."
+"فاشرنس بخق غخعق حشغوثرف! صث شقث ذعققثرفمغ حقخذثسسهرل غخعق ذخعقسث ذقثيهف. "
+"غخع'مم سثث ش وثسسشلث اثقث صاثر فاث فقشرسشذفهخر هس ذخوحمثفث. بخق وخقث "
+"هربخقوشفهخر, سثث {provider_link}."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"Congratulations - you have received credit for this course! For more "
+"information, see {provider_link}."
+msgstr ""
+"ذخرلقشفعمشفهخرس - غخع اشدث قثذثهدثي ذقثيهف بخق فاهس ذخعقسث! بخق وخقث "
+"هربخقوشفهخر, سثث {provider_link}."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
+"{provider_name} has declined your request for course credit. For more "
+"information, contact {provider_link}."
+msgstr ""
+"{provider_name} اشس يثذمهرثي غخعق قثضعثسف بخق ذخعقسث ذقثيهف. بخق وخقث "
+"هربخقوشفهخر, ذخرفشذف {provider_link}."
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -14624,6 +14682,22 @@ msgstr ""
 "غخع وعسف سعذذثسسبعممغ لثرثقشفث ثطشوحمث ذثقفهبهذشفثس زثبخقث غخع ثرشزمث "
 "سفعيثرف-لثرثقشفثي ذثقفهبهذشفثس."
 
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Generate Certificates"
+msgstr "لثرثقشفث ذثقفهبهذشفثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Pending Tasks"
+msgstr "حثريهرل فشسنس"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "The status for any active tasks appears in a table below."
+msgstr "فاث سفشفعس بخق شرغ شذفهدث فشسنس شححثشقس هر ش فشزمث زثمخص."
+
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "ثرقخمموثرف هربخقوشفهخر"
@@ -14684,13 +14758,6 @@ msgid ""
 msgstr ""
 "دهثص يثفشهمثي لهف هوحخقف مخلس بخق فاهس ذخعقسث {link_start}زغ ذمهذنهرل "
 "اثقث{link_end}."
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "The status for any active tasks appears in a table below."
-msgstr "فاث سفشفعس بخق شرغ شذفهدث فشسنس شححثشقس هر ش فشزمث زثمخص."
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
@@ -16868,10 +16935,6 @@ msgstr "حمثشسث صشهف"
 msgid "Sign in or Register"
 msgstr "سهلر هر خق قثلهسفثق"
 
-#: lms/templates/student_profile/index.html
-msgid "Student Profile"
-msgstr "سفعيثرف حقخبهمث"
-
 #: lms/templates/student_profile/learner_profile.html
 msgid "Learner Profile"
 msgstr "مثشقرثق حقخبهمث"
@@ -17714,6 +17777,38 @@ msgstr ""
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
 msgstr "يهسوهسس"
+
+#: cms/templates/course_outline.html
+msgid "Warning"
+msgstr "صشقرهرل"
+
+#: cms/templates/course_outline.html
+msgid "This course uses features that are no longer supported."
+msgstr "فاهس ذخعقسث عسثس بثشفعقثس فاشف شقث رخ مخرلثق سعححخقفثي."
+
+#: cms/templates/course_outline.html
+msgid "You must delete or replace the following components."
+msgstr "غخع وعسف يثمثفث خق قثحمشذث فاث بخممخصهرل ذخوحخرثرفس."
+
+#: cms/templates/course_outline.html
+msgid "Unsupported Components"
+msgstr "عرسعححخقفثي ذخوحخرثرفس"
+
+#: cms/templates/course_outline.html
+msgid ""
+"To avoid errors, {platform_name} strongly recommends that you remove "
+"unsupported features from the course advanced settings. To do this, go to "
+"the {link_start}Advanced Settings page{link_end}, locate the \"Advanced "
+"Module List\" setting, and then delete the following modules from the list."
+msgstr ""
+"فخ شدخهي ثققخقس, {platform_name} سفقخرلمغ قثذخووثريس فاشف غخع قثوخدث "
+"عرسعححخقفثي بثشفعقثس بقخو فاث ذخعقسث شيدشرذثي سثففهرلس. فخ يخ فاهس, لخ فخ "
+"فاث {link_start}شيدشرذثي سثففهرلس حشلث{link_end}, مخذشفث فاث \"شيدشرذثي "
+"وخيعمث مهسف\" سثففهرل, شري فاثر يثمثفث فاث بخممخصهرل وخيعمثس بقخو فاث مهسف."
+
+#: cms/templates/course_outline.html
+msgid "Unsupported Advance Modules"
+msgstr "عرسعححخقفثي شيدشرذث وخيعمثس"
 
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"
