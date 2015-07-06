@@ -1,6 +1,7 @@
 """
 Acceptance tests for course in studio
 """
+from flaky import flaky
 from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioCourseTest
@@ -126,6 +127,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self.log_in(self.other_user)
         self._assert_current_course(visible=True)
 
+    @flaky  # TODO fix this, see TNL-2667
     def test_added_users_cannot_add_or_delete_other_users(self):
         """
         Scenario: Added users cannot delete or add other users
