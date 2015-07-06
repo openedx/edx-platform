@@ -4,7 +4,8 @@ End-to-end tests for the courseware unit bookmarks.
 """
 import json
 import requests
-from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from ...pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.course_nav import CourseNavPage
@@ -82,7 +83,7 @@ class BookmarksTest(BookmarksTestMixin):
 
         # Get session to be used for bookmarking units
         self.session = requests.Session()
-        params = {'username': self.USERNAME, 'email': self.EMAIL}
+        params = {'username': self.USERNAME, 'email': self.EMAIL, 'course_id': self.course_id}
         response = self.session.get(BASE_URL + "/auto_auth", params=params)
         self.assertTrue(response.ok, "Failed to get session")
 
@@ -96,7 +97,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.create_course_fixture(num_chapters)
 
         # Auto-auth register for the course.
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
 
         self.courseware_page.visit()
 
@@ -158,7 +159,7 @@ class BookmarksTest(BookmarksTestMixin):
 
         # Logout and login as staff
         LogoutPage(self.browser).visit()
-        AutoAuthPage(
+        StudioAutoAuthPage(
             self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id, staff=True
         ).visit()
 
@@ -170,7 +171,7 @@ class BookmarksTest(BookmarksTestMixin):
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
 
         # Visit courseware as a student.
         self.courseware_page.visit()
@@ -325,7 +326,7 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=1
         )
 
-        self.bookmarks_page.click_bookmarked_block(1)
+        self.bookmarks_page.click_bookmarked_block(0)
         self.assertTrue(is_404_page(self.browser))
 
     def test_page_size_limit(self):
