@@ -214,6 +214,7 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
             }
         ]
         self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
