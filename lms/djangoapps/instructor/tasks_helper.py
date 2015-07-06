@@ -36,16 +36,24 @@ def get_section_users(course_id, query):
     return results
 
 
-def not_open_query(course_id, query):
+def get_users_in_course(course_id):
     """
-    Specific db query for sections or problems that have not been opened
+    Return list of users currently enrolled in a course
     """
     ids_in_course = CourseEnrollment.objects.filter(
         course_id=course_id,
         is_active=1,
     ).values_list(DatabaseFields.USER_ID)
-    total_students = User.objects.filter(id__in=ids_in_course)
-    without_open = total_students.exclude(
+    users_in_course = User.objects.filter(id__in=ids_in_course)
+    return users_in_course
+
+
+def not_open_query(course_id, query):
+    """
+    Specific db query for sections or problems that have not been opened
+    """
+    users_in_course = get_users_in_course(course_id)
+    without_open = users_in_course.exclude(
         id__in=StudentModule.objects.filter(
             module_state_key=query.entity_id,
             course_id=course_id,
@@ -58,13 +66,8 @@ def not_completed_query(course_id, query):
     """
     Specific db query for sections or problems that are not completed
     """
-    ids_in_course = CourseEnrollment.objects.filter(
-        course_id=course_id,
-        is_active=1,
-    ).values_list(DatabaseFields.USER_ID)
-    total_students = User.objects.filter(id__in=ids_in_course)
-
-    without_completed = total_students.exclude(
+    users_in_course = get_users_in_course(course_id)
+    without_completed = users_in_course.exclude(
         id__in=StudentModule.objects.filter(
             module_state_key=query.entity_id,
             course_id=course_id,
