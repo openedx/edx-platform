@@ -5,7 +5,6 @@ consist primarily of authentication, request validation, and serialization.
 """
 import logging
 
-from ipware.ip import get_ip
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
@@ -33,7 +32,11 @@ from enrollment.errors import (
 )
 from student.models import User
 
+
 log = logging.getLogger(__name__)
+REQUIRED_ATTRIBUTES = {
+    "credit": ["credit:provider_id"],
+}
 
 
 class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
@@ -264,15 +267,25 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
                If honor mode is not supported for the course, the request fails and returns the available modes.
 
-               A server-to-server call can be used by this command to enroll a user in other modes, such as "verified"
-               or "professional". If the mode is not supported for the course, the request will fail and return the
-               available modes.
+               A server-to-server call can be used by this command to enroll a user in other modes, such as "verified",
+               "professional" or "credit". If the mode is not supported for the course, the request will fail and
+               return the available modes.
+
+               You can include other parameters as enrollment attributes for specific course mode as needed. For
+               example, for credit mode, you can include parameters namespace:'credit', name:'provider_id',
+               value:'UniversityX' to specify credit provider attribute.
 
         **Example Requests**:
 
             GET /api/enrollment/v1/enrollment
 
             POST /api/enrollment/v1/enrollment{"mode": "honor", "course_details":{"course_id": "edX/DemoX/Demo_Course"}}
+
+            POST /api/enrollment/v1/enrollment{
+                "mode": "credit",
+                "course_details":{"course_id": "edX/DemoX/Demo_Course"},
+                "enrollment_attributes":[{"namespace": "credit","name": "provider_id","value": "hogwarts",},]
+            }
 
         **Post Parameters**
 
@@ -291,6 +304,12 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
             * email_opt_in: A Boolean indicating whether the user
               wishes to opt into email from the organization running this course. Optional.
+
+            * enrollment_attributes: A list of dictionary that contains:
+
+                * namespace: Namespace of the attribute
+                * name: Name of the attribute
+                * value: Value of the attribute
 
         **Response Values**
 
@@ -335,7 +354,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
                 * user: The username of the user.
     """
-
     authentication_classes = OAuth2AuthenticationAllowInactiveUser, EnrollmentCrossDomainSessionAuth
     permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
@@ -370,6 +388,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         go through `add_enrollment()`, which allows creation of new and reactivation of old enrollments.
         """
         # Get the User, Course ID, and Mode from the request.
+
         username = request.DATA.get('user', request.user.username)
         course_id = request.DATA.get('course_details', {}).get('course_id')
 
@@ -438,9 +457,17 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     }
                 )
 
+            enrollment_attributes = request.DATA.get('enrollment_attributes')
             enrollment = api.get_enrollment(username, unicode(course_id))
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
+            missing_attrs = []
+            if enrollment_attributes:
+                actual_attrs = [
+                    u"{namespace}:{name}".format(**attr)
+                    for attr in enrollment_attributes
+                ]
+                missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
             if has_api_key_permissions and (mode_changed or active_changed):
                 if mode_changed and active_changed and not is_active:
                     # if the requester wanted to deactivate but specified the wrong mode, fail
@@ -451,7 +478,21 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     )
                     log.warning(msg)
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
-                response = api.update_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
+
+                if len(missing_attrs) > 0:
+                    msg = u"Missing enrollment attributes: requested mode={} required attributes={}".format(
+                        mode, REQUIRED_ATTRIBUTES.get(mode)
+                    )
+                    log.warning(msg)
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
+
+                response = api.update_enrollment(
+                    username,
+                    unicode(course_id),
+                    mode=mode,
+                    is_active=is_active,
+                    enrollment_attributes=enrollment_attributes
+                )
             else:
                 # Will reactivate inactive enrollments.
                 response = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)

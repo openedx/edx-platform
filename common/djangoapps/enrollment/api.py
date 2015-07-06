@@ -5,8 +5,8 @@ course level, such as available course modes.
 """
 from django.utils import importlib
 import logging
-from django.core.cache import cache
 from django.conf import settings
+from django.core.cache import cache
 from enrollment import errors
 
 log = logging.getLogger(__name__)
@@ -181,7 +181,7 @@ def add_enrollment(user_id, course_id, mode='honor', is_active=True):
     return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
 
-def update_enrollment(user_id, course_id, mode=None, is_active=None):
+def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_attributes=None):
     """Updates the course mode for the enrolled user.
 
     Update a course enrollment for the given user and course.
@@ -232,6 +232,10 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None):
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
         log.warn(msg)
         raise errors.EnrollmentNotFoundError(msg)
+    else:
+        if enrollment_attributes is not None:
+            set_enrollment_attributes(user_id, course_id, enrollment_attributes)
+
     return enrollment
 
 
@@ -300,6 +304,53 @@ def get_course_enrollment_details(course_id, include_expired=False):
 
     log.info(u"Get enrollment data for course %s", course_id)
     return course_enrollment_details
+
+
+def set_enrollment_attributes(user_id, course_id, attributes):
+    """Set enrollment attributes for the enrollment of given user in the
+    course provided.
+
+    Args:
+        course_id (str): The Course to set enrollment attributes for.
+        user_id (str): The User to set enrollment attributes for.
+        attributes (list): Attributes to be set.
+
+    Example:
+        >>>set_enrollment_attributes(
+            "Bob",
+            "course-v1-edX-DemoX-1T2015",
+            [
+                {
+                    "namespace": "credit",
+                    "name": "provider_id",
+                    "value": "hogwarts",
+                },
+            ]
+        )
+    """
+    _data_api().add_or_update_enrollment_attr(user_id, course_id, attributes)
+
+
+def get_enrollment_attributes(user_id, course_id):
+    """Retrieve enrollment attributes for given user for provided course.
+
+    Args:
+        user_id: The User to get enrollment attributes for
+        course_id (str): The Course to get enrollment attributes for.
+
+    Example:
+        >>>get_enrollment_attributes("Bob", "course-v1-edX-DemoX-1T2015")
+        [
+            {
+                "namespace": "credit",
+                "name": "provider_id",
+                "value": "hogwarts",
+            },
+        ]
+
+    Returns: list
+    """
+    return _data_api().get_enrollment_attributes(user_id, course_id)
 
 
 def _validate_course_mode(course_id, mode):
