@@ -431,7 +431,7 @@ class UserStateCache(object):
         the cache.
 
         Arguments:
-            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to get
 
         Returns: A django orm object from the cache
         """
