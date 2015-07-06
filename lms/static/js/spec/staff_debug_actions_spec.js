@@ -14,6 +14,12 @@ define(['backbone', 'jquery', 'js/staff_debug_actions'],
                 });
             });
 
+            describe('sanitize_string', function () {
+                it('escapes escapable characters in a string', function () {
+                    expect(StaffDebug.sanitized_string('.*+?^:${}()|][')).toBe('\\.\\*\\+\\?\\^\\:\\$\\{\\}\\(\\)\\|\\]\\[');
+                });
+            });
+
             describe('get_user', function () {
 
                 it('gets the placeholder username if input field is empty', function () {
