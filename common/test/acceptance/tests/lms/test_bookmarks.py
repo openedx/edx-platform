@@ -2,13 +2,15 @@
 """
 End-to-end tests for the courseware unit bookmarks.
 """
-
+import json
+import requests
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.common.logout import LogoutPage
+from ...pages.common import BASE_URL
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import EventsTestMixin, UniqueCourseTest, is_404_page
@@ -78,6 +80,12 @@ class BookmarksTest(BookmarksTestMixin):
         self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
         self.course_nav = CourseNavPage(self.browser)
 
+        # Get session to be used for bookmarking units
+        self.session = requests.Session()
+        params = {'username': self.USERNAME, 'email': self.EMAIL}
+        response = self.session.get(BASE_URL + "/auto_auth", params=params)
+        self.assertTrue(response.ok, "Failed to get session")
+
     def _test_setup(self, num_chapters=2):
         """
         Setup test settings.
@@ -92,25 +100,37 @@ class BookmarksTest(BookmarksTestMixin):
 
         self.courseware_page.visit()
 
-    def _bookmark_unit(self, index):
+    def _bookmark_unit(self, location):
         """
         Bookmark a unit
 
         Arguments:
-            index: unit index to bookmark
+            location (str): unit location
         """
-        self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
-        self.courseware_page.click_bookmark_unit_button()
+        _headers = {
+            'Content-type': 'application/json',
+            'X-CSRFToken': self.session.cookies['csrftoken'],
+        }
+        params = {'course_id': self.course_id}
+        data = json.dumps({'usage_id': location})
+        response = self.session.post(
+            BASE_URL + '/api/bookmarks/v1/bookmarks/',
+            data=data,
+            params=params,
+            headers=_headers
+        )
+        self.assertTrue(response.ok, "Failed to bookmark unit")
 
     def _bookmark_units(self, num_units):
         """
-        Bookmark first `num_units` units by visiting them
+        Bookmark first `num_units` units
 
         Arguments:
             num_units(int): Number of units to bookmarks
         """
+        xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
         for index in range(num_units):
-            self._bookmark_unit(index)
+            self._bookmark_unit(xblocks[index].locator)
 
     def _breadcrumb(self, num_units):
         """
@@ -180,11 +200,11 @@ class BookmarksTest(BookmarksTestMixin):
         Verify pagination info
         """
         self.assertEqual(self.bookmarks_page.count(), bookmark_count_on_current_page)
-        self.assertEqual(self.bookmarks_page.paging_header_text, header_text)
-        self.assertEqual(self.bookmarks_page.paging_footer_button_state('previous'), previous_button_enabled)
-        self.assertEqual(self.bookmarks_page.paging_footer_button_state('next'), next_button_enabled)
-        self.assertEqual(self.bookmarks_page.paging_footer_button_value('current'), current_page_number)
-        self.assertEqual(self.bookmarks_page.paging_footer_button_value('total'), total_pages)
+        self.assertEqual(self.bookmarks_page.get_pagination_header_text(), header_text)
+        self.assertEqual(self.bookmarks_page.is_previous_page_button_enabled(), previous_button_enabled)
+        self.assertEqual(self.bookmarks_page.is_next_page_button_enabled(), next_button_enabled)
+        self.assertEqual(self.bookmarks_page.get_current_page_number(), current_page_number)
+        self.assertEqual(self.bookmarks_page.get_total_pages, total_pages)
 
     def test_bookmark_button(self):
         """
@@ -251,12 +271,18 @@ class BookmarksTest(BookmarksTestMixin):
         self.assertEqual(self.bookmarks_page.results_header_text(), 'MY BOOKMARKS')
         self.assertEqual(self.bookmarks_page.count(), 2)
 
-        bookmarked_breadcrumbs = self.bookmarks_page.breadcrumbs()
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=2,
+            header_text='Showing 1-2 out of 2 total',
+            previous_button_enabled=False,
+            next_button_enabled=False,
+            current_page_number=1,
+            total_pages=1
+        )
 
-        # Verify bookmarked breadcrumbs and bookmarks order (most recently bookmarked unit should come first)
+        bookmarked_breadcrumbs = self.bookmarks_page.breadcrumbs()
         breadcrumbs = self._breadcrumb(2)
-        breadcrumbs.reverse()
-        self.assertEqual(bookmarked_breadcrumbs, breadcrumbs)
+        self.assertItemsEqual(bookmarked_breadcrumbs, breadcrumbs)
 
         # get usage ids for units
         xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
@@ -290,6 +316,15 @@ class BookmarksTest(BookmarksTestMixin):
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.count(), 2)
 
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=2,
+            header_text='Showing 1-2 out of 2 total',
+            previous_button_enabled=False,
+            next_button_enabled=False,
+            current_page_number=1,
+            total_pages=1
+        )
+
         self.bookmarks_page.click_bookmarked_block(1)
         self.assertTrue(is_404_page(self.browser))
 
@@ -310,6 +345,15 @@ class BookmarksTest(BookmarksTestMixin):
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.count(), 10)
+
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=10,
+            header_text='Showing 1-10 out of 11 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
+            total_pages=2
+        )
 
     def test_pagination_with_single_page(self):
         """
@@ -336,26 +380,22 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=1
         )
 
-    def test_pagination_with_multiple_pages(self):
+    def test_next_page_button(self):
         """
-        Scenario: Bookmarks list pagination is working as expected for multiple pages
+        Scenario: Next button is working as expected for bookmarks list pagination
+
         Given that I am a registered user
         And I visit my courseware page
         And I have bookmarked all the 12 units available
+
         Then I click on Bookmarks button
         And I should see a bookmarked list of 10 items
-        And I should see paging header and footer with correct data
-        And previous page button is disabled in footer
-        And next page button is enabled in footer
+        And I should see paging header and footer with correct info
+
         Then I click on next page button in footer
         And I should be navigated to second page
         And I should see a bookmarked list with 2 items
-        And I should see paging header and footer with correct data
-        And next page button is disabled in footer
-        And previous page button is enabled in footer
-        Then I click on previous page button
-        And I should be navigated to first page
-        And I should see paging header and footer with correct data
+        And I should see paging header and footer with correct info
         """
         self._test_setup(num_chapters=12)
         self._bookmark_units(num_units=12)
@@ -372,8 +412,7 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=2
         )
 
-        self.bookmarks_page.click_paging_footer_button('next')
-
+        self.bookmarks_page.press_next_page_button()
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
             header_text='Showing 11-12 out of 12 total',
@@ -383,8 +422,41 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=2
         )
 
-        self.bookmarks_page.click_paging_footer_button('previous')
+    def test_previous_page_button(self):
+        """
+        Scenario: Previous button is working as expected for bookmarks list pagination
 
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked all the 12 units available
+        And I click on Bookmarks button
+
+        Then I click on next page button in footer
+        And I should be navigated to second page
+        And I should see a bookmarked list with 2 items
+        And I should see paging header and footer with correct info
+
+        Then I click on previous page button
+        And I should be navigated to first page
+        And I should see paging header and footer with correct info
+        """
+        self._test_setup(num_chapters=12)
+        self._bookmark_units(num_units=12)
+
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+
+        self.bookmarks_page.press_next_page_button()
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=2,
+            header_text='Showing 11-12 out of 12 total',
+            previous_button_enabled=True,
+            next_button_enabled=False,
+            current_page_number=2,
+            total_pages=2
+        )
+
+        self.bookmarks_page.press_previous_page_button()
         self._verify_pagination_info(
             bookmark_count_on_current_page=10,
             header_text='Showing 1-10 out of 12 total',
@@ -394,29 +466,28 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=2
         )
 
-    def test_pagination_with_page_number(self):
+    def test_pagination_with_valid_page_number(self):
         """
-        Scenario: Bookmarks list pagination navigation works as expected by page
-            number for valid and invalid values
+        Scenario: Bookmarks list pagination works as expected for valid page number
+
         Given that I am a registered user
         And I visit my courseware page
-        And I have bookmarked all the 121 units available
+        And I have bookmarked all the 12 units available
+
         Then I click on Bookmarks button
         And I should see a bookmarked list
         And I should see total page value is 2
         Then I enter 2 in the page number input
         And I should be navigated to page 2
-        Then I enter 3 in the page number input
-        And I should stay at page 2
         """
         self._test_setup(num_chapters=11)
         self._bookmark_units(num_units=11)
 
         self.bookmarks_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.paging_footer_button_value('total'), 2)
+        self.assertEqual(self.bookmarks_page.get_total_pages, 2)
 
-        self.bookmarks_page.goto_page_number(2)
+        self.bookmarks_page.go_to_page(2)
         self._verify_pagination_info(
             bookmark_count_on_current_page=1,
             header_text='Showing 11-11 out of 11 total',
@@ -426,13 +497,33 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=2
         )
 
-        self.bookmarks_page.goto_page_number(3, wait_for_page_change=False)
+    def test_pagination_with_invalid_page_number(self):
+        """
+        Scenario: Bookmarks list pagination works as expected for invalid page number
+
+        Given that I am a registered user
+        And I visit my courseware page
+        And I have bookmarked all the 11 units available
+        Then I click on Bookmarks button
+        And I should see a bookmarked list
+        And I should see total page value is 2
+        Then I enter 3 in the page number input
+        And I should stay at page 1
+        """
+        self._test_setup(num_chapters=11)
+        self._bookmark_units(num_units=11)
+
+        self.bookmarks_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.results_present())
+        self.assertEqual(self.bookmarks_page.get_total_pages, 2)
+
+        self.bookmarks_page.go_to_page(3)
         self._verify_pagination_info(
-            bookmark_count_on_current_page=1,
-            header_text='Showing 11-11 out of 11 total',
-            previous_button_enabled=True,
-            next_button_enabled=False,
-            current_page_number=2,
+            bookmark_count_on_current_page=10,
+            header_text='Showing 1-10 out of 11 total',
+            previous_button_enabled=False,
+            next_button_enabled=True,
+            current_page_number=1,
             total_pages=2
         )
 
@@ -460,7 +551,17 @@ class BookmarksTest(BookmarksTestMixin):
                 }
             }
         ]
-        self._bookmark_unit(0)
+        self._bookmark_units(num_units=1)
         self.bookmarks_page.click_bookmarks_button()
+
+        self._verify_pagination_info(
+            bookmark_count_on_current_page=1,
+            header_text='Showing 1 out of 1 total',
+            previous_button_enabled=False,
+            next_button_enabled=False,
+            current_page_number=1,
+            total_pages=1
+        )
+
         self.bookmarks_page.click_bookmarked_block(0)
         self.verify_event_data('edx.bookmark.accessed', event_data)

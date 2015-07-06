@@ -17,7 +17,10 @@
 
             initialize: function () {
                 var bookmarksCollection = new BookmarksCollection(
-                    {course_id: $('.courseware-results').data('courseId')}
+                    {
+                        course_id: $('.courseware-results').data('courseId'),
+                        url: $(".courseware-bookmarks-button").data('bookmarksApiUrl')
+                    }
                 );
                 bookmarksCollection.bootstrap();
                 this.bookmarksListView = new BookmarksListView(

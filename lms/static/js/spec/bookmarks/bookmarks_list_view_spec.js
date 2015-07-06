@@ -135,7 +135,7 @@ define(['backbone',
                 expect(bookmarksButtonView.$('.bookmarks-list-button')).toHaveClass('is-inactive');
             });
 
-            it("has rendered empty bookmarks list correctly", function () {
+            it("can correctly render an empty bookmarks list", function () {
                 var requests = AjaxHelpers.requests(this);
                 var expectedData = createBookmarksData({numBookmarksToCreate: 0});
 
@@ -187,9 +187,26 @@ define(['backbone',
                 expect(renderSpy).toHaveBeenCalled();
             });
 
-            it("can go to a page other than defaultPage", function () {
+            it("can go to a page number", function () {
                 var requests = AjaxHelpers.requests(this);
                 var expectedData = createBookmarksData(
+                    {
+                        numBookmarksToCreate: 10,
+                        count: 12,
+                        num_pages: 2,
+                        current_page: 1,
+                        start: 0
+                    }
+                );
+
+                bookmarksButtonView.$('.bookmarks-list-button').click();
+                AjaxHelpers.respondWithJson(requests, expectedData);
+                verifyBookmarkedData(bookmarksButtonView.bookmarksListView, expectedData);
+
+                bookmarksButtonView.bookmarksListView.$('input#page-number-input').val('2');
+                bookmarksButtonView.bookmarksListView.$('input#page-number-input').trigger('change');
+
+                expectedData = createBookmarksData(
                     {
                         numBookmarksToCreate: 2,
                         count: 12,
@@ -198,9 +215,6 @@ define(['backbone',
                         start: 10
                     }
                 );
-
-                bookmarksButtonView.bookmarksListView.defaultPage = 2;
-                bookmarksButtonView.$('.bookmarks-list-button').click();
                 AjaxHelpers.respondWithJson(requests, expectedData);
                 verifyBookmarkedData(bookmarksButtonView.bookmarksListView, expectedData);
 
