@@ -98,7 +98,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
                 'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
-                'id': i,
+                'id': i
             } for i in xrange(signatory_count)
 
         ]

@@ -74,15 +74,15 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             },
             "honor": {
                 "certificate_type": "Honor Code",
-                "document_body_class_append": "is-honorcode"
+                "certificate_title": "Certificate of Achievement"
             },
             "verified": {
                 "certificate_type": "Verified",
-                "document_body_class_append": "is-idverified"
+                "certificate_title": "Verified Certificate of Achievement"
             },
             "xseries": {
-                "certificate_type": "XSeries",
-                "document_body_class_append": "is-xseries"
+                "certificate_title": "XSeries Certificate of Achievement",
+                "certificate_type": "XSeries"
             }
         }"""
 
