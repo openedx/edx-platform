@@ -89,7 +89,9 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       editor.$el.addClass('new')
       setTimeout(=>
         editor.$el.removeClass('new')
-      , 500)
+      , 1000)
+      $('html, body').animate {scrollTop: $('.new-component-item').offset().top}, 500
+      
 
       editor.createItem(
         @model.get('id'),
