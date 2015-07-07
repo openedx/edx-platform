@@ -94,6 +94,16 @@ class CreditProvider(TimeStampedModel):
         )
     )
 
+    fulfillment_instructions = models.TextField(
+        null=True,
+        blank=True,
+        help_text=ugettext_lazy(
+            "Plain text or html content for displaying further steps on "
+            "receipt page *after* paying for the credit to get credit for a "
+            "credit course against a credit provider."
+        )
+    )
+
     CREDIT_PROVIDERS_CACHE_KEY = "credit.providers.list"
 
     @classmethod
@@ -122,6 +132,16 @@ class CreditProvider(TimeStampedModel):
             cache.set(cls.CREDIT_PROVIDERS_CACHE_KEY, providers)
 
         return providers
+
+    @classmethod
+    def get_credit_provider(cls, provider_id):
+        """
+        Retrieve a credit provider with provided 'provider_id'.
+        """
+        try:
+            return CreditProvider.objects.get(active=True, provider_id=provider_id)
+        except cls.DoesNotExist:
+            return None
 
     def __unicode__(self):
         """Unicode representation of the credit provider. """
