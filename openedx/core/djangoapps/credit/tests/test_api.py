@@ -5,6 +5,8 @@ import unittest
 import datetime
 import ddt
 import pytz
+from mock import patch
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection, transaction
@@ -697,6 +699,7 @@ class CreditMessagesTests(ModuleStoreTestCase, CreditApiTestBase):
         request_status = api.get_credit_request_status(self.student.username, self.course.id)
         self.assertEqual(len(request_status), 0)
 
+    @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
     def test_credit_messages(self):
         self._set_creditcourse()
 
