@@ -1,10 +1,8 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'backbone-super', 'jquery.fileupload'
-    ], function (gettext, $, _, Backbone, RequireMustache) {
-
-        var Mustache = window.Mustache || RequireMustache;
+        'gettext', 'jquery', 'underscore', 'backbone', 'backbone-super', 'jquery.fileupload'
+    ], function (gettext, $, _, Backbone) {
 
         var messageRevertDelay = 6000;
         var FieldViews = {};
@@ -127,7 +125,7 @@
                 if (xhr.status === 400) {
                     try {
                         var errors = JSON.parse(xhr.responseText),
-                            validationErrorMessage = Mustache.escapeHtml(
+                            validationErrorMessage = _.escape(
                                 errors.field_errors[this.options.valueAttribute].user_message
                             ),
                             message = this.indicators.validationError + validationErrorMessage;
@@ -253,7 +251,7 @@
             },
 
             updateValueInField: function () {
-                this.$('.u-field-value input').val(Mustache.escapeHtml(this.modelValue()));
+                this.$('.u-field-value input').val(_.escape(this.modelValue()));
             }
         });
 
@@ -290,7 +288,7 @@
 
             updateValueInField: function () {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
-                this.$('.u-field-value input').val(Mustache.escapeHtml(value));
+                this.$('.u-field-value input').val(_.escape(value));
             },
 
             saveValue: function () {
@@ -375,7 +373,7 @@
                     value = this.options.placeholderValue || '';
                 }
                 this.$('.u-field-value').attr('aria-label', this.options.title);
-                this.$('.u-field-value-readonly').html(Mustache.escapeHtml(value));
+                this.$('.u-field-value-readonly').html(_.escape(value));
 
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();

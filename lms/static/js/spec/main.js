@@ -3,7 +3,6 @@
     requirejs.config({
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
-            'mustache': 'xmodule_js/common_static/js/vendor/mustache',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
             'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
@@ -61,7 +60,6 @@
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
-            'js/mustache': 'js/mustache',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
 
