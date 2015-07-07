@@ -396,10 +396,31 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
+    def filter_responses_for_cleaning(self, response_key, student_answers_keys):
+        """
+        Filter single response if it is not in student given answers
+        """
+        if hasattr(self.responders[response_key], 'answer_id'):
+            return self.responders[response_key].answer_id in student_answers_keys
+        if hasattr(self.responders[response_key], 'answer_ids'):
+            self.responders[response_key].answer_ids = [answer_id for answer_id in self.responders[response_key].answer_ids
+                                                        if answer_id in student_answers_keys]
+        return True
+
+    def clean_unanswered_responses(self):
+        """
+        Clear responses which are unanswered for re-scoring
+        """
+        student_answers_keys = map(str, self.student_answers.keys())
+        if student_answers_keys:  # Must contain some answers so it will trigger only when new response is added to existing problem
+            self.responders = {key: response for (key, response) in self.responders.iteritems()
+                               if self.filter_responses_for_cleaning(key, student_answers_keys)}
+
     def rescore_existing_answers(self):
         """
         Rescore student responses.  Called by capa_module.rescore_problem.
         """
+        self.clean_unanswered_responses()
         return self._grade_answers(None)
 
     def _grade_answers(self, student_answers):
