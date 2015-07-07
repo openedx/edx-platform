@@ -416,8 +416,9 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Scenario: On the Certificates tab of the Instructor Dashboard, Generate Certificates button is visible.
             Given that I am on the Certificates tab on the Instructor Dashboard
-            Then I see 'Generate Certificates' button
-            And when I click on 'Generate Certificates' button
+            And the instructor-generation feature flag has been enabled
+            Then I see a 'Generate Certificates' button
+            And when I click on the 'Generate Certificates' button
             Then I should see a status message and 'Generate Certificates' button should be disabled.
         """
         self.assertTrue(self.certificates_section.generate_certificates_button.visible)
