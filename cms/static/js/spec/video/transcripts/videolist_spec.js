@@ -8,7 +8,9 @@ define(
     ],
 function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
     'use strict';
-    describe('CMS.Views.Metadata.VideoList', function () {
+    // TODO: reenable these specs, using AjaxHelpers and the correct pattern
+    // to avoid flakiness. See TNL-2689.
+    xdescribe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
             ),
