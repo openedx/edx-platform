@@ -13,5 +13,4 @@ urlpatterns = patterns(
     url(r'^baskets/{}/order/$'.format(BASKET_ID_PATTERN), views.BasketOrderView.as_view(), name="basket_order"),
     url(r'^checkout/cancel/$', views.checkout_cancel, name="checkout_cancel"),
     url(r'^checkout/receipt/$', views.checkout_receipt, name="checkout_receipt"),
-    url(r'^api/', include('commerce.api.urls', namespace='api'))
 )
