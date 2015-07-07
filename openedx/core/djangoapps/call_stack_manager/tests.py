@@ -109,13 +109,6 @@ def donottrack_func_child():
     ModelMixin.objects.all()
 
 
-@donottrack()
-def donottrack_check_with_return():
-    """ function that returns something i.e. a wrapped function returning some value
-    """
-    return 42
-
-
 @patch('openedx.core.djangoapps.call_stack_manager.core.log.info')
 @patch('openedx.core.djangoapps.call_stack_manager.core.REGULAR_EXPS', [])
 class TestingCallStackManager(TestCase):
@@ -220,11 +213,3 @@ class TestingCallStackManager(TestCase):
         for __ in range(1, 5):
             ModelMixinCallStckMngr(id_field=1).save()
         self.assertEqual(len(log_capt.call_args_list), 1)
-
-    def test_donottrack_with_return(self, log_capt):
-        """ Test for @donottrack
-        Checks if wrapper function returns the same value as wrapped function
-        """
-        everything = donottrack_check_with_return()
-        self.assertEqual(everything, 42)
-        self.assertEqual(len(log_capt.call_args_list), 0)

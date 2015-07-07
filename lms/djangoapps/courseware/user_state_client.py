@@ -18,8 +18,6 @@ from courseware.models import StudentModule, StudentModuleHistory
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import UsageKey
 
-from openedx.core.djangoapps.call_stack_manager import donottrack
-
 new_contract('UsageKey', UsageKey)
 
 
@@ -27,6 +25,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
     An interface that uses the Django ORM StudentModule as a backend.
     """
+
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
         """
         This error is raised if the service backing this client is currently unavailable.
@@ -54,7 +53,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         self.user = user
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(
         username="basestring",
         block_key=UsageKey,
@@ -84,11 +82,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         return state
 
-    @donottrack(StudentModule, StudentModuleHistory)
-    @contract(username="basestring",
-              block_key=UsageKey,
-              state="dict(basestring: *)",
-              scope=ScopeBase)
+    @contract(username="basestring", block_key=UsageKey, state="dict(basestring: *)", scope=ScopeBase)
     def set(self, username, block_key, state, scope=Scope.user_state):
         """
         Set fields for a particular XBlock.
@@ -101,7 +95,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         self.set_many(username, {block_key: state}, scope)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(
         username="basestring",
         block_key=UsageKey,
@@ -120,7 +113,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         return self.delete_many(username, [block_key], scope, fields=fields)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(
         username="basestring",
         block_key=UsageKey,
@@ -147,7 +139,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             field: date for (_, field, date) in results
         }
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(username="basestring", block_keys="seq(UsageKey)|set(UsageKey)")
     def _get_student_modules(self, username, block_keys):
         """
@@ -175,7 +166,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 usage_key = student_module.module_state_key.map_into_course(student_module.course_id)
                 yield (student_module, usage_key)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(
         username="basestring",
         block_keys="seq(UsageKey)|set(UsageKey)",
@@ -207,7 +197,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 state = json.loads(module.state)
             yield (usage_key, state)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(username="basestring", block_keys_to_state="dict(UsageKey: dict(basestring: *))", scope=ScopeBase)
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
@@ -254,7 +243,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 # We just read this object, so we know that we can do an update
                 student_module.save(force_update=True)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(
         username="basestring",
         block_keys="seq(UsageKey)|set(UsageKey)",
@@ -288,7 +276,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             # We just read this object, so we know that we can do an update
             student_module.save(force_update=True)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(
         username="basestring",
         block_keys="seq(UsageKey)|set(UsageKey)",
@@ -321,7 +308,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             for field in json.loads(student_module.state):
                 yield (usage_key, field, student_module.modified)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     @contract(username="basestring", block_key=UsageKey, scope=ScopeBase)
     def get_history(self, username, block_key, scope=Scope.user_state):
         """
