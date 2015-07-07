@@ -19,18 +19,14 @@ var edx = edx || {};
 
         initialize: function( data ) {
             this.tpl = $(this.tpl).html();
-            this.providers = data.thirdPartyAuth.providers || [];
-            this.hintedProvider = _.findWhere(this.providers, {id: data.hintedProvider})
-            this.platformName = data.platformName;
-
+            this.hintedProvider = (
+                _.findWhere(data.thirdPartyAuth.providers, {id: data.hintedProvider}) ||
+                _.findWhere(data.thirdPartyAuth.secondaryProviders, {id: data.hintedProvider})
+            );
         },
 
         render: function() {
             $(this.el).html( _.template( this.tpl, {
-                // We pass the context object to the template so that
-                // we can perform variable interpolation using sprintf
-                providers: this.providers,
-                platformName: this.platformName,
                 hintedProvider: this.hintedProvider
             }));
 
