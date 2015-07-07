@@ -681,7 +681,9 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
-        default="images_course_image.jpg"
+        # Note that Peter Fogg introduced this code on 8/21/2013
+        # (adding ability to specify course image on settings page).
+        default=""
     )
     issue_badges = Boolean(
         display_name=_("Issue Open Badges"),
