@@ -1,6 +1,13 @@
-###
-### Script for deleting a course
-###
+"""
+    Command for deleting courses
+
+    Arguments:
+        arg1 (str): Course key of the course to delete
+        arg2 (str): 'commit'
+
+    Returns:
+        none
+"""
 from django.core.management.base import BaseCommand, CommandError
 from .prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
@@ -10,14 +17,20 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
+
 def _get_all_courses():
-    """ Utility function to list all available courses. """
+    """
+    Utility function to list all available courses.
+    """
 
     courses = modulestore().get_courses_keys()
     return courses
 
 
 class Command(BaseCommand):
+    """
+    Delete a MongoDB backed course
+    """
     help = '''Delete a MongoDB backed course'''
 
     def handle(self, *args, **options):
@@ -33,7 +46,7 @@ class Command(BaseCommand):
             try:
                 course_key = CourseKey.from_string(args[0])
             except InvalidKeyError:
-                try: 
+                try:
                     course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
                 except InvalidKeyError:
                     raise CommandError("Invalid course_key: '%s'. Proper syntax: 'org/number/run commit' " % args[0])
