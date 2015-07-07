@@ -175,7 +175,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
-    def delete_item(self, location, user_id, revision=None, **kwargs):
+    def delete_item(
+            self, location, user_id, revision=None, fail_silently=False,
+            **kwargs
+    ):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
 
@@ -188,6 +191,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 ModuleStoreEnum.RevisionOption.all - removes both Draft and Published parents
                     currently only provided by contentstore.views.item.orphan_handler
                 Otherwise, raises a ValueError.
+            fail_silently:
+                False - will raise a ValueError if the block does not exist in
+                        any of the branches we are asked to delete it from
+                        (default).
+                True - will silently fail to delete.
         """
         with self.bulk_operations(location.course_key):
             if isinstance(location, LibraryUsageLocator):
@@ -214,7 +222,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 try:
                     SplitMongoModuleStore.delete_item(self, branched_location, user_id)
                 except ValueError as e:
-                    if revision != ModuleStoreEnum.RevisionOption.all:
+                    if not fail_silently:
                         raise e
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
                 if (
