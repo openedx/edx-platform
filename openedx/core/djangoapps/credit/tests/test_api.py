@@ -4,6 +4,7 @@ Tests for the API functions in the credit app.
 import datetime
 import ddt
 import pytz
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection, transaction
