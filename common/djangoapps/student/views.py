@@ -312,8 +312,7 @@ def _cert_info(user, course, cert_status, course_mode):
             if get_active_web_certificate(course) is not None:
                 certificate_url = get_certificate_url(
                     user_id=user.id,
-                    course_id=unicode(course.id),
-                    verify_uuid=None
+                    course_id=unicode(course.id)
                 )
                 status_dict.update({
                     'show_cert_web_view': True,

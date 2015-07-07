@@ -863,8 +863,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"You can now access your certificate")
         cert_url = certs_api.get_certificate_url(
             user_id=self.user.id,
-            course_id=self.course.id,
-            verify_uuid=certificate.verify_uuid
+            course_id=self.course.id
         )
         self.assertContains(resp, cert_url)
 

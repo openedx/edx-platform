@@ -64,8 +64,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid='abcdefg12345678'
+            course_id=unicode(self.course.id)
         )
 
         self._create_certificate(enrollment_mode)
