@@ -68,9 +68,7 @@ div.calc-main {
       @include box-sizing(border-box);
       padding: lh();
 
-      label.sr {
-        // including the label here in case other .sr values are added
-        // we want to limit this 'white' only to the label
+      .calc-output-label {
         color: $white;
       }
 
@@ -95,9 +93,7 @@ div.calc-main {
           color: #333;
         }
 
-        span.sr {
-          // including the element here in case other .sr values are added
-          // we want to limit this 'white' only to the span
+        .calc-button-label {
           background: $black;
           color: $white;
         }
@@ -163,9 +159,7 @@ div.calc-main {
               border: none;
             }
 
-            span.sr {
-              // including the element here in case other .sr values are added
-              // we want to limit this 'white' only to the span
+            .calc-hint {
               background: $black;
               color: $white;
             }
