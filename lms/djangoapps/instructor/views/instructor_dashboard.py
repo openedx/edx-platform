@@ -127,6 +127,10 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
         sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
 
+    # Gate access to Proctoring tab
+    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and course.enable_proctored_exams:
+        sections.append(_section_proctoring(course, access))
+
     # Certificates panel
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
@@ -213,6 +217,19 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'reports_enabled': reports_enabled,
         'course_price': course_price,
         'total_amount': total_amount
+    }
+    return section_data
+
+
+def _section_proctoring(course, access):
+    """ Provide data for the corresponding dashboard section """
+    course_key = course.id
+
+    section_data = {
+        'section_key': 'proctoring',
+        'section_display_name': _('Proctoring'),
+        'access': access,
+        'course_id': unicode(course_key)
     }
     return section_data
 
