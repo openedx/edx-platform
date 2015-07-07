@@ -379,6 +379,9 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
+    # Batch-Generated Certificates from Instructor Dashboard
+    'CERTIFICATES_INSTRUCTOR_GENERATION': False,
+
     # Social Media Sharing on Student Dashboard
     'SOCIAL_SHARING_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
