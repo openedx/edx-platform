@@ -24,7 +24,7 @@ class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):
         Returns the User Enrollment information.
         """
         course = get_course_by_id(course_id, depth=0)
-        is_course_staff = has_access(user, 'staff', course)
+        is_course_staff = bool(has_access(user, 'staff', course))
 
         # check the user enrollment role
         if user.is_staff:

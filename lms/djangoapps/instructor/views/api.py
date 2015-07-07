@@ -2188,7 +2188,7 @@ def list_forum_members(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
+    has_instructor_access = bool(has_access(request.user, 'instructor', course))
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -2311,7 +2311,7 @@ def update_forum_role_membership(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
+    has_instructor_access = bool(has_access(request.user, 'instructor', course))
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )

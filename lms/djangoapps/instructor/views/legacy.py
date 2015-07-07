@@ -83,7 +83,7 @@ def instructor_dashboard(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
-    instructor_access = has_access(request.user, 'instructor', course)   # an instructor can manage staff lists
+    instructor_access = bool(has_access(request.user, 'instructor', course))   # an instructor can manage staff lists
 
     forum_admin_access = has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR)
 
