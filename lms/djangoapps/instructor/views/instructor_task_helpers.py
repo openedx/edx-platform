@@ -121,6 +121,8 @@ def extract_task_features(task):
         except ValueError:
             log.error("Could not parse task output as valid json; task output: %s", task.task_output)
         else:
+            if isinstance(task_output, int):
+                task_output = {'duration_ms': task_output}
             if 'duration_ms' in task_output:
                 duration_sec = int(task_output['duration_ms'] / 1000.0)
     task_feature_dict['duration_sec'] = duration_sec
