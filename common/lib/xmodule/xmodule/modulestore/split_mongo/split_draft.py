@@ -299,7 +299,15 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         return super(DraftVersioningModuleStore, self).get_block_original_usage(usage_key)
 
     def get_orphans(self, course_key, **kwargs):
-        course_key = self._map_revision_to_branch(course_key)
+        if course_key.branch is None:
+            draft_key = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
+            draft_orphans = super(DraftVersioningModuleStore,
+                                  self).get_orphans(course_key, **kwargs)
+            pub_key = course_key.for_branch(
+                            ModuleStoreEnum.BranchName.published)
+            pub_orphans = super(DraftVersioningModuleStore,
+                                self).get_orphans(pub_key, **kwargs)
+            return draft_orphans + pub_orphans
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
     def fix_not_found(self, course_key, user_id):
