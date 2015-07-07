@@ -5,6 +5,7 @@ import unittest
 import datetime
 
 import pytz
+from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -26,6 +27,7 @@ TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
     "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY,
 })
+@patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
 class CreditCourseDashboardTest(ModuleStoreTestCase):
     """
     Tests for credit courses on the student dashboard.
