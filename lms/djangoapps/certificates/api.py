@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 
 from certificates.models import (
@@ -216,13 +217,18 @@ def generate_example_certificates(course_key):
 
 def has_html_certificates_enabled(course_key, course=None):
     """
-    It determines if course has html certificates enabled
+    Determine if a course has html certificates enabled.
+
+    Arguments:
+        course_key (CourseKey|str): A course key or a string representation
+            of one.
+        course (CourseDescriptor|CourseOverview): A course.
     """
     html_certificates_enabled = False
     try:
         if not isinstance(course_key, CourseKey):
             course_key = CourseKey.from_string(course_key)
-        course = course if course else modulestore().get_course(course_key, depth=0)
+        course = course if course else CourseOverview.get_from_id(course_key)
         if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and course.cert_html_view_enabled:
             html_certificates_enabled = True
     except:  # pylint: disable=bare-except

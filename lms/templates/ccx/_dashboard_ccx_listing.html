@@ -1,4 +1,4 @@
-<%page args="ccx, membership, course, show_courseware_link, is_course_blocked" />
+<%page args="ccx, membership, course_overview, show_courseware_link, is_course_blocked" />
 
 <%!
 from django.utils.translation import ugettext as _
@@ -7,7 +7,7 @@ from courseware.courses import course_image_url, get_course_about_section
 from ccx_keys.locator import CCXLocator
 %>
 <%
-  ccx_target = reverse('info', args=[CCXLocator.from_course_locator(course.id, ccx.id)])
+  ccx_target = reverse('info', args=[CCXLocator.from_course_locator(course_overview.id, ccx.id)])
 %>
 <li class="course-item">
   <article class="course">
@@ -16,16 +16,16 @@ from ccx_keys.locator import CCXLocator
         % if show_courseware_link:
           % if not is_course_blocked:
               <a href="${ccx_target}" class="cover">
-                <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+                <img src="${course_overview.course_image_url}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course_overview.number, ccx_name=ccx.display_name) |h}" />
               </a>
           % else:
               <a class="fade-cover">
-                <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+                <img src="${course_overview.course_image_url}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course_overview.number, ccx_name=ccx.display_name) |h}" />
               </a>
           % endif
         % else:
           <a class="cover">
-            <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+            <img src="${course_overview.course_image_url}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course_overview.number, ccx_name=ccx.display_name) |h}" />
           </a>
         % endif
       </div>
@@ -43,7 +43,7 @@ from ccx_keys.locator import CCXLocator
         </h3>
         <div class="course-info">
           <span class="info-university">${get_course_about_section(course, 'university')} - </span>
-          <span class="info-course-id">${course.display_number_with_default | h}</span>
+          <span class="info-course-id">${course_overview.display_number_with_default | h}</span>
           <span class="info-date-block" data-tooltip="Hi">
           % if ccx.has_ended():
             ${_("Ended - {end_date}").format(end_date=ccx.end_datetime_text("SHORT_DATE"))}
