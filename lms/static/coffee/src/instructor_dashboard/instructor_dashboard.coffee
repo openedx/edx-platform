@@ -182,6 +182,9 @@ setup_instructor_dashboard_sections = (idash_content) ->
   ,
     constructor: window.InstructorDashboard.sections.Certificates
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#certificates"
+  ,
+    constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#proctoring"
   ]
 
   sections_to_initialize.map ({constructor, $element}) ->
