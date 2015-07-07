@@ -1990,6 +1990,9 @@ input[name="subject"] {
     }
   }
 }
+.special-allowance-container{
+  @extend .ecommerce-wrapper;
+}
 
 .rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
 .rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
