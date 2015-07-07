@@ -4,7 +4,7 @@ define(['jquery',
         'teams/js/models/topic'],
     function ($, _, TopicCardView, Topic) {
 
-        describe('topic card view', function () {
+        describe('Topic card view', function () {
             var createTopicCardView = function() {
                 return new TopicCardView({
                     model: new Topic({
