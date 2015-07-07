@@ -89,6 +89,8 @@ urlpatterns = (
     # Video Abstraction Layer used to allow video teams to manage video assets
     # independently of courseware. https://github.com/edx/edx-val
     url(r'^api/val/v0/', include('edxval.urls')),
+
+    url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
 )
 
 # Full Course/Library Import/Export API
