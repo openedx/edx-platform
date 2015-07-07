@@ -124,7 +124,8 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'namespace': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'namespace': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'order': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'})
         },
         'credit.creditrequirementstatus': {
             'Meta': {'unique_together': "(('username', 'requirement'),)", 'object_name': 'CreditRequirementStatus'},
