@@ -28,15 +28,23 @@ define([
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
                         registerUrl: '/auth/login/facebook/?auth_entry=account_register'
                     }
+                ],
+                secondaryProviders: [
+                    {
+                        id: 'saml-harvard',
+                        name: 'Harvard',
+                        iconClass: 'fa-university',
+                        loginUrl: '/auth/login/tpa-saml/?auth_entry=account_login&idp=harvard',
+                        registerUrl: '/auth/login/tpa-saml/?auth_entry=account_register&idp=harvard'
+                    }
                 ]
-            },
-            HINTED_PROVIDER = "oa2-google-oauth2";
+            };
 
-        var createHintedLoginView = function(test) {
+        var createHintedLoginView = function(hintedProvider) {
             // Initialize the login view
             view = new HintedLoginView({
                 thirdPartyAuth: THIRD_PARTY_AUTH,
-                hintedProvider: HINTED_PROVIDER,
+                hintedProvider: hintedProvider,
                 platformName: PLATFORM_NAME
             });
 
@@ -52,15 +60,23 @@ define([
         });
 
         it('displays a choice as two buttons', function() {
-            createHintedLoginView(this);
+            createHintedLoginView("oa2-google-oauth2");
 
             expect($('.proceed-button.button-oa2-google-oauth2')).toBeVisible();
             expect($('.form-toggle')).toBeVisible();
             expect($('.proceed-button.button-oa2-facebook')).not.toBeVisible();
         });
 
+        it('works with secondary providers as well', function() {
+            createHintedLoginView("saml-harvard");
+
+            expect($('.proceed-button.button-saml-harvard')).toBeVisible();
+            expect($('.form-toggle')).toBeVisible();
+            expect($('.proceed-button.button-oa2-google-oauth2')).not.toBeVisible();
+        });
+
         it('redirects the user to the hinted provider if the user clicks the proceed button', function() {
-            createHintedLoginView(this);
+            createHintedLoginView("oa2-google-oauth2");
 
             // Click the "Yes, proceed" button
             $('.proceed-button').click();
