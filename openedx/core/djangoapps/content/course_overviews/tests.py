@@ -6,13 +6,16 @@ import ddt
 import itertools
 import pytz
 import math
+import mock
 
 from django.utils import timezone
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from lms.djangoapps.courseware.courses import course_image_url
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_mongo_calls_range
 
@@ -41,12 +44,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
          - the CourseDescriptor itself
          - a CourseOverview that was newly constructed from _create_from_course
          - a CourseOverview that was loaded from the MySQL database
+
+        Arguments:
+            course (CourseDescriptor): the course to be checked.
         """
 
         def get_seconds_since_epoch(date_time):
             """
             Returns the number of seconds between the Unix Epoch and the given
                 datetime. If the given datetime is None, return None.
+
+            Arguments:
+                date_time (datetime): the datetime in question.
             """
             if date_time is None:
                 return None
@@ -189,18 +198,14 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         by comparing pairs of them given a variety of scenarios.
 
         Arguments:
-            course_kwargs (dict): kwargs to be passed to course constructor
-            modulestore_type (ModuleStoreEnum.Type)
-            is_user_enrolled (bool)
+            course_kwargs (dict): kwargs to be passed to course constructor.
+            modulestore_type (ModuleStoreEnum.Type): type of store to create the
+                course in.
         """
-
-        course = CourseFactory.create(
-            course="TEST101",
-            org="edX",
-            run="Run1",
-            default_store=modulestore_type,
-            **course_kwargs
-        )
+        # Note: We specify a value for 'run' here because, for some reason,
+        # .create raises an InvalidKeyError if we don't (even though my
+        # other test functions don't specify a run but work fine).
+        course = CourseFactory.create(default_store=modulestore_type, run="TestRun", **course_kwargs)
         self.check_course_overview_against_course(course)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -208,17 +213,15 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         """
         Tests that when a course is published, the corresponding
         course_overview is removed from the cache.
+
+        Arguments:
+            modulestore_type (ModuleStoreEnum.Type): type of store to create the
+                course in.
         """
         with self.store.default_store(modulestore_type):
 
             # Create a course where mobile_available is True.
-            course = CourseFactory.create(
-                course="TEST101",
-                org="edX",
-                run="Run1",
-                mobile_available=True,
-                default_store=modulestore_type
-            )
+            course = CourseFactory.create(mobile_available=True, default_store=modulestore_type)
             course_overview_1 = CourseOverview.get_from_id(course.id)
             self.assertTrue(course_overview_1.mobile_available)
 
@@ -238,14 +241,16 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
     def test_course_overview_caching(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
         Tests that CourseOverview structures are actually getting cached.
+
+        Arguments:
+            modulestore_type (ModuleStoreEnum.Type): type of store to create the
+                course in.
+            min_mongo_calls (int): minimum number of MongoDB queries we expect
+                to be made.
+            max_mongo_calls (int): maximum number of MongoDB queries we expect
+                to be made.
         """
-        course = CourseFactory.create(
-            course="TEST101",
-            org="edX",
-            run="Run1",
-            mobile_available=True,
-            default_store=modulestore_type
-        )
+        course = CourseFactory.create(default_store=modulestore_type)
 
         # The first time we load a CourseOverview, it will be a cache miss, so
         # we expect the modulestore to be queried.
@@ -256,3 +261,36 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         # we expect no modulestore queries to be made.
         with check_mongo_calls(0):
             _course_overview_2 = CourseOverview.get_from_id(course.id)
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_get_non_existent_course(self, modulestore_type):
+        """
+        Tests that requesting a non-existent course from get_from_id raises
+        CourseOverview.DoesNotExist.
+
+        Arguments:
+            modulestore_type (ModuleStoreEnum.Type): type of store to create the
+                course in.
+        """
+        store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
+        with self.assertRaises(CourseOverview.DoesNotExist):
+            CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_get_errored_course(self, modulestore_type):
+        """
+        Test that getting an ErrorDescriptor back from the module store causes
+        get_from_id to raise an IOError.
+
+        Arguments:
+            modulestore_type (ModuleStoreEnum.Type): type of store to create the
+                course in.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        mock_get_course = mock.Mock(return_value=ErrorDescriptor)
+        with mock.patch('xmodule.modulestore.mixed.MixedModuleStore.get_course', mock_get_course):
+            # This mock makes it so when the module store tries to load course data,
+            # an exception is thrown, which causes get_course to return an ErrorDescriptor,
+            # which causes get_from_id to raise an IOError.
+            with self.assertRaises(IOError):
+                CourseOverview.get_from_id(course.id)

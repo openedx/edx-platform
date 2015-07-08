@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
+Miscellaneous tests for the student app.
 """
 from datetime import datetime, timedelta
 import logging
@@ -28,8 +25,8 @@ from student.views import (process_survey_link, _cert_info,
 from student.tests.factories import UserFactory, CourseModeFactory
 from util.testing import EventTestMixin
 from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ModuleStoreEnum
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
@@ -193,6 +190,7 @@ class CourseEndingTest(TestCase):
         self.assertIsNone(_cert_info(user, course2, cert_status, course_mode))
 
 
+@ddt.ddt
 class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
@@ -486,6 +484,48 @@ class DashboardTest(ModuleStoreTestCase):
             'source=o'
         )
         self.assertContains(response, expected_url)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1), (ModuleStoreEnum.Type.split, 3))
+    @ddt.unpack
+    def test_dashboard_metadata_caching(self, modulestore_type, expected_mongo_calls):
+        """
+        Check that the student dashboard makes use of course metadata caching.
+
+        The first time the student dashboard displays a specific course, it will
+        make a call to the module store. After that first request, though, the
+        course's metadata should be cached as a CourseOverview.
+
+        Arguments:
+            modulestore_type (ModuleStoreEnum.Type): Type of modulestore to create
+                test course in.
+            expected_mongo_calls (int >=0): Number of MongoDB queries expected for
+                a single call to the module store.
+
+        Note to future developers:
+            If you break this test so that the "check_mongo_calls(0)" fails,
+            please do NOT change it to "check_mongo_calls(n>1)". Instead, change
+            your code to not load courses from the module store. This may
+            involve adding fields to CourseOverview so that loading a full
+            CourseDescriptor isn't necessary.
+        """
+        # Create a course, log in the user, and enroll them in the course.
+        test_course = CourseFactory.create(default_store=modulestore_type)
+        self.client.login(username="jack", password="test")
+        CourseEnrollment.enroll(self.user, test_course.id)
+
+        # The first request will result in a modulestore query.
+        with check_mongo_calls(expected_mongo_calls):
+            response_1 = self.client.get(reverse('dashboard'))
+            self.assertEquals(response_1.status_code, 200)
+
+        # Subsequent requests will only result in SQL queries to load the
+        # CourseOverview object that has been created.
+        with check_mongo_calls(0):
+            response_2 = self.client.get(reverse('dashboard'))
+            self.assertEquals(response_2.status_code, 200)
+            response_3 = self.client.get(reverse('dashboard'))
+            self.assertEquals(response_3.status_code, 200)
 
 
 class UserSettingsEventTestMixin(EventTestMixin):

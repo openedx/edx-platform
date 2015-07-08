@@ -33,6 +33,7 @@ from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -100,6 +101,9 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseDescriptor):
         return _has_access_course_desc(user, action, obj)
 
+    if isinstance(obj, CourseOverview):
+        return _has_access_course_overview(user, action, obj)
+
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, action, obj, course_key)
 
@@ -129,6 +133,87 @@ def has_access(user, action, obj, course_key=None):
 
 
 # ================ Implementation helpers ================================
+def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
+    """
+    Checks if a user has access to a descriptor based on its start date.
+
+    If there is no start date specified, grant access.
+    Else, check if we're past the start date.
+
+    Note:
+        We do NOT check whether the user is staff or if the descriptor
+        is detached... it is assumed both of these are checked by the caller.
+
+    Arguments:
+        user (User): the user whose descriptor access we are checking.
+        descriptor (AType): the descriptor for which we are checking access.
+    where AType is any descriptor that has the attributes .location and
+        .days_early_for_beta
+    """
+    start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
+    if start_dates_disabled and not is_masquerading_as_student(user, course_key):
+        return True
+    else:
+        now = datetime.now(UTC())
+        effective_start = _adjust_start_date_for_beta_testers(
+            user,
+            descriptor,
+            course_key=course_key
+        )
+        return (
+            descriptor.start is None
+            or now > effective_start
+            or in_preview_mode()
+        )
+
+
+def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
+    """
+    Checks if a user has access to a course based on its prerequisites.
+
+    If the user is staff or anonymous, immediately grant access.
+    Else, return whether or not the prerequisite courses have been passed.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        course (AType): the course for which we are checking access.
+    where AType is CourseDescriptor, CourseOverview, or any other class that
+        represents a course and has the attributes .location and .id.
+    """
+    return (
+        not settings.FEATURES['ENABLE_PREREQUISITE_COURSES']
+        or _has_staff_access_to_descriptor(user, course, course.id)
+        or not course.pre_requisite_courses
+        or user.is_anonymous()
+        or not get_pre_requisite_courses_not_completed(user, [course.id])
+    )
+
+
+def _can_load_course_on_mobile(user, course):
+    """
+    Checks if a user can view the given course on a mobile device.
+
+    This function only checks mobile-specific access restrictions. Other access
+    restrictions such as start date and the .visible_to_staff_only flag must
+    be checked by callers in *addition* to the return value of this function.
+
+    Arguments:
+        user (User): the user whose course access  we are checking.
+        course (CourseDescriptor|CourseOverview): the course for which we are
+            checking access.
+
+    Returns:
+        bool: whether the course can be accessed on mobile.
+    """
+    return (
+        is_mobile_available_for_user(user, course) and
+        (
+            _has_staff_access_to_descriptor(user, course, course.id) or
+            not any_unfulfilled_milestones(course.id, user.id)
+        )
+    )
+
+
 def _has_access_course_desc(user, action, course):
     """
     Check if user has access to a course descriptor.
@@ -153,23 +238,6 @@ def _has_access_course_desc(user, action, course):
         """
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, 'load', course, course.id)
-
-    def can_load_mobile():
-        """
-        Can this user access this course from a mobile device?
-        """
-        return (
-            # check start date
-            can_load() and
-            # check mobile_available flag
-            is_mobile_available_for_user(user, course) and
-            (
-                # either is a staff user or
-                _has_staff_access_to_descriptor(user, course, course.id) or
-                # check for unfulfilled milestones
-                not any_unfulfilled_milestones(course.id, user.id)
-            )
-        )
 
     def can_enroll():
         """
@@ -274,25 +342,11 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
-    def can_view_courseware_with_prerequisites():  # pylint: disable=invalid-name
-        """
-        Checks if prerequisite courses feature is enabled and course has prerequisites
-        and user is neither staff nor anonymous then it returns False if user has not
-        passed prerequisite courses otherwise return True.
-        """
-        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
-                and not _has_staff_access_to_descriptor(user, course, course.id) \
-                and course.pre_requisite_courses \
-                and not user.is_anonymous() \
-                and get_pre_requisite_courses_not_completed(user, [course.id]):
-            return False
-        else:
-            return True
-
     checkers = {
         'load': can_load,
-        'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
-        'load_mobile': can_load_mobile,
+        'view_courseware_with_prerequisites':
+            lambda: _can_view_courseware_with_prerequisites(user, course),
+        'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, course),
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
@@ -302,6 +356,51 @@ def _has_access_course_desc(user, action, course):
     }
 
     return _dispatch(checkers, action, user, course)
+
+
+def _can_load_course_overview(user, course_overview):
+    """
+    Check if a user can load a course overview.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        course_overview (CourseOverview): a course overview.
+
+    Note:
+        The user doesn't have to be enrolled in the course in order to have load
+        load access.
+    """
+    return (
+        not course_overview.visible_to_staff_only
+        and _can_access_descriptor_with_start_date(user, course_overview, course_overview.id)
+    ) or _has_staff_access_to_descriptor(user, course_overview, course_overview.id)
+
+
+_COURSE_OVERVIEW_CHECKERS = {
+    'load': _can_load_course_overview,
+    'load_mobile': lambda user, course_overview: (
+        _can_load_course_overview(user, course_overview)
+        and _can_load_course_on_mobile(user, course_overview)
+    ),
+    'view_courseware_with_prerequisites': _can_view_courseware_with_prerequisites
+}
+COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()  # pylint: disable=invalid-name
+
+
+def _has_access_course_overview(user, action, course_overview):
+    """
+    Check if user has access to a course overview.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        action (str): the action the user is trying to perform.
+            See COURSE_OVERVIEW_SUPPORTED_ACTIONS for valid values.
+        course_overview (CourseOverview): overview of the course in question.
+    """
+    if action in _COURSE_OVERVIEW_CHECKERS:
+        return _COURSE_OVERVIEW_CHECKERS[action](user, course_overview)
+    else:
+        raise ValueError(u"Unknown action for object type 'CourseOverview': '{}'".format(action))
 
 
 def _has_access_error_desc(user, action, descriptor, course_key):
@@ -408,38 +507,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-        if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
-            return False
-
-        # enforce group access
-        if not _has_group_access(descriptor, user, course_key):
-            # if group_access check failed, deny access unless the requestor is staff,
-            # in which case immediately grant access.
-            return _has_staff_access_to_descriptor(user, descriptor, course_key)
-
-        # If start dates are off, can always load
-        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user, course_key):
-            debug("Allow: DISABLE_START_DATES")
-            return True
-
-        # Check start date
-        if 'detached' not in descriptor._class_tags and descriptor.start is not None:
-            now = datetime.now(UTC())
-            effective_start = _adjust_start_date_for_beta_testers(
-                user,
-                descriptor,
-                course_key=course_key
+        return (
+            not descriptor.visible_to_staff_only
+            and _has_group_access(descriptor, user, course_key)
+            and (
+                'detached' in descriptor._class_tags  # pylint: disable=protected-access
+                or _can_access_descriptor_with_start_date(user, descriptor, course_key)
             )
-            if in_preview_mode() or now > effective_start:
-                # after start date, everyone can see it
-                debug("Allow: now > effective start date")
-                return True
-            # otherwise, need staff access
-            return _has_staff_access_to_descriptor(user, descriptor, course_key)
-
-        # No start date, so can always load.
-        debug("Allow: no start date")
-        return True
+        ) or _has_staff_access_to_descriptor(user, descriptor, course_key)
 
     checkers = {
         'load': can_load,
@@ -700,4 +775,4 @@ def in_preview_mode():
     Returns whether the user is in preview mode or not.
     """
     hostname = get_current_request_hostname()
-    return hostname and settings.PREVIEW_DOMAIN in hostname.split('.')
+    return bool(hostname and settings.PREVIEW_DOMAIN in hostname.split('.'))

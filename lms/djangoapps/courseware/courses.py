@@ -152,6 +152,16 @@ def find_file(filesystem, dirs, filename):
     raise ResourceNotFoundError(u"Could not find {0}".format(filename))
 
 
+def get_course_university_about_section(course):  # pylint: disable=invalid-name
+    """
+    Returns a snippet of HTML displaying the course's university.
+
+    Arguments:
+        course (CourseDescriptor|CourseOverview): A course.
+    """
+    return course.display_org_with_default
+
+
 def get_course_about_section(course, section_key):
     """
     This returns the snippet of html to be rendered on the course about page,
@@ -227,7 +237,7 @@ def get_course_about_section(course, section_key):
     elif section_key == "title":
         return course.display_name_with_default
     elif section_key == "university":
-        return course.display_org_with_default
+        return get_course_university_about_section(course)
     elif section_key == "number":
         return course.display_number_with_default
 

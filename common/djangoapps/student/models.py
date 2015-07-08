@@ -850,6 +850,13 @@ class CourseEnrollment(models.Model):
         unique_together = (('user', 'course_id'),)
         ordering = ('user', 'course_id')
 
+    def __init__(self, *args, **kwargs):
+        super(CourseEnrollment, self).__init__(*args, **kwargs)
+
+        # Private variable for storing course_overview to minimize calls to the database.
+        # When the property .course_overview is accessed for the first time, this variable will be set.
+        self._course_overview = None
+
     def __unicode__(self):
         return (
             "[CourseEnrollment] {}: {} ({}); active: ({})"
@@ -1318,10 +1325,21 @@ class CourseEnrollment(models.Model):
     @property
     def course_overview(self):
         """
-        Return a CourseOverview of this enrollment's course.
-        """
-        from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-        return CourseOverview.get_from_id(self.course_id)
+        Returns a CourseOverview of the course to which this enrollment refers.
+        Returns None if an error occurred while trying to load the course.
+
+        Note:
+            If the course is re-published within the lifetime of this
+            CourseEnrollment object, then the value of this property will
+            become stale.
+       """
+        if not self._course_overview:
+            from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+            try:
+                self._course_overview = CourseOverview.get_from_id(self.course_id)
+            except (CourseOverview.DoesNotExist, IOError):
+                self._course_overview = None
+        return self._course_overview
 
     def is_verified_enrollment(self):
         """
