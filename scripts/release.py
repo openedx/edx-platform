@@ -403,7 +403,7 @@ def generate_pr_table(start_ref, end_ref):
     """
     Return a UTF-8 string corresponding to a pull request table to embed in Confluence.
     """
-    header = "|| Merged By || Author || Title || PR || JIRA || Verified? ||"
+    header = "|| Merged By || Author || Title || PR || JIRA || Release Notes? || Verified? ||"
     pr_link = "[#{num}|https://github.com/edx/edx-platform/pull/{num}]"
     user_link = "[@{user}|https://github.com/{user}]"
     rows = [header]
@@ -424,12 +424,13 @@ def generate_pr_table(start_ref, end_ref):
                 title = "?"
                 body = "?"
                 author = ""
-            rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {verified} |".format(
+            rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {release_notes} | {verified} |".format(
                 merged_by=email if i == 0 else "",
                 author=user_link.format(user=author) if author else "",
                 title=title.replace("|", "\|").replace('{', '\{').replace('}', '\}'),
                 pull_request=pr_link.format(num=pull_request),
                 jira=", ".join(parse_ticket_references(body)),
+                release_notes="",
                 verified="",
             ))
     return "\n".join(rows).encode("utf8")
@@ -455,16 +456,17 @@ def generate_commit_table(start_ref, end_ref):
     The commits in the table should only be commits that are not in the
     pull request table.
     """
-    header = "|| Author || Summary || Commit || JIRA || Verified? ||"
+    header = "|| Author || Summary || Commit || JIRA || Release Notes? || Verified? ||"
     commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
     rows = [header]
     commits = get_commits_not_in_prs(start_ref, end_ref)
     for commit in commits:
-        rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
+        rows.append("| {author} | {summary} | {commit} | {jira} | {release_notes} | {verified} |".format(
             author=commit.author.email,
             summary=commit.summary.replace("|", "\|"),
             commit=commit_link.format(sha=commit.hexsha),
             jira=", ".join(parse_ticket_references(commit.message)),
+            release_notes="",
             verified="",
         ))
     return "\n".join(rows)
