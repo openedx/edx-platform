@@ -47,7 +47,6 @@
             "underscore.string": "js/vendor/underscore.string.min",
             "jquery": "js/vendor/jquery.min",
             "jquery.cookie": "js/vendor/jquery.cookie",
-            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
             "jquery.url": "js/vendor/url.min",
             "jquery.ui": "js/vendor/jquery-ui.min",
             "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
@@ -74,7 +73,9 @@
             "osda": 'js/vendor/ova/OpenSeaDragonAnnotation',
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
-            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2'
+            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
+            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min"
             // end of files needed by OVA
         },
         shim: {
@@ -102,6 +103,10 @@
             "jquery.fileupload": {
                 deps: ["jquery.ui", "jquery.iframe-transport"],
                 exports: "jQuery.fn.fileupload"
+            },
+            "jquery.tinymce": {
+                deps: ["jquery", "tinymce"],
+                exports: "jQuery.fn.tinymce"
             },
             "underscore": {
                 exports: "_"
@@ -174,6 +179,9 @@
                     "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars",
                     "URI"
                 ]
+            },
+            "tinymce": {
+                exports: "tinymce"
             }
             // End of needed by OVA
         }
