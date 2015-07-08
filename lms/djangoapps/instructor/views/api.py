@@ -274,7 +274,7 @@ def require_sales_admin(func):
             log.error(u"Unable to find course with course key %s", course_id)
             return HttpResponseNotFound()
 
-        access = auth.has_access(request.user, CourseSalesAdminRole(course_key))
+        access = auth.has_role(request.user, CourseSalesAdminRole(course_key))
 
         if access:
             return func(request, course_id)
@@ -299,7 +299,7 @@ def require_finance_admin(func):
             log.error(u"Unable to find course with course key %s", course_id)
             return HttpResponseNotFound()
 
-        access = auth.has_access(request.user, CourseFinanceAdminRole(course_key))
+        access = auth.has_role(request.user, CourseFinanceAdminRole(course_key))
 
         if access:
             return func(request, course_id)
@@ -2188,7 +2188,7 @@ def list_forum_members(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
+    has_instructor_access = bool(has_access(request.user, 'instructor', course))
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -2311,7 +2311,7 @@ def update_forum_role_membership(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
+    has_instructor_access = bool(has_access(request.user, 'instructor', course))
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
