@@ -1383,11 +1383,9 @@ class TestRebindModule(TestSubmittingProblems):
 
     def test_rebind_module_to_new_users(self):
         module = self.get_module_for_user(self.user, self.problem)
-        # read a mutable field, scoped to a single user,
-        # in order to mark it as dirty
-        module.correct_map
 
         correct_map_field = module.fields['correct_map']
+        # pylint: disable=protected-access
         self.assertIn(correct_map_field, module._dirty_fields)
         self.assertIn(correct_map_field.name, module._field_data_cache)
 
@@ -1395,6 +1393,7 @@ class TestRebindModule(TestSubmittingProblems):
         # from the module's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
         module.descriptor.bind_for_student(module.system, user2.id)
+        # pylint: disable=protected-access
         self.assertNotIn(correct_map_field, module._dirty_fields)
         self.assertNotIn(correct_map_field.name, module._field_data_cache)
 

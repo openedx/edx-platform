@@ -590,8 +590,9 @@ class XModuleMixin(XModuleFields, XBlock):
                 # not the most elegant way of doing this, but if we're removing
                 # a field from the module's field_data_cache, we should also
                 # remove it from its _dirty_fields
+                # pylint: disable=protected-access
                 if field in self._dirty_fields:
-                    del self._dirty_fields[field]  # pylint: disable=protected-access
+                    del self._dirty_fields[field]
 
         # Set the new xmodule_runtime and field_data (which are user-specific)
         self.xmodule_runtime = xmodule_runtime
