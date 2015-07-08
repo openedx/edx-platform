@@ -126,9 +126,12 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertEqual(len(self.certificates_page.certificates), 1)
 
-        # Delete certificate
-        certificate.delete_certificate()
+        # Delete the certificate we just created
+        certificate.click_delete_certificate_button()
+        self.certificates_page.click_confirmation_prompt_primary_button()
+        self.certificates_page.wait_for_first_certificate_button()
 
+        # Reload the page and confirm there are no certificates
         self.certificates_page.visit()
         self.assertEqual(len(self.certificates_page.certificates), 0)
 

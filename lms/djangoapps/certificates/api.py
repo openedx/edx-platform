@@ -154,7 +154,11 @@ def set_cert_generation_enabled(course_key, is_enabled):
 
     """
     CertificateGenerationCourseSetting.set_enabled_for_course(course_key, is_enabled)
-
+    cert_event_type = 'enabled' if is_enabled else 'disabled'
+    event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
+    tracker.emit(event_name, {
+        'course_id': unicode(course_key),
+    })
     if is_enabled:
         log.info(u"Enabled self-generated certificates for course '%s'.", unicode(course_key))
     else:
