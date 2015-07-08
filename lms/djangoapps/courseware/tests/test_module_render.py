@@ -1384,18 +1384,10 @@ class TestRebindModule(TestSubmittingProblems):
     def test_rebind_module_to_new_users(self):
         module = self.get_module_for_user(self.user, self.problem)
 
-        correct_map_field = module.fields['correct_map']
-        # pylint: disable=protected-access
-        self.assertIn(correct_map_field, module._dirty_fields)
-        self.assertIn(correct_map_field.name, module._field_data_cache)
-
         # Bind the module to another student, which will remove "correct_map"
         # from the module's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
         module.descriptor.bind_for_student(module.system, user2.id)
-        # pylint: disable=protected-access
-        self.assertNotIn(correct_map_field, module._dirty_fields)
-        self.assertNotIn(correct_map_field.name, module._field_data_cache)
 
         # XBlock's save method assumes that if a field is in _dirty_fields,
         # then it's also in _field_data_cache. If this assumption
