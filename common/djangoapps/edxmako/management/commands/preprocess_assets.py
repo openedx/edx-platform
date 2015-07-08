@@ -8,23 +8,59 @@ For this to work, assets need to be named with the appropriate
 template extension (e.g., .mako for Mako templates). Currently Mako
 is the only template engine supported.
 """
+
+import glob
 import os
-
-from django.core.management.base import NoArgsCommand
-from django.conf import settings
-
-from mako.template import Template
 import textwrap
 
+from django.core.management.base import BaseCommand
+from django.conf import settings
 
-class Command(NoArgsCommand):
+
+class Command(BaseCommand):
     """
     Basic management command to preprocess asset template files.
     """
 
     help = "Preprocess asset template files to ready them for compilation."
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
+        theme_name = getattr(settings, "THEME_NAME", None)
+        use_custom_theme = settings.FEATURES.get("USE_CUSTOM_THEME", False)
+        if not use_custom_theme or not theme_name:
+            # No custom theme, nothing to do!
+            return
+
+        dest_dir = args[-1]
+        for source_file in args[:-1]:
+            self.process_one_file(source_file, dest_dir, theme_name)
+
+    def process_one_file(self, source_file, dest_dir, theme_name):
+        with open(source_file) as fsource:
+            original_content = content = fsource.read()
+
+        content = content.replace(
+            "//<THEME-OVERRIDE>",
+            "@import '{}';".format(theme_name),
+            )
+
+        if content != original_content:
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+            dest_file = os.path.join(dest_dir, os.path.basename(source_file))
+            with open(dest_file, "w") as fout:
+                fout.write(textwrap.dedent("""\
+                /*
+                 * This file is dynamically generated and ignored by Git.
+                 * DO NOT MAKE CHANGES HERE. Instead, go edit its source:
+                 * {}
+                 */
+                \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+                """.format(source_file)))
+                fout.write(content)
+
+
+    def xxxx___handle_noargs(self, **options):
         """
         Walk over all of the static files directories specified in the
         settings file, looking for asset template files (indicated by
@@ -42,33 +78,8 @@ class Command(NoArgsCommand):
                 for filename in files:
                     outfile, extension = os.path.splitext(filename)
                     # We currently only handle Mako templates
+                    if extension == ".scss":
+                        print("* {}/{}".format(root, filename))
                     if extension == ".mako":
                         self.__preprocess(os.path.join(root, filename),
                                           os.path.join(root, outfile))
-
-    def __context(self):
-        """
-        Return a dict that contains all of the available context
-        variables to the asset template.
-        """
-        # TODO: do we need to include anything else?
-        # TODO: do this with the django-settings-context-processor
-        return {
-            "FEATURES": settings.FEATURES,
-            "THEME_NAME": getattr(settings, "THEME_NAME", None),
-        }
-
-    def __preprocess(self, infile, outfile):
-        """
-        Run `infile` through the Mako template engine, storing the
-        result in `outfile`.
-        """
-        with open(outfile, "w") as _outfile:
-            _outfile.write(textwrap.dedent("""\
-            /*
-             * This file is dynamically generated and ignored by Git.
-             * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
-             * %s
-             */
-            """ % infile))
-            _outfile.write(Template(filename=str(infile)).render(env=self.__context()))
