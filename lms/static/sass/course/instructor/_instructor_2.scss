@@ -1925,6 +1925,76 @@ input[name="subject"] {
 }
 .special-allowance-container{
   @extend .ecommerce-wrapper;
+  .allowance-table {
+    width: 100%;
+    tr:nth-child(even){
+        background-color: $gray-l6;
+        border-bottom: 1px solid #f3f3f3;
+      }
+    .allowance-headings {
+      height: 40px;
+      border-bottom: 1px solid #BEBEBE;
+
+      th:nth-child(5){
+        text-align: center;
+        width: 120px;
+      }
+      th:first-child{
+        padding-left: $baseline;
+      }
+      th {
+        text-align: left;
+        border-bottom: 1px solid $border-color-1;
+        font-size: 16px;
+
+        &.exam-name {
+          width: 150px;
+        }
+        &.username {
+          width: 140px;
+        }
+        &.email {
+          width: 250px;
+          word-wrap: break-word;
+        }
+        &.allowance-name {
+          width: 140px;
+        }
+        &.allowance-value {
+          width: 150px;
+        }
+        &.c_action {
+          width: 60px;
+        }
+      }
+    }
+    // allowance-items style
+    .allowance-items {
+      td {
+        padding: ($baseline/2) 0;
+        position: relative;
+        line-height: normal;
+        font-size: 14px;
+      }
+      td:nth-child(5),td:first-child{
+        @include padding-left($baseline);
+      }
+      td:nth-child(2){
+        line-height: 22px;
+        @include padding-right(0px);
+        word-wrap: break-word;
+      }
+      td:nth-child(5){
+        @include padding-left(0);
+        text-align: center;
+      }
+      td{
+        a.remove_allowance{
+          @include margin-left(15px);
+        }
+      }
+    }
+  }
 }
 
 .rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
