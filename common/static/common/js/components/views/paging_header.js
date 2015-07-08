@@ -16,9 +16,9 @@
 
             render: function () {
                 var message,
-                    start = this.collection.start,
+                    start = _.isUndefined(this.collection.start) ? 0 : this.collection.start,
                     end = start + this.collection.length,
-                    num_items = this.collection.totalCount,
+                    num_items = _.isUndefined(this.collection.totalCount) ? 0 : this.collection.totalCount,
                     context = {first_index: Math.min(start + 1, end), last_index: end, num_items: num_items};
                 if (end <= 1) {
                     message = interpolate(gettext('Showing %(first_index)s out of %(num_items)s total'), context, true);

@@ -39,7 +39,7 @@ urlpatterns = patterns(
         name="topics_detail"
     ),
     url(
-        r'^v0/team_membership$',
+        r'^v0/team_membership/$',
         MembershipListView.as_view(),
         name="team_membership_list"
     ),
