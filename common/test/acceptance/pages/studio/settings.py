@@ -49,6 +49,10 @@ class SettingsPage(CoursePage):
         """
         Returns the pre-requisite course drop down field options.
         """
+        self.wait_for_element_visibility(
+            '#pre-requisite-course',
+            'Prerequisite course element is available'
+        )
         return self.get_elements('#pre-requisite-course')
 
     @property
@@ -56,6 +60,10 @@ class SettingsPage(CoursePage):
         """
         Returns the enable entrance exam checkbox.
         """
+        self.wait_for_element_visibility(
+            '#entrance-exam-enabled',
+            'Entrance exam checkbox is available'
+        )
         return self.get_element('#entrance-exam-enabled')
 
     @property
@@ -64,6 +72,10 @@ class SettingsPage(CoursePage):
         Returns the alert confirmation element, which contains text
         such as 'Your changes have been saved.'
         """
+        self.wait_for_element_visibility(
+            '#alert-confirmation-title',
+            'Alert confirmation title element is available'
+        )
         return self.get_element('#alert-confirmation-title')
 
     @property

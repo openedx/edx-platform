@@ -15,14 +15,14 @@ from rest_framework.reverse import reverse
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 
-from course_structure_api.v0 import api, serializers
-from course_structure_api.v0.errors import CourseNotFoundError, CourseStructureNotAvailableError
+from course_structure_api.v0 import serializers
 from courseware import courses
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from openedx.core.lib.api.view_utils import view_course_access, view_auth_classes
 from openedx.core.lib.api.serializers import PaginationSerializer
+from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from student.roles import CourseInstructorRole, CourseStaffRole
 from util.module_utils import get_dynamic_descriptor_children
 
@@ -73,7 +73,7 @@ class CourseViewMixin(object):
                 self.course_key = CourseKey.from_string(course_id)
                 self.check_course_permissions(self.request.user, self.course_key)
                 return func(self, *args, **kwargs)
-            except CourseNotFoundError:
+            except errors.CourseNotFoundError:
                 raise Http404
 
         return func_wrapper
@@ -262,7 +262,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
     def get(self, request, **kwargs):
         try:
             return Response(api.course_structure(self.course_key))
-        except CourseStructureNotAvailableError:
+        except errors.CourseStructureNotAvailableError:
             # If we don't have data stored, we will try to regenerate it, so
             # return a 503 and as them to retry in 2 minutes.
             return Response(status=503, headers={'Retry-After': '120'})

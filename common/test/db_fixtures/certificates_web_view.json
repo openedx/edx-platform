@@ -1,6 +1,15 @@
 [
   {
     "pk": 99,
+    "model": "certificates.certificategenerationconfiguration",
+    "fields": {
+      "change_date": "2015-06-18 11:02:13",
+      "changed_by": 99,
+      "enabled": true
+    }
+  },
+  {
+    "pk": 99,
     "model": "auth.user",
     "fields": {
       "date_joined": "2015-06-12 11:02:13",

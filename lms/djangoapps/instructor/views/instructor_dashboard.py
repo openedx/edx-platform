@@ -245,12 +245,15 @@ def _section_certificates(course):
             for cert_status in example_cert_status
         )
     )
+    instructor_generation_enabled = settings.FEATURES.get('CERTIFICATES_INSTRUCTOR_GENERATION', False)
+
     return {
         'section_key': 'certificates',
         'section_display_name': _('Certificates'),
         'example_certificate_status': example_cert_status,
         'can_enable_for_course': can_enable_for_course,
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
+        'instructor_generation_enabled': instructor_generation_enabled,
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',
@@ -259,7 +262,15 @@ def _section_certificates(course):
             'enable_certificate_generation': reverse(
                 'enable_certificate_generation',
                 kwargs={'course_id': course.id}
-            )
+            ),
+            'start_certificate_generation': reverse(
+                'start_certificate_generation',
+                kwargs={'course_id': course.id}
+            ),
+            'list_instructor_tasks_url': reverse(
+                'list_instructor_tasks',
+                kwargs={'course_id': course.id}
+            ),
         }
     }
 

@@ -63,10 +63,10 @@ class NoseTestSuite(TestSuite):
                 cmd0 = "`which {}`".format(cmd0)
 
             cmd = (
-                "python -m coverage run {cov_args} --rcfile={root}/.coveragerc "
+                "python -m coverage run {cov_args} --rcfile={rcfile} "
                 "{cmd0} {cmd_rest}".format(
                     cov_args=self.cov_args,
-                    root=self.root,
+                    rcfile=Env.PYTHON_COVERAGERC,
                     cmd0=cmd0,
                     cmd_rest=cmd_rest,
                 )

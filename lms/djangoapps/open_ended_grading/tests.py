@@ -3,7 +3,7 @@ Tests for open ended grading interfaces
 
 ./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
-
+import ddt
 import json
 import logging
 
@@ -18,15 +18,18 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from config_models.models import cache
 from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from student.models import unique_id_for_user
+from xblock_django.models import XBlockDisableConfig
 from xmodule import peer_grading_module
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
@@ -547,3 +550,39 @@ class TestStudentProblemList(ModuleStoreTestCase):
         self.assertEqual(len(valid_problems), 2)
         # Ensure that human names are being set properly.
         self.assertEqual(valid_problems[0]['grader_type_display_name'], "Instructor Assessment")
+
+
+@ddt.ddt
+class TestTabs(ModuleStoreTestCase):
+    """
+    Test tabs.
+    """
+    def setUp(self):
+        super(TestTabs, self).setUp()
+        self.course = CourseFactory(advanced_modules=('combinedopenended'))
+        self.addCleanup(lambda: self._enable_xblock_disable_config(False))
+
+    def _enable_xblock_disable_config(self, enabled):
+        """ Enable or disable xblocks disable. """
+        config = XBlockDisableConfig.current()
+        config.enabled = enabled
+        config.disabled_blocks = "\n".join(('combinedopenended', 'peergrading'))
+        config.save()
+        cache.clear()
+
+    @ddt.data(
+        views.StaffGradingTab,
+        views.PeerGradingTab,
+        views.OpenEndedGradingTab,
+    )
+    def test_tabs_enabled(self, tab):
+        self.assertTrue(tab.is_enabled(self.course))
+
+    @ddt.data(
+        views.StaffGradingTab,
+        views.PeerGradingTab,
+        views.OpenEndedGradingTab,
+    )
+    def test_tabs_disabled(self, tab):
+        self._enable_xblock_disable_config(True)
+        self.assertFalse(tab.is_enabled(self.course))

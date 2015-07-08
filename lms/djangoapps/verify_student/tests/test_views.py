@@ -543,7 +543,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
         original_url = reverse(url_name, kwargs={'course_id': unicode(course.id)})
         login_url = u"{login_url}?next={original_url}".format(
-            login_url=reverse('accounts_login'),
+            login_url=reverse('signin_user'),
             original_url=original_url
         )
         self.assertRedirects(response, login_url)
@@ -1028,7 +1028,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         ecommerce api, we correctly call to that api to create a basket.
         """
         user = UserFactory.create(username="test-username")
-        course_mode = CourseModeFactory(sku="test-sku")
+        course_mode = CourseModeFactory(sku="test-sku").to_tuple()  # pylint: disable=no-member
         expected_payment_data = {'foo': 'bar'}
         # mock out the payment processors endpoint
         httpretty.register_uri(
@@ -1037,15 +1037,26 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
             body=json.dumps({'payment_data': expected_payment_data}),
             content_type="application/json",
         )
-        # call the function
-        actual_payment_data = checkout_with_ecommerce_service(user, 'dummy-course-key', course_mode, 'test-processor')
-        # check the api call
+
+        with mock.patch('verify_student.views.audit_log') as mock_audit_log:
+            # Call the function
+            actual_payment_data = checkout_with_ecommerce_service(
+                user,
+                'dummy-course-key',
+                course_mode,
+                'test-processor'
+            )
+
+            # Verify that an audit message was logged
+            self.assertTrue(mock_audit_log.called)
+
+        # Check the api call
         self.assertEqual(json.loads(httpretty.last_request().body), {
             'products': [{'sku': 'test-sku'}],
             'checkout': True,
             'payment_processor_name': 'test-processor',
         })
-        # check the response
+        # Check the response
         self.assertEqual(actual_payment_data, expected_payment_data)
 
 

@@ -29,6 +29,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 
 from commerce import ecommerce_api_client
+from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
 from ecommerce_api_client.exceptions import SlumberBaseException
@@ -617,6 +618,7 @@ class PayAndVerifyView(View):
 
 def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
     """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
+    course_id = unicode(course_key)
     try:
         api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
@@ -625,12 +627,21 @@ def checkout_with_ecommerce_service(user, course_key, course_mode, processor):  
             'checkout': True,
             'payment_processor_name': processor
         })
+
         # Pass the payment parameters directly from the API response.
         return result.get('payment_data')
     except SlumberBaseException:
-        params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
+        params = {'username': user.username, 'mode': course_mode.slug, 'course_id': course_id}
         log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise
+    finally:
+        audit_log(
+            'checkout_requested',
+            course_id=course_id,
+            mode=course_mode.slug,
+            processor_name=processor,
+            user_id=user.id
+        )
 
 
 def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):

@@ -90,6 +90,7 @@ urlpatterns = (
     # independently of courseware. https://github.com/edx/edx-val
     url(r'^api/val/v0/', include('edxval.urls')),
 
+    url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:

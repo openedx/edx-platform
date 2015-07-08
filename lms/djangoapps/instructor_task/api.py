@@ -24,7 +24,8 @@ from instructor_task.tasks import (
     cohort_students,
     enrollment_report_features_csv,
     calculate_may_enroll_csv,
-    exec_summary_report_csv
+    exec_summary_report_csv,
+    generate_certificates,
 )
 
 from instructor_task.api_helper import (
@@ -416,6 +417,20 @@ def submit_cohort_students(request, course_key, file_name):
     task_type = 'cohort_students'
     task_class = cohort_students
     task_input = {'file_name': file_name}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def generate_certificates_for_all_students(request, course_key):   # pylint: disable=invalid-name
+    """
+    Submits a task to generate certificates for all students enrolled in the course.
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    task_type = 'generate_certificates_all_student'
+    task_class = generate_certificates
+    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

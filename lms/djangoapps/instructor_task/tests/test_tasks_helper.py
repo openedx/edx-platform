@@ -11,14 +11,13 @@ from mock import Mock, patch
 import tempfile
 import unicodecsv
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
-from instructor_task.models import ReportStore
-from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv, \
-    upload_enrollment_report, upload_exec_summary_report
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
@@ -38,6 +37,9 @@ from instructor_task.tasks_helper import (
     upload_problem_grade_report,
     upload_students_csv,
     upload_may_enroll_csv,
+    upload_enrollment_report,
+    upload_exec_summary_report,
+    generate_students_certificates,
 )
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 
@@ -1300,3 +1302,54 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         )
 
         self._verify_csv_data(user.username, expected_output)
+
+
+@override_settings(CERT_QUEUE='test-queue')
+class TestCertificateGeneration(InstructorTaskModuleTestCase):
+    """
+    Test certificate generation task works.
+    """
+    def setUp(self):
+        super(TestCertificateGeneration, self).setUp()
+        self.initialize_course()
+
+    def test_certificate_generation_for_students(self):
+        """
+        Verify that certificates generated for all eligible students enrolled in a course.
+        """
+        # create 10 students
+        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
+                    for i in xrange(1, 11)]
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        # white-list 5 students
+        for student in students[2:7]:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        current_task = Mock()
+        current_task.update_state = Mock()
+        with self.assertNumQueries(104):
+            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+                mock_current_task.return_value = current_task
+                with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+                    mock_queue.return_value = (0, "Successfully queued")
+                    result = generate_students_certificates(None, None, self.course.id, None, 'certificates generated')
+        self.assertDictContainsSubset(
+            {
+                'action_name': 'certificates generated',
+                'total': 10,
+                'attempted': 8,
+                'succeeded': 5,
+                'failed': 3,
+                'skipped': 2
+            },
+            result
+        )

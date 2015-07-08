@@ -3,12 +3,12 @@ Asset compilation and collection.
 """
 from __future__ import print_function
 import argparse
+from paver import tasks
 from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import glob
 import traceback
-import os
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 
@@ -191,6 +191,10 @@ def watch_assets(options):
     """
     Watch for changes to asset files, and regenerate js/css
     """
+    # Don't watch assets when performing a dry run
+    if tasks.environment.dry_run:
+        return
+
     observer = Observer()
 
     CoffeeScriptWatcher().register(observer)
@@ -246,10 +250,10 @@ def update_assets(args):
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
-    call_task('compile_sass', options={'debug': args.debug})
+    call_task('pavelib.assets.compile_sass', options={'debug': args.debug})
 
     if args.collect:
         collect_assets(args.system, args.settings)
 
     if args.watch:
-        call_task('watch_assets', options={'background': not args.debug})
+        call_task('pavelib.assets.watch_assets', options={'background': not args.debug})

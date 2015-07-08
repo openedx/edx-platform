@@ -444,7 +444,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], 'http://testserver/accounts/login?next=/dashboard')
+        self.assertEqual(response['Location'], 'http://testserver/login?next=/dashboard')
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_externalauth_login_required_course_context(self):
@@ -455,7 +455,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=invalid-name
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
-                         ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
+                         ('http://testserver/login?next={url}'.format(url=TARGET_URL), 302))
         self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)

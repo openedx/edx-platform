@@ -31,7 +31,8 @@
                 if ( provider.registerUrl ) { %>
                     <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
                         <span class="icon fa <%- provider.iconClass %>" aria-hidden="true"></span>
-                        <%- provider.name %>
+                        <span aria-hidden="true"><%- provider.name %></span>
+                        <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
                     </button>
             <%  }
             }); %>

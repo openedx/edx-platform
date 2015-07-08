@@ -21,9 +21,10 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
-from tempfile import mkdtemp
 from uuid import uuid4
 from warnings import filterwarnings, simplefilter
+
+from openedx.core.lib.tempdir import mkdtemp_clean
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
@@ -87,9 +88,11 @@ _SYSTEM = 'lms'
 
 _REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
 _REPORT_DIR.makedirs_p()
+_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
+_NOSEID_DIR.makedirs_p()
 
 NOSE_ARGS = [
-    '--id-file', REPO_ROOT / '.testids' / _SYSTEM / 'noseids',
+    '--id-file', _NOSEID_DIR / 'noseids',
     '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
 
@@ -149,7 +152,7 @@ update_module_store_settings(
         'fs_root': TEST_ROOT / "data",
     },
     xml_store_options={
-        'data_dir': mkdtemp(dir=TEST_ROOT),  # never inadvertently load all the XML courses
+        'data_dir': mkdtemp_clean(dir=TEST_ROOT),  # never inadvertently load all the XML courses
     },
     doc_store_settings={
         'host': MONGO_HOST,

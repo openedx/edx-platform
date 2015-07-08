@@ -385,6 +385,10 @@ $sm-btn-linkedin: #0077b5;
             color: $white;
         }
 
+        span {
+            color: inherit;
+        }
+
         &:hover,
         &:focus {
             background-image: none;

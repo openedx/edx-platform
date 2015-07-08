@@ -93,7 +93,7 @@ var edx = edx || {};
         },
 
         thirdPartyAuth: function( event ) {
-            var providerUrl = $(event.target).data('provider-url') || '';
+            var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
             if (providerUrl) {
                 window.location.href = providerUrl;

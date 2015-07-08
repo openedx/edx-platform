@@ -19,11 +19,13 @@
   .nav-item {
     position: relative;
     display: inline-block;
+    vertical-align: middle;
   }
 
   .nav-link {
     @include transition(all $tmg-f2 ease-in-out 0s);
     display: block;
+    border: 0;
     padding: ($baseline/4) ($baseline*0.75);
 
     &.previous {

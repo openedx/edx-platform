@@ -62,7 +62,7 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
         Given there is a course with certificate configuration
         And I have passed the course and certificate is generated
         When I view the certificate web view page
-        Then I should see the accomplishment banner
+        Then I should see the accomplishment banner. banner should have linked-in and facebook share buttons
         And When I click on `Add to Profile` button `edx.certificate.shared` event should be emitted
         """
         self.cert_fixture.install()
@@ -70,6 +70,7 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
         self.certificate_page.visit()
         self.assertTrue(self.certificate_page.accomplishment_banner.visible)
         self.assertTrue(self.certificate_page.add_to_linkedin_profile_button.visible)
+        self.assertTrue(self.certificate_page.add_to_facebook_profile_button.visible)
         self.certificate_page.add_to_linkedin_profile_button.click()
         actual_events = self.wait_for_events(
             event_filter={'event_type': 'edx.certificate.shared'},

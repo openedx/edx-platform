@@ -9,6 +9,8 @@ import signal
 import psutil
 import atexit
 
+from paver import tasks
+
 
 def kill_process(proc):
     """
@@ -40,6 +42,14 @@ def run_multi_processes(cmd_list, out_log=None, err_log=None):
     if err_log:
         err_log_file = open(err_log, 'w')
         kwargs['stderr'] = err_log_file
+
+    # If the user is performing a dry run of a task, then just log
+    # the command strings and return so that no destructive operations
+    # are performed.
+    if tasks.environment.dry_run:
+        for cmd in cmd_list:
+            tasks.environment.info(cmd)
+        return
 
     try:
         for cmd in cmd_list:

@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from course_modes.models import CourseMode
+from lms.djangoapps.commerce.utils import audit_log
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from rest_framework import status
@@ -489,3 +490,16 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     ).format(username=username, course_id=course_id)
                 }
             )
+        finally:
+            # Assumes that the ecommerce service uses an API key to authenticate.
+            if has_api_key_permissions:
+                current_enrollment = api.get_enrollment(username, unicode(course_id))
+                audit_log(
+                    'enrollment_change_requested',
+                    course_id=unicode(course_id),
+                    requested_mode=mode,
+                    actual_mode=current_enrollment['mode'] if current_enrollment else None,
+                    requested_activation=is_active,
+                    actual_activation=current_enrollment['is_active'] if current_enrollment else None,
+                    user_id=user.id
+                )

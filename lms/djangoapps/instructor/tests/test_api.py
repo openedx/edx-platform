@@ -8,7 +8,6 @@ import random
 import pytz
 import io
 import json
-import os
 import requests
 import shutil
 import tempfile

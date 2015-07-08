@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 from open_ended_grading.utils import (
     STAFF_ERROR_MESSAGE, StudentProblemList, generate_problem_url, create_controller_query_service
 )
+from xblock_django.models import XBlockDisableConfig
 
 log = logging.getLogger(__name__)
 
@@ -75,6 +76,8 @@ class StaffGradingTab(EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
+            return False
         if user and not has_access(user, 'staff', course, course.id):
             return False
         return "combinedopenended" in course.advanced_modules
@@ -92,6 +95,8 @@ class PeerGradingTab(EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
+            return False
         if not super(PeerGradingTab, cls).is_enabled(course, user=user):
             return False
         return "combinedopenended" in course.advanced_modules
@@ -109,6 +114,8 @@ class OpenEndedGradingTab(EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
+            return False
         if not super(OpenEndedGradingTab, cls).is_enabled(course, user=user):
             return False
         return "combinedopenended" in course.advanced_modules

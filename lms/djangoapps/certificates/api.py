@@ -26,7 +26,8 @@ from certificates.queue import XQueueCertInterface
 log = logging.getLogger("edx.certificate")
 
 
-def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch'):
+def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
+                               forced_grade=None):
     """
     It will add the add-cert request into the xqueue.
 
@@ -45,12 +46,17 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         insecure - (Boolean)
         generation_mode - who has requested certificate generation. Its value should `batch`
         in case of django command and `self` if student initiated the request.
+        forced_grade - a string indicating to replace grade parameter. if present grading
+                       will be skipped.
     """
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
     generate_pdf = not has_html_certificates_enabled(course_key, course)
-    status, cert = xqueue.add_cert(student, course_key, course=course, generate_pdf=generate_pdf)
+    status, cert = xqueue.add_cert(student, course_key,
+                                   course=course,
+                                   generate_pdf=generate_pdf,
+                                   forced_grade=forced_grade)
     if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,

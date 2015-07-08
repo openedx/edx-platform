@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, credit_message" />
+<%page args="course, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings" />
 
 <%!
 import urllib
@@ -128,7 +128,7 @@ from student.helpers import (
                   share_window_name = 'shareWindow'
                   share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
                 %>
-                % if share_url and share_settings.get('FACEBOOK_SHARING', False):
+                % if share_url and share_settings.get('DASHBOARD_FACEBOOK', False):
                   <% facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' + share_url %>
                     <a
                       data-tooltip="${_('Share on Facebook')}"
@@ -143,9 +143,9 @@ from student.helpers import (
                       <i class="fa fa-facebook" aria-hidden="true"></i>
                     </a>
                 % endif
-                % if share_url and share_settings.get('TWITTER_SHARING', False):
+                % if share_url and share_settings.get('DASHBOARD_TWITTER', False):
                   <% share_text_default = _("I'm learning on {platform_name}:").format(platform_name=settings.PLATFORM_NAME) %>
-                  <% share_text = urllib.quote_plus(share_settings.get('TWITTER_SHARING_TEXT', share_text_default)) %>
+                  <% share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', share_text_default)) %>
                   <% twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + share_url %>
                     <a
                       data-tooltip="${_('Share on Twitter')}"
@@ -275,9 +275,9 @@ from student.helpers import (
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 
-      % if credit_message:
-          <%include file='_dashboard_credit_information.html' args='credit_message=credit_message'/>
-      % endif
+      % if credit_status is not None:
+        <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
+      % endif 
 
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">

@@ -162,7 +162,11 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """
         Verifies that the view contacts the E-Commerce API with the correct data and headers.
         """
-        response = self._post_to_view()
+        with mock.patch('commerce.views.audit_log') as mock_audit_log:
+            response = self._post_to_view()
+
+            # Verify that an audit message was logged
+            self.assertTrue(mock_audit_log.called)
 
         # Validate the response content
         if is_completed:
@@ -304,19 +308,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         with mock_create_basket():
             self._test_successful_ecommerce_api_call(False)
-
-
-class OrdersViewTests(BasketsViewTests):
-    """
-    Ensures that /orders/ points to and behaves like /baskets/, for backward
-    compatibility with stale js clients during updates.
-
-    (XCOM-214) remove after release.
-    """
-
-    def setUp(self):
-        super(OrdersViewTests, self).setUp()
-        self.url = reverse('commerce:orders')
 
 
 @attr('shard_1')

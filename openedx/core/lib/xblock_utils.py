@@ -106,6 +106,9 @@ def wrap_xblock(
             # The block is acting as an XModuleDescriptor
             css_classes.append('xmodule_edit')
 
+        if getattr(block, 'HIDDEN', False):
+            css_classes.append('is-hidden')
+
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
         data['type'] = block.js_module_name
         shim_xmodule_js(block, frag)
@@ -240,7 +243,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
         else:
             return frag
 
-    if isinstance(block, SequenceModule):
+    if isinstance(block, SequenceModule) or getattr(block, 'HIDDEN', False):
         return frag
 
     block_id = block.location

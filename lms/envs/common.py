@@ -379,13 +379,18 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
+    # Batch-Generated Certificates from Instructor Dashboard
+    'CERTIFICATES_INSTRUCTOR_GENERATION': False,
+
     # Social Media Sharing on Student Dashboard
-    'DASHBOARD_SHARE_SETTINGS': {
+    'SOCIAL_SHARING_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
         'CUSTOM_COURSE_URLS': False,
-        'FACEBOOK_SHARING': False,
-        'TWITTER_SHARING': False,
-        'TWITTER_SHARING_TEXT': None
+        'DASHBOARD_FACEBOOK': False,
+        'CERTIFICATE_FACEBOOK': False,
+        'CERTIFICATE_FACEBOOK_TEXT': None,
+        'DASHBOARD_TWITTER': False,
+        'DASHBOARD_TWITTER_TEXT': None
     },
 
     # Course discovery feature
@@ -408,6 +413,9 @@ FEATURES = {
 
     # Credit course API
     'ENABLE_CREDIT_API': False,
+
+    # The block types to disable need to be specified in "x block disable config" in django admin.
+    'ENABLE_DISABLING_XBLOCK_TYPES': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -546,8 +554,8 @@ DEV_CONTENT = True
 
 EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/accounts/login'
-LOGIN_URL = EDX_ROOT_URL + '/accounts/login'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/login'
+LOGIN_URL = EDX_ROOT_URL + '/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -1279,8 +1287,6 @@ student_account_js = [
     'js/student_account/accessApp.js',
 ]
 
-student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
-
 verify_student_js = [
     'js/form.ext.js',
     'js/my_courses_dropdown.js',
@@ -1338,6 +1344,7 @@ certificates_web_view_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
     'js/src/logger.js',
+    'js/utils/facebook.js',
 ]
 
 credit_web_view_js = [
@@ -1550,10 +1557,6 @@ PIPELINE_JS = {
         'source_filenames': student_account_js,
         'output_filename': 'js/student_account.js'
     },
-    'student_profile': {
-        'source_filenames': student_profile_js,
-        'output_filename': 'js/student_profile.js'
-    },
     'verify_student': {
         'source_filenames': verify_student_js,
         'output_filename': 'js/verify_student.js'
@@ -1623,7 +1626,6 @@ STATICFILES_IGNORE_PATTERNS = (
 
     # Symlinks used by js-test-tool
     "xmodule_js",
-    "common",
 )
 
 PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
@@ -1918,6 +1920,8 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    'xblock_django',
 )
 
 ######################### CSRF #########################################
@@ -2449,6 +2453,8 @@ SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearch
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
 # Use the LMS specific filter generator
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
+# Override to skip enrollment start date filtering in course search
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
 
 ### PERFORMANCE EXPERIMENT SETTINGS ###
 # CDN experiment/monitoring flags

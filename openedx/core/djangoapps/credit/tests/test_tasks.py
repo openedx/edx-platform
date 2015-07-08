@@ -11,7 +11,7 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import listen_for_course_publish
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class TestTaskExecution(ModuleStoreTestCase):
@@ -84,6 +84,13 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
+
+    def test_query_counts(self):
+        self.add_credit_course(self.course.id)
+        self.add_icrv_xblock()
+
+        with check_mongo_calls(3):
+            listen_for_course_publish(self, self.course.id)
 
     @mock.patch(
         'openedx.core.djangoapps.credit.tasks.set_credit_requirements',

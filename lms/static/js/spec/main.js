@@ -31,6 +31,7 @@
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
+            'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             "backbone-super": "js/vendor/backbone-super",
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
@@ -91,7 +92,6 @@
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
             'js/student_account/views/HintedLoginView': 'js/student_account/views/HintedLoginView',
-            'js/student_profile/profile': 'js/student_profile/profile',
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
@@ -279,10 +279,6 @@
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
-            },
-            'js/student_profile/profile': {
-                exports: 'js/student_profile/profile',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
             'js/staff_debug_actions': {
@@ -618,6 +614,8 @@
         // Run the LMS tests
         'lms/include/teams/js/spec/teams_factory_spec.js',
         'lms/include/teams/js/spec/topic_card_spec.js',
+        'lms/include/teams/js/spec/topic_collection_spec.js',
+        'lms/include/teams/js/spec/topics_spec.js',
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
@@ -643,7 +641,6 @@
         'lms/include/js/spec/student_account/account_settings_factory_spec.js',
         'lms/include/js/spec/student_account/account_settings_fields_spec.js',
         'lms/include/js/spec/student_account/account_settings_view_spec.js',
-        'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/views/fields_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',

@@ -26,6 +26,7 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 
 log = logging.getLogger("edx.courseware")
 
@@ -126,9 +127,22 @@ def grade(student, request, course, keep_raw_scores=False):
     """
     Wraps "_grade" with the manual_transaction context manager just in case
     there are unanticipated errors.
+    Send a signal to update the minimum grade requirement status.
     """
     with manual_transaction():
-        return _grade(student, request, course, keep_raw_scores)
+        grade_summary = _grade(student, request, course, keep_raw_scores)
+        responses = GRADES_UPDATED.send_robust(
+            sender=None,
+            username=request.user.username,
+            grade_summary=grade_summary,
+            course_key=course.id,
+            deadline=course.end
+        )
+
+        for receiver, response in responses:
+            log.info('Signal fired when student grade is calculated. Receiver: %s. Response: %s', receiver, response)
+
+        return grade_summary
 
 
 def _grade(student, request, course, keep_raw_scores):
