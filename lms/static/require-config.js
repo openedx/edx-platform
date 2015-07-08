@@ -4,9 +4,14 @@
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
-        var defineDependency = function (globalVariable, name) {
+        var defineDependency = function (globalVariable, name, noShim) {
             if (window[globalVariable]) {
-                define(name, [], function() {return window[globalVariable];});
+                if (noShim) {
+                    define(name, {});
+                }
+                else {
+                    define(name, [], function() {return window[globalVariable];});
+                }
             }
             else {
                 console.error("Expected library to be included on page, but not found on window object: " + name);
@@ -18,6 +23,12 @@
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
         defineDependency("Backbone", "backbone");
+        // utility.js adds two functions to the window object, but does not return anything
+        defineDependency("isExternal", "utility", true);
+
+        // This is necessary to avoid text.js being deployed to production. We do need it used during the optimizer
+        // process to inline templates, but then we don't need it past that point.
+        define("text", {});
     }
 
     require.config({
@@ -43,6 +54,7 @@
             "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
             "URI": "js/vendor/URI.min",
             "string_utils": "js/src/string_utils",
+            "utility": "js/src/utility",
 
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
