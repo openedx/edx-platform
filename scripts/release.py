@@ -38,6 +38,7 @@ git = repo.git
 
 PEOPLE_YAML = "https://raw.githubusercontent.com/edx/repo-tools/master/people.yaml"
 
+
 class memoized(object):
     """
     Decorator. Caches a function's return value each time it is called.
