@@ -260,15 +260,6 @@ def select_option_by_value(browser_query, value):
     EmptyPromise(options_selected, "Option is selected").fulfill()
 
 
-def is_option_value_selected(browser_query, value):
-    """
-    return true if given value is selected in html select element, else return false.
-    """
-    select = Select(browser_query.first.results[0])
-    ddl_selected_value = select.first_selected_option.get_attribute('value')
-    return ddl_selected_value == value
-
-
 def element_has_text(page, css_selector, text):
     """
     Return true if the given text is present in the list.
