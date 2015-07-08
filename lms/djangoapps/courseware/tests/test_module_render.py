@@ -1394,7 +1394,7 @@ class TestRebindModule(TestSubmittingProblems):
         # Bind the module to another student, which will remove "correct_map"
         # from the module's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
-        module.bind_for_student(module.system, user2.id)
+        module.descriptor.bind_for_student(module.system, user2.id)
         self.assertNotIn(correct_map_field, module._dirty_fields)
         self.assertNotIn(correct_map_field.name, module._field_data_cache)
 
@@ -1405,7 +1405,7 @@ class TestRebindModule(TestSubmittingProblems):
         # _field_data cache, but not _dirty_fields, when we bound
         # this module to the second student. (TNL-2640)
         user3 = UserFactory.create()
-        module.bind_for_student(module.system, user3.id)
+        module.descriptor.bind_for_student(module.system, user3.id)
 
     def test_rebind_noauth_module_to_user_not_anonymous(self):
         """
