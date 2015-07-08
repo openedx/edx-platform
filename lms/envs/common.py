@@ -1226,13 +1226,11 @@ courseware_js = (
 courseware_search_js = ['js/search/course/main.js']
 
 proctoring_js = (
+    ['proctoring/js/models/*.js'] +
+    ['proctoring/js/collections/*.js'] +
+    ['proctoring/js/views/*.js'] +
     ['proctoring/js/*.js']
 )
-
-#proctoring_js = (
-#    ['proctoring/js/courseware/base/**/*.js'] +
-#    ['proctoring/js/courseware/proctored_exam/proctored_app.js']
-#)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
