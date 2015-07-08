@@ -41,7 +41,7 @@ class CourseApiViewTestMixin(object):
 
 class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseListView. """
-    path = reverse('commerce:api:v1:courses:list')
+    path = reverse('commerce_api:v1:courses:list')
 
     def test_authentication_required(self):
         """ Verify only authenticated users can access the view. """
@@ -72,7 +72,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
     def setUp(self):
         super(CourseRetrieveUpdateViewTests, self).setUp()
-        self.path = reverse('commerce:api:v1:courses:retrieve_update', args=[unicode(self.course.id)])
+        self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(self.course.id)])
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password=PASSWORD)
 
@@ -103,7 +103,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
     def test_retrieve_invalid_course(self):
         """ The view should return HTTP 404 when retrieving data for a course that does not exist. """
-        path = reverse('commerce:api:v1:courses:retrieve_update', args=['a/b/c'])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=['a/b/c'])
         response = self.client.get(path, content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 404)
 
@@ -134,7 +134,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             u'modes': [self._serialize_course_mode(
                 CourseMode(mode_slug=u'credit', min_price=500, currency=u'USD', sku=u'ABC123')), ]
         }
-        path = reverse('commerce:api:v1:courses:retrieve_update', args=[course_id])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 200)
         actual = json.loads(response.content)
@@ -156,7 +156,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
                     CourseMode(mode_slug=u'honor', min_price=0, currency=u'USD', sku=u'DEADBEEF')),
             ]
         }
-        path = reverse('commerce:api:v1:courses:retrieve_update', args=[course_id])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE, **request_kwargs)
         self.assertEqual(response.status_code, 201)
         actual = json.loads(response.content)
