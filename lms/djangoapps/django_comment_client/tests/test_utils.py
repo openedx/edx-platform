@@ -170,6 +170,13 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             discussion_category='Chapter',
             discussion_target='Discussion 1'
         )
+        self.discussion2 = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='test_discussion_id_2',
+            discussion_category='Chapter 2',
+            discussion_target='Discussion 2'
+        )
         self.private_discussion = ItemFactory.create(
             parent_location=self.course.location,
             category='discussion',
@@ -212,11 +219,18 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         self.assertFalse(utils.has_required_keys(self.bad_discussion))
 
     def verify_discussion_metadata(self):
-        """Retrieves the metadata for self.discussion and verifies that it is correct"""
-        metadata = utils.get_cached_discussion_id_map(self.course, 'test_discussion_id', self.user)
-        metadata = metadata[self.discussion.discussion_id]
-        self.assertEqual(metadata['location'], self.discussion.location)
-        self.assertEqual(metadata['title'], 'Chapter / Discussion 1')
+        """Retrieves the metadata for self.discussion and self.discussion2 and verifies that it is correct"""
+        metadata = utils.get_cached_discussion_id_map(
+            self.course,
+            ['test_discussion_id', 'test_discussion_id_2'],
+            self.user
+        )
+        discussion1 = metadata[self.discussion.discussion_id]
+        discussion2 = metadata[self.discussion2.discussion_id]
+        self.assertEqual(discussion1['location'], self.discussion.location)
+        self.assertEqual(discussion1['title'], 'Chapter / Discussion 1')
+        self.assertEqual(discussion2['location'], self.discussion2.location)
+        self.assertEqual(discussion2['title'], 'Chapter 2 / Discussion 2')
 
     def test_get_discussion_id_map_from_cache(self):
         self.verify_discussion_metadata()
@@ -226,21 +240,35 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         self.verify_discussion_metadata()
 
     def test_get_missing_discussion_id_map_from_cache(self):
-        metadata = utils.get_cached_discussion_id_map(self.course, 'bogus_id', self.user)
+        metadata = utils.get_cached_discussion_id_map(self.course, ['bogus_id'], self.user)
         self.assertEqual(metadata, {})
 
     def test_get_discussion_id_map_from_cache_without_access(self):
         user = UserFactory.create()
 
-        metadata = utils.get_cached_discussion_id_map(self.course, 'private_discussion_id', self.user)
+        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], self.user)
         self.assertEqual(metadata['private_discussion_id']['title'], 'Chapter 3 / Beta Testing')
 
-        metadata = utils.get_cached_discussion_id_map(self.course, 'private_discussion_id', user)
+        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], user)
         self.assertEqual(metadata, {})
 
     def test_get_bad_discussion_id(self):
-        metadata = utils.get_cached_discussion_id_map(self.course, 'bad_discussion_id', self.user)
+        metadata = utils.get_cached_discussion_id_map(self.course, ['bad_discussion_id'], self.user)
         self.assertEqual(metadata, {})
+
+    def test_discussion_id_accessible(self):
+        self.assertTrue(utils.discussion_category_id_access(self.course, self.user, 'test_discussion_id'))
+
+    def test_bad_discussion_id_not_accessible(self):
+        self.assertFalse(utils.discussion_category_id_access(self.course, self.user, 'bad_discussion_id'))
+
+    def test_missing_discussion_id_not_accessible(self):
+        self.assertFalse(utils.discussion_category_id_access(self.course, self.user, 'bogus_id'))
+
+    def test_discussion_id_not_accessible_without_access(self):
+        user = UserFactory.create()
+        self.assertTrue(utils.discussion_category_id_access(self.course, self.user, 'private_discussion_id'))
+        self.assertFalse(utils.discussion_category_id_access(self.course, user, 'private_discussion_id'))
 
 
 class CategoryMapTestMixin(object):

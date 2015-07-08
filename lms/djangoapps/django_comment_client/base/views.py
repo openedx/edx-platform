@@ -27,8 +27,7 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids,
-    get_discussion_id_map,
+    discussion_category_id_access,
     get_cached_discussion_id_map,
 )
 from django_comment_client.permissions import check_permissions_by_view, has_permission
@@ -82,7 +81,7 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     commentable_id = data['commentable_id']
 
     if id_map is None:
-        id_map = get_cached_discussion_id_map(course, commentable_id, user)
+        id_map = get_cached_discussion_id_map(course, [commentable_id], user)
 
     if commentable_id in id_map:
         data['category_name'] = id_map[commentable_id]["title"]
@@ -209,14 +208,9 @@ def create_thread(request, course_id, commentable_id):
     event_data = get_thread_created_event_data(thread, follow)
     data = thread.to_dict()
 
-    # Calls to id map are expensive, but we need this more than once.
-    # Prefetch it.
-    id_map = get_discussion_id_map(course, request.user)
+    add_courseware_context([data], course, request.user)
 
-    add_courseware_context([data], course, request.user, id_map=id_map)
-
-    track_forum_event(request, THREAD_CREATED_EVENT_NAME,
-                      course, thread, event_data, id_map=id_map)
+    track_forum_event(request, THREAD_CREATED_EVENT_NAME, course, thread, event_data)
 
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
@@ -246,8 +240,7 @@ def update_thread(request, course_id, thread_id):
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        commentable_ids = get_discussion_categories_ids(course, request.user)
-        if request.POST.get("commentable_id") in commentable_ids:
+        if discussion_category_id_access(course, request.user, request.POST.get("commentable_id")):
             thread.commentable_id = request.POST["commentable_id"]
         else:
             return JsonError(_("Topic doesn't exist"))

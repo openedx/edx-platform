@@ -118,19 +118,22 @@ def get_cached_discussion_key(course, discussion_id):
         raise DiscussionIdMapIsNotCached()
 
 
-def get_cached_discussion_id_map(course, discussion_id, user):
+def get_cached_discussion_id_map(course, discussion_ids, user):
     """
-    Returns a dict mapping discussion_id to discussion module metadata if it is cached and visible to the user.
-    If not, returns the result of get_discussion_id_map
+    Returns a dict mapping discussion_ids to respective discussion module metadata if it is cached and visible to the
+    user. If not, returns the result of get_discussion_id_map
     """
     try:
-        key = get_cached_discussion_key(course, discussion_id)
-        if not key:
-            return {}
-        module = modulestore().get_item(key)
-        if not (has_required_keys(module) and has_access(user, 'load', module, course.id)):
-            return {}
-        return dict([get_discussion_id_map_entry(module)])
+        entries = []
+        for discussion_id in discussion_ids:
+            key = get_cached_discussion_key(course, discussion_id)
+            if not key:
+                continue
+            module = modulestore().get_item(key)
+            if not (has_required_keys(module) and has_access(user, 'load', module, course.id)):
+                continue
+            entries.append(get_discussion_id_map_entry(module))
+        return dict(entries)
     except DiscussionIdMapIsNotCached:
         return get_discussion_id_map(course, user)
 
@@ -324,6 +327,23 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
     return _filter_unstarted_categories(category_map) if exclude_unstarted else category_map
 
 
+def discussion_category_id_access(course, user, discussion_id):
+    """
+    Returns True iff the given discussion_id is accessible for user in course. Uses the discussion id cache if available
+    falling back to get_discussion_categories_ids if there is no cache.
+    """
+    if discussion_id in course.top_level_discussion_topic_ids:
+        return True
+    try:
+        key = get_cached_discussion_key(course, discussion_id)
+        if not key:
+            return False
+        module = modulestore().get_item(key)
+        return has_required_keys(module) and has_access(user, 'load', module, course.id)
+    except DiscussionIdMapIsNotCached:
+        return discussion_id in get_discussion_categories_ids(course, user)
+
+
 def get_discussion_categories_ids(course, user, include_all=False):
     """
     Returns a list of available ids of categories for the course that
@@ -490,10 +510,14 @@ def extend_content(content):
 
 def add_courseware_context(content_list, course, user, id_map=None):
     """
-    Decorates `content_list` with courseware metadata.
+    Decorates `content_list` with courseware metadata using the discussion id map cache if available.
     """
     if id_map is None:
-        id_map = get_discussion_id_map(course, user)
+        id_map = get_cached_discussion_id_map(
+            course,
+            [content['commentable_id'] for content in content_list],
+            user
+        )
 
     for content in content_list:
         commentable_id = content['commentable_id']
