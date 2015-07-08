@@ -11,6 +11,8 @@
            function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView, TopicsView) {
                var TeamTabView = Backbone.View.extend({
                    initialize: function(options) {
+                       var router, TempTabView;
+                       router = new Backbone.Router();
                        this.headerModel = new HeaderModel({
                            description: gettext("Course teams are organized into topics created by course instructors. Try to join others in an existing team before you decide to create a new team!"),
                            title: gettext("Teams")
@@ -19,7 +21,7 @@
                            model: this.headerModel
                        });
                        // TODO replace this with actual views!
-                       var TempTabView = Backbone.View.extend({
+                       TempTabView = Backbone.View.extend({
                            initialize: function (options) {
                                this.text = options.text;
                            },
@@ -39,16 +41,15 @@
                                view: new TopicsView({
                                    collection: options.topicCollection
                                })
-                           }]
+                           }],
+                           router: router
                        });
-                       Backbone.history.start();
                    },
 
                    render: function() {
-                       this.$el.append(this.headerView.$el);
-                       this.headerView.render();
-                       this.$el.append(this.tabbedView.$el);
-                       this.tabbedView.render();
+                       this.$el.append(this.headerView.render().$el);
+                       this.$el.append(this.tabbedView.render().$el);
+                       return this;
                    }
                });
 
