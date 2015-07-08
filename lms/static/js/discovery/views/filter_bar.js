@@ -31,7 +31,7 @@ define([
         render: function () {
             this.$el.html(this.tpl());
             this.$ul = this.$el.find('ul');
-            this.$el.addClass('animate');
+            this.$el.addClass('is-animated');
             return this;
         },
 
@@ -63,12 +63,12 @@ define([
         },
 
         show: function () {
-            this.$el.removeClass('slide-up');
+            this.$el.removeClass('is-collapsed');
         },
 
         hide: function () {
             this.$ul.empty();
-            this.$el.addClass('slide-up');
+            this.$el.addClass('is-collapsed');
         }
 
     });

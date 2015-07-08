@@ -394,13 +394,13 @@ define([
             it('removes filter', function () {
                 this.filters.remove('org');
                 expect(this.filterBar.$el.find('ul')).toBeEmpty();
-                expect(this.filterBar.$el).toHaveClass('slide-up');
+                expect(this.filterBar.$el).toHaveClass('is-collapsed');
             });
 
             it('resets filters', function () {
                 this.filters.reset();
                 expect(this.filterBar.$el.find('ul')).toBeEmpty();
-                expect(this.filterBar.$el).toHaveClass('slide-up');
+                expect(this.filterBar.$el).toHaveClass('is-collapsed');
             });
 
             it('triggers events', function () {
@@ -577,10 +577,10 @@ define([
                 $('.discovery-submit').trigger('click');
                 AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
                 expect($('.active-filter').length).toBe(1);
-                expect($('#filter-bar')).not.toHaveClass('slide-up');
+                expect($('#filter-bar')).not.toHaveClass('is-collapsed');
                 $('#clear-all-filters').trigger('click');
                 expect($('.active-filter').length).toBe(0);
-                expect($('#filter-bar')).toHaveClass('slide-up');
+                expect($('#filter-bar')).toHaveClass('is-collapsed');
             });
 
             it('check filters and bar removed on last filter cleared', function () {
