@@ -1532,7 +1532,6 @@ class TestXBlockInfo(ItemTest):
 
     def test_vertical_xblock_info(self):
         vertical = modulestore().get_item(self.vertical.location)
-        vertical.start = datetime(year=1899, month=1, day=1, tzinfo=UTC)
 
         xblock_info = create_xblock_info(
             vertical,
@@ -1552,6 +1551,29 @@ class TestXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS
         )
         self.validate_component_xblock_info(xblock_info)
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_validate_start_date(self, store_type):
+        """
+        Validate if start-date year is less than 1900 reset the date to DEFAULT_START_DATE.
+        """
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(
+                parent_location=course.location, category='chapter', display_name='Week 1'
+            )
+
+            chapter.start = datetime(year=1899, month=1, day=1, tzinfo=UTC)
+
+            xblock_info = create_xblock_info(
+                chapter,
+                include_child_info=True,
+                include_children_predicate=ALWAYS,
+                include_ancestor_info=True,
+                user=self.user
+            )
+
+            self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
@@ -1605,7 +1627,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
         self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
-        self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
         # Validate that the correct ancestor info has been included
         ancestor_info = xblock_info.get('ancestor_info', None)
