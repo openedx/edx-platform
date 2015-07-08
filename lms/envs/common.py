@@ -2563,6 +2563,9 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
+# The Help link to the FAQ page about the credit
+CREDIT_HELP_LINK_URL = "#"
+
 # Default domain for the e-mail address associated with users who are created
 # via the LTI Provider feature. Note that the generated e-mail addresses are
 # not expected to be active; this setting simply allows administrators to
