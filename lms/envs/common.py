@@ -1251,6 +1251,12 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery.ba-bbq.min.js',
 ]
 
+# Common files used by both RequireJS code and non-RequireJS code
+base_application_js = [
+    'js/src/utility.js',
+    'js/src/logger.js',
+]
+
 dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
@@ -1276,7 +1282,6 @@ student_account_js = [
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
-    'js/src/utility.js',
     'js/src/accessibility_tools.js',
     'js/src/ie_shim.js',
     'js/src/string_utils.js',
@@ -1302,7 +1307,6 @@ verify_student_js = [
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
-    'js/src/utility.js',
     'js/src/accessibility_tools.js',
     'js/src/ie_shim.js',
     'js/src/string_utils.js',
@@ -1489,20 +1493,23 @@ project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - s
 
 
 PIPELINE_JS = {
+    'base_application': {
+        'source_filenames': base_application_js,
+        'output_filename': 'js/lms-base-application.js',
+    },
+
     'application': {
 
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + [
+        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
-            'js/src/utility.js',
             'js/src/accessibility_tools.js',
             'js/src/ie_shim.js',
             'js/src/string_utils.js',
-            'js/src/logger.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
@@ -1593,10 +1600,6 @@ PIPELINE_JS = {
     'certificates_wv': {
         'source_filenames': certificates_web_view_js,
         'output_filename': 'js/certificates/web_view.js'
-    },
-    'utility': {
-        'source_filenames': ['js/src/utility.js'],
-        'output_filename': 'js/utility.js'
     },
     'credit_wv': {
         'source_filenames': credit_web_view_js,

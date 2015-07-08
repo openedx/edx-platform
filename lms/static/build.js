@@ -47,11 +47,12 @@
             'gettext': 'empty:',
             'coffee/src/ajax_prefix': 'empty:',
             'jquery': 'empty:',
-            'jquery.cookie': 'empty',
-            'jquery.url': 'empty',
+            'jquery.cookie': 'empty:',
+            'jquery.url': 'empty:',
             'backbone': 'empty:',
             'underscore': 'empty:',
             'logger': 'empty:',
+            'utility': 'empty:',
             'URI': 'empty:'
         },
         /**
