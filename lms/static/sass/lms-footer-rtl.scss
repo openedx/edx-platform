@@ -9,6 +9,8 @@
 @import 'base/variables';
 @import 'base/mixins';
 
+//<THEME-OVERRIDE>
+
 footer#footer-openedx {
     @import 'base/reset';
     @import 'base/extends';

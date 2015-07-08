@@ -19,12 +19,14 @@ from .utils.cmd import cmd, django_cmd
 # setup baseline paths
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
-SASS_DIRS = {
-    "lms/static/sass": "lms/static/css",
-    "cms/static/sass": "cms/static/css",
-    "common/static/sass": "common/static/css",
-    "lms/static/certificates/sass": "lms/static/certificates/css",
-}
+# A list of directories.  Each will be paired with a sibling /css directory.
+SASS_DIRS = [
+    path("lms/static/sass"),
+    path("lms/static/themed_sass"),
+    path("cms/static/sass"),
+    path("common/static/sass"),
+    path("lms/static/certificates/sass"),
+]
 SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
 SASS_CACHE_PATH = '/tmp/sass-cache'
 
@@ -41,7 +43,7 @@ def configure_paths():
         css_dir = theme_root / "static" / "css"
         if sass_dir.isdir():
             css_dir.mkdir_p()
-            SASS_DIRS[sass_dir] = css_dir
+            SASS_DIRS.append(sass_dir)
 
     if edxapp_env.env_tokens.get("COMP_THEME_DIR", False):
         theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
@@ -49,12 +51,12 @@ def configure_paths():
         lms_css = theme_dir / "lms" / "static" / "css"
         if lms_sass.isdir():
             lms_css.mkdir_p()
-            SASS_DIRS[lms_sass] = lms_css
+            SASS_DIRS.append(lms_sass)
         studio_sass = theme_dir / "studio" / "static" / "sass"
         studio_css = theme_dir / "studio" / "static" / "css"
         if studio_sass.isdir():
             studio_css.mkdir_p()
-            SASS_DIRS[studio_sass] = studio_css
+            SASS_DIRS.append(studio_sass)
 
 configure_paths()
 
@@ -96,7 +98,7 @@ class SassWatcher(PatternMatchingEventHandler):
         """
         register files with observer
         """
-        for dirname in SASS_LOAD_PATHS + SASS_DIRS.keys():
+        for dirname in SASS_LOAD_PATHS + SASS_DIRS:
             paths = []
             if '*' in dirname:
                 paths.extend(glob.glob(dirname))
@@ -171,16 +173,27 @@ def compile_sass(options):
         parts.append("--sourcemap")
     else:
         parts.append("--style compressed --quiet")
-    for load_path in SASS_LOAD_PATHS + SASS_DIRS.keys():
+    for load_path in SASS_LOAD_PATHS + SASS_DIRS:
         parts.append("--load-path {path}".format(path=load_path))
 
-    for sass_dir, css_dir in SASS_DIRS.items():
+    for sass_dir in SASS_DIRS:
+        css_dir = sass_dir.parent / "css"
         if css_dir:
             parts.append("{sass}:{css}".format(sass=sass_dir, css=css_dir))
         else:
             parts.append(sass_dir)
 
     sh(cmd(*parts))
+
+
+def compile_templated_sass(systems, settings):
+    """
+    Render Mako templates for Sass files.
+    `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
+    `settings` is the Django settings module to use.
+    """
+    for sys in systems:
+        sh(django_cmd(sys, settings, 'preprocess_assets', 'lms/static/sass/*.scss', 'lms/static/themed_sass'))
 
 
 def process_xmodule_assets():
@@ -262,6 +275,7 @@ def update_assets(args):
     )
     args = parser.parse_args(args)
 
+    compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
     call_task('pavelib.assets.compile_sass', options={'debug': args.debug})
