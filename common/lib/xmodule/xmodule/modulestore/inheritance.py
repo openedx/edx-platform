@@ -18,6 +18,8 @@ _ = lambda text: text
 
 class UserPartitionList(List):
     """Special List class for listing UserPartitions"""
+    MUTABLE=False
+
     def from_json(self, values):
         return [UserPartition.from_json(v) for v in values]
 
