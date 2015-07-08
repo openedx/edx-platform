@@ -1,13 +1,13 @@
 ;(function (define) {
 
-define(['jquery', 'backbone'], function ($, Backbone) {
+define(['jquery', 'backbone', 'gettext'], function ($, Backbone, gettext) {
    'use strict';
 
     return Backbone.View.extend({
 
         el: '#discovery-form',
         events: {
-            'submit form': 'submitForm',
+            'submit form': 'submitForm'
         },
 
         initialize: function () {
@@ -23,23 +23,20 @@ define(['jquery', 'backbone'], function ($, Backbone) {
         },
 
         doSearch: function (term) {
-            if (term) {
+            if (term !== undefined) {
                 this.$searchField.val(term);
             }
             else {
                 term = this.$searchField.val();
             }
             this.trigger('search', $.trim(term));
-            this.$message.empty();
         },
 
         clearSearch: function () {
-            this.$message.empty();
             this.$searchField.val('');
         },
 
         showLoadingIndicator: function () {
-            this.$message.empty();
             this.$loadingIndicator.removeClass('hidden');
         },
 
