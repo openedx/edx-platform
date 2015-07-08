@@ -1,7 +1,6 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
-from flaky import flaky
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
@@ -41,7 +40,7 @@ class SettingsMilestonesTest(StudioCourseTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
-    @flaky  # TODO: fix this. SOL-449
+    @skip  # TODO: fix this. SOL-449
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
