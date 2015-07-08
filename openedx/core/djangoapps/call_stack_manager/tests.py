@@ -109,11 +109,15 @@ def donottrack_func_child():
     ModelMixin.objects.all()
 
 
-@donottrack()
-def donottrack_check_with_return():
-    """ function that returns something i.e. a wrapped function returning some value
+class ClassReturingValue(object):
     """
-    return 42
+    Test class with a decorated method
+    """
+    @donottrack()
+    def donottrack_check_with_return(cls, a=43):
+        """ function that returns something i.e. a wrapped function returning some value
+        """
+        return 42+a
 
 
 @patch('openedx.core.djangoapps.call_stack_manager.core.log.info')
@@ -225,6 +229,7 @@ class TestingCallStackManager(TestCase):
         """ Test for @donottrack
         Checks if wrapper function returns the same value as wrapped function
         """
-        everything = donottrack_check_with_return()
-        self.assertEqual(everything, 42)
+        class_returning_value = ClassReturingValue()
+        everything = class_returning_value.donottrack_check_with_return(a=42)
+        self.assertEqual(everything, 84)
         self.assertEqual(len(log_capt.call_args_list), 0)

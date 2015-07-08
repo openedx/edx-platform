@@ -34,6 +34,7 @@ import logging
 import traceback
 import re
 import collections
+import wrapt
 from django.db.models import Manager
 
 log = logging.getLogger(__name__)
@@ -116,31 +117,25 @@ def donottrack(*classes_not_to_be_tracked):
     Returns:
         wrapped function
     """
-
-    def real_donottrack(function):
+    @wrapt.decorator
+    def real_donottrack(wrapped, instance, args, kwargs):
         """takes function to be decorated and returns wrapped function
 
         Args:
             function - wrapped function i.e. real_donottrack
         """
-        def wrapper(*args, **kwargs):
-            """ wrapper function for decorated function
-            Returns:
-                wrapper function i.e. wrapper
-            """
-            if len(classes_not_to_be_tracked) == 0:
-                global TRACK_FLAG  # pylint: disable=W0603
-                current_flag = TRACK_FLAG
-                TRACK_FLAG = False
-                return_value = function(*args, **kwargs)
-                TRACK_FLAG = current_flag
-                return return_value
-            else:
-                global HALT_TRACKING  # pylint: disable=W0603
-                current_halt_track = HALT_TRACKING
-                HALT_TRACKING = classes_not_to_be_tracked
-                return_value = function(*args, **kwargs)
-                HALT_TRACKING = current_halt_track
-                return return_value
-        return wrapper
+        if len(classes_not_to_be_tracked) == 0:
+            global TRACK_FLAG  # pylint: disable=W0603
+            current_flag = TRACK_FLAG
+            TRACK_FLAG = False
+            return_value = wrapped(*args, **kwargs)
+            TRACK_FLAG = current_flag
+            return return_value
+        else:
+            global HALT_TRACKING  # pylint: disable=W0603
+            current_halt_track = HALT_TRACKING
+            HALT_TRACKING = classes_not_to_be_tracked
+            return_value = wrapped(*args, **kwargs)
+            HALT_TRACKING = current_halt_track
+            return return_value
     return real_donottrack

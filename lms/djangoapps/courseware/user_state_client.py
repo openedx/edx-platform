@@ -18,7 +18,7 @@ from courseware.models import StudentModule, StudentModuleHistory
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import UsageKey
 
-from openedx.core.djangoapps.call_stack_manager import donottrack
+from openedx.core.djangoapps.call_stack_manager.core import donottrack
 
 new_contract('UsageKey', UsageKey)
 
@@ -358,6 +358,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         return history_entries
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
         """
         You get no ordering guarantees. Fetching will happen in batch_size
@@ -368,6 +369,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state, batch_size=None):
         """
         You get no ordering guarantees. Fetching will happen in batch_size
