@@ -43,6 +43,7 @@
             "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
             "URI": "js/vendor/URI.min",
             "string_utils": "js/src/string_utils",
+            "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
 
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
@@ -162,6 +163,9 @@
                     "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars",
                     "URI"
                 ]
+            },
+            "tinymce": {
+                exports: "tinymce"
             }
             // End of needed by OVA
         }
