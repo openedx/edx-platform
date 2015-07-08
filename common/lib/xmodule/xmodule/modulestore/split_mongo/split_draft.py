@@ -175,10 +175,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
-    def delete_item(
-            self, location, user_id, revision=None, fail_silently=False,
-            **kwargs
-    ):
+    def delete_item(self, location, user_id, revision=None, **kwargs):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
 
@@ -189,13 +186,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 None - deletes the item and its subtree, and updates the parents per description above
                 ModuleStoreEnum.RevisionOption.published_only - removes only Published versions
                 ModuleStoreEnum.RevisionOption.all - removes both Draft and Published parents
-                    currently only provided by contentstore.views.item.orphan_handler
                 Otherwise, raises a ValueError.
-            fail_silently:
-                False - will raise a ValueError if the block does not exist in
-                        any of the branches we are asked to delete it from
-                        (default).
-                True - will silently fail to delete.
         """
         with self.bulk_operations(location.course_key):
             if isinstance(location, LibraryUsageLocator):
@@ -219,11 +210,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             for branch in branches_to_delete:
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
-                try:
-                    SplitMongoModuleStore.delete_item(self, branched_location, user_id)
-                except ValueError as e:
-                    if not fail_silently:
-                        raise e
+                SplitMongoModuleStore.delete_item(self, branched_location, user_id)
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
                 if (
                         branch == ModuleStoreEnum.BranchName.draft and
@@ -308,14 +295,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
     def get_orphans(self, course_key, **kwargs):
         if course_key.branch is None:
-            draft_key = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
-            draft_orphans = super(DraftVersioningModuleStore,
-                                  self).get_orphans(course_key, **kwargs)
-            pub_key = course_key.for_branch(
-                            ModuleStoreEnum.BranchName.published)
-            pub_orphans = super(DraftVersioningModuleStore,
-                                self).get_orphans(pub_key, **kwargs)
-            return draft_orphans + pub_orphans
+            raise ValueError("Branch not specified.")
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
     def fix_not_found(self, course_key, user_id):
