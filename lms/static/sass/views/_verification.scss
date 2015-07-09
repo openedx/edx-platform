@@ -244,6 +244,42 @@
       }
     }
   }
+  .report-receipt-provider {
+        @extend %ui-window;
+        border-top:3px solid $credit-color-base !important;
+        p {
+          padding: 0 $baseline $baseline/2 $baseline;
+          overflow: auto;
+        }
+        .bold_param {
+          padding: $baseline*.75 $baseline 0 $baseline;
+          font-weight: 600;
+        }
+        .bold_param span {
+          @include float(right);
+        }
+        div {
+          padding: 10px 20px;
+          margin: 0 0 15px;
+          overflow: auto;
+        }
+        div span {
+          @include float(right);
+          padding: 0;
+          margin: 0;
+        }
+        .complete-course {
+          @extend %btn-pl-primary-base;
+          @include float(right);
+
+          &.archived {
+            @extend %btn-pl-default-base;
+          }
+        }
+        .custom_instructions div {
+          @include float(left);
+        }
+      }
 
   // ====================
 
