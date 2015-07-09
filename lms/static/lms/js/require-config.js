@@ -25,10 +25,6 @@
         defineDependency("Backbone", "backbone");
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency("isExternal", "utility", true);
-
-        // This is necessary to avoid text.js being deployed to production. We do need it used during the optimizer
-        // process to inline templates, but then we don't need it past that point.
-        define("text", {});
     }
 
     require.config({

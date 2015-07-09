@@ -86,6 +86,17 @@
             'tender': 'empty:',
             'youtube': 'empty:'
         },
+
+        /**
+         * Inline requireJS text templates.
+         */
+        inlineText: true,
+
+        /**
+         * Stub out requireJS text in the optimized file, but leave available for non-optimized development use.
+         */
+        stubModules: ["text"],
+
         /**
          * If shim config is used in the app during runtime, duplicate the config
          * here. Necessary if shim config is used, so that the shim's dependencies

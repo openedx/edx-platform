@@ -1,1 +1,1 @@
-define(['domReady!', 'jquery', 'backbone', 'underscore', 'gettext', 'text']);
+define(['domReady!', 'jquery', 'backbone', 'underscore', 'gettext']);
