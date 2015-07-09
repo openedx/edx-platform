@@ -55,12 +55,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         self.user = user
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(
-        username="basestring",
-        block_key=UsageKey,
-        scope=ScopeBase,
-        fields="seq(basestring)|set(basestring)|None"
-    )
     def get(self, username, block_key, scope=Scope.user_state, fields=None):
         """
         Retrieve the stored XBlock state for a single xblock usage.
@@ -85,10 +79,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         return state
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(username="basestring",
-              block_key=UsageKey,
-              state="dict(basestring: *)",
-              scope=ScopeBase)
     def set(self, username, block_key, state, scope=Scope.user_state):
         """
         Set fields for a particular XBlock.
@@ -102,12 +92,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         self.set_many(username, {block_key: state}, scope)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(
-        username="basestring",
-        block_key=UsageKey,
-        scope=ScopeBase,
-        fields="seq(basestring)|set(basestring)|None"
-    )
     def delete(self, username, block_key, scope=Scope.user_state, fields=None):
         """
         Delete the stored XBlock state for a single xblock usage.
@@ -121,12 +105,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         return self.delete_many(username, [block_key], scope, fields=fields)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(
-        username="basestring",
-        block_key=UsageKey,
-        scope=ScopeBase,
-        fields="seq(basestring)|set(basestring)|None"
-    )
     def get_mod_date(self, username, block_key, scope=Scope.user_state, fields=None):
         """
         Get the last modification date for fields from the specified blocks.
@@ -148,7 +126,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         }
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(username="basestring", block_keys="seq(UsageKey)|set(UsageKey)")
     def _get_student_modules(self, username, block_keys):
         """
         Retrieve the :class:`~StudentModule`s for the supplied ``username`` and ``block_keys``.
@@ -176,12 +153,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 yield (student_module, usage_key)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(
-        username="basestring",
-        block_keys="seq(UsageKey)|set(UsageKey)",
-        scope=ScopeBase,
-        fields="seq(basestring)|set(basestring)|None"
-    )
     def get_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Retrieve the stored XBlock state for a single xblock usage.
@@ -208,7 +179,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             yield (usage_key, state)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(username="basestring", block_keys_to_state="dict(UsageKey: dict(basestring: *))", scope=ScopeBase)
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
         Set fields for a particular XBlock.
@@ -255,12 +225,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 student_module.save(force_update=True)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(
-        username="basestring",
-        block_keys="seq(UsageKey)|set(UsageKey)",
-        scope=ScopeBase,
-        fields="seq(basestring)|set(basestring)|None"
-    )
     def delete_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Delete the stored XBlock state for a many xblock usages.
@@ -289,12 +253,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             student_module.save(force_update=True)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(
-        username="basestring",
-        block_keys="seq(UsageKey)|set(UsageKey)",
-        scope=ScopeBase,
-        fields="seq(basestring)|set(basestring)|None"
-    )
     def get_mod_date_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Get the last modification date for fields from the specified blocks.
@@ -322,7 +280,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 yield (usage_key, field, student_module.modified)
 
     @donottrack(StudentModule, StudentModuleHistory)
-    @contract(username="basestring", block_key=UsageKey, scope=ScopeBase)
     def get_history(self, username, block_key, scope=Scope.user_state):
         """
         Retrieve history of state changes for a given block for a given
