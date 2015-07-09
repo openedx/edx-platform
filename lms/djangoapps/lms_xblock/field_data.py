@@ -35,11 +35,14 @@ class LmsFieldData(SplitFieldData):
             Scope.user_state: student_data,
             Scope.user_info: student_data,
             Scope.preferences: student_data,
-            RemoteScope.individual: shared_data
+            RemoteScope.shared_user_state: shared_data
         })
 
     def __repr__(self):
         return "LmsFieldData{!r}".format((self._authored_data, self._student_data))
+
+
+## TODO: maybe this is useless
 
 class SharedFieldData(FieldData):
     """Summary"""

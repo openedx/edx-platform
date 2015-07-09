@@ -823,7 +823,7 @@ class FieldDataCache(object):
         return scope_map
 
     @contract(key=DjangoKeyValueStore.Key)
-    def get(self, key, remote = False):
+    def get(self, key, remote=False):
         """
         Load the field value specified by `key`.
 

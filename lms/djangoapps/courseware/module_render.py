@@ -315,7 +315,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     """
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
 
-    shared_data = SharedFieldData(course_id, user)
+    shared_data = student_data
 
     def make_xqueue_callback(dispatch='score_update'):
         """
