@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """ Commerce app tests package. """
+import datetime
+import json
 
+from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from freezegun import freeze_time
 import httpretty
 import jwt
 import mock
 
+from ecommerce_api_client import auth
 from commerce import ecommerce_api_client
 from student.tests.factories import UserFactory
 
@@ -32,16 +37,20 @@ class EcommerceApiClientTest(TestCase):
 
     def setUp(self):
         super(EcommerceApiClientTest, self).setUp()
+
         self.user = UserFactory()
         self.user.email = self.TEST_USER_EMAIL
         self.user.save()  # pylint: disable=no-member
 
     @httpretty.activate
+    @freeze_time('2015-7-2')
+    @override_settings(JWT_ISSUER='http://example.com/oauth', JWT_EXPIRATION=30)
     def test_tracking_context(self):
         """
         Ensure the tracking context is set up in the api client correctly and
         automatically.
         """
+
         # fake an ecommerce api request.
         httpretty.register_uri(
             httpretty.POST,
@@ -49,6 +58,7 @@ class EcommerceApiClientTest(TestCase):
             status=200, body='{}',
             adding_headers={'Content-Type': JSON}
         )
+
         mock_tracker = mock.Mock()
         mock_tracker.resolve_context = mock.Mock(return_value={'client_id': self.TEST_CLIENT_ID})
         with mock.patch('commerce.tracker.get_tracker', return_value=mock_tracker):
@@ -60,11 +70,14 @@ class EcommerceApiClientTest(TestCase):
             'username': self.user.username,
             'full_name': self.user.profile.name,
             'email': self.user.email,
+            'iss': settings.JWT_ISSUER,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.JWT_EXPIRATION),
             'tracking_context': {
                 'lms_user_id': self.user.id,  # pylint: disable=no-member
                 'lms_client_id': self.TEST_CLIENT_ID,
             },
         }
+
         expected_header = 'JWT {}'.format(jwt.encode(expected_payload, TEST_API_SIGNING_KEY))
         self.assertEqual(actual_header, expected_header)
 
