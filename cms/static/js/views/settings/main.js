@@ -54,8 +54,8 @@ var DetailsView = ValidatingView.extend({
 
         if (options.showMinGradeWarning || false) {
             new NotificationView.Warning({
-                title: gettext("Credit Eligibility Requirements"),
-                message: gettext("Minimum passing grade for credit is not set."),
+                title: gettext("Course Credit Requirements"),
+                message: gettext("The minimum grade for course credit is not set."),
                 closeIcon: true
             }).show();
         }
