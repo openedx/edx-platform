@@ -35,7 +35,8 @@ class CourseApiViewTestMixin(object):
             u'name': course_mode.mode_slug,
             u'currency': course_mode.currency.lower(),
             u'price': course_mode.min_price,
-            u'sku': course_mode.sku
+            u'sku': course_mode.sku,
+            u'expires': course_mode.expiration_datetime,
         }
 
 
