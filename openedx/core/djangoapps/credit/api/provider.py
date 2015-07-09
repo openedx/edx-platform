@@ -2,17 +2,13 @@
 API for initiating and tracking requests for credit from a provider.
 """
 
-import logging
-import uuid
 import datetime
-
+import logging
 import pytz
+import uuid
 
 from django.db import transaction
 
-from util.date_utils import to_timestamp
-
-from student.models import User
 from openedx.core.djangoapps.credit.exceptions import (
     UserIsNotEligible,
     CreditProviderNotConfigured,
@@ -27,6 +23,8 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility,
 )
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+from student.models import User
+from util.date_utils import to_timestamp
 
 
 log = logging.getLogger(__name__)
@@ -49,6 +47,47 @@ def get_credit_providers():
     Returns: list
     """
     return CreditProvider.get_credit_providers()
+
+
+def get_credit_provider_info(provider_id):
+    """Retrieve the 'CreditProvider' model data against provided
+     credit provider.
+
+    Args:
+        provider_id (str): The identifier for the credit provider
+
+    Returns: 'CreditProvider' data dictionary
+
+    Example Usage:
+        >>> get_credit_provider_info("hogwarts")
+        {
+            "provider_id": "hogwarts",
+            "display_name": "Hogwarts School of Witchcraft and Wizardry",
+            "provider_url": "https://credit.example.com/",
+            "provider_status_url": "https://credit.example.com/status/",
+            "enable_integration": False,
+            "fulfillment_instructions": "
+                <p>In order to fulfill credit, Hogwarts School of Witchcraft and Wizardry requires learners to:</p>
+                <ul>
+                <li>Sample instruction abc</li>
+                <li>Sample instruction xyz</li>
+                </ul>",
+        }
+
+    """
+    credit_provider = CreditProvider.get_credit_provider(provider_id=provider_id)
+    credit_provider_data = {}
+    if credit_provider:
+        credit_provider_data = {
+            "provider_id": credit_provider.provider_id,
+            "display_name": credit_provider.display_name,
+            "provider_url": credit_provider.provider_url,
+            "provider_status_url": credit_provider.provider_status_url,
+            "enable_integration": credit_provider.enable_integration,
+            "fulfillment_instructions": credit_provider.fulfillment_instructions
+        }
+
+    return credit_provider_data
 
 
 @transaction.commit_on_success
@@ -84,7 +123,7 @@ def create_credit_request(course_key, provider_id, username):
     Arguments:
         course_key (CourseKey): The identifier for the course.
         provider_id (str): The identifier of the credit provider.
-        user (User): The user initiating the request.
+        username (str): The user initiating the request.
 
     Returns: dict
 
