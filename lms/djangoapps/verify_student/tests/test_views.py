@@ -239,6 +239,17 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         )
         self._assert_redirects_to_dashboard(response)
 
+    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    def test_pay_and_verify_hides_header_nav(self):
+        course = self._create_course("verified")
+        self._enroll(course.id, "verified")
+        response = self._get_page('verify_student_start_flow', course.id)
+
+        # Verify that the header navigation links are hidden for the edx.org version
+        self.assertNotContains(response, "How it Works")
+        self.assertNotContains(response, "Find courses")
+        self.assertNotContains(response, "Schools & Partners")
+
     def test_verify_now(self):
         # We've already paid, and now we're trying to verify
         course = self._create_course("verified")
