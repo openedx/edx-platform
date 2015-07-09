@@ -202,6 +202,7 @@ def checkout_receipt(request):
         'error_text': error_text,
         'for_help_text': for_help_text,
         'payment_support_email': payment_support_email,
+        'nav_hidden': True,
     }
     return render_to_response('commerce/checkout_receipt.html', context)
 
