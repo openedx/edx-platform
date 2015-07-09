@@ -2565,3 +2565,7 @@ CREDIT_HELP_LINK_URL = "#"
 # not expected to be active; this setting simply allows administrators to
 # route any messages intended for LTI users to a common domain.
 LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
+
+# Number of seconds before JWT tokens expire
+JWT_EXPIRATION = 30
+JWT_ISSUER = None
