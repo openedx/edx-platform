@@ -65,6 +65,7 @@ def get_credit_provider_info(provider_id):
             "display_name": "Hogwarts School of Witchcraft and Wizardry",
             "provider_url": "https://credit.example.com/",
             "provider_status_url": "https://credit.example.com/status/",
+            "provider_description: "A new model for the Witchcraft and Wizardry School System.",
             "enable_integration": False,
             "fulfillment_instructions": "
                 <p>In order to fulfill credit, Hogwarts School of Witchcraft and Wizardry requires learners to:</p>
@@ -83,6 +84,7 @@ def get_credit_provider_info(provider_id):
             "display_name": credit_provider.display_name,
             "provider_url": credit_provider.provider_url,
             "provider_status_url": credit_provider.provider_status_url,
+            "provider_description": credit_provider.provider_description,
             "enable_integration": credit_provider.enable_integration,
             "fulfillment_instructions": credit_provider.fulfillment_instructions
         }

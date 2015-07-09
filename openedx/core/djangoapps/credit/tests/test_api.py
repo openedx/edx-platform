@@ -48,6 +48,7 @@ class CreditApiTestBase(TestCase):
     PROVIDER_NAME = "Hogwarts School of Witchcraft and Wizardry"
     PROVIDER_URL = "https://credit.example.com/request"
     PROVIDER_STATUS_URL = "https://credit.example.com/status"
+    PROVIDER_DESCRIPTION = "A new model for the Witchcraft and Wizardry School System."
     ENABLE_INTEGRATION = True
     FULFILLMENT_INSTRUCTIONS = "Sample fulfillment instruction for credit completion."
 
@@ -64,6 +65,7 @@ class CreditApiTestBase(TestCase):
             display_name=self.PROVIDER_NAME,
             provider_url=self.PROVIDER_URL,
             provider_status_url=self.PROVIDER_STATUS_URL,
+            provider_description=self.PROVIDER_DESCRIPTION,
             enable_integration=self.ENABLE_INTEGRATION,
             fulfillment_instructions=self.FULFILLMENT_INSTRUCTIONS
         )
@@ -459,6 +461,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             "display_name": self.PROVIDER_NAME,
             "provider_url": self.PROVIDER_URL,
             "provider_status_url": self.PROVIDER_STATUS_URL,
+            "provider_description": self.PROVIDER_DESCRIPTION,
             "enable_integration": self.ENABLE_INTEGRATION,
             "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS
         }
