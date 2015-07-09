@@ -6,7 +6,7 @@ from pytz import UTC
 from django.core.urlresolvers import reverse, NoReverseMatch
 
 import third_party_auth
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from course_modes.models import CourseMode
 
 
@@ -19,7 +19,7 @@ VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
 VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
 
-def check_verify_status_by_course(user, course_enrollments, all_course_modes):
+def check_verify_status_by_course(user, course_enrollments):
     """
     Determine the per-course verification statuses for a given user.
 
@@ -44,8 +44,6 @@ def check_verify_status_by_course(user, course_enrollments, all_course_modes):
     Arguments:
         user (User): The currently logged-in user.
         course_enrollments (list[CourseEnrollment]): The courses the user is enrolled in.
-        all_course_modes (list): List of all course modes for the student's enrolled courses,
-            including modes that have expired.
 
     Returns:
         dict: Mapping of course keys verification status dictionaries.
@@ -69,24 +67,21 @@ def check_verify_status_by_course(user, course_enrollments, all_course_modes):
         user, queryset=verifications
     )
 
+    # Retrieve verification deadlines for the enrolled courses
+    enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
+    course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
+
     recent_verification_datetime = None
 
     for enrollment in course_enrollments:
 
-        # Get the verified mode (if any) for this course
-        # We pass in the course modes we have already loaded to avoid
-        # another database hit, as well as to ensure that expired
-        # course modes are included in the search.
-        verified_mode = CourseMode.verified_mode_for_course(
-            enrollment.course_id,
-            modes=all_course_modes[enrollment.course_id]
-        )
+        # If the user hasn't enrolled as verified, then the course
+        # won't display state related to its verification status.
+        if enrollment.mode in CourseMode.VERIFIED_MODES:
 
-        # If no verified mode has ever been offered, or the user hasn't enrolled
-        # as verified, then the course won't display state related to its
-        # verification status.
-        if verified_mode is not None and enrollment.mode in CourseMode.VERIFIED_MODES:
-            deadline = verified_mode.expiration_datetime
+            # Retrieve the verification deadline associated with the course.
+            # This could be None if the course doesn't have a deadline.
+            deadline = course_deadlines.get(enrollment.course_id)
 
             relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
 

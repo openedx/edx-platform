@@ -47,6 +47,7 @@ from shoppingcart.processors import (
 )
 from verify_student.ssencrypt import has_valid_signature
 from verify_student.models import (
+    VerificationDeadline,
     SoftwareSecurePhotoVerification,
     VerificationCheckpoint,
     VerificationStatus,
@@ -194,6 +195,10 @@ class PayAndVerifyView(View):
         FACE_PHOTO_STEP: [WEBCAM_REQ],
     }
 
+    # Deadline types
+    VERIFICATION_DEADLINE = "verification"
+    UPGRADE_DEADLINE = "upgrade"
+
     @method_decorator(login_required)
     def get(
         self, request, course_id,
@@ -201,7 +206,8 @@ class PayAndVerifyView(View):
         current_step=None,
         message=FIRST_TIME_VERIFY_MSG
     ):
-        """Render the pay/verify requirements page.
+        """
+        Render the payment and verification flow.
 
         Arguments:
             request (HttpRequest): The request object.
@@ -244,28 +250,45 @@ class PayAndVerifyView(View):
         if redirect_url:
             return redirect(redirect_url)
 
-        expired_verified_course_mode, unexpired_paid_course_mode = self._get_expired_verified_and_paid_mode(course_key)
+        # If the verification deadline has passed
+        # then show the user a message that he/she can't verify.
+        #
+        # We're making the assumptions (enforced in Django admin) that:
+        #
+        # 1) Only verified modes have verification deadlines.
+        #
+        # 2) If set, verification deadlines are always AFTER upgrade deadlines, because why would you
+        #   let someone upgrade into a verified track if they can't complete verification?
+        #
+        verification_deadline = VerificationDeadline.deadline_for_course(course.id)
+        response = self._response_if_deadline_passed(course, self.VERIFICATION_DEADLINE, verification_deadline)
+        if response is not None:
+            log.info(u"Verification deadline for '%s' has passed.", course.id)
+            return response
 
-        # Check that the course has an unexpired paid mode
-        if unexpired_paid_course_mode is not None:
-            if CourseMode.is_verified_mode(unexpired_paid_course_mode):
+        # Retrieve the relevant course mode for the payment/verification flow.
+        #
+        # WARNING: this is technical debt!  A much better way to do this would be to
+        # separate out the payment flow and use the product SKU to figure out what
+        # the user is trying to purchase.
+        #
+        # Nonethless, for the time being we continue to make the really ugly assumption
+        # that at some point there was a paid course mode we can query for the price.
+        relevant_course_mode = self._get_paid_mode(course_key)
+
+        # If we can find a relevant course mode, then log that we're entering the flow
+        # Otherwise, this course does not support payment/verification, so respond with a 404.
+        if relevant_course_mode is not None:
+            if CourseMode.is_verified_mode(relevant_course_mode):
                 log.info(
-                    u"Entering verified workflow for user '%s', course '%s', with current step '%s'.",
+                    u"Entering payment and verification flow for user '%s', course '%s', with current step '%s'.",
                     request.user.id, course_id, current_step
                 )
-        elif expired_verified_course_mode is not None:
-            # Check if there is an *expired* verified course mode;
-            # if so, we should show a message explaining that the verification
-            # deadline has passed.
-            log.info(u"Verification deadline for '%s' has passed.", course_id)
-            context = {
-                'course': course,
-                'deadline': (
-                    get_default_time_display(expired_verified_course_mode.expiration_datetime)
-                    if expired_verified_course_mode.expiration_datetime else ""
+            else:
+                log.info(
+                    u"Entering payment flow for user '%s', course '%s', with current step '%s'",
+                    request.user.id, course_id, current_step
                 )
-            }
-            return render_to_response("verify_student/missed_verification_deadline.html", context)
         else:
             # Otherwise, there has never been a verified/paid mode,
             # so return a page not found response.
@@ -275,14 +298,32 @@ class PayAndVerifyView(View):
             )
             raise Http404
 
+        # If the user is trying to *pay* and the upgrade deadline has passed,
+        # then they shouldn't be able to enter the flow.
+        #
+        # NOTE: This should match the availability dates used by the E-Commerce service
+        # to determine whether a user can purchase a product.  The idea is that if the service
+        # won't fulfill the order, we shouldn't even let the user get into the payment flow.
+        #
+        user_is_trying_to_pay = message in [self.FIRST_TIME_VERIFY_MSG, self.UPGRADE_MSG]
+        if user_is_trying_to_pay:
+            upgrade_deadline = relevant_course_mode.expiration_datetime
+            response = self._response_if_deadline_passed(course, self.UPGRADE_DEADLINE, upgrade_deadline)
+            if response is not None:
+                log.info(u"Upgrade deadline for '%s' has passed.", course.id)
+                return response
+
         # Check whether the user has verified, paid, and enrolled.
         # A user is considered "paid" if he or she has an enrollment
         # with a paid course mode (such as "verified").
         # For this reason, every paid user is enrolled, but not
         # every enrolled user is paid.
         # If the course mode is not verified(i.e only paid) then already_verified is always True
-        already_verified = self._check_already_verified(request.user) \
-            if CourseMode.is_verified_mode(unexpired_paid_course_mode) else True
+        already_verified = (
+            self._check_already_verified(request.user)
+            if CourseMode.is_verified_mode(relevant_course_mode)
+            else True
+        )
         already_paid, is_enrolled = self._check_enrollment(request.user, course_key)
 
         # Redirect the user to a more appropriate page if the
@@ -302,7 +343,7 @@ class PayAndVerifyView(View):
             always_show_payment,
             already_verified,
             already_paid,
-            unexpired_paid_course_mode
+            relevant_course_mode
         )
         requirements = self._requirements(display_steps, request.user.is_active)
 
@@ -346,7 +387,7 @@ class PayAndVerifyView(View):
         verification_good_until = self._verification_valid_until(request.user)
 
         # get available payment processors
-        if unexpired_paid_course_mode.sku:
+        if relevant_course_mode.sku:
             # transaction will be conducted via ecommerce service
             processors = ecommerce_api_client(request.user).payment.processors.get()
         else:
@@ -358,7 +399,7 @@ class PayAndVerifyView(View):
             'contribution_amount': contribution_amount,
             'course': course,
             'course_key': unicode(course_key),
-            'course_mode': unexpired_paid_course_mode,
+            'course_mode': relevant_course_mode,
             'courseware_url': courseware_url,
             'current_step': current_step,
             'disable_courseware_js': True,
@@ -370,8 +411,8 @@ class PayAndVerifyView(View):
             'requirements': requirements,
             'user_full_name': full_name,
             'verification_deadline': (
-                get_default_time_display(unexpired_paid_course_mode.expiration_datetime)
-                if unexpired_paid_course_mode.expiration_datetime else ""
+                get_default_time_display(verification_deadline)
+                if verification_deadline else ""
             ),
             'already_verified': already_verified,
             'verification_good_until': verification_good_until,
@@ -449,41 +490,35 @@ class PayAndVerifyView(View):
         if url is not None:
             return redirect(url)
 
-    def _get_expired_verified_and_paid_mode(self, course_key):  # pylint: disable=invalid-name
-        """Retrieve expired verified mode and unexpired paid mode(with min_price>0) for a course.
+    def _get_paid_mode(self, course_key):
+        """
+        Retrieve the paid course mode for a course.
+
+        The returned course mode may or may not be expired.
+        Unexpired modes are preferred to expired modes.
 
         Arguments:
             course_key (CourseKey): The location of the course.
 
         Returns:
-            Tuple of `(expired_verified_mode, unexpired_paid_mode)`.  If provided,
-                `expired_verified_mode` is an *expired* verified mode for the course.
-                If provided, `unexpired_paid_mode` is an *unexpired* paid(with min_price>0)
-                mode for the course.  Either of these may be None.
+            CourseMode tuple
 
         """
         # Retrieve all the modes at once to reduce the number of database queries
         all_modes, unexpired_modes = CourseMode.all_and_unexpired_modes_for_courses([course_key])
 
-        # Unexpired paid modes
-        unexpired_paid_modes = [mode for mode in unexpired_modes[course_key] if mode.min_price]
-        if len(unexpired_paid_modes) > 1:
-            # There is more than one paid mode defined,
-            # so choose the first one.
-            log.warn(
-                u"More than one paid modes are defined for course '%s' choosing the first one %s",
-                course_key, unexpired_paid_modes[0]
-            )
-        unexpired_paid_mode = unexpired_paid_modes[0] if unexpired_paid_modes else None
+        # Retrieve the first unexpired, paid mode, if there is one
+        for mode in unexpired_modes[course_key]:
+            if mode.min_price > 0:
+                return mode
 
-        # Find an unexpired verified mode
-        verified_mode = CourseMode.verified_mode_for_course(course_key, modes=unexpired_modes[course_key])
-        expired_verified_mode = None
+        # Otherwise, find the first expired mode
+        for mode in all_modes[course_key]:
+            if mode.min_price > 0:
+                return mode
 
-        if verified_mode is None:
-            expired_verified_mode = CourseMode.verified_mode_for_course(course_key, modes=all_modes[course_key])
-
-        return (expired_verified_mode, unexpired_paid_mode)
+        # Otherwise, return None and so the view knows to respond with a 404.
+        return None
 
     def _display_steps(self, always_show_payment, already_verified, already_paid, course_mode):
         """Determine which steps to display to the user.
@@ -610,11 +645,42 @@ class PayAndVerifyView(View):
         has_paid = False
 
         if enrollment_mode is not None and is_active:
-            all_modes = CourseMode.modes_for_course_dict(course_key)
+            all_modes = CourseMode.modes_for_course_dict(course_key, include_expired=True)
             course_mode = all_modes.get(enrollment_mode)
             has_paid = (course_mode and course_mode.min_price > 0)
 
         return (has_paid, bool(is_active))
+
+    def _response_if_deadline_passed(self, course, deadline_name, deadline_datetime):
+        """
+        Respond with some error messaging if the deadline has passed.
+
+        Arguments:
+            course (Course): The course the user is trying to enroll in.
+            deadline_name (str): One of the deadline constants.
+            deadline_datetime (datetime): The deadline.
+
+        Returns: HttpResponse or None
+
+        """
+        if deadline_name not in [self.VERIFICATION_DEADLINE, self.UPGRADE_DEADLINE]:
+            log.error("Invalid deadline name %s.  Skipping check for whether the deadline passed.", deadline_name)
+            return None
+
+        deadline_passed = (
+            deadline_datetime is not None and
+            deadline_datetime < datetime.datetime.now(UTC)
+        )
+        if deadline_passed:
+            context = {
+                'course': course,
+                'deadline_name': deadline_name,
+                'deadline': (
+                    get_default_time_display(deadline_datetime)
+                    if deadline_datetime else ""
+                )
+            }
+            return render_to_response("verify_student/missed_deadline.html", context)
 
 
 def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
