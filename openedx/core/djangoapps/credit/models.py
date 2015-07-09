@@ -94,6 +94,13 @@ class CreditProvider(TimeStampedModel):
         )
     )
 
+    provider_description = models.TextField(
+        default="",
+        help_text=ugettext_lazy(
+            "Description for the credit provider displayed to users."
+        )
+    )
+
     fulfillment_instructions = models.TextField(
         null=True,
         blank=True,
