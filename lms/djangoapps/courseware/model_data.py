@@ -431,7 +431,7 @@ class UserStateCache(object):
         the cache.
 
         Arguments:
-            kvs_key (`DjangoKeyValueStore.Key`): The field value to delete
+            kvs_key (`DjangoKeyValueStore.Key`): The field value to get
 
         Returns: A django orm object from the cache
         """
@@ -825,7 +825,7 @@ class FieldDataCache(object):
         return scope_map
 
     @contract(key=DjangoKeyValueStore.Key)
-    def get(self, key):
+    def get(self, key, remote = False):
         """
         Load the field value specified by `key`.
 
@@ -836,7 +836,7 @@ class FieldDataCache(object):
         Raises: KeyError if key isn't found in the cache
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and remote == False:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id

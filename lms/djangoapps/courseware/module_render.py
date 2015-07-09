@@ -37,7 +37,7 @@ from courseware.entrance_exams import (
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData, SharedFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError
@@ -314,6 +314,8 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         (LmsModuleSystem, KvsFieldData):  (module system, student_data) bound to, primarily, the user and descriptor
     """
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
+
+    shared_data = SharedFieldData(course_id, user)
 
     def make_xqueue_callback(dispatch='score_update'):
         """
@@ -600,7 +602,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
-    field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+    field_data = LmsFieldData(descriptor._field_data, student_data, shared_data)  # pylint: disable=protected-access
 
     user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
 
