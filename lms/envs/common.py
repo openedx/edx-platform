@@ -1755,6 +1755,7 @@ YOUTUBE = {
 
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
 }
+YOUTUBE_API_KEY = 'YOUTUBE_API_TEST_KEY'
 
 ################################### APPS ######################################
 INSTALLED_APPS = (

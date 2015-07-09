@@ -44,7 +44,7 @@ from lms.envs.common import (
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
-    ENABLE_CREDIT_ELIGIBILITY
+    ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
 )
 from path import path
 from warnings import simplefilter
@@ -995,8 +995,8 @@ XBLOCK_SETTINGS = {
     "VideoDescriptor": {
         "licensing_enabled": FEATURES.get("LICENSING", False)
     },
-    "VideoModule": {
-        "api_key": 'AIzaSyD4Nl2sPF86nAty2TWM5hdMoKJTmqxMZoc'
+    'VideoModule': {
+        'YOUTUBE_API_KEY': YOUTUBE_API_KEY
     }
 }
 
