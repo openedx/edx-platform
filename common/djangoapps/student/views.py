@@ -880,6 +880,7 @@ def _credit_statuses(user, course_enrollments):
             "purchased": course_key in credit_enrollments,
             "provider_name": None,
             "provider_status_url": None,
+            "provider_id": None,
             "request_status": request_status_by_course.get(course_key),
             "error": False,
         }
@@ -903,6 +904,7 @@ def _credit_statuses(user, course_enrollments):
                 provider_info = provider_info_by_id.get(provider_id, {})
                 status["provider_name"] = provider_info.get("display_name")
                 status["provider_status_url"] = provider_info.get("status_url")
+                status["provider_id"] = provider_id
 
         statuses[course_key] = status
 

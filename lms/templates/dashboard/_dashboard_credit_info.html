@@ -9,15 +9,14 @@
 
 % if credit_status["eligible"]:
     <div class="message message-status is-shown credit-message">
-    % if credit_status["error"]:
-        <p class="message-copy credit-error-msg">
+        <p class="message-copy is-hidden credit-error-msg" data-credit-error="${credit_status['error']}">
             ${_("An error occurred with this transaction. For help, contact {support_email}.").format(
                 support_email=u'<a href="mailto:{address}">{address}</a>'.format(
                     address=settings.DEFAULT_FEEDBACK_EMAIL
                 )
             )}
         </p>
-    % elif not credit_status["purchased"]:
+    % if not credit_status["purchased"] and not credit_status["error"] :
         <p class="credit-eligibility-msg">
             % if credit_status["deadline"] < datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30):
                 ${_("The opportunity to purchase credit for this course expires on {deadline}. You've worked hard - don't miss out!").format(deadline=get_default_time_display(credit_status["deadline"]))}
@@ -27,19 +26,34 @@
         </p>
         <div class="purchase_credit">
             ## TODO: set the URL for the link to the provider selection page on the E-Commerce service
-            <a class="btn purchase-credit-btn" href="#" target="_blank" data-course-key="${credit_status["course_key"]}">${_("Purchase Course Credit")}</a>
+            <a class="btn credit-btn purchase-credit-btn" href="#" target="_blank" data-course-key="${credit_status['course_key']}">${_("Purchase Course Credit")}</a>
         </div>
-    % elif credit_status["request_status"] in [None, "pending"]:
-        <p class="message-copy credit-request-pending-msg">
-        ${_("Thanks for your payment! We are currently processing your course credit. You'll see a message here when the transaction is complete. For more information, see {provider_link}.").format(
-                provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
-                    provider_url=credit_status["provider_status_url"],
-                    provider_name=credit_status["provider_name"],
+    % elif credit_status["request_status"] in [None, "pending"] and not credit_status["error"] :
+        % if credit_status["request_status"] == "pending":
+            <p class="message-copy credit-request-pending-msg">
+            ${_("Thanks for your payment! We are currently processing your course credit. You'll see a message here when the transaction is complete. For more information, see {provider_link}.").format(
+                    provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
+                        provider_url=credit_status["provider_status_url"],
+                        provider_name=credit_status["provider_name"],
+                    )
                 )
-            )
-        }
-        </p>
-    % elif credit_status["request_status"] == "approved":
+            }
+            </p>
+        % elif credit_status["request_status"] is None:
+            <p class="message-copy credit-request-pending-msg">
+            ${_("Thank you for your payment! To receive your course credit, go to the {provider_link} website. You may have to complete some additional steps depending on the institution").format(
+                    provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
+                        provider_url=credit_status["provider_status_url"],
+                        provider_name=credit_status["provider_name"],
+                    )
+                )
+            }
+            </p>
+        % endif
+
+        <button class="btn credit-btn pending-credit-btn" data-course-key="${credit_status['course_key']}" data-user="${user.username}" data-provider="${credit_status['provider_id']}">${_("Complete Credit")}</button>
+        <form id="credit-pending-form"> </form>
+    % elif credit_status["request_status"] == "approved" and not credit_status["error"] :
         <p class="message-copy credit-request-approved-msg">
         ${_("Congratulations - you have received credit for this course! For more information, see {provider_link}.").format(
                 provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
@@ -49,7 +63,8 @@
             )
         }
         </p>
-    % elif credit_status["request_status"] == "rejected":
+        <a class="btn credit-btn" href="${credit_status['provider_status_url']}" target="_blank">${_("Access credit")}</a>
+    % elif credit_status["request_status"] == "rejected" and not credit_status["error"] :
         <p class="message-copy credit-request-rejected-msg">
         ${_("{provider_name} has declined your request for course credit. For more information, contact {provider_link}.").format(
                 provider_name=credit_status["provider_name"],
@@ -60,6 +75,14 @@
             )
         }
         </p>
+        <a class="btn credit-btn" href="${credit_status['provider_status_url']}" target="_blank">
+            ${_("Contact {provider_link}").format(provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
+                provider_url=credit_status["provider_status_url"],
+                provider_name=credit_status["provider_name"],
+            )
+            )
+        }
+        </a>
     % endif
     </div>
 % endif
