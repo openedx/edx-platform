@@ -85,6 +85,7 @@ except ImportError:
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
+
 @XBlock.wants('settings')
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule, LicenseMixin):
     """

@@ -120,7 +120,10 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         callback = self.get_params['callback']
         youtube_metadata = json.loads(
             requests.get(
-                "http://www.googleapis.com/youtube/v3/videos/?id={id}&part=contentDetails&key={}&referrer=*.edx.org/*'".format(id=youtube_id, key=settings.XBLOCK_SETTINGS['VideoModule']['api_key'])
+                "http://www.googleapis.com/youtube/v3/videos/?id={id}&part=contentDetails&key={}".format(
+                    id=youtube_id,
+                    key=settings.XBLOCK_SETTINGS['VideoModule']['api_key']
+                )
             ).text
         )
         data = OrderedDict({
