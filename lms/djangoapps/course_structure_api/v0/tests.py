@@ -80,7 +80,7 @@ class CourseViewTestsMixin(object):
         factory = MultipleChoiceResponseXMLFactory()
         args = {'choices': [False, True, False]}
         problem_xml = factory.build_xml(**args)
-        ItemFactory.create(
+        self.problem = ItemFactory.create(
             category="problem",
             parent_location=self.sequential.location,
             display_name="Problem 1",
@@ -92,6 +92,12 @@ class CourseViewTestsMixin(object):
             category="video",
             parent_location=self.sequential.location,
             display_name="Video 1",
+        )
+
+        self.html = ItemFactory.create(
+            category="html",
+            parent_location=self.sequential.location,
+            display_name="HTML 1",
         )
 
         self.empty_course = CourseFactory.create(
@@ -457,7 +463,7 @@ class CourseBlocksOrNavigationTestMixin(CourseDetailTestMixin, CourseViewTestsMi
         blocks = response.data[self.block_navigation_view_type]
 
         # verify number of blocks
-        self.assertEquals(len(blocks), 4)
+        self.assertEquals(len(blocks), 5)
 
         # verify fields in blocks
         for field, block in product(self.block_fields, blocks.values()):
@@ -519,6 +525,23 @@ class CourseBlocksTestMixin(object):
         self.assertIn('problem', root_block['block_count'])
         self.assertEquals(root_block['block_count']['problem'], 1)
 
+    def test_multi_device_support(self):
+        """
+        Verifies the view's response when multi_device support is requested.
+        """
+        response = self.http_get_for_course(
+            data={'fields': 'multi_device'}
+        )
+        self.assertEquals(response.status_code, 200)
+
+        for block, expected_multi_device_support in (
+                (self.problem, True),
+                (self.html, True),
+                (self.video, False)
+        ):
+            block_response = response.data[self.block_navigation_view_type][unicode(block.location)]
+            self.assertEquals(block_response['multi_device'], expected_multi_device_support)
+
 
 class CourseNavigationTestMixin(object):
     """
@@ -535,7 +558,7 @@ class CourseNavigationTestMixin(object):
         )
         root_block = response.data[self.block_navigation_view_type][unicode(self.course.location)]
         self.assertIn('descendants', root_block)
-        self.assertEquals(len(root_block['descendants']), 3)
+        self.assertEquals(len(root_block['descendants']), 4)
 
     def test_depth(self):
         """
@@ -545,7 +568,7 @@ class CourseNavigationTestMixin(object):
 
         container_descendants = (
             (self.course.location, 1),
-            (self.sequential.location, 2),
+            (self.sequential.location, 3),
         )
         for container_location, expected_num_descendants in container_descendants:
             block = response.data[self.block_navigation_view_type][unicode(container_location)]

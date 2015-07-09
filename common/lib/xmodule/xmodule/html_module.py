@@ -84,7 +84,9 @@ class HtmlModule(HtmlModuleMixin):
     """
     Module for putting raw html in a course
     """
-    pass
+    @XBlock.supports("multi_device")
+    def student_view(self, context):
+        return super(HtmlModule, self).student_view(context)
 
 
 class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
@@ -95,7 +97,6 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: d
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
-    has_responsive_ui = True
     show_in_read_only_mode = True
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
