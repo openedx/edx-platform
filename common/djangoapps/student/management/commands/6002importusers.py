@@ -29,8 +29,8 @@ def import_user(u):
     user_keys = ["id","username","email","password","is_staff","is_active",
                 "is_superuser","last_login", "date_joined"]
 
-    up_keys = ["id","user_id","name","cedula","year_of_birth",
-               "gender","level_of_education","city", "country"]
+    up_keys = ["id","user_id","name","cedula"] #,"year_of_birth"
+#               "gender","level_of_education","city", "country"]
 
 #    user_keys = ['id', 'username', 'email', 'password', 'is_staff',
 #                 'is_active', 'is_superuser', 'last_login', 'date_joined',
@@ -40,20 +40,38 @@ def import_user(u):
 #               'level_of_education', 'city', 'country']
 
     u = User()
+    flag = False
+    crear = True
+    usuario = False
+    cedula = False
     for key in user_keys:
-        u.__setattr__(key, user_info[key])
-    # need to be explicit ?
-    u.is_staff = False
-    u.is_superuser = False
-    u.save()
+        try:
+            usuario = User.objects.get(email=user_info['email'])
+        except User.DoesNotExist:
+            pass
+        try:
+            cedula = User.objects.get(username=user_info['username'])
+        except User.DoesNotExist:
+            pass
 
+        u.__setattr__(key, user_info[key])
+
+    if usuario or cedula:
+        crear = False
+    # need to be explicit ?
+    if crear:
+        u.is_staff = False
+        u.is_superuser = False
+        u.save()
+    else:
+        return
     up = UserProfile()
     up.user = u
     for key in up_keys:
         valor = up_info[key]
-        if key == 'city':
-            city = City.objects.get(name__iexact=up_info[key])
-            valor = city
+#        if key == 'city':
+#            city = City.objects.get(name__iexact=up_info[key])
+#            valor = city
         up.__setattr__(key, valor)
     up.year_of_birth = False
     up.save()
