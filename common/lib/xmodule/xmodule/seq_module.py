@@ -148,12 +148,16 @@ class SequenceModule(SequenceFields, XModule):
         fragment = Fragment()
 
         if self.is_time_limited:
+            # Is this sequent part of a timed or proctored exam?
             proctoring_service = self.runtime.service(self, 'proctoring')
             user_service = self.runtime.service(self, 'user')
             user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
             course_id = self.runtime.course_id
             content_id = self.location
 
+            # See if the edx-proctoring subsystem wants to present
+            # a special view to the student rather
+            # than the actual sequence content
             view_html = proctoring_service.get_student_view(
                 user_id,
                 course_id,
