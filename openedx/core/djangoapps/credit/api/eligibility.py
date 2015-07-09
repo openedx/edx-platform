@@ -6,6 +6,7 @@ whether a user has satisfied those requirements.
 import logging
 
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements, InvalidCreditCourse
+from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
 from openedx.core.djangoapps.credit.models import (
     CreditCourse,
     CreditRequirement,
@@ -275,7 +276,12 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
     # If we're marking this requirement as "satisfied", there's a chance
     # that the user has met all eligibility requirements.
     if status == "satisfied":
-        CreditEligibility.update_eligibility(reqs, username, course_key)
+        is_eligible, eligibility_record_created = CreditEligibility.update_eligibility(reqs, username, course_key)
+        if eligibility_record_created and is_eligible:
+            try:
+                send_credit_notifications(username, course_key)
+            except Exception:  # pylint: disable=broad-except
+                log.error("Error sending email")
 
 
 def get_credit_requirement_status(course_key, username, namespace=None, name=None):

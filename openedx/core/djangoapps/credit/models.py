@@ -111,6 +111,24 @@ class CreditProvider(TimeStampedModel):
         )
     )
 
+    eligibility_email_message = models.TextField(
+        default="",
+        help_text=ugettext_lazy(
+            "Plain text or html content for displaying custom message inside "
+            "credit eligibility email content which is sent when user has met "
+            "all credit eligibility requirements."
+        )
+    )
+
+    receipt_email_message = models.TextField(
+        default="",
+        help_text=ugettext_lazy(
+            "Plain text or html content for displaying custom message inside "
+            "credit receipt email content which is sent *after* paying to get "
+            "credit for a credit course."
+        )
+    )
+
     CREDIT_PROVIDERS_CACHE_KEY = "credit.providers.list"
 
     @classmethod
@@ -479,6 +497,7 @@ class CreditEligibility(TimeStampedModel):
             username (str): Identifier of the user being updated.
             course_key (CourseKey): Identifier of the course.
 
+        Returns: tuple
         """
         # Check all requirements for the course to determine if the user
         # is eligible.  We need to check all the *requirements*
@@ -497,8 +516,11 @@ class CreditEligibility(TimeStampedModel):
                     username=username,
                     course=CreditCourse.objects.get(course_key=course_key),
                 )
+                return is_eligible, True
             except IntegrityError:
-                pass
+                return is_eligible, False
+        else:
+            return is_eligible, False
 
     @classmethod
     def get_user_eligibilities(cls, username):

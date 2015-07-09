@@ -156,3 +156,6 @@ analytics-python==0.4.4
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
 jsonfield==1.0.3
+
+# Inlines CSS styles into HTML for email notifications.
+pynliner==0.5.2
