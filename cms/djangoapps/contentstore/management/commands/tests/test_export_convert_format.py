@@ -3,6 +3,7 @@ Test for export_convert_format.
 """
 from unittest import TestCase
 from django.core.management import call_command, CommandError
+from django.conf import settings
 from tempfile import mkdtemp
 import shutil
 from path import path
@@ -16,7 +17,7 @@ class ConvertExportFormat(TestCase):
     """
     def setUp(self):
         """ Common setup. """
-        self.temp_dir = mkdtemp()
+        self.temp_dir = mkdtemp(dir=settings.DATA_DIR)
         self.data_dir = path(__file__).realpath().parent / 'data'
         self.version0 = self.data_dir / "Version0_drafts.tar.gz"
         self.version1 = self.data_dir / "Version1_drafts.tar.gz"
@@ -53,8 +54,8 @@ class ConvertExportFormat(TestCase):
         """
         Helper function for determining if 2 archives are equal.
         """
-        temp_dir_1 = mkdtemp()
-        temp_dir_2 = mkdtemp()
+        temp_dir_1 = mkdtemp(dir=settings.DATA_DIR)
+        temp_dir_2 = mkdtemp(dir=settings.DATA_DIR)
         try:
             extract_source(file1, temp_dir_1)
             extract_source(file2, temp_dir_2)
