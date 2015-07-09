@@ -31,7 +31,6 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
-from edxmako.middleware import MakoMiddleware
 from edxmako.tests import mako_middleware_process_request
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
@@ -201,6 +200,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
         request = self.request_factory.get(reverse('about_course', args=[course.id.to_deprecated_string()]))
         request.user = AnonymousUser()
+        mako_middleware_process_request(request)
         response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
@@ -343,7 +343,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         request.user = self.user
 
         # TODO: Remove the dependency on MakoMiddleware (by making the views explicitly supply a RequestContext)
-        MakoMiddleware().process_request(request)
+        mako_middleware_process_request(request)
 
         result = views.course_about(request, course_id)
         if expected_end_text is not None:
@@ -748,8 +748,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
-        MakoMiddleware().process_request(self.request)
-
+        mako_middleware_process_request(self.request)
         course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
