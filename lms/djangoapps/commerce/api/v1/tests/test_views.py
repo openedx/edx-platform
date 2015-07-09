@@ -33,7 +33,7 @@ class CourseApiViewTestMixin(object):
         """ Serialize a CourseMode to a dict. """
         return {
             u'name': course_mode.mode_slug,
-            u'currency': course_mode.currency,
+            u'currency': course_mode.currency.lower(),
             u'price': course_mode.min_price,
             u'sku': course_mode.sku
         }
