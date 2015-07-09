@@ -29,7 +29,11 @@ from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 
 @attr('shard_1')
 @mock.patch.dict(
-    'django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True}
+    'django.conf.settings.FEATURES',
+    {
+        'ENABLE_XBLOCK_VIEW_ENDPOINT': True,
+        'ENABLE_MAX_SCORE_CACHE': False,
+    }
 )
 @ddt.ddt
 class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
@@ -173,18 +177,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         # (providers, course_width, enable_ccx): # of sql queries, # of mongo queries, # of xblocks
-        ('no_overrides', 1, True): (27, 7, 14),
-        ('no_overrides', 2, True): (135, 7, 85),
-        ('no_overrides', 3, True): (595, 7, 336),
-        ('ccx', 1, True): (27, 7, 14),
-        ('ccx', 2, True): (135, 7, 85),
-        ('ccx', 3, True): (595, 7, 336),
-        ('no_overrides', 1, False): (27, 7, 14),
-        ('no_overrides', 2, False): (135, 7, 85),
-        ('no_overrides', 3, False): (595, 7, 336),
-        ('ccx', 1, False): (27, 7, 14),
-        ('ccx', 2, False): (135, 7, 85),
-        ('ccx', 3, False): (595, 7, 336),
+        ('no_overrides', 1, True): (23, 7, 14),
+        ('no_overrides', 2, True): (68, 7, 85),
+        ('no_overrides', 3, True): (263, 7, 336),
+        ('ccx', 1, True): (23, 7, 14),
+        ('ccx', 2, True): (68, 7, 85),
+        ('ccx', 3, True): (263, 7, 336),
+        ('no_overrides', 1, False): (23, 7, 14),
+        ('no_overrides', 2, False): (68, 7, 85),
+        ('no_overrides', 3, False): (263, 7, 336),
+        ('ccx', 1, False): (23, 7, 14),
+        ('ccx', 2, False): (68, 7, 85),
+        ('ccx', 3, False): (263, 7, 336),
     }
 
 
@@ -196,16 +200,16 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True): (27, 4, 9),
-        ('no_overrides', 2, True): (135, 19, 54),
-        ('no_overrides', 3, True): (595, 84, 215),
-        ('ccx', 1, True): (27, 4, 9),
-        ('ccx', 2, True): (135, 19, 54),
-        ('ccx', 3, True): (595, 84, 215),
-        ('no_overrides', 1, False): (27, 4, 9),
-        ('no_overrides', 2, False): (135, 19, 54),
-        ('no_overrides', 3, False): (595, 84, 215),
-        ('ccx', 1, False): (27, 4, 9),
-        ('ccx', 2, False): (135, 19, 54),
-        ('ccx', 3, False): (595, 84, 215),
+        ('no_overrides', 1, True): (23, 4, 9),
+        ('no_overrides', 2, True): (68, 19, 54),
+        ('no_overrides', 3, True): (263, 84, 215),
+        ('ccx', 1, True): (23, 4, 9),
+        ('ccx', 2, True): (68, 19, 54),
+        ('ccx', 3, True): (263, 84, 215),
+        ('no_overrides', 1, False): (23, 4, 9),
+        ('no_overrides', 2, False): (68, 19, 54),
+        ('no_overrides', 3, False): (263, 84, 215),
+        ('ccx', 1, False): (23, 4, 9),
+        ('ccx', 2, False): (68, 19, 54),
+        ('ccx', 3, False): (263, 84, 215),
     }
