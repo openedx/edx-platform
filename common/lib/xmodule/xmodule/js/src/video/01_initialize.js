@@ -9,23 +9,15 @@
  *
  * @module Initialize
  */
-// TODO this is temporary hack to run the jasmine tests
-(function(requirejs, define) {
-    requirejs.config({
-        paths: {
-            'moment': 'xmodule/include/common_static/js/vendor/moment.min'
-        }
-    });
-
-}).call(this, RequireJS.requirejs, define);
-
 
 (function (requirejs, require, define) {
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_i18n.js', 'moment'],
-function (VideoPlayer, i18n, moment) {
+['video/03_video_player.js', 'video/00_i18n.js'],
+function (VideoPlayer, i18n) {
+    var moment = window.moment;
+
     /**
      * @function
      *
@@ -223,7 +215,7 @@ function (VideoPlayer, i18n, moment) {
             state.el.trigger('youtube_availability', [state.youtubeIsAvailable]);
         }, state.config.ytTestTimeout);
 
-        $.getScript(document.location.protocol + '//' + state.config.ytApiUrl);
+        $.getScript(state.config.ytApiUrl);
     }
 
     // function _configureCaptions(state)
@@ -684,8 +676,7 @@ function (VideoPlayer, i18n, moment) {
         }
 
         return $.ajax({
-            url: ['https:', '//', this.config.ytTestUrl, '?id=', url,
-                '&part=contentDetails&key=', this.config.ytKey ,'&referrer=*.edx.org/*'].join(''),
+            url: [this.config.ytMetadataUrl, '?id=', url, '&part=contentDetails&key=', this.config.ytKey].join(''),
             timeout: this.config.ytTestTimeout,
             success: _.isFunction(callback) ? callback : null
         });

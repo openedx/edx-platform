@@ -2,6 +2,11 @@
     requirejs.config({
         paths: {
             'moment': 'common_static/js/vendor/moment.min'
+        },
+        shim: {
+            'moment': {
+                exports: 'moment'
+            }
         }
     });
 

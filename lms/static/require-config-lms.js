@@ -51,6 +51,7 @@
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
             "underscore.string": "js/vendor/underscore.string.min",
+            "moment": "js/vendor/moment.min",
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",

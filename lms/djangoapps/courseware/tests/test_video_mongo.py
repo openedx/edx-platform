@@ -63,7 +63,7 @@ class TestVideoYouTube(TestVideo):
                 "transcriptLanguages": OrderedDict({"en": "English", "uk": u"Українська"}),
                 "ytTestTimeout": 1500,
                 "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "www.googleapis.com/youtube/v3/videos/",
+                "ytMetadataUrl": "www.googleapis.com/youtube/v3/videos/",
                 "ytKey": None,
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
@@ -141,7 +141,7 @@ class TestVideoNonYouTube(TestVideo):
                 "transcriptLanguages": OrderedDict({"en": "English"}),
                 "ytTestTimeout": 1500,
                 "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "www.googleapis.com/youtube/v3/videos/",
+                "ytMetadataUrl": "www.googleapis.com/youtube/v3/videos/",
                 "ytKey": None,
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
@@ -195,7 +195,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             "transcriptLanguages": OrderedDict({"en": "English"}),
             "ytTestTimeout": 1500,
             "ytApiUrl": "www.youtube.com/iframe_api",
-            "ytTestUrl": "www.googleapis.com/youtube/v3/videos/",
+            "ytMetadataUrl": "www.googleapis.com/youtube/v3/videos/",
             "ytKey": None,
             "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation/__lang__'
@@ -1185,7 +1185,7 @@ class TestVideoWithBumper(TestVideo):
                 "transcriptLanguages": OrderedDict({"en": "English", "uk": u"Українська"}),
                 "ytTestTimeout": 1500,
                 "ytApiUrl": "www.youtube.com/iframe_api",
-                "ytTestUrl": "www.googleapis.com/youtube/v3/videos/",
+                "ytMetadataUrl": "www.googleapis.com/youtube/v3/videos/",
                 "ytKey": None,
                 "transcriptTranslationUrl": self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'

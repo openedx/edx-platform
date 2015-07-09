@@ -266,9 +266,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         api_key = None
         if settings_service:
-            xb_settings = settings_service.get_settings_bucket(self)
-            if xb_settings and 'api_key' in xb_settings:
-                api_key = xb_settings['api_key']
+            xblock_settings = settings_service.get_settings_bucket(self)
+            if xblock_settings and 'api_key' in xblock_settings:
+                api_key = xblock_settings['api_key']
 
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
@@ -295,7 +295,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'ytTestTimeout': 1500,
 
             'ytApiUrl': settings.YOUTUBE['API'],
-            'ytTestUrl': settings.YOUTUBE['TEST_URL'],
+            'ytMetadataUrl': settings.YOUTUBE['METADATA_URL'],
             'ytKey': api_key,
 
             'transcriptTranslationUrl': self.runtime.handler_url(
