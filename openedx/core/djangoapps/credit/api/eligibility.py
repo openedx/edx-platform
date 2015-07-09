@@ -155,12 +155,14 @@ def is_user_eligible_for_credit(username, course_key):
     return CreditEligibility.is_user_eligible_for_credit(course_key, username)
 
 
-def get_eligibilities_for_user(username):
+def get_eligibilities_for_user(username, course_key=None):
     """
-    Retrieve all courses for which the user is eligible for credit.
+    Retrieve all courses or particular course for which the user is eligible
+    for credit.
 
     Arguments:
         username (unicode): Identifier of the user.
+        course_key (unicode): Identifier of the course.
 
     Example:
         >>> get_eligibilities_for_user("ron")
@@ -179,12 +181,17 @@ def get_eligibilities_for_user(username):
     Returns: list
 
     """
+    eligibilities = CreditEligibility.get_user_eligibilities(username)
+
+    if course_key:
+        eligibilities = eligibilities.filter(course_key=course_key)
+
     return [
         {
             "course_key": eligibility.course.course_key,
             "deadline": eligibility.deadline,
         }
-        for eligibility in CreditEligibility.get_user_eligibilities(username)
+        for eligibility in eligibilities
     ]
 
 
