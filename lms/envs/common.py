@@ -1938,7 +1938,7 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
-    
+
     'xblock_django',
 
     # edX Proctoring
@@ -2585,3 +2585,11 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
+
+
+#### PROCTORING CONFIGURATION DEFAULTS
+
+PROCTORING_BACKEND_PROVIDER = {
+    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'options': {},
+}
