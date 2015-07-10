@@ -154,12 +154,12 @@ class RenderXBlockTestMixin(object):
     def test_unauthenticated(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
-        self.verify_response(expected_response_code=302)
+        self.verify_response(expected_response_code=404)
 
     def test_unenrolled_student(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=False, login=True)
-        self.verify_response(expected_response_code=302)
+        self.verify_response(expected_response_code=404)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_fail_block_unreleased(self):
