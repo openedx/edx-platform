@@ -527,6 +527,18 @@ class DashboardTest(ModuleStoreTestCase):
             response_3 = self.client.get(reverse('dashboard'))
             self.assertEquals(response_3.status_code, 200)
 
+    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    def test_dashboard_header_nav_has_find_courses(self):
+        self.client.login(username="jack", password="test")
+        response = self.client.get(reverse("dashboard"))
+
+        # "Find courses" is shown in the side panel
+        self.assertContains(response, "Find Courses")
+
+        # But other links are hidden in the navigation
+        self.assertNotContains(response, "How it Works")
+        self.assertNotContains(response, "Schools & Partners")
+
 
 class UserSettingsEventTestMixin(EventTestMixin):
     """
