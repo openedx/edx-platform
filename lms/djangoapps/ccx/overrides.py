@@ -7,6 +7,8 @@ import logging
 
 from django.db import transaction, IntegrityError
 
+import request_cache
+
 from courseware.field_overrides import FieldOverrideProvider  # pylint: disable=import-error
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
@@ -69,7 +71,11 @@ def get_current_ccx(course_key):
     if not isinstance(course_key, CCXLocator):
         return None
 
-    return CustomCourseForEdX.objects.get(pk=course_key.ccx)
+    ccx_cache = request_cache.get_cache('ccx')
+    if course_key not in ccx_cache:
+        ccx_cache[course_key] = CustomCourseForEdX.objects.get(pk=course_key.ccx)
+
+    return ccx_cache[course_key]
 
 
 def get_override_for_ccx(ccx, block, name, default=None):
