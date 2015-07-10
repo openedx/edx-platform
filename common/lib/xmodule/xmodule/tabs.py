@@ -146,7 +146,7 @@ class CourseTab(object):
         """
         Overrides the not equal operator as a partner to the equal operator.
         """
-        return not (self == other)
+        return not self == other
 
     @classmethod
     def validate(cls, tab_dict, raise_error=True):

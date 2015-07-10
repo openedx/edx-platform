@@ -309,7 +309,7 @@ class formula(object):
             with 'scriptN'. There have been problems using script_N or script(N)
             """
             for child in parent:
-                if (gettag(child) == 'mstyle' and child.get('mathvariant') == 'script'):
+                if gettag(child) == 'mstyle' and child.get('mathvariant') == 'script':
                     newchild = etree.Element('mi')
                     newchild.text = 'script%s' % flatten_pmathml(child[0])
                     parent.replace(child, newchild)
@@ -397,7 +397,7 @@ class formula(object):
             """
             for child in parent:
                 # fix msubsup
-                if (gettag(child) == 'msubsup' and len(child) == 3):
+                if gettag(child) == 'msubsup' and len(child) == 3:
                     newchild = etree.Element('msup')
                     newbase = etree.Element('mi')
                     newbase.text = '%s_%s' % (flatten_pmathml(child[0]), flatten_pmathml(child[1]))

@@ -170,7 +170,7 @@ def cannot_edit_fail(_step):
     # try to change the grade range -- this should throw an exception
     try:
         ranges.last.value = 'Failure'
-    except (InvalidElementStateException):
+    except InvalidElementStateException:
         pass  # We should get this exception on failing to edit the element
 
     # check to be sure that nothing has changed

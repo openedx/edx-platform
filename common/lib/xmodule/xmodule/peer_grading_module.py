@@ -118,7 +118,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         # We need to set the location here so the child modules can use it.
         self.runtime.set('location', self.location)
-        if (self.runtime.open_ended_grading_interface):
+        if self.runtime.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system.render_template)
         else:
             self.peer_gs = MockPeerGradingService()

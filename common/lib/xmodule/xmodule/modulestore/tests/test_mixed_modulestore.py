@@ -1407,7 +1407,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             course_id.make_usage_key('course_info', 'updates'),
         ]
 
-        for location in (orphan_locations + detached_locations):
+        for location in orphan_locations + detached_locations:
             self.store.create_item(
                 self.user_id,
                 location.course_key,

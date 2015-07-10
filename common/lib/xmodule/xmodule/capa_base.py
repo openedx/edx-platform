@@ -469,7 +469,7 @@ class CapaMixin(CapaFields):
 
         # If the problem is closed (and not a survey question with max_attempts==0),
         # then do NOT show the reset button.
-        if (self.closed() and not is_survey_question):
+        if self.closed() and not is_survey_question:
             return False
 
         # Button only shows up for randomized problems if the question has been submitted

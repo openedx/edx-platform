@@ -95,7 +95,7 @@ def the_page_title_should_be(step, title):
 
 @step(u'the page title should contain "([^"]*)"$')
 def the_page_title_should_contain(step, title):
-    assert(title in world.browser.title)
+    assert title in world.browser.title
 
 
 @step('I log in$')

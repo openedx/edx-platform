@@ -371,7 +371,7 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         result = {}
         for field in self.fields.values():
-            if (field.scope == scope and field.is_set_on(self)):
+            if field.scope == scope and field.is_set_on(self):
                 result[field.name] = field.read_json(self)
         return result
 

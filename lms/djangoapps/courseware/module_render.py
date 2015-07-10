@@ -1055,9 +1055,9 @@ def get_score_bucket(grade, max_grade):
     Used with statsd tracking.
     """
     score_bucket = "incorrect"
-    if(grade > 0 and grade < max_grade):
+    if grade > 0 and grade < max_grade:
         score_bucket = "partial"
-    elif(grade == max_grade):
+    elif grade == max_grade:
         score_bucket = "correct"
 
     return score_bucket

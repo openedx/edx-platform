@@ -87,7 +87,7 @@ def get_lms_link_for_item(location, preview=False):
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(location, UsageKey))
+    assert isinstance(location, UsageKey)
 
     if settings.LMS_BASE is None:
         return None
@@ -109,7 +109,7 @@ def get_lms_link_for_about_page(course_key):
     Returns the url to the course about page from the location tuple.
     """
 
-    assert(isinstance(course_key, CourseKey))
+    assert isinstance(course_key, CourseKey)
 
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):

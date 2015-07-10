@@ -63,7 +63,7 @@ class CapaFactory(object):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + cls.answer_key(response_num, input_num))
+        return "input_" + cls.answer_key(response_num, input_num)
 
     @classmethod
     def answer_key(cls, response_num=2, input_num=1):

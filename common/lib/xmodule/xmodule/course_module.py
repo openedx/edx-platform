@@ -1009,7 +1009,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                     policy_str = grading_policy_file.read()
                     # if we successfully read the file, stop looking at backups
                     break
-            except (IOError):
+            except IOError:
                 msg = "Unable to load course settings file from '{0}'".format(policy_path)
                 log.warning(msg)
 

@@ -885,7 +885,7 @@ class CourseEnrollment(models.Model):
         # save it to the database so that it can have an ID that we can throw
         # into our CourseEnrollment object. Otherwise, we'll get an
         # IntegrityError for having a null user_id.
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
 
         if user.id is None:
             user.save()
@@ -994,7 +994,7 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
-            assert(isinstance(self.course_id, CourseKey))
+            assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
                 'course_id': self.course_id.to_deprecated_string(),

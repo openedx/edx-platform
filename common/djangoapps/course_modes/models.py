@@ -457,7 +457,7 @@ class CourseMode(models.Model):
             return False
 
         # Check that the default mode is available.
-        return (cls.HONOR in modes_dict)
+        return cls.HONOR in modes_dict
 
     @classmethod
     def is_white_label(cls, course_id, modes_dict=None):

@@ -102,7 +102,7 @@ class PaymentFakeView(View):
         ])
         public_sig = processor_hash(hash_val)
 
-        return (public_sig == post_params.get('signature'))
+        return public_sig == post_params.get('signature')
 
     @classmethod
     def response_post_params(cls, post_params):

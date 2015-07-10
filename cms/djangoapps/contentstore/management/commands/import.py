@@ -29,7 +29,7 @@ class Command(BaseCommand):
             raise CommandError("import requires at least one argument: <data directory> [--nostatic] [<course dir>...]")
 
         data_dir = args[0]
-        do_import_static = not (options.get('nostatic', False))
+        do_import_static = not options.get('nostatic', False)
         if len(args) > 1:
             source_dirs = args[1:]
         else:
