@@ -39,6 +39,8 @@ class AccountView(APIView):
             request for another account and has "is_staff" access, the response
             contains:
 
+            * id: The unique and immutable identifier of the user account.
+
             * username: The username associated with the account.
 
             * name: The full name of the user.
