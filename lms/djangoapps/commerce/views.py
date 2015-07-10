@@ -21,10 +21,11 @@ from course_modes.models import CourseMode
 from courseware import courses
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
+from enrollment.views import EnrollmentCrossDomainSessionAuth
 from embargo import api as embargo_api
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
-from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from verify_student.models import SoftwareSecurePhotoVerification
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
@@ -38,7 +39,7 @@ class BasketsView(APIView):
     """ Creates a basket with a course seat and enrolls users. """
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
-    authentication_classes = (SessionAuthenticationAllowInactiveUser,)
+    authentication_classes = (EnrollmentCrossDomainSessionAuth, OAuth2AuthenticationAllowInactiveUser)
     permission_classes = (IsAuthenticated,)
 
     def _is_data_valid(self, request):
