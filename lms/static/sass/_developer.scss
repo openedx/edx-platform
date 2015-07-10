@@ -67,7 +67,7 @@
   .payment-button {
     float: right;
     @include margin-left( ($baseline/2) );
-
+    
     &.is-selected {
       background: $m-green-s1 !important;
     }
@@ -79,6 +79,7 @@
   .global-new, #global-navigation {
     display: none;
   }
+}
 
   // Copied from _pagination.scss in cms
   .pagination {
@@ -99,16 +100,12 @@
     .nav-item {
       position: relative;
       display: inline-block;
-      vertical-align: middle;
     }
 
     .nav-link {
       @include transition(all $tmg-f2 ease-in-out 0s);
       display: block;
-      border: 0;
-      background-image: none;
-      background-color: transparent;
-      padding: ($baseline/2) ($baseline*0.75);
+      padding: ($baseline/4) ($baseline*0.75);
 
       &.previous {
         margin-right: ($baseline/2);
@@ -157,7 +154,6 @@
       @extend %t-copy-base;
       @extend %t-strong;
       width: ($baseline*2.5);
-      vertical-align: middle;
       margin: 0 ($baseline*0.75);
       padding: ($baseline/4);
       text-align: center;
@@ -219,5 +215,16 @@
         }
       }
     }
+  }
+
+
+// moved here from _teams.scss
+.search-tools {
+  @extend %t-copy-sub1;
+  margin: ($baseline/10) $baseline;
+  color: $gray-l1;
+
+  p, span { // override
+    color: inherit;
   }
 }
