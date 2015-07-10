@@ -1942,7 +1942,7 @@ INSTALLED_APPS = (
     'xblock_django',
 
     # edX Proctoring
-    'edx_proctoring'
+    'edx_proctoring',
 )
 
 ######################### CSRF #########################################
