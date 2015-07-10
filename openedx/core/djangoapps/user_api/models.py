@@ -24,7 +24,7 @@ class UserPreference(models.Model):
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ("user", "key")
 
     @classmethod
@@ -93,7 +93,7 @@ class UserCourseTag(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     value = models.TextField()
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ("user", "course_id", "key")
 
 
@@ -108,6 +108,6 @@ class UserOrgTag(TimeStampedModel):
     org = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
 
-    class Meta:
+    class Meta(object):
         """ Meta class for defining unique constraints. """
         unique_together = ("user", "org", "key")
