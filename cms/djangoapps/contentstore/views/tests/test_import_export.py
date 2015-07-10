@@ -204,6 +204,19 @@ class ImportTestCase(CourseTestCase):
 
         return outside_tar
 
+    def _edx_platform_tar(self):
+        """
+        Tarfile with file that extracts to edx-platform directory.
+
+        Extracting this tarfile in directory <dir> will also put its contents
+        directly in <dir> (rather than <dir/tarname>).
+        """
+        outside_tar = self.unsafe_common_dir / "unsafe_file.tar.gz"
+        with tarfile.open(outside_tar, "w:gz") as tar:
+            tar.addfile(tarfile.TarInfo(os.path.join(os.path.abspath("."), "a_file")))
+
+        return outside_tar
+
     def test_unsafe_tar(self):
         """
         Check that safety measure work.
@@ -228,6 +241,12 @@ class ImportTestCase(CourseTestCase):
         try_tar(self._symlink_tar())
         try_tar(self._outside_tar())
         try_tar(self._outside_tar2())
+        try_tar(self._edx_platform_tar())
+
+        # test trying to open a tar outside of the normal data directory
+        with self.settings(DATA_DIR='/not/the/data/dir'):
+            try_tar(self._edx_platform_tar())
+
         # Check that `import_status` returns the appropriate stage (i.e.,
         # either 3, indicating all previous steps are completed, or 0,
         # indicating no upload in progress)
