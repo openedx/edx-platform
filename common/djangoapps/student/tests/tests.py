@@ -10,18 +10,20 @@ import ddt
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.test.client import RequestFactory, Client
+from django.test.client import Client
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user, LinkedInAddToProfileConfiguration
 )
-from student.views import (process_survey_link, _cert_info,
-                           change_enrollment, complete_course_mode_info)
+from student.views import (
+    process_survey_link,
+    _cert_info,
+    complete_course_mode_info,
+)
 from student.tests.factories import UserFactory, CourseModeFactory
 from util.testing import EventTestMixin
 from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME

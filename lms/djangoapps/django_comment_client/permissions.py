@@ -4,7 +4,6 @@ Module for checking permissions with the comment_client backend
 
 import logging
 from types import NoneType
-from django.core import cache
 
 from request_cache.middleware import RequestCache
 from lms.lib.comment_client import Thread

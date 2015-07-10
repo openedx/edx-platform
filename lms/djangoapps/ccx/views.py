@@ -16,7 +16,6 @@ from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse,
     HttpResponseForbidden,
-    HttpResponseRedirect,
 )
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -26,23 +25,22 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from courseware.courses import get_course_by_id  # pylint: disable=import-error
+from courseware.courses import get_course_by_id
 
-from courseware.field_overrides import disable_overrides  # pylint: disable=import-error
-from courseware.grades import iterate_grades_for  # pylint: disable=import-error
-from courseware.model_data import FieldDataCache  # pylint: disable=import-error
-from courseware.module_render import get_module_for_descriptor  # pylint: disable=import-error
-from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from courseware.field_overrides import disable_overrides
+from courseware.grades import iterate_grades_for
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole
 
-from instructor.offline_gradecalc import student_grades  # pylint: disable=import-error
-from instructor.views.api import _split_input_list  # pylint: disable=import-error
-from instructor.views.tools import get_student_from_identifier  # pylint: disable=import-error
+from instructor.offline_gradecalc import student_grades
+from instructor.views.api import _split_input_list
+from instructor.views.tools import get_student_from_identifier
 
 from .models import CustomCourseForEdX, CcxMembership
 from .overrides import (

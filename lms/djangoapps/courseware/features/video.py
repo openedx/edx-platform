@@ -6,7 +6,7 @@ import json
 import os
 import time
 import requests
-from nose.tools import assert_less, assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false
 from common import i_am_registered_for_the_course, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings

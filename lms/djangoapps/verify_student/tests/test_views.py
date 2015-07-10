@@ -17,7 +17,6 @@ from mock import patch, Mock, ANY
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
@@ -33,7 +32,6 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
 from embargo.test_utils import restrict_course
-from microsite_configuration import microsite
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from shoppingcart.models import Order, CertificateItem
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -42,7 +40,7 @@ from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 from verify_student.views import (
     checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
-    _send_email, _compose_message_reverification_email
+    _compose_message_reverification_email
 )
 from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationCheckpoint,

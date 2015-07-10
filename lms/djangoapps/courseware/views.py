@@ -7,7 +7,6 @@ import urllib
 import json
 import cgi
 
-from collections import OrderedDict
 from datetime import datetime
 from django.utils import translation
 from django.utils.translation import ugettext as _

@@ -1,16 +1,12 @@
 """Helpers for the student app. """
-import time
 from datetime import datetime
 import urllib
 
 from pytz import UTC
-
-from django.utils.http import cookie_date
-from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
 import third_party_auth
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
+from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from course_modes.models import CourseMode
 
 

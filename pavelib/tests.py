@@ -3,7 +3,7 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task, no_help
+from paver.easy import sh, task, cmdopts, needs, call_task
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from optparse import make_option

@@ -3,9 +3,6 @@ LTI Provider view functions
 """
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
 import logging

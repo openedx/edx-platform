@@ -80,9 +80,6 @@ from logging import getLogger
 
 from . import provider
 
-# Note that this lives in openedx, so this dependency should be refactored.
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-
 
 # These are the query string params you can pass
 # to the URL that starts the authentication process.

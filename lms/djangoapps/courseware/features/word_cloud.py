@@ -1,9 +1,6 @@
 # pylint: disable=missing-docstring
 
-from time import sleep
-
 from lettuce import world, step
-from lettuce.django import django_url
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 
 

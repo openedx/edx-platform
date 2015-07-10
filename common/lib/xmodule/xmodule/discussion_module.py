@@ -4,7 +4,6 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope, UNIQUE_ID
-from uuid import uuid4
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text

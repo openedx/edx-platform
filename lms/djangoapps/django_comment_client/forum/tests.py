@@ -2,7 +2,6 @@ import json
 import logging
 
 import ddt
-from django.core import cache
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory

@@ -1,6 +1,5 @@
 """Base integration test for provider implementations."""
 
-import re
 import unittest
 
 import json

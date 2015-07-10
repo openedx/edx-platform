@@ -8,7 +8,6 @@ import logging
 import ddt
 import itertools
 import mimetypes
-from unittest import skip
 from uuid import uuid4
 from contextlib import contextmanager
 from mock import patch

@@ -2,7 +2,7 @@
 
 import random
 
-from third_party_auth import pipeline, provider
+from third_party_auth import pipeline
 from third_party_auth.tests import testutil
 import unittest
 
