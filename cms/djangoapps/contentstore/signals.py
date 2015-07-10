@@ -83,7 +83,7 @@ def look_for_timed_exam_publishing(sender, course_key, **kwargs):
             )
             log.info('Updated timed exam {exam_id}'.format(exam_id=exam['id']))
         except ProctoredExamNotFoundException:
-            exam = create_exam(
+            exam_id = create_exam(
                 course_id=unicode(course_key),
                 content_id=unicode(timed_exam.location),
                 exam_name=timed_exam.display_name,
@@ -91,7 +91,7 @@ def look_for_timed_exam_publishing(sender, course_key, **kwargs):
                 is_proctored=timed_exam.is_proctored_enabled,
                 is_active=True
             )
-            log.info('Created new timed exam {exam_id}'.format(exam_id=exam['id']))
+            log.info('Created new timed exam {exam_id}'.format(exam_id=exam_id))
 
     # then see which exams we have in edx-proctoring that are not in
     # our current list. That means the the user has disabled it

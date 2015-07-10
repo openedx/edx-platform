@@ -2534,3 +2534,11 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 # when a credit provider notifies us that a student has been approved
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
+
+
+#### PROCTORING CONFIGURATION DEFAULTS
+
+PROCTORING_BACKEND_PROVIDER = {
+    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'options': {},
+}
