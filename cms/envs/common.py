@@ -761,6 +761,9 @@ INSTALLED_APPS = (
 
     # Credit courses
     'openedx.core.djangoapps.credit',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 
