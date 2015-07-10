@@ -86,35 +86,32 @@ def get_override_for_ccx(ccx, block, name, default=None):
     specify the block and the name of the field.  If the field is not
     overridden for the given ccx, returns `default`.
     """
-    if not hasattr(block, '_ccx_overrides'):
-        block._ccx_overrides = {}  # pylint: disable=protected-access
-    overrides = block._ccx_overrides.get(ccx.id)  # pylint: disable=protected-access
-    if overrides is None:
-        overrides = _get_overrides_for_ccx(ccx, block)
-        block._ccx_overrides[ccx.id] = overrides  # pylint: disable=protected-access
-    return overrides.get(name, default)
+    overrides = _get_overrides_for_ccx(ccx)
+    return overrides.get(block.location, {}).get(name, default)
 
 
-def _get_overrides_for_ccx(ccx, block):
+def _get_overrides_for_ccx(ccx):
     """
     Returns a dictionary mapping field name to overriden value for any
     overrides set on this block for this CCX.
     """
-    overrides = {}
-    # block as passed in may have a location specific to a CCX, we must strip
-    # that for this query
-    location = block.location
-    if isinstance(block.location, CCXBlockUsageLocator):
-        location = block.location.to_block_locator()
-    query = CcxFieldOverride.objects.filter(
-        ccx=ccx,
-        location=location
-    )
-    for override in query:
-        field = block.fields[override.field]
-        value = field.from_json(json.loads(override.value))
-        overrides[override.field] = value
-    return overrides
+    request_cache = RequestCache.get_request_cache().data.setdefault('ccx-overrides', {})
+
+    if ccx not in request_cache:
+        overrides = {}
+        query = CcxFieldOverride.objects.filter(
+            ccx=ccx,
+        )
+
+        for override in query:
+            block_overrides = overrides.setdefault(override.location, {})
+            field = block.fields[override.field]
+            value = field.from_json(json.loads(override.value))
+            block_overrides[override.field] = value
+
+        request_cache[ccx] = overrides
+
+    return request_cache[ccx]
 
 
 @transaction.commit_on_success
