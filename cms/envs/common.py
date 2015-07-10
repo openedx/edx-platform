@@ -764,6 +764,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     'xblock_django',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 
