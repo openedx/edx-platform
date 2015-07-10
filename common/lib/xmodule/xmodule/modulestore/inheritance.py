@@ -98,7 +98,12 @@ class InheritanceMixin(XBlockMixin):
     )
     rerandomize = String(
         display_name=_("Randomization"),
-        help=_("Specify how often variable values in a problem are randomized when a student loads the problem. Valid values are \"always\", \"onreset\", \"never\", and \"per_student\". This setting only applies to problems that have randomly generated numeric values."),
+        help=_(
+            'Specify the default for how often variable values in a problem are randomized. '
+            'This setting should be set to \"never\" unless you plan to provide a Python '
+            'script to identify and randomize values in most of the problems in your course. '
+            'Valid values are \"always\", \"onreset\", \"never\", and \"per_student\".'
+        ),
         scope=Scope.settings,
         default="never",
     )
