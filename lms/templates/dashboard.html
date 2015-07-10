@@ -147,21 +147,19 @@ from django.core.urlresolvers import reverse
     <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
   % endif
 
-  <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="User info">
+  % if settings.FEATURES.get('IS_EDX_DOMAIN'):
+    <div class="wrapper-find-courses">
+      <p class="copy">Check out our recently launched courses and what's new in your favorite subjects</p>
+      <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
+    </div>
+  % endif
+
+  <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
     <header class="profile">
-      <h2 class="username-header"><span class="sr">${_("Username")}: </span></h2>
+      <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
     </header>
     <section class="user-info">
       <ul>
-        % if settings.FEATURES.get('IS_EDX_DOMAIN'):
-        <li>
-          <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
-        </li>
-        % endif
-        <li class="heads-up">
-          <span class="title">${_("Want to change your account settings?")}</span>
-          <span class="copy">${_("Click the arrow next to your username above.")}</span>
-        </li>
 
         % if len(order_history_list):
         <li class="order-history">
