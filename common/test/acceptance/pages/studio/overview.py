@@ -404,7 +404,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         self.add_child()
 
 
-class ExpandCollapseLinkState:
+class ExpandCollapseLinkState(object):
     """
     Represents the three states that the expand/collapse link can be in
     """
