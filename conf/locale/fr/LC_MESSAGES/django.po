@@ -29,13 +29,13 @@
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Justine Seran, 2015
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
-# laurentFUN <laurent.at.fun@gmail.com>, 2014
+# laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # Marco Morales, 2014
 # moocit-france <contact@moocit.fr>, 2014-2015
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
-# Olivier Marquez <oliviermarquez@gmail.com>, 2013-2014
+# Olivier Marquez <oliviermarquez@gmail.com>, 2013-2015
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
@@ -176,10 +176,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:02+0000\n"
+"POT-Creation-Date: 2015-07-13 04:33+0000\n"
 "PO-Revision-Date: 2015-06-19 17:16+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
+"Language-Team: French (http://www.transifex.com/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -212,7 +212,7 @@ msgid "Advanced"
 msgstr "Avancé"
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
-#: lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Examen d'entrée"
 
@@ -226,6 +226,7 @@ msgstr "Section"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/ccx/schedule.html
 msgid "Subsection"
 msgstr "Sous-section"
 
@@ -273,7 +274,7 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Current Configuration"
-msgstr ""
+msgstr "Configuration actuelle"
 
 #: common/djangoapps/config_models/admin.py
 msgid "All (Show History)"
@@ -281,21 +282,21 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
-msgstr ""
+msgstr "Mise à jour"
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
-msgstr ""
+msgstr "Modifier la date"
 
 #. Translators: this label indicates the name of the user who made this
 #. change:
 #: common/djangoapps/config_models/models.py
 msgid "Changed by"
-msgstr ""
+msgstr "Modifié par"
 
 #: common/djangoapps/config_models/models.py
 msgid "Enabled"
-msgstr ""
+msgstr "Activé"
 
 #: common/djangoapps/cors_csrf/models.py
 msgid ""
@@ -356,7 +357,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Professional Ed"
-msgstr ""
+msgstr "Professionnel de l'éducation"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
@@ -433,7 +434,7 @@ msgstr ""
 
 #: common/djangoapps/embargo/models.py
 msgid "The country to which this rule applies."
-msgstr ""
+msgstr "Le pays auquel cette règle s'applique."
 
 #: common/djangoapps/embargo/models.py
 msgid "Whitelist {country} for {course}"
@@ -577,9 +578,10 @@ msgstr "Collège / enseignement secondaire inférieur"
 msgid "Elementary/primary school"
 msgstr "Enseignement primaire"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "None"
 msgstr "Aucun"
 
@@ -1402,11 +1404,13 @@ msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
 "La balise {expected_tag} était attendue; {given_tag} a été reçue à la place"
 
+#: common/lib/capa/capa/responsetypes.py
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Correct"
 msgstr "Correct"
 
+#: common/lib/capa/capa/responsetypes.py
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Incorrect"
@@ -2052,6 +2056,8 @@ msgstr "Vos réponses ont été sauvegardées."
 msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
 msgstr ""
+"Vos réponses ont été enregistrées mais pas encore évaluées. Cliquez sur "
+"«Vérifier» pour les évaluer. "
 
 #. Translators: A student must "make an attempt" to solve the problem on the
 #. page before they can reset it.
@@ -2534,7 +2540,7 @@ msgstr ""
 #. his students.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable CCX"
-msgstr ""
+msgstr "Activer CCX"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2953,6 +2959,14 @@ msgstr ""
 msgid "Certificate Name (Long)"
 msgstr "Nom du certificat (long)"
 
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Web/HTML View Enabled"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "If true, certificate Web/HTML views are enabled for the course."
+msgstr ""
+
 #. Translators: This field is the container for course-specific certifcate
 #. configuration values
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2971,7 +2985,7 @@ msgstr ""
 #. configuration values
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Configuration"
-msgstr ""
+msgstr "Configuration du certificat"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
@@ -3105,8 +3119,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Both"
-msgstr ""
+msgstr "Les deux"
 
+#: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
 msgid "About"
 msgstr "A propos"
@@ -3153,9 +3168,9 @@ msgid ""
 "http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "Course Language"
-msgstr ""
+msgstr "Langue du cours"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Specify the language of your course."
@@ -3362,12 +3377,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Any Type"
-msgstr ""
+msgstr "Tous les types"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: cms/templates/widgets/header.html
 msgid "Library"
-msgstr ""
+msgstr "Bibliothèque"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Select the library from which you want to draw content."
@@ -3375,7 +3390,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Library Version"
-msgstr ""
+msgstr "Version de la bibliothèque"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Mode"
@@ -3745,7 +3760,7 @@ msgstr "Entrez la date à laquelle les problèmes doivent être rendus."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Entrance Exam"
-msgstr ""
+msgstr "Est un examen d'entrée"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -5142,15 +5157,15 @@ msgstr "Note"
 msgid "problems"
 msgstr "exercices"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Remboursement] Demande de remboursement de l'utilisateur"
-
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
 msgstr ""
+
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Remboursement] Demande de remboursement de l'utilisateur"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -5656,7 +5671,7 @@ msgstr "Le corps ne peut pas être vide"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"
-msgstr ""
+msgstr "Le sujet n'existe pas"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Comment level too deep"
@@ -5693,12 +5708,13 @@ msgstr "Notes"
 msgid "{platform_name} Staff"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
-msgstr "Équipe pédagogique"
+msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "Équipe pédagogique"
 
@@ -5718,7 +5734,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Manually Enrolled"
-msgstr ""
+msgstr "Inscrit manuellement"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
@@ -5890,32 +5906,32 @@ msgstr "Buts"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
-msgstr ""
+msgstr "Cohorte"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5935,7 +5951,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course Id"
-msgstr ""
+msgstr "ID de Cours"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "% Discount"
@@ -5950,6 +5966,7 @@ msgstr ""
 msgid "Description"
 msgstr "Description"
 
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Expiration Date"
@@ -5974,28 +5991,28 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Instructor Tasks' section."
+"of the generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"the 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Instructor Tasks' section."
+"report, see the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Instructor Tasks' section. When completed, the "
-"report will be available for download in the table below. You will be able "
-"to download the report when it is complete."
+"the report, see the 'Pending Tasks' section. When completed, the report will"
+" be available for download in the table below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6021,7 +6038,7 @@ msgstr "Une erreur est survenue lors de la suppression du score."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course has no entrance exam section."
-msgstr ""
+msgstr "Le cours n'a pas d'examen d'entrée."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "all_students and unique_student_identifier are mutually exclusive."
@@ -6050,32 +6067,27 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Instructor Tasks' section."
+"generation task in the 'Pending Tasks' section."
 msgstr ""
-"Votre rapport de note est en cours de génération ! Vous pouvez voir le "
-"statut de la tâche dans la section 'Tâches enseignant en attente'."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"Tasks' table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
-"La génération d'un rapport de note est déjà en cours. Regardez dans 'Tâches "
-"enseignant en attente' pour voir l'état de la tâche. Une fois terminé, le "
-"rapport sera disponible au téléchargement dans le tableau ci-dessous."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Instructor Tasks' section."
+" generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"A problem grade report is already being generated. Check the 'Pending Tasks'"
+" table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6175,6 +6187,7 @@ msgstr ""
 msgid "E-Commerce"
 msgstr "e-Commerce"
 
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: cms/templates/certificates.html cms/templates/export.html
 #: cms/templates/widgets/header.html
 msgid "Certificates"
@@ -6202,9 +6215,10 @@ msgstr "Inscription"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
-msgstr ""
+msgstr "Cohortes"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "Admin Étudiant"
 
@@ -6490,33 +6504,41 @@ msgstr ""
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "First Name"
-msgstr ""
+msgstr "Prénom"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Last Name"
-msgstr ""
+msgstr "Nom"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
-msgstr ""
+msgstr "Nom Entreprise"
 
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/discussion/_underscore_templates.html wiki/forms.py
 msgid "Title"
 msgstr "Titre"
 
-#: lms/templates/register.html
+#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "Année de naissance"
 
-#: lms/templates/register.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "City"
 msgstr "Ville"
 
-#: lms/templates/register.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Country"
@@ -6524,7 +6546,7 @@ msgstr "Pays"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
-msgstr ""
+msgstr "Date d'inscription"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Currently Enrolled"
@@ -6788,7 +6810,7 @@ msgstr ""
 msgid "This component refers to deleted or invalid content groups."
 msgstr ""
 
-#: lms/templates/notes.html
+#: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Mes Notes"
 
@@ -6952,7 +6974,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Lower-case ISO currency codes"
-msgstr ""
+msgstr "Codes ISO des devises en minuscule"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Optional: provide additional information for this transaction"
@@ -7026,19 +7048,19 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Donation for {course}"
-msgstr ""
+msgstr "Don pour {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Donation for {platform_name}"
-msgstr ""
+msgstr "Don pour {platform_name}"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Page {page_number} of {page_count}"
-msgstr ""
+msgstr "Page {page_number} sur {page_count}"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
 msgid "Invoice"
-msgstr ""
+msgstr "Facture"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Order"
@@ -7070,8 +7092,9 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Amount"
-msgstr ""
+msgstr "Montant"
 
+#: lms/djangoapps/shoppingcart/pdf.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
@@ -7080,7 +7103,7 @@ msgstr "Total"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Payment Received"
-msgstr ""
+msgstr "Paiement reçu"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Balance"
@@ -7088,7 +7111,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Billing Address"
-msgstr ""
+msgstr "Adresse de facturation"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Disclaimer"
@@ -7096,7 +7119,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "TERMS AND CONDITIONS"
-msgstr ""
+msgstr "TERMES ET CONDITIONS"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order Number"
@@ -7151,7 +7174,7 @@ msgstr "Commentaires"
 msgid "University"
 msgstr "Université"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 msgid "Course"
 msgstr "Cours"
 
@@ -7159,7 +7182,8 @@ msgstr "Cours"
 msgid "Course Announce Date"
 msgstr "Date de l'annonce du cours"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "Date de début du Cours"
 
@@ -7608,7 +7632,7 @@ msgstr ""
 #. for which we don't know a user-friendly message to display in advance.
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "UNKNOWN REASON"
-msgstr ""
+msgstr "RAISON INCONNUE"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {parameter}"
@@ -7929,7 +7953,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/plugins.py
 msgid "Teams"
-msgstr ""
+msgstr "Équipes"
 
 #: lms/djangoapps/teams/views.py
 msgid "The supplied course id {course_id} is not valid."
@@ -7961,7 +7985,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
-msgstr ""
+msgstr "Le nom d'utilisateur est requis"
 
 #: lms/djangoapps/teams/views.py
 msgid "Team id is required."
@@ -8012,19 +8036,19 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
-msgstr ""
+msgstr "Introduction"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Make payment"
-msgstr ""
+msgstr "Payer"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Payment confirmation"
-msgstr ""
+msgstr "Confirmation de paiement"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Take photo"
-msgstr ""
+msgstr "Prendre une photo"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Take a photo of your ID"
@@ -8032,11 +8056,11 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Review your info"
-msgstr ""
+msgstr "Vérifiez vos informations"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Enrollment confirmation"
-msgstr ""
+msgstr "Confirmation d'inscription"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Selected price is not valid number."
@@ -8091,7 +8115,10 @@ msgstr ""
 msgid "Could not submit photos"
 msgstr "Envoi de photos impossible"
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.facebook.com.  Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Facebook"
 msgstr "Facebook"
 
@@ -8099,51 +8126,54 @@ msgstr "Facebook"
 msgid "Like {platform_name} on Facebook"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the website name of www.twitter.com.  Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/envs/common.py lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Twitter"
 msgstr "Twitter"
 
 #: lms/envs/common.py
 msgid "Follow {platform_name} on Twitter"
-msgstr ""
+msgstr "Suivre {platform_name} sur Twitter"
 
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
 #: lms/envs/common.py
 msgid "LinkedIn"
-msgstr ""
+msgstr "LinkedIn"
 
 #: lms/envs/common.py
 msgid "Follow {platform_name} on LinkedIn"
-msgstr ""
+msgstr "Suivre {platform_name} sur LinkedIn"
 
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
 #: lms/envs/common.py
 msgid "Google+"
-msgstr ""
+msgstr "Google+"
 
 #: lms/envs/common.py
 msgid "Follow {platform_name} on Google+"
-msgstr ""
+msgstr "Suivre {platform_name} sur Google+"
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
 #: lms/envs/common.py
 msgid "Tumblr"
-msgstr ""
+msgstr "Tumblr"
 
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
 #: lms/envs/common.py
 msgid "Meetup"
-msgstr ""
+msgstr "Meetup"
 
 #. Translators: This is the website name of www.reddit.com.  Please
 #. translate this the way that Reddit advertises in your language.
 #: lms/envs/common.py
 msgid "Reddit"
-msgstr ""
+msgstr "Reddit"
 
 #: lms/envs/common.py
 msgid "Subscribe to the {platform_name} subreddit"
@@ -8165,24 +8195,20 @@ msgstr ""
 #. translate this the way that YouTube advertises in your language.
 #: lms/envs/common.py
 msgid "Youtube"
-msgstr ""
+msgstr "Youtube"
 
 #: lms/envs/common.py
 msgid "Subscribe to the {platform_name} YouTube channel"
-msgstr ""
+msgstr "S'inscrire à la chaîne Youtube de {platform_name}"
 
-#: lms/envs/common.py
-msgid "Taiwan"
-msgstr ""
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/settings.html
+#: lms/envs/devstack.py cms/templates/course-create-rerun.html
+#: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
 msgstr "Organisation"
 
 #: lms/envs/devstack.py
 msgid "Course Type"
-msgstr ""
+msgstr "Type de cours"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
@@ -8494,6 +8520,7 @@ msgid "Edit"
 msgstr "Éditer"
 
 #: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
+#: lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
@@ -8845,7 +8872,7 @@ msgstr "Pas de pièce jointe à cet article."
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr ""
+msgstr "Vous ne pouvez pas créer deux cohortes avec le même nom"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid ""
@@ -8854,7 +8881,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
-msgstr ""
+msgstr "Une cohorte avec le même nom existe déjà."
 
 #: openedx/core/djangoapps/credit/models.py
 msgid ""
@@ -8893,32 +8920,31 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Description for the credit provider displayed to users."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Plain text or html content for displaying further steps on receipt page "
+"*after* paying for the credit to get credit for a credit course against a "
+"credit provider."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "File upload corrupted. Please try again"
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "Could not find the {root_xml_file} file in the package."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
-msgstr ""
+msgstr "bytes"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
@@ -8940,14 +8966,19 @@ msgstr ""
 "L'adresse email que vous avez utilisée pour vous inscrire sur "
 "{platform_name}"
 
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/register.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "Mot de passe"
 
-#: lms/templates/login.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Se souvenir de moi"
 
@@ -8973,7 +9004,11 @@ msgstr ""
 msgid "Jane Doe"
 msgstr ""
 
-#: lms/templates/register.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 msgid "Needed for any certificates you may earn"
 msgstr "Nécessaire pour tous certificats que vous pourriez obtenir"
 
@@ -9001,11 +9036,17 @@ msgstr ""
 msgid "Highest level of education completed"
 msgstr "Plus haut niveau de formation obtenu"
 
-#: lms/templates/signup_modal.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Year of birth"
 msgstr "Année de naissance"
 
-#: lms/templates/signup_modal.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Mailing address"
 msgstr "Adresse postale"
 
@@ -9063,11 +9104,11 @@ msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
-msgstr ""
+msgstr "Cette valeur est invalide."
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This field is not editable"
-msgstr ""
+msgstr "Ce champ n'est pas modifiable"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -9100,7 +9141,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
-msgstr ""
+msgstr "(Sans nom)"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -9182,6 +9223,9 @@ msgid ""
 "instructions here to upload a file elsewhere and link to it instead: "
 "{faq_url}"
 msgstr ""
+"Le fichier {filename} dépasse la taille maximale de {size_mb} MB. Veuillez "
+"suivre les instructions suivantes pour téléverser un fichier ailleurs et "
+"créer un lien à la place : {faq_url}"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
@@ -9214,7 +9258,7 @@ msgstr "Vide"
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/tests/test_course_index.py
 msgid "Course has been successfully reindexed."
-msgstr ""
+msgstr "Cours réindexé avec succès."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
@@ -9252,7 +9296,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
-msgstr ""
+msgstr "Id du cours prérequis invalide"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -9265,14 +9309,15 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This group configuration is in use and cannot be deleted."
 msgstr ""
+"Cette configuration de groupe est utilisée et ne peut pas être supprimée."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "This content group is in use and cannot be deleted."
-msgstr ""
+msgstr "Ce groupe de contenu est utilisé et ne peut pas être effacé."
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
 msgid "Entrance Exam - Subsection"
-msgstr ""
+msgstr "Examen d'entrée - Sous-section"
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
 msgid "Completed Course Entrance Exam"
@@ -9291,9 +9336,15 @@ msgid "Empty"
 msgstr "Vide"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid ""
-"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
-" unit."
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload corrupted. Please try again"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "Could not find the {0} file in the package."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
@@ -9324,7 +9375,7 @@ msgstr ""
 #. a percent value out of 100, e.g. "58%" means "58/100".
 #: cms/djangoapps/contentstore/views/item.py
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "{section_or_subsection} \"{display_name}\""
@@ -9391,7 +9442,9 @@ msgstr ""
 "Vous ne pouvez  pas supprimer le dernier administrateur. Créez-en un autre "
 "afin de supprimer celui-ci."
 
-#: cms/templates/import.html
+#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
 msgid "Uploading"
 msgstr "Chargement en cours"
 
@@ -9411,19 +9464,19 @@ msgstr "Prêt"
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
-msgstr ""
+msgstr "Echec"
 
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Invalid Token"
-msgstr ""
+msgstr "Jeton invalide"
 
 #. Translators: This is the status for a video that was included in a course
 #. import
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Imported"
-msgstr ""
+msgstr "Importé"
 
 #. Translators: This is the status for a video that is in an unknown state
 #: cms/djangoapps/contentstore/views/videos.py
@@ -9614,7 +9667,7 @@ msgstr "Langue préférée"
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course End Date"
-msgstr ""
+msgstr "Date de fin du cours"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
@@ -9663,31 +9716,32 @@ msgstr "Se déconnecter"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
-msgstr ""
+msgstr "Tous droits réservés"
 
 #: common/templates/license.html
 msgid "Attribution"
-msgstr ""
+msgstr "Attribution"
 
 #: common/templates/license.html
 msgid "Noncommercial"
-msgstr ""
+msgstr "Non commercial"
 
 #: common/templates/license.html
 msgid "No Derivatives"
-msgstr ""
+msgstr "Pas de travaux dérivés"
 
 #: common/templates/license.html
 msgid "Share Alike"
-msgstr ""
+msgstr "Partage à l'identique"
 
 #: common/templates/license.html
 msgid "Creative Commons licensed content, with terms as follow:"
 msgstr ""
+"Contenu sous licence Creative Commons, aveec les conditions suivantes:"
 
 #: common/templates/license.html
 msgid "Some Rights Reserved"
-msgstr ""
+msgstr "Quelques droits réservés"
 
 #: common/templates/course_modes/choose.html
 msgid "Enroll In {} | Choose Your Track"
@@ -9699,7 +9753,7 @@ msgstr "Désolé, une erreur s'est produite en tentant de vous inscrire."
 
 #: common/templates/course_modes/choose.html
 msgid "Congratulations!  You are now enrolled in {course_name}"
-msgstr ""
+msgstr "Félicitations! Vous êtes maintenant inscrit à {course_name}"
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
@@ -9841,7 +9895,7 @@ msgstr "Rechercher vos cours"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
 msgid "Clear search"
-msgstr ""
+msgstr "Effacer la recherche"
 
 #: lms/templates/dashboard.html
 msgid "Want to change your account settings?"
@@ -9978,7 +10032,7 @@ msgstr "Utilisateur"
 
 #: lms/templates/footer-edx-v3.html
 msgid "Page Footer"
-msgstr ""
+msgstr "Bas de page"
 
 #: lms/templates/footer-edx-v3.html
 msgid "About edX"
@@ -10508,7 +10562,7 @@ msgstr "Mondial"
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation.html
 msgid "Sysadmin"
-msgstr ""
+msgstr "Administrateur système"
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -10529,7 +10583,7 @@ msgstr "votre réponse"
 
 #: lms/templates/problem.html
 msgid "Hint"
-msgstr ""
+msgstr "Indice"
 
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
@@ -11331,7 +11385,7 @@ msgstr "Lettres grecques"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Name of letter"
-msgstr ""
+msgstr "Nom de la lettre"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Constants"
@@ -11361,7 +11415,7 @@ msgstr "Notation scientifique"
 #. Translators: 10^ is a mathematical symbol. Please do not translate.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "10^ and the exponent"
-msgstr ""
+msgstr "10^ et l'exposant"
 
 #. Translators: this is part of scientific notation. Please see
 #. http://en.wikipedia.org/wiki/Scientific_notation#E_notation
@@ -11372,7 +11426,7 @@ msgstr "e notation"
 #. Translators: 1e is a mathematical symbol. Please do not translate.
 #: lms/templates/calculator/toggle_calculator.html
 msgid "1e and the exponent"
-msgstr ""
+msgstr "1e et l'exposant"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculate"
@@ -11403,15 +11457,15 @@ msgstr "Commence - {start_date}"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 msgid "View Archived Custom Course"
-msgstr ""
+msgstr "Voir le cours CCX archivé"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 msgid "View Custom Course"
-msgstr ""
+msgstr "Voir le cours CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
-msgstr ""
+msgstr "Tableau de bord CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/courseware/legacy_instructor_dashboard.html
@@ -11420,12 +11474,12 @@ msgstr "Inscriptions"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
-msgstr ""
+msgstr "Planifier"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
-msgstr ""
+msgstr "Règles de notation"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11507,11 +11561,11 @@ msgstr "S'inscrire"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
-msgstr ""
+msgstr "Gestion de la liste des étudiants"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
-msgstr ""
+msgstr "AVERTISSEMENT"
 
 #: lms/templates/ccx/grading_policy.html
 msgid ""
@@ -11526,7 +11580,7 @@ msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Save Grading Policy"
-msgstr ""
+msgstr "Enregistrer les règles de notation"
 
 #: lms/templates/ccx/schedule.html
 msgid "Set date"
@@ -11554,15 +11608,15 @@ msgstr ""
 
 #: lms/templates/ccx/schedule.html
 msgid "Add Unit"
-msgstr ""
+msgstr "Ajouter une unité"
 
 #: lms/templates/ccx/schedule.html
 msgid "Add All Units"
-msgstr ""
+msgstr "Ajouter toutes les unités"
 
 #: lms/templates/ccx/schedule.html
 msgid "All units have been added."
-msgstr ""
+msgstr "Toutes les unités ont été ajoutées."
 
 #: lms/templates/ccx/student_admin.html
 msgid "Student Grades"
@@ -11570,7 +11624,7 @@ msgstr "Notes des étudiants"
 
 #: lms/templates/ccx/student_admin.html
 msgid "View gradebook"
-msgstr ""
+msgstr "Voir le carnet de notes"
 
 #: lms/templates/ccx/student_admin.html
 msgid "Download student grades"
@@ -11590,27 +11644,27 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
-msgstr ""
+msgstr "Poster sur Facebook"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to LinkedIn Profile"
-msgstr ""
+msgstr "Ajouter au profil LinkedIn"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to Mozilla Backpack"
-msgstr ""
+msgstr "Ajouter à Mozilla Backpack"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
-msgstr ""
+msgstr "Imprimer le Certificat"
 
 #: lms/templates/certificates/_accomplishment-header.html
 msgid "{platform_name} Home"
-msgstr ""
+msgstr "Accueil {platform_name}"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Noted by"
-msgstr ""
+msgstr "Noté par"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Supported by the following organizations"
@@ -12154,6 +12208,7 @@ msgid "Psychometrics"
 msgstr "Psychométriques"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "Admin"
 
@@ -12391,11 +12446,6 @@ msgstr ""
 "octobre, serveur 1 (montré ici comme un exemple) :"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
 msgstr "Tâches Enseignant en Attente"
 
@@ -12521,8 +12571,7 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"You can now access your certificate. If you keep working and receive a "
-"higher grade,you can request an {link_start} updated certificate {link_end}."
+"You can keep working for a higher grade, or request your certificate now."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12556,11 +12605,6 @@ msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr ""
 
@@ -12585,7 +12629,11 @@ msgid "Go to your dashboard"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
+msgid "{student_name}, you have not yet met the requirements for credit."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Information about course credit requirements"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12936,14 +12984,33 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
+"Thank you for your payment! To receive your course credit, go to the "
+"{provider_link} website. You may have to complete some additional steps "
+"depending on the institution"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Complete Credit"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
 "Congratulations - you have received credit for this course! For more "
 "information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "{provider_name} has declined your request for course credit. For more "
 "information, contact {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Contact {provider_link}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -14249,7 +14316,7 @@ msgstr ""
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
-msgstr ""
+msgstr "Merci,"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -14460,8 +14527,13 @@ msgid "Generate Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
-msgstr ""
+msgstr "Tâches en attente"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -14478,11 +14550,8 @@ msgstr "Information d'inscription"
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"Number of enrollees (instructors, staff members, and students) by track"
+msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""
-"Nombre d'inscrits (instructeurs, membres de l'équipe pédagogique et "
-"étudiants) par parcours"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
@@ -14760,15 +14829,15 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Invoice Number"
-msgstr ""
+msgstr "Numéro de facture"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Cancel Invoice"
-msgstr ""
+msgstr "Annuler la facture"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Resubmit Invoice"
-msgstr ""
+msgstr "Renvoyer la facture"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
@@ -14912,7 +14981,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Select a currency."
-msgstr ""
+msgstr "Sélectionnez une devise."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter a coupon code."
@@ -15337,10 +15406,8 @@ msgstr "Ajout par des bêta testeurs par lots"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
-"be enrolled as a beta tester."
+"be enrolled as beta testers."
 msgstr ""
-"Note : Les utilisateurs doivent avoir un compte {platform_name} activé avant"
-" de pouvoir s'inscrire comme bêta-testeurs."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15367,15 +15434,15 @@ msgstr "Supprimer des bêta-testeurs"
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Administration List Management"
-msgstr "Gestion des listes d'administration"
+msgid "Course Team Management"
+msgstr ""
 
 #. Translators: an "Administrator Group" is a group, such as Course Staff,
 #. that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Select an Administrator Group:"
-msgstr "Sélectionner un Groupe Administrateur :"
+msgid "Select a course team role:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -15383,49 +15450,35 @@ msgstr "Obtention des listes disponibles"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Staff cannot modify staff or beta tester lists. To modify these lists, "
-"contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a discussion admin for discussion management."
+"Staff cannot modify these lists. To manage course team membership, a course "
+"Admin must give you the Admin role to add Staff or Beta Testers, or the "
+"Discussion Admin role to add discussion moderators and TAs."
 msgstr ""
-"Les membres d'équipe pédagogique ne peuvent pas modifier les listes de "
-"membres d'équipe ou de bêta-testeurs. Pour modifier ces listes, veuillez "
-"contacter votre enseignant et lui demander de vous ajouter en tant "
-"qu'enseignant pour les listes de membres d'équipe et de bêta-testeur, ou un "
-"administrateur des discussions pour la gestion des discussions."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Course staff can help you manage limited aspects of your course. Staff can "
-"enroll and unenroll students, as well as modify their grades and see all "
-"course data. Course staff are not automatically given access to Studio and "
-"will not be able to edit your course."
+"Course team members with the Staff role help you manage your course. Staff "
+"can enroll and unenroll learners, as well as modify their grades and access "
+"all course data. Staff also have access to your course in Studio and "
+"Insights. You can only give course team roles to enrolled users."
 msgstr ""
-"L'équipe du cours peut vous aider à gérer certains aspects de votre cours. "
-"L'équipe peut inscrire et désinscrire des étudiants, ainsi que modifier "
-"leurs notes et voir les données du cours. L'équipe du cours n'a pas "
-"automatiquement accès à Studio et ne sera pas en mesure d'éditer votre "
-"cours."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "Ajouter à l‘équipe"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Instructors"
-msgstr "Enseignants"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer discussion access."
+"Course team members with the Admin role help you manage your course. They "
+"can do all of the tasks that Staff can do, and can also add and remove the "
+"Staff and Admin roles, discussion moderation roles, and the beta tester role"
+" to manage course team membership. You can only give course team roles to "
+"enrolled users."
 msgstr ""
-"Les enseignants assurent le cœur de la gestion du cours. Les enseignants "
-"peuvent ajouter et supprimer des membres de l'équipe de cours, tout comme "
-"administrer l'accès aux discussions."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Add Instructor"
-msgstr "Ajouter un enseignant"
+msgid "Add Admin"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -15433,12 +15486,10 @@ msgstr "Beta testeurs"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Beta testers can see course content before the rest of the students. They "
-"can make sure that the content works, but have no additional privileges."
+"Beta Testers can see course content before other learners. They can make "
+"sure that the content works, but have no additional privileges. You can only"
+" give course team roles to enrolled users."
 msgstr ""
-"Les testeurs Beta peuvent voir le contenu du cours avant les autres "
-"étudiants. Ils peuvent s'assure du bon fonctionnement du contenu, mais n'ont"
-" aucun privilège supplémentaire."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -15450,15 +15501,12 @@ msgstr "Administrateurs de discussion"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. They "
-"CAN add/delete other moderators and their posts are marked as 'staff'."
+"Discussion Admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. Their "
+"posts are marked as 'staff'. They can also add and remove the discussion "
+"moderation roles to manage course team membership. You can only give course "
+"team roles to enrolled users."
 msgstr ""
-"Les administrateurs de discussion peuvent modifier ou supprimer un message, "
-"annuler un signalement d'abus, fermer ou rouvrir une discussion, approuver "
-"une réponse et voir les messages de toutes les cohortes. Ils PEUVENT "
-"ajouter/supprimer d'autres modérateurs et leurs messages sont affichés en "
-"tant que 'équipe pédagogique'."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -15470,16 +15518,12 @@ msgstr "Modérateurs de discussion"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion moderators can edit or delete any post, clear misuse flags, close"
+"Discussion Moderators can edit or delete any post, clear misuse flags, close"
 " and re-open threads, endorse responses, and see posts from all cohorts. "
-"They CANNOT add/delete other moderators and their posts are marked as "
-"'staff'."
+"Their posts are marked as 'staff'. They cannot manage course team membership"
+" by adding or removing discussion moderation roles. You can only give course"
+" team roles to enrolled users."
 msgstr ""
-"Les modérateurs de discussion peuvent modifier ou supprimer un message, "
-"annuler un signalement d'abus, fermer ou rouvrir une discussion, approuver "
-"une réponse et voir les messages de toutes les cohortes. Ils NE PEUVENT PAS "
-"ajouter/supprimer d'autres modérateurs et leurs messages sont affichés en "
-"tant que 'équipe pédagogique'."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -15494,14 +15538,9 @@ msgid ""
 "Community TA's are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked 'Community TA'."
+"from all cohorts. Their posts are marked as 'Community TA'. You can only "
+"give course team roles to enrolled users."
 msgstr ""
-"Les Assistants sont des membres de la communauté d'apprenants que vous "
-"considérez comme particulièrement utiles et efficaces dans les discussions. "
-"Ils peuvent modifier ou supprimer des messages, supprimer des indicateurs "
-"d'usage inapproprié, fermer et réouvrir des fils de discussion, approuver "
-"des réponses et voir les messages de toutes les cohortes. Leurs messages "
-"sont affichés comme 'Assistants'. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -15606,12 +15645,12 @@ msgid "Myself"
 msgstr "Moi même"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and instructors"
-msgstr "L'équipe et les enseignants"
+msgid "Staff and admins"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff and instructors)"
-msgstr "Tous (élèves, personnel et professeur)"
+msgid "All (students, staff, and admins)"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -15787,12 +15826,9 @@ msgstr "Supprimer l'état de l'étudiant pour ce problème"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
-" for this problem and student, click on this button:"
+" the 'Pending Tasks' table. To see status for all tasks submitted for this "
+"problem and student, click on this button:"
 msgstr ""
-"La notation fonctionne en arrière plan, et l'état des tâches actives sera "
-"visible dans un tableau ci-dessous. Pour voir l'état de toutes les tâches "
-"soumises pour cet exercice et étudiant, cliquez sur ce bouton :"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -15982,21 +16018,12 @@ msgid ""
 "{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:\n"
 "{ul_tag}\n"
 "{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}\n"
-"{li_tag}The instructor needs to score the essays that are used to help you better understand the grading\n"
+"{li_tag}The course team needs to score the essays that are used to help you better understand the grading\n"
 "criteria.{end_li_tag}\n"
 "{li_tag}There must be submissions that are waiting for grading.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
 msgstr ""
-"\n"
-"{p_tag}Vous n'avez actuellement pas d'évaluation par les pairs à faire.  Pour avoir des évaluation par des pairs à faire:\n"
-"{ul_tag}\n"
-"{li_tag}Vous devez avoir envoyé une réponse à une question évaluée par des pairs.{end_li_tag}\n"
-"{li_tag}L'enseignant a besoin d'évaluer les essais qui sont utilisés pour vous aider à mieux comprendre les \n"
-"critères d'évaluations.{end_li_tag}\n"
-"{li_tag} Il doit y avoir des soumissions en attente d'une évaluation.{end_li_tag}\n"
-"{end_ul_tag}\n"
-"{end_p_tag}\n"
 
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/peer_grading/peer_grading_closed.html
@@ -16345,7 +16372,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Enrollment Link"
-msgstr ""
+msgstr "Lien d'Inscription"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Used"
@@ -16353,11 +16380,11 @@ msgstr "Utilisé"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
-msgstr ""
+msgstr "Invalide"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
-msgstr ""
+msgstr "Date d'achat"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Print Receipt"
@@ -16369,7 +16396,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Purchase Order Number"
@@ -16385,7 +16412,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Recipient Name"
-msgstr ""
+msgstr "Nom du bénéficiaire:"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Recipient Email"
@@ -16428,7 +16455,7 @@ msgstr "Prix par étudiant"
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Discount Applied:"
-msgstr ""
+msgstr "Remise Appliquée:"
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
@@ -16463,7 +16490,7 @@ msgstr "{course_name}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{start_date} - {end_date}"
-msgstr ""
+msgstr "{start_date} - {end_date}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -16525,7 +16552,7 @@ msgstr[1] ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
-msgstr ""
+msgstr "Image de couverture"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Course Dates:"
@@ -16545,11 +16572,11 @@ msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Apply"
-msgstr ""
+msgstr "Appliquer"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "code has been applied"
-msgstr ""
+msgstr "le code a été appliqué"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "TOTAL:"
@@ -16578,7 +16605,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Empty Cart"
-msgstr ""
+msgstr "Vider le panier"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Shopping cart"
@@ -16680,11 +16707,11 @@ msgstr "Les serveurs de {platform_name} sont actuellement surchargés"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
-msgstr ""
+msgstr "Veuillez patienter"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please wait"
-msgstr ""
+msgstr "Veuillez patienter"
 
 #: lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
@@ -16726,7 +16753,7 @@ msgstr "Lier"
 
 #: lms/templates/survey/survey.html
 msgid "User Survey"
-msgstr ""
+msgstr "Enquête Utilisateur"
 
 #: lms/templates/survey/survey.html
 msgid "Pre-Course Survey"
@@ -17035,7 +17062,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Using File URLs"
-msgstr ""
+msgstr "Utiliser les URL de fichiers"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -17067,7 +17094,7 @@ msgstr "En savoir plus à propos de la gestion de fichiers"
 
 #: cms/templates/asset_index.html
 msgid "Max per-file size: {max_filesize}MB"
-msgstr ""
+msgstr "Taille maximale de fichier: {max_filesize}MB"
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -17129,7 +17156,7 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"
-msgstr ""
+msgstr "En savoir plus sur les certificats"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -17220,7 +17247,7 @@ msgstr "Glissez pour modifier l'ordre"
 
 #: cms/templates/container.html
 msgid "Open the courseware in the LMS"
-msgstr ""
+msgstr "Ouvrir le contenu du cours dans le LMS"
 
 #: cms/templates/container.html
 msgid "View Live Version"
@@ -17232,7 +17259,7 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"
-msgstr ""
+msgstr "Ajout de composants"
 
 #: cms/templates/container.html
 msgid ""
@@ -17248,7 +17275,7 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "Editing components"
-msgstr ""
+msgstr "Edition des composants"
 
 #: cms/templates/container.html
 msgid ""
@@ -17257,11 +17284,12 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "Reorganizing components"
-msgstr ""
+msgstr "Réorganisation des composants"
 
 #: cms/templates/container.html
 msgid "Drag components to new locations within this component."
 msgstr ""
+"Glisser des composants dans de nouveaux emplacements avec ce composant."
 
 #: cms/templates/container.html
 msgid "For content experiments, you can drag components to other groups."
@@ -17495,7 +17523,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Warning"
-msgstr ""
+msgstr "Attention"
 
 #: cms/templates/course_outline.html
 msgid "This course uses features that are no longer supported."
@@ -17531,11 +17559,11 @@ msgstr "Nouvelle Section"
 
 #: cms/templates/course_outline.html
 msgid "Reindex current course"
-msgstr ""
+msgstr "Réindexer le cours"
 
 #: cms/templates/course_outline.html
 msgid "Reindex"
-msgstr ""
+msgstr "Réindexer"
 
 #: cms/templates/course_outline.html
 msgid "Collapse All Sections"
@@ -17828,7 +17856,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Export My Library Content"
-msgstr ""
+msgstr "Exporter le contenu de ma bibliothèque"
 
 #: cms/templates/export.html
 msgid "Export My Course Content"
@@ -17836,7 +17864,7 @@ msgstr "Exporter le contenu de mon cours"
 
 #: cms/templates/export.html
 msgid "Export Library Content"
-msgstr ""
+msgstr "Exporter le contenu de la bibliothèque"
 
 #: cms/templates/export.html
 msgid "Export Course Content"
@@ -17889,7 +17917,7 @@ msgstr "Données du forum et discussions"
 
 #: cms/templates/export.html
 msgid "Why export a library?"
-msgstr ""
+msgstr "Pourquoi exporter une bibliothèque ?"
 
 #: cms/templates/export.html
 msgid ""
@@ -18321,7 +18349,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Library Import"
-msgstr ""
+msgstr "Importer une bibliothèque"
 
 #: cms/templates/import.html
 msgid "Course Import"
@@ -18695,7 +18723,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
-msgstr ""
+msgstr "Cours en Cours de Traitement"
 
 #: cms/templates/index.html
 msgid "Course Run:"
@@ -18733,7 +18761,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Libraries"
-msgstr ""
+msgstr "Bibliothèques"
 
 #: cms/templates/index.html
 msgid "Re-run Course"
@@ -18759,7 +18787,7 @@ msgstr "Votre nouveau Cours en un clic !"
 
 #: cms/templates/index.html
 msgid "Becoming a Course Creator in {studio_name}"
-msgstr ""
+msgstr "Devenir un créateur de Cours dans {studio_name}"
 
 #: cms/templates/index.html
 msgid ""
@@ -18935,7 +18963,7 @@ msgstr "Demandez de l'aide avec votre compte {studio_name}"
 
 #: cms/templates/library.html
 msgid "Content Library"
-msgstr ""
+msgstr "Bibliothèque de contenu"
 
 #: cms/templates/library.html
 msgid "Add Component"
@@ -18943,7 +18971,7 @@ msgstr "Ajouter un composant"
 
 #: cms/templates/library.html
 msgid "Adding content to your library"
-msgstr ""
+msgstr "Ajouter du contenu à votre bibliothèque"
 
 #: cms/templates/library.html
 msgid ""
@@ -18960,7 +18988,7 @@ msgstr ""
 
 #: cms/templates/library.html
 msgid "Using library content in courses"
-msgstr ""
+msgstr "Utiliser la bibliothèque dans un cours"
 
 #: cms/templates/library.html
 msgid ""
@@ -18974,7 +19002,7 @@ msgstr ""
 
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
-msgstr ""
+msgstr "En savoir plus à propos des bibliothèques de contenu"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
@@ -19028,12 +19056,8 @@ msgid "User's Email Address"
 msgstr "Adresse email utilisateur"
 
 #: cms/templates/manage_users.html
-msgid ""
-"Please provide the email address of the course staff member you'd like to "
-"add"
+msgid "Provide the email address of the user you want to add as Staff"
 msgstr ""
-"Merci de fournir l'adresse mail du membre de l'équipe pédagogique du cours "
-"que vous souhaitez ajouter"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
@@ -19059,12 +19083,9 @@ msgstr "Rôles dans l'équipe pédagogique"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Course team members, or staff, are course co-authors. They have full writing"
-" and editing privileges on all course content."
+"Course team members with the Staff role are course co-authors. They have "
+"full writing and editing privileges on all course content."
 msgstr ""
-"Les membres de l'équipe pédagogique sont considérés comme co-auteurs du "
-"cours. Ils ont les droits d'accès complets en édition et en écriture sur "
-"tout le contenu du cours."
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -19075,20 +19096,22 @@ msgstr ""
 "ajouter ou supprimer des membres à cette équipe."
 
 #: cms/templates/manage_users.html
+msgid ""
+"All course team members are automatically enrolled in the course and can "
+"access content in Studio, the LMS, and Insights."
+msgstr ""
+
+#: cms/templates/manage_users.html
 msgid "Transferring Ownership"
 msgstr "Transfert de possession"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Every course must have an Admin. If you're the Admin and you want transfer "
-"ownership of the course, click Add admin access to make another user the "
-"Admin, then ask that user to remove you from the Course Team list."
+"Every course must have an Admin. If you are the Admin and you want to "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
+"Course Team list."
 msgstr ""
-"Chaque cours doit avoir un administrateur. Si vous êtes l'administrateur "
-"d'un cours et que vous souhaitez transférer ce droit, cliquez sur \"Ajouter "
-"un accès administrateur\" pour donner ce droit à un autre utilisateur, "
-"ensuite, demandez à cet utilisateur de vous retirer de l'équipe pédagogique "
-"de ce cours."
 
 #: cms/templates/manage_users_lib.html
 msgid "Library User Access"
@@ -19096,11 +19119,11 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
 msgid "User Access"
-msgstr ""
+msgstr "Permettre l'accès à cette bibliothèque"
 
 #: cms/templates/manage_users_lib.html
 msgid "Grant Access to This Library"
-msgstr ""
+msgstr "Permettre l'accès à cette bibliothèque"
 
 #: cms/templates/manage_users_lib.html
 msgid "Provide the email address of the user you want to add"
@@ -19108,7 +19131,7 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid "Add More Users to This Library"
-msgstr ""
+msgstr "Ajouter d'autres utilisateurs à cette bibliothèque"
 
 #: cms/templates/manage_users_lib.html
 msgid ""
@@ -19118,7 +19141,7 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid "Add a New User"
-msgstr ""
+msgstr "Ajouter un nouvel utilisateur"
 
 #: cms/templates/manage_users_lib.html
 msgid "Library Access Roles"
@@ -19130,25 +19153,26 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Users can view library content and can reference or use library components "
-"in their courses, but they cannot edit the contents of a library."
+"Library Users can view library content and can reference or use library "
+"components in their courses, but they cannot edit the contents of a library."
 msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Staff are content co-authors. They have full editing privileges on the "
-"contents of a library."
+"Library Staff are content co-authors. They have full editing privileges on "
+"the contents of a library."
 msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Admins have full editing privileges and can also add and remove other team "
-"members. There must be at least one user with Admin privileges in a library."
+"Library Admins have full editing privileges and can also add and remove "
+"other team members. There must be at least one user with the Admin role in a"
+" library."
 msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
-msgstr ""
+msgstr "S'inscrire"
 
 #: cms/templates/register.html
 msgid "Sign Up for {studio_name}"
@@ -19296,15 +19320,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Credit Eligibility Requirements"
+msgid "Course Credit Requirements"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Steps needed for credit eligibility"
+msgid "Steps required to earn course credit"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Minimum Passing Grade"
+msgid "Minimum Grade"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -19316,17 +19340,11 @@ msgid "Proctored Exam {number}"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Successful In-Course Reverification"
+msgid "ID Verification"
 msgstr ""
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "In-Course Reverification {number}"
-msgstr ""
-
-#: cms/templates/settings.html
-msgid "Access to {display_name}"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -19395,7 +19413,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Details"
-msgstr ""
+msgstr "Détails du cours"
 
 #: cms/templates/settings.html
 msgid "Provide useful information about your course"
@@ -19534,11 +19552,11 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Grade Requirements"
-msgstr ""
+msgstr "Note requise"
 
 #: cms/templates/settings.html
 msgid " %"
-msgstr ""
+msgstr "%"
 
 #: cms/templates/settings.html
 msgid ""
@@ -19655,19 +19673,19 @@ msgid "Your overall grading scale for student final grades"
 msgstr "Votre échelle globale d'évaluation des notes finales des étudiants"
 
 #: cms/templates/settings_graders.html
-msgid "Credit Grade &amp; Eligibility"
+msgid "Credit Eligibility"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Settings for credit eligibility"
+msgid "Settings for course credit eligibility"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Minimum Passing Grade to Earn Credit:"
+msgid "Minimum Credit-Eligible Grade:"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Must be greater than or equal to passing grade"
+msgid "Must be greater than or equal to the course passing grade"
 msgstr ""
 
 #: cms/templates/settings_graders.html
@@ -19736,11 +19754,11 @@ msgstr "Déplier ou Replier"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility Settings"
-msgstr ""
+msgstr "Réglages de visibilité"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilité"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -19852,7 +19870,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
-msgstr ""
+msgstr "Il n'existe aucun groupe de contenu"
 
 #: cms/templates/visibility_editor.html
 msgid ""
@@ -19863,7 +19881,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Manage content groups"
-msgstr ""
+msgstr "Gérer les groupes de contenus"
 
 #. Translators: Any text between {screen_reader_start} and {screen_reader_end}
 #. is only read by screen readers and never shown in the browser.
@@ -19876,7 +19894,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Make visible to:"
-msgstr ""
+msgstr "Rendre visible pour :"
 
 #: cms/templates/visibility_editor.html
 msgid "All Students and Staff"
@@ -19888,7 +19906,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Deleted Content Group"
-msgstr ""
+msgstr "Groupe de contenu effacé"
 
 #: cms/templates/visibility_editor.html
 msgid ""
@@ -20006,11 +20024,11 @@ msgstr "Exporter"
 
 #: cms/templates/widgets/header.html
 msgid "Current Library:"
-msgstr ""
+msgstr "Bibliothèque actuelle :"
 
 #: cms/templates/widgets/header.html
 msgid "Account"
-msgstr ""
+msgstr "Compte"
 
 #: cms/templates/widgets/header.html
 msgid "Account Navigation"
@@ -20058,7 +20076,7 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "{studio_name} Documentation"
-msgstr ""
+msgstr "{studio_name} Documentation"
 
 #: cms/templates/widgets/sock.html
 msgid ""
@@ -20082,11 +20100,11 @@ msgstr "S'inscrire à edX101"
 
 #: cms/templates/widgets/sock.html
 msgid "How to use {studio_name} to build your course"
-msgstr ""
+msgstr "Comment utiliser{studio_name} pour construire votre cours"
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about {studio_name}?"
-msgstr ""
+msgstr "Avez-vous des problèmes, questions ou suggestions sur {studio_name} ?"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
