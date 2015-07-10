@@ -1043,7 +1043,7 @@ def accounts_login(request):
 
 # Need different levels of logging
 @ensure_csrf_cookie
-def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,unused-argument
+def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
     """AJAX request to log in the user."""
 
     backend_name = None

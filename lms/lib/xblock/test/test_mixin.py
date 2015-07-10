@@ -230,7 +230,7 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
                 )
 
 
-class RenamedTuple(tuple):  # pylint: disable=incomplete-protocol
+class RenamedTuple(tuple):
     """
     This class is only used to allow overriding __name__ on the tuples passed
     through ddt, in order to have the generated test names make sense.

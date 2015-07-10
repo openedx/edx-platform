@@ -58,7 +58,7 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
 
 import random
-import string  # pylint: disable-msg=deprecated-module
+import string  # pylint: disable=deprecated-module
 from collections import OrderedDict
 import urllib
 import analytics
@@ -431,7 +431,7 @@ def running(request):
 # Pipeline functions.
 # Signatures are set by python-social-auth; prepending 'unused_' causes
 # TypeError on dispatch to the auth backend's authenticate().
-# pylint: disable-msg=unused-argument
+# pylint: disable=unused-argument
 
 
 def parse_query_params(strategy, response, *args, **kwargs):

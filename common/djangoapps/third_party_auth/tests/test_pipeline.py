@@ -7,8 +7,8 @@ from third_party_auth.tests import testutil
 import unittest
 
 
-# Allow tests access to protected methods (or module-protected methods) under
-# test. pylint: disable-msg=protected-access
+# Allow tests access to protected methods (or module-protected methods) under test.
+# pylint: disable=protected-access
 
 
 class MakeRandomPasswordTest(testutil.TestCase):

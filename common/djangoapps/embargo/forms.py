@@ -55,7 +55,7 @@ class RestrictedCourseForm(forms.ModelForm):
         return course_key
 
 
-class IPFilterForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
+class IPFilterForm(forms.ModelForm):
     """Form validating entry of IP addresses"""
 
     class Meta:  # pylint: disable=missing-docstring
