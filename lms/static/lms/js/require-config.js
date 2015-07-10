@@ -1,56 +1,57 @@
 ;(function (require, define) {
-    var paths = {}, config;
 
-    // jquery, underscore, gettext, URI, tinymce, or jquery.tinymce may already
-    // have been loaded and we do not want to load them a second time. Check if
-    // it is the case and use the global var instead.
-    if (window.jQuery) {
-        define("jquery", [], function() {return window.jQuery;});
-    } else {
-        paths.jquery = "js/vendor/jquery.min";
-    }
-    if (window._) {
-        define("underscore", [], function() {return window._;});
-    } else {
-        paths.jquery = "js/vendor/underscore-min";
-    }
-    if (window.gettext) {
-        define("gettext", [], function() {return window.gettext;});
-    } else {
-        paths.gettext = "/i18n";
-    }
-    if (window.Logger) {
-        define("logger", [], function() {return window.Logger;});
-    } else {
-        paths.logger = "js/src/logger";
-    }
-    if (window.URI) {
-        define("URI", [], function() {return window.URI;});
-    } else {
-        paths.URI = "js/vendor/URI.min";
-    }
-    if (window.tinymce) {
-        define('tinymce', [], function() {return window.tinymce;});
-    } else {
-        paths.tinymce = "js/vendor/tinymce/js/tinymce/tinymce.full.min";
-    }
-    if (window.jquery && window.jquery.tinymce) {
-        define("jquery.tinymce", [], function() {return window.jquery.tinymce;});
-    } else {
-        paths.tinymce = "js/vendor/tinymce/js/tinymce/jquery.tinymce.min";
+    // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
+    // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
+    // Note that when the optimizer executes this code, window will not be defined.
+    if (window) {
+        var defineDependency = function (globalVariable, name, noShim) {
+            if (window[globalVariable]) {
+                if (noShim) {
+                    define(name, {});
+                }
+                else {
+                    define(name, [], function() {return window[globalVariable];});
+                }
+            }
+            else {
+                console.error("Expected library to be included on page, but not found on window object: " + name);
+            }
+        };
+        defineDependency("jQuery", "jquery");
+        defineDependency("_", "underscore");
+        defineDependency("gettext", "gettext");
+        defineDependency("Logger", "logger");
+        defineDependency("URI", "URI");
+        defineDependency("Backbone", "backbone");
+        // utility.js adds two functions to the window object, but does not return anything
+        defineDependency("isExternal", "utility", true);
     }
 
-    config = {
-        // NOTE: baseUrl has been previously set in lms/static/templates/main.html
+    require.config({
+        // NOTE: baseUrl has been previously set in lms/templates/main.html
         waitSeconds: 60,
         paths: {
+            "gettext": "/i18n",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
             "text": 'js/vendor/requirejs/text',
+            "logger": "js/src/logger",
             "backbone": "js/vendor/backbone-min",
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
+            "underscore": "js/vendor/underscore-min",
             "underscore.string": "js/vendor/underscore.string.min",
+            "jquery": "js/vendor/jquery.min",
+            "jquery.cookie": "js/vendor/jquery.cookie",
+            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
+            "jquery.url": "js/vendor/url.min",
+            "jquery.ui": "js/vendor/jquery-ui.min",
+            "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
+            "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
+            "URI": "js/vendor/URI.min",
+            "string_utils": "js/src/string_utils",
+            "utility": "js/src/utility",
+
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
@@ -64,7 +65,7 @@
             "tags-annotator": 'js/vendor/ova/tags-annotator',
             "diacritic-annotator": 'js/vendor/ova/diacritic-annotator',
             "flagging-annotator": 'js/vendor/ova/flagging-annotator',
-            "jquery-Watch": 'js/vendor/ova/jquery-Watch',
+            "jquery-Watch": "js/vendor/ova/jquery-Watch",
             "openseadragon": 'js/vendor/ova/openseadragon',
             "osda": 'js/vendor/ova/OpenSeaDragonAnnotation',
             "ova": 'js/vendor/ova/ova',
@@ -73,6 +74,9 @@
             // end of files needed by OVA
         },
         shim: {
+            "gettext": {
+                exports: "gettext"
+            },
             "annotator_1.2.9": {
                 deps: ["jquery"],
                 exports: "Annotator"
@@ -82,6 +86,18 @@
             },
             "jquery": {
                 exports: "$"
+            },
+            "jquery.cookie": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.cookie"
+            },
+            "jquery.url": {
+                deps: ["jquery"],
+                exports: "jQuery.url"
+            },
+            "jquery.fileupload": {
+                deps: ["jquery.ui", "jquery.iframe-transport"],
+                exports: "jQuery.fn.fileupload"
             },
             "underscore": {
                 exports: "_"
@@ -97,8 +113,9 @@
             "backbone-super": {
                 deps: ["backbone"]
             },
-            "logger": {
-                exports: "Logger"
+            "string_utils": {
+                deps: ["underscore"],
+                exports: "interpolate_text"
             },
             // Needed by OVA
             "video.dev": {
@@ -156,12 +173,5 @@
             }
             // End of needed by OVA
         }
-    };
-
-    for (var key in paths) {
-        if ({}.hasOwnProperty.call(paths, key)) {
-            config.paths[key] = paths[key];
-        }
-    }
-    require.config(config);
+    });
 }).call(this, require || RequireJS.require, define || RequireJS.define);

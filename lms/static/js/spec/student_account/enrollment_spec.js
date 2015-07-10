@@ -2,7 +2,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
     function( AjaxHelpers, EnrollmentInterface ) {
         'use strict';
 
-        describe( 'edx.student.account.EnrollmentInterface', function() {
+        describe( 'EnrollmentInterface', function() {
 
             var COURSE_KEY = 'edX/DemoX/Fall',
                 ENROLL_URL = '/commerce/baskets/',
