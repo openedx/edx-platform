@@ -476,7 +476,11 @@ def extend_content(content):
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except User.DoesNotExist:
-            log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
+            log.error(
+                'User ID %s in comment content %s but not in our DB.',
+                content.get('user_id'),
+                content.get('id')
+            )
 
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
@@ -547,9 +551,10 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
             try:
                 endorser = User.objects.get(pk=endorsement["user_id"])
             except User.DoesNotExist:
-                log.error("User ID {0} in endorsement for comment {1} but not in our DB.".format(
+                log.error(
+                    "User ID %s in endorsement for comment %s but not in our DB.",
                     content.get('user_id'),
-                    content.get('id'))
+                    content.get('id')
                 )
 
         # Only reveal endorser if requester can see author or if endorser is staff

@@ -387,7 +387,7 @@ class Courses(SysadminDashboardView):
 
         msg = u''
 
-        log.debug('Adding course using git repo {0}'.format(gitloc))
+        log.debug('Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
@@ -723,7 +723,7 @@ class GitLogs(TemplateView):
             try:
                 course = get_course_by_id(course_id)
             except Exception:  # pylint: disable=broad-except
-                log.info('Cannot find course {0}'.format(course_id))
+                log.info('Cannot find course %s', course_id)
                 raise Http404
 
             # Allow only course team, instructors, and staff
@@ -731,11 +731,11 @@ class GitLogs(TemplateView):
                     CourseInstructorRole(course.id).has_user(request.user) or
                     CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
-            log.debug('course_id={0}'.format(course_id))
+            log.debug('course_id=%s', course_id)
             cilset = CourseImportLog.objects.filter(
                 course_id=course_id
             ).order_by('-created')
-            log.debug('cilset length={0}'.format(len(cilset)))
+            log.debug('cilset length=%s', len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)

@@ -23,6 +23,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         post_dict = json.loads(data_string)
 
         # Log the request
+        # pylint: disable=logging-format-interpolation
         logger.debug(
             "Comment Service received POST request {0} to path {1}"
             .format(json.dumps(post_dict), self.path)
@@ -60,6 +61,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         post_dict = json.loads(data_string)
 
         # Log the request
+        # pylint: disable=logging-format-interpolation
         logger.debug(
             "Comment Service received PUT request {0} to path {1}"
             .format(json.dumps(post_dict), self.path)

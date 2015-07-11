@@ -224,14 +224,15 @@ def get_course_about_section(course, section_key):
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
-                        u"Error rendering course={course}, section_key={section_key}".format(
-                            course=course, section_key=section_key
-                        ))
+                        u"Error rendering course=%s, section_key=%s",
+                        course, section_key
+                    )
             return html
 
         except ItemNotFoundError:
             log.warning(
-                u"Missing about section {key} in course {url}".format(key=section_key, url=course.location.to_deprecated_string())
+                u"Missing about section %s in course %s",
+                section_key, course.location.to_deprecated_string()
             )
             return None
     elif section_key == "title":
@@ -291,9 +292,9 @@ def get_course_info_section(request, course, section_key):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course={course}, section_key={section_key}".format(
-                    course=course, section_key=section_key
-                ))
+                u"Error rendering course=%s, section_key=%s",
+                course, section_key
+            )
 
     return html
 
@@ -330,7 +331,8 @@ def get_course_syllabus_section(course, section_key):
                 )
         except ResourceNotFoundError:
             log.exception(
-                u"Missing syllabus section {key} in course {url}".format(key=section_key, url=course.location.to_deprecated_string())
+                u"Missing syllabus section %s in course %s",
+                section_key, course.location.to_deprecated_string()
             )
             return "! Syllabus missing !"
 
