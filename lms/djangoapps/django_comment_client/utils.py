@@ -389,7 +389,7 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+            log.info(u'%s queries run, total %s seconds', len(connection.queries), total_time)
         return response
 
 
