@@ -66,9 +66,11 @@ class DiscussionModule(DiscussionFields, XModule):
 
     def get_course(self):
         """
-        Return course by course id.
+        Return the CourseDescriptor by course id.
         """
-        return self.descriptor.runtime.modulestore.get_course(self.course_id)
+        course_key = self.location.course_key
+        root_course_loc = course_key.make_usage_key(u'course', u'course')
+        return self.runtime.get_block(root_course_loc)
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
