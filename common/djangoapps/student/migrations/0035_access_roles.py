@@ -20,6 +20,11 @@ class Migration(DataMigration):
     Converts course_creator, instructor_, staff_, and betatestuser_ to new table
     """
 
+    # Because we instantiate the module store and the modulestore needs this config table to exist.
+    depends_on = (
+        ("xblock_django", "0001_initial"),
+    )
+
     GROUP_ENTRY_RE = re.compile(r'(?P<role_id>staff|instructor|beta_testers|course_creator_group)_?(?P<course_id_string>.*)')
 
     def forwards(self, orm):
