@@ -390,6 +390,8 @@ FEATURES = {
         'DASHBOARD_FACEBOOK': False,
         'CERTIFICATE_FACEBOOK': False,
         'CERTIFICATE_FACEBOOK_TEXT': None,
+        'CERTIFICATE_TWITTER': False,
+        'CERTIFICATE_TWITTER_TEXT': None,
         'DASHBOARD_TWITTER': False,
         'DASHBOARD_TWITTER_TEXT': None
     },
