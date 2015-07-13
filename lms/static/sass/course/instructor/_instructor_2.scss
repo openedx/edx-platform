@@ -1921,7 +1921,7 @@ input[name="subject"] {
   }
 }
 
-.ecommerce-wrapper{
+.ecommerce-wrapper, .proctoring-wrapper{
   h2{
     height: 26px;
     line-height: 26px;
@@ -1991,7 +1991,6 @@ input[name="subject"] {
   }
 }
 .special-allowance-container{
-  @extend .ecommerce-wrapper;
   .allowance-table {
     width: 100%;
     tr:nth-child(even){
