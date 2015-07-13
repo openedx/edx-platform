@@ -20,6 +20,7 @@ from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
 from courseware.access import has_access
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
 )
@@ -62,6 +63,15 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
+def has_required_keys(module):
+    """Returns True iff module has the proper attributes for generating metadata with get_discussion_id_map_entry()"""
+    for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+        if getattr(module, key, None) is None:
+            log.debug("Required key '%s' not in discussion %s, leaving out of category map", key, module.location)
+            return False
+    return True
+
+
 def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
     """
     Return a list of all valid discussion modules in this course that
@@ -69,17 +79,60 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
     """
     all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
-    def has_required_keys(module):
-        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-            if getattr(module, key, None) is None:
-                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
-                return False
-        return True
-
     return [
         module for module in all_modules
         if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
     ]
+
+
+def get_discussion_id_map_entry(module):
+    """
+    Returns a tuple of (discussion_id, metadata) suitable for inclusion in the results of get_discussion_id_map().
+    """
+    return (
+        module.discussion_id,
+        {
+            "location": module.location,
+            "title": module.discussion_category.split("/")[-1].strip() + " / " + module.discussion_target
+        }
+    )
+
+
+class DiscussionIdMapIsNotCached(Exception):
+    """Thrown when the discussion id map is not cached for this course, but an attempt was made to access it."""
+    pass
+
+
+def get_cached_discussion_key(course, discussion_id):
+    """
+    Returns the usage key of the discussion module associated with discussion_id if it is cached. If the discussion id
+    map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
+    raises a DiscussionIdMapIsNotCached exception.
+    """
+    try:
+        cached_mapping = CourseStructure.objects.get(course_id=course.id).discussion_id_map
+        if not cached_mapping:
+            raise DiscussionIdMapIsNotCached()
+        return cached_mapping.get(discussion_id)
+    except CourseStructure.DoesNotExist:
+        raise DiscussionIdMapIsNotCached()
+
+
+def get_cached_discussion_id_map(course, discussion_id, user):
+    """
+    Returns a dict mapping discussion_id to discussion module metadata if it is cached and visible to the user.
+    If not, returns the result of get_discussion_id_map
+    """
+    try:
+        key = get_cached_discussion_key(course, discussion_id)
+        if not key:
+            return {}
+        module = modulestore().get_item(key)
+        if not (has_required_keys(module) and has_access(user, 'load', module, course.id)):
+            return {}
+        return dict([get_discussion_id_map_entry(module)])
+    except DiscussionIdMapIsNotCached:
+        return get_discussion_id_map(course, user)
 
 
 def get_discussion_id_map(course, user):
@@ -87,13 +140,7 @@ def get_discussion_id_map(course, user):
     Transform the list of this course's discussion modules (visible to a given user) into a dictionary of metadata keyed
     by discussion_id.
     """
-    def get_entry(module):  # pylint: disable=missing-docstring
-        discussion_id = module.discussion_id
-        title = module.discussion_target
-        last_category = module.discussion_category.split("/")[-1].strip()
-        return (discussion_id, {"location": module.location, "title": last_category + " / " + title})
-
-    return dict(map(get_entry, get_accessible_discussion_modules(course, user)))
+    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_modules(course, user)))
 
 
 def _filter_unstarted_categories(category_map):
