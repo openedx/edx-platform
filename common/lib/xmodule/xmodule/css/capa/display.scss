@@ -351,7 +351,7 @@ div.problem {
         display: inline-block;
         width: 20px;
         height: 20px;
-        background: url('../images/incorrect-icon.png') center center no-repeat;
+        background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
       }
 
       input {
@@ -1366,9 +1366,9 @@ div.problem .imageinput.capa_inputtype {
     height: 20px;
   }
   .correct {
-    background: url('../images/correct-icon.png') center center no-repeat;
+    background: url($static-path + '/images/correct-icon.png') center center no-repeat;
   }
   .incorrect {
-    background: url('../images/incorrect-icon.png') center center no-repeat;
+    background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
   }
 }
