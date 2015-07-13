@@ -35,12 +35,33 @@ class LmsFieldData(SplitFieldData):
             Scope.user_state: student_data,
             Scope.user_info: student_data,
             Scope.preferences: student_data,
-            RemoteScope.shared_user_state: shared_data
+            RemoteScope.user_state: shared_data
         })
 
     def __repr__(self):
         return "LmsFieldData{!r}".format((self._authored_data, self._student_data))
 
+    def _shared_field_data(self, remote_scope):
+        """Summary
+        
+        Args:
+            remote_scope (TYPE): Description
+        
+        Returns:
+            TYPE: Description
+        """
+        return self._find_scope_in_mapping(remote_scope)
+
+    def get(self, block, name):
+        query = block.fields[name].query
+        if query is None:
+            return self._field_data(block, name).get(block, name)
+        else:
+            field_data_cache = self._shared_field_data(query.remote_scope)
+            try:
+                return field_data_cache.get(block, name, remote=True)
+            except TypeError:
+                raise TypeError
 
 ## TODO: maybe this is useless
 
