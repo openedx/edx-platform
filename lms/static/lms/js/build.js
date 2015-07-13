@@ -18,7 +18,16 @@
          * done.
          */
         modules: getModulesList([
-            'teams/js/teams_tab_factory'
+            'teams/js/teams_tab_factory',
+            'js/discovery/discovery_factory',
+            'js/edxnotes/views/page_factory',
+            'js/edxnotes/views/toggle_notes_factory',
+            'js/groups/views/cohorts_dashboard_factory',
+            'js/search/course/course_search_factory',
+            'js/search/dashboard/dashboard_search_factory',
+            'js/student_profile/views/learner_profile_factory',
+            'js/student_account/views/account_settings_factory',
+            'js/student_account/views/finish_auth_factory'
         ]),
 
         /**
@@ -53,7 +62,7 @@
             'underscore': 'empty:',
             'logger': 'empty:',
             'utility': 'empty:',
-            'URI': 'empty:'
+            'URI': 'empty:',
         },
 
         /**
