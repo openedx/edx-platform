@@ -57,7 +57,6 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment, CourseAccessRole
 from verify_student.models import SoftwareSecurePhotoVerification
-from util.query import use_read_replica_if_available
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -1262,7 +1261,7 @@ def generate_students_certificates(
     that are enrolled.
     """
     start_time = time()
-    enrolled_students = use_read_replica_if_available(CourseEnrollment.objects.users_enrolled_in(course_id))
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     current_step = {'step': 'Calculating students already have certificates'}
@@ -1386,7 +1385,7 @@ def students_require_certificate(course_id, enrolled_students):
     :param enrolled_students:
     """
     # compute those students where certificates already generated
-    students_already_have_certs = use_read_replica_if_available(User.objects.filter(
+    students_already_have_certs = User.objects.filter(
         ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
-        generatedcertificate__course_id=course_id))
+        generatedcertificate__course_id=course_id)
     return list(set(enrolled_students) - set(students_already_have_certs))
