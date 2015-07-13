@@ -5,7 +5,7 @@ Declaration of CourseOverview model
 import json
 
 import django.db.models
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.utils.translation import ugettext
 
 from util.date_utils import strftime_localized
@@ -59,6 +59,13 @@ class CourseOverview(django.db.models.Model):
     mobile_available = BooleanField()
     visible_to_staff_only = BooleanField()
     _pre_requisite_courses_json = TextField()  # JSON representation of list of CourseKey strings
+
+    # Enrollment details
+    enrollment_start = DateTimeField(null=True)
+    enrollment_end = DateTimeField(null=True)
+    enrollment_domain = TextField(null=True)
+    invitation_only = BooleanField(default=False)
+    max_student_enrollments_allowed = IntegerField(null=True)
 
     @staticmethod
     def _create_from_course(course):
@@ -114,7 +121,13 @@ class CourseOverview(django.db.models.Model):
             days_early_for_beta=course.days_early_for_beta,
             mobile_available=course.mobile_available,
             visible_to_staff_only=course.visible_to_staff_only,
-            _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses)
+            _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses),
+
+            enrollment_start=course.enrollment_start,
+            enrollment_end=course.enrollment_end,
+            enrollment_domain=course.enrollment_domain,
+            invitation_only=course.invitation_only,
+            max_student_enrollments_allowed=course.max_student_enrollments_allowed,
         )
 
     @staticmethod

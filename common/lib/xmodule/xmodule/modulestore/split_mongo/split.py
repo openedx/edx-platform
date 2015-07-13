@@ -2443,6 +2443,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
 
+        self._emit_course_deleted_signal(course_key)
+
     @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)
     def inherit_settings(
         self, block_map, block_key, inherited_settings_map, inheriting_settings=None, inherited_from=None

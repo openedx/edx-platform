@@ -1353,7 +1353,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         otherwise a publish will be signalled at the end of the bulk operation
 
         Arguments:
-            library_updated - library_updated to which the signal applies
+            library_key - library_key to which the signal applies
         """
         signal_handler = getattr(self, 'signal_handler', None)
         if signal_handler:
@@ -1362,6 +1362,14 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
                 bulk_record.has_library_updated_item = True
             else:
                 signal_handler.send("library_updated", library_key=library_key)
+
+    def _emit_course_deleted_signal(self, course_key):
+        """
+        Helper method used to emit the course_deleted signal.
+        """
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler:
+            signal_handler.send("course_deleted", course_key=course_key)
 
 
 def only_xmodules(identifier, entry_points):

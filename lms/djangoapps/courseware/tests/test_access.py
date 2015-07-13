@@ -515,6 +515,12 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         self.user_staff = UserFactory.create(is_staff=True)
         self.user_anonymous = AnonymousUserFactory.create()
 
+    ENROLL_TEST_DATA = list(itertools.product(
+        ['user_normal', 'user_staff', 'user_anonymous'],
+        ['enroll'],
+        ['course_default', 'course_started', 'course_not_started', 'course_staff_only'],
+    ))
+
     LOAD_TEST_DATA = list(itertools.product(
         ['user_normal', 'user_beta_tester', 'user_staff'],
         ['load'],
@@ -533,7 +539,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         ['course_default', 'course_with_pre_requisite', 'course_with_pre_requisites'],
     ))
 
-    @ddt.data(*(LOAD_TEST_DATA + LOAD_MOBILE_TEST_DATA + PREREQUISITES_TEST_DATA))
+    @ddt.data(*(ENROLL_TEST_DATA + LOAD_TEST_DATA + LOAD_MOBILE_TEST_DATA + PREREQUISITES_TEST_DATA))
     @ddt.unpack
     def test_course_overview_access(self, user_attr_name, action, course_attr_name):
         """
