@@ -49,20 +49,6 @@ class DashboardPage(PageObject):
 
         return self.q(css='h3.course-title > a').map(_get_course_name).results
 
-    @property
-    def sidebar_menu_title(self):
-        """
-        Return the title value for sidebar menu.
-        """
-        return self.q(css='.user-info span.title').text[0]
-
-    @property
-    def sidebar_menu_description(self):
-        """
-        Return the description text for sidebar menu.
-        """
-        return self.q(css='.user-info span.copy').text[0]
-
     def get_enrollment_mode(self, course_name):
         """Get the enrollment mode for a given course on the dashboard.
 

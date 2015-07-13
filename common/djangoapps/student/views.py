@@ -698,6 +698,7 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'ccx_membership_triplets': ccx_membership_triplets,
+        'nav_hidden': True,
     }
 
     return render_to_response('dashboard.html', context)

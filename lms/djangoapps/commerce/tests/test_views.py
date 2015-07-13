@@ -406,3 +406,14 @@ class ReceiptViewTests(UserMixin, TestCase):
         system_message = "A system error occurred while processing your payment"
         self.assertRegexpMatches(response.content, user_message if is_user_message_expected else system_message)
         self.assertNotRegexpMatches(response.content, user_message if not is_user_message_expected else system_message)
+
+    @mock.patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    def test_hide_nav_header(self):
+        self._login()
+        post_data = {'decision': 'ACCEPT', 'reason_code': '200', 'signed_field_names': 'dummy'}
+        response = self.post_to_receipt_page(post_data)
+
+        # Verify that the header navigation links are hidden for the edx.org version
+        self.assertNotContains(response, "How it Works")
+        self.assertNotContains(response, "Find courses")
+        self.assertNotContains(response, "Schools & Partners")
