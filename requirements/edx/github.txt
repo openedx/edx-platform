@@ -34,7 +34,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@d1ff8cf31a9b94916ce06ba06d4176bd72e15768#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@0d3d43bd1ef0f882ef70d19d4f652d35dd37eb01#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
