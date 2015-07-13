@@ -4,6 +4,11 @@ from datetime import datetime, timedelta
 import pytz
 %>
 <%page args="section_data"/>
-<div class="special-allowance-container" data-course-id="${ section_data['course_id'] }">
-
+<div class="proctoring-wrapper">
+  <div id = "proctoring-accordion">
+    <div class="wrap">
+       <h2>${_('Allowance Section')}</h2>
+      <div class="special-allowance-container" data-course-id="${ section_data['course_id'] }"></div>
+    </div>
+  </div>
 </div>
