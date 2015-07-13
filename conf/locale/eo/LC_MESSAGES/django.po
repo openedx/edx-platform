@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:11+0000\n"
-"PO-Revision-Date: 2015-07-06 12:11:43.963099\n"
+"POT-Creation-Date: 2015-07-13 04:42+0000\n"
+"PO-Revision-Date: 2015-07-13 04:42:08.333956\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3237,6 +3237,17 @@ msgstr ""
 msgid "Certificate Name (Long)"
 msgstr "Çértïfïçäté Nämé (Löng) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Web/HTML View Enabled"
+msgstr ""
+"Çértïfïçäté Wéß/HTML Vïéw Énäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "If true, certificate Web/HTML views are enabled for the course."
+msgstr ""
+"Ìf trüé, çértïfïçäté Wéß/HTML vïéws äré énäßléd för thé çöürsé. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #. Translators: This field is the container for course-specific certifcate
 #. configuration values
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5936,10 +5947,6 @@ msgstr "Sçöré Ⱡ'σяєм ιρѕ#"
 msgid "problems"
 msgstr "prößléms Ⱡ'σяєм ιρѕυм ∂#"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Réfünd] Ûsér-Réqüéstéd Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5947,6 +5954,10 @@ msgid ""
 msgstr ""
 "À réfünd réqüést häs ßéén ïnïtïätéd för {username} ({email}). Tö pröçéss "
 "thïs réqüést, pléäsé vïsït thé lïnk(s) ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Réfünd] Ûsér-Réqüéstéd Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -6562,13 +6573,13 @@ msgid "{platform_name} Staff"
 msgstr "{platform_name} Stäff Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
 msgstr "Çöürsé Stäff Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "Stäff Ⱡ'σяєм ιρѕ#"
 
@@ -6793,60 +6804,60 @@ msgstr "Çöhört Ⱡ'σяєм ιρѕυ#"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 "Ýöür énrölléd stüdént pröfïlé répört ïs ßéïng générätéd! Ýöü çän vïéw thé "
-"stätüs öf thé générätïön täsk ïn thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"stätüs öf thé générätïön täsk ïn thé 'Péndïng Täsks' séçtïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι#"
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 "Àn énrölléd stüdént pröfïlé répört générätïön täsk ïs älréädý ïn prögréss. "
-"Çhéçk thé 'Péndïng Ìnstrüçtör Täsks' täßlé för thé stätüs öf thé täsk. Whén "
-"çömplétéd, thé répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"Çhéçk thé 'Péndïng Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, "
+"thé répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυ#"
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢є#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 "Ýöür stüdénts whö mäý énröll répört ïs ßéïng générätéd! Ýöü çän vïéw thé "
-"stätüs öf thé générätïön täsk ïn thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"stätüs öf thé générätïön täsk ïn thé 'Péndïng Täsks' séçtïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυм#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 "À stüdénts whö mäý énröll répört générätïön täsk ïs älréädý ïn prögréss. "
-"Çhéçk thé 'Péndïng Ìnstrüçtör Täsks' täßlé för thé stätüs öf thé täsk. Whén "
-"çömplétéd, thé répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"Çhéçk thé 'Péndïng Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, "
+"thé répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα#"
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтє#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6909,54 +6920,48 @@ msgstr "Tötäl Dïsçöüntéd Àmöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Instructor Tasks' section."
+"of the generation task in the 'Pending Tasks' section."
 msgstr ""
 "Ýöür détäïléd énröllmént répört ïs ßéïng générätéd! Ýöü çän vïéw thé stätüs "
-"öf thé générätïön täsk ïn thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
+"öf thé générätïön täsk ïn thé 'Péndïng Täsks' séçtïön. Ⱡ'#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"the 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
 msgstr ""
 "À détäïléd énröllmént répört générätïön täsk ïs älréädý ïn prögréss. Çhéçk "
-"thé 'Péndïng Ìnstrüçtör Täsks' täßlé för thé stätüs öf thé täsk. Whén "
-"çömplétéd, thé répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαт#"
+"thé 'Péndïng Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, thé "
+"répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
+" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Instructor Tasks' section."
+"report, see the 'Pending Tasks' section."
 msgstr ""
 "Ýöür éxéçütïvé sümmärý répört ïs ßéïng çréätéd. Tö vïéw thé stätüs öf thé "
-"répört, séé thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Ⱡ'σяєм #"
+"répört, séé thé 'Péndïng Täsks' séçtïön. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Instructor Tasks' section. When completed, the "
-"report will be available for download in the table below. You will be able "
-"to download the report when it is complete."
+"the report, see the 'Pending Tasks' section. When completed, the report will"
+" be available for download in the table below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 "Àn éxéçütïvé sümmärý répört ïs çürréntlý ïn prögréss. Tö vïéw thé stätüs öf "
-"thé répört, séé thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Whén çömplétéd, thé "
-"répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ýöü wïll ßé äßlé "
-"tö döwnlöäd thé répört whén ït ïs çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂#"
+"thé répört, séé thé 'Péndïng Täsks' séçtïön. Whén çömplétéd, thé répört wïll"
+" ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ýöü wïll ßé äßlé tö döwnlöäd "
+"thé répört whén ït ïs çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ι#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -7027,54 +7032,48 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Instructor Tasks' section."
+"generation task in the 'Pending Tasks' section."
 msgstr ""
 "Ýöür grädé répört ïs ßéïng générätéd! Ýöü çän vïéw thé stätüs öf thé "
-"générätïön täsk ïn thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Ⱡ'σяє#"
+"générätïön täsk ïn thé 'Péndïng Täsks' séçtïön. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"Tasks' table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
 "À grädé répört générätïön täsk ïs älréädý ïn prögréss. Çhéçk thé 'Péndïng "
-"Ìnstrüçtör Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, thé "
-"répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
-" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢α#"
+"Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, thé répört wïll ßé "
+"äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Instructor Tasks' section."
+" generation task in the 'Pending Tasks' section."
 msgstr ""
 "Ýöür prößlém grädé répört ïs ßéïng générätéd! Ýöü çän vïéw thé stätüs öf thé"
-" générätïön täsk ïn thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
+" générätïön täsk ïn thé 'Péndïng Täsks' séçtïön. Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"A problem grade report is already being generated. Check the 'Pending Tasks'"
+" table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
-"À prößlém grädé répört ïs älréädý ßéïng générätéd. Çhéçk thé 'Péndïng "
-"Ìnstrüçtör Täsks' täßlé för thé stätüs öf thé täsk. Whén çömplétéd, thé "
-"répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
-" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢#"
+"À prößlém grädé répört ïs älréädý ßéïng générätéd. Çhéçk thé 'Péndïng Täsks'"
+" täßlé för thé stätüs öf thé täsk. Whén çömplétéd, thé répört wïll ßé "
+"äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσ#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -9603,10 +9602,6 @@ msgstr ""
 "Süßsçrïßé tö thé {platform_name} ÝöüTüßé çhännél Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυ#"
 
-#: lms/envs/common.py
-msgid "Taiwan"
-msgstr "Täïwän Ⱡ'σяєм ιρѕυ#"
-
 #: lms/envs/devstack.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
@@ -10412,28 +10407,31 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια#"
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Description for the credit provider displayed to users."
+msgstr ""
+"Désçrïptïön för thé çrédït prövïdér dïspläýéd tö üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Plain text or html content for displaying further steps on receipt page "
+"*after* paying for the credit to get credit for a credit course against a "
+"credit provider."
+msgstr ""
+"Pläïn téxt ör html çöntént för dïspläýïng fürthér stéps ön réçéïpt pägé "
+"*äftér* päýïng för thé çrédït tö gét çrédït för ä çrédït çöürsé ägäïnst ä "
+"çrédït prövïdér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕ#"
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 "Déädlïné för pürçhäsïng änd réqüéstïng çrédït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-"Wé önlý süppört üplöädïng ä .tär.gz fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "File upload corrupted. Please try again"
-msgstr ""
-"Fïlé üplöäd çörrüptéd. Pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "Could not find the {root_xml_file} file in the package."
-msgstr ""
-"Çöüld nöt fïnd thé {root_xml_file} fïlé ïn thé päçkägé. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
@@ -10892,12 +10890,22 @@ msgid "Empty"
 msgstr "Émptý Ⱡ'σяєм ιρѕ#"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid ""
-"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
-" unit."
+msgid "We only support uploading a .tar.gz file."
 msgstr ""
-"Àn ïnvälïd pärént kéý wäs süpplïéd: \"{supplied_key}\" ïs nöt ä välïd çöürsé"
-" ünït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Wé önlý süppört üplöädïng ä .tär.gz fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload corrupted. Please try again"
+msgstr ""
+"Fïlé üplöäd çörrüptéd. Pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "Could not find the {0} file in the package."
+msgstr ""
+"Çöüld nöt fïnd thé {0} fïlé ïn thé päçkägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -14091,6 +14099,7 @@ msgid "Psychometrics"
 msgstr "Psýçhömétrïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "Àdmïn Ⱡ'σяєм ιρѕ#"
 
@@ -14375,11 +14384,6 @@ msgstr ""
 "(shöwn héré äs än éxämplé): Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
 msgstr "Péndïng Ìnstrüçtör Täsks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
@@ -14509,12 +14513,10 @@ msgstr "Ýöür çértïfïçäté ïs äväïläßlé Ⱡ'σяєм ιρѕυм �
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"You can now access your certificate. If you keep working and receive a "
-"higher grade,you can request an {link_start} updated certificate {link_end}."
+"You can keep working for a higher grade, or request your certificate now."
 msgstr ""
-"Ýöü çän nöw äççéss ýöür çértïfïçäté. Ìf ýöü kéép wörkïng änd réçéïvé ä "
-"hïghér grädé,ýöü çän réqüést än {link_start} üpdätéd çértïfïçäté {link_end}."
-" Ⱡ#"
+"Ýöü çän kéép wörkïng för ä hïghér grädé, ör réqüést ýöür çértïfïçäté nöw. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
@@ -14561,13 +14563,6 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-"Ýöü çän kéép wörkïng för ä hïghér grädé, ör réqüést ýöür çértïfïçäté nöw. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr "Réqüést Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -14597,10 +14592,16 @@ msgid "Go to your dashboard"
 msgstr "Gö tö ýöür däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
+msgid "{student_name}, you have not yet met the requirements for credit."
 msgstr ""
-"Ýöü hävé nöt ýét mét thé réqüïréménts för çrédït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"{student_name}, ýöü hävé nöt ýét mét thé réqüïréménts för çrédït. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/courseware/progress.html
+msgid "Information about course credit requirements"
+msgstr ""
+"Ìnförmätïön äßöüt çöürsé çrédït réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/courseware/progress.html
 msgid "display_name"
@@ -15030,11 +15031,35 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
+"Thank you for your payment! To receive your course credit, go to the "
+"{provider_link} website. You may have to complete some additional steps "
+"depending on the institution"
+msgstr ""
+"Thänk ýöü för ýöür päýmént! Tö réçéïvé ýöür çöürsé çrédït, gö tö thé "
+"{provider_link} wéßsïté. Ýöü mäý hävé tö çömplété sömé äddïtïönäl stéps "
+"dépéndïng ön thé ïnstïtütïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒι¢ια ∂єѕєяυηт #"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Complete Credit"
+msgstr "Çömplété Çrédït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
 "Congratulations - you have received credit for this course! For more "
 "information, see {provider_link}."
 msgstr ""
 "Çöngrätülätïöns - ýöü hävé réçéïvéd çrédït för thïs çöürsé! För möré "
 "ïnförmätïön, séé {provider_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access credit"
+msgstr "Àççéss çrédït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
@@ -15043,6 +15068,10 @@ msgid ""
 msgstr ""
 "{provider_name} häs déçlïnéd ýöür réqüést för çöürsé çrédït. För möré "
 "ïnförmätïön, çöntäçt {provider_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Contact {provider_link}"
+msgstr "Çöntäçt {provider_link} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -16797,6 +16826,11 @@ msgid "Generate Certificates"
 msgstr "Généräté Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
 msgstr "Péndïng Täsks Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -16817,11 +16851,10 @@ msgstr "Énröllmént Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"Number of enrollees (instructors, staff members, and students) by track"
+msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""
-"Nümßér öf énrölléés (ïnstrüçtörs, stäff mémßérs, änd stüdénts) ßý träçk "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Nümßér öf énrölléés (ädmïns, stäff, änd stüdénts) ßý träçk Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
@@ -17830,10 +17863,10 @@ msgstr "Bätçh Bétä Téstér Àddïtïön Ⱡ'σяєм ιρѕυм ∂σłσя
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
-"be enrolled as a beta tester."
+"be enrolled as beta testers."
 msgstr ""
 "Nöté: Ûsérs müst hävé än äçtïvätéd {platform_name} äççöünt ßéföré théý çän "
-"ßé énrölléd äs ä ßétä téstér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+"ßé énrölléd äs ßétä téstérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -17860,15 +17893,15 @@ msgstr "Rémövé ßétä téstérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Administration List Management"
-msgstr "Àdmïnïsträtïön Lïst Mänägémént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Course Team Management"
+msgstr "Çöürsé Téäm Mänägémént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #. Translators: an "Administrator Group" is a group, such as Course Staff,
 #. that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Select an Administrator Group:"
-msgstr "Séléçt än Àdmïnïsträtör Gröüp: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Select a course team role:"
+msgstr "Séléçt ä çöürsé téäm rölé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -17876,60 +17909,57 @@ msgstr "Géttïng äväïläßlé lïsts... Ⱡ'σяєм ιρѕυм ∂σłσя 
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Staff cannot modify staff or beta tester lists. To modify these lists, "
-"contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a discussion admin for discussion management."
+"Staff cannot modify these lists. To manage course team membership, a course "
+"Admin must give you the Admin role to add Staff or Beta Testers, or the "
+"Discussion Admin role to add discussion moderators and TAs."
 msgstr ""
-"Stäff çännöt mödïfý stäff ör ßétä téstér lïsts. Tö mödïfý thésé lïsts, "
-"çöntäçt ýöür ïnstrüçtör änd äsk thém tö ädd ýöü äs än ïnstrüçtör för stäff "
-"änd ßétä lïsts, ör ä dïsçüssïön ädmïn för dïsçüssïön mänägémént. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"Stäff çännöt mödïfý thésé lïsts. Tö mänägé çöürsé téäm mémßérshïp, ä çöürsé "
+"Àdmïn müst gïvé ýöü thé Àdmïn rölé tö ädd Stäff ör Bétä Téstérs, ör thé "
+"Dïsçüssïön Àdmïn rölé tö ädd dïsçüssïön mödérätörs änd TÀs. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтє#"
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Course staff can help you manage limited aspects of your course. Staff can "
-"enroll and unenroll students, as well as modify their grades and see all "
-"course data. Course staff are not automatically given access to Studio and "
-"will not be able to edit your course."
+"Course team members with the Staff role help you manage your course. Staff "
+"can enroll and unenroll learners, as well as modify their grades and access "
+"all course data. Staff also have access to your course in Studio and "
+"Insights. You can only give course team roles to enrolled users."
 msgstr ""
-"Çöürsé stäff çän hélp ýöü mänägé lïmïtéd äspéçts öf ýöür çöürsé. Stäff çän "
-"énröll änd ünénröll stüdénts, äs wéll äs mödïfý théïr grädés änd séé äll "
-"çöürsé dätä. Çöürsé stäff äré nöt äütömätïçällý gïvén äççéss tö Stüdïö änd "
-"wïll nöt ßé äßlé tö édït ýöür çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя#"
+"Çöürsé téäm mémßérs wïth thé Stäff rölé hélp ýöü mänägé ýöür çöürsé. Stäff "
+"çän énröll änd ünénröll léärnérs, äs wéll äs mödïfý théïr grädés änd äççéss "
+"äll çöürsé dätä. Stäff älsö hävé äççéss tö ýöür çöürsé ïn Stüdïö änd "
+"Ìnsïghts. Ýöü çän önlý gïvé çöürsé téäm rölés tö énrölléd üsérs. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "Àdd Stäff Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Instructors"
-msgstr "Ìnstrüçtörs Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer discussion access."
+"Course team members with the Admin role help you manage your course. They "
+"can do all of the tasks that Staff can do, and can also add and remove the "
+"Staff and Admin roles, discussion moderation roles, and the beta tester role"
+" to manage course team membership. You can only give course team roles to "
+"enrolled users."
 msgstr ""
-"Ìnstrüçtörs äré thé çöré ädmïnïsträtïön öf ýöür çöürsé. Ìnstrüçtörs çän ädd "
-"änd rémövé çöürsé stäff, äs wéll äs ädmïnïstér dïsçüssïön äççéss. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
+"Çöürsé téäm mémßérs wïth thé Àdmïn rölé hélp ýöü mänägé ýöür çöürsé. Théý "
+"çän dö äll öf thé täsks thät Stäff çän dö, änd çän älsö ädd änd rémövé thé "
+"Stäff änd Àdmïn rölés, dïsçüssïön mödérätïön rölés, änd thé ßétä téstér rölé"
+" tö mänägé çöürsé téäm mémßérshïp. Ýöü çän önlý gïvé çöürsé téäm rölés tö "
+"énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Add Instructor"
-msgstr "Àdd Ìnstrüçtör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+msgid "Add Admin"
+msgstr "Àdd Àdmïn Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -17937,17 +17967,18 @@ msgstr "Bétä Téstérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Beta testers can see course content before the rest of the students. They "
-"can make sure that the content works, but have no additional privileges."
+"Beta Testers can see course content before other learners. They can make "
+"sure that the content works, but have no additional privileges. You can only"
+" give course team roles to enrolled users."
 msgstr ""
-"Bétä téstérs çän séé çöürsé çöntént ßéföré thé rést öf thé stüdénts. Théý "
-"çän mäké süré thät thé çöntént wörks, ßüt hävé nö äddïtïönäl prïvïlégés. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι#"
+"Bétä Téstérs çän séé çöürsé çöntént ßéföré öthér léärnérs. Théý çän mäké "
+"süré thät thé çöntént wörks, ßüt hävé nö äddïtïönäl prïvïlégés. Ýöü çän önlý"
+" gïvé çöürsé téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -17959,18 +17990,18 @@ msgstr "Dïsçüssïön Àdmïns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. They "
-"CAN add/delete other moderators and their posts are marked as 'staff'."
+"Discussion Admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. Their "
+"posts are marked as 'staff'. They can also add and remove the discussion "
+"moderation roles to manage course team membership. You can only give course "
+"team roles to enrolled users."
 msgstr ""
-"Dïsçüssïön ädmïns çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé änd"
-" ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. Théý "
-"ÇÀN ädd/délété öthér mödérätörs änd théïr pösts äré märkéd äs 'stäff'. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ρ#"
+"Dïsçüssïön Àdmïns çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé änd"
+" ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. Théïr "
+"pösts äré märkéd äs 'stäff'. Théý çän älsö ädd änd rémövé thé dïsçüssïön "
+"mödérätïön rölés tö mänägé çöürsé téäm mémßérshïp. Ýöü çän önlý gïvé çöürsé "
+"téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -17982,19 +18013,18 @@ msgstr "Dïsçüssïön Mödérätörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion moderators can edit or delete any post, clear misuse flags, close"
+"Discussion Moderators can edit or delete any post, clear misuse flags, close"
 " and re-open threads, endorse responses, and see posts from all cohorts. "
-"They CANNOT add/delete other moderators and their posts are marked as "
-"'staff'."
+"Their posts are marked as 'staff'. They cannot manage course team membership"
+" by adding or removing discussion moderation roles. You can only give course"
+" team roles to enrolled users."
 msgstr ""
-"Dïsçüssïön mödérätörs çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé"
+"Dïsçüssïön Mödérätörs çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé"
 " änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. "
-"Théý ÇÀNNÖT ädd/délété öthér mödérätörs änd théïr pösts äré märkéd äs "
-"'stäff'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυ#"
+"Théïr pösts äré märkéd äs 'stäff'. Théý çännöt mänägé çöürsé téäm mémßérshïp"
+" ßý äddïng ör rémövïng dïsçüssïön mödérätïön rölés. Ýöü çän önlý gïvé çöürsé"
+" téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє є#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -18009,15 +18039,15 @@ msgid ""
 "Community TA's are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked 'Community TA'."
+"from all cohorts. Their posts are marked as 'Community TA'. You can only "
+"give course team roles to enrolled users."
 msgstr ""
 "Çömmünïtý TÀ's äré mémßérs öf thé çömmünïtý whöm ýöü déém pärtïçülärlý "
 "hélpfül ön thé dïsçüssïön ßöärds. Théý çän édït ör délété äný pöst, çléär "
 "mïsüsé flägs, çlösé änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts "
-"fröm äll çöhörts. Théïr pösts äré märkéd 'Çömmünïtý TÀ'. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σ#"
+"fröm äll çöhörts. Théïr pösts äré märkéd äs 'Çömmünïtý TÀ'. Ýöü çän önlý "
+"gïvé çöürsé téäm rölés tö énrölléd üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -18139,14 +18169,13 @@ msgid "Myself"
 msgstr "Mýsélf Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and instructors"
-msgstr "Stäff änd ïnstrüçtörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Staff and admins"
+msgstr "Stäff änd ädmïns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff and instructors)"
+msgid "All (students, staff, and admins)"
 msgstr ""
-"Àll (stüdénts, stäff änd ïnstrüçtörs) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+"Àll (stüdénts, stäff, änd ädmïns) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -18343,17 +18372,17 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
-" for this problem and student, click on this button:"
+" the 'Pending Tasks' table. To see status for all tasks submitted for this "
+"problem and student, click on this button:"
 msgstr ""
 "Résçörïng rüns ïn thé ßäçkgröünd, änd stätüs för äçtïvé täsks wïll äppéär ïn"
-" thé 'Péndïng Ìnstrüçtör Täsks' täßlé. Tö séé stätüs för äll täsks süßmïttéd"
-" för thïs prößlém änd stüdént, çlïçk ön thïs ßüttön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢#"
+" thé 'Péndïng Täsks' täßlé. Tö séé stätüs för äll täsks süßmïttéd för thïs "
+"prößlém änd stüdént, çlïçk ön thïs ßüttön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -18576,7 +18605,7 @@ msgid ""
 "{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:\n"
 "{ul_tag}\n"
 "{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}\n"
-"{li_tag}The instructor needs to score the essays that are used to help you better understand the grading\n"
+"{li_tag}The course team needs to score the essays that are used to help you better understand the grading\n"
 "criteria.{end_li_tag}\n"
 "{li_tag}There must be submissions that are waiting for grading.{end_li_tag}\n"
 "{end_ul_tag}\n"
@@ -18586,12 +18615,12 @@ msgstr ""
 "{p_tag}Ýöü çürréntlý dö nöt hävé äný péér grädïng tö dö.  Ìn ördér tö hävé péér grädïng tö dö:\n"
 "{ul_tag}\n"
 "{li_tag}Ýöü nééd tö hävé süßmïttéd ä réspönsé tö ä péér grädïng prößlém.{end_li_tag}\n"
-"{li_tag}Thé ïnstrüçtör nééds tö sçöré thé éssäýs thät äré üséd tö hélp ýöü ßéttér ündérständ thé grädïng\n"
+"{li_tag}Thé çöürsé téäm nééds tö sçöré thé éssäýs thät äré üséd tö hélp ýöü ßéttér ündérständ thé grädïng\n"
 "çrïtérïä.{end_li_tag}\n"
 "{li_tag}Théré müst ßé süßmïssïöns thät äré wäïtïng för grädïng.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,#\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłι#\n"
 
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/peer_grading/peer_grading_closed.html
@@ -22340,12 +22369,10 @@ msgid "User's Email Address"
 msgstr "Ûsér's Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/manage_users.html
-msgid ""
-"Please provide the email address of the course staff member you'd like to "
-"add"
+msgid "Provide the email address of the user you want to add as Staff"
 msgstr ""
-"Pléäsé prövïdé thé émäïl äddréss öf thé çöürsé stäff mémßér ýöü'd lïké tö "
-"ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Prövïdé thé émäïl äddréss öf thé üsér ýöü wänt tö ädd äs Stäff Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
@@ -22373,11 +22400,11 @@ msgstr "Çöürsé Téäm Rölés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 
 #: cms/templates/manage_users.html
 msgid ""
-"Course team members, or staff, are course co-authors. They have full writing"
-" and editing privileges on all course content."
+"Course team members with the Staff role are course co-authors. They have "
+"full writing and editing privileges on all course content."
 msgstr ""
-"Çöürsé téäm mémßérs, ör stäff, äré çöürsé çö-äüthörs. Théý hävé füll wrïtïng"
-" änd édïtïng prïvïlégés ön äll çöürsé çöntént. Ⱡ'σяєм ιρѕ#"
+"Çöürsé téäm mémßérs wïth thé Stäff rölé äré çöürsé çö-äüthörs. Théý hävé "
+"füll wrïtïng änd édïtïng prïvïlégés ön äll çöürsé çöntént. Ⱡ#"
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -22388,23 +22415,32 @@ msgstr ""
 "mémßérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: cms/templates/manage_users.html
+msgid ""
+"All course team members are automatically enrolled in the course and can "
+"access content in Studio, the LMS, and Insights."
+msgstr ""
+"Àll çöürsé téäm mémßérs äré äütömätïçällý énrölléd ïn thé çöürsé änd çän "
+"äççéss çöntént ïn Stüdïö, thé LMS, änd Ìnsïghts. Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/manage_users.html
 msgid "Transferring Ownership"
 msgstr "Tränsférrïng Öwnérshïp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Every course must have an Admin. If you're the Admin and you want transfer "
-"ownership of the course, click Add admin access to make another user the "
-"Admin, then ask that user to remove you from the Course Team list."
+"Every course must have an Admin. If you are the Admin and you want to "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
+"Course Team list."
 msgstr ""
-"Évérý çöürsé müst hävé än Àdmïn. Ìf ýöü'ré thé Àdmïn änd ýöü wänt tränsfér "
-"öwnérshïp öf thé çöürsé, çlïçk Àdd ädmïn äççéss tö mäké änöthér üsér thé "
-"Àdmïn, thén äsk thät üsér tö rémövé ýöü fröm thé Çöürsé Téäm lïst. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. є#"
+"Évérý çöürsé müst hävé än Àdmïn. Ìf ýöü äré thé Àdmïn änd ýöü wänt tö "
+"tränsfér öwnérshïp öf thé çöürsé, çlïçk <strong>Àdd ädmïn äççéss</strong> tö"
+" mäké änöthér üsér thé Àdmïn, thén äsk thät üsér tö rémövé ýöü fröm thé "
+"Çöürsé Téäm lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
+" ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
 
 #: cms/templates/manage_users_lib.html
 msgid "Library User Access"
@@ -22452,39 +22488,40 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Users can view library content and can reference or use library components "
-"in their courses, but they cannot edit the contents of a library."
+"Library Users can view library content and can reference or use library "
+"components in their courses, but they cannot edit the contents of a library."
 msgstr ""
-"Ûsérs çän vïéw lïßrärý çöntént änd çän référénçé ör üsé lïßrärý çömpönénts "
-"ïn théïr çöürsés, ßüt théý çännöt édït thé çönténts öf ä lïßrärý. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
-
-#: cms/templates/manage_users_lib.html
-msgid ""
-"Staff are content co-authors. They have full editing privileges on the "
-"contents of a library."
-msgstr ""
-"Stäff äré çöntént çö-äüthörs. Théý hävé füll édïtïng prïvïlégés ön thé "
-"çönténts öf ä lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/templates/manage_users_lib.html
-msgid ""
-"Admins have full editing privileges and can also add and remove other team "
-"members. There must be at least one user with Admin privileges in a library."
-msgstr ""
-"Àdmïns hävé füll édïtïng prïvïlégés änd çän älsö ädd änd rémövé öthér téäm "
-"mémßérs. Théré müst ßé ät léäst öné üsér wïth Àdmïn prïvïlégés ïn ä lïßrärý."
+"Lïßrärý Ûsérs çän vïéw lïßrärý çöntént änd çän référénçé ör üsé lïßrärý "
+"çömpönénts ïn théïr çöürsés, ßüt théý çännöt édït thé çönténts öf ä lïßrärý."
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
 "тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
 " qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт α#"
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм#"
+
+#: cms/templates/manage_users_lib.html
+msgid ""
+"Library Staff are content co-authors. They have full editing privileges on "
+"the contents of a library."
+msgstr ""
+"Lïßrärý Stäff äré çöntént çö-äüthörs. Théý hävé füll édïtïng prïvïlégés ön "
+"thé çönténts öf ä lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/manage_users_lib.html
+msgid ""
+"Library Admins have full editing privileges and can also add and remove "
+"other team members. There must be at least one user with the Admin role in a"
+" library."
+msgstr ""
+"Lïßrärý Àdmïns hävé füll édïtïng prïvïlégés änd çän älsö ädd änd rémövé "
+"öthér téäm mémßérs. Théré müst ßé ät léäst öné üsér wïth thé Àdmïn rölé ïn ä"
+" lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт #"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -22684,17 +22721,18 @@ msgstr ""
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρя#"
 
 #: cms/templates/settings.html
-msgid "Credit Eligibility Requirements"
-msgstr "Çrédït Élïgïßïlïtý Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Course Credit Requirements"
+msgstr "Çöürsé Çrédït Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/settings.html
-msgid "Steps needed for credit eligibility"
+msgid "Steps required to earn course credit"
 msgstr ""
-"Stéps néédéd för çrédït élïgïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Stéps réqüïréd tö éärn çöürsé çrédït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: cms/templates/settings.html
-msgid "Minimum Passing Grade"
-msgstr "Mïnïmüm Pässïng Grädé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Minimum Grade"
+msgstr "Mïnïmüm Grädé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/settings.html
 msgid "Successful Proctored Exam"
@@ -22705,20 +22743,13 @@ msgid "Proctored Exam {number}"
 msgstr "Pröçtöréd Éxäm {number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/settings.html
-msgid "Successful In-Course Reverification"
-msgstr ""
-"Süççéssfül Ìn-Çöürsé Révérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+msgid "ID Verification"
+msgstr "ÌD Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "In-Course Reverification {number}"
 msgstr ""
 "Ìn-Çöürsé Révérïfïçätïön {number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: cms/templates/settings.html
-msgid "Access to {display_name}"
-msgstr "Àççéss tö {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -23109,24 +23140,24 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/settings_graders.html
-msgid "Credit Grade &amp; Eligibility"
-msgstr "Çrédït Grädé &amp; Élïgïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+msgid "Credit Eligibility"
+msgstr "Çrédït Élïgïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/settings_graders.html
-msgid "Settings for credit eligibility"
-msgstr "Séttïngs för çrédït élïgïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/templates/settings_graders.html
-msgid "Minimum Passing Grade to Earn Credit:"
+msgid "Settings for course credit eligibility"
 msgstr ""
-"Mïnïmüm Pässïng Grädé tö Éärn Çrédït: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+"Séttïngs för çöürsé çrédït élïgïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: cms/templates/settings_graders.html
-msgid "Must be greater than or equal to passing grade"
+msgid "Minimum Credit-Eligible Grade:"
+msgstr "Mïnïmüm Çrédït-Élïgïßlé Grädé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/settings_graders.html
+msgid "Must be greater than or equal to the course passing grade"
 msgstr ""
-"Müst ßé gréätér thän ör éqüäl tö pässïng grädé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α#"
+"Müst ßé gréätér thän ör éqüäl tö thé çöürsé pässïng grädé Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"

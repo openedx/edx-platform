@@ -31,7 +31,7 @@
 # Michael Cao <ming.cao.ming@gmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
-# shuchuanchen <am15501@163.com>, 2014
+# shuchuanchen <am15501@163.com>, 2014-2015
 # riceball <snowyu.lee@gmail.com>, 2014
 # Song Qiang <cncatdog@163.com>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
@@ -55,6 +55,7 @@
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 赵宏鑫 <zhaohongxinxin@aol.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2015 EdX
@@ -161,6 +162,7 @@
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 李子豪 <178354170lizihao@gmail.com>, 2014
 # 李莉 <happylily0516@foxmail.com>, 2013
+# 汤和果 <hgtang93@163.com>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
 # 胡超威 <chadennishu@gmail.com>, 2014
@@ -243,10 +245,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:02+0000\n"
+"POT-Creation-Date: 2015-07-13 04:33+0000\n"
 "PO-Revision-Date: 2015-06-18 03:04+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -288,11 +290,13 @@ msgstr "章"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/ccx/schedule.html
 msgid "Subsection"
 msgstr "节"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "单元"
 
@@ -449,6 +453,7 @@ msgstr "社区助教"
 
 #: common/djangoapps/django_comment_common/models.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "学生"
 
@@ -2773,6 +2778,14 @@ msgstr ""
 msgid "Certificate Name (Long)"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Web/HTML View Enabled"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "If true, certificate Web/HTML views are enabled for the course."
+msgstr ""
+
 #. Translators: This field is the container for course-specific certifcate
 #. configuration values
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3481,11 +3494,9 @@ msgstr ""
 msgid "Peer Grading Interface"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/seq_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/templates/ccx/schedule.html
 msgid "Due Date"
-msgstr ""
+msgstr "截止日期"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
@@ -4776,15 +4787,15 @@ msgstr "得分"
 msgid "problems"
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Refund] 用户申请退款"
-
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
 msgstr ""
+
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Refund] 用户申请退款"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -5300,12 +5311,13 @@ msgstr ""
 msgid "{platform_name} Staff"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
-msgstr "授课教师"
+msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "教员"
 
@@ -5500,27 +5512,27 @@ msgstr "群组"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5580,28 +5592,28 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Instructor Tasks' section."
+"of the generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"the 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Instructor Tasks' section."
+"report, see the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Instructor Tasks' section. When completed, the "
-"report will be available for download in the table below. You will be able "
-"to download the report when it is complete."
+"the report, see the 'Pending Tasks' section. When completed, the report will"
+" be available for download in the table below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5656,27 +5668,27 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Instructor Tasks' section."
-msgstr "您的成绩报告已经生成！您可以在“主讲教师待处理任务处理”板块查看生成任务的状态。"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A grade report generation task is already in progress. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
-msgstr "一个成绩报告生成任务已在处理中。可在“主讲教师待处理任务”列表中查看任务状态。当任务完成时，报告可在表格下方下载。"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Instructor Tasks' section."
+"generation task in the 'Pending Tasks' section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"A grade report generation task is already in progress. Check the 'Pending "
+"Tasks' table for the status of the task. When completed, the report will be "
+"available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your problem grade report is being generated! You can view the status of the"
+" generation task in the 'Pending Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem grade report is already being generated. Check the 'Pending Tasks'"
+" table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5794,6 +5806,7 @@ msgid "Cohorts"
 msgstr "群组"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "学生管理"
 
@@ -6696,7 +6709,8 @@ msgstr "课程"
 msgid "Course Announce Date"
 msgstr "课程发布日期"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "课程开始日期"
 
@@ -7673,10 +7687,6 @@ msgstr ""
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr ""
 
-#: lms/envs/common.py
-msgid "Taiwan"
-msgstr "中国台湾省"
-
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
 msgid "Organization"
@@ -8360,19 +8370,18 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Description for the credit provider displayed to users."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Plain text or html content for displaying further steps on receipt page "
+"*after* paying for the credit to get credit for a credit course against a "
+"credit provider."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "File upload corrupted. Please try again"
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "Could not find the {root_xml_file} file in the package."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -8740,9 +8749,15 @@ msgid "Empty"
 msgstr "空白页"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid ""
-"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
-" unit."
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload corrupted. Please try again"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "Could not find the {0} file in the package."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
@@ -9059,11 +9074,11 @@ msgstr "常用语言"
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course End Date"
-msgstr ""
+msgstr "课程结束日期"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
-msgstr ""
+msgstr "修习要求"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
@@ -9103,11 +9118,11 @@ msgstr "帮助"
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Sign Out"
-msgstr ""
+msgstr "退出"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
-msgstr ""
+msgstr "保留所有权利"
 
 #: common/templates/license.html
 msgid "Attribution"
@@ -9127,15 +9142,15 @@ msgstr ""
 
 #: common/templates/license.html
 msgid "Creative Commons licensed content, with terms as follow:"
-msgstr ""
+msgstr "知识共享许可内容，条款如下："
 
 #: common/templates/license.html
 msgid "Some Rights Reserved"
-msgstr ""
+msgstr "保留部分权利"
 
 #: common/templates/course_modes/choose.html
 msgid "Enroll In {} | Choose Your Track"
-msgstr ""
+msgstr "选修{}｜选择你的学习方式"
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to enroll you"
@@ -9249,11 +9264,11 @@ msgstr "隐藏批注"
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
-msgstr ""
+msgstr "了解更多"
 
 #: lms/templates/course.html
 msgid "Starts"
-msgstr ""
+msgstr "开始"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
@@ -9261,11 +9276,11 @@ msgstr "课程面板"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr ""
+msgstr "当前课程"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
-msgstr ""
+msgstr "您尚未选修任课程"
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
@@ -9277,23 +9292,23 @@ msgstr "课程加载错误"
 
 #: lms/templates/dashboard.html
 msgid "Search Your Courses"
-msgstr ""
+msgstr "查找课程"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
 msgid "Clear search"
-msgstr ""
+msgstr "清空搜索结果"
 
 #: lms/templates/dashboard.html
 msgid "Want to change your account settings?"
-msgstr ""
+msgstr "想要更改你的账户设置？"
 
 #: lms/templates/dashboard.html
 msgid "Click the arrow next to your username above."
-msgstr ""
+msgstr "单击上方你用户名旁边的箭头。"
 
 #: lms/templates/dashboard.html
 msgid "Order History"
-msgstr ""
+msgstr "订单记录"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -9416,11 +9431,11 @@ msgstr "用户"
 
 #: lms/templates/footer-edx-v3.html
 msgid "Page Footer"
-msgstr ""
+msgstr "页脚"
 
 #: lms/templates/footer-edx-v3.html
 msgid "About edX"
-msgstr ""
+msgstr "关于 edX"
 
 #: lms/templates/footer-edx-v3.html lms/templates/footer.html
 msgid "Legal"
@@ -9608,7 +9623,7 @@ msgstr "任何人，任何地点，任何时间"
 #. http://openedx.org for more information.
 #: lms/templates/index.html
 msgid "Welcome to Open edX!"
-msgstr ""
+msgstr "欢迎来到Open edX!"
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
@@ -9618,11 +9633,11 @@ msgstr "成功了！这是一个 Open edX 实例的默认主页。"
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
-msgstr ""
+msgstr "查找课程"
 
 #: lms/templates/index.html
 msgid "View all Courses"
-msgstr ""
+msgstr "浏览所有课程"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -9704,7 +9719,7 @@ msgstr "进入我的课程"
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html
 msgid "Processing your account information"
-msgstr ""
+msgstr "正在处理您的帐户信息"
 
 #: lms/templates/login.html
 msgid "Please log in"
@@ -9720,7 +9735,7 @@ msgstr "我们很遗憾，{platform_name} 账户现在无法使用"
 
 #: lms/templates/login.html
 msgid "We couldn't log you in."
-msgstr ""
+msgstr "无法登录。"
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -9786,7 +9801,7 @@ msgstr "点击来启动"
 
 #: lms/templates/manage_user_standing.html
 msgid "Manage student accounts"
-msgstr ""
+msgstr "管理学生账户"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -9794,7 +9809,7 @@ msgstr "用户名："
 
 #: lms/templates/manage_user_standing.html
 msgid "Profile:"
-msgstr ""
+msgstr "用户资料："
 
 #: lms/templates/manage_user_standing.html
 msgid "Image:"
@@ -9810,7 +9825,7 @@ msgstr ""
 
 #: lms/templates/manage_user_standing.html
 msgid "View Profile"
-msgstr ""
+msgstr "查看用户资料"
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable Account"
@@ -9822,7 +9837,7 @@ msgstr "重新启用账户"
 
 #: lms/templates/manage_user_standing.html
 msgid "Remove Profile Image"
-msgstr ""
+msgstr "删除照片"
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
@@ -9855,7 +9870,7 @@ msgstr "原始数据："
 
 #: lms/templates/navigation-edx.html
 msgid "Home Page"
-msgstr ""
+msgstr "主页"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
@@ -9880,11 +9895,11 @@ msgstr "更多选择下拉列表"
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
-msgstr ""
+msgstr "账户设置"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "My Profile"
-msgstr ""
+msgstr "我的用户资料"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
@@ -9897,7 +9912,7 @@ msgstr "注册"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Sign in"
-msgstr ""
+msgstr "登录"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
@@ -9929,11 +9944,11 @@ msgstr "您没有任何笔记。"
 
 #: lms/templates/problem.html
 msgid "your answer"
-msgstr ""
+msgstr "你的回答"
 
 #: lms/templates/problem.html
 msgid "Hint"
-msgstr ""
+msgstr "提示"
 
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
@@ -10101,7 +10116,7 @@ msgstr "注册以创建你在 {platform_name}的账户"
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
 msgid "Sign up with {provider_name}"
-msgstr ""
+msgstr "使用 {provider_name} 帐号登录"
 
 #: lms/templates/register.html
 msgid "Create your own {platform_name} account below"
@@ -10141,7 +10156,7 @@ msgstr "公开显示名称"
 
 #: lms/templates/register.html
 msgid "Additional Personal Information"
-msgstr ""
+msgstr "更多个人信息"
 
 #: lms/templates/register.html
 msgid "example: New York"
@@ -10326,7 +10341,7 @@ msgstr "课本导航"
 
 #: lms/templates/staticbook.html
 msgid "Page"
-msgstr ""
+msgstr "页面"
 
 #: lms/templates/staticbook.html
 msgid "Previous page"
@@ -10610,7 +10625,7 @@ msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Tips"
-msgstr ""
+msgstr "提示"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid ""
@@ -10742,7 +10757,7 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 msgid "{course_number} {ccx_name} Cover Image"
-msgstr ""
+msgstr "{course_number} {ccx_name} 封面图片"
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -10778,12 +10793,12 @@ msgstr "选课"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
-msgstr ""
+msgstr "时间表"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
-msgstr ""
+msgstr "评分标准"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10854,11 +10869,11 @@ msgstr "选修"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
-msgstr ""
+msgstr "管理学生列表"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
-msgstr ""
+msgstr "警告"
 
 #: lms/templates/ccx/grading_policy.html
 msgid ""
@@ -10869,23 +10884,23 @@ msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Most coaches should not need to make changes to the grading policy."
-msgstr ""
+msgstr "大多数教师不应该更改评分标准。"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Save Grading Policy"
-msgstr ""
+msgstr "保存评分标准"
 
 #: lms/templates/ccx/schedule.html
 msgid "Set date"
-msgstr ""
+msgstr "设置日期"
 
 #: lms/templates/ccx/schedule.html
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "你还有未保存的更改。"
 
 #: lms/templates/ccx/schedule.html
 msgid "There was an error saving changes."
-msgstr ""
+msgstr "保存更改时发生了错误。"
 
 #: lms/templates/ccx/schedule.html
 msgid "Schedule a Unit"
@@ -10893,23 +10908,23 @@ msgstr ""
 
 #: lms/templates/ccx/schedule.html
 msgid "Start Date"
-msgstr ""
+msgstr "开始日期"
 
 #: lms/templates/ccx/schedule.html
 msgid "(Optional)"
-msgstr ""
+msgstr "(可选的)"
 
 #: lms/templates/ccx/schedule.html
 msgid "Add Unit"
-msgstr ""
+msgstr "添加单元"
 
 #: lms/templates/ccx/schedule.html
 msgid "Add All Units"
-msgstr ""
+msgstr "添加所有单元"
 
 #: lms/templates/ccx/schedule.html
 msgid "All units have been added."
-msgstr ""
+msgstr "所有单元已经添加。"
 
 #: lms/templates/ccx/student_admin.html
 msgid "Student Grades"
@@ -10949,11 +10964,11 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
-msgstr ""
+msgstr "打印证书"
 
 #: lms/templates/certificates/_accomplishment-header.html
 msgid "{platform_name} Home"
-msgstr ""
+msgstr "{platform_name} 主页"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Noted by"
@@ -10965,16 +10980,16 @@ msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid "This is an invalid certificate number"
-msgstr ""
+msgstr "这是无效的证书号"
 
 #: lms/templates/certificates/invalid.html
 msgid "This Certificate Does Not Exist"
-msgstr ""
+msgstr "此证书不存在"
 
 #: lms/templates/certificates/invalid.html
 msgid ""
 "We cannot find a certificate on file that matches this URL or ID number."
-msgstr ""
+msgstr "我们无法找到符合此链接或编号的证书。"
 
 #: lms/templates/certificates/invalid.html
 msgid "Looking for a Particular Certificate?"
@@ -11213,11 +11228,11 @@ msgstr "该课程已满"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
-msgstr ""
+msgstr "该课程只能通过邀请选修"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
-msgstr ""
+msgstr "选课已关闭"
 
 #: lms/templates/courseware/course_about.html
 msgid "Add {course_name} to Cart ({price})"
@@ -11233,7 +11248,7 @@ msgstr "在职员界面查看课程简介页面"
 
 #: lms/templates/courseware/course_about.html
 msgid "Course About"
-msgstr ""
+msgstr "课程介绍"
 
 #: lms/templates/courseware/course_about.html
 msgid "Overview"
@@ -11245,7 +11260,7 @@ msgstr "与亲朋好友分享！"
 
 #: lms/templates/courseware/course_about.html
 msgid "Tweet that you've registered for this course"
-msgstr ""
+msgstr "在推特上发布你已注册此课程"
 
 #: lms/templates/courseware/course_about.html
 msgid "Email someone to say you've registered for this course"
@@ -11323,7 +11338,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
-msgstr ""
+msgstr "课程资料"
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -11365,7 +11380,7 @@ msgstr "{course_number} 课程页面"
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 msgid "Course Utilities"
-msgstr ""
+msgstr "课程工具"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -11377,11 +11392,11 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
-msgstr ""
+msgstr "搜索课程"
 
 #: lms/templates/courseware/courseware.html
 msgid "search"
-msgstr ""
+msgstr "搜索"
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -11477,6 +11492,7 @@ msgid "Psychometrics"
 msgstr "心理测验学"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "管理员"
 
@@ -11686,11 +11702,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
 msgstr "等待主讲教师处理"
 
@@ -11814,8 +11825,7 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"You can now access your certificate. If you keep working and receive a "
-"higher grade,you can request an {link_start} updated certificate {link_end}."
+"You can keep working for a higher grade, or request your certificate now."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11849,11 +11859,6 @@ msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-
-#: lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr ""
 
@@ -11878,7 +11883,11 @@ msgid "Go to your dashboard"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
+msgid "{student_name}, you have not yet met the requirements for credit."
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Information about course credit requirements"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12201,14 +12210,33 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
+"Thank you for your payment! To receive your course credit, go to the "
+"{provider_link} website. You may have to complete some additional steps "
+"depending on the institution"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Complete Credit"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
 "Congratulations - you have received credit for this course! For more "
 "information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "{provider_name} has declined your request for course credit. For more "
 "information, contact {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Contact {provider_link}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -13604,6 +13632,11 @@ msgid "Generate Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
 msgstr ""
 
@@ -13622,8 +13655,7 @@ msgstr "选课信息"
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"Number of enrollees (instructors, staff members, and students) by track"
+msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -14427,8 +14459,8 @@ msgstr "批量添加Beta测试员"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
-"be enrolled as a beta tester."
-msgstr "注意：用户必须首先拥有已激活的{platform_name}账户方可成为Beta测试员。"
+"be enrolled as beta testers."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -14451,15 +14483,15 @@ msgstr "删除beta测试人员"
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Administration List Management"
-msgstr "管理员列表管理"
+msgid "Course Team Management"
+msgstr ""
 
 #. Translators: an "Administrator Group" is a group, such as Course Staff,
 #. that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Select an Administrator Group:"
-msgstr "选择管理员组"
+msgid "Select a course team role:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -14467,38 +14499,35 @@ msgstr "正在获取可用列表……"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Staff cannot modify staff or beta tester lists. To modify these lists, "
-"contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a discussion admin for discussion management."
-msgstr "教员无法修改教员列表或beta测试人员列表。要修改这些列表，请联系您的主讲教师并要求将您加入主讲教师、beta测试人员或论坛管理员。"
+"Staff cannot modify these lists. To manage course team membership, a course "
+"Admin must give you the Admin role to add Staff or Beta Testers, or the "
+"Discussion Admin role to add discussion moderators and TAs."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Course staff can help you manage limited aspects of your course. Staff can "
-"enroll and unenroll students, as well as modify their grades and see all "
-"course data. Course staff are not automatically given access to Studio and "
-"will not be able to edit your course."
+"Course team members with the Staff role help you manage your course. Staff "
+"can enroll and unenroll learners, as well as modify their grades and access "
+"all course data. Staff also have access to your course in Studio and "
+"Insights. You can only give course team roles to enrolled users."
 msgstr ""
-"课程教员可以帮助您分担部分课程管理工作。教员可以为学生选课或从该课程剔除学生，可以修改自己判定的成绩，可以看到所有课程数据。但课程教员不会自动获取访问 "
-"Studio 的权限，所以无法编辑您的课程。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "添加教员"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Instructors"
-msgstr "主讲教师"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer discussion access."
-msgstr "主讲教师是管理您课程的核心人员，主讲教师可以添加、删除课程教员，也可以管理论坛的访问权限。"
+"Course team members with the Admin role help you manage your course. They "
+"can do all of the tasks that Staff can do, and can also add and remove the "
+"Staff and Admin roles, discussion moderation roles, and the beta tester role"
+" to manage course team membership. You can only give course team roles to "
+"enrolled users."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Add Instructor"
-msgstr "添加主讲教师"
+msgid "Add Admin"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -14506,9 +14535,10 @@ msgstr "Beta测试者"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Beta testers can see course content before the rest of the students. They "
-"can make sure that the content works, but have no additional privileges."
-msgstr "Beta测试者可以在其余学生之前看到课程内容。他们可以确保内容有效，但没有额外特权。"
+"Beta Testers can see course content before other learners. They can make "
+"sure that the content works, but have no additional privileges. You can only"
+" give course team roles to enrolled users."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -14520,11 +14550,12 @@ msgstr "论坛管理员"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. They "
-"CAN add/delete other moderators and their posts are marked as 'staff'."
+"Discussion Admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. Their "
+"posts are marked as 'staff'. They can also add and remove the discussion "
+"moderation roles to manage course team membership. You can only give course "
+"team roles to enrolled users."
 msgstr ""
-"讨论区管理员能够编辑或删除任何帖子、清除灌水标记、关闭或重新打开主题、批准回复、以及查看所有群组内的帖子，并且他们能够增加／删除其他版主。他们的帖子都被标记为“工作人员”。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -14536,12 +14567,12 @@ msgstr "版主"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion moderators can edit or delete any post, clear misuse flags, close"
+"Discussion Moderators can edit or delete any post, clear misuse flags, close"
 " and re-open threads, endorse responses, and see posts from all cohorts. "
-"They CANNOT add/delete other moderators and their posts are marked as "
-"'staff'."
+"Their posts are marked as 'staff'. They cannot manage course team membership"
+" by adding or removing discussion moderation roles. You can only give course"
+" team roles to enrolled users."
 msgstr ""
-"讨论区版主能够编辑或删除任何帖子、清除灌水标记、关闭或重新打开主题、批准回复、以及查看所有群组内的帖子，但他们不能增加／删除其他版主。他们的帖子都被标记为“工作人员”。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -14556,9 +14587,9 @@ msgid ""
 "Community TA's are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked 'Community TA'."
+"from all cohorts. Their posts are marked as 'Community TA'. You can only "
+"give course team roles to enrolled users."
 msgstr ""
-"社区助教们是讨论区中对你最有帮助的成员。他们能够编辑或删除任何帖子、清除灌水标记、关闭或重新打开主题、批准回复、以及查看所有群组内的帖子。他们的帖子都被标记为“社区助教”。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -14652,12 +14683,12 @@ msgid "Myself"
 msgstr "我自己"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and instructors"
-msgstr "教员与主讲教师"
+msgid "Staff and admins"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff and instructors)"
-msgstr "所有人(学生，教员和主讲教师)"
+msgid "All (students, staff, and admins)"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -14808,9 +14839,9 @@ msgstr "删除关于这个问题的学生状态"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
-" for this problem and student, click on this button:"
-msgstr "后台正在重新评分，活跃任务的状态会出现在“等待主讲教师处理”列表中。如果您要查看关于这个问题及学生的所有已提交任务的状态，点击这个按钮。"
+" the 'Pending Tasks' table. To see status for all tasks submitted for this "
+"problem and student, click on this button:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -14992,20 +15023,12 @@ msgid ""
 "{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:\n"
 "{ul_tag}\n"
 "{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}\n"
-"{li_tag}The instructor needs to score the essays that are used to help you better understand the grading\n"
+"{li_tag}The course team needs to score the essays that are used to help you better understand the grading\n"
 "criteria.{end_li_tag}\n"
 "{li_tag}There must be submissions that are waiting for grading.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
 msgstr ""
-"\n"
-"{p_tag}你目前没有互评要做。若要参与互评：\n"
-"{ul_tag}\n"
-"{li_tag}你需要提交一个互评问题的作业。{end_li_tag}\n"
-"{li_tag}教师需要提供一些打分样本以帮助你更好的理解打分原则。{end_li_tag}\n"
-"{li_tag}必须有人提交待打分的作业。{end_li_tag}\n"
-"{end_ul_tag}\n"
-"{end_p_tag}\n"
 
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/peer_grading/peer_grading_closed.html
@@ -17823,10 +17846,8 @@ msgid "User's Email Address"
 msgstr "用户邮箱地址"
 
 #: cms/templates/manage_users.html
-msgid ""
-"Please provide the email address of the course staff member you'd like to "
-"add"
-msgstr "请提供您想要添加的课程教员的邮箱地址"
+msgid "Provide the email address of the user you want to add as Staff"
+msgstr ""
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
@@ -17852,9 +17873,9 @@ msgstr "课程团队角色"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Course team members, or staff, are course co-authors. They have full writing"
-" and editing privileges on all course content."
-msgstr "课程团队成员或教员都是课程共同作者。他们有权编写及修改所有课程内容。"
+"Course team members with the Staff role are course co-authors. They have "
+"full writing and editing privileges on all course content."
+msgstr ""
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -17863,15 +17884,22 @@ msgid ""
 msgstr "管理员是课程团队成员中可以添加和移除其它课程团队成员的用户。"
 
 #: cms/templates/manage_users.html
+msgid ""
+"All course team members are automatically enrolled in the course and can "
+"access content in Studio, the LMS, and Insights."
+msgstr ""
+
+#: cms/templates/manage_users.html
 msgid "Transferring Ownership"
 msgstr "移交所有权"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Every course must have an Admin. If you're the Admin and you want transfer "
-"ownership of the course, click Add admin access to make another user the "
-"Admin, then ask that user to remove you from the Course Team list."
-msgstr "每门课程必须有一名管理员。如果您当前是管理员，且期望移交管理员身份，您可以赋予其他用户管理员权限，并请求他们将您从课程团队列表中删除。"
+"Every course must have an Admin. If you are the Admin and you want to "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
+"Course Team list."
+msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid "Library User Access"
@@ -17913,21 +17941,22 @@ msgstr "有三种知识库用户访问角色：用户、教员和管理员。"
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Users can view library content and can reference or use library components "
-"in their courses, but they cannot edit the contents of a library."
-msgstr "用户可以查看知识库内容、在他们的课程中引用或使用知识库组件，但是他们不能编辑知识库中的内容。"
+"Library Users can view library content and can reference or use library "
+"components in their courses, but they cannot edit the contents of a library."
+msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Staff are content co-authors. They have full editing privileges on the "
-"contents of a library."
-msgstr "员工是内容的共同作者，他们对知识库的内容具有完全的编辑权限。"
+"Library Staff are content co-authors. They have full editing privileges on "
+"the contents of a library."
+msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Admins have full editing privileges and can also add and remove other team "
-"members. There must be at least one user with Admin privileges in a library."
-msgstr "管理员拥有完整的编辑权限并可以添加／删除其他团队成员，每个知识库中至少需要有一个用户具备管理员权限。"
+"Library Admins have full editing privileges and can also add and remove "
+"other team members. There must be at least one user with the Admin role in a"
+" library."
+msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -18074,15 +18103,15 @@ msgid ""
 msgstr "您的课程概要页面在您的课程公开之后才对外可见。为了向该页面提供信息并预览该页面，请遵循您的项目经理提供的指导。"
 
 #: cms/templates/settings.html
-msgid "Credit Eligibility Requirements"
+msgid "Course Credit Requirements"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Steps needed for credit eligibility"
+msgid "Steps required to earn course credit"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Minimum Passing Grade"
+msgid "Minimum Grade"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -18094,17 +18123,11 @@ msgid "Proctored Exam {number}"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Successful In-Course Reverification"
+msgid "ID Verification"
 msgstr ""
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "In-Course Reverification {number}"
-msgstr ""
-
-#: cms/templates/settings.html
-msgid "Access to {display_name}"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -18409,19 +18432,19 @@ msgid "Your overall grading scale for student final grades"
 msgstr "您对学生最终得分的整体评分范围"
 
 #: cms/templates/settings_graders.html
-msgid "Credit Grade &amp; Eligibility"
+msgid "Credit Eligibility"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Settings for credit eligibility"
+msgid "Settings for course credit eligibility"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Minimum Passing Grade to Earn Credit:"
+msgid "Minimum Credit-Eligible Grade:"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Must be greater than or equal to passing grade"
+msgid "Must be greater than or equal to the course passing grade"
 msgstr ""
 
 #: cms/templates/settings_graders.html
