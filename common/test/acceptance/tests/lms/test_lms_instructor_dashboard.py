@@ -172,7 +172,7 @@ class CSVReportGeneration(UniqueCourseTest):
         # Expect to see a message that grade report is being generated
         expected_msg = (
             "Your student responses report is being generated! You can view the status of "
-            "the generation task in the 'Pending Instructor Tasks' section."
+            "the generation task in the 'Pending Tasks' section."
         )
         actual_msg = self.data_download_section.get_report_generation_msg()
         self.assertEqual(expected_msg, actual_msg)
