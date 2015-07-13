@@ -37,7 +37,7 @@ from courseware.courses import (
     get_studio_url, get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
-)
+    UserNotEnrolled)
 from courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -1465,7 +1465,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
+        try:
+            course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=check_if_enrolled)
+        except UserNotEnrolled:
+            raise Http404("Course not found.")
 
         # get the block, which verifies whether the user has access to the block.
         block, _ = get_module_by_usage_id(
