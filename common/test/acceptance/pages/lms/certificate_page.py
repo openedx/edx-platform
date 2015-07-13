@@ -56,4 +56,4 @@ class CertificatePage(PageObject):
         """
         returns Facebook share button
         """
-        return self.q(css='a.action-share-facebook')
+        return self.q(css='button.action-share-facebook')
