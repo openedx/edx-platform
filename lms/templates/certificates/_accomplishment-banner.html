@@ -53,7 +53,7 @@ from django.core.urlresolvers import reverse
                     % if share_settings:
                       <%
                        facebook_share_text = _("I completed the {course_title} course on {platform_name}.").format(course_title=accomplishment_course_title, platform_name=platform_name)
-                       twitter_share_text = _("I completed a course on {platform_name}. See my certificate here!").format(platform_name=platform_name)
+                       twitter_share_text = _("I completed a course on {platform_name}. Take a look at my certificate.").format(platform_name=platform_name)
                        share_url = request.build_absolute_uri(reverse('cert_html_view', kwargs=dict(user_id=str(user.id),course_id=unicode(course_id))))
                        if share_settings.get('CERTIFICATE_FACEBOOK_TEXT', None):
                             facebook_share_text = share_settings.get('CERTIFICATE_FACEBOOK_TEXT')
@@ -61,32 +61,26 @@ from django.core.urlresolvers import reverse
                             twitter_share_text = share_settings.get('CERTIFICATE_TWITTER_TEXT')
                       %>
                       % if share_settings.get('CERTIFICATE_FACEBOOK', False):
-                        <a href="javascript:void(0)"
+                        <button class="action action-share-facebook btn btn-overlay btn-small icon-only" id="action-share-facebook"
                            onclick="FaceBook.share({
                             share_text: '${facebook_share_text}',
                             share_link: '${share_url}',
                             picture_link: '${request.build_absolute_uri(course_image_url)}',
                             description: '${_('Click the link to see my certificate.')}'
-                            });"
-                           class="action action-share-facebook btn btn-overlay btn-small icon-only" id="action-share-facebook">
+                            });">
                             <i class="icon fa fa-facebook-official" aria-hidden="true"></i>
                             <span class="action-label">${_("Post on Facebook")}</span>
-                        </a>
+                        </button>
                       %endif
                       % if share_settings.get('CERTIFICATE_TWITTER', False):
                       <% twitter_url = 'https://twitter.com/intent/tweet?text=' + twitter_share_text + '&url='+ share_url%>
-                        <a
-                          data-tooltip="${_('Share on Twitter')}"
+                        <button data-tooltip="${_('Share on Twitter')}"
                           class="action action-share-twitter btn btn-overlay btn-small icon-only"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                          href="${twitter_url}"
-                          target="_blank"
                           title="${_('Share on Twitter')}"
                           onclick="popupWindow('${twitter_url}', 'tweetWindow', 640, 480); return false;">
-                          <span class="action-label">${_("Tweet this Accomplishment")}</span>
-                          <i class="icon fa fa-twitter" aria-hidden="true"></i>
-                        </a>
+                            <i class="icon fa fa-twitter" aria-hidden="true"></i>
+                            <span class="action-label">${_("Tweet this Accomplishment. Pop up window.")}</span>
+                        </button>
                       %endif
                     %endif
 
