@@ -338,7 +338,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Verify that the header navigation links are hidden for the edx.org version
         self.assertNotContains(response, "How it Works")
-        self.assertNotContains(response, "Find Courses")
+        self.assertNotContains(response, "Find courses")
         self.assertNotContains(response, "Schools & Partners")
 
 

@@ -533,7 +533,7 @@ class DashboardTest(ModuleStoreTestCase):
         response = self.client.get(reverse("dashboard"))
 
         # "Find courses" is shown in the side panel
-        self.assertContains(response, "Find Courses")
+        self.assertContains(response, "Find courses")
 
         # But other links are hidden in the navigation
         self.assertNotContains(response, "How it Works")
