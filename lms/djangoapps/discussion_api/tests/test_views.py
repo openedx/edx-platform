@@ -134,6 +134,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             }
         )
 
+
 @ddt.ddt
 @httpretty.activate
 class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):

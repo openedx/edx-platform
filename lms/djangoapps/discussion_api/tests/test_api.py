@@ -812,6 +812,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
             query: ["true"],
         })
 
+
 @ddt.ddt
 class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Test for get_comment_list"""
