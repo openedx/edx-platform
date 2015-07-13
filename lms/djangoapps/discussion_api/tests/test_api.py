@@ -542,8 +542,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
                 "page": ["6"],
                 "per_page": ["14"],
                 "recursive": ["False"],
-                },
-            )
+            },
+        )
 
     def test_thread_content(self):
         source_threads = [
