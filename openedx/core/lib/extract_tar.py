@@ -66,7 +66,7 @@ def safemembers(members, base):
     return members
 
 
-def safetar_extractall(tar_file, path=".", members=None):
+def safetar_extractall(tar_file, path=".", members=None):  # pylint: disable=unused-argument
     """
     Safe version of `tar_file.extractall()`.
     """
