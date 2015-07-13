@@ -21,11 +21,7 @@
 </div>
 
 <%block name="js_extra">
-<script type="text/javascript">
-    (function (require) {
-        require(['teams/js/teams_tab_factory'], function (TeamsTabFactory) {
-            new TeamsTabFactory(${ json.dumps(topics, cls=EscapedEdxJSONEncoder) }, '${ topics_url }', '${ unicode(course.id) }');
-        });
-    }).call(this, require || RequireJS.require);
-</script>
+<%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
+    TeamsTabFactory($('.teams-content'), ${ json.dumps(topics, cls=EscapedEdxJSONEncoder) }, '${ topics_url }', '${ unicode(course.id) }');
+</%static:require_module>
 </%block>
