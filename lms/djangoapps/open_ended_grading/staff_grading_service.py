@@ -257,7 +257,7 @@ def get_next(request, course_id):
 
     'error': if success is False, will have an error message with more info.
     """
-    assert(isinstance(course_id, basestring))
+    assert isinstance(course_id, basestring)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
 
@@ -300,7 +300,7 @@ def get_problem_list(request, course_id):
 
         'error': if success is False, will have an error message with more info.
     """
-    assert(isinstance(course_id, basestring))
+    assert isinstance(course_id, basestring)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
     try:

@@ -18,15 +18,13 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
 
-from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
-from student.tests.factories import CourseModeFactory, UserFactory
+from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt

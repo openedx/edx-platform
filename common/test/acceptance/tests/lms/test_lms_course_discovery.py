@@ -2,9 +2,7 @@
 Test course discovery.
 """
 import datetime
-from flaky import flaky
 import json
-import os
 
 from bok_choy.web_app_test import WebAppTest
 from ..helpers import remove_file

@@ -16,7 +16,7 @@ from util.date_utils import get_time_display
 
 class CourseModeForm(forms.ModelForm):
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseMode
 
     COURSE_MODE_SLUG_CHOICES = (

@@ -12,7 +12,7 @@ from lxml.etree import XMLParser as _XMLParser
 from lxml.etree import _Element, _ElementTree  # pylint: disable=unused-import, no-name-in-module
 
 # This should be imported after lxml.etree so that it overrides the following attributes.
-from defusedxml.lxml import parse, fromstring, XML
+from defusedxml.lxml import parse, fromstring, XML  # pylint: disable=unused-import
 
 
 class XMLParser(_XMLParser):  # pylint: disable=function-redefined

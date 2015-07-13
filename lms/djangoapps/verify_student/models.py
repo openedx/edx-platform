@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import ugettext as _
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -895,7 +895,7 @@ class VerificationCheckpoint(models.Model):
     checkpoint_location = models.CharField(max_length=255)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
-    class Meta:  # pylint: disable=missing-docstring, old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('course_id', 'checkpoint_location')
 
     def __unicode__(self):
@@ -1089,7 +1089,7 @@ class SkippedReverification(models.Model):
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:  # pylint: disable=missing-docstring, old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
 
     @classmethod

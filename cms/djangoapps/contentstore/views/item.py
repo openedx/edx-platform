@@ -242,7 +242,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-        elif view_name in (PREVIEW_VIEWS + container_views):
+        elif view_name in PREVIEW_VIEWS + container_views:
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
             can_edit = has_studio_write_access(request.user, usage_key.course_key)
 

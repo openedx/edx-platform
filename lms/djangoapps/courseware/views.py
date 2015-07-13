@@ -7,7 +7,6 @@ import urllib
 import json
 import cgi
 
-from collections import OrderedDict
 from datetime import datetime
 from django.utils import translation
 from django.utils.translation import ugettext as _
@@ -599,14 +598,13 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             raise
         else:
             log.exception(
-                u"Error in index view: user={user}, course={course}, chapter={chapter}"
-                u" section={section} position={position}".format(
-                    user=user,
-                    course=course,
-                    chapter=chapter,
-                    section=section,
-                    position=position
-                ))
+                u"Error in index view: user=%s, course=%s, chapter=%s, section=%s, position=%s",
+                user,
+                course,
+                chapter,
+                section,
+                position
+            )
             try:
                 result = render_to_response('courseware/courseware-error.html', {
                     'staff_access': staff_access,
@@ -638,9 +636,12 @@ def jump_to_id(request, course_id, module_id):
             ))
     if len(items) > 1:
         log.warning(
-            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
-            ))
+            u"Multiple items found with id: %s in course_id: %s. Referer: %s. Using first: %s",
+            module_id,
+            course_id,
+            request.META.get("HTTP_REFERER", ""),
+            items[0].location.to_deprecated_string()
+        )
 
     return jump_to(request, course_id, items[0].location.to_deprecated_string())
 
@@ -1240,7 +1241,7 @@ def get_static_tab_contents(request, course, tab):
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug('course_module = {0}'.format(tab_module))
+    logging.debug('course_module = %s', tab_module)
 
     html = ''
     if tab_module is not None:
@@ -1249,7 +1250,7 @@ def get_static_tab_contents(request, course, tab):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course={course}, tab={tab_url}".format(course=course, tab_url=tab['url_slug'])
+                u"Error rendering course=%s, tab=%s", course, tab['url_slug']
             )
 
     return html

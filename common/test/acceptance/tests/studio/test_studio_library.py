@@ -2,7 +2,6 @@
 Acceptance tests for Content Libraries in Studio
 """
 from ddt import ddt, data
-from unittest import skip
 from nose.plugins.attrib import attr
 from flaky import flaky
 

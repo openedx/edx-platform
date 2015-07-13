@@ -1,7 +1,7 @@
 """
 Defines the URL routes for this app.
 """
-from django.conf.urls import patterns, url, include
+from django.conf.urls import patterns, url
 
 from commerce import views
 

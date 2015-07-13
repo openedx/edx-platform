@@ -8,8 +8,7 @@ import pytz
 from django.conf import settings
 from django.db.utils import IntegrityError
 from mock import patch
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

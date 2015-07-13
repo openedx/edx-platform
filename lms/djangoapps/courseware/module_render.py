@@ -890,10 +890,9 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warn(
-            "Invalid location for course id {course_id}: {usage_key}".format(
-                course_id=usage_key.course_key,
-                usage_key=usage_key
-            )
+            "Invalid location for course id %s: %s",
+            usage_key.course_key,
+            usage_key
         )
         raise Http404
 
@@ -1055,9 +1054,9 @@ def get_score_bucket(grade, max_grade):
     Used with statsd tracking.
     """
     score_bucket = "incorrect"
-    if(grade > 0 and grade < max_grade):
+    if grade > 0 and grade < max_grade:
         score_bucket = "partial"
-    elif(grade == max_grade):
+    elif grade == max_grade:
         score_bucket = "correct"
 
     return score_bucket

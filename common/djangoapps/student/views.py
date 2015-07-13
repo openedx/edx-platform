@@ -6,7 +6,6 @@ import logging
 import uuid
 import json
 import warnings
-from datetime import timedelta
 from collections import defaultdict
 from pytz import UTC
 from requests import HTTPError
@@ -26,9 +25,8 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
-from django.utils import timezone
 from django.utils.translation import ungettext
-from django.utils.http import cookie_date, base36_to_int
+from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -49,7 +47,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
-    Registration, UserProfile, PendingNameChange,
+    Registration, UserProfile,
     PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
@@ -60,10 +58,8 @@ from verify_student.models import SoftwareSecurePhotoVerification  # pylint: dis
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
-    get_active_web_certificate,
     has_html_certificates_enabled,
 )
-from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
@@ -86,7 +82,6 @@ from external_auth.login_and_register import (
 )
 
 from bulk_email.models import Optout, CourseAuthorization
-import shoppingcart
 from lang_pref import LANGUAGE_KEY
 
 import track.views
@@ -1048,7 +1043,7 @@ def accounts_login(request):
 
 # Need different levels of logging
 @ensure_csrf_cookie
-def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,unused-argument
+def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
     """AJAX request to log in the user."""
 
     backend_name = None

@@ -1151,7 +1151,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         # pylint: disable=fixme
         # TODO (vshnayder): post-launch, make errors properties of items
         # self.get_item(location)
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         return self._course_errors[course_key].errors
 
     def get_errored_courses(self):
@@ -1169,7 +1169,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
 
         Default impl--linear search through course list
         """
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         for course in self.get_courses(**kwargs):
             if course.id == course_id:
                 return course
@@ -1184,7 +1184,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
                 to search for whether a potentially conflicting course exists in that case.
         """
         # linear search through list
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         if ignore_case:
             return next(
                 (

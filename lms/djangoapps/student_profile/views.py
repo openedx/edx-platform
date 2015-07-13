@@ -17,8 +17,6 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import User
 from microsite_configuration import microsite
 
-from django.utils.translation import ugettext as _
-
 
 @login_required
 @require_http_methods(['GET'])

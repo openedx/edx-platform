@@ -3,7 +3,7 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task, no_help
+from paver.easy import sh, task, cmdopts, needs, call_task
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from optparse import make_option
@@ -11,7 +11,7 @@ from optparse import make_option
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text  # pylint: disable=invalid-name
 
 __test__ = False  # do not collect
 

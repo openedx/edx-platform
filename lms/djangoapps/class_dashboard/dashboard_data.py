@@ -326,7 +326,7 @@ def get_d3_section_grade_distrib(course_id, section):
             c_unit += 1
             c_problem = 0
             for child in unit.get_children():
-                if (child.location.category == 'problem'):
+                if child.location.category == 'problem':
                     c_problem += 1
                     problem_set.append(child.location)
                     problem_info[child.location] = {

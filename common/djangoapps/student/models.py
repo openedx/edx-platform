@@ -216,7 +216,7 @@ class UserProfile(models.Model):
     MITx fall prototype.
     """
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         db_table = "auth_userprofile"
 
     # CRITICAL TODO/SECURITY
@@ -436,7 +436,7 @@ class Registration(models.Model):
         registration profile is created when the user creates an
         account, but that account is inactive. Once the user clicks
         on the activation key, it becomes active. '''
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         db_table = "auth_registration"
 
     user = models.ForeignKey(User, unique=True)
@@ -846,7 +846,7 @@ class CourseEnrollment(models.Model):
 
     objects = CourseEnrollmentManager()
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
         ordering = ('user', 'course_id')
 
@@ -885,7 +885,7 @@ class CourseEnrollment(models.Model):
         # save it to the database so that it can have an ID that we can throw
         # into our CourseEnrollment object. Otherwise, we'll get an
         # IntegrityError for having a null user_id.
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
 
         if user.id is None:
             user.save()
@@ -994,7 +994,7 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
-            assert(isinstance(self.course_id, CourseKey))
+            assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
                 'course_id': self.course_id.to_deprecated_string(),
@@ -1407,7 +1407,7 @@ class CourseEnrollmentAllowed(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
@@ -1444,7 +1444,7 @@ class CourseAccessRole(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
     role = models.CharField(max_length=64, db_index=True)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('user', 'org', 'course_id', 'role')
 
     @property
@@ -1835,7 +1835,7 @@ class LanguageProficiency(models.Model):
     /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
     (update_account_settings) so that the events are emitted.
     """
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('code', 'user_profile'),)
 
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')

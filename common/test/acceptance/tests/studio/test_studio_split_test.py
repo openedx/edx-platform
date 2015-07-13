@@ -2,7 +2,6 @@
 Acceptance tests for Studio related to the split_test module.
 """
 
-import json
 import math
 from unittest import skip
 from nose.plugins.attrib import attr

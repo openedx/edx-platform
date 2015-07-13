@@ -2719,7 +2719,7 @@ class ExternalResponse(LoncapaResponse):
                 exans = [''] * len(self.answer_ids)
                 exans[0] = msg
 
-        if not (len(exans) == len(self.answer_ids)):
+        if not len(exans) == len(self.answer_ids):
             log.error('Expected %s answers from external server, only got %s!',
                       len(self.answer_ids), len(exans))
             raise Exception('Short response from external server')

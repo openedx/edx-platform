@@ -174,7 +174,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
 
         # if we don't already have a chapter create a new one
-        if not(hasattr(self, 'chapter')):
+        if not hasattr(self, 'chapter'):
             self.chapter = ItemFactory.create(
                 parent_location=self.course.location,
                 category='chapter'

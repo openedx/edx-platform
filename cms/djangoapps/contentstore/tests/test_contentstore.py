@@ -659,7 +659,7 @@ class MiscCourseTests(ContentStoreTestCase):
         direct_store_items = self.store.get_items(
             self.course.id, revision=ModuleStoreEnum.RevisionOption.published_only
         )
-        items_from_direct_store = [item for item in direct_store_items if (item.location == self.problem.location)]
+        items_from_direct_store = [item for item in direct_store_items if item.location == self.problem.location]
         self.assertEqual(len(items_from_direct_store), 1)
         self.assertFalse(getattr(items_from_direct_store[0], 'is_draft', False))
 
@@ -667,7 +667,7 @@ class MiscCourseTests(ContentStoreTestCase):
         draft_store_items = self.store.get_items(
             self.course.id, revision=ModuleStoreEnum.RevisionOption.draft_only
         )
-        items_from_draft_store = [item for item in draft_store_items if (item.location == self.problem.location)]
+        items_from_draft_store = [item for item in draft_store_items if item.location == self.problem.location]
         self.assertEqual(len(items_from_draft_store), 1)
         # TODO the below won't work for split mongo
         self.assertTrue(getattr(items_from_draft_store[0], 'is_draft', False))

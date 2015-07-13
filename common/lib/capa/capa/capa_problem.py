@@ -631,7 +631,7 @@ class LoncapaProblem(object):
                 parent = inc.getparent()
                 parent.insert(parent.index(inc), incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (filename, self.problem_id))
+                log.debug('Included %s into %s', filename, self.problem_id)
 
     def _extract_system_path(self, script):
         """
@@ -853,7 +853,7 @@ class LoncapaProblem(object):
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath(
-                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in (input_tags + solution_tags)]),
+                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in input_tags + solution_tags]),
                 id=response_id_str
             )
 

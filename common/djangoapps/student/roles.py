@@ -99,7 +99,7 @@ class GlobalStaff(AccessRole):
 
     def add_users(self, *users):
         for user in users:
-            if (user.is_authenticated() and user.is_active):
+            if user.is_authenticated() and user.is_active:
                 user.is_staff = True
                 user.save()
 

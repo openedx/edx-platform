@@ -3,7 +3,6 @@ Find courses page (main page of the LMS).
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import BrokenPromise
 from . import BASE_URL
 
 

@@ -5,7 +5,7 @@ from django.http import Http404
 from rest_framework import generics
 from rest_framework.response import Response
 
-from courseware.courses import get_course_about_section, get_course_info_section_module
+from courseware.courses import get_course_info_section_module
 from static_replace import make_static_urls_absolute, replace_static_urls
 from openedx.core.lib.xblock_utils import get_course_update_items
 

@@ -25,7 +25,7 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
 from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.http import urlquote, is_safe_url
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _

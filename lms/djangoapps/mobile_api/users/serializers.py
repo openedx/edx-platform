@@ -4,7 +4,6 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from courseware.courses import course_image_url
 from student.models import CourseEnrollment, User
 from certificates.models import certificate_status_for_student, CertificateStatuses
 

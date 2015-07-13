@@ -27,7 +27,7 @@ def is_shopping_cart_enabled():
         settings.FEATURES.get('ENABLE_SHOPPING_CART')
     )
 
-    return (enable_paid_course_registration and enable_shopping_cart)
+    return enable_paid_course_registration and enable_shopping_cart
 
 
 def parse_pages(pdf_buffer, password):

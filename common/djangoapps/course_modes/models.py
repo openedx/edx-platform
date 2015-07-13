@@ -82,7 +82,7 @@ class CourseMode(models.Model):
     # Modes that allow a student to earn credit with a university partner
     CREDIT_MODES = [CREDIT_MODE]
 
-    class Meta:
+    class Meta(object):
         """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
 
@@ -457,7 +457,7 @@ class CourseMode(models.Model):
             return False
 
         # Check that the default mode is available.
-        return (cls.HONOR in modes_dict)
+        return cls.HONOR in modes_dict
 
     @classmethod
     def is_white_label(cls, course_id, modes_dict=None):
