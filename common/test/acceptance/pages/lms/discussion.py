@@ -561,7 +561,7 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
         ).fulfill()
 
     def is_thread_anonymous(self):
-        return not self.q(css=".posted-details > .username").present
+        return not self.q(css=".posted-details > .username-wrapper > .username").present
 
     @wait_for_js
     def check_if_selector_is_focused(self, selector):
