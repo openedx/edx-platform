@@ -429,7 +429,7 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
         ).fulfill()
 
     def is_thread_anonymous(self):
-        return not self.q(css=".posted-details > .username").present
+        return not self.q(css=".posted-details > .username-wrapper > .username").present
 
 
 class DiscussionUserProfilePage(CoursePage):
