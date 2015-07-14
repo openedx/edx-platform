@@ -296,6 +296,10 @@ def get_thread_list(
 
     text_search_rewrite = None
 
+    cc_map = {"last_activity_at": "activity", "comment_count": "comments", "vote_count": "votes"}
+    query_params["sort_key"] = cc_map.get(order_by) or "activity"
+    query_params["sort_direction"] = order_direction or "desc"
+
     if view:
         if view == "unanswered":
             query_params["unanswered"] = "true"
