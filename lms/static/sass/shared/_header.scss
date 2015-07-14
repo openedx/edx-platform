@@ -627,8 +627,8 @@ header.global-new {
       a {
         display:block;
         padding: 3px 10px;
-        font-size: 18px;
-        line-height: 24px;
+        font-size: 14px;
+        line-height: 1.5;
         font-weight: 600;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
@@ -715,7 +715,6 @@ header.global-new {
         font-size: 14px;
 
         &.nav-courseware-button {
-          width: 86px;
           text-align: center;
           margin-top: -3px;
         }
@@ -832,13 +831,6 @@ header.global-new {
     @include media( $edx-bp-huge ) {
       .wrapper-header {
         padding: 17px 0;
-      }
-
-      .nav-global,
-      .nav-courseware {
-        a {
-          font-size: 18px;
-        }
       }
     }
   }
