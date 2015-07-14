@@ -27,7 +27,6 @@ from courseware.access import has_access
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
-from django_comment_common.utils import ThreadContext
 from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
     merge_dict,
@@ -124,17 +123,26 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
+    is_cohorted = is_commentable_cohorted(course.id, discussion_id)
 
-    if group_id == "all":
+    if group_id in ("all", "None"):
         group_id = None
 
-    if not group_id:
-        if not has_permission(request.user, "see_all_cohorts", course.id):
-            group_id = get_cohort_id(request.user, course.id)
-            if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
-                default_query_params['exclude_groups'] = True
+
+    if not has_permission(request.user, "see_all_cohorts", course.id):
+        group_id = get_cohort_id(request.user, course.id)
+        if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
+            default_query_params['exclude_groups'] = True
 
     if group_id:
+        group_id = int(group_id)
+        try:
+            CourseUserGroup.objects.get(course_id=course.id, id=group_id)
+        except CourseUserGroup.DoesNotExist:
+            if not is_cohorted:
+                group_id = None
+            else:
+                raise ValueError("Invalid Group ID")
         default_query_params["group_id"] = group_id
 
     #so by default, a moderator sees all items, and a student sees his cohort
@@ -157,8 +165,11 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         )
     )
 
+    if not is_cohorted:
+        query_params.pop('group_id', None)
+
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
-    threads = _set_group_names(course.id, threads, discussion_id=discussion_id)
+    threads = _set_group_names(course.id, threads)
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
