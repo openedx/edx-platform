@@ -1,7 +1,7 @@
 """ Commerce API v0 view tests. """
 import json
+import itertools
 from uuid import uuid4
-from nose.plugins.attrib import attr
 
 import ddt
 from django.conf import settings
@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 import mock
+from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -33,7 +34,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
     """
     Tests for the commerce orders view.
     """
-    def _post_to_view(self, course_id=None):
+    def _post_to_view(self, course_id=None, marketing_email_opt_in=False):
         """
         POST to the view being tested.
 
@@ -42,8 +43,12 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         :return: Response
         """
-        course_id = unicode(course_id or self.course.id)
-        return self.client.post(self.url, {'course_id': course_id})
+        payload = {
+            "course_id": unicode(course_id or self.course.id)
+        }
+        if marketing_email_opt_in:
+            payload["email_opt_in"] = True
+        return self.client.post(self.url, payload)
 
     def assertResponseMessage(self, response, expected_msg):
         """ Asserts the detail field in the response's JSON body equals the expected message. """
@@ -296,6 +301,28 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         with mock_create_basket():
             self._test_successful_ecommerce_api_call(False)
+
+    @mock.patch('commerce.api.v0.views.update_email_opt_in')
+    @ddt.data(*itertools.product((False, True), (False, True), (False, True)))
+    @ddt.unpack
+    def test_marketing_email_opt_in(self, is_opt_in, has_sku, is_exception, mock_update):
+        """
+        Ensures the email opt-in flag is handled, if present, and that problems handling the
+        flag don't cause the rest of the enrollment transaction to fail.
+        """
+        if not has_sku:
+            for course_mode in CourseMode.objects.filter(course_id=self.course.id):
+                course_mode.sku = None
+                course_mode.save()
+
+        if is_exception:
+            mock_update.side_effect = Exception("boink")
+
+        return_value = {'id': TEST_BASKET_ID, 'payment_data': None, 'order': {'number': TEST_ORDER_NUMBER}}
+        with mock_create_basket(response=return_value, expect_called=has_sku):
+            response = self._post_to_view(marketing_email_opt_in=is_opt_in)
+        self.assertEqual(mock_update.called, is_opt_in)
+        self.assertEqual(response.status_code, 200)
 
 
 @attr('shard_1')
