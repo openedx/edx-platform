@@ -9,6 +9,7 @@ from textwrap import dedent
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch
 from nose.plugins.attrib import attr
@@ -33,31 +34,10 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class ProblemSubmissionTestMixin(TestCase):
     """
-    Check that a course gets graded properly.
+    TestCase mixin that provides functions to submit answers to problems.
     """
-
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-
-    def setUp(self):
-
-        super(TestSubmittingProblems, self).setUp(create_user=False)
-        # Create course
-        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        assert self.course, "Couldn't load course %r" % self.COURSE_NAME
-
-        # create a test student
-        self.student = 'view@test.com'
-        self.password = 'foo'
-        self.create_account('u1', self.student, self.password)
-        self.activate_user(self.student)
-        self.enroll(self.course)
-        self.student_user = User.objects.get(email=self.student)
-        self.factory = RequestFactory()
-
     def refresh_course(self):
         """
         Re-fetch the course from the database so that the object being dealt with has everything added to it.
@@ -68,7 +48,6 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Returns the url of the problem given the problem's name
         """
-
         return self.course.id.make_usage_key('problem', problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
@@ -135,6 +114,32 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         modx_url = self.modx_url(problem_location, 'problem_show')
         resp = self.client.post(modx_url)
         return resp
+
+
+class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, ProblemSubmissionTestMixin):
+    """
+    Check that a course gets graded properly.
+    """
+
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+
+    def setUp(self):
+
+        super(TestSubmittingProblems, self).setUp(create_user=False)
+        # Create course
+        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        assert self.course, "Couldn't load course %r" % self.COURSE_NAME
+
+        # create a test student
+        self.student = 'view@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.activate_user(self.student)
+        self.enroll(self.course)
+        self.student_user = User.objects.get(email=self.student)
+        self.factory = RequestFactory()
 
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """

@@ -29,6 +29,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
     has_children = True
 
+    show_in_read_only_mode = True
+
     def student_view(self, context):
         """
         Renders the student view of the block in the LMS.

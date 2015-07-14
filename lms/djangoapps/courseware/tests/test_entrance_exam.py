@@ -528,6 +528,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.entrance_exam
         )
         return toc_for_course(
+            self.request.user,
             self.request,
             self.course,
             self.entrance_exam.url_name,

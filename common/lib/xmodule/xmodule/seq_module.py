@@ -157,6 +157,8 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
+    show_in_read_only_mode = True
+
     js = {
         'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')],
     }
