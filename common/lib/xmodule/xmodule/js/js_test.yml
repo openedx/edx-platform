@@ -70,7 +70,3 @@ spec_paths:
 # Paths to fixture files (optional)
 fixture_paths:
     - fixtures
-
-requirejs:
-  paths:
-    main: spec/main_requirejs
