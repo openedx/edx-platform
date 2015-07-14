@@ -371,6 +371,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
         )
     except cc.utils.CommentClientRequestError as e:
         if e.status_code == 404:
+            print "Can't find it!"
             raise Http404
         raise
 
