@@ -25,8 +25,7 @@
             % endif
         </p>
         <div class="purchase_credit">
-            ## TODO: set the URL for the link to the provider selection page on the E-Commerce service
-            <a class="btn credit-btn purchase-credit-btn" href="#" target="_blank" data-course-key="${credit_status['course_key']}">${_("Purchase Course Credit")}</a>
+            <a class="btn credit-btn purchase-credit-btn" href="${settings.ECOMMERCE_PUBLIC_URL_ROOT}/credit/checkout/${credit_status['course_key']}" target="_blank" data-course-key="${credit_status['course_key']}">${_("Purchase Course Credit")}</a>
         </div>
     % elif credit_status["request_status"] in [None, "pending"] and not credit_status["error"] :
         % if credit_status["request_status"] == "pending":
