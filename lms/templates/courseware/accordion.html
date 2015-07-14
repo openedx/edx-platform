@@ -36,7 +36,7 @@
               <p class="subtitle">${section['format']} ${due_date}</p>
 
               % if 'graded' in section and section['graded']:
-                  <img src="/static/images/graded.png" alt="Graded Section">
+              <i class="icon fa fa-pencil-square-o" aria-hidden="true" data-tooltip="${_("This section is graded.")}"></i>
               % endif
             </a>
           </li>
