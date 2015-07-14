@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 from edxmako.shortcuts import render_to_response
 
+from contentstore.views.helpers import xblock_studio_url
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -57,7 +58,7 @@ class BulkSettingsUtil():
             settings_dict[setting_type] = value
 
         if category == 'vertical':
-            settings_dict['ispublic'] = modulestore().compute_publish_state(child)
+            settings_dict['ispublic'] = modulestore().has_published_version(child)
 
         return settings_dict
 
@@ -69,17 +70,11 @@ class BulkSettingsUtil():
             - Chapters: Course url
             - Problems: Unit url
         """
-        handler = category
 
-        if category == "chapter":
-            usage_key_string = unicode(parent.id)
-        elif category == "sequential" or category == "unit":
-            usage_key_string = unicode(child.location)
+        if category in ['chapter', 'sequential', 'vertical']:
+            return xblock_studio_url(child)
         else:
-            usage_key_string = unicode(parent.location)
-            handler = 'unit'
-
-        return reverse('component_handler', kwargs={'usage_key_string': usage_key_string, 'handler': handler})
+            return xblock_studio_url(parent)
 
     @classmethod
     def get_bulksettings_metadata(cls, course):
