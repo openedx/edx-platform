@@ -9,7 +9,6 @@
 
 # Third-party:
 -e git+https://github.com/ottoyiu/django-cors-headers.git@1e7bf86310e54cf2520c1b197d4e54bf80004df3#egg=django-cors-headers
--e git+https://github.com/carljm/django-model-utils.git@d29f7b573ed4e53dc3a4dff7c339b76f890445eb#egg=django-model-utils
 -e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/jschneier/django-storages.git@d04064d34a40684bc1561411eb4631fd81e0609c#egg=django-storages
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
