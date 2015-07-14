@@ -85,19 +85,19 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
     """
     def test_link_on_dashboard_works(self):
         """
-        Scenario: Verify that the "Account Settings" link works from the dashboard.
+        Scenario: Verify that the "Account" link works from the dashboard.
 
 
         Given that I am a registered user
         And I visit my dashboard
-        And I click on "Account Settings" in the top drop down
+        And I click on "Account" in the top drop down
         Then I should see my account settings page
         """
         self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
-        self.assertIn('Account Settings', dashboard_page.username_dropdown_link_text)
+        self.assertIn('Account', dashboard_page.username_dropdown_link_text)
         dashboard_page.click_account_settings_link()
 
 
