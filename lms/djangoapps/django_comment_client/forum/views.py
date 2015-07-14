@@ -197,7 +197,7 @@ def _set_group_names(course_id, threads):
     """ Adds group name if the thread has a group id"""
 
     for thread in threads:
-        if thread.get('group_id'):
+        if thread.get('group_id') and is_course_cohorted(course_id):
             thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
             thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
         else:
@@ -363,6 +363,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
         )
     except cc.utils.CommentClientRequestError as e:
         if e.status_code == 404:
+            print "Can't find it!"
             raise Http404
         raise
 
