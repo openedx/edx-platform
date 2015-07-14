@@ -603,15 +603,11 @@ class ViewsTestCase(
 
         commentable_id = 'cohorted-commentable-id'
 
-        self.course = CourseFactory.create(
-            org='MITx',
-            course='999',
-            display_name='Robot Super Course',
-            cohort_config={
-                'cohorted': True,
-                'inline_discussions_cohorting_default': True
-            }
-        )
+        self.course.cohort_config = {
+            'cohorted': True,
+            'inline_discussions_cohorting_default': True
+        }
+        self.store.update_item(self.course, self.student.id)
 
         assert_true(is_commentable_cohorted(self.course.id, commentable_id))
 
