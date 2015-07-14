@@ -65,7 +65,7 @@ def i_should_be_on_the_dashboard(step):
 @step(u'I (?:visit|access|open) the courses page$')
 def i_am_on_the_courses_page(step):
     world.visit('/courses')
-    assert world.is_css_present('section.courses')
+    assert world.is_css_present('div.courses')
 
 
 @step(u'I press the "([^"]*)" button$')

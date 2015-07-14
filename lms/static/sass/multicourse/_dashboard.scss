@@ -13,7 +13,7 @@
 // ====================
 .dashboard {
   @include clearfix();
-  padding: ($baseline*2) 0 0 0;
+  padding: ($baseline*2) 0 $baseline 0;
 
   .profile-sidebar {
     background: transparent;
