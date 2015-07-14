@@ -253,6 +253,50 @@ class UserProfile(models.Model):
     city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
+
+    MARKET_CHOICES = (
+        ('23', ugettext_noop('Atlanta')),
+        ('60', ugettext_noop('Austin')),
+        ('46', ugettext_noop('Baltimore')),
+        ('102', ugettext_noop('Boise')),
+        ('10', ugettext_noop('Boston')),
+        ('61', ugettext_noop('Charlotte')),
+        ('14', ugettext_noop('Chicago')),
+        ('34', ugettext_noop('Connecticut')),
+        ('22', ugettext_noop('Dallas')),
+        ('27', ugettext_noop('Denver')),
+        ('24', ugettext_noop('Detroit')),
+        ('826', ugettext_noop('Houston')),
+        ('58', ugettext_noop('Indianapolis')),
+        ('13', ugettext_noop('Los Angeles')),
+        ('33', ugettext_noop('Miami')),
+        ('20', ugettext_noop('Minneapolis')),
+        ('807', ugettext_noop('Moline')),
+        ('30', ugettext_noop('New Jersey')),
+        ('11', ugettext_noop('New York City')),
+        ('51', ugettext_noop('Northern Virginia')),
+        ('32', ugettext_noop('Ohio')),
+        ('19', ugettext_noop('Orange County')),
+        ('72', ugettext_noop('Orlando')),
+        ('18', ugettext_noop('Philadelphia')),
+        ('31', ugettext_noop('Phoenix')),
+        ('41', ugettext_noop('Portland, OR')),
+        ('803', ugettext_noop('Raleigh/Durham')),
+        ('73', ugettext_noop('Rhode Island')),
+        ('78', ugettext_noop('Richmond')),
+        ('16', ugettext_noop('San Diego')),
+        ('12', ugettext_noop('San Francisco')),
+        ('17', ugettext_noop('Seattle')),
+        ('15', ugettext_noop('Silicon Valley')),
+        ('37', ugettext_noop('St. Louis')),
+        ('68', ugettext_noop('Tampa')),
+        ('40', ugettext_noop('Toronto')),
+        ('47', ugettext_noop('Vancouver')),
+        ('25', ugettext_noop('Washington, DC')),
+        ('881', ugettext_noop('Wisconsin'))
+    )
+    market = models.IntegerField(blank=True, null=True, choices = MARKET_CHOICES)
+
     allow_certificate = models.BooleanField(default=1)
 
     def get_meta(self):  # pylint: disable=missing-docstring
