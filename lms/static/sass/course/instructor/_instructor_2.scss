@@ -1990,14 +1990,14 @@ input[name="subject"] {
     }
   }
 }
-.special-allowance-container{
-  .allowance-table {
+.special-allowance-container, .student-proctored-exam-container{
+  .allowance-table, .exam-attempts-table {
     width: 100%;
     tr:nth-child(even){
         background-color: $gray-l6;
         border-bottom: 1px solid #f3f3f3;
       }
-    .allowance-headings {
+    .allowance-headings, .exam-attempt-headings {
       height: 40px;
       border-bottom: 1px solid #BEBEBE;
 
@@ -2012,7 +2012,19 @@ input[name="subject"] {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
         font-size: 16px;
-
+        &.attempt-allowed-time {
+            width: 140px;
+            word-wrap: break-word;
+        }
+        &.attempt-started-at {
+          width: 160px;
+        }
+        &.attempt-completed-at {
+          width: 160px;
+        }
+        &.attempt-status {
+          width: 100px;
+        }
         &.exam-name {
           width: 150px;
         }
@@ -2058,6 +2070,79 @@ input[name="subject"] {
         a.remove_allowance{
           @include margin-left(15px);
         }
+      }
+    }
+  }
+  .pagination {
+    display: inline-block;
+    padding-left: 0;
+    margin: 20px 0;
+    border-radius: 4px;
+    > li {
+      display: inline; // Remove list-style and block-level defaults
+      > a,
+      > span {
+        padding: 6px 12px;
+        line-height: 1.41;
+        text-decoration: none;
+        color: #00095f;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        margin-left: -1px;
+      }
+      > a.active {
+        background-color: #ccc;
+      }
+      &:first-child {
+        > a,
+        > span {
+          margin-left: 0;
+          @include border-left-radius(4px);
+        }
+      }
+      &:last-child {
+        > a,
+        > span {
+          @include border-right-radius(4px);
+        }
+      }
+    }
+
+    > li > a,
+    > li > span {
+      &:hover,
+      &:focus {
+        z-index: 3;
+        color: darken(#003a7d, 15%);
+        background-color: lighten(#000, 93.5%);
+        border-color: #ddd;
+      }
+    }
+
+    > .active > a,
+    > .active > span {
+      &,
+      &:hover,
+      &:focus {
+        z-index: 2;
+        color: #fff;
+        background-color: darken(#428bca, 6.5%);
+        border-color: darken(#428bca, 6.5%);
+        cursor: default;
+      }
+    }
+
+    > .disabled {
+      > span,
+      > span:hover,
+      > span:focus,
+      > a,
+      > a:hover,
+      > a:focus {
+        color: lighten(#000, 46.7%);
+        background-color: #fff;
+        border-color: #ddd;
+        cursor: not-allowed;
       }
     }
   }
