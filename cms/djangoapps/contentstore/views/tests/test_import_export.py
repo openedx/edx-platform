@@ -209,6 +209,19 @@ class ImportTestCase(CourseTestCase):
 
         return outside_tar
 
+    def _edx_platform_tar(self):
+        """
+        Tarfile with file that extracts to edx-platform directory.
+
+        Extracting this tarfile in directory <dir> will also put its contents
+        directly in <dir> (rather than <dir/tarname>).
+        """
+        outside_tar = self.unsafe_common_dir / "unsafe_file.tar.gz"
+        with tarfile.open(outside_tar, "w:gz") as tar:
+            tar.addfile(tarfile.TarInfo(os.path.join(os.path.abspath("."), "a_file")))
+
+        return outside_tar
+
     def test_unsafe_tar(self):
         """
         Check that safety measure work.
@@ -233,6 +246,12 @@ class ImportTestCase(CourseTestCase):
         try_tar(self._symlink_tar())
         try_tar(self._outside_tar())
         try_tar(self._outside_tar2())
+        try_tar(self._edx_platform_tar())
+
+        # test trying to open a tar outside of the normal data directory
+        with self.settings(DATA_DIR='/not/the/data/dir'):
+            try_tar(self._edx_platform_tar())
+
         # Check that `import_status` returns the appropriate stage (i.e.,
         # either 3, indicating all previous steps are completed, or 0,
         # indicating no upload in progress)
@@ -294,13 +313,19 @@ class ImportTestCase(CourseTestCase):
         self.assertIn(test_block3.url_name, children)
         self.assertIn(test_block4.url_name, children)
 
-        extract_dir = path(tempfile.mkdtemp())
+        extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
+        # the extract_dir needs to be passed as a relative dir to
+        # import_library_from_xml
+        extract_dir_relative = path.relpath(extract_dir, settings.DATA_DIR)
+
         try:
-            tar = tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz')
-            safetar_extractall(tar, extract_dir)
+            with tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz') as tar:
+                safetar_extractall(tar, extract_dir)
             library_items = import_library_from_xml(
-                self.store, self.user.id,
-                settings.GITHUB_REPO_ROOT, [extract_dir / 'library'],
+                self.store,
+                self.user.id,
+                settings.GITHUB_REPO_ROOT,
+                [extract_dir_relative / 'library'],
                 load_error_modules=False,
                 static_content_store=contentstore(),
                 target_id=lib_key
