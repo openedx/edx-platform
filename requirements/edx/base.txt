@@ -128,7 +128,7 @@ ddt==0.8.0
 diff-cover==0.7.3
 django-crum==0.6.1
 django_nose==1.4.1
-factory_boy==2.5.2
+factory_boy==2.4.1
 flaky==2.0.3
 freezegun==0.1.11
 lettuce==0.2.20
