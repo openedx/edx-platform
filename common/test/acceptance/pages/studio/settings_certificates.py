@@ -131,9 +131,11 @@ class CertificatesPage(CoursePage):
     def click_confirmation_prompt_primary_button(self):
         """
         Clicks the main action presented by the prompt (such as 'Delete')
+        We need to use Javascript here because the confirmation prompt is a CSS transition
         """
         self.wait_for_confirmation_prompt()
-        self.q(css='a.button.action-primary').first.click()
+        jquery_cmd = "$('a.button.action-primary').focus().click()"
+        self.browser.execute_script(jquery_cmd)
         self.wait_for_ajax()
 
 
