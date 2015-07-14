@@ -19,6 +19,7 @@ from courseware import courses
 from embargo import api as embargo_api
 from enrollment.api import add_enrollment
 from enrollment.views import EnrollmentCrossDomainSessionAuth
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
@@ -62,6 +63,22 @@ class BasketsView(APIView):
         """ Enroll the user in the course. """
         add_enrollment(user.username, unicode(course_key))
 
+    def _handle_marketing_opt_in(self, request, course_key, user):
+        """
+        Handle the marketing email opt-in flag, if it was set.
+
+        Errors here aren't expected, but should not break the outer enrollment transaction.
+        """
+        email_opt_in = request.DATA.get('email_opt_in', None)
+        if email_opt_in is not None:
+            try:
+                update_email_opt_in(user, course_key.org, email_opt_in)
+            except Exception:  # pylint: disable=broad-except
+                # log the error, return silently
+                log.exception(
+                    'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
+                )
+
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
         Attempt to create the basket and enroll the user.
@@ -96,6 +113,7 @@ class BasketsView(APIView):
                                                   username=user.username)
             log.debug(msg)
             self._enroll(course_key, user)
+            self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
 
         # Setup the API
@@ -108,6 +126,8 @@ class BasketsView(APIView):
             log.debug(msg)
             return DetailResponse(msg)
 
+        response = None
+
         # Make the API call
         try:
             response_data = api.baskets.post({
@@ -118,12 +138,12 @@ class BasketsView(APIView):
             payment_data = response_data["payment_data"]
             if payment_data:
                 # Pass data to the client to begin the payment flow.
-                return JsonResponse(payment_data)
+                response = JsonResponse(payment_data)
             elif response_data['order']:
                 # The order was completed immediately because there is no charge.
                 msg = Messages.ORDER_COMPLETED.format(order_number=response_data['order']['number'])
                 log.debug(msg)
-                return DetailResponse(msg)
+                response = DetailResponse(msg)
             else:
                 msg = u'Unexpected response from basket endpoint.'
                 log.error(
@@ -142,6 +162,9 @@ class BasketsView(APIView):
                 processor_name=None,
                 user_id=user.id
             )
+
+        self._handle_marketing_opt_in(request, course_key, user)
+        return response
 
 
 class BasketOrderView(APIView):
