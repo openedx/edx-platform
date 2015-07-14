@@ -9,8 +9,6 @@ from sets import Set
 
 import django_comment_client.utils as utils
 import newrelic.agent
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -19,12 +17,24 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseServerError
-from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
+from django.shortcuts import render_to_response
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from django_comment_client.constants import TYPE_ENTRY
+from django.views.decorators.http import require_GET
+import newrelic.agent
+
+from courseware.courses import get_course_with_access
+from openedx.core.djangoapps.course_groups.cohorts import (
+    is_commentable_cohorted,
+    get_cohorted_commentables,
+    get_cohort_id,
+    get_cohorted_threads_privacy,
+)
+from courseware.access import has_access
+
 from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
     available_division_schemes,
@@ -45,10 +55,6 @@ from xmodule.modulestore.django import modulestore
 
 import lms.lib.comment_client as cc
 from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
-from openedx.core.djangoapps.course_groups.cohorts import (
-    get_cohort_id,
-    get_cohorted_threads_privacy,
-)
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 log = logging.getLogger("edx.discussions")
@@ -148,17 +154,26 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
+    is_cohorted = is_commentable_cohorted(course.id, discussion_id)
 
-    if group_id == "all":
+    if group_id in ("all", "None"):
         group_id = None
 
-    if not group_id:
-        if not has_permission(request.user, "see_all_cohorts", course.id):
-            group_id = get_cohort_id(request.user, course.id)
-            if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
-                default_query_params['exclude_groups'] = True
+
+    if not has_permission(request.user, "see_all_cohorts", course.id):
+        group_id = get_cohort_id(request.user, course.id)
+        if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
+            default_query_params['exclude_groups'] = True
 
     if group_id:
+        group_id = int(group_id)
+        try:
+            CourseUserGroup.objects.get(course_id=course.id, id=group_id)
+        except CourseUserGroup.DoesNotExist:
+            if not is_cohorted:
+                group_id = None
+            else:
+                raise ValueError("Invalid Group ID")
         default_query_params["group_id"] = group_id
 
     #so by default, a moderator sees all items, and a student sees his cohort
@@ -180,6 +195,9 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
             )
         )
     )
+
+    if not is_cohorted:
+        query_params.pop('group_id', None)
 
     paginated_results = cc.Thread.search(query_params)
     threads = paginated_results.collection
