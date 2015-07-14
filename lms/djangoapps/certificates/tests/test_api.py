@@ -229,13 +229,13 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
 
 @attr('shard_1')
 @ddt.ddt
-class CertificateGenerationEnabledTest(TestCase):
+class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
     def setUp(self):
-        super(CertificateGenerationEnabledTest, self).setUp()
+        super(CertificateGenerationEnabledTest, self).setUp('certificates.api.tracker')
 
         # Since model-based configuration is cached, we need
         # to clear the cache before each test.
@@ -256,6 +256,12 @@ class CertificateGenerationEnabledTest(TestCase):
 
         if is_course_enabled is not None:
             certs_api.set_cert_generation_enabled(self.COURSE_KEY, is_course_enabled)
+            cert_event_type = 'enabled' if is_course_enabled else 'disabled'
+            event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
+            self.assert_event_emitted(
+                event_name,
+                course_id=unicode(self.COURSE_KEY),
+            )
 
         self._assert_enabled_for_course(self.COURSE_KEY, expect_enabled)
 
