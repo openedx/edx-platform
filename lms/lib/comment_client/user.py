@@ -190,7 +190,7 @@ def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, t
         params.update({'thread_ids': ",".join(thread_ids)})
 
     response = perform_request(
-        'post',
+        'get',
         url,
         params
     )
