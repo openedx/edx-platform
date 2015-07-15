@@ -440,7 +440,11 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             {
                 "id": self.PROVIDER_ID,
                 "display_name": self.PROVIDER_NAME,
+                "url": self.PROVIDER_URL,
                 "status_url": self.PROVIDER_STATUS_URL,
+                "description": self.PROVIDER_DESCRIPTION,
+                "enable_integration": self.ENABLE_INTEGRATION,
+                "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS
             }
         ])
 
@@ -452,25 +456,25 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         result = api.get_credit_providers()
         self.assertEqual(result, [])
 
-    def test_get_credit_provider_details(self):
+    def test_get_credit_providers_details(self):
         """Test that credit api method 'test_get_credit_provider_details'
         returns dictionary data related to provided credit provider.
         """
-        expected_result = {
-            "provider_id": self.PROVIDER_ID,
+        expected_result = [{
+            "id": self.PROVIDER_ID,
             "display_name": self.PROVIDER_NAME,
-            "provider_url": self.PROVIDER_URL,
-            "provider_status_url": self.PROVIDER_STATUS_URL,
-            "provider_description": self.PROVIDER_DESCRIPTION,
+            "url": self.PROVIDER_URL,
+            "status_url": self.PROVIDER_STATUS_URL,
+            "description": self.PROVIDER_DESCRIPTION,
             "enable_integration": self.ENABLE_INTEGRATION,
-            "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS
-        }
-        result = api.get_credit_provider_info(self.PROVIDER_ID)
+            "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS,
+        }]
+        result = api.get_credit_providers([self.PROVIDER_ID])
         self.assertEqual(result, expected_result)
 
         # now test that user gets empty dict for non existent credit provider
-        result = api.get_credit_provider_info('fake_provider_id')
-        self.assertEqual(result, {})
+        result = api.get_credit_providers(['fake_provider_id'])
+        self.assertEqual(result, [])
 
     def test_credit_request(self):
         # Initiate a credit request
