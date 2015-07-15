@@ -5,32 +5,9 @@
 <%block name="pagetitle">${_("Please Wait")}</%block>
 
 <%block name="headextra">
-
-    <script>
-        (function (require, define) {
-            'use strict';
-            define("js/student_account/views/finish_auth_factory",
-                [
-                    'jquery', 'underscore', 'backbone',
-                    'js/student_account/views/FinishAuthView'
-                ],
-                function ($, _, Backbone, FinishAuthView) {
-                    return function() {
-                        var view = new FinishAuthView({});
-                        view.render();
-                    };
-                }
-            );
-
-            require(["js/student_account/views/finish_auth_factory"],
-                function (factory) {
-                    factory();
-                }
-            );
-
-        }).call(this, require || RequireJS.require, define || RequireJS.define);
-    </script>
-
+<%static:require_module module_name="js/student_account/views/finish_auth_factory" class_name="FinishAuthFactory">
+    FinishAuthFactory();
+</%static:require_module>
 </%block>
 
 <div class="finish-auth">
