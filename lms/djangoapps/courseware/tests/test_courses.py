@@ -17,9 +17,12 @@ from courseware.courses import (
     get_course_by_id, get_cms_course_link, course_image_url,
     get_course_info_section, get_course_about_section, get_cms_block_link
 )
+
+from courseware.courses import get_course_with_access
 from courseware.module_render import get_module_for_descriptor
 from courseware.tests.helpers import get_request_for_user
 from courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore import ModuleStoreEnum
@@ -52,6 +55,16 @@ class CoursesTest(ModuleStoreTestCase):
         self.assertEqual(cms_url, get_cms_course_link(self.course))
         cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.location))
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
+
+    def test_get_course_with_access(self):
+        user = UserFactory.create()
+        course = CourseFactory.create(visible_to_staff_only=True)
+
+        with self.assertRaises(CoursewareAccessException) as error:
+            get_course_with_access(user, 'load', course.id)
+        self.assertEqual(error.exception.message, "Course not found.")
+        self.assertEqual(error.exception.access_response.error_code, "not_visible_to_user")
+        self.assertFalse(error.exception.access_response.has_access)
 
 
 @attr('shard_1')
