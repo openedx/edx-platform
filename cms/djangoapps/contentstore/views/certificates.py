@@ -35,6 +35,7 @@ from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from eventtracking import tracker
 from student.auth import has_studio_write_access
+from student.roles import GlobalStaff
 from util.db import generate_int_id, MYSQL_MAX_INT
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
@@ -293,6 +294,9 @@ def certificate_activation_handler(request, course_key_string):
     POST
         json: is_active. update the activation state of certificate
     """
+    # Only global staff (PMs) are able to activate/deactivate certificate configuration
+    if not GlobalStaff().has_user(request.user):
+        raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     try:
@@ -452,6 +456,10 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
         return JsonResponse(serialized_certificate, status=201)
 
     elif request.method == "DELETE":
+        # Only global staff (PMs) are able to activate/deactivate certificate configuration
+        if not GlobalStaff().has_user(request.user):
+            raise PermissionDenied()
+
         if not match_cert:
             return JsonResponse(status=404)
         CertificateManager.remove_certificate(

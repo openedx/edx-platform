@@ -10,8 +10,8 @@ class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.
     """
-    def setUp(self, is_staff=False):
-        super(CertificatesTest, self).setUp(is_staff)
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(CertificatesTest, self).setUp(is_staff=True)
         self.certificates_page = CertificatesPage(
             self.browser,
             self.course_info['org'],
@@ -131,7 +131,6 @@ class CertificatesTest(StudioCourseTest):
         # Delete the certificate we just created
         certificate.click_delete_certificate_button()
         self.certificates_page.click_confirmation_prompt_primary_button()
-        self.certificates_page.wait_for_first_certificate_button()
 
         # Reload the page and confirm there are no certificates
         self.certificates_page.visit()
