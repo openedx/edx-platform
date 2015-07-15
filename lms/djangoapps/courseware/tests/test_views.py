@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import MagicMock, patch, create_autospec, Mock
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from pytz import UTC
 from xblock.core import XBlock
@@ -187,6 +188,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.enrollment.created = self.date
         self.enrollment.save()
         self.request_factory = RequestFactory()
+        self.request = self.request_factory.get("foo")
+        self.request.user = self.user
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
 
@@ -280,6 +283,19 @@ class ViewsTestCase(ModuleStoreTestCase):
             request_url = '/'.join(url_parts_copy)
             response = self.client.get(request_url)
             self.assertEqual(response.status_code, 404)
+
+    def test_syllabus(self):
+        """
+        Tests syllabus.html
+        """
+        request = self.request_factory.get("foo")
+        request.user = self.user
+        MakoMiddleware().process_request(request)
+        result = views.syllabus(self.request, self.course.id.to_deprecated_string())
+        self.assertContains(result, "<!DOCTYPE html>")
+        self.assertContains(result, "<h1>Syllabus</h1>")
+        self.assertRaises(Http404, views.syllabus, self.request, 'edX/toy/TT_2012_Fall')
+        self.assertRaises(InvalidKeyError, views.syllabus, self.request, 'invalid_key')
 
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))

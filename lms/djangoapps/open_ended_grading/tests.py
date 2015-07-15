@@ -34,7 +34,7 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
 
-from open_ended_grading import staff_grading_service, views, utils
+from open_ended_grading import staff_grading_service, open_ended_notifications, views, utils
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -586,3 +586,17 @@ class TestTabs(ModuleStoreTestCase):
     def test_tabs_disabled(self, tab):
         self._enable_xblock_disable_config(True)
         self.assertFalse(tab.is_enabled(self.course))
+
+
+class TestNotifications(ModuleStoreTestCase):
+    """
+    Test open ended notifications.
+    """
+    def setUp(self):
+        super(TestNotifications, self).setUp()
+        self.user = factories.UserFactory()
+        self.course = CourseFactory(advanced_modules=('combinedopenended'))
+
+    def test_combined_notifications(self):
+        result = open_ended_notifications.combined_notifications(self.course, self.user)
+        self.assertFalse(result['pending_grading'])
