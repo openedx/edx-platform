@@ -52,7 +52,7 @@ class CourseOverview(django.db.models.Model):
     cert_name_long = TextField()
 
     # Grading
-    lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2)
+    lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2, null=True)
 
     # Access parameters
     days_early_for_beta = FloatField(null=True)
@@ -77,6 +77,16 @@ class CourseOverview(django.db.models.Model):
         from lms.djangoapps.certificates.api import get_active_web_certificate
         from lms.djangoapps.courseware.courses import course_image_url
 
+        # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
+        # If the course has a malformed grading policy such that
+        # course._grading_policy['GRADE_CUTOFFS'] = {}, then
+        # course.lowest_passing_grade will raise a ValueError.
+        # Work around this for now by defaulting to None.
+        try:
+            lowest_passing_grade = course.lowest_passing_grade
+        except ValueError:
+            lowest_passing_grade = None
+
         return CourseOverview(
             id=course.id,
             _location=course.location,
@@ -98,7 +108,7 @@ class CourseOverview(django.db.models.Model):
             has_any_active_web_certificate=(get_active_web_certificate(course) is not None),
             cert_name_short=course.cert_name_short,
             cert_name_long=course.cert_name_long,
-            lowest_passing_grade=course.lowest_passing_grade,
+            lowest_passing_grade=lowest_passing_grade,
             end_of_course_survey_url=course.end_of_course_survey_url,
 
             days_early_for_beta=course.days_early_for_beta,

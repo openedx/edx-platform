@@ -294,3 +294,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             # which causes get_from_id to raise an IOError.
             with self.assertRaises(IOError):
                 CourseOverview.get_from_id(course.id)
+
+    def test_malformed_grading_policy(self):
+        """
+        Test that CourseOverview handles courses with a malformed grading policy
+        such that course._grading_policy['GRADE_CUTOFFS'] = {} by defaulting
+        .lowest_passing_grade to None.
+
+        Created in response to https://openedx.atlassian.net/browse/TNL-2806.
+        """
+        course = CourseFactory.create()
+        course._grading_policy['GRADE_CUTOFFS'] = {}  # pylint: disable=protected-access
+        with self.assertRaises(ValueError):
+            __ = course.lowest_passing_grade
+        course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
+        self.assertEqual(course_overview.lowest_passing_grade, None)
