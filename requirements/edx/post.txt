@@ -1,0 +1,12 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @mollydb - to check licensing
+#   * support@edx.org - to check system requirements
+
+# This needs to be installed *after* lxml, which is in base.txt.
+# python-saml pulls in lxml as a dependency, and due to a bug in setuptools,
+# trying to compile lxml as a dependency causes setuptools to go into an
+# infinite loop and run out of memory. Because why would you trust a
+# dependency management tool to manage dependencies for you?
+python-saml==2.1.3
