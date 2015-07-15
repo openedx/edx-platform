@@ -1,11 +1,11 @@
 .. _User Accounts API:
 
 ##################################################
-User Accounts API
+User API User Accounts Resource
 ##################################################
 
-This page contains information on using the User Accounts API to
-complete the following actions.
+With the User API **User Accounts** resource, you can complete the following
+tasks.
 
 * `Get and Update the User's Account Information`_
 
@@ -31,7 +31,7 @@ Get and Update the User's Account Information
       "name": "John Doe", 
       "language": "", 
       "gender": "m", 
-      "year_of_birth": 1997, 
+      "year_of_birth": 1987, 
       "level_of_education": "m", 
       "goals": "Professional Development", 
       "country": US, 

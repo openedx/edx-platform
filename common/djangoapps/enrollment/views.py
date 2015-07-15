@@ -319,17 +319,16 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
               A POST request can include the following parameters.
 
-              * user: The username of the currently logged in user. Optional.
+              * user: Optional. The username of the currently logged in user.
                 You cannot use the command to enroll a different user.
 
-              * mode: The course mode for the enrollment. Individual users
-                cannot upgrade their enrollment mode from 'honor'. Only
+              * mode: Optional. The course mode for the enrollment. Individual
+                users cannot upgrade their enrollment mode from 'honor'. Only
                 server-to-server requests can enroll with other modes.
-                Optional.
 
-              * is_active: A Boolean value indicating whether the enrollment
-                is active. Only server-to-server requests are allowed to
-                deactivate an enrollment. Optional.
+              * is_active: Optional. A Boolean value indicating whether the
+                enrollment is active. Only server-to-server requests are
+                allowed to deactivate an enrollment.
 
               * course details: A collection that includes the following
                 information.
@@ -340,7 +339,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 the user wants to receive email from the organization that runs
                 this course.
 
-              * enrollment_attributes: A list of dictionary that contains:
+              * enrollment_attributes: A dictionary that contains the following
+                values.
 
                   * namespace: Namespace of the attribute
                   * name: Name of the attribute

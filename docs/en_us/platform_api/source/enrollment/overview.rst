@@ -34,7 +34,7 @@ The Enrollment API supports the following tasks, methods, and endpoints.
        <Get the Users Enrollment Status in a Course>`
      - GET
      - /api/enrollment/v1/enrollment/{user_id},{course_id}
-   * - :ref:`Get enrollment details for a course
+   * - :ref:`Get the user's enrollment information for a course
        <Get Enrollment Details for a Course>`
      - GET
      - /api/enrollment/v1/course/{course_id}

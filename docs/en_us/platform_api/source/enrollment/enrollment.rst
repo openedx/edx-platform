@@ -1,12 +1,13 @@
-##################################################
-Enrollment API 
-##################################################
+###################################
+Enrollment API Enrollment Resource 
+###################################
 
-You can use the Enrollment API to complete the following tasks.
+With the Enrollment API **Enrollment** resource, you can complete the
+following tasks.
 
 * :ref:`Get the user's enrollment status in a course <Get the Users Enrollment
   Status in a Course>`.
-* :ref:`Get enrollment details for a course<Get Enrollment Details for a
+* :ref:`Get the user's enrollment information for a course<Get Enrollment Details for a
   Course>`.
 * :ref:`View a user's enrollments <View and add to a Users Course
   Enrollments>`.
@@ -93,9 +94,9 @@ Get the User's Enrollment Information for a Course
 
 .. _View and add to a Users Course Enrollments:
 
-*********************************************
-View and Add to a User's Course Enrollments
-*********************************************
+**********************************************************
+View a User's Enrollments or Enroll a User in a Course
+**********************************************************
 
 .. autoclass:: enrollment.views.EnrollmentListView
 

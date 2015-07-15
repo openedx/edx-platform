@@ -1,11 +1,12 @@
 ##################################################
-Mobile Course Information API Resource
+Mobile API Course Information Resource
 ##################################################
 
-With the Mobile Course Information API resource, you can complete the following tasks.
+With the Mobile API **Course Information** resource, you can complete the
+following tasks.
 
-* - :ref:`Get updates about a course<Get Course Updates>`.
-* - :ref:`Get a list of course handouts<Get Course Handouts>`.
+* :ref:`Get updates about a course<Get Course Updates>`.
+* :ref:`Get a list of course handouts<Get Course Handouts>`.
   
 .. _Get Course Updates:
 

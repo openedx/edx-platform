@@ -8,6 +8,6 @@ Mobile API Version 0.5
     :maxdepth: 2
     
     overview
-    users
     course_info
+    users
     video_outlines
