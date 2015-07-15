@@ -19,22 +19,30 @@ class UserTests(TestCase):
     """ Tests for User model """
     @ddt.unpack
     @ddt.data(
-        (CourseLocator(TEST_ORG, TEST_COURSE_ID, TEST_RUN), None, None, {}),
-        (CourseLocator(TEST_ORG, TEST_COURSE_ID, TEST_RUN), datetime(2015, 01, 01), None, {'1': 1}),
-        (CourseLocator("edX", "DemoX", "now"), datetime(2014, 12, 03, 18, 15, 44), None, {'1': {'num_threads': 10}}),
-        (CourseLocator("edX", "DemoX", "now"), datetime(2016, 03, 17, 22, 54, 03), 'discussion', {}),
-        (CourseLocator("Umbrella", "ZMB101", "T1"), datetime(2016, 03, 17, 22, 54, 03), 'question', {'num_threads': 5}),
+        (CourseLocator(TEST_ORG, TEST_COURSE_ID, TEST_RUN), None, None, None, {}),
+        (CourseLocator(TEST_ORG, TEST_COURSE_ID, TEST_RUN), datetime(2015, 01, 01), None, None, {'1': 1}),
+        (CourseLocator("edX", "DemoX", "now"), datetime(2014, 12, 03, 18, 15, 44), None, [1, 2, 3], {
+            '1': {'num_threads': 10}
+        }),
+        (CourseLocator("edX", "DemoX", "now"), datetime(2016, 03, 17, 22, 54, 03), 'discussion', [2, 4, 5], {}),
+        (CourseLocator("Umbrella", "ZMB101", "T1"), datetime(2016, 03, 17, 22, 54, 03), 'question', None, {
+            'num_threads': 5
+        }),
     )
-    def test_all_social_stats_sends_correct_request(self, course_key, end_date, thread_type, expected_result):
+    def test_all_social_stats_sends_correct_request(
+            self, course_key, end_date, thread_type, thread_ids, expected_result
+    ):
         """
         Tests that all_social_stats classmethod invokes get_user_social_stats with correct parameters
         when optional parameters are explicitly specified
         """
         with mock.patch("lms.lib.comment_client.user.get_user_social_stats") as patched_stats:
             patched_stats.return_value = expected_result
-            result = User.all_social_stats(course_key, end_date, thread_type)
+            result = User.all_social_stats(course_key, end_date, thread_type, thread_ids)
             self.assertEqual(result, expected_result)
-            patched_stats.assert_called_once_with('*', course_key, end_date=end_date, thread_type=thread_type)
+            patched_stats.assert_called_once_with(
+                '*', course_key, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids,
+            )
 
     def test_all_social_stats_defaults(self):
         """
@@ -45,7 +53,7 @@ class UserTests(TestCase):
             patched_stats.return_value = {}
             course_key = CourseLocator("edX", "demoX", "now")
             User.all_social_stats(course_key)
-            patched_stats.assert_called_once_with('*', course_key, end_date=None, thread_type=None)
+            patched_stats.assert_called_once_with('*', course_key, end_date=None, thread_type=None, thread_ids=None)
 
 
 @ddt.ddt
