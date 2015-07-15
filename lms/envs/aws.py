@@ -678,3 +678,8 @@ if FEATURES.get('ENABLE_LTI_PROVIDER'):
 
 ##################### Credit Provider help link ####################
 CREDIT_HELP_LINK_URL = ENV_TOKENS.get('CREDIT_HELP_LINK_URL', CREDIT_HELP_LINK_URL)
+
+
+#### JWT configuration ####
+JWT_ISSUER = ENV_TOKENS.get('JWT_ISSUER', JWT_ISSUER)
+JWT_EXPIRATION = ENV_TOKENS.get('JWT_EXPIRATION', JWT_EXPIRATION)
