@@ -9,7 +9,7 @@ var edx = edx || {};
     edx.student.account.EnrollmentInterface = {
 
         urls: {
-            baskets: '/commerce/baskets/',
+            baskets: '/api/commerce/v0/baskets/',
         },
 
         headers: {

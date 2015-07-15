@@ -83,7 +83,7 @@ var edx = edx || {};
          * @return {object}                 JQuery Promise.
          */
         getReceiptData: function (basketId) {
-            var urlFormat = this.useEcommerceApi ? '/commerce/baskets/%s/order/' : '/shoppingcart/receipt/%s/';
+            var urlFormat = this.useEcommerceApi ? '/api/commerce/v0/baskets/%s/order/' : '/shoppingcart/receipt/%s/';
 
             return $.ajax({
                 url: _.sprintf(urlFormat, basketId),
