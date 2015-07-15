@@ -20,6 +20,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
@@ -491,6 +492,23 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         )
         self.assertEqual(response.status_code, 403)
 
+    def test_delete_certificate_without_global_staff_permissions(self):
+        """
+        Tests certificate deletion without global staff permission on course.
+        """
+        self._add_course_certificates(count=2, signatory_count=1)
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
+        self.client.login(username=user.username, password='test')
+        response = self.client.delete(
+            self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 403)
+
     def test_delete_non_existing_certificate(self):
         """
         Try to delete a non existing certificate. It should return status code 404 Not found.
@@ -595,6 +613,27 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
         self._add_course_certificates(count=1, signatory_count=2)
         user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.post(
+            test_url,
+            data=json.dumps({"is_active": activate}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEquals(response.status_code, 403)
+
+    @ddt.data(True, False)
+    def test_certificate_activation_without_global_staff_permissions(self, activate):
+        """
+        Tests certificate Activate and Deactivate should not be allowed if user
+        does not have global staff permissions on course.
+        """
+        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        self._add_course_certificates(count=1, signatory_count=2)
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
         self.client.login(username=user.username, password='test')
         response = self.client.post(
             test_url,
