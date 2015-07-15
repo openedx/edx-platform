@@ -329,8 +329,9 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
 
 def discussion_category_id_access(course, user, discussion_id):
     """
-    Returns True iff the given discussion_id is accessible for user in course. Uses the discussion id cache if available
-    falling back to get_discussion_categories_ids if there is no cache.
+    Returns True iff the given discussion_id is accessible for user in course.
+    Uses the discussion id cache if available, falling back to
+    get_discussion_categories_ids if there is no cache.
     """
     if discussion_id in course.top_level_discussion_topic_ids:
         return True
