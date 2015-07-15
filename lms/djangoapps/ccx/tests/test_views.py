@@ -19,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from request_cache.middleware import RequestCache
 from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
 from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
@@ -500,26 +501,6 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         role.add_users(coach)
         ccx = CcxFactory(course_id=course.id, coach=self.coach)
 
-        # Apparently the test harness doesn't use LmsFieldStorage, and I'm not
-        # sure if there's a way to poke the test harness to do so.  So, we'll
-        # just inject the override field storage in this brute force manner.
-        OverrideFieldData.provider_classes = None
-        # pylint: disable=protected-access
-        for block in iter_blocks(course):
-            block._field_data = OverrideFieldData.wrap(coach, course, block._field_data)
-            new_cache = {'tabs': [], 'discussion_topics': []}
-            if 'grading_policy' in block._field_data_cache:
-                new_cache['grading_policy'] = block._field_data_cache['grading_policy']
-            block._field_data_cache = new_cache
-
-        def cleanup_provider_classes():
-            """
-            After everything is done, clean up by un-doing the change to the
-            OverrideFieldData object that is done during the wrap method.
-            """
-            OverrideFieldData.provider_classes = None
-        self.addCleanup(cleanup_provider_classes)
-
         # override course grading policy and make last section invisible to students
         override_field_for_ccx(ccx, course, 'grading_policy', {
             'GRADER': [
@@ -558,9 +539,13 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.client.login(username=coach.username, password="test")
 
+        self.addCleanup(RequestCache.clear_request_cache)
+
     @patch('ccx.views.render_to_response', intercept_renderer)
     def test_gradebook(self):
         self.course.enable_ccx = True
+        RequestCache.clear_request_cache()
+
         url = reverse(
             'ccx_gradebook',
             kwargs={'course_id': self.ccx_key}
@@ -577,6 +562,8 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_grades_csv(self):
         self.course.enable_ccx = True
+        RequestCache.clear_request_cache()
+
         url = reverse(
             'ccx_grades_csv',
             kwargs={'course_id': self.ccx_key}
@@ -588,11 +575,11 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             response.content.strip().split('\n')
         )
         data = dict(zip(headers, row))
+        self.assertTrue('HW 04' not in data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')
         self.assertEqual(data['HW 03'], '0.25')
         self.assertEqual(data['HW Avg'], '0.5')
-        self.assertTrue('HW 04' not in data)
 
     @patch('courseware.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
