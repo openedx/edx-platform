@@ -528,3 +528,6 @@ AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
+
+# Enable the Full Course/Library Import/Export API
+FEATURES['ENABLE_IMPORT_EXPORT_LMS'] = True
