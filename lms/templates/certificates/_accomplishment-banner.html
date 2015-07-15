@@ -76,7 +76,7 @@ from django.core.urlresolvers import reverse
                         </button>
                       %endif
                       % if share_settings.get('CERTIFICATE_TWITTER', False):
-                      <% twitter_url = 'https://twitter.com/intent/tweet?text=' + twitter_share_text + '&url='+ share_url%>
+                      <% twitter_url = 'https://twitter.com/intent/tweet?text=' + twitter_share_text + '&url='+ urllib.quote_plus(share_url)%>
                         <button data-tooltip="${_('Share on Twitter')}"
                           class="action action-share-twitter btn btn-overlay btn-small icon-only"
                           title="${_('Share on Twitter')}"
