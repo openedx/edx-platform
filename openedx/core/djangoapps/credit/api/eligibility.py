@@ -13,6 +13,8 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility,
 )
 
+from opaque_keys.edx.keys import CourseKey
+
 
 log = logging.getLogger(__name__)
 
@@ -182,13 +184,13 @@ def get_eligibilities_for_user(username, course_key=None):
 
     """
     eligibilities = CreditEligibility.get_user_eligibilities(username)
-
     if course_key:
-        eligibilities = eligibilities.filter(course_key=course_key)
+        course_key = CourseKey.from_string(unicode(course_key))
+        eligibilities = eligibilities.filter(course__course_key=course_key)
 
     return [
         {
-            "course_key": eligibility.course.course_key,
+            "course_key": unicode(eligibility.course.course_key),
             "deadline": eligibility.deadline,
         }
         for eligibility in eligibilities
