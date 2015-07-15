@@ -99,7 +99,6 @@ class CoursesApiTests(ModuleStoreTestCase):
             mock_request,
             problem.location,
             field_data_cache,
-            course.id
         )
         return module
 
