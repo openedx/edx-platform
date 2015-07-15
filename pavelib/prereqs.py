@@ -20,7 +20,6 @@ PYTHON_REQ_FILES = [
     'requirements/edx/github.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
-    'requirements/edx/post.txt',
 ]
 
 # Developers can have private requirements, for local copies of github repos,
