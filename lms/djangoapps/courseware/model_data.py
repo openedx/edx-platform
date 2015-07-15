@@ -823,7 +823,7 @@ class FieldDataCache(object):
         return scope_map
 
     @contract(key=DjangoKeyValueStore.Key)
-    def get(self, key, remote=False):
+    def get(self, key):
         """
         Load the field value specified by `key`.
 
@@ -834,7 +834,7 @@ class FieldDataCache(object):
         Raises: KeyError if key isn't found in the cache
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and remote == False:
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and key.query is None:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
