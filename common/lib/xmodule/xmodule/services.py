@@ -4,10 +4,6 @@ Module contains various XModule/XBlock services
 from django.conf import settings
 
 import types
-import edx_notifications.lib.publisher as notifications_publisher_lib
-import edx_notifications.lib.consumer as notifications_consumer_lib
-
-from xmodule.modulestore.django import modulestore
 
 
 class SettingsService(object):
@@ -100,6 +96,9 @@ class NotificationsService(object):
         Class initializer, which just inspects the libraries and exposes the same functions
         as a direct pass through
         """
+        # Avoids chicken-and-egg problem during tests.
+        import edx_notifications.lib.publisher as notifications_publisher_lib
+        import edx_notifications.lib.consumer as notifications_consumer_lib
 
         self._bind_to_module_functions(notifications_publisher_lib)
         self._bind_to_module_functions(notifications_consumer_lib)
@@ -135,7 +134,8 @@ class CoursewareParentInfoService(object):
         """
         Returns the location and display name of the parent
         """
-
+        # Avoids chicken-and-egg problem during tests.
+        from xmodule.modulestore.django import modulestore
         parent_location = modulestore().get_parent_location(module)
         parent_module = modulestore().get_item(parent_location)
 
