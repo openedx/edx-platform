@@ -51,7 +51,7 @@ class MongoContentStore(ContentStore):
         """
         Closes any open connections to the underlying databases
         """
-        self.fs_files.database.connection.close()
+        self.fs_files.database.client.close()
 
     def _drop_database(self):
         """
@@ -59,7 +59,7 @@ class MongoContentStore(ContentStore):
         Intended to be used by test code for cleanup.
         """
         self.close_connections()
-        self.fs_files.database.connection.drop_database(self.fs_files.database)
+        self.fs_files.database.client.drop_database(self.fs_files.database)
 
     def save(self, content):
         content_id, content_son = self.asset_db_key(content.location)
@@ -196,9 +196,9 @@ class MongoContentStore(ContentStore):
             items = self.fs_files.find(query)
             assets_to_delete = assets_to_delete + items.count()
             for asset in items:
-                self.fs.delete(asset[prefix])
+                self.fs.delete_one(asset[prefix])
 
-            self.fs_files.remove(query)
+            self.fs_files.delete_many(query)
         return assets_to_delete
 
     def _get_all_content_for_course(self,
@@ -279,7 +279,7 @@ class MongoContentStore(ContentStore):
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key, __ = self.asset_db_key(location)
         # catch upsert error and raise NotFoundError if asset doesn't exist
-        result = self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
+        result = self.fs_files.update_one({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
         if not result.get('updatedExisting', True):
             raise NotFoundError(asset_db_key)
 

@@ -51,7 +51,7 @@ Markdown==2.2.1
 --allow-external meliae
 --allow-unverified meliae
 meliae==0.4.0
-mongoengine==0.7.10
+mongoengine==0.10.0
 networkx==1.7
 nose==1.3.3
 oauthlib==0.7.2
@@ -63,7 +63,7 @@ pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
 PyJWT==1.0.1
-pymongo==2.7.2
+pymongo==3.0.3
 pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
@@ -156,3 +156,4 @@ analytics-python==0.4.4
 # Needed for mailchimp(mailing djangoapp)
 mailsnake==1.6.2
 jsonfield==1.0.3
+blinker
