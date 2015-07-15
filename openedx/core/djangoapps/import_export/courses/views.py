@@ -231,9 +231,9 @@ class FullCourseImportExport(APIView):
                     "error": True,
                     "error_message": str(exc),
                     "failed_module":
-                    str(failed_item.location) if failed_item else None,
+                    str(failed_item.location) if failed_item else "",
                     "unit":
-                    str(unit.location) if unit else None
+                    str(unit.location) if unit else ""
                 },
                 redirect_url=redirect_url
             )
@@ -247,7 +247,7 @@ class FullCourseImportExport(APIView):
                     "context_course": courselike_module.url_name,
                     "error": True,
                     "error_message": str(exc),
-                    "unit": None
+                    "unit": ""
                 },
                 redirect_url=redirect_url
             )
