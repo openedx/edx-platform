@@ -63,6 +63,7 @@ from certificates.api import (  # pylint: disable=import-error
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
@@ -867,7 +868,7 @@ def _credit_statuses(user, course_enrollments):
 
     statuses = {}
     for eligibility in credit_api.get_eligibilities_for_user(user.username):
-        course_key = eligibility["course_key"]
+        course_key = CourseKey.from_string(unicode(eligibility["course_key"]))
         status = {
             "course_key": unicode(course_key),
             "eligible": True,
