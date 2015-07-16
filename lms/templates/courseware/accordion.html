@@ -34,7 +34,9 @@
                     due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
               %>
               <p class="subtitle">${section['format']} ${due_date}</p>
-
+              % if section['is_proctored_enabled']:
+                <i class="fa fa-lock"></i>
+              % endif
               % if 'graded' in section and section['graded']:
                   <img src="/static/images/graded.png" alt="Graded Section">
               % endif
