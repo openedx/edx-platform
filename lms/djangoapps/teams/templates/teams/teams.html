@@ -28,7 +28,9 @@
         topics_url: '${ topics_url }',
         teams_url: '${ teams_url }',
         maxTeamSize: ${ course.teams_max_size },
-        course_id: '${ unicode(course.id) }'
+        course_id: '${ unicode(course.id) }',
+        languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
+        countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) }
     });
 </%static:require_module>
 </%block>

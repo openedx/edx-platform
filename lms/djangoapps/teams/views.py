@@ -21,6 +21,7 @@ from rest_framework import permissions
 
 from django.db.models import Count
 from django.contrib.auth.models import User
+from django_countries import countries
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 
@@ -96,7 +97,9 @@ class TeamsDashboardView(View):
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
             "topics_url": reverse('topics_list', request=request),
-            "teams_url": reverse('teams_list', request=request)
+            "teams_url": reverse('teams_list', request=request),
+            "languages": settings.ALL_LANGUAGES,
+            "countries": list(countries),
         }
         return render_to_response("teams/teams.html", context)
 

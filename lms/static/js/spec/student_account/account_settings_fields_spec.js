@@ -49,7 +49,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var selector = '.u-field-value > select';
                 var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                     valueAttribute: 'language',
-                    options: FieldViewsSpecHelpers.SELECT_OPTIONS
+                    options: FieldViewsSpecHelpers.SELECT_OPTIONS,
+                    persistChanges: true
                 });
 
                 var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
@@ -92,7 +93,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var selector = '.u-field-value > select';
                 var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                     valueAttribute: 'language_proficiencies',
-                    options: FieldViewsSpecHelpers.SELECT_OPTIONS
+                    options: FieldViewsSpecHelpers.SELECT_OPTIONS,
+                    persistChanges: true
                 });
                 fieldData.model.set({'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]}]});
 

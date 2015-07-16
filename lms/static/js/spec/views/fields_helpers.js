@@ -126,6 +126,37 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, "Do not reset this!");
         };
 
+        var verifyPersistence = function (fieldClass, requests) {
+            var fieldData = createFieldData(fieldClass, {
+                title: 'Username',
+                valueAttribute: 'username',
+                helpMessage: 'The username that you use to sign in to edX.',
+                validValue: 'My Name',
+                persistChanges: false,
+                messagePosition: 'header'
+            });
+            var view = new fieldClass(fieldData).render();
+            var valueInputSelector;
+
+            switch (fieldClass) {
+                case FieldViews.TextFieldView:
+                    valueInputSelector = '.u-field-value > input';
+                    break;
+                case FieldViews.DropdownFieldView:
+                    valueInputSelector = '.u-field-value > select';
+                    _.extend(fieldData, {validValue: SELECT_OPTIONS[0][0]});
+                    break;
+                case FieldViews.TextareaFieldView:
+                    valueInputSelector = '.u-field-value > textarea';
+                    break;
+            }
+
+            view.$(valueInputSelector).val(fieldData.validValue).change();
+            expect(view.fieldValue()).toBe(fieldData.validValue);
+            expectMessageContains(view, view.helpMessage);
+            expect(requests.length).toBe(0);
+        };
+
         var verifyEditableField = function (view, data, requests) {
             var request_data = {};
             var url = view.model.url;
@@ -230,6 +261,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             verifySuccessMessageReset: verifySuccessMessageReset,
             verifyEditableField: verifyEditableField,
             verifyTextField: verifyTextField,
-            verifyDropDownField: verifyDropDownField
+            verifyDropDownField: verifyDropDownField,
+            verifyPersistence: verifyPersistence
         };
     });

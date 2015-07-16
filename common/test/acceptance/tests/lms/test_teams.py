@@ -6,7 +6,7 @@ import json
 from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest
-from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage
+from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
 from ...pages.lms.tab_nav import TabNavPage
@@ -270,6 +270,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
 
     def create_teams(self, num_teams):
         """Create `num_teams` teams belonging to `self.topic`."""
@@ -455,3 +456,196 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             self.browse_teams_page.team_cards[0].find_element_by_css_selector('.member-count').text,
             '1 / 10 Members'
         )
+
+    def test_navigation_links(self):
+        """
+        Scenario: User should be able to navigate to "browse all teams" and "search team description" links.
+        Given I am enrolled in a course with a team configuration and a topic
+            containing one team
+        When I visit the Teams page for that topic
+        Then I should see the correct page header
+        And I should see the link to "browse all team"
+        And I should navigate to that link
+        And I see the relevant page loaded
+        And I should see the link to "search teams"
+        And I should navigate to that link
+        And I see the relevant page loaded
+        """
+        self.browse_teams_page.visit()
+        self.verify_page_header()
+
+        self.browse_teams_page.click_browse_all_teams_link()
+        self.assertTrue(self.topics_page.is_browser_on_page())
+
+        self.browse_teams_page.visit()
+        self.verify_page_header()
+        self.browse_teams_page.click_search_team_link()
+        # TODO Add search page expectation once that implemented.
+
+
+@attr('shard_5')
+class CreateTeamTest(TeamsTabBase):
+    """
+    Tests for creating a new Team within a Topic on the Teams page.
+    """
+
+    def setUp(self):
+        super(CreateTeamTest, self).setUp()
+        self.topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        self.browse_teams_page.visit()
+        self.create_team_page = CreateTeamPage(self.browser, self.course_id, self.topic)
+        self.team_name = 'Avengers'
+
+    def verify_page_header(self):
+        """
+        Verify that the page header correctly reflects the
+        create team header, description and breadcrumb.
+        """
+        self.assertEqual(self.create_team_page.header_page_name, 'Create a New Team')
+        self.assertEqual(
+            self.create_team_page.header_page_description,
+            'Create a new team if you can\'t find existing teams to join, '
+            'or if you would like to learn with friends you know.'
+        )
+        self.assertEqual(self.create_team_page.header_page_breadcrumbs, self.topic['name'])
+
+    def verify_and_navigate_to_create_team_page(self):
+        """Navigates to the create team page and verifies."""
+        self.browse_teams_page.click_create_team_link()
+        self.verify_page_header()
+
+    def fill_create_form(self):
+        """Fill the create team form fields with appropriate values."""
+        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name)
+        self.create_team_page.value_for_textarea_field(
+            field_id='description',
+            value='The Avengers are a fictional team of superheroes.'
+        )
+        self.create_team_page.value_for_dropdown_field(field_id='language', value='English')
+        self.create_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+
+    def test_user_can_see_create_team_page(self):
+        """
+        Scenario: The user should be able to see the create team page via teams list page.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Teams page for that topic
+        Then I should see the Create Team page link on bottom
+        And When I click create team link
+        Then I should see the create team page.
+        And I should see the create team header
+        And I should also see the help messages for fields.
+        """
+        self.verify_and_navigate_to_create_team_page()
+        self.assertEqual(
+            self.create_team_page.message_for_field('name'),
+            'A name that identifies your team (maximum 255 characters).'
+        )
+        self.assertEqual(
+            self.create_team_page.message_for_textarea_field('description'),
+            'A short description of the team to help other learners understand '
+            'the goals or direction of the team (maximum 300 characters).'
+        )
+        self.assertEqual(
+            self.create_team_page.message_for_field('country'),
+            'The country that team members primarily identify with.'
+        )
+        self.assertEqual(
+            self.create_team_page.message_for_field('language'),
+            'The language that team members primarily use to communicate with each other.'
+        )
+
+    def test_user_can_see_error_message_for_missing_data(self):
+        """
+        Scenario: The user should be able to see error message in case of missing required field.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        And When I click create team button without filling required fields
+        Then I should see the error message and highlighted fields.
+        """
+        self.verify_and_navigate_to_create_team_page()
+        self.create_team_page.submit_form()
+
+        self.assertEqual(
+            self.create_team_page.validation_message_text,
+            'Check the highlighted fields below and try again.'
+        )
+        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.create_team_page.error_for_field(field_id='description'))
+
+    def test_user_can_see_error_message_for_incorrect_data(self):
+        """
+        Scenario: The user should be able to see error message in case of increasing length for required fields.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        When I add text > than 255 characters for name field
+        And I click Create button
+        Then I should see the error message for exceeding length.
+        """
+        self.verify_and_navigate_to_create_team_page()
+
+        # Fill the name field with >255 characters to see validation message.
+        self.create_team_page.value_for_text_field(
+            field_id='name',
+            value='EdX is a massive open online course (MOOC) provider and online learning platform. '
+                  'It hosts online university-level courses in a wide range of disciplines to a worldwide '
+                  'audience, some at no charge. It also conducts research into learning based on how '
+                  'people use its platform. EdX was created for students and institutions that seek to'
+                  'transform themselves through cutting-edge technologies, innovative pedagogy, and '
+                  'rigorous courses. More than 70 schools, nonprofits, corporations, and international'
+                  'organizations offer or plan to offer courses on the edX website. As of 22 October 2014,'
+                  'edX has more than 4 million users taking more than 500 courses online.'
+        )
+        self.create_team_page.submit_form()
+
+        self.assertEqual(
+            self.create_team_page.validation_message_text,
+            'Check the highlighted fields below and try again.'
+        )
+        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
+
+    def test_user_can_create_new_team_successfully(self):
+        """
+        Scenario: The user should be able to create new team.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        When I fill all the fields present with appropriate data
+        And I click Create button
+        Then I should see teams list page with newly created team.
+        """
+        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.verify_and_navigate_to_create_team_page()
+
+        self.fill_create_form()
+        self.create_team_page.submit_form()
+
+        self.assertTrue(self.browse_teams_page.is_browser_on_page())
+        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1 out of 1 total')
+        # Verify the newly created team content.
+        team_card = self.browse_teams_page.team_cards.results[0]
+        self.assertEqual(team_card.find_element_by_css_selector('.card-title').text, self.team_name)
+        self.assertEqual(
+            team_card.find_element_by_css_selector('.card-description').text,
+            'The Avengers are a fictional team of superheroes.'
+        )
+
+    def test_user_can_cancel_the_team_creation(self):
+        """
+        Scenario: The user should be able to cancel the creation of new team.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        When I click Cancel button
+        Then I should see teams list page without any new team.
+        """
+        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+
+        self.verify_and_navigate_to_create_team_page()
+        self.create_team_page.cancel_team()
+
+        self.assertTrue(self.browse_teams_page.is_browser_on_page())
+        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')

@@ -533,6 +533,8 @@
         'lms/include/teams/js/spec/topics_spec.js',
         'lms/include/teams/js/spec/teams_spec.js',
         'lms/include/teams/js/spec/teams_tab_spec.js',
+        'lms/include/teams/js/spec/team_actions_spec.js',
+        'lms/include/teams/js/spec/edit_team_spec.js',
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',

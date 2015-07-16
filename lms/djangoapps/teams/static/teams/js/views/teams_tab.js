@@ -12,9 +12,11 @@
             'teams/js/collections/topic',
             'teams/js/views/teams',
             'teams/js/collections/team',
+            'teams/js/views/edit_team',
             'text!teams/templates/teams_tab.underscore'],
            function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
-                     TopicsView, TopicModel, TopicCollection, TeamsView, TeamCollection, teamsTemplate) {
+                     TopicsView, TopicModel, TopicCollection, TeamsView, TeamCollection,
+                     TeamEditView, teamsTemplate) {
                var ViewWithHeader = Backbone.View.extend({
                    initialize: function (options) {
                        this.header = options.header;
@@ -38,6 +40,8 @@
                        this.topic_url = options.topic_url;
                        this.teams_url = options.teams_url;
                        this.maxTeamSize = options.maxTeamSize;
+                       this.languages = options.languages;
+                       this.countries = options.countries;
                        // This slightly tedious approach is necessary
                        // to use regular expressions within Backbone
                        // routes, allowing us to capture which tab
@@ -45,9 +49,10 @@
                        router = this.router = new Backbone.Router();
                        _.each([
                            [':default', _.bind(this.routeNotFound, this)],
-                           ['topics/:topic_id', _.bind(this.browseTopic, this)],
-                           [new RegExp('^(browse)$'), _.bind(this.goToTab, this)],
-                           [new RegExp('^(teams)$'), _.bind(this.goToTab, this)]
+                           ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
+                           ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
+                           [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
+                           [new RegExp('^(teams)\/?$'), _.bind(this.goToTab, this)]
                        ], function (route) {
                            router.route.apply(router, route);
                        });
@@ -94,6 +99,35 @@
                        this.mainView.setElement(this.$el).render();
                        this.hideWarning();
                        return this;
+                   },
+
+                   /**
+                    * Render the create new team form.
+                    */
+                   newTeam: function (topicId) {
+                       var self = this;
+                       this.getTeamsView(topicId).done(function (teamsView) {
+                           self.mainView = new ViewWithHeader({
+                               header: new HeaderView({
+                                   model: new HeaderModel({
+                                       description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know."),
+                                       title: gettext("Create a New Team"),
+                                       breadcrumbs: [
+                                           {
+                                               title: teamsView.main.teamParams.topicName,
+                                               url: '#topics/' + teamsView.main.teamParams.topicId
+                                           }
+                                       ]
+                                   })
+                               }),
+                               main: new TeamEditView({
+                                   tagName: 'create-new-team',
+                                   teamParams: teamsView.main.teamParams,
+                                   primaryButtonTitle: 'Create'
+                               })
+                           });
+                           self.render();
+                       });
                    },
 
                    /**
@@ -172,6 +206,14 @@
                                    per_page: 10,
                                    parse: true
                                }),
+                               teamParams: {
+                                   courseId: this.course_id,
+                                   teamsUrl: this.teams_url,
+                                   topicId: topic.get('id'),
+                                   topicName: topic.get('name'),
+                                   languages: self.languages,
+                                   countries: self.countries
+                               },
                                maxTeamSize: this.maxTeamSize
                            })
                        });
