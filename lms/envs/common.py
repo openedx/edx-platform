@@ -2595,4 +2595,5 @@ PROCTORING_BACKEND_PROVIDER = {
     'class': 'edx_proctoring.backends.NullBackendProvider',
     'options': {},
 }
+PROCTORING_SETTINGS = {}
 
