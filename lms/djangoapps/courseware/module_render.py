@@ -180,6 +180,7 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                                      'due': section.due,
                                      'active': active,
                                      'graded': section.graded,
+                                     'is_proctored_enabled': section.is_proctored_enabled,
                                      })
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
