@@ -7,6 +7,7 @@ import logging
 from lxml import etree
 from lxml.builder import ElementMaker
 import requests
+from requests.exceptions import RequestException
 import requests_oauthlib
 import uuid
 
@@ -93,6 +94,61 @@ def generate_replace_result_xml(result_sourcedid, score):
         )
     )
     return etree.tostring(xml, xml_declaration=True, encoding='UTF-8')
+
+
+def get_assignments_for_problem(problem_descriptor, user_id, course_key):
+    """
+    Trace the parent hierarchy from a given problem to find all blocks that
+    correspond to graded assignment launches for this user. A problem may
+    show up multiple times for a given user; the problem could be embedded in
+    multiple courses (or multiple times in the same course), or the block could
+    be embedded more than once at different granularities (as an individual
+    problem and as a problem in a vertical, for example).
+
+    Returns a list of GradedAssignment objects that are associated with the
+    given descriptor for the current user.
+    """
+    locations = []
+    current_descriptor = problem_descriptor
+    while current_descriptor:
+        locations.append(current_descriptor.location)
+        current_descriptor = current_descriptor.get_parent()
+    assignments = GradedAssignment.objects.filter(
+        user=user_id, course_key=course_key, usage_key__in=locations
+    )
+    return assignments
+
+
+def send_score_update(assignment, score):
+    """
+    Create and send the XML message to the campus LMS system to update the grade
+    for a single graded assignment.
+    """
+    xml = generate_replace_result_xml(
+        assignment.lis_result_sourcedid, score
+    )
+    try:
+        response = sign_and_send_replace_result(assignment, xml)
+    except RequestException:
+        # failed to send result. 'response' is None, so more detail will be
+        # logged at the end of the method.
+        response = None
+        log.exception("Outcome Service: Error when sending result.")
+
+    # If something went wrong, make sure that we have a complete log record.
+    # That way we can manually fix things up on the campus system later if
+    # necessary.
+    if not (response and check_replace_result_response(response)):
+        log.error(
+            "Outcome Service: Failed to update score on LTI consumer. "
+            "User: %s, course: %s, usage: %s, score: %s, status: %s, body: %s",
+            assignment.user,
+            assignment.course_key,
+            assignment.usage_key,
+            score,
+            response,
+            response.text if response else 'Unknown'
+        )
 
 
 def sign_and_send_replace_result(assignment, xml):

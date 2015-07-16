@@ -390,7 +390,10 @@ class TestInstructorEnrollmentStudentModule(ModuleStoreTestCase):
                 module_state_key=msk
             ).count(), 0)
 
-    def test_delete_submission_scores(self):
+    # Disable the score change signal to prevent other components from being
+    # pulled into tests.
+    @mock.patch('courseware.module_render.SCORE_CHANGED.send')
+    def test_delete_submission_scores(self, _lti_mock):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
 

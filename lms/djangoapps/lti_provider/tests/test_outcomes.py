@@ -9,8 +9,19 @@ from student.tests.factories import UserFactory
 
 from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 import lti_provider.outcomes as outcomes
-import lti_provider.tasks as tasks
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
+
+
+def create_score(earned, possible):
+    """
+    Create a new mock Score object with specified earned and possible values
+    """
+    score = MagicMock()
+    score.possible = possible
+    score.earned = earned
+    return score
 
 
 class StoreOutcomeParametersTest(TestCase):
@@ -177,81 +188,6 @@ class SignAndSendReplaceResultTest(TestCase):
         self.assertEqual(response, 'response')
 
 
-class SendOutcomeTest(TestCase):
-    """
-    Tests for the send_outcome method in tasks.py
-    """
-
-    def setUp(self):
-        super(SendOutcomeTest, self).setUp()
-        self.course_key = CourseLocator(
-            org='some_org',
-            course='some_course',
-            run='some_run'
-        )
-        self.usage_key = BlockUsageLocator(
-            course_key=self.course_key,
-            block_type='problem',
-            block_id='block_id'
-        )
-        self.user = UserFactory.create()
-        self.points_possible = 10
-        self.points_earned = 3
-        self.generate_xml_mock = self.setup_patch(
-            'lti_provider.outcomes.generate_replace_result_xml',
-            'replace result XML'
-        )
-        self.replace_result_mock = self.setup_patch(
-            'lti_provider.outcomes.sign_and_send_replace_result',
-            'replace result response'
-        )
-        self.check_result_mock = self.setup_patch(
-            'lti_provider.outcomes.check_replace_result_response',
-            True
-        )
-        consumer = LtiConsumer(
-            consumer_name='Lti Consumer Name',
-            consumer_key='consumer_key',
-            consumer_secret='consumer_secret',
-            instance_guid='tool_instance_guid'
-        )
-        consumer.save()
-        outcome = OutcomeService(
-            lis_outcome_service_url='http://example.com/service_url',
-            lti_consumer=consumer
-        )
-        outcome.save()
-        self.assignment = GradedAssignment(
-            user=self.user,
-            course_key=self.course_key,
-            usage_key=self.usage_key,
-            outcome_service=outcome,
-            lis_result_sourcedid='sourcedid',
-        )
-        self.assignment.save()
-
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a method with a given return value, and return the mock
-        """
-        mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
-
-    def test_send_outcome(self):
-        tasks.send_outcome(
-            self.points_possible,
-            self.points_earned,
-            self.user.id,
-            unicode(self.course_key),
-            unicode(self.usage_key)
-        )
-        self.generate_xml_mock.assert_called_once_with('sourcedid', 0.3)
-        self.replace_result_mock.assert_called_once_with(self.assignment, 'replace result XML')
-
-
 class XmlHandlingTest(TestCase):
     """
     Tests for the generate_replace_result_xml and check_replace_result_response
@@ -363,3 +299,125 @@ class XmlHandlingTest(TestCase):
             major_code='<imsx_codeMajor>failure</imsx_codeMajor>'
         )
         self.assertFalse(outcomes.check_replace_result_response(response))
+
+
+class TestAssignmentsForProblem(ModuleStoreTestCase):
+    """
+    Test cases for the assignments_for_problem method in outcomes.py
+    """
+    def setUp(self):
+        super(TestAssignmentsForProblem, self).setUp()
+        self.user = UserFactory.create()
+        self.user_id = self.user.id
+        self.outcome_service = self.create_outcome_service('outcomes')
+        self.course = CourseFactory.create()
+        with self.store.bulk_operations(self.course.id, emit_signals=False):
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter")
+            self.vertical = ItemFactory.create(parent=self.chapter, category="vertical")
+            self.unit = ItemFactory.create(parent=self.vertical, category="unit")
+
+    def create_outcome_service(self, id_suffix):
+        """
+        Create and save a new OutcomeService model in the test database. The
+        OutcomeService model requires an LtiConsumer model, so we create one of
+        those as well. The method takes an ID string that is used to ensure that
+        unique fields do not conflict.
+        """
+        lti_consumer = LtiConsumer(
+            consumer_name='lti_consumer_name' + id_suffix,
+            consumer_key='lti_consumer_key' + id_suffix,
+            consumer_secret='lti_consumer_secret' + id_suffix,
+            instance_guid='lti_instance_guid' + id_suffix
+        )
+        lti_consumer.save()
+        outcome_service = OutcomeService(
+            lis_outcome_service_url='https://example.com/outcomes/' + id_suffix,
+            lti_consumer=lti_consumer
+        )
+        outcome_service.save()
+        return outcome_service
+
+    def create_graded_assignment(self, desc, result_id, outcome_service):
+        """
+        Create and save a new GradedAssignment model in the test database.
+        """
+        assignment = GradedAssignment(
+            user=self.user,
+            course_key=self.course.id,
+            usage_key=desc.location,
+            outcome_service=outcome_service,
+            lis_result_sourcedid=result_id,
+            version_number=0
+        )
+        assignment.save()
+        return assignment
+
+    def test_with_no_graded_assignments(self):
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, self.user_id, self.course.id
+            )
+        self.assertEqual(len(assignments), 0)
+
+    def test_with_graded_unit(self):
+        self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, self.user_id, self.course.id
+            )
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
+
+    def test_with_graded_vertical(self):
+        self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, self.user_id, self.course.id
+            )
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_vertical')
+
+    def test_with_graded_unit_and_vertical(self):
+        self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
+        self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, self.user_id, self.course.id
+            )
+        self.assertEqual(len(assignments), 2)
+        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
+        self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_vertical')
+
+    def test_with_unit_used_twice(self):
+        self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
+        self.create_graded_assignment(self.unit, 'graded_unit2', self.outcome_service)
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, self.user_id, self.course.id
+            )
+        self.assertEqual(len(assignments), 2)
+        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
+        self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_unit2')
+
+    def test_with_unit_graded_for_different_user(self):
+        self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
+        other_user = UserFactory.create()
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, other_user.id, self.course.id
+            )
+        self.assertEqual(len(assignments), 0)
+
+    def test_with_unit_graded_for_multiple_consumers(self):
+        other_outcome_service = self.create_outcome_service('second_consumer')
+        self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
+        self.create_graded_assignment(self.unit, 'graded_unit2', other_outcome_service)
+        with check_mongo_calls(3):
+            assignments = outcomes.get_assignments_for_problem(
+                self.unit, self.user_id, self.course.id
+            )
+        self.assertEqual(len(assignments), 2)
+        self.assertEqual(assignments[0].lis_result_sourcedid, 'graded_unit')
+        self.assertEqual(assignments[1].lis_result_sourcedid, 'graded_unit2')
+        self.assertEqual(assignments[0].outcome_service, self.outcome_service)
+        self.assertEqual(assignments[1].outcome_service, other_outcome_service)
