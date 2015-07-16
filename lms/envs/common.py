@@ -346,6 +346,9 @@ FEATURES = {
     # Milestones application flag
     'MILESTONES_APP': False,
 
+    # Organizations application flag
+    'ORGANIZATIONS_APP': False,
+
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
@@ -2402,6 +2405,9 @@ OPTIONAL_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 )
 
 for app_name in OPTIONAL_APPS:
