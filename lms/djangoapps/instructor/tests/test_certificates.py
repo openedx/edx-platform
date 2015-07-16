@@ -96,6 +96,7 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
 
     def _assert_certificates_visible(self, is_visible):
         """Check that the certificates section is visible on the instructor dash. """
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         response = self.client.get(self.url)
         if is_visible:
             self.assertContains(response, "Certificates")
@@ -122,6 +123,7 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
 
     def _assert_certificate_status(self, cert_name, expected_status):
         """Check the certificate status display on the instructor dash. """
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         response = self.client.get(self.url)
 
         if expected_status == 'started':
@@ -138,6 +140,7 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
 
     def _assert_enable_certs_button_is_disabled(self):
         """Check that the "enable student-generated certificates" button is disabled. """
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         response = self.client.get(self.url)
         expected_html = '<button class="is-disabled" disabled>Enable Student-Generated Certificates</button>'
         self.assertContains(response, expected_html)
@@ -179,11 +182,13 @@ class CertificatesInstructorApiTest(ModuleStoreTestCase):
 
         # Global staff have access
         self.client.login(username=self.global_staff.username, password='test')
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
     def test_generate_example_certificates(self):
         self.client.login(username=self.global_staff.username, password='test')
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         url = reverse(
             'generate_example_certificates',
             kwargs={'course_id': unicode(self.course.id)}
@@ -202,6 +207,7 @@ class CertificatesInstructorApiTest(ModuleStoreTestCase):
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):
         self.client.login(username=self.global_staff.username, password='test')
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         url = reverse(
             'enable_certificate_generation',
             kwargs={'course_id': unicode(self.course.id)}

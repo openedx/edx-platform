@@ -30,10 +30,10 @@ class UnitTestLibraries(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        user_password = super(UnitTestLibraries, self).setUp()
+        self.user_password = super(UnitTestLibraries, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password=user_password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
     ######################################################
     # Tests for /library/ - list and create libraries:
@@ -207,6 +207,7 @@ class UnitTestLibraries(ModuleStoreTestCase):
         """
         library = LibraryFactory.create()
         extra_user, _ = self.create_non_staff_user()
+        self.grant_sudo_access(unicode(library.location.library_key), self.user_password)
         manage_users_url = reverse_library_url('manage_library_users', unicode(library.location.library_key))
 
         response = self.client.get(manage_users_url)

@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-from ratelimitbackend import admin
 from django.conf.urls.static import static
 
 import django.contrib.auth.views
 from microsite_configuration import microsite
 import auth_exchange.views
+from edx_admin import admin
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -79,6 +79,8 @@ urlpatterns = (
 
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
+
+    url(r'^sudo/$', 'sudo.views.sudo'),
 
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),

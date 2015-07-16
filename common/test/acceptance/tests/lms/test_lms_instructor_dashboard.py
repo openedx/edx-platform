@@ -6,7 +6,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
-from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
+from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin, get_sudo_access
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage
@@ -22,7 +22,9 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         Logs in as an instructor and returns the id.
         """
         username = "test_instructor_{uuid}".format(uuid=self.unique_id[0:6])
-        auto_auth_page = AutoAuthPage(self.browser, username=username, course_id=self.course_id, staff=True)
+        auto_auth_page = AutoAuthPage(
+            self.browser, username=username, course_id=self.course_id, staff=True, password="test"
+        )
         return username, auto_auth_page.visit().get_user_id()
 
     def visit_instructor_dashboard(self):
@@ -30,6 +32,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         Visits the instructor dashboard.
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        get_sudo_access(self.browser, instructor_dashboard_page, "test")
         instructor_dashboard_page.visit()
         return instructor_dashboard_page
 
@@ -142,10 +145,10 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Then I see Student Email input box, Reset Student Attempt, Rescore Student Submission,
             Delete Student State for entrance exam and Show Background Task History for Student buttons
         """
-        self.assertTrue(self.student_admin_section.is_student_email_input_visible())
-        self.assertTrue(self.student_admin_section.is_reset_attempts_button_visible())
-        self.assertTrue(self.student_admin_section.is_rescore_submission_button_visible())
-        self.assertTrue(self.student_admin_section.is_delete_student_state_button_visible())
+        self.assertTrue(self.student_admin_section.is_entrance_exam_student_email_input_visible())
+        self.assertTrue(self.student_admin_section.is_entrance_exam_reset_attempts_button_visible())
+        self.assertTrue(self.student_admin_section.is_entrance_exam_rescore_submission_button_visible())
+        self.assertTrue(self.student_admin_section.is_entrance_exam_delete_student_state_button_visible())
         self.assertTrue(self.student_admin_section.is_background_task_history_button_visible())
 
     def test_clicking_reset_student_attempts_button_without_email_shows_error(self):
@@ -158,10 +161,10 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Then I should be shown an Error Notification
             And The Notification message should read 'Please enter a student email address or username.'
         """
-        self.student_admin_section.click_reset_attempts_button()
+        self.student_admin_section.entrance_exam_click_reset_attempts_button()
         self.assertEqual(
             'Please enter a student email address or username.',
-            self.student_admin_section.top_notification.text[0]
+            self.student_admin_section.entrance_exam_top_notification.text[0]
         )
 
     def test_clicking_reset_student_attempts_button_with_success(self):
@@ -174,8 +177,8 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_reset_attempts_button()
+        self.student_admin_section.set_student_email_for_ee(self.student_identifier)
+        self.student_admin_section.entrance_exam_click_reset_attempts_button()
         alert = get_modal_alert(self.student_admin_section.browser)
         alert.dismiss()
 
@@ -188,10 +191,10 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Adjustment after non existing student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_reset_attempts_button()
+        self.student_admin_section.set_student_email_for_ee('non_existing@example.com')
+        self.student_admin_section.entrance_exam_click_reset_attempts_button()
         self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.assertGreater(len(self.student_admin_section.entrance_exam_top_notification.text[0]), 0)
 
     def test_clicking_rescore_submission_button_with_success(self):
         """
@@ -202,8 +205,8 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Adjustment after entering a valid student email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_rescore_submissions_button()
+        self.student_admin_section.set_student_email_for_ee(self.student_identifier)
+        self.student_admin_section.entrance_exam_click_rescore_submissions_button()
         alert = get_modal_alert(self.student_admin_section.browser)
         alert.dismiss()
 
@@ -216,10 +219,10 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Adjustment after non existing student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_rescore_submissions_button()
+        self.student_admin_section.set_student_email_for_ee('non_existing@example.com')
+        self.student_admin_section.entrance_exam_click_rescore_submissions_button()
         self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.assertGreater(len(self.student_admin_section.entrance_exam_top_notification.text[0]), 0)
 
     def test_clicking_skip_entrance_exam_button_with_success(self):
         """
@@ -231,7 +234,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
+        self.student_admin_section.set_student_email_for_ee(self.student_identifier)
         self.student_admin_section.click_skip_entrance_exam_button()
         #first we have window.confirm
         alert = get_modal_alert(self.student_admin_section.browser)
@@ -251,14 +254,14 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
+        self.student_admin_section.set_student_email_for_ee('non_existing@example.com')
         self.student_admin_section.click_skip_entrance_exam_button()
         #first we have window.confirm
         alert = get_modal_alert(self.student_admin_section.browser)
         alert.accept()
 
         self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.assertGreater(len(self.student_admin_section.entrance_exam_top_notification.text[0]), 0)
 
     def test_clicking_delete_student_attempts_button_with_success(self):
         """
@@ -270,8 +273,8 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_delete_student_state_button()
+        self.student_admin_section.set_student_email_for_ee(self.student_identifier)
+        self.student_admin_section.entrance_exam_click_delete_student_state_button()
         alert = get_modal_alert(self.student_admin_section.browser)
         alert.dismiss()
 
@@ -286,10 +289,10 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_delete_student_state_button()
+        self.student_admin_section.set_student_email_for_ee('non_existing@example.com')
+        self.student_admin_section.entrance_exam_click_delete_student_state_button()
         self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.assertGreater(len(self.student_admin_section.entrance_exam_top_notification.text[0]), 0)
 
     def test_clicking_task_history_button_with_success(self):
         """
@@ -301,8 +304,8 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an table listing all background tasks
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_task_history_button()
+        self.student_admin_section.set_student_email_for_ee(self.student_identifier)
+        self.student_admin_section.entrance_exam_click_task_history_button()
         self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
 
 
