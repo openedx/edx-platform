@@ -92,7 +92,7 @@ ${page_title_breadcrumbs(course_name())}
     var $$course_id = "${course.id | escapejs}";
 
     $(function(){
-        $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
+        $(".ui-accordion-header a, .ui-accordion-content .subtitle-name").each(function() {
           var elemText = $(this).text().replace(/^\s+|\s+$/g,''); // Strip leading and trailing whitespace
           var wordArray = elemText.split(" ");
           var finalTitle = "";
