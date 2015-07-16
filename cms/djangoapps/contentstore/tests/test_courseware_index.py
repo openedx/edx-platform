@@ -871,8 +871,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         self.update_item(store, self.html_unit1)
         self.reindex_library(store)
         response = self.search()
-        # TODO: MockSearchEngine never updates existing item: returns 3 items here - uncomment when it's fixed
-        # self.assertEqual(response["total"], 2)
+        self.assertEqual(response["total"], 2)
         html_contents = [cont['html_content'] for cont in self._get_contents(response)]
         self.assertIn(new_data, html_contents)
 
@@ -1264,7 +1263,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         added_to_index = self.reindex_course(self.store)
         self.assertEqual(added_to_index, 16)
         response = self.searcher.search(field_dictionary={"course": unicode(self.course.id)})
-        self.assertEqual(response["total"], 23)
+        self.assertEqual(response["total"], 17)
 
         group_access_content = {'group_access': {666: [1]}}
 
