@@ -7,6 +7,7 @@ import json
 from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
@@ -93,6 +94,22 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
             # to be disabled even if an error has occurred
             certs_api.set_cert_generation_enabled(self.course.id, True)
             self._assert_enable_certs_button(False)
+
+    @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_show_enabled_button_for_html_certs(self):
+        """
+        Tests `Enable Student-Generated Certificates` button is enabled
+        and `Generate Example Certificates` button is not available if
+        course has Web/HTML certificates view enabled.
+        """
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.client.login(username=self.global_staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Enable Student-Generated Certificates')
+        self.assertContains(response, 'enable-certificates-submit')
+        self.assertNotContains(response, 'Generate Example Certificates')
 
     def _assert_certificates_visible(self, is_visible):
         """Check that the certificates section is visible on the instructor dash. """
