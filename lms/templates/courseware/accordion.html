@@ -33,10 +33,14 @@
                     formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
                     due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
               %>
-              <p class="subtitle">${section['format']} ${due_date}</p>
-              % if section['is_proctored_enabled']:
-                <i class="fa fa-lock"></i>
-              % endif
+              <p class="subtitle">
+                % if section['is_proctored_enabled']:
+                  <i class="fa fa-lock"></i>&nbsp;
+                % endif
+                <span class="subtitle-name">${section['format']} ${due_date}
+                </span>
+              </p>
+
               % if 'graded' in section and section['graded']:
               <i class="icon fa fa-pencil-square-o" aria-hidden="true" data-tooltip="${_("This section is graded.")}"></i>
               % endif
