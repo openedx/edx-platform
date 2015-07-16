@@ -6,6 +6,9 @@ define(['backbone', 'jquery', 'js/staff_debug_actions'],
             var locationName = 'test_loc';
             var fixture_id = 'sd_fu_' + locationName;
             var fixture = $('<input>', { id: fixture_id, placeholder: "userman" });
+            var escapableLocationName = 'test\.\*\+\?\^\:\$\{\}\(\)\|\]\[loc';
+            var escapableFixture_id = 'sd_fu_' + escapableLocationName;
+            var escapableFixture = $('<input>', {id: escapableFixture_id, placeholder: "userman"});
 
             describe('get_url ', function () {
                 it('defines url to courseware ajax entry point', function () {
@@ -34,6 +37,11 @@ define(['backbone', 'jquery', 'js/staff_debug_actions'],
 
                     $('#' + fixture_id).val('');
                     $('#' + fixture_id).remove();
+                });
+                it('gets the placeholder name if the id has escapable characters', function() {
+                    $('body').append(escapableFixture);
+                    expect(StaffDebug.get_user('test.*+?^:${}()|][loc')).toBe('userman');
+                    $('#' + escapableFixture_id).remove();
                 });
             });
             describe('reset', function () {
