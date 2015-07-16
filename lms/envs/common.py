@@ -1243,7 +1243,6 @@ proctoring_js = (
 # RequireJS and an optimizer.
 base_vendor_js = [
     'js/vendor/jquery.min.js',
-    'js/vendor/date.js',
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'js/vendor/underscore-min.js',
