@@ -394,7 +394,7 @@ class TestUserStateSummaryStorage(StorageTestBase, TestCase):
     factory = UserStateSummaryFactory
     scope = Scope.user_state_summary
     key_factory = user_state_summary_key
-    storage_class = factory.FACTORY_FOR
+    storage_class = factory._meta.model
 
 
 class TestStudentPrefsStorage(OtherUserFailureTestMixin, StorageTestBase, TestCase):
