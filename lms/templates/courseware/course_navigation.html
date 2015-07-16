@@ -40,8 +40,8 @@ include_proctoring_widget = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', Fals
         <%static:include path="courseware/${template_name}.underscore" />
     </script>
   % endfor
-% endif
 <div class="proctored_exam_status"></div>
+% endif
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu">
