@@ -3,14 +3,20 @@ Helper functions for managing interactions with the LTI outcomes service defined
 in LTI v1.1.
 """
 
+from collections import defaultdict
+from django.contrib.auth.models import User
+from django.test.client import RequestFactory
 import logging
 from lxml import etree
 from lxml.builder import ElementMaker
 import requests
+from requests.exceptions import RequestException
 import requests_oauthlib
 import uuid
 
+from courseware.grades import progress_summary
 from lti_provider.models import GradedAssignment, OutcomeService
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.lti_provider")
 
@@ -93,6 +99,109 @@ def generate_replace_result_xml(result_sourcedid, score):
         )
     )
     return etree.tostring(xml, xml_declaration=True, encoding='UTF-8')
+
+
+def get_assignments_for_problem(problem_descriptor, user_id, course_key):
+    """
+    Trace the parent hierarchy from a given problem to find all blocks that
+    correspond to graded assignment launches for this user. A problem may
+    show up multiple times for a given user; the problem could be embedded in
+    multiple courses (or multiple times in the same course), or the block could
+    be embedded more than once at different granularities (as an individual
+    problem and as a problem in a vertical, for example).
+
+    Returns a dict where the key is a usage descriptor for a block in the
+    parent hierarchy, and the value is a list of GradedAssignment objects that
+    are associated with that descriptor for the current user.
+    """
+    assignments = defaultdict(list)
+    current_descriptor = problem_descriptor
+    while current_descriptor:
+        assignments_for_block = GradedAssignment.objects.filter(
+            user=user_id, course_key=course_key, usage_key=current_descriptor.location
+        )
+        for assignment in assignments_for_block:
+            assignments[current_descriptor].append(assignment)
+        current_descriptor = current_descriptor.get_parent()
+    return assignments
+
+
+def get_scores_for_locations(user_id, course_key):
+    """
+    Calculate the scores associated with all problems in the course. This method
+    returns a dictionary that maps a problem's usage ID to a Score object.
+    """
+    user = User.objects.get(id=user_id)
+    course = modulestore().get_course(course_key, depth=0)
+    # We make a fake request because grading code expects to be able to look at
+    # the request. We have to attach the correct user to the request before
+    # grading that student.
+    request = RequestFactory().get('/')
+    request.user = user
+    course_scores = progress_summary(user, request, course)
+    location_to_score = {}
+    for chapter in course_scores:
+        for section in chapter['sections']:
+            for score in section['scores']:
+                location_to_score[score.module_id] = score
+    return location_to_score
+
+
+def calculate_score(descriptor, location_to_score):
+    """
+    Calculate the aggregate score for a block by adding up the earned and
+    possible scores for all child blocks. Returns a tuple containing
+    (earned_score, possible_score).
+    """
+    if descriptor.location in location_to_score:
+        score = location_to_score.get(descriptor.location)
+        earned = score.earned
+        possible = score.possible
+    else:
+        earned = 0.0
+        possible = 0.0
+    for child in descriptor.get_children():
+        if child.location in location_to_score:
+            score = location_to_score[child.location]
+            child_earned = score.earned
+            child_possible = score.possible
+        else:
+            child_earned, child_possible = calculate_score(child, location_to_score)
+        earned += child_earned
+        possible += child_possible
+    return earned, possible
+
+
+def send_score_update(assignment, score):
+    """
+    Create and send the XML message to the campus LMS system to update the grade
+    for a single graded assignment.
+    """
+    xml = generate_replace_result_xml(
+        assignment.lis_result_sourcedid, score
+    )
+    try:
+        response = sign_and_send_replace_result(assignment, xml)
+    except RequestException:
+        # failed to send result. 'response' is None, so more detail will be
+        # logged at the end of the method.
+        response = None
+        log.exception("Outcome Service: Error when sending result.")
+
+    # If something went wrong, make sure that we have a complete log record.
+    # That way we can manually fix things up on the campus system later if
+    # necessary.
+    if not (response and check_replace_result_response(response)):
+        log.error(
+            "Outcome Service: Failed to update score on LTI consumer. "
+            "User: %s, course: %s, usage: %s, score: %s, status: %s, body: %s",
+            assignment.user,
+            assignment.course_key,
+            assignment.usage_key,
+            score,
+            response,
+            response.text if response else 'Unknown'
+        )
 
 
 def sign_and_send_replace_result(assignment, xml):
