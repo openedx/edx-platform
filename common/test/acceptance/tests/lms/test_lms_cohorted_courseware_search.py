@@ -4,6 +4,7 @@ Test courseware search
 import os
 import json
 
+from ..helpers import remove_file
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.lms.courseware_search import CoursewareSearchPage
@@ -40,6 +41,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
+        self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
 
         super(CoursewareSearchCohortTest, self).setUp(is_staff=is_staff)
         self.staff_user = self.user
@@ -78,10 +80,6 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.create_cohorts_and_assign_students()
 
         self._studio_reindex()
-
-    def tearDown(self):
-        super(CoursewareSearchCohortTest, self).tearDown()
-        os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):
         """
