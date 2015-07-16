@@ -1,7 +1,7 @@
-define(["jquery", "sinon", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_utils", "js/views/pages/course_outline",
+define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_utils", "js/views/pages/course_outline",
         "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers",
         "common/js/spec_helpers/template_helpers"],
-    function($, Sinon, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers) {
+    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers) {
 
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
