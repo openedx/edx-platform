@@ -3,6 +3,7 @@ URLs for the credit app.
 """
 from django.conf.urls import patterns, url
 
+from .api.provider import get_credit_provider_info
 from .views import create_credit_request, credit_provider_callback, get_providers_detail, get_eligibility_for_user
 
 PROVIDER_ID_PATTERN = r'(?P<provider_id>[^/]+)'
@@ -10,6 +11,11 @@ PROVIDER_ID_PATTERN = r'(?P<provider_id>[^/]+)'
 urlpatterns = patterns(
     '',
 
+    url(
+        r"^v1/providers/(?P<provider_id>[^/]+)/$",
+        get_credit_provider_info,
+        name="get_provider_info"
+    ),
     url(
         r"^v1/providers/$",
         get_providers_detail,

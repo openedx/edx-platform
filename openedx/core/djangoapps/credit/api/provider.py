@@ -8,6 +8,7 @@ import pytz
 import uuid
 
 from django.db import transaction
+from lms.djangoapps.django_comment_client.utils import JsonResponse
 
 from openedx.core.djangoapps.credit.exceptions import (
     UserIsNotEligible,
@@ -39,7 +40,6 @@ def get_credit_providers(providers_list=None):
 
     Returns:
         list of credit providers represented as dictionaries
-
     Response Values:
         >>> get_credit_providers(['hogwarts'])
         [
@@ -60,8 +60,50 @@ def get_credit_providers(providers_list=None):
             ...
         ]
     """
-
     return CreditProvider.get_credit_providers(providers_list=providers_list)
+
+
+def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-argument
+    """Retrieve the 'CreditProvider' model data against provided
+     credit provider.
+
+    Args:
+        provider_id (str): The identifier for the credit provider
+
+    Returns: 'CreditProvider' data dictionary
+
+    Example Usage:
+        >>> get_credit_provider_info("hogwarts")
+        {
+            "provider_id": "hogwarts",
+            "display_name": "Hogwarts School of Witchcraft and Wizardry",
+            "provider_url": "https://credit.example.com/",
+            "provider_status_url": "https://credit.example.com/status/",
+            "provider_description: "A new model for the Witchcraft and Wizardry School System.",
+            "enable_integration": False,
+            "fulfillment_instructions": "
+                <p>In order to fulfill credit, Hogwarts School of Witchcraft and Wizardry requires learners to:</p>
+                <ul>
+                <li>Sample instruction abc</li>
+                <li>Sample instruction xyz</li>
+                </ul>",
+        }
+
+    """
+    credit_provider = CreditProvider.get_credit_provider(provider_id=provider_id)
+    credit_provider_data = {}
+    if credit_provider:
+        credit_provider_data = {
+            "provider_id": credit_provider.provider_id,
+            "display_name": credit_provider.display_name,
+            "provider_url": credit_provider.provider_url,
+            "provider_status_url": credit_provider.provider_status_url,
+            "provider_description": credit_provider.provider_description,
+            "enable_integration": credit_provider.enable_integration,
+            "fulfillment_instructions": credit_provider.fulfillment_instructions
+        }
+
+    return JsonResponse(credit_provider_data)
 
 
 @transaction.commit_on_success
