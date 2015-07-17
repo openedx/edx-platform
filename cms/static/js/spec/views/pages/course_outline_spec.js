@@ -757,7 +757,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     target.click();
                     expect($('#id_exam_proctoring')).not.toHaveAttr('disabled','disabled');
                     expect($('#id_time_limit')).not.toHaveAttr('disabled','disabled');
-                    expect($('#id_time_limit').val()).toBe('00:00');
+                    expect($('#id_time_limit').val()).toBe('00:30');
                     expect($('#id_exam_proctoring')).not.toHaveAttr('checked');
                 });
 
