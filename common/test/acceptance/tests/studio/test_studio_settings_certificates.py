@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-from flaky import flaky
+from unittest import skip
 from .base_studio_test import StudioCourseTest
 from ...pages.studio.settings_certificates import CertificatesPage
 
@@ -106,7 +106,7 @@ class CertificatesTest(StudioCourseTest):
 
         self.assertIn("Updated Course Title Override 2", certificate.course_title)
 
-    @flaky  # TODO fix this, see SOL-1053
+    @skip  # TODO fix this, see SOL-1053
     def test_can_delete_certificate(self):
         """
         Scenario: Ensure that the user can delete certificate.
