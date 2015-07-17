@@ -446,12 +446,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
                 editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor];
-
-            } else if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor];
                 if (options.enable_proctored_exams) {
                     editors.push(TimedExaminationPreferenceEditor);
                 }
+            } else if (xblockInfo.isVertical()) {
+                editors = [StaffLockEditor];
             }
             return new SettingsXBlockModal($.extend({
                 editors: editors,
