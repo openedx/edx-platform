@@ -325,6 +325,22 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEquals(course_modes, expected_modes)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    def test_hide_nav(self):
+        # Create the course modes
+        for mode in ["honor", "verified"]:
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Load the track selection page
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+
+        # Verify that the header navigation links are hidden for the edx.org version
+        self.assertNotContains(response, "How it Works")
+        self.assertNotContains(response, "Find courses")
+        self.assertNotContains(response, "Schools & Partners")
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):

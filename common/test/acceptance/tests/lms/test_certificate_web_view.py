@@ -36,8 +36,11 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
             self.course_info["display_name"],
             settings=course_settings
         )
+        self.course_fixture.add_advanced_settings({
+            "cert_html_view_enabled": {"value": "true"}
+        })
         self.course_fixture.install()
-        self.user_id = "99"  # we have createad a user with this id in fixture
+        self.user_id = "99"  # we have created a user with this id in fixture
         self.cert_fixture = CertificateConfigFixture(self.course_id, test_certificate_config)
 
         # Load certificate web view page for use by the tests

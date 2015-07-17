@@ -29,8 +29,8 @@ class CreditEligibilityTest(CourseTestCase):
         """
         response = self.client.get_html(self.course_details_url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Credit Eligibility Requirements")
-        self.assertNotContains(response, "Steps needed for credit eligibility")
+        self.assertNotContains(response, "Course Credit Requirements")
+        self.assertNotContains(response, "Steps required to earn course credit")
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': True})
     def test_course_details_with_enabled_setting(self):
@@ -41,8 +41,8 @@ class CreditEligibilityTest(CourseTestCase):
         # course is not set as credit course
         response = self.client.get_html(self.course_details_url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Credit Eligibility Requirements")
-        self.assertNotContains(response, "Steps needed for credit eligibility")
+        self.assertNotContains(response, "Course Credit Requirements")
+        self.assertNotContains(response, "Steps required to earn course credit")
 
         # verify that credit eligibility requirements block shows if the
         # course is set as credit course and it has eligibility requirements
@@ -55,5 +55,5 @@ class CreditEligibilityTest(CourseTestCase):
 
         response = self.client.get_html(self.course_details_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Credit Eligibility Requirements")
-        self.assertContains(response, "Steps needed for credit eligibility")
+        self.assertContains(response, "Course Credit Requirements")
+        self.assertContains(response, "Steps required to earn course credit")

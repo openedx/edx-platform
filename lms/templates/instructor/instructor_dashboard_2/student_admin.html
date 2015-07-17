@@ -78,7 +78,7 @@
 
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <p id="task-history-single-help">
-      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Tasks' table. "
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
@@ -119,7 +119,7 @@
 
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <p id="entrance-exam-task-history-help">
-      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Tasks' table. "
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
@@ -161,7 +161,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h2> ${_("Pending Tasks")} </h2>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />

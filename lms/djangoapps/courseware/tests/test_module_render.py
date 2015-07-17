@@ -794,16 +794,19 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.assertTrue(url.startswith('/static/toy_course_dir/'))
         self.course.static_asset_path = ""
 
+    @override_settings(DEFAULT_COURSE_ABOUT_IMAGE_URL='test.png')
+    @override_settings(STATIC_URL='static/')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_course_image_for_split_course(self, store):
         """
-        for split courses if course_image is empty then course_image_url will be blank
+        for split courses if course_image is empty then course_image_url will be
+        the default image url defined in settings
         """
         self.course = CourseFactory.create(default_store=store)
         self.course.course_image = ''
 
         url = course_image_url(self.course)
-        self.assertEqual('', url)
+        self.assertEqual('static/test.png', url)
 
     def test_get_course_info_section(self):
         self.course.static_asset_path = "toy_course_dir"
@@ -1357,22 +1360,43 @@ class TestRebindModule(TestSubmittingProblems):
         super(TestRebindModule, self).setUp()
         self.homework = self.add_graded_section_to_course('homework')
         self.lti = ItemFactory.create(category='lti', parent=self.homework)
+        self.problem = ItemFactory.create(category='problem', parent=self.homework)
         self.user = UserFactory.create()
         self.anon_user = AnonymousUser()
 
-    def get_module_for_user(self, user):
+    def get_module_for_user(self, user, item=None):
         """Helper function to get useful module at self.location in self.course_id for user"""
         mock_request = MagicMock()
         mock_request.user = user
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, user, self.course, depth=2)
 
+        if item is None:
+            item = self.lti
+
         return render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
-            self.lti.location,
+            item.location,
             field_data_cache,
         )._xmodule
+
+    def test_rebind_module_to_new_users(self):
+        module = self.get_module_for_user(self.user, self.problem)
+
+        # Bind the module to another student, which will remove "correct_map"
+        # from the module's _field_data_cache and _dirty_fields.
+        user2 = UserFactory.create()
+        module.descriptor.bind_for_student(module.system, user2.id)
+
+        # XBlock's save method assumes that if a field is in _dirty_fields,
+        # then it's also in _field_data_cache. If this assumption
+        # doesn't hold, then we get an error trying to bind this module
+        # to a third student, since we've removed "correct_map" from
+        # _field_data cache, but not _dirty_fields, when we bound
+        # this module to the second student. (TNL-2640)
+        user3 = UserFactory.create()
+        module.descriptor.bind_for_student(module.system, user3.id)
 
     def test_rebind_noauth_module_to_user_not_anonymous(self):
         """

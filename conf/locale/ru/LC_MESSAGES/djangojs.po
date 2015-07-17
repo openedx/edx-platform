@@ -99,10 +99,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:00+0000\n"
-"PO-Revision-Date: 2015-06-26 19:41+0000\n"
+"POT-Creation-Date: 2015-07-13 04:31+0000\n"
+"PO-Revision-Date: 2015-07-10 19:12+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
+"Language-Team: Russian (http://www.transifex.com/p/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -225,7 +225,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Скрыть пояснения"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
@@ -1143,9 +1143,11 @@ msgstr "Новый документ"
 msgid "New window"
 msgstr "Новое окно"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/paging-header.underscore
 msgid "Next"
 msgstr ""
 
@@ -1551,7 +1553,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
@@ -2065,44 +2066,12 @@ msgstr ""
 msgid "Are you sure you want to delete this response?"
 msgstr ""
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
 #: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr ""
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
 #: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s descending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s ascending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s descending"
-msgstr ""
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: common/static/common/js/components/views/paging_header.js
-msgid "%(total_items)s total"
+msgid "Showing %(first_index)s-%(last_index)s out of %(num_items)s total"
 msgstr ""
 
 #: common/static/js/capa/drag_and_drop/base_image.js
@@ -2343,6 +2312,15 @@ msgstr ""
 msgid "Tags:"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/collections/topic.js
+#: lms/templates/edxnotes/tab-item.underscore
+msgid "name"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/collections/topic.js
+msgid "team count"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Course teams are organized into topics created by course instructors. Try to"
@@ -2368,6 +2346,10 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "View Teams in the %(topic_name)s Topic"
+msgstr ""
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
@@ -4203,11 +4185,17 @@ msgid "The course must have an assigned start date."
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
-msgid "The course end date cannot be before the course start date."
+msgid ""
+"The course must have at least one active certificate configuration before it"
+" can be started."
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
-msgid "The course start date cannot be before the enrollment start date."
+msgid "The course end date must be later than the course start date."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The course start date must be later than the enrollment start date."
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
@@ -4254,10 +4242,9 @@ msgstr ""
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 
-#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
 #: cms/templates/js/asset-library.underscore
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -4560,6 +4547,46 @@ msgstr ""
 msgid "Date added"
 msgstr ""
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s descending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr ""
+
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
 #. the servers where its duration is determined.
@@ -4765,11 +4792,11 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
-msgid "Credit Eligibility Requirements"
+msgid "Course Credit Requirements"
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
-msgid "Minimum passing grade for credit is not set."
+msgid "The minimum grade for course credit is not set."
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
@@ -4919,7 +4946,7 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
-msgstr ""
+msgstr "Благодарим Вас! Ваш платёж получен."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -4970,7 +4997,7 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Go to Dashboard"
-msgstr ""
+msgstr "Перейти к панели управления"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5039,10 +5066,6 @@ msgstr ""
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
-msgstr ""
-
-#: lms/templates/edxnotes/tab-item.underscore
-msgid "name"
 msgstr ""
 
 #: lms/templates/edxnotes/tab-item.underscore
@@ -5910,7 +5933,7 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
-msgstr ""
+msgstr "Добавить новый Компонент"
 
 #: cms/templates/js/advanced_entry.underscore
 msgid "Deprecated"
@@ -6016,7 +6039,9 @@ msgid "Course title"
 msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
-msgid "Title of the course"
+msgid ""
+"Specify an alternative to the official course title to display on "
+"certificates. Leave blank to use the official course title."
 msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
@@ -6456,6 +6481,10 @@ msgstr ""
 msgid "Add your first textbook"
 msgstr ""
 
+#: cms/templates/js/paging-header.underscore
+msgid "Previous"
+msgstr ""
+
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
 msgstr ""
@@ -6480,12 +6509,14 @@ msgstr ""
 #: cms/templates/js/publish-xblock.underscore
 msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr ""
+"Последний раз опубликовано %(last_published_date)s пользователем "
+"%(publish_username)s"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
-msgstr ""
+msgstr "сообщение"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -6514,7 +6545,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Release:"
-msgstr ""
+msgstr "Выпуск:"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publishing Status"
@@ -6563,7 +6594,7 @@ msgstr ""
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date:"
-msgstr ""
+msgstr "Дата выпуска:"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Time in UTC:"
@@ -6591,7 +6622,9 @@ msgid "Name of the signatory"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Maximum 40 characters"
+msgid ""
+"The name of this signatory as it should appear on certificates. Maximum 40 "
+"characters."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -6599,11 +6632,19 @@ msgid "Title of the signatory"
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "2 Lines, 40 characters each"
+msgid ""
+"The title of this signatory as it should appear on certificates. Maximum 2 "
+"lines, 40 characters each."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization of the signatory"
+msgstr ""
+
+#: cms/templates/js/signatory-editor.underscore
+msgid ""
+"The organization that this signatory belongs to, as it should appear on "
+"certificates. Maximum 40 characters."
 msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
@@ -6805,11 +6846,11 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
-msgstr ""
+msgstr "Вы хотите заменить субтитры в edX субтитрами с YouTube?"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Yes, replace the edX transcript with the YouTube transcript"
-msgstr ""
+msgstr "Да, заменить субтитры в edX субтитрами с YouTube"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 msgid "Timed Transcript Uploaded Successfully"

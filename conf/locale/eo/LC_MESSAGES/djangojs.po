@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:10+0000\n"
-"PO-Revision-Date: 2015-07-06 12:11:44.276660\n"
+"POT-Creation-Date: 2015-07-13 04:40+0000\n"
+"PO-Revision-Date: 2015-07-13 04:42:08.623413\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1140,9 +1140,11 @@ msgstr "Néw döçümént Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "New window"
 msgstr "Néw wïndöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/paging-header.underscore
 msgid "Next"
 msgstr "Néxt Ⱡ'σяєм ι#"
 
@@ -1559,7 +1561,6 @@ msgstr "Vértïçäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
 msgid "View"
@@ -2140,55 +2141,17 @@ msgstr ""
 "Àré ýöü süré ýöü wänt tö délété thïs réspönsé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
 #: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr ""
-"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, fïltéréd ßý "
-"%(asset_type)s, sörtéd ßý %(sort_name)s äsçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Shöwïng %(first_index)s öüt öf %(num_items)s tötäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
 #: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
-"%(asset_type)s, sorted by %(sort_name)s descending"
+msgid "Showing %(first_index)s-%(last_index)s out of %(num_items)s total"
 msgstr ""
-"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, fïltéréd ßý "
-"%(asset_type)s, sörtéd ßý %(sort_name)s désçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s ascending"
-msgstr ""
-"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, sörtéd ßý "
-"%(sort_name)s äsçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: common/static/common/js/components/views/paging_header.js
-msgid ""
-"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
-"%(sort_name)s descending"
-msgstr ""
-"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, sörtéd ßý "
-"%(sort_name)s désçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: common/static/common/js/components/views/paging_header.js
-msgid "%(total_items)s total"
-msgstr "%(total_items)s tötäl Ⱡ'σяєм ιρѕυм ∂σł#"
+"Shöwïng %(first_index)s-%(last_index)s öüt öf %(num_items)s tötäl Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2429,6 +2392,15 @@ msgstr "Réplý Ⱡ'σяєм ιρѕ#"
 msgid "Tags:"
 msgstr "Tägs: Ⱡ'σяєм ιρѕ#"
 
+#: lms/djangoapps/teams/static/teams/js/collections/topic.js
+#: lms/templates/edxnotes/tab-item.underscore
+msgid "name"
+msgstr "nämé Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/teams/static/teams/js/collections/topic.js
+msgid "team count"
+msgstr "téäm çöünt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Course teams are organized into topics created by course instructors. Try to"
@@ -2460,6 +2432,11 @@ msgid "%(team_count)s Team"
 msgid_plural "%(team_count)s Teams"
 msgstr[0] "%(team_count)s Téäm Ⱡ'σяєм ιρѕυм ∂#"
 msgstr[1] "%(team_count)s Téäms Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "View Teams in the %(topic_name)s Topic"
+msgstr ""
+"Vïéw Téäms ïn thé %(topic_name)s Töpïç Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
@@ -4752,16 +4729,24 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: cms/static/js/models/settings/course_details.js
-msgid "The course end date cannot be before the course start date."
+msgid ""
+"The course must have at least one active certificate configuration before it"
+" can be started."
 msgstr ""
-"Thé çöürsé énd däté çännöt ßé ßéföré thé çöürsé stärt däté. Ⱡ'σяєм ιρѕυм "
+"Thé çöürsé müst hävé ät léäst öné äçtïvé çértïfïçäté çönfïgürätïön ßéföré ït"
+" çän ßé stärtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The course end date must be later than the course start date."
+msgstr ""
+"Thé çöürsé énd däté müst ßé lätér thän thé çöürsé stärt däté. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/models/settings/course_details.js
-msgid "The course start date cannot be before the enrollment start date."
+msgid "The course start date must be later than the enrollment start date."
 msgstr ""
-"Thé çöürsé stärt däté çännöt ßé ßéföré thé énröllmént stärt däté. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Thé çöürsé stärt däté müst ßé lätér thän thé énröllmént stärt däté. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
@@ -5200,6 +5185,56 @@ msgstr "Nöt Grädéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Date added"
 msgstr "Däté äddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s ascending"
+msgstr ""
+"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, fïltéréd ßý "
+"%(asset_type)s, sörtéd ßý %(sort_name)s äsçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, filtered by "
+"%(asset_type)s, sorted by %(sort_name)s descending"
+msgstr ""
+"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, fïltéréd ßý "
+"%(asset_type)s, sörtéd ßý %(sort_name)s désçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
+msgstr ""
+"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, sörtéd ßý "
+"%(sort_name)s äsçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
+msgstr ""
+"Shöwïng %(current_item_range)s öüt öf %(total_items_count)s, sörtéd ßý "
+"%(sort_name)s désçéndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "%(total_items)s total"
+msgstr "%(total_items)s tötäl Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
 #. the servers where its duration is determined.
@@ -5446,14 +5481,14 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт#"
 
 #: cms/static/js/views/settings/main.js
-msgid "Credit Eligibility Requirements"
-msgstr "Çrédït Élïgïßïlïtý Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Course Credit Requirements"
+msgstr "Çöürsé Çrédït Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/static/js/views/settings/main.js
-msgid "Minimum passing grade for credit is not set."
+msgid "The minimum grade for course credit is not set."
 msgstr ""
-"Mïnïmüm pässïng grädé för çrédït ïs nöt sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"Thé mïnïmüm grädé för çöürsé çrédït ïs nöt sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/settings/main.js
 msgid "%(hours)s:%(minutes)s (current UTC time)"
@@ -5759,10 +5794,6 @@ msgstr "Nötéd ïn: Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
 msgstr "Läst Édïtéd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/edxnotes/tab-item.underscore
-msgid "name"
-msgstr "nämé Ⱡ'σяєм ι#"
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
@@ -6973,8 +7004,12 @@ msgid "Course title"
 msgstr "Çöürsé tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/certificate-editor.underscore
-msgid "Title of the course"
-msgstr "Tïtlé öf thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid ""
+"Specify an alternative to the official course title to display on "
+"certificates. Leave blank to use the official course title."
+msgstr ""
+"Spéçïfý än ältérnätïvé tö thé öffïçïäl çöürsé tïtlé tö dïspläý ön "
+"çértïfïçätés. Léävé ßlänk tö üsé thé öffïçïäl çöürsé tïtlé. Ⱡ'σяєм #"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Organization Logo"
@@ -7474,6 +7509,10 @@ msgstr ""
 msgid "Add your first textbook"
 msgstr "Àdd ýöür fïrst téxtßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: cms/templates/js/paging-header.underscore
+msgid "Previous"
+msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
 msgstr "Prévïöüs Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -7617,20 +7656,36 @@ msgid "Name of the signatory"
 msgstr "Nämé öf thé sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "Maximum 40 characters"
-msgstr "Mäxïmüm 40 çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid ""
+"The name of this signatory as it should appear on certificates. Maximum 40 "
+"characters."
+msgstr ""
+"Thé nämé öf thïs sïgnätörý äs ït shöüld äppéär ön çértïfïçätés. Mäxïmüm 40 "
+"çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title of the signatory"
 msgstr "Tïtlé öf thé sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/js/signatory-editor.underscore
-msgid "2 Lines, 40 characters each"
-msgstr "2 Lïnés, 40 çhäräçtérs éäçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+msgid ""
+"The title of this signatory as it should appear on certificates. Maximum 2 "
+"lines, 40 characters each."
+msgstr ""
+"Thé tïtlé öf thïs sïgnätörý äs ït shöüld äppéär ön çértïfïçätés. Mäxïmüm 2 "
+"lïnés, 40 çhäräçtérs éäçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization of the signatory"
 msgstr "Örgänïzätïön öf thé sïgnätörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid ""
+"The organization that this signatory belongs to, as it should appear on "
+"certificates. Maximum 40 characters."
+msgstr ""
+"Thé örgänïzätïön thät thïs sïgnätörý ßélöngs tö, äs ït shöüld äppéär ön "
+"çértïfïçätés. Mäxïmüm 40 çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signature Image"

@@ -39,6 +39,15 @@ class CourseModeModelTest(TestCase):
             currency=currency,
         )
 
+    def test_save(self):
+        """ Verify currency is always lowercase. """
+        cm, __ = self.create_mode('honor', 'honor', 0, '', 'USD')
+        self.assertEqual(cm.currency, 'usd')
+
+        cm.currency = 'GHS'
+        cm.save()
+        self.assertEqual(cm.currency, 'ghs')
+
     def test_modes_for_course_empty(self):
         """
         If we can't find any modes, we should get back the default mode

@@ -166,9 +166,9 @@ def celery(options):
     ("fast", "f", "Skip updating assets"),
     ("optimized", "o", "Run with optimized assets"),
     ("settings_lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
-    ("asset_settings_lms=", "al", "Set LMS only, overriding the value from --asset_settings (if provided)"),
+    ("asset_settings_lms=", None, "Set LMS only, overriding the value from --asset_settings (if provided)"),
     ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
-    ("asset_settings_cms=", "ac", "Set Studio only, overriding the value from --asset_settings (if provided)"),
+    ("asset_settings_cms=", None, "Set Studio only, overriding the value from --asset_settings (if provided)"),
 ])
 def run_all_servers(options):
     """

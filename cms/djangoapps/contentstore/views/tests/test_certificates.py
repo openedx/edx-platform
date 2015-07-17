@@ -5,6 +5,7 @@ Group Configuration Tests.
 """
 import json
 import mock
+import ddt
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -19,6 +20,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
@@ -230,6 +232,19 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
         self._remove_ids(content)  # pylint: disable=unused-variable
         self.assertEqual(content, expected)
 
+    def test_cannot_create_certificate_if_user_has_no_write_permissions(self):
+        """
+        Tests user without write permissions on course should not able to create certificate
+        """
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.ajax_post(
+            self._url(),
+            data=CERTIFICATE_JSON
+        )
+
+        self.assertEqual(response.status_code, 403)
+
     @override_settings(LMS_BASE=None)
     def test_no_lms_base_for_certificate_web_view_link(self):
         test_link = get_lms_link_for_certificate_web_view(
@@ -330,6 +345,7 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
             self.assertNotEqual(new_certificate.get('id'), prev_certificate.get('id'))
 
 
+@ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
@@ -433,6 +449,21 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         self.assertEqual(certificates[0].get('name'), 'Name 0')
         self.assertEqual(certificates[0].get('description'), 'Description 0')
 
+    def test_delete_certificate_without_write_permissions(self):
+        """
+        Tests certificate deletion without write permission on course.
+        """
+        self._add_course_certificates(count=2, signatory_count=1)
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.delete(
+            self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 403)
+
     def test_delete_non_existing_certificate(self):
         """
         Try to delete a non existing certificate. It should return status code 404 Not found.
@@ -522,6 +553,25 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             course = self.store.get_course(self.course.id)
             certificates = course.certificates['certificates']
             self.assertEqual(certificates[0].get('is_active'), is_active)
+
+    @ddt.data(True, False)
+    def test_certificate_activation_without_write_permissions(self, activate):
+        """
+        Tests certificate Activate and Deactivate should not be allowed if user
+        does not have write permissions on course.
+        """
+        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        self._add_course_certificates(count=1, signatory_count=2)
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.post(
+            test_url,
+            data=json.dumps({"is_active": activate}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEquals(response.status_code, 403)
 
     def test_certificate_activation_failure(self):
         """

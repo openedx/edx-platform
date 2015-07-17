@@ -126,10 +126,9 @@ def course_image_url(course):
             url += '/' + course.course_image
         else:
             url += '/images/course_image.jpg'
-    elif course.course_image == '':
-        # if course_image is empty the url will be blank as location
-        # of the course_image does not exist
-        url = ''
+    elif not course.course_image:
+        # if course_image is empty, use the default image url from settings
+        url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
     else:
         loc = StaticContent.compute_location(course.id, course.course_image)
         url = StaticContent.serialize_asset_key_with_slash(loc)
@@ -151,6 +150,16 @@ def find_file(filesystem, dirs, filename):
         if filesystem.exists(filepath):
             return filepath
     raise ResourceNotFoundError(u"Could not find {0}".format(filename))
+
+
+def get_course_university_about_section(course):  # pylint: disable=invalid-name
+    """
+    Returns a snippet of HTML displaying the course's university.
+
+    Arguments:
+        course (CourseDescriptor|CourseOverview): A course.
+    """
+    return course.display_org_with_default
 
 
 def get_course_about_section(course, section_key):
@@ -228,7 +237,7 @@ def get_course_about_section(course, section_key):
     elif section_key == "title":
         return course.display_name_with_default
     elif section_key == "university":
-        return course.display_org_with_default
+        return get_course_university_about_section(course)
     elif section_key == "number":
         return course.display_number_with_default
 

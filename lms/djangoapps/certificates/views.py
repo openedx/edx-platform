@@ -21,7 +21,8 @@ from certificates.api import (
     get_active_web_certificate,
     get_certificate_url,
     generate_user_certificates,
-    emit_certificate_event
+    emit_certificate_event,
+    has_html_certificates_enabled
 )
 from certificates.models import (
     certificate_status_for_student,
@@ -442,8 +443,7 @@ def _update_certificate_context(context, course, user, user_certificate):
             user_certificate.mode,
             get_certificate_url(
                 user_id=user.id,
-                course_id=unicode(course.id),
-                verify_uuid=user_certificate.verify_uuid
+                course_id=unicode(course.id)
             )
         )
 
@@ -507,7 +507,7 @@ def render_html_view(request, user_id, course_id):
     invalid_template_path = 'certificates/invalid.html'
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+    if not has_html_certificates_enabled(course_id):
         return render_to_response(invalid_template_path, context)
 
     # Load the core building blocks for the view context

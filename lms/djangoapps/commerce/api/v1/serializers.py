@@ -9,6 +9,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
     """ CourseMode serializer. """
     name = serializers.CharField(source='mode_slug')
     price = serializers.IntegerField(source='min_price')
+    expires = serializers.DateTimeField(source='expiration_datetime', required=False, blank=True)
 
     def get_identity(self, data):
         try:
@@ -18,7 +19,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
 
     class Meta(object):  # pylint: disable=missing-docstring
         model = CourseMode
-        fields = ('name', 'currency', 'price', 'sku')
+        fields = ('name', 'currency', 'price', 'sku', 'expires')
 
 
 class CourseSerializer(serializers.Serializer):

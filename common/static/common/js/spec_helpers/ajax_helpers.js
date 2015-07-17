@@ -18,12 +18,12 @@ define(['sinon', 'underscore'], function(sinon, _) {
      * Get a reference to the mocked server, and respond
      * to all requests with the specified statusCode.
      */
-    fakeServer = function (statusCode, that) {
+    fakeServer = function (that, response) {
         var server = sinon.fakeServer.create();
         that.after(function() {
             server.restore();
         });
-        server.respondWith([statusCode, {}, '']);
+        server.respondWith(response);
         return server;
     };
 

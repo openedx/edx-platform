@@ -1,4 +1,6 @@
 import datetime
+import ddt
+import itertools
 import pytz
 
 from django.test import TestCase
@@ -9,8 +11,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
 from courseware.masquerade import CourseMasquerade
-from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
+from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory, BetaTesterFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory, CourseEnrollmentFactory
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
@@ -18,6 +21,7 @@ from xmodule.course_module import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.milestones_helpers import fulfill_course_milestone
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -424,3 +428,91 @@ class UserRoleTestCase(TestCase):
             'student',
             access.get_user_role(self.anonymous_user, self.course_key)
         )
+
+
+@ddt.ddt
+class CourseOverviewAccessTestCase(ModuleStoreTestCase):
+    """
+    Tests confirming that has_access works equally on CourseDescriptors and
+    CourseOverviews.
+    """
+
+    def setUp(self):
+        super(CourseOverviewAccessTestCase, self).setUp()
+
+        today = datetime.datetime.now(pytz.UTC)
+        last_week = today - datetime.timedelta(days=7)
+        next_week = today + datetime.timedelta(days=7)
+
+        self.course_default = CourseFactory.create()
+        self.course_started = CourseFactory.create(start=last_week)
+        self.course_not_started = CourseFactory.create(start=next_week, days_early_for_beta=10)
+        self.course_staff_only = CourseFactory.create(visible_to_staff_only=True)
+        self.course_mobile_available = CourseFactory.create(mobile_available=True)
+        self.course_with_pre_requisite = CourseFactory.create(
+            pre_requisite_courses=[str(self.course_started.id)]
+        )
+        self.course_with_pre_requisites = CourseFactory.create(
+            pre_requisite_courses=[str(self.course_started.id), str(self.course_not_started.id)]
+        )
+
+        self.user_normal = UserFactory.create()
+        self.user_beta_tester = BetaTesterFactory.create(course_key=self.course_not_started.id)
+        self.user_completed_pre_requisite = UserFactory.create()  # pylint: disable=invalid-name
+        fulfill_course_milestone(self.user_completed_pre_requisite, self.course_started.id)
+        self.user_staff = UserFactory.create(is_staff=True)
+        self.user_anonymous = AnonymousUserFactory.create()
+
+    LOAD_TEST_DATA = list(itertools.product(
+        ['user_normal', 'user_beta_tester', 'user_staff'],
+        ['load'],
+        ['course_default', 'course_started', 'course_not_started', 'course_staff_only'],
+    ))
+
+    LOAD_MOBILE_TEST_DATA = list(itertools.product(
+        ['user_normal', 'user_staff'],
+        ['load_mobile'],
+        ['course_default', 'course_mobile_available'],
+    ))
+
+    PREREQUISITES_TEST_DATA = list(itertools.product(
+        ['user_normal', 'user_completed_pre_requisite', 'user_staff', 'user_anonymous'],
+        ['view_courseware_with_prerequisites'],
+        ['course_default', 'course_with_pre_requisite', 'course_with_pre_requisites'],
+    ))
+
+    @ddt.data(*(LOAD_TEST_DATA + LOAD_MOBILE_TEST_DATA + PREREQUISITES_TEST_DATA))
+    @ddt.unpack
+    def test_course_overview_access(self, user_attr_name, action, course_attr_name):
+        """
+        Check that a user's access to a course is equal to the user's access to
+        the corresponding course overview.
+
+        Instead of taking a user and course directly as arguments, we have to
+        take their attribute names, as ddt doesn't allow us to reference self.
+
+        Arguments:
+            user_attr_name (str): the name of the attribute on self that is the
+                User to test with.
+            action (str): action to test with.
+                See COURSE_OVERVIEW_SUPPORTED_ACTIONS for valid values.
+            course_attr_name (str): the name of the attribute on self that is
+                the CourseDescriptor to test with.
+        """
+        user = getattr(self, user_attr_name)
+        course = getattr(self, course_attr_name)
+
+        course_overview = CourseOverview.get_from_id(course.id)
+        self.assertEqual(
+            access.has_access(user, action, course, course_key=course.id),
+            access.has_access(user, action, course_overview, course_key=course.id)
+        )
+
+    def test_course_overivew_unsupported_action(self):
+        """
+        Check that calling has_access with an unsupported action raises a
+        ValueError.
+        """
+        overview = CourseOverview.get_from_id(self.course_default.id)
+        with self.assertRaises(ValueError):
+            access.has_access(self.user, '_non_existent_action', overview)

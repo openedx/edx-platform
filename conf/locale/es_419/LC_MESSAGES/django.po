@@ -168,10 +168,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:02+0000\n"
+"POT-Creation-Date: 2015-07-13 04:33+0000\n"
 "PO-Revision-Date: 2015-06-29 17:10+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
-"Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
+"Language-Team: Spanish (Latin America) (http://www.transifex.com/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3033,6 +3033,14 @@ msgstr ""
 msgid "Certificate Name (Long)"
 msgstr "Nombre (largo) para el certificado"
 
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Web/HTML View Enabled"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "If true, certificate Web/HTML views are enabled for the course."
+msgstr ""
+
 #. Translators: This field is the container for course-specific certifcate
 #. configuration values
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5396,10 +5404,6 @@ msgstr "Puntaje"
 msgid "problems"
 msgstr "problemas"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Refund] Devolución solicitada por el usuario"
-
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5407,6 +5411,10 @@ msgid ""
 msgstr ""
 "Se ha solicitado una devolución para {username} ({email}). Para procesar "
 "esta solicitud, visite el vínculo(s) a continuación."
+
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Refund] Devolución solicitada por el usuario"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -5956,13 +5964,13 @@ msgid "{platform_name} Staff"
 msgstr "El equipo de {platform_name}"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
 msgstr "Equipo del curso"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "Equipo"
 
@@ -6167,42 +6175,28 @@ msgstr "Cohorte"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
-"Su reporte de perfiles de inscritos está siendo generado! Puede ver el "
-"estado de la tarea de generación en la sección de 'Tareas Pendientes de "
-"Instructor'"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
-"Una tarea de reporte de perfiles de inscritos ya está en progreso. Verifique"
-" la tabla de 'Tareas pendientes de instructor' para ver el estado de esta "
-"tarea. Cuando se haya completado, el reporte estará disponible para ser "
-"descargado en la tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
-"Su reporte de estudiantes que se pueden inscribir está siendo generado! "
-"Puede ver el estado de la tarea de generación en la sección de 'Tareas "
-"Pendientes de Instructor'"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
-"Una tarea de reporte de estudiantes que pueden inscribirse ya está en "
-"progreso. Verifique la tabla de 'Tareas pendientes de instructor' para ver "
-"el estado de esta tarea. Cuando se haya completado, el reporte estará "
-"disponible para ser descargado en la tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6265,42 +6259,29 @@ msgstr "Cantidad Total descontada"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Instructor Tasks' section."
+"of the generation task in the 'Pending Tasks' section."
 msgstr ""
-"Su reporte detallado de inscripciones está siendo generado! Puede ver el "
-"estado de la tarea de generación en la sección de 'Tareas Pendientes de "
-"Instructor'"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"the 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
 msgstr ""
-"Una tarea de reporte detallado de inscripciones ya está en progreso. "
-"Verifique la tabla de 'Tareas pendientes de instructor' para ver el estado "
-"de esta tarea. Cuando se haya completado, el reporte estará disponible para "
-"ser descargado en la tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Instructor Tasks' section."
+"report, see the 'Pending Tasks' section."
 msgstr ""
-"Su resumen ejecutivo está siendo generado. Puede ver el estado de la tarea "
-"de generación en la sección de 'Tareas Pendientes de Instructor'."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Instructor Tasks' section. When completed, the "
-"report will be available for download in the table below. You will be able "
-"to download the report when it is complete."
+"the report, see the 'Pending Tasks' section. When completed, the report will"
+" be available for download in the table below. You will be able to download "
+"the report when it is complete."
 msgstr ""
-"Una tarea de resumen ejecutivo ya está en progreso. Verifique la tabla de "
-"'Tareas pendientes de instructor' para ver el estado de esta tarea. Cuando "
-"se haya completado, el reporte estará disponible para ser descargado en la "
-"tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6358,40 +6339,28 @@ msgstr "No se puede repuntuar con all_students y unique_student_identifier."
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Instructor Tasks' section."
+"generation task in the 'Pending Tasks' section."
 msgstr ""
-"Su reporte de notas está siendo generado! Puede ver el estado de la tarea de"
-" generación en la sección de 'Tareas Pendientes de Instructor'"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"Tasks' table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
-"Una tarea de reporte de notas ya está en progreso. Verifique la tabla de "
-"'Tareas pendientes de instructor' para ver el estado de esta tarea. Cuando "
-"se haya completado, el reporte estará disponible para ser descargado en la "
-"tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Instructor Tasks' section."
+" generation task in the 'Pending Tasks' section."
 msgstr ""
-"Su reporte de calificaciones de problemas está siendo generado! Puede ver el"
-" estado de la tarea en la sección 'Tareas de instructor pendientes'."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"A problem grade report is already being generated. Check the 'Pending Tasks'"
+" table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
-"Ya está siendo generado un reporte de calificaciones de problemas. Revise la"
-" sección 'Tareas de instructor pendientes' para ver el estado de la tarea. "
-"Cuando se haya completado, el reporte estará disponible para descargar en la"
-" tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -8669,10 +8638,6 @@ msgstr "Youtube"
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "Suscríbase al canal YouTube de {platform_name}."
 
-#: lms/envs/common.py
-msgid "Taiwan"
-msgstr "Taiwan"
-
 #: lms/envs/devstack.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
@@ -9407,19 +9372,18 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Description for the credit provider displayed to users."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Plain text or html content for displaying further steps on receipt page "
+"*after* paying for the credit to get credit for a credit course against a "
+"credit provider."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "File upload corrupted. Please try again"
-msgstr ""
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "Could not find the {root_xml_file} file in the package."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -9835,9 +9799,15 @@ msgid "Empty"
 msgstr "Vacío"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid ""
-"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
-" unit."
+msgid "We only support uploading a .tar.gz file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload corrupted. Please try again"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "Could not find the {0} file in the package."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
@@ -12762,6 +12732,7 @@ msgid "Psychometrics"
 msgstr "Psicometría"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "Administrador"
 
@@ -13006,11 +12977,6 @@ msgstr ""
 " ejemplo del 12 de Septiembre al 17 de octubre, 1 servidor)."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
 msgstr "Tareas de instructor pendientes"
 
@@ -13136,9 +13102,10 @@ msgstr "Su certificado está disponible"
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"You can now access your certificate. If you keep working and receive a "
-"higher grade,you can request an {link_start} updated certificate {link_end}."
+"You can keep working for a higher grade, or request your certificate now."
 msgstr ""
+"Puede seguir trabajando en el curso para obtener una calificación superior, "
+"o puede solicitar su certificado ahora."
 
 #: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
@@ -13174,13 +13141,6 @@ msgid "Congratulations, you qualified for a certificate!"
 msgstr "Felicitaciones, usted califica para recibir un certificado!"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-"Puede seguir trabajando en el curso para obtener una calificación superior, "
-"o puede solicitar su certificado ahora."
-
-#: lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr "Solicitar certificado"
 
@@ -13205,9 +13165,12 @@ msgid "Go to your dashboard"
 msgstr "Ir al panel principal"
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
+msgid "{student_name}, you have not yet met the requirements for credit."
 msgstr ""
-"No ha completado los requerimientos para obtener crédito por este curso."
+
+#: lms/templates/courseware/progress.html
+msgid "Information about course credit requirements"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "display_name"
@@ -13565,14 +13528,33 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
+"Thank you for your payment! To receive your course credit, go to the "
+"{provider_link} website. You may have to complete some additional steps "
+"depending on the institution"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Complete Credit"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
 "Congratulations - you have received credit for this course! For more "
 "information, see {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "{provider_name} has declined your request for course credit. For more "
 "information, contact {provider_link}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Contact {provider_link}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -15143,6 +15125,11 @@ msgid "Generate Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
 msgstr ""
 
@@ -15162,11 +15149,8 @@ msgstr "Información de inscripción"
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"Number of enrollees (instructors, staff members, and students) by track"
+msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""
-"Número total de inscritos (incluye instructores, personal de apoyo y "
-"estudiantes) por ruta:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
@@ -16064,10 +16048,8 @@ msgstr "Addición en lote de usuarios de prueba beta"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
-"be enrolled as a beta tester."
+"be enrolled as beta testers."
 msgstr ""
-"Nota: Los usuarios de prueba deben tener una cuenta activa en "
-"{platform_name} antes de que puedan ser registrados como usuarios de prueba."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -16094,15 +16076,15 @@ msgstr "Eliminar usuario de prueba"
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Administration List Management"
-msgstr "Gestión de listas de Administración"
+msgid "Course Team Management"
+msgstr ""
 
 #. Translators: an "Administrator Group" is a group, such as Course Staff,
 #. that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Select an Administrator Group:"
-msgstr "Seleccione un Grupo de administradores:"
+msgid "Select a course team role:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -16110,49 +16092,35 @@ msgstr "Obteniendo la listas disponibles..."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Staff cannot modify staff or beta tester lists. To modify these lists, "
-"contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a discussion admin for discussion management."
+"Staff cannot modify these lists. To manage course team membership, a course "
+"Admin must give you the Admin role to add Staff or Beta Testers, or the "
+"Discussion Admin role to add discussion moderators and TAs."
 msgstr ""
-"El personal del curso no puede modificar las listas de personal o las listas"
-" probadores beta. Para modificar estas listas, comuníquese con su instructor"
-" y pídale que lo agregarle como un instructor para el gestionar las listas "
-"de personal y las listas beta, o como administrador de foro para la gestión "
-"de los foros."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Course staff can help you manage limited aspects of your course. Staff can "
-"enroll and unenroll students, as well as modify their grades and see all "
-"course data. Course staff are not automatically given access to Studio and "
-"will not be able to edit your course."
+"Course team members with the Staff role help you manage your course. Staff "
+"can enroll and unenroll learners, as well as modify their grades and access "
+"all course data. Staff also have access to your course in Studio and "
+"Insights. You can only give course team roles to enrolled users."
 msgstr ""
-"El personal de apoyo del curso puede ayudarle a gestionar algunos aspectos "
-"de su curso. El personal puede registrar y dar de baja a los estudiantes, "
-"así como modificar sus calificaciones y ver todos los datos del curso. "
-"Personal del curso no tendrá automáticamente el acceso a studio y no estará "
-"en capacidad de modificar su curso."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "Adicionar personal de apoyo"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Instructors"
-msgstr "Instructores"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer discussion access."
+"Course team members with the Admin role help you manage your course. They "
+"can do all of the tasks that Staff can do, and can also add and remove the "
+"Staff and Admin roles, discussion moderation roles, and the beta tester role"
+" to manage course team membership. You can only give course team roles to "
+"enrolled users."
 msgstr ""
-"Los instructores son los administradores principales de un curso. Pueden "
-"añadir y eliminar personal del curso, así como administrar el acceso a los "
-"foros de discusión."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Add Instructor"
-msgstr "Adicionar instructor"
+msgid "Add Admin"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -16160,12 +16128,10 @@ msgstr "Usuarios de pruebas beta"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Beta testers can see course content before the rest of the students. They "
-"can make sure that the content works, but have no additional privileges."
+"Beta Testers can see course content before other learners. They can make "
+"sure that the content works, but have no additional privileges. You can only"
+" give course team roles to enrolled users."
 msgstr ""
-"Los Usuarios de pruebas beta pueden ver el contenido del curso antes de que "
-"el resto de los alumnos. Pueden asegurarse de que el contenido funcione, "
-"pero no tienen privilegios adicionales."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -16177,15 +16143,12 @@ msgstr "Administradores de foros de discusión"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. They "
-"CAN add/delete other moderators and their posts are marked as 'staff'."
+"Discussion Admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. Their "
+"posts are marked as 'staff'. They can also add and remove the discussion "
+"moderation roles to manage course team membership. You can only give course "
+"team roles to enrolled users."
 msgstr ""
-"Los administradores de los foros de discusión pueden editar o borrar "
-"cualquier publicación, pueden borrar los reportes de abuso, cerrar y reabrir"
-" discusiones, validar respuestas, y ver las publicaciones de todas las "
-"cohortes de un curso. También pueden añadir o eliminar a otros moderadores y"
-" sus comentarios quedarán marcados como 'Funcionario'."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -16197,16 +16160,12 @@ msgstr "Moderadores de foros de discusión"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion moderators can edit or delete any post, clear misuse flags, close"
+"Discussion Moderators can edit or delete any post, clear misuse flags, close"
 " and re-open threads, endorse responses, and see posts from all cohorts. "
-"They CANNOT add/delete other moderators and their posts are marked as "
-"'staff'."
+"Their posts are marked as 'staff'. They cannot manage course team membership"
+" by adding or removing discussion moderation roles. You can only give course"
+" team roles to enrolled users."
 msgstr ""
-"Los moderadores pueden editar o borrar cualquier publicación en el foro, "
-"quitar las marcas de uso indebido, cerrar o reabrir discusiones, validar "
-"respuestas y ver las publicaciones de todas las cohortes. No pueden añadir o"
-" borrar a otros moderadores, y sus publicaciones son marcadas como "
-"'publicaciones de funcionarios'."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -16221,13 +16180,9 @@ msgid ""
 "Community TA's are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked 'Community TA'."
+"from all cohorts. Their posts are marked as 'Community TA'. You can only "
+"give course team roles to enrolled users."
 msgstr ""
-"Los profesores asistentes son miembros de la comunidad a quienes encontrará "
-"particularmente útiles en los foros. Ellos pueden editar o borrar cualquier "
-"publicación,  borrar los reportes de abuso, cerrar y reabrir discusiones, "
-"validar respuestas, y ver las publicaciones de todas las cohortes de un "
-"curso. Sus publicaciones estarán marcadas como \"Profesor asistente\"."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -16331,12 +16286,12 @@ msgid "Myself"
 msgstr "Mi mismo"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and instructors"
-msgstr "El personal del curso y los instructores"
+msgid "Staff and admins"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff and instructors)"
-msgstr "Todos (Estudiantes, personal del curso e instructores)"
+msgid "All (students, staff, and admins)"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -16512,13 +16467,9 @@ msgstr "Borrar el estado del estudiante para el problema"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
-" for this problem and student, click on this button:"
+" the 'Pending Tasks' table. To see status for all tasks submitted for this "
+"problem and student, click on this button:"
 msgstr ""
-"Las tareas de re puntuación en segundo plano y el estado de las tareas "
-"activas aparecerán en la tabla de 'Tareas de instructor pendientes'. Para "
-"ver el estado de todas las tareas enviadas para este problema y estudiantes,"
-" haga clic en este botón:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -16712,20 +16663,12 @@ msgid ""
 "{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:\n"
 "{ul_tag}\n"
 "{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}\n"
-"{li_tag}The instructor needs to score the essays that are used to help you better understand the grading\n"
+"{li_tag}The course team needs to score the essays that are used to help you better understand the grading\n"
 "criteria.{end_li_tag}\n"
 "{li_tag}There must be submissions that are waiting for grading.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
 msgstr ""
-"\n"
-"{p_tag}Usted no tiene ninguna calificación de pares pendiente.  Para tener calificaciones de pares:\n"
-"{ul_tag}\n"
-"{li_tag}Usted debe haber enviado una respuesta a un problema de calificación de pares.{end_li_tag}\n"
-"{li_tag}El instructor debe haber calificado los ensayos que se usan para explicarle mejor a usted los criterios de calificación.{end_li_tag}\n"
-"{li_tag}Debe haber envíos que estén pendientes de ser calificados.{end_li_tag}\n"
-"{end_ul_tag}\n"
-"{end_p_tag}\n"
 
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/peer_grading/peer_grading_closed.html
@@ -19986,12 +19929,8 @@ msgid "User's Email Address"
 msgstr "Dirección de correo electrónico del usuario"
 
 #: cms/templates/manage_users.html
-msgid ""
-"Please provide the email address of the course staff member you'd like to "
-"add"
+msgid "Provide the email address of the user you want to add as Staff"
 msgstr ""
-"Por favor proporcione la dirección de correo electrónico de los miembros de "
-"equipo que quiere añadir"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
@@ -20020,12 +19959,9 @@ msgstr "Roles de equipo de apoyo para el curso"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Course team members, or staff, are course co-authors. They have full writing"
-" and editing privileges on all course content."
+"Course team members with the Staff role are course co-authors. They have "
+"full writing and editing privileges on all course content."
 msgstr ""
-"Los miembros de el equipo del curso, o funcionarios, son coautores del "
-"curso. Ellos tienen privilegios completos de edición y escritura sobre todo "
-"el contenido del curso."
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -20036,20 +19972,22 @@ msgstr ""
 "eliminar a otros miembros del equipo del curso."
 
 #: cms/templates/manage_users.html
+msgid ""
+"All course team members are automatically enrolled in the course and can "
+"access content in Studio, the LMS, and Insights."
+msgstr ""
+
+#: cms/templates/manage_users.html
 msgid "Transferring Ownership"
 msgstr "Transfiriendo la propiedad"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Every course must have an Admin. If you're the Admin and you want transfer "
-"ownership of the course, click Add admin access to make another user the "
-"Admin, then ask that user to remove you from the Course Team list."
+"Every course must have an Admin. If you are the Admin and you want to "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
+"Course Team list."
 msgstr ""
-"Cada curso tiene que tener un administrador. Si usted es el administrador y "
-"desea transferir la propiedad del curso, haga clic en añadir acceso de "
-"administrador para nombrar a otro usuario como administrador, y luego "
-"solicite a dicho usuario que lo elimine de la lista de miembros del equipo "
-"del curso."
 
 #: cms/templates/manage_users_lib.html
 msgid "Library User Access"
@@ -20098,29 +20036,22 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Users can view library content and can reference or use library components "
-"in their courses, but they cannot edit the contents of a library."
+"Library Users can view library content and can reference or use library "
+"components in their courses, but they cannot edit the contents of a library."
 msgstr ""
-"Los usuarios pueden ver el contenido de la librería y referenciar o hacer "
-"uso de los componentes en sus cursos, pero no pueden editar los contenidos "
-"de la librería."
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Staff are content co-authors. They have full editing privileges on the "
-"contents of a library."
+"Library Staff are content co-authors. They have full editing privileges on "
+"the contents of a library."
 msgstr ""
-"Los miembros de el equipo del curso son coautores del curso. Tienen "
-"privilegios completos de edición sobre el contenido de la librería."
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Admins have full editing privileges and can also add and remove other team "
-"members. There must be at least one user with Admin privileges in a library."
+"Library Admins have full editing privileges and can also add and remove "
+"other team members. There must be at least one user with the Admin role in a"
+" library."
 msgstr ""
-"Los administradores tienen privilegios de edición y también pueden añadir o "
-"remover los roles a otros miembros. Una librería siempre debe tener al menos"
-" un usuario administrador."
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -20290,16 +20221,16 @@ msgstr ""
 "previsualizarla, siga las instrucciones entregadas por su administrador."
 
 #: cms/templates/settings.html
-msgid "Credit Eligibility Requirements"
-msgstr "Requerimientos para elegibilidad para créditos"
+msgid "Course Credit Requirements"
+msgstr ""
 
 #: cms/templates/settings.html
-msgid "Steps needed for credit eligibility"
-msgstr "Pasos necesarios para elegibilidad para créditos"
+msgid "Steps required to earn course credit"
+msgstr ""
 
 #: cms/templates/settings.html
-msgid "Minimum Passing Grade"
-msgstr "Nota mínima para pasar"
+msgid "Minimum Grade"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Successful Proctored Exam"
@@ -20310,18 +20241,12 @@ msgid "Proctored Exam {number}"
 msgstr "Examen supervisado {number}"
 
 #: cms/templates/settings.html
-msgid "Successful In-Course Reverification"
-msgstr "Re verificación dentro del curso exitosa"
+msgid "ID Verification"
+msgstr ""
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "In-Course Reverification {number}"
 msgstr "Re verificación dentro del curso {number}"
-
-#: cms/templates/settings.html
-msgid "Access to {display_name}"
-msgstr "Acceso a {display_name}"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -20669,20 +20594,20 @@ msgstr ""
 "estudiantes"
 
 #: cms/templates/settings_graders.html
-msgid "Credit Grade &amp; Eligibility"
-msgstr "Calificación para créditos y elegibilidad"
+msgid "Credit Eligibility"
+msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Settings for credit eligibility"
-msgstr "Configuración de elegibilidad para créditos"
+msgid "Settings for course credit eligibility"
+msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Minimum Passing Grade to Earn Credit:"
-msgstr "Calificación mínima para obtener créditos:"
+msgid "Minimum Credit-Eligible Grade:"
+msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Must be greater than or equal to passing grade"
-msgstr "Debe ser mayor o igual a la calificación mínima para aprobar."
+msgid "Must be greater than or equal to the course passing grade"
+msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"

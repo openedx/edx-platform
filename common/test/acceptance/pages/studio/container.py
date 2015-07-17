@@ -281,6 +281,36 @@ class ContainerPage(PageObject):
         """
         return "is-editing" in self.q(css=self.NAME_FIELD_WRAPPER_SELECTOR).first.attrs("class")[0]
 
+    def get_category_tab_names(self, category_type):
+        """
+        Returns list of tab name in a category.
+
+        Arguments:
+            category_type (str): category type
+
+        Returns:
+            list
+        """
+        self.q(css='.add-xblock-component-button[data-type={}]'.format(category_type)).first.click()
+        return self.q(css='.{}-type-tabs>li>a'.format(category_type)).text
+
+    def get_category_tab_components(self, category_type, tab_index):
+        """
+        Return list of component names in a tab in a category.
+
+        Arguments:
+            category_type (str): category type
+            tab_index (int): tab index in a category
+
+        Returns:
+            list
+        """
+        css = '#tab{tab_index} a[data-category={category_type}] span'.format(
+            tab_index=tab_index,
+            category_type=category_type
+        )
+        return self.q(css=css).html
+
 
 class XBlockWrapper(PageObject):
     """

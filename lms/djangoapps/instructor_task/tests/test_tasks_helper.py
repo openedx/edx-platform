@@ -1336,7 +1336,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         current_task = Mock()
         current_task.update_state = Mock()
-        with self.assertNumQueries(104):
+        with self.assertNumQueries(125):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:

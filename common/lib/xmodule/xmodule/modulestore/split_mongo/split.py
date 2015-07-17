@@ -2397,6 +2397,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 parent_block.edit_info.edited_by = user_id
                 parent_block.edit_info.previous_version = parent_block.edit_info.update_version
                 parent_block.edit_info.update_version = new_id
+                # remove the source_version reference
+                parent_block.edit_info.source_version = None
                 self.decache_block(usage_locator.course_key, new_id, parent_block_key)
 
             self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)

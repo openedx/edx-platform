@@ -4,6 +4,7 @@ Tests for credit courses on the student dashboard.
 import unittest
 import datetime
 
+from mock import patch
 import pytz
 from mock import patch
 

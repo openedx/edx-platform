@@ -62,7 +62,10 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar_mongo.panel.MongoDebugPanel',
-    'debug_toolbar.panels.profiling.ProfilingPanel',
+    # ProfilingPanel has been intentionally removed for default devstack.py
+    # runtimes for performance reasons. If you wish to re-enable it in your
+    # local development environment, please create a new settings file
+    # that imports and extends devstack.py.
 )
 
 DEBUG_TOOLBAR_CONFIG = {

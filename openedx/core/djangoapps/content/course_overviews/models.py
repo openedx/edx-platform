@@ -5,13 +5,13 @@ Declaration of CourseOverview model
 import json
 
 import django.db.models
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField
 from django.utils.translation import ugettext
 
-from lms.djangoapps.certificates.api import get_active_web_certificate
-from lms.djangoapps.courseware.courses import course_image_url
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
+from xmodule.course_module import CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
@@ -46,14 +46,16 @@ class CourseOverview(django.db.models.Model):
     # Certification data
     certificates_display_behavior = TextField(null=True)
     certificates_show_before_end = BooleanField()
+    cert_html_view_enabled = BooleanField()
     has_any_active_web_certificate = BooleanField()
     cert_name_short = TextField()
     cert_name_long = TextField()
 
     # Grading
-    lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2)
+    lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2, null=True)
 
     # Access parameters
+    days_early_for_beta = FloatField(null=True)
     mobile_available = BooleanField()
     visible_to_staff_only = BooleanField()
     _pre_requisite_courses_json = TextField()  # JSON representation of list of CourseKey strings
@@ -72,6 +74,19 @@ class CourseOverview(django.db.models.Model):
         Returns:
             CourseOverview: overview extracted from the given course
         """
+        from lms.djangoapps.certificates.api import get_active_web_certificate
+        from lms.djangoapps.courseware.courses import course_image_url
+
+        # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
+        # If the course has a malformed grading policy such that
+        # course._grading_policy['GRADE_CUTOFFS'] = {}, then
+        # course.lowest_passing_grade will raise a ValueError.
+        # Work around this for now by defaulting to None.
+        try:
+            lowest_passing_grade = course.lowest_passing_grade
+        except ValueError:
+            lowest_passing_grade = None
+
         return CourseOverview(
             id=course.id,
             _location=course.location,
@@ -89,12 +104,14 @@ class CourseOverview(django.db.models.Model):
 
             certificates_display_behavior=course.certificates_display_behavior,
             certificates_show_before_end=course.certificates_show_before_end,
+            cert_html_view_enabled=course.cert_html_view_enabled,
             has_any_active_web_certificate=(get_active_web_certificate(course) is not None),
             cert_name_short=course.cert_name_short,
             cert_name_long=course.cert_name_long,
-            lowest_passing_grade=course.lowest_passing_grade,
+            lowest_passing_grade=lowest_passing_grade,
             end_of_course_survey_url=course.end_of_course_survey_url,
 
+            days_early_for_beta=course.days_early_for_beta,
             mobile_available=course.mobile_available,
             visible_to_staff_only=course.visible_to_staff_only,
             _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses)
@@ -111,10 +128,17 @@ class CourseOverview(django.db.models.Model):
         future use.
 
         Arguments:
-            course_id (CourseKey): the ID of the course overview to be loaded
+            course_id (CourseKey): the ID of the course overview to be loaded.
 
         Returns:
-            CourseOverview: overview of the requested course
+            CourseOverview: overview of the requested course. If loading course
+            from the module store failed, returns None.
+
+        Raises:
+            - CourseOverview.DoesNotExist if the course specified by course_id
+                was not found.
+            - IOError if some other error occurs while trying to load the
+                course from the module store.
         """
         course_overview = None
         try:
@@ -123,9 +147,17 @@ class CourseOverview(django.db.models.Model):
             store = modulestore()
             with store.bulk_operations(course_id):
                 course = store.get_course(course_id)
-                if course:
+                if isinstance(course, CourseDescriptor):
                     course_overview = CourseOverview._create_from_course(course)
-                    course_overview.save()  # Save new overview to the cache
+                    course_overview.save()
+                elif course is not None:
+                    raise IOError(
+                        "Error while loading course {} from the module store: {}",
+                        unicode(course_id),
+                        course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    )
+                else:
+                    raise CourseOverview.DoesNotExist()
         return course_overview
 
     def clean_id(self, padding_char='='):

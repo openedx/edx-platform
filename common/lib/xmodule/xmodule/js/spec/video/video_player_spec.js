@@ -333,6 +333,30 @@ function (VideoPlayer) {
             });
         });
 
+        describe('onSeek Youtube', function(){
+            beforeEach(function () {
+                state = jasmine.initializePlayerYouTube();
+                state.videoEl = $('video, iframe');
+            });
+
+           describe('when the video is playing', function () {
+               beforeEach(function(){
+                  state.videoPlayer.onStateChange({
+                      data: YT.PlayerState.PLAYING
+                  });
+               });
+
+               it('Video has started playing', function () {
+                   expect($('.video_control')).toHaveClass('pause');
+               });
+
+               it('seek the player', function () {
+                   state.videoPlayer.seekTo(10);
+                   expect(state.videoPlayer.currentTime).toBe(10);
+               });
+           });
+        });
+
         describe('onSeek', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
