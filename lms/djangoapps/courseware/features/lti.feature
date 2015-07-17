@@ -51,7 +51,6 @@ Feature: LMS.LTI component
   Then I see text "Problem Scores: 5/10"
   And I see graph with total progress "5%"
   Then I click on the "Instructor" tab
-  Then I get sudo access with password "test"
   And I click on the "Student Admin" tab
   And I click on the "View Gradebook" link
   And I see in the gradebook table that "HW" is "50"
@@ -91,7 +90,6 @@ Feature: LMS.LTI component
   Then I see text "Problem Scores: 8/10"
   And I see graph with total progress "8%"
   Then I click on the "Instructor" tab
-  Then I get sudo access with password "test"
   And I click on the "Student Admin" tab
   And I click on the "View Gradebook" link
   And I see in the gradebook table that "HW" is "80"
@@ -118,7 +116,6 @@ Feature: LMS.LTI component
   Then I see text "Problem Scores: 0/10"
   And I see graph with total progress "0%"
   Then I click on the "Instructor" tab
-  Then I get sudo access with password "test"
   And I click on the "Student Admin" tab
   And I click on the "View Gradebook" link
   And I see in the gradebook table that "HW" is "0"
