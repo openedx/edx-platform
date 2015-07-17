@@ -43,7 +43,10 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
-
+from openedx.core.djangoapps.course_cache.course_transformations import (
+    MultiParentAccessRule,
+    VisibilityTransformation,
+)
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -2577,4 +2580,5 @@ JWT_ISSUER = None
 
 # TODO me: Add a comment explaining what this is.
 ALL_COURSE_TRANSFORMATIONS = {
+    'visibility': VisibilityTransformation('visibility', MultiParentAccessRule.ACCESS_TO_ALL_REQUIRED)
 }
