@@ -12,7 +12,6 @@ from mock import patch
 from nose.tools import assert_in  # pylint: disable=no-name-in-module
 
 from courseware.tests.factories import StaffFactory, InstructorFactory
-from terrain.steps import i_get_sudo_access
 
 
 @step(u'Given I am "([^"]*)" for a very large course')
@@ -72,17 +71,11 @@ def i_am_staff_or_instructor(step, role):  # pylint: disable=unused-argument
         )
 
 
-def go_to_instructor_tab(step):
+def go_to_section(section_name):
     # section name should be one of
     # course_info, membership, student_admin, data_download, analytics, send_email
     world.visit(u'/courses/{}'.format(world.course_key))
     world.css_click(u'a[href="/courses/{}/instructor"]'.format(world.course_key))
-    i_get_sudo_access(step, 'test')
-
-
-def go_to_section(section_name):
-    # section name should be one of
-    # course_info, membership, student_admin, data_download, analytics, send_email
     world.css_click('a[data-section="{0}"]'.format(section_name))
 
 
@@ -91,7 +84,6 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
 
     if button == "Generate Grade Report":
         # Go to the data download section of the instructor dash
-        go_to_instructor_tab(step)
         go_to_section("data_download")
 
         # Click generate grade report button
@@ -109,21 +101,18 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
 
     elif button == "Grading Configuration":
         # Go to the data download section of the instructor dash
-        go_to_instructor_tab(step)
         go_to_section("data_download")
 
         world.css_click('input[name="dump-gradeconf"]')
 
     elif button == "List enrolled students' profile information":
         # Go to the data download section of the instructor dash
-        go_to_instructor_tab(step)
         go_to_section("data_download")
 
         world.css_click('input[name="list-profiles"]')
 
     elif button == "Download profile information as a CSV":
         # Go to the data download section of the instructor dash
-        go_to_instructor_tab(step)
         go_to_section("data_download")
 
         world.css_click('input[name="list-profiles-csv"]')
@@ -143,5 +132,4 @@ def click_a_button(step, tab_name):  # pylint: disable=unused-argument
         'Analytics': 'analytics',
         'Email': 'send_email',
     }
-    go_to_instructor_tab(step)
     go_to_section(tab_name_dict[tab_name])

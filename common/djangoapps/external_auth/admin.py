@@ -3,7 +3,7 @@ django admin pages for courseware model
 '''
 
 from external_auth.models import *
-from django.contrib import admin
+from ratelimitbackend import admin
 
 
 class ExternalAuthMapAdmin(admin.ModelAdmin):

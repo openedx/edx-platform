@@ -52,7 +52,6 @@ from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
 )
-from django_sudo_helpers.decorators import sudo_required
 import track.views
 from django.utils.translation import ugettext as _
 
@@ -80,7 +79,6 @@ def split_by_comma_and_whitespace(a_str):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@sudo_required
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)

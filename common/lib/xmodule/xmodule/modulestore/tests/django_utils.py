@@ -17,7 +17,6 @@ from request_cache.middleware import RequestCache
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from openedx.core.lib.tempdir import mkdtemp_clean
 
-from sudo.utils import region_name
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
@@ -423,13 +422,3 @@ class ModuleStoreTestCase(TestCase):
                 fields={"display_name": "Syllabus"},
             )
         return self.toy_loc
-
-    def grant_sudo_access(self, region, password):
-        """
-        Grant sudo access to staff or instructor user.
-        """
-        self.client.post(
-            '/sudo/?region={}'.format(region_name(region)),
-            {'password': password},
-            follow=True
-        )
