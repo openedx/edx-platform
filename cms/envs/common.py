@@ -758,6 +758,7 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.course_cache',
 
     # Credit courses
     'openedx.core.djangoapps.credit',
