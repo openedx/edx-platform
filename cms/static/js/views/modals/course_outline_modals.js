@@ -268,14 +268,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         timeLimitFocusout: function(event) {
             var selectedTimeLimit = $(event.currentTarget).val();
             if (!this.isValidTimeLimit(selectedTimeLimit)) {
-                $(event.currentTarget).val("00:00");
+                $(event.currentTarget).val("00:30");
             }
         },
         timedExamination: function (event) {
             event.preventDefault();
             if (!$(event.currentTarget).is(':checked')) {
                 this.$('#id_exam_proctoring').attr('checked', false);
-                this.$('#id_time_limit').val('00:00');
+                this.$('#id_time_limit').val('00:30');
                 this.$('#id_exam_proctoring').attr('disabled','disabled');
                 this.$('#id_time_limit').attr('disabled', 'disabled');
             }
@@ -329,7 +329,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         convertTimeLimitToMinutes: function (time_limit) {
             var time = time_limit.split(':');
             var total_time = (parseInt(time[0]) * 60) + parseInt(time[1]);
-            return total_time
+            return total_time;
         },
         isExamProctoringEnable: function () {
             return this.$('#id_exam_proctoring').is(':checked');
@@ -445,10 +445,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (xblockInfo.isChapter()) {
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
-                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor];
+                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
+
+                // since timed/proctored exams are optional
+                // we want it before the StaffLockEditor
+                // to keep it closer to the GradingEditor
                 if (options.enable_proctored_exams) {
                     editors.push(TimedExaminationPreferenceEditor);
                 }
+
+                editors.push(StaffLockEditor);
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
             }
