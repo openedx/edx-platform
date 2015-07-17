@@ -1,10 +1,14 @@
 import logging
 import json
+import ddt
 
+from django.conf import settings
+from django.core.cache import get_cache
 from django.test.client import Client, RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -18,8 +22,11 @@ from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 
 
 log = logging.getLogger(__name__)
@@ -161,16 +168,19 @@ class ThreadActionGroupIdTestCase(
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
-class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
+class ViewsTestCaseMixin(object):
+    """
+    This class is used by both ViewsQueryCountTestCase and ViewsTestCase. By
+    breaking out set_up_course into its own method, ViewsQueryCountTestCase
+    can build a course in a particular modulestore, while ViewsTestCase can
+    just run it in setUp for all tests.
+    """
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-
-        # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
-        # so we need to call super.setUp() which reloads urls.py (because
-        # of the UrlResetMixin)
-        super(ViewsTestCase, self).setUp(create_user=False)
+    def set_up_course(self, module_count=0):
+        """
+        Creates a course, optionally with module_count discussion modules, and
+        a user with appropriate permissions.
+        """
 
         # create a course
         self.course = CourseFactory.create(
@@ -179,6 +189,17 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             display_name='Robot Super Course',
         )
         self.course_id = self.course.id
+
+        # add some discussion modules
+        for i in range(module_count):
+            ItemFactory.create(
+                parent_location=self.course.location,
+                category='discussion',
+                discussion_id='id_module_{}'.format(i),
+                discussion_category='Category {}'.format(i),
+                discussion_target='Discussion {}'.format(i)
+            )
+
         # seed the forums permissions and roles
         call_command('seed_permissions_roles', self.course_id.to_deprecated_string())
 
@@ -201,7 +222,24 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             self.client = Client()
             assert_true(self.client.login(username='student', password='test'))
 
-    def test_create_thread(self, mock_request):
+    def _setup_mock_request(self, mock_request, include_depth=False):
+        """
+        Ensure that mock_request returns the data necessary to make views
+        function correctly
+        """
+        mock_request.return_value.status_code = 200
+        data = {
+            "user_id": str(self.student.id),
+            "closed": False,
+        }
+        if include_depth:
+            data["depth"] = 0
+        self._set_mock_request_data(mock_request, data)
+
+    def create_thread_helper(self, mock_request):
+        """
+        Issues a request to create a thread and verifies the result.
+        """
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "thread_type": "discussion",
@@ -255,13 +293,90 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
                 'title': u'Hello',
                 'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
                 'anonymous': False,
-                'course_id': u'MITx/999/Robot_Super_Course',
+                'course_id': unicode(self.course_id),
             },
             params={'request_id': ANY},
             headers=ANY,
             timeout=5
         )
         assert_equal(response.status_code, 200)
+
+    def update_thread_helper(self, mock_request):
+        """
+        Issues a request to update a thread and verifies the result.
+        """
+        self._setup_mock_request(mock_request)
+        response = self.client.post(
+            reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
+            data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
+        )
+        self.assertEqual(response.status_code, 200)
+
+
+@ddt.ddt
+@patch('lms.lib.comment_client.utils.requests.request')
+class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ViewsQueryCountTestCase, self).setUp(create_user=False)
+
+    def clear_caches(self):
+        """Clears caches so that query count numbers are accurate."""
+        for cache in settings.CACHES:
+            get_cache(cache).clear()
+        RequestCache.clear_request_cache()
+
+    def count_queries(func):  # pylint: disable=no-self-argument
+        """
+        Decorates test methods to count mongo and SQL calls for a
+        particular modulestore.
+        """
+        def inner(self, default_store, module_count, mongo_calls, sql_queries, *args, **kwargs):
+            with modulestore().default_store(default_store):
+                self.set_up_course(module_count=module_count)
+                self.clear_caches()
+                with self.assertNumQueries(sql_queries):
+                    with check_mongo_calls(mongo_calls):
+                        func(self, *args, **kwargs)
+        return inner
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 3, 4, 21),
+        (ModuleStoreEnum.Type.mongo, 20, 4, 21),
+        (ModuleStoreEnum.Type.split, 3, 13, 21),
+        (ModuleStoreEnum.Type.split, 20, 13, 21),
+    )
+    @ddt.unpack
+    @count_queries
+    def test_create_thread(self, mock_request):
+        self.create_thread_helper(mock_request)
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 3, 3, 16),
+        (ModuleStoreEnum.Type.mongo, 20, 3, 16),
+        (ModuleStoreEnum.Type.split, 3, 10, 16),
+        (ModuleStoreEnum.Type.split, 20, 10, 16),
+    )
+    @ddt.unpack
+    @count_queries
+    def test_update_thread(self, mock_request):
+        self.update_thread_helper(mock_request)
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
+        # so we need to call super.setUp() which reloads urls.py (because
+        # of the UrlResetMixin)
+        super(ViewsTestCase, self).setUp(create_user=False)
+        self.set_up_course()
+
+    def test_create_thread(self, mock_request):
+        self.create_thread_helper(mock_request)
 
     def test_delete_comment(self, mock_request):
         self._set_mock_request_data(mock_request, {
@@ -279,20 +394,6 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         args = mock_request.call_args[0]
         self.assertEqual(args[0], "delete")
         self.assertTrue(args[1].endswith("/{}".format(test_comment_id)))
-
-    def _setup_mock_request(self, mock_request, include_depth=False):
-        """
-        Ensure that mock_request returns the data necessary to make views
-        function correctly
-        """
-        mock_request.return_value.status_code = 200
-        data = {
-            "user_id": str(self.student.id),
-            "closed": False,
-        }
-        if include_depth:
-            data["depth"] = 0
-        self._set_mock_request_data(mock_request, data)
 
     def _test_request_error(self, view_name, view_kwargs, data, mock_request):
         """
@@ -372,14 +473,9 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         )
 
     def test_update_thread_course_topic(self, mock_request):
-        self._setup_mock_request(mock_request)
-        response = self.client.post(
-            reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
-            data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
-        )
-        self.assertEqual(response.status_code, 200)
+        self.update_thread_helper(mock_request)
 
-    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
+    @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
     def test_update_thread_wrong_commentable_id(self, mock_get_discussion_id_map, mock_request):
         self._test_request_error(
             "update_thread",
@@ -876,7 +972,7 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
+    @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request, mock_get_discussion_id_map):
         self._set_mock_request_data(mock_request, {
