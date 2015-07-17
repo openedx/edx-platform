@@ -1,6 +1,7 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 import logging
 
+from django.conf import settings
 from datetime import datetime
 from pytz import UTC
 
@@ -34,7 +35,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
 
 @receiver(SignalHandler.course_published)
-def look_for_timed_exam_publishing(sender, course_key, **kwargs):
+def look_for_timed_exam_publishing(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Receives a course published signal an examines the course for sequences
     that are marked as timed exams
@@ -80,7 +81,8 @@ def look_for_timed_exam_publishing(sender, course_key, **kwargs):
                 is_proctored=timed_exam.is_proctored_enabled,
                 is_active=True
             )
-            log.info('Updated timed exam {exam_id}'.format(exam_id=exam['id']))
+            msg = 'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
+            log.info(msg)
         except ProctoredExamNotFoundException:
             exam_id = create_exam(
                 course_id=unicode(course_key),
@@ -90,7 +92,8 @@ def look_for_timed_exam_publishing(sender, course_key, **kwargs):
                 is_proctored=timed_exam.is_proctored_enabled,
                 is_active=True
             )
-            log.info('Created new timed exam {exam_id}'.format(exam_id=exam_id))
+            msg = 'Created new timed exam {exam_id}'.format(exam_id=exam_id)
+            log.info(msg)
 
     # then see which exams we have in edx-proctoring that are not in
     # our current list. That means the the user has disabled it
@@ -101,10 +104,15 @@ def look_for_timed_exam_publishing(sender, course_key, **kwargs):
         if exam['is_active']:
             # try to look up the content_id in the sequences location
 
-            if not filter(lambda t: unicode(t.location) == exam['content_id'], timed_exams):
+            search = [
+                timed_exam for timed_exam in timed_exams if
+                unicode(timed_exam.location) == exam['content_id']
+            ]
+            if not search:
                 # This means it was turned off in Studio, we need to mark
                 # the exam as inactive (we don't delete!)
-                log.info('Disabling timed exam {exam_id}'.format(exam_id=exam['id']))
+                msg = 'Disabling timed exam {exam_id}'.format(exam_id=exam['id'])
+                log.info(msg)
                 update_exam(
                     exam_id=exam['id'],
                     is_active=False,
