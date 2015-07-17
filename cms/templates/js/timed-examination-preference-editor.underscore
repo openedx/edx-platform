@@ -1,0 +1,39 @@
+<form>
+    <h3 class="modal-section-title"><%= gettext('Timed Exam') %></h3>
+    <div class="modal-section-content has-actions">
+        <div class='exam-time-list-fields'>
+            <ul class="list-fields list-input">
+                <li class="field field-checkbox checkbox-cosmetic">
+                    <input type="checkbox" id="id_timed_examination" name="timed_examination" class="input input-checkbox" />
+                    <label for="id_timed_examination" class="label">
+                      <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+                      <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+                      <%= gettext('This exam is timed') %>
+                    </label>
+                </li>
+            </ul>
+        </div>
+        <div class='exam-time-list-fields'>
+            <ul class="list-fields list-input time-limit">
+                <li class="field field-text field-time-limit">
+                    <label for="id_time_limit" class="label"><%= gettext('Time Allotted:') %></label>
+                    <input type="text" id="id_time_limit" name="time_limit"
+                      value=""
+                      placeholder="HH:MM" class="time_limit release-time time input input-text" autocomplete="off" />
+                </li>
+                <p class='field-message'><%= gettext('Students will be warned 20 minutes before time expires') %></p>
+            </ul>
+        </div>
+        <ul class="list-fields list-input">
+            <li class="field field-checkbox checkbox-cosmetic">
+                <input type="checkbox" id="id_exam_proctoring" name="exam_proctoring" class="input input-checkbox" />
+                <label for="id_exam_proctoring" class="label">
+                    <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+                      <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+                      <%= gettext('This exam is proctored') %>
+                </label>
+            </li>
+            <p class='field-message'> <%= gettext('Student access will be managed by exam codes') %> </p>
+        </ul>
+    </div>
+</form>

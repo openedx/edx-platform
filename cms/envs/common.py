@@ -181,6 +181,9 @@ FEATURES = {
 
     # Can the visibility of the discussion tab be configured on a per-course basis?
     'ALLOW_HIDING_DISCUSSION_TAB': False,
+
+    # Timed or Proctored Exams
+    'ENABLE_PROCTORED_EXAMS': False,
 }
 
 ENABLE_JASMINE = False
@@ -761,6 +764,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     'xblock_django',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 
@@ -1016,3 +1022,12 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 ################################ Deprecated Blocks Info ################################
 
 DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+
+
+#### PROCTORING CONFIGURATION DEFAULTS
+
+PROCTORING_BACKEND_PROVIDER = {
+    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'options': {},
+}
+PROCTORING_SETTINGS = {}

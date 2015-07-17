@@ -48,6 +48,34 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
+    is_time_limited = Boolean(
+        display_name=_("Is Time Limited"),
+        help=_(
+            "This setting indicates whether students have a limited time"
+            " to view or interact with this courseware component."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    default_time_limit_mins = Integer(
+        display_name=_("Time Limit in Minutes"),
+        help=_(
+            "The number of minutes available to users for viewing or interacting with this courseware component."
+        ),
+        default=None,
+        scope=Scope.settings,
+    )
+
+    is_proctored_enabled = Boolean(
+        display_name=_("Is Proctoring Enabled"),
+        help=_(
+            "This setting indicates whether this exam is a proctored exam."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
 
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence

@@ -56,6 +56,9 @@ git+https://github.com/edx/edx-lint.git@ed8c8d2a0267d4d42f43642d193e25f8bd575d9b
 git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-client==1.1.0
 -e git+https://github.com/edx/edx-user-state-client.git@64a8b603f42669bb7fdca03d364d4e8d3d6ad67d#egg=edx-user-state-client
 
+-e git+https://github.com/edx/edx-proctoring.git@6e7b4dba5b6d7a13c7dc111ae64e0579a1301ff9#egg=edx-proctoring
+
+
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll
