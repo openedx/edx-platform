@@ -38,8 +38,8 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFiel
     """
     class Meta(object):  # pylint: disable=missing-docstring
         model = User
-        fields = ("username", "email", "date_joined", "is_active")
-        read_only_fields = ("username", "email", "date_joined", "is_active")
+        fields = ("id", "username", "email", "date_joined", "is_active")
+        read_only_fields = ("id", "username", "email", "date_joined", "is_active")
         explicit_read_only_fields = ()
 
 
