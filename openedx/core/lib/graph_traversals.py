@@ -83,6 +83,7 @@ def traverse_depth_first(
     """
     ...
     """
+    # TODO me: Remove this function if we don't end up using it anywhere.
     return _traverse_generic(
         start_node,
         get_parents=None,

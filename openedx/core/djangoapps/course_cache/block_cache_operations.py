@@ -17,7 +17,7 @@ def _get_cache():
         django.core.cache.BaseCache
     """
     # TODO: For Django 1.7+, use django.core.cache.caches[cache_name].
-    return django.core.cache.get_cache('course_blocks_cache')
+    return django.core.cache.get_cache('edx_course_blocks_mem_cache')
 
 
 def create_block_structure(course_key):
