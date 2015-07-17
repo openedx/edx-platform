@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.signals import listen_for_course_publish
+from openedx.core.djangoapps.credit.signals import on_course_publish
 
 
 class CreditEligibilityTest(CourseTestCase):
@@ -50,7 +50,7 @@ class CreditEligibilityTest(CourseTestCase):
         credit_course.save()
         self.assertEqual(len(get_credit_requirements(self.course.id)), 0)
         # test that after publishing course, minimum grade requirement is added
-        listen_for_course_publish(self, self.course.id)
+        on_course_publish(self.course.id)
         self.assertEqual(len(get_credit_requirements(self.course.id)), 1)
 
         response = self.client.get_html(self.course_details_url)
