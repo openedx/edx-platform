@@ -15,10 +15,13 @@ from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 log = logging.getLogger(__name__)
 
 
-@receiver(SignalHandler.course_published)
-def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
-    """Receive 'course_published' signal and kick off a celery task to update
-    the credit course requirements.
+def on_course_publish(course_key):  # pylint: disable=unused-argument
+    """
+    Will receive a delegated 'course_published' signal from cms/djangoapps/contentstore/signals.py
+    and kick off a celery task to update the credit course requirements.
+
+    IMPORTANT: It is assumed that the edx-proctoring subsystem has been appropriate refreshed
+    with any on_publish event workflow *BEFORE* this method is called.
     """
 
     # Import here, because signal is registered at startup, but items in tasks
