@@ -83,7 +83,7 @@ class AccountView(APIView):
               address, or null.
             * name: The full name of the user.
             * profile_image: A JSON representation of a user's profile image
-              information. This representation has the following keys. 
+              information. This representation has the following keys.
 
                 * "has_image": Boolean indicating whether the user has a profile
                   image.
@@ -99,7 +99,7 @@ class AccountView(APIView):
 
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
-            rendered values to avoid script injections. 
+            rendered values to avoid script injections.
 
             If a user who does not have "is_staff" access requests account
             information for a different user, only a subset of these fields is

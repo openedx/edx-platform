@@ -50,22 +50,22 @@ class ProfileImageUploadView(APIView):
 
     **Example Responses**
 
-        When the requesting user tries to upload the image for a different user, the 
+        When the requesting user tries to upload the image for a different user, the
         request returns one of the following responses.
 
-        * If the requesting user has staff access, the request returns an HTTP 403 
+        * If the requesting user has staff access, the request returns an HTTP 403
           "Forbidden" response.
 
         * If the requesting user does not have staff access, the request returns
           an HTTP 404 "Not Found" response.
 
-        * If no user matches the "username" parameter, the request returns an HTTP 
+        * If no user matches the "username" parameter, the request returns an HTTP
           404 "Not Found" response.
 
-        * If the upload could not be performed, the request returns an HTTP 400 "Bad 
+        * If the upload could not be performed, the request returns an HTTP 400 "Bad
           Request" response with more information.
 
-        * If the upload is successful, the request returns an HTTP 204 "No Content" 
+        * If the upload is successful, the request returns an HTTP 204 "No Content"
           response with no additional content.
 
     """
@@ -141,20 +141,20 @@ class ProfileImageRemoveView(APIView):
 
     **Example Responses**
 
-        When the requesting user tries to remove the profile image for a different user, the 
-        request returns one of the following responses.
+        When the requesting user tries to remove the profile image for a
+        different user, the request returns one of the following responses.
 
-        * If the user does not have staff access, the request returns an HTTP 
+        * If the user does not have staff access, the request returns an HTTP
           404 "Not Found" response.
 
-        * If no user matches the "username" parameter, the request returns an HTTP 
-          404 "Not Found" response.
+        * If no user matches the "username" parameter, the request returns an
+          HTTP 404 "Not Found" response.
 
-        * If the image could not be removed, the request returns an HTTP 400 "Bad 
-          Request" response with more information.
+        * If the image could not be removed, the request returns an HTTP 400
+          "Bad Request" response with more information.
 
-        * If the request successfully removes the image, the request returns an 
-          HTTP 204 "No Content" response with no additional content.
+        * If the request successfully removes the image, the request returns
+          an HTTP 204 "No Content" response with no additional content.
 
 
     """

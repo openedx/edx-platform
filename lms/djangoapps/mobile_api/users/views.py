@@ -81,9 +81,9 @@ class UserCourseStatus(views.APIView):
         PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
         **PATCH Parameters**
-           
-          The body of the PATCH request can include the following parameters. 
-          
+
+          The body of the PATCH request can include the following parameters.
+
           * last_visited_module_id={module_id}
           * modification_date={date}
 

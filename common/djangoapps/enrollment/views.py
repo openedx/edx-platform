@@ -308,11 +308,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             GET /api/enrollment/v1/enrollment
 
             POST /api/enrollment/v1/enrollment {
-                
+
                 "mode": "credit",
                 "course_details":{"course_id": "edX/DemoX/Demo_Course"},
                 "enrollment_attributes":[{"namespace": "credit","name": "provider_id","value": "hogwarts",},]
-            
+
             }
 
             **POST Parameters**
@@ -353,7 +353,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
               * mode: Optional. The course mode for the enrollment. Individual
                 users cannot upgrade their enrollment mode from "honor". Only
                 server-to-server requests can enroll with other modes.
-              
+
               * user: Optional. The user ID of the currently logged in user. You
                 cannot use the command to enroll a different user.
 
