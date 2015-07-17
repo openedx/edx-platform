@@ -30,6 +30,7 @@ class RenderXBlockTestMixin(object):
         '<footer id="footer-openedx"',
         '<div class="window-wrap"',
         '<div class="preview-menu"',
+        '<div class="container"'
     ]
 
     # DOM elements that appear in an xBlock,

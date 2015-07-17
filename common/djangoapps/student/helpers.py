@@ -23,8 +23,9 @@ VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
 VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
 
-def check_verify_status_by_course(user, course_enrollment_pairs, all_course_modes):
-    """Determine the per-course verification statuses for a given user.
+def check_verify_status_by_course(user, course_enrollments, all_course_modes):
+    """
+    Determine the per-course verification statuses for a given user.
 
     The possible statuses are:
         * VERIFY_STATUS_NEED_TO_VERIFY: The student has not yet submitted photos for verification.
@@ -46,8 +47,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
 
     Arguments:
         user (User): The currently logged-in user.
-        course_enrollment_pairs (list): The courses the user is enrolled in.
-            The list should contain tuples of `(Course, CourseEnrollment)`.
+        course_enrollments (list[CourseEnrollment]): The courses the user is enrolled in.
         all_course_modes (list): List of all course modes for the student's enrolled courses,
             including modes that have expired.
 
@@ -75,15 +75,15 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
 
     recent_verification_datetime = None
 
-    for course, enrollment in course_enrollment_pairs:
+    for enrollment in course_enrollments:
 
         # Get the verified mode (if any) for this course
         # We pass in the course modes we have already loaded to avoid
         # another database hit, as well as to ensure that expired
         # course modes are included in the search.
         verified_mode = CourseMode.verified_mode_for_course(
-            course.id,
-            modes=all_course_modes[course.id]
+            enrollment.course_id,
+            modes=all_course_modes[enrollment.course_id]
         )
 
         # If no verified mode has ever been offered, or the user hasn't enrolled
@@ -156,7 +156,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
                 if deadline is not None and deadline > now:
                     days_until_deadline = (deadline - now).days
 
-                status_by_course[course.id] = {
+                status_by_course[enrollment.course_id] = {
                     'status': status,
                     'days_until_deadline': days_until_deadline
                 }

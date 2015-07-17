@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-06 12:11+0000\n"
-"PO-Revision-Date: 2015-07-06 12:11:43.963099\n"
+"POT-Creation-Date: 2015-07-13 04:42+0000\n"
+"PO-Revision-Date: 2015-07-13 04:42:08.333956\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2813,6 +2813,14 @@ msgstr ""
 msgid "Certificate Name (Long)"
 msgstr "ذثقفهبهذشفث رشوث (مخرل)"
 
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Web/HTML View Enabled"
+msgstr "ذثقفهبهذشفث صثز/افوم دهثص ثرشزمثي"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "If true, certificate Web/HTML views are enabled for the course."
+msgstr "هب فقعث, ذثقفهبهذشفث صثز/افوم دهثصس شقث ثرشزمثي بخق فاث ذخعقسث."
+
 #. Translators: This field is the container for course-specific certifcate
 #. configuration values
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5097,10 +5105,6 @@ msgstr "سذخقث"
 msgid "problems"
 msgstr "حقخزمثوس"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[قثبعري] عسثق-قثضعثسفثي قثبعري"
-
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5108,6 +5112,10 @@ msgid ""
 msgstr ""
 "ش قثبعري قثضعثسف اشس زثثر هرهفهشفثي بخق {username} ({email}). فخ حقخذثسس "
 "فاهس قثضعثسف, حمثشسث دهسهف فاث مهرن(س) زثمخص."
+
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[قثبعري] عسثق-قثضعثسفثي قثبعري"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -5648,13 +5656,13 @@ msgid "{platform_name} Staff"
 msgstr "{platform_name} سفشبب"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
 msgstr "ذخعقسث سفشبب"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "سفشبب"
 
@@ -5858,38 +5866,38 @@ msgstr "ذخاخقف"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 "غخعق ثرقخممثي سفعيثرف حقخبهمث قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث "
-"سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر."
+"سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 "شر ثرقخممثي سفعيثرف حقخبهمث قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. "
-"ذاثذن فاث 'حثريهرل هرسفقعذفخق فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر "
-"ذخوحمثفثي, فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"ذاثذن فاث 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, "
+"فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Instructor Tasks' section."
+"status of the generation task in the 'Pending Tasks' section."
 msgstr ""
 "غخعق سفعيثرفس صاخ وشغ ثرقخمم قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث "
-"سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر."
+"سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"Check the 'Pending Tasks' table for the status of the task. When completed, "
+"the report will be available for download in the table below."
 msgstr ""
 "ش سفعيثرفس صاخ وشغ ثرقخمم قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. "
-"ذاثذن فاث 'حثريهرل هرسفقعذفخق فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر "
-"ذخوحمثفثي, فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"ذاثذن فاث 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, "
+"فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -5949,40 +5957,40 @@ msgstr "فخفشم يهسذخعرفثي شوخعرف"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Instructor Tasks' section."
+"of the generation task in the 'Pending Tasks' section."
 msgstr ""
 "غخعق يثفشهمثي ثرقخمموثرف قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث سفشفعس "
-"خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر."
+"خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Instructor Tasks' table for the status of the task. When "
-"completed, the report will be available for download in the table below."
+"the 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
 msgstr ""
 "ش يثفشهمثي ثرقخمموثرف قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. ذاثذن "
-"فاث 'حثريهرل هرسفقعذفخق فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر "
-"ذخوحمثفثي, فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"فاث 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث "
+"قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Instructor Tasks' section."
+"report, see the 'Pending Tasks' section."
 msgstr ""
 "غخعق ثطثذعفهدث سعووشقغ قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
-"قثحخقف, سثث فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر."
+"قثحخقف, سثث فاث 'حثريهرل فشسنس' سثذفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Instructor Tasks' section. When completed, the "
-"report will be available for download in the table below. You will be able "
-"to download the report when it is complete."
+"the report, see the 'Pending Tasks' section. When completed, the report will"
+" be available for download in the table below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 "شر ثطثذعفهدث سعووشقغ قثحخقف هس ذعققثرفمغ هر حقخلقثسس. فخ دهثص فاث سفشفعس خب "
-"فاث قثحخقف, سثث فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر. صاثر ذخوحمثفثي, فاث "
-"قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص. غخع صهمم زث شزمث "
-"فخ يخصرمخشي فاث قثحخقف صاثر هف هس ذخوحمثفث."
+"فاث قثحخقف, سثث فاث 'حثريهرل فشسنس' سثذفهخر. صاثر ذخوحمثفثي, فاث قثحخقف صهمم"
+" زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي "
+"فاث قثحخقف صاثر هف هس ذخوحمثفث."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6036,38 +6044,38 @@ msgstr "ذشررخف قثسذخقث صهفا شمم_سفعيثرفس شري عر
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Instructor Tasks' section."
+"generation task in the 'Pending Tasks' section."
 msgstr ""
 "غخعق لقشيث قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث سفشفعس خب فاث "
-"لثرثقشفهخر فشسن هر فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر."
+"لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"Tasks' table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
 "ش لقشيث قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. ذاثذن فاث 'حثريهرل "
-"هرسفقعذفخق فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث "
-"قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث قثحخقف صهمم زث "
+"شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Instructor Tasks' section."
+" generation task in the 'Pending Tasks' section."
 msgstr ""
 "غخعق حقخزمثو لقشيث قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث سفشفعس خب فاث"
-" لثرثقشفهخر فشسن هر فاث 'حثريهرل هرسفقعذفخق فشسنس' سثذفهخر."
+" لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending "
-"Instructor Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"A problem grade report is already being generated. Check the 'Pending Tasks'"
+" table for the status of the task. When completed, the report will be "
+"available for download in the table below."
 msgstr ""
-"ش حقخزمثو لقشيث قثحخقف هس شمقثشيغ زثهرل لثرثقشفثي. ذاثذن فاث 'حثريهرل "
-"هرسفقعذفخق فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث "
-"قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"ش حقخزمثو لقشيث قثحخقف هس شمقثشيغ زثهرل لثرثقشفثي. ذاثذن فاث 'حثريهرل فشسنس'"
+" فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث قثحخقف صهمم زث "
+"شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -8299,10 +8307,6 @@ msgstr "غخعفعزث"
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "سعزسذقهزث فخ فاث {platform_name} غخعفعزث ذاشررثم"
 
-#: lms/envs/common.py
-msgid "Taiwan"
-msgstr "فشهصشر"
-
 #: lms/envs/devstack.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
@@ -9036,20 +9040,22 @@ msgstr ""
 "قثضعثسفثي ذقثيهف."
 
 #: openedx/core/djangoapps/credit/models.py
+msgid "Description for the credit provider displayed to users."
+msgstr "يثسذقهحفهخر بخق فاث ذقثيهف حقخدهيثق يهسحمشغثي فخ عسثقس."
+
+#: openedx/core/djangoapps/credit/models.py
+msgid ""
+"Plain text or html content for displaying further steps on receipt page "
+"*after* paying for the credit to get credit for a credit course against a "
+"credit provider."
+msgstr ""
+"حمشهر فثطف خق افوم ذخرفثرف بخق يهسحمشغهرل بعقفاثق سفثحس خر قثذثهحف حشلث "
+"*شبفثق* حشغهرل بخق فاث ذقثيهف فخ لثف ذقثيهف بخق ش ذقثيهف ذخعقسث شلشهرسف ش "
+"ذقثيهف حقخدهيثق."
+
+#: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr "يثشيمهرث بخق حعقذاشسهرل شري قثضعثسفهرل ذقثيهف."
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "We only support uploading a .tar.gz file."
-msgstr "صث خرمغ سعححخقف عحمخشيهرل ش .فشق.لظ بهمث."
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "File upload corrupted. Please try again"
-msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
-
-#: openedx/core/djangoapps/import_export/courses/views.py
-msgid "Could not find the {root_xml_file} file in the package."
-msgstr "ذخعمي رخف بهري فاث {root_xml_file} بهمث هر فاث حشذنشلث."
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
@@ -9454,12 +9460,16 @@ msgid "Empty"
 msgstr "ثوحفغ"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid ""
-"An invalid parent key was supplied: \"{supplied_key}\" is not a valid course"
-" unit."
-msgstr ""
-"شر هردشمهي حشقثرف نثغ صشس سعححمهثي: \"{supplied_key}\" هس رخف ش دشمهي ذخعقسث"
-" عرهف."
+msgid "We only support uploading a .tar.gz file."
+msgstr "صث خرمغ سعححخقف عحمخشيهرل ش .فشق.لظ بهمث."
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload corrupted. Please try again"
+msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "Could not find the {0} file in the package."
+msgstr "ذخعمي رخف بهري فاث {0} بهمث هر فاث حشذنشلث."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -12335,6 +12345,7 @@ msgid "Psychometrics"
 msgstr "حسغذاخوثفقهذس"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "شيوهر"
 
@@ -12576,11 +12587,6 @@ msgstr ""
 "(ساخصر اثقث شس شر ثطشوحمث):"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/send_email.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
 msgstr "حثريهرل هرسفقعذفخق فشسنس"
 
@@ -12706,11 +12712,9 @@ msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"You can now access your certificate. If you keep working and receive a "
-"higher grade,you can request an {link_start} updated certificate {link_end}."
+"You can keep working for a higher grade, or request your certificate now."
 msgstr ""
-"غخع ذشر رخص شذذثسس غخعق ذثقفهبهذشفث. هب غخع نثثح صخقنهرل شري قثذثهدث ش "
-"اهلاثق لقشيث,غخع ذشر قثضعثسف شر {link_start} عحيشفثي ذثقفهبهذشفث {link_end}."
+"غخع ذشر نثثح صخقنهرل بخق ش اهلاثق لقشيث, خق قثضعثسف غخعق ذثقفهبهذشفث رخص."
 
 #: lms/templates/courseware/progress.html
 msgid "View certificate in a new browser window or tab."
@@ -12745,12 +12749,6 @@ msgid "Congratulations, you qualified for a certificate!"
 msgstr "ذخرلقشفعمشفهخرس, غخع ضعشمهبهثي بخق ش ذثقفهبهذشفث!"
 
 #: lms/templates/courseware/progress.html
-msgid ""
-"You can keep working for a higher grade, or request your certificate now."
-msgstr ""
-"غخع ذشر نثثح صخقنهرل بخق ش اهلاثق لقشيث, خق قثضعثسف غخعق ذثقفهبهذشفث رخص."
-
-#: lms/templates/courseware/progress.html
 msgid "Request Certificate"
 msgstr "قثضعثسف ذثقفهبهذشفث"
 
@@ -12775,8 +12773,12 @@ msgid "Go to your dashboard"
 msgstr "لخ فخ غخعق يشسازخشقي"
 
 #: lms/templates/courseware/progress.html
-msgid "You have not yet met the requirements for credit."
-msgstr "غخع اشدث رخف غثف وثف فاث قثضعهقثوثرفس بخق ذقثيهف."
+msgid "{student_name}, you have not yet met the requirements for credit."
+msgstr "{student_name}, غخع اشدث رخف غثف وثف فاث قثضعهقثوثرفس بخق ذقثيهف."
+
+#: lms/templates/courseware/progress.html
+msgid "Information about course credit requirements"
+msgstr "هربخقوشفهخر شزخعف ذخعقسث ذقثيهف قثضعهقثوثرفس"
 
 #: lms/templates/courseware/progress.html
 msgid "display_name"
@@ -13137,11 +13139,29 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
+"Thank you for your payment! To receive your course credit, go to the "
+"{provider_link} website. You may have to complete some additional steps "
+"depending on the institution"
+msgstr ""
+"فاشرن غخع بخق غخعق حشغوثرف! فخ قثذثهدث غخعق ذخعقسث ذقثيهف, لخ فخ فاث "
+"{provider_link} صثزسهفث. غخع وشغ اشدث فخ ذخوحمثفث سخوث شييهفهخرشم سفثحس "
+"يثحثريهرل خر فاث هرسفهفعفهخر"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Complete Credit"
+msgstr "ذخوحمثفث ذقثيهف"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid ""
 "Congratulations - you have received credit for this course! For more "
 "information, see {provider_link}."
 msgstr ""
 "ذخرلقشفعمشفهخرس - غخع اشدث قثذثهدثي ذقثيهف بخق فاهس ذخعقسث! بخق وخقث "
 "هربخقوشفهخر, سثث {provider_link}."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Access credit"
+msgstr "شذذثسس ذقثيهف"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
@@ -13150,6 +13170,10 @@ msgid ""
 msgstr ""
 "{provider_name} اشس يثذمهرثي غخعق قثضعثسف بخق ذخعقسث ذقثيهف. بخق وخقث "
 "هربخقوشفهخر, ذخرفشذف {provider_link}."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Contact {provider_link}"
+msgstr "ذخرفشذف {provider_link}"
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -14687,6 +14711,11 @@ msgid "Generate Certificates"
 msgstr "لثرثقشفث ذثقفهبهذشفثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
 msgstr "حثريهرل فشسنس"
 
@@ -14705,10 +14734,8 @@ msgstr "ثرقخمموثرف هربخقوشفهخر"
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"Number of enrollees (instructors, staff members, and students) by track"
-msgstr ""
-"رعوزثق خب ثرقخممثثس (هرسفقعذفخقس, سفشبب وثوزثقس, شري سفعيثرفس) زغ فقشذن"
+msgid "Number of enrollees (admins, staff, and students) by track"
+msgstr "رعوزثق خب ثرقخممثثس (شيوهرس, سفشبب, شري سفعيثرفس) زغ فقشذن"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
@@ -15581,10 +15608,10 @@ msgstr "زشفذا زثفش فثسفثق شييهفهخر"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
-"be enrolled as a beta tester."
+"be enrolled as beta testers."
 msgstr ""
 "رخفث: عسثقس وعسف اشدث شر شذفهدشفثي {platform_name} شذذخعرف زثبخقث فاثغ ذشر "
-"زث ثرقخممثي شس ش زثفش فثسفثق."
+"زث ثرقخممثي شس زثفش فثسفثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15609,15 +15636,15 @@ msgstr "قثوخدث زثفش فثسفثقس"
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Administration List Management"
-msgstr "شيوهرهسفقشفهخر مهسف وشرشلثوثرف"
+msgid "Course Team Management"
+msgstr "ذخعقسث فثشو وشرشلثوثرف"
 
 #. Translators: an "Administrator Group" is a group, such as Course Staff,
 #. that
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Select an Administrator Group:"
-msgstr "سثمثذف شر شيوهرهسفقشفخق لقخعح:"
+msgid "Select a course team role:"
+msgstr "سثمثذف ش ذخعقسث فثشو قخمث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -15625,45 +15652,47 @@ msgstr "لثففهرل شدشهمشزمث مهسفس..."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Staff cannot modify staff or beta tester lists. To modify these lists, "
-"contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a discussion admin for discussion management."
+"Staff cannot modify these lists. To manage course team membership, a course "
+"Admin must give you the Admin role to add Staff or Beta Testers, or the "
+"Discussion Admin role to add discussion moderators and TAs."
 msgstr ""
-"سفشبب ذشررخف وخيهبغ سفشبب خق زثفش فثسفثق مهسفس. فخ وخيهبغ فاثسث مهسفس, "
-"ذخرفشذف غخعق هرسفقعذفخق شري شسن فاثو فخ شيي غخع شس شر هرسفقعذفخق بخق سفشبب "
-"شري زثفش مهسفس, خق ش يهسذعسسهخر شيوهر بخق يهسذعسسهخر وشرشلثوثرف."
+"سفشبب ذشررخف وخيهبغ فاثسث مهسفس. فخ وشرشلث ذخعقسث فثشو وثوزثقساهح, ش ذخعقسث "
+"شيوهر وعسف لهدث غخع فاث شيوهر قخمث فخ شيي سفشبب خق زثفش فثسفثقس, خق فاث "
+"يهسذعسسهخر شيوهر قخمث فخ شيي يهسذعسسهخر وخيثقشفخقس شري فشس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Course staff can help you manage limited aspects of your course. Staff can "
-"enroll and unenroll students, as well as modify their grades and see all "
-"course data. Course staff are not automatically given access to Studio and "
-"will not be able to edit your course."
+"Course team members with the Staff role help you manage your course. Staff "
+"can enroll and unenroll learners, as well as modify their grades and access "
+"all course data. Staff also have access to your course in Studio and "
+"Insights. You can only give course team roles to enrolled users."
 msgstr ""
-"ذخعقسث سفشبب ذشر اثمح غخع وشرشلث مهوهفثي شسحثذفس خب غخعق ذخعقسث. سفشبب ذشر "
-"ثرقخمم شري عرثرقخمم سفعيثرفس, شس صثمم شس وخيهبغ فاثهق لقشيثس شري سثث شمم "
-"ذخعقسث يشفش. ذخعقسث سفشبب شقث رخف شعفخوشفهذشممغ لهدثر شذذثسس فخ سفعيهخ شري "
-"صهمم رخف زث شزمث فخ ثيهف غخعق ذخعقسث."
+"ذخعقسث فثشو وثوزثقس صهفا فاث سفشبب قخمث اثمح غخع وشرشلث غخعق ذخعقسث. سفشبب "
+"ذشر ثرقخمم شري عرثرقخمم مثشقرثقس, شس صثمم شس وخيهبغ فاثهق لقشيثس شري شذذثسس "
+"شمم ذخعقسث يشفش. سفشبب شمسخ اشدث شذذثسس فخ غخعق ذخعقسث هر سفعيهخ شري "
+"هرسهلافس. غخع ذشر خرمغ لهدث ذخعقسث فثشو قخمثس فخ ثرقخممثي عسثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "شيي سفشبب"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Instructors"
-msgstr "هرسفقعذفخقس"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer discussion access."
+"Course team members with the Admin role help you manage your course. They "
+"can do all of the tasks that Staff can do, and can also add and remove the "
+"Staff and Admin roles, discussion moderation roles, and the beta tester role"
+" to manage course team membership. You can only give course team roles to "
+"enrolled users."
 msgstr ""
-"هرسفقعذفخقس شقث فاث ذخقث شيوهرهسفقشفهخر خب غخعق ذخعقسث. هرسفقعذفخقس ذشر شيي "
-"شري قثوخدث ذخعقسث سفشبب, شس صثمم شس شيوهرهسفثق يهسذعسسهخر شذذثسس."
+"ذخعقسث فثشو وثوزثقس صهفا فاث شيوهر قخمث اثمح غخع وشرشلث غخعق ذخعقسث. فاثغ "
+"ذشر يخ شمم خب فاث فشسنس فاشف سفشبب ذشر يخ, شري ذشر شمسخ شيي شري قثوخدث فاث "
+"سفشبب شري شيوهر قخمثس, يهسذعسسهخر وخيثقشفهخر قخمثس, شري فاث زثفش فثسفثق قخمث"
+" فخ وشرشلث ذخعقسث فثشو وثوزثقساهح. غخع ذشر خرمغ لهدث ذخعقسث فثشو قخمثس فخ "
+"ثرقخممثي عسثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Add Instructor"
-msgstr "شيي هرسفقعذفخق"
+msgid "Add Admin"
+msgstr "شيي شيوهر"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -15671,11 +15700,13 @@ msgstr "زثفش فثسفثقس"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Beta testers can see course content before the rest of the students. They "
-"can make sure that the content works, but have no additional privileges."
+"Beta Testers can see course content before other learners. They can make "
+"sure that the content works, but have no additional privileges. You can only"
+" give course team roles to enrolled users."
 msgstr ""
-"زثفش فثسفثقس ذشر سثث ذخعقسث ذخرفثرف زثبخقث فاث قثسف خب فاث سفعيثرفس. فاثغ "
-"ذشر وشنث سعقث فاشف فاث ذخرفثرف صخقنس, زعف اشدث رخ شييهفهخرشم حقهدهمثلثس."
+"زثفش فثسفثقس ذشر سثث ذخعقسث ذخرفثرف زثبخقث خفاثق مثشقرثقس. فاثغ ذشر وشنث "
+"سعقث فاشف فاث ذخرفثرف صخقنس, زعف اشدث رخ شييهفهخرشم حقهدهمثلثس. غخع ذشر خرمغ"
+" لهدث ذخعقسث فثشو قخمثس فخ ثرقخممثي عسثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -15687,13 +15718,17 @@ msgstr "يهسذعسسهخر شيوهرس"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion admins can edit or delete any post, clear misuse flags, close and"
-" re-open threads, endorse responses, and see posts from all cohorts. They "
-"CAN add/delete other moderators and their posts are marked as 'staff'."
+"Discussion Admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. Their "
+"posts are marked as 'staff'. They can also add and remove the discussion "
+"moderation roles to manage course team membership. You can only give course "
+"team roles to enrolled users."
 msgstr ""
 "يهسذعسسهخر شيوهرس ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق وهسعسث بمشلس, ذمخسث شري"
-" قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم ذخاخقفس. فاثغ "
-"ذشر شيي/يثمثفث خفاثق وخيثقشفخقس شري فاثهق حخسفس شقث وشقنثي شس 'سفشبب'."
+" قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم ذخاخقفس. فاثهق "
+"حخسفس شقث وشقنثي شس 'سفشبب'. فاثغ ذشر شمسخ شيي شري قثوخدث فاث يهسذعسسهخر "
+"وخيثقشفهخر قخمثس فخ وشرشلث ذخعقسث فثشو وثوزثقساهح. غخع ذشر خرمغ لهدث ذخعقسث "
+"فثشو قخمثس فخ ثرقخممثي عسثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
@@ -15705,15 +15740,17 @@ msgstr "يهسذعسسهخر وخيثقشفخقس"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Discussion moderators can edit or delete any post, clear misuse flags, close"
+"Discussion Moderators can edit or delete any post, clear misuse flags, close"
 " and re-open threads, endorse responses, and see posts from all cohorts. "
-"They CANNOT add/delete other moderators and their posts are marked as "
-"'staff'."
+"Their posts are marked as 'staff'. They cannot manage course team membership"
+" by adding or removing discussion moderation roles. You can only give course"
+" team roles to enrolled users."
 msgstr ""
 "يهسذعسسهخر وخيثقشفخقس ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق وهسعسث بمشلس, ذمخسث"
 " شري قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس بقخو شمم ذخاخقفس. "
-"فاثغ ذشررخف شيي/يثمثفث خفاثق وخيثقشفخقس شري فاثهق حخسفس شقث وشقنثي شس "
-"'سفشبب'."
+"فاثهق حخسفس شقث وشقنثي شس 'سفشبب'. فاثغ ذشررخف وشرشلث ذخعقسث فثشو وثوزثقساهح"
+" زغ شييهرل خق قثوخدهرل يهسذعسسهخر وخيثقشفهخر قخمثس. غخع ذشر خرمغ لهدث ذخعقسث"
+" فثشو قخمثس فخ ثرقخممثي عسثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -15728,12 +15765,14 @@ msgid ""
 "Community TA's are members of the community whom you deem particularly "
 "helpful on the discussion boards. They can edit or delete any post, clear "
 "misuse flags, close and re-open threads, endorse responses, and see posts "
-"from all cohorts. Their posts are marked 'Community TA'."
+"from all cohorts. Their posts are marked as 'Community TA'. You can only "
+"give course team roles to enrolled users."
 msgstr ""
 "ذخووعرهفغ فش'س شقث وثوزثقس خب فاث ذخووعرهفغ صاخو غخع يثثو حشقفهذعمشقمغ "
 "اثمحبعم خر فاث يهسذعسسهخر زخشقيس. فاثغ ذشر ثيهف خق يثمثفث شرغ حخسف, ذمثشق "
 "وهسعسث بمشلس, ذمخسث شري قث-خحثر فاقثشيس, ثريخقسث قثسحخرسثس, شري سثث حخسفس "
-"بقخو شمم ذخاخقفس. فاثهق حخسفس شقث وشقنثي 'ذخووعرهفغ فش'."
+"بقخو شمم ذخاخقفس. فاثهق حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. غخع ذشر خرمغ "
+"لهدث ذخعقسث فثشو قخمثس فخ ثرقخممثي عسثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -15834,12 +15873,12 @@ msgid "Myself"
 msgstr "وغسثمب"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "Staff and instructors"
-msgstr "سفشبب شري هرسفقعذفخقس"
+msgid "Staff and admins"
+msgstr "سفشبب شري شيوهرس"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
-msgid "All (students, staff and instructors)"
-msgstr "شمم (سفعيثرفس, سفشبب شري هرسفقعذفخقس)"
+msgid "All (students, staff, and admins)"
+msgstr "شمم (سفعيثرفس, سفشبب, شري شيوهرس)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -16007,12 +16046,12 @@ msgstr "يثمثفث سفعيثرف سفشفث بخق حقخزمثو"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
-" for this problem and student, click on this button:"
+" the 'Pending Tasks' table. To see status for all tasks submitted for this "
+"problem and student, click on this button:"
 msgstr ""
 "قثسذخقهرل قعرس هر فاث زشذنلقخعري, شري سفشفعس بخق شذفهدث فشسنس صهمم شححثشق هر"
-" فاث 'حثريهرل هرسفقعذفخق فشسنس' فشزمث. فخ سثث سفشفعس بخق شمم فشسنس سعزوهففثي"
-" بخق فاهس حقخزمثو شري سفعيثرف, ذمهذن خر فاهس زعففخر:"
+" فاث 'حثريهرل فشسنس' فشزمث. فخ سثث سفشفعس بخق شمم فشسنس سعزوهففثي بخق فاهس "
+"حقخزمثو شري سفعيثرف, ذمهذن خر فاهس زعففخر:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -16205,7 +16244,7 @@ msgid ""
 "{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:\n"
 "{ul_tag}\n"
 "{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}\n"
-"{li_tag}The instructor needs to score the essays that are used to help you better understand the grading\n"
+"{li_tag}The course team needs to score the essays that are used to help you better understand the grading\n"
 "criteria.{end_li_tag}\n"
 "{li_tag}There must be submissions that are waiting for grading.{end_li_tag}\n"
 "{end_ul_tag}\n"
@@ -16215,7 +16254,7 @@ msgstr ""
 "{p_tag}غخع ذعققثرفمغ يخ رخف اشدث شرغ حثثق لقشيهرل فخ يخ.  هر خقيثق فخ اشدث حثثق لقشيهرل فخ يخ:\n"
 "{ul_tag}\n"
 "{li_tag}غخع رثثي فخ اشدث سعزوهففثي ش قثسحخرسث فخ ش حثثق لقشيهرل حقخزمثو.{end_li_tag}\n"
-"{li_tag}فاث هرسفقعذفخق رثثيس فخ سذخقث فاث ثسسشغس فاشف شقث عسثي فخ اثمح غخع زثففثق عريثقسفشري فاث لقشيهرل\n"
+"{li_tag}فاث ذخعقسث فثشو رثثيس فخ سذخقث فاث ثسسشغس فاشف شقث عسثي فخ اثمح غخع زثففثق عريثقسفشري فاث لقشيهرل\n"
 "ذقهفثقهش.{end_li_tag}\n"
 "{li_tag}فاثقث وعسف زث سعزوهسسهخرس فاشف شقث صشهفهرل بخق لقشيهرل.{end_li_tag}\n"
 "{end_ul_tag}\n"
@@ -19421,12 +19460,8 @@ msgid "User's Email Address"
 msgstr "عسثق'س ثوشهم شييقثسس"
 
 #: cms/templates/manage_users.html
-msgid ""
-"Please provide the email address of the course staff member you'd like to "
-"add"
-msgstr ""
-"حمثشسث حقخدهيث فاث ثوشهم شييقثسس خب فاث ذخعقسث سفشبب وثوزثق غخع'ي مهنث فخ "
-"شيي"
+msgid "Provide the email address of the user you want to add as Staff"
+msgstr "حقخدهيث فاث ثوشهم شييقثسس خب فاث عسثق غخع صشرف فخ شيي شس سفشبب"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
@@ -19454,11 +19489,11 @@ msgstr "ذخعقسث فثشو قخمثس"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Course team members, or staff, are course co-authors. They have full writing"
-" and editing privileges on all course content."
+"Course team members with the Staff role are course co-authors. They have "
+"full writing and editing privileges on all course content."
 msgstr ""
-"ذخعقسث فثشو وثوزثقس, خق سفشبب, شقث ذخعقسث ذخ-شعفاخقس. فاثغ اشدث بعمم صقهفهرل"
-" شري ثيهفهرل حقهدهمثلثس خر شمم ذخعقسث ذخرفثرف."
+"ذخعقسث فثشو وثوزثقس صهفا فاث سفشبب قخمث شقث ذخعقسث ذخ-شعفاخقس. فاثغ اشدث "
+"بعمم صقهفهرل شري ثيهفهرل حقهدهمثلثس خر شمم ذخعقسث ذخرفثرف."
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -19469,18 +19504,28 @@ msgstr ""
 "وثوزثقس."
 
 #: cms/templates/manage_users.html
+msgid ""
+"All course team members are automatically enrolled in the course and can "
+"access content in Studio, the LMS, and Insights."
+msgstr ""
+"شمم ذخعقسث فثشو وثوزثقس شقث شعفخوشفهذشممغ ثرقخممثي هر فاث ذخعقسث شري ذشر "
+"شذذثسس ذخرفثرف هر سفعيهخ, فاث موس, شري هرسهلافس."
+
+#: cms/templates/manage_users.html
 msgid "Transferring Ownership"
 msgstr "فقشرسبثققهرل خصرثقساهح"
 
 #: cms/templates/manage_users.html
 msgid ""
-"Every course must have an Admin. If you're the Admin and you want transfer "
-"ownership of the course, click Add admin access to make another user the "
-"Admin, then ask that user to remove you from the Course Team list."
+"Every course must have an Admin. If you are the Admin and you want to "
+"transfer ownership of the course, click <strong>Add admin access</strong> to"
+" make another user the Admin, then ask that user to remove you from the "
+"Course Team list."
 msgstr ""
-"ثدثقغ ذخعقسث وعسف اشدث شر شيوهر. هب غخع'قث فاث شيوهر شري غخع صشرف فقشرسبثق "
-"خصرثقساهح خب فاث ذخعقسث, ذمهذن شيي شيوهر شذذثسس فخ وشنث شرخفاثق عسثق فاث "
-"شيوهر, فاثر شسن فاشف عسثق فخ قثوخدث غخع بقخو فاث ذخعقسث فثشو مهسف."
+"ثدثقغ ذخعقسث وعسف اشدث شر شيوهر. هب غخع شقث فاث شيوهر شري غخع صشرف فخ "
+"فقشرسبثق خصرثقساهح خب فاث ذخعقسث, ذمهذن <strong>شيي شيوهر شذذثسس</strong> فخ"
+" وشنث شرخفاثق عسثق فاث شيوهر, فاثر شسن فاشف عسثق فخ قثوخدث غخع بقخو فاث "
+"ذخعقسث فثشو مهسف."
 
 #: cms/templates/manage_users_lib.html
 msgid "Library User Access"
@@ -19524,27 +19569,29 @@ msgstr "فاثقث شقث فاقثث شذذثسس قخمثس بخق مهزقشق
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Users can view library content and can reference or use library components "
-"in their courses, but they cannot edit the contents of a library."
+"Library Users can view library content and can reference or use library "
+"components in their courses, but they cannot edit the contents of a library."
 msgstr ""
-"عسثقس ذشر دهثص مهزقشقغ ذخرفثرف شري ذشر قثبثقثرذث خق عسث مهزقشقغ ذخوحخرثرفس "
-"هر فاثهق ذخعقسثس, زعف فاثغ ذشررخف ثيهف فاث ذخرفثرفس خب ش مهزقشقغ."
+"مهزقشقغ عسثقس ذشر دهثص مهزقشقغ ذخرفثرف شري ذشر قثبثقثرذث خق عسث مهزقشقغ "
+"ذخوحخرثرفس هر فاثهق ذخعقسثس, زعف فاثغ ذشررخف ثيهف فاث ذخرفثرفس خب ش مهزقشقغ."
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Staff are content co-authors. They have full editing privileges on the "
-"contents of a library."
+"Library Staff are content co-authors. They have full editing privileges on "
+"the contents of a library."
 msgstr ""
-"سفشبب شقث ذخرفثرف ذخ-شعفاخقس. فاثغ اشدث بعمم ثيهفهرل حقهدهمثلثس خر فاث "
-"ذخرفثرفس خب ش مهزقشقغ."
+"مهزقشقغ سفشبب شقث ذخرفثرف ذخ-شعفاخقس. فاثغ اشدث بعمم ثيهفهرل حقهدهمثلثس خر "
+"فاث ذخرفثرفس خب ش مهزقشقغ."
 
 #: cms/templates/manage_users_lib.html
 msgid ""
-"Admins have full editing privileges and can also add and remove other team "
-"members. There must be at least one user with Admin privileges in a library."
+"Library Admins have full editing privileges and can also add and remove "
+"other team members. There must be at least one user with the Admin role in a"
+" library."
 msgstr ""
-"شيوهرس اشدث بعمم ثيهفهرل حقهدهمثلثس شري ذشر شمسخ شيي شري قثوخدث خفاثق فثشو "
-"وثوزثقس. فاثقث وعسف زث شف مثشسف خرث عسثق صهفا شيوهر حقهدهمثلثس هر ش مهزقشقغ."
+"مهزقشقغ شيوهرس اشدث بعمم ثيهفهرل حقهدهمثلثس شري ذشر شمسخ شيي شري قثوخدث "
+"خفاثق فثشو وثوزثقس. فاثقث وعسف زث شف مثشسف خرث عسثق صهفا فاث شيوهر قخمث هر ش"
+" مهزقشقغ."
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -19711,16 +19758,16 @@ msgstr ""
 "هرسفقعذفهخرس حقخدهيثي زغ غخعق حقخلقشو وشرشلثق."
 
 #: cms/templates/settings.html
-msgid "Credit Eligibility Requirements"
-msgstr "ذقثيهف ثمهلهزهمهفغ قثضعهقثوثرفس"
+msgid "Course Credit Requirements"
+msgstr "ذخعقسث ذقثيهف قثضعهقثوثرفس"
 
 #: cms/templates/settings.html
-msgid "Steps needed for credit eligibility"
-msgstr "سفثحس رثثيثي بخق ذقثيهف ثمهلهزهمهفغ"
+msgid "Steps required to earn course credit"
+msgstr "سفثحس قثضعهقثي فخ ثشقر ذخعقسث ذقثيهف"
 
 #: cms/templates/settings.html
-msgid "Minimum Passing Grade"
-msgstr "وهرهوعو حشسسهرل لقشيث"
+msgid "Minimum Grade"
+msgstr "وهرهوعو لقشيث"
 
 #: cms/templates/settings.html
 msgid "Successful Proctored Exam"
@@ -19731,18 +19778,12 @@ msgid "Proctored Exam {number}"
 msgstr "حقخذفخقثي ثطشو {number}"
 
 #: cms/templates/settings.html
-msgid "Successful In-Course Reverification"
-msgstr "سعذذثسسبعم هر-ذخعقسث قثدثقهبهذشفهخر"
+msgid "ID Verification"
+msgstr "هي دثقهبهذشفهخر"
 
-#. Translators: 'Access to Assessment 1' means the access for a requirement
-#. with name 'Assessment 1'
 #: cms/templates/settings.html
 msgid "In-Course Reverification {number}"
 msgstr "هر-ذخعقسث قثدثقهبهذشفهخر {number}"
-
-#: cms/templates/settings.html
-msgid "Access to {display_name}"
-msgstr "شذذثسس فخ {display_name}"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -20079,20 +20120,20 @@ msgid "Your overall grading scale for student final grades"
 msgstr "غخعق خدثقشمم لقشيهرل سذشمث بخق سفعيثرف بهرشم لقشيثس"
 
 #: cms/templates/settings_graders.html
-msgid "Credit Grade &amp; Eligibility"
-msgstr "ذقثيهف لقشيث &amp; ثمهلهزهمهفغ"
+msgid "Credit Eligibility"
+msgstr "ذقثيهف ثمهلهزهمهفغ"
 
 #: cms/templates/settings_graders.html
-msgid "Settings for credit eligibility"
-msgstr "سثففهرلس بخق ذقثيهف ثمهلهزهمهفغ"
+msgid "Settings for course credit eligibility"
+msgstr "سثففهرلس بخق ذخعقسث ذقثيهف ثمهلهزهمهفغ"
 
 #: cms/templates/settings_graders.html
-msgid "Minimum Passing Grade to Earn Credit:"
-msgstr "وهرهوعو حشسسهرل لقشيث فخ ثشقر ذقثيهف:"
+msgid "Minimum Credit-Eligible Grade:"
+msgstr "وهرهوعو ذقثيهف-ثمهلهزمث لقشيث:"
 
 #: cms/templates/settings_graders.html
-msgid "Must be greater than or equal to passing grade"
-msgstr "وعسف زث لقثشفثق فاشر خق ثضعشم فخ حشسسهرل لقشيث"
+msgid "Must be greater than or equal to the course passing grade"
+msgstr "وعسف زث لقثشفثق فاشر خق ثضعشم فخ فاث ذخعقسث حشسسهرل لقشيث"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"

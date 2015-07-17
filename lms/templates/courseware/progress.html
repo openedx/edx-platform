@@ -59,7 +59,7 @@ from django.utils.http import urlquote_plus
               <div class="msg-content">
                 <h2 class="title">${_("Your certificate is available")}</h2>
                 <p class="copy">
-                  ${_("You can now access your certificate. If you keep working and receive a higher grade, you can request an updated certificate.")}
+                  ${_("You can keep working for a higher grade, or request your certificate now.")}
                 </p>
               </div>
               <div class="msg-actions">
@@ -111,9 +111,9 @@ from django.utils.http import urlquote_plus
                         ${_("{link} to purchase course credit.").format(link="<a href={url}>{url_name}</a>".format(url = reverse('dashboard'), url_name = _('Go to your dashboard')))}
                     </span>
                 %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
-                    <span>${student.get_full_name()}, ${_("You have not yet met the requirements for credit.")}</span>
+                    <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.get_full_name())}</span>
                 %endif
-                <button class="credit-help"><i class="fa fa-question"></i><span class="sr">Help regarding credit requirement</span></button><br>
+                <a href="${settings.CREDIT_HELP_LINK_URL}" class="credit-help"><i class="fa fa-question"></i><span class="sr">${_("Information about course credit requirements")}</span></a><br>
                 <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
                 %for requirement in credit_course_requirements['requirements']:
                     <div class="requirement">

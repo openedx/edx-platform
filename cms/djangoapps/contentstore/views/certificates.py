@@ -33,7 +33,7 @@ from django.views.decorators.http import require_http_methods
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey, AssetKey
-from student.auth import has_studio_read_access
+from student.auth import has_studio_write_access
 from util.db import generate_int_id, MYSQL_MAX_INT
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
@@ -53,7 +53,7 @@ def _get_course_and_check_access(course_key, user, depth=0):
     Internal method used to calculate and return the locator and
     course module for the view functions in this file.
     """
-    if not has_studio_read_access(user, course_key):
+    if not has_studio_write_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module

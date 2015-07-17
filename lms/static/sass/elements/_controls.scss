@@ -352,6 +352,19 @@
   }
 }
 
+%btn-pl-elevated-alt {
+  @extend %btn-pl-default-base;
+  box-shadow: 0 3px 0 0 $gray-l4;
+  border: 1px solid $gray-l4;
+
+  &:hover {
+    box-shadow: 0 3px 0 0 $action-primary-bg;
+    border: 1px solid $action-primary-bg;
+    background-color: lighten($action-primary-bg,20%);
+    color: $white;
+  }
+}
+
 // ====================
 
   // application: canned actions

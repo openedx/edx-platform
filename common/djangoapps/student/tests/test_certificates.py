@@ -47,9 +47,14 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_display_download_certificate_button(self, enrollment_mode):
         """
-        Tests if CERTIFICATES_HTML_VIEW is True and there is no active certificate configuration available
+        Tests if CERTIFICATES_HTML_VIEW is True
+        and course has enabled web certificates via cert_html_view_enabled setting
+        and no active certificate configuration available
         then any of the Download certificate button should not be visible.
         """
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
         self._create_certificate(enrollment_mode)
         self._check_can_not_download_certificate()
 
@@ -59,8 +64,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            verify_uuid='abcdefg12345678'
+            course_id=unicode(self.course.id)
         )
 
         self._create_certificate(enrollment_mode)
@@ -75,6 +79,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
             }
         ]
         self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
         self.course.save()   # pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
 

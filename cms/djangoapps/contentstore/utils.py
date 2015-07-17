@@ -4,12 +4,12 @@ Common utility functions useful throughout the contentstore
 # pylint: disable=no-member
 
 import logging
+from opaque_keys import InvalidKeyError
 import re
 from datetime import datetime
 from pytz import UTC
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
@@ -160,7 +160,10 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
 
 def course_image_url(course):
     """Returns the image url for the course."""
-    loc = StaticContent.compute_location(course.location.course_key, course.course_image)
+    try:
+        loc = StaticContent.compute_location(course.location.course_key, course.course_image)
+    except InvalidKeyError:
+        return ''
     path = StaticContent.serialize_asset_key_with_slash(loc)
     return path
 
@@ -310,3 +313,22 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     Creates the URL for handlers that use usage_keys as URL parameters.
     """
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
+
+
+def has_active_web_certificate(course):
+    """
+    Returns True if given course has active web certificate configuration.
+    If given course has no active web certificate configuration returns False.
+    Returns None If `CERTIFICATES_HTML_VIEW` is not enabled of course has not enabled
+    `cert_html_view_enabled` settings.
+    """
+    cert_config = None
+    if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and course.cert_html_view_enabled:
+        cert_config = False
+        certificates = getattr(course, 'certificates', {})
+        configurations = certificates.get('certificates', [])
+        for config in configurations:
+            if config.get('is_active'):
+                cert_config = True
+                break
+    return cert_config

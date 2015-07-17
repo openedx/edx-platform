@@ -130,12 +130,10 @@ ${fragment.foot_html()}
 
 </%block>
 
-<div class="container">
-  <div class="course-wrapper">
-    <section class="course-content" id="course-content">
-      ${fragment.body_html()}
-    </section>
-  </div>
+<div class="course-wrapper">
+  <section class="course-content" id="course-content">
+    ${fragment.body_html()}
+  </section>
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">

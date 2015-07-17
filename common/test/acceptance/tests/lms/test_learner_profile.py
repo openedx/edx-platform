@@ -468,6 +468,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
+    @flaky  # TODO fix this, see TNL-2704
     def test_user_can_upload_the_profile_image_with_success(self):
         """
         Scenario: Upload profile image works correctly.

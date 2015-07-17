@@ -119,7 +119,8 @@ class ChooseModeView(View):
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
-            "responsive": True
+            "responsive": True,
+            "nav_hidden": True,
         }
         if "verified" in modes:
             context["suggested_prices"] = [

@@ -10,14 +10,14 @@
       <select id="id_to" name="send_to">
         <option value="myself">${_("Myself")}</option>
         %if to_option == "staff":
-        <option value="staff" selected="selected">${_("Staff and instructors")}</option>
+        <option value="staff" selected="selected">${_("Staff and admins")}</option>
         %else:
-        <option value="staff">${_("Staff and instructors")}</option>
+        <option value="staff">${_("Staff and admins")}</option>
           %endif
           %if to_option == "all":
-            <option value="all" selected="selected">${_("All (students, staff and instructors)")}</option>
+            <option value="all" selected="selected">${_("All (students, staff, and admins)")}</option>
           %else:
-      <option value="all">${_("All (students, staff and instructors)")}</option>
+      <option value="all">${_("All (students, staff, and admins)")}</option>
       %endif
       </select>
     </li>
@@ -58,7 +58,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h2> ${_("Pending Tasks")} </h2>
     <div class="running-tasks-section">
       <p>${_("Email actions run in the background. The status for any active tasks - including email tasks - appears in a table below.")} </p>
       <br />

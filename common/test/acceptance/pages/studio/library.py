@@ -256,6 +256,9 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         self.q(css=btn_selector).first.click()
 
         # This causes a reload (see cms/static/xmodule_js/public/js/library_content_edit.js)
+        # Check that the ajax request that caused the reload is done.
+        self.wait_for_ajax()
+        # Then check that we are still on the right page.
         self.wait_for(lambda: self.is_browser_on_page(), 'StudioLibraryContainerXBlockWrapper has reloaded.')
         # Wait longer than the default 60 seconds, because this was intermittently failing on jenkins
         # with the screenshot showing that the Loading indicator was still visible. See TE-745.

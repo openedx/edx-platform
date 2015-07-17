@@ -40,6 +40,7 @@ from django.utils.translation import ugettext_lazy as _
 from .discussionsettings import *
 import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
+from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
@@ -389,6 +390,8 @@ FEATURES = {
         'DASHBOARD_FACEBOOK': False,
         'CERTIFICATE_FACEBOOK': False,
         'CERTIFICATE_FACEBOOK_TEXT': None,
+        'CERTIFICATE_TWITTER': False,
+        'CERTIFICATE_TWITTER_TEXT': None,
         'DASHBOARD_TWITTER': False,
         'DASHBOARD_TWITTER_TEXT': None
     },
@@ -416,6 +419,9 @@ FEATURES = {
 
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
+
+    # Enable the max score cache to speed up grading
+    'ENABLE_MAX_SCORE_CACHE': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -703,7 +709,7 @@ from xmodule.x_module import XModuleMixin
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
@@ -835,6 +841,7 @@ STATICFILES_DIRS = [
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
+DEFAULT_COURSE_ABOUT_IMAGE_URL = 'images/pencils.jpg'
 
 # User-uploaded content
 MEDIA_ROOT = '/edx/var/edxapp/media/'
@@ -1247,7 +1254,6 @@ dashboard_js = (
 )
 dashboard_search_js = ['js/search/dashboard/main.js']
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
-rwd_header_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/utils/rwd_header.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1260,7 +1266,6 @@ instructor_dash_js = (
 # These are not courseware, so they do not need many of the courseware-specific
 # JavaScript modules.
 student_account_js = [
-    'js/utils/rwd_header.js',
     'js/utils/edx.utils.validate.js',
     'js/form.ext.js',
     'js/my_courses_dropdown.js',
@@ -1548,10 +1553,6 @@ PIPELINE_JS = {
     'dashboard_search': {
         'source_filenames': dashboard_search_js,
         'output_filename': 'js/dashboard-search.js',
-    },
-    'rwd_header': {
-        'source_filenames': rwd_header_js,
-        'output_filename': 'js/rwd_header.js'
     },
     'student_account': {
         'source_filenames': student_account_js,
@@ -2108,9 +2109,6 @@ REGISTRATION_EXTRA_FIELDS = {
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
 
-############ CERTIFICATE VERIFICATION URL (STATIC FILES) ###########
-CERTIFICATES_STATIC_VERIFY_URL = "https://verify-test.edx.org/cert/"
-
 #################### Badgr OpenBadges generation #######################
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
@@ -2412,7 +2410,8 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 # Country code overrides
 # Used by django-countries
 COUNTRIES_OVERRIDE = {
-    "TW": _("Taiwan"),
+    # Taiwan is specifically not translated to avoid it being translated as "Taiwan (Province of China)"
+    "TW": "Taiwan",
 }
 
 # which access.py permission name to check in order to determine if a course is visible in
@@ -2554,8 +2553,15 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
+# The Help link to the FAQ page about the credit
+CREDIT_HELP_LINK_URL = "#"
+
 # Default domain for the e-mail address associated with users who are created
 # via the LTI Provider feature. Note that the generated e-mail addresses are
 # not expected to be active; this setting simply allows administrators to
 # route any messages intended for LTI users to a common domain.
 LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
+
+# Number of seconds before JWT tokens expire
+JWT_EXPIRATION = 30
+JWT_ISSUER = None

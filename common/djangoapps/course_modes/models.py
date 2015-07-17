@@ -86,6 +86,11 @@ class CourseMode(models.Model):
         """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
 
+    def save(self, force_insert=False, force_update=False, using=None):
+        # Ensure currency is always lowercase.
+        self.currency = self.currency.lower()
+        super(CourseMode, self).save(force_insert, force_update, using)
+
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
         """Find all modes for a list of course IDs, including expired modes.
@@ -308,7 +313,7 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         for mode in modes:
-            if (mode.currency == currency) and (mode.slug == 'verified'):
+            if (mode.currency.lower() == currency.lower()) and (mode.slug == 'verified'):
                 return mode.min_price
         return 0
 
@@ -490,7 +495,7 @@ class CourseMode(models.Model):
         If there is no mode found, will return the price of DEFAULT_MODE, which is 0
         """
         modes = cls.modes_for_course(course_id)
-        return min(mode.min_price for mode in modes if mode.currency == currency)
+        return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
 
     @classmethod
     def enrollment_mode_display(cls, mode, verification_status):

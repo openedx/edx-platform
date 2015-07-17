@@ -19,9 +19,10 @@ try:
     from git.refs.symbolic import SymbolicReference
     from dateutil.parser import parse as parse_datestring
     import requests
+    import yaml
 except ImportError:
     print("Error: missing dependencies! Please run this command to install them:")
-    print("pip install path.py requests python-dateutil GitPython==0.3.2.RC1")
+    print("pip install path.py requests python-dateutil GitPython==0.3.2.RC1 PyYAML")
     sys.exit(1)
 
 try:
@@ -34,6 +35,8 @@ PR_BRANCH_RE = re.compile(r"remotes/edx/pr/(\d+)")
 PROJECT_ROOT = path(__file__).abspath().dirname()
 repo = Repo(PROJECT_ROOT)
 git = repo.git
+
+PEOPLE_YAML = "https://raw.githubusercontent.com/edx/repo-tools/master/people.yaml"
 
 
 class memoized(object):
@@ -359,6 +362,24 @@ def prs_by_email(start_ref, end_ref):
     The dictionary is alphabetically ordered by email address
     The pull request list is ordered by merge date
     """
+    # `emails` maps from other_emails to primary email, based on people.yaml.
+    emails = {}
+    try:
+        people_resp = requests.get(PEOPLE_YAML)
+        people_resp.raise_for_status()
+        people = yaml.safe_load(people_resp.text)
+    except requests.exceptions.RequestException as e:
+        # Hmm, muddle through without canonicalized emails...
+        message = (
+            "Warning: could not fetch people.yaml: {message}".format(message=e.message)
+        )
+        print(colorize("red", message), file=sys.stderr)
+    else:
+        for person in people.itervalues():
+            if 'other_emails' in person:
+                for other_email in person['other_emails']:
+                    emails[other_email] = person['email']
+
     unordered_data = collections.defaultdict(set)
     for pr_num in get_merged_prs(start_ref, end_ref):
         ref = "refs/remotes/edx/pr/{num}".format(num=pr_num)
@@ -368,7 +389,8 @@ def prs_by_email(start_ref, end_ref):
         except DoesNotExist:
             pass  # this commit will be included in the commits_without_prs table
         else:
-            unordered_data[merge.author.email].add((pr_num, merge))
+            email = emails.get(merge.author.email, merge.author.email)
+            unordered_data[email].add((pr_num, merge))
 
     ordered_data = collections.OrderedDict()
     for email in sorted(unordered_data.keys()):
@@ -379,7 +401,7 @@ def prs_by_email(start_ref, end_ref):
 
 def generate_pr_table(start_ref, end_ref):
     """
-    Return a string corresponding to a pull request table to embed in Confluence
+    Return a UTF-8 string corresponding to a pull request table to embed in Confluence.
     """
     header = "|| Merged By || Author || Title || PR || JIRA || Verified? ||"
     pr_link = "[#{num}|https://github.com/edx/edx-platform/pull/{num}]"
@@ -410,7 +432,7 @@ def generate_pr_table(start_ref, end_ref):
                 jira=", ".join(parse_ticket_references(body)),
                 verified="",
             ))
-    return "\n".join(rows)
+    return "\n".join(rows).encode("utf8")
 
 
 @memoized
@@ -497,7 +519,7 @@ def main():
         print(generate_pr_table(args.previous, args.current))
         return
 
-    print("EMAIL:")
+    print("Generating email and it's list of recipients for stage verification. This may take around a minute...")
     print(generate_email(args.previous, args.current, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")

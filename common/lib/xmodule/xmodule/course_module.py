@@ -20,6 +20,7 @@ from xmodule.tabs import CourseTabList
 from xmodule.mixin import LicenseMixin
 import json
 
+from xblock.core import XBlock
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
@@ -712,6 +713,12 @@ class CourseFields(object):
         scope=Scope.settings,
         default=""
     )
+    cert_html_view_enabled = Boolean(
+        display_name=_("Certificate Web/HTML View Enabled"),
+        help=_("If true, certificate Web/HTML views are enabled for the course."),
+        scope=Scope.settings,
+        default=False,
+    )
     cert_html_view_overrides = Dict(
         # Translators: This field is the container for course-specific certifcate configuration values
         display_name=_("Certificate Web/HTML View Overrides"),
@@ -1315,11 +1322,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         except UndefinedContext:
             module = self
 
+        def possibly_scored(usage_key):
+            """Can this XBlock type can have a score or children?"""
+            return usage_key.block_type in self.block_types_affecting_grading
+
         all_descriptors = []
         graded_sections = {}
 
         def yield_descriptor_descendents(module_descriptor):
-            for child in module_descriptor.get_children():
+            for child in module_descriptor.get_children(usage_key_filter=possibly_scored):
                 yield child
                 for module_descriptor in yield_descriptor_descendents(child):
                     yield module_descriptor
@@ -1344,6 +1355,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         return {'graded_sections': graded_sections,
                 'all_descriptors': all_descriptors, }
+
+    @lazy
+    def block_types_affecting_grading(self):
+        """Return all block types that could impact grading (i.e. scored, or having children)."""
+        return frozenset(
+            cat for (cat, xblock_class) in XBlock.load_classes() if (
+                getattr(xblock_class, 'has_score', False) or getattr(xblock_class, 'has_children', False)
+            )
+        )
 
     @staticmethod
     def make_id(org, course, url_name):

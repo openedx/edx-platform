@@ -31,7 +31,8 @@ define([
                 entrance_exam_enabled : '',
                 entrance_exam_minimum_score_pct: '50',
                 license: null,
-                language: ''
+                language: '',
+                has_cert_config: false
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -69,6 +70,13 @@ define([
             AjaxHelpers.expectJsonRequest(
                 requests, 'POST', urlRoot, expectedJson
             );
+        });
+
+        it('Changing course start date without active certificate configuration should result in error', function () {
+            this.view.$el.find('#course-start-date')
+                .val('10/06/2014')
+                .trigger('change');
+            expect(this.view.$el.find('span.message-error').text()).toContain("course must have at least one active certificate configuration");
         });
 
         it('Selecting a course in pre-requisite drop down should save it as part of course details', function () {

@@ -6,8 +6,7 @@ from mock import Mock, patch
 from nose.plugins.attrib import attr
 from functools import partial
 
-from courseware.model_data import DjangoKeyValueStore
-from courseware.model_data import InvalidScopeError, FieldDataCache
+from courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
 from courseware.models import StudentModule
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
