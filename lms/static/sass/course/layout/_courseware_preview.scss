@@ -5,6 +5,10 @@
   padding: ($baseline*0.75);
   background-color: $gray-l3;
 
+  @media print {
+    display: none;
+  }
+
   .preview-menu {
     @extend %inner-wrapper;
     width: auto;
