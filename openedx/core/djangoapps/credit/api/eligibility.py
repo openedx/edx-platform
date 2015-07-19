@@ -294,6 +294,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
                         "display_name": "In Course Reverification",
                         "criteria": {},
+                        "reason": {},
                         "status": "failed",
                         "status_date": "2015-06-26 07:49:13",
                     },
@@ -302,6 +303,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
                         "display_name": "Proctored Mid Term Exam",
                         "criteria": {},
+                        "reason": {},
                         "status": "satisfied",
                         "status_date": "2015-06-26 11:07:42",
                     },
@@ -310,7 +312,8 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
                         "display_name": "Minimum Passing Grade",
                         "criteria": {"min_grade": 0.8},
-                        "status": "failed",
+                        "reason": {"final_grade": 0.95},
+                        "status": "satisfied",
                         "status_date": "2015-06-26 11:07:44",
                     },
                 ]
@@ -329,6 +332,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
             "name": requirement.name,
             "display_name": requirement.display_name,
             "criteria": requirement.criteria,
+            "reason": requirement_status.reason if requirement_status else None,
             "status": requirement_status.status if requirement_status else None,
             "status_date": requirement_status.modified if requirement_status else None,
         })
