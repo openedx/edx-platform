@@ -286,6 +286,7 @@ class CreditRequirement(TimeStampedModel):
         Model metadata.
         """
         unique_together = ('namespace', 'name', 'course')
+        ordering = ["order"]
 
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement, order):
@@ -337,7 +338,7 @@ class CreditRequirement(TimeStampedModel):
 
         """
         # order credit requirements according to their appearance in courseware
-        requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True).order_by("-order")
+        requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True)
 
         if namespace is not None:
             requirements = requirements.filter(namespace=namespace)

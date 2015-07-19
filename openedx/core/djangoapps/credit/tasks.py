@@ -2,6 +2,9 @@
 This file contains celery tasks for credit course views.
 """
 
+import datetime
+from pytz import UTC
+
 from django.conf import settings
 
 from celery import task
@@ -13,17 +16,15 @@ from .api import set_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 LOGGER = get_task_logger(__name__)
 
 
 # XBlocks that can be added as credit requirements
-CREDIT_REQUIREMENT_XBLOCKS = [
-    {
-        "category": "edx-reverification-block",
-        "requirement-namespace": "reverification"
-    }
+CREDIT_REQUIREMENT_XBLOCK_CATEGORIES = [
+    "edx-reverification-block",
 ]
 
 
@@ -123,22 +124,60 @@ def _get_credit_course_requirement_xblocks(course_key):  # pylint: disable=inval
     # Retrieve all XBlocks from the course that we know to be credit requirements.
     # For performance reasons, we look these up by their "category" to avoid
     # loading and searching the entire course tree.
-    for desc in CREDIT_REQUIREMENT_XBLOCKS:
+    for category in CREDIT_REQUIREMENT_XBLOCK_CATEGORIES:
         requirements.extend([
             {
-                "namespace": desc["requirement-namespace"],
+                "namespace": block.get_credit_requirement_namespace(),
                 "name": block.get_credit_requirement_name(),
                 "display_name": block.get_credit_requirement_display_name(),
                 "criteria": {},
             }
-            for block in modulestore().get_items(
-                course_key,
-                qualifiers={"category": desc["category"]}
-            )
+            for block in _get_xblocks(course_key, category)
             if _is_credit_requirement(block)
         ])
 
     return requirements
+
+
+def _is_in_course_tree(block):
+    """
+    Check that the XBlock is in the course tree.
+
+    It's possible that the XBlock is not in the course tree
+    if its parent has been deleted and is now an orphan.
+    """
+    ancestor = block.get_parent()
+    while ancestor is not None and ancestor.location.category != "course":
+        ancestor = ancestor.get_parent()
+
+    return ancestor is not None
+
+
+def _get_xblocks(course_key, category):
+    """
+    Retrieve all XBlocks in the course for a particular category.
+
+    Returns only XBlocks that are published and haven't been deleted.
+    """
+    xblocks = [
+        block for block in modulestore().get_items(
+            course_key,
+            qualifiers={"category": category},
+            revision=ModuleStoreEnum.RevisionOption.published_only,
+        )
+        if _is_in_course_tree(block)
+    ]
+
+    # Secondary sort on credit requirement name
+    xblocks = sorted(xblocks, key=lambda block: block.get_credit_requirement_display_name())
+
+    # Primary sort on start date
+    xblocks = sorted(xblocks, key=lambda block: (
+        block.start if block.start is not None
+        else datetime.datetime(datetime.MINYEAR, 1, 1).replace(tzinfo=UTC)
+    ))
+
+    return xblocks
 
 
 def _is_credit_requirement(xblock):
@@ -152,19 +191,19 @@ def _is_credit_requirement(xblock):
         True if XBlock is a credit requirement else False
 
     """
-    if not callable(getattr(xblock, "get_credit_requirement_namespace", None)):
-        LOGGER.error(
-            "XBlock %s is marked as a credit requirement but does not "
-            "implement get_credit_requirement_namespace()", unicode(xblock)
-        )
-        return False
+    required_methods = [
+        "get_credit_requirement_namespace",
+        "get_credit_requirement_name",
+        "get_credit_requirement_display_name"
+    ]
 
-    if not callable(getattr(xblock, "get_credit_requirement_name", None)):
-        LOGGER.error(
-            "XBlock %s is marked as a credit requirement but does not "
-            "implement get_credit_requirement_name()", unicode(xblock)
-        )
-        return False
+    for method_name in required_methods:
+        if not callable(getattr(xblock, method_name, None)):
+            LOGGER.error(
+                "XBlock %s is marked as a credit requirement but does not "
+                "implement %s", unicode(xblock), method_name
+            )
+            return False
 
     return True
 
