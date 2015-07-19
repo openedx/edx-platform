@@ -105,6 +105,14 @@ def enable_theme():
     settings.LOCALE_PATHS = (theme_root / 'conf/locale',) + settings.LOCALE_PATHS
 
 
+def enable_microsites():
+    """
+    Calls the enable_microsites function in the microsite backend.
+    Here for backwards compatibility
+    """
+    microsite.enable_microsites(log)
+
+
 def enable_third_party_auth():
     """
     Enable the use of third_party_auth, which allows users to sign in to edX
