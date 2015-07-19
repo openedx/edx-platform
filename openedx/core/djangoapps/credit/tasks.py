@@ -72,7 +72,7 @@ def _get_course_credit_requirements(course_key):
     """
     credit_xblock_requirements = _get_credit_course_requirement_xblocks(course_key)
     min_grade_requirement = _get_min_grade_requirement(course_key)
-    proctored_exams_requirements = _get_proctored_exams_requirements(course_key)
+    proctored_exams_requirements = _get_proctoring_requirements(course_key)
     credit_requirements = (
         min_grade_requirement + credit_xblock_requirements + proctored_exams_requirements
     )
@@ -169,7 +169,7 @@ def _is_credit_requirement(xblock):
     return True
 
 
-def _get_proctored_exams_requirements(course_key):
+def _get_proctoring_requirements(course_key):
     """
     Will return list of requirements regarding any exams that have been
     marked as proctored exams. For credit-bearing courses, all

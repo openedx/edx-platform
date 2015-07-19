@@ -21,7 +21,7 @@ from edx_proctoring.exceptions import (
 log = logging.getLogger(__name__)
 
 
-def register_timed_and_proctored_exams(course_key):
+def register_proctored_exams(course_key):
     """
     Is typically when on a course published signal. The course is examined for sequences
     that are marked as timed exams. Then these are registered with the edx-proctoring
