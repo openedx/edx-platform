@@ -48,6 +48,11 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
+
+class ProctoringFields(object):
+    """
+    Fields that are specific to Proctored or Timed Exams
+    """
     is_time_limited = Boolean(
         display_name=_("Is Time Limited"),
         help=_(
@@ -76,8 +81,17 @@ class SequenceFields(object):
         scope=Scope.settings,
     )
 
+    is_practice_exam = Boolean(
+        display_name=_("Is Practice Exam"),
+        help=_(
+            "This setting indicates whether this exam is only test that will not be fully verified."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
 
-class SequenceModule(SequenceFields, XModule):
+
+class SequenceModule(SequenceFields, ProctoringFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {
@@ -181,7 +195,7 @@ class SequenceModule(SequenceFields, XModule):
         return new_class
 
 
-class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
+class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
