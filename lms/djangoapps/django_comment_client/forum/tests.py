@@ -970,12 +970,12 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
             discussion_target="Discussion1"
         )
 
-    def send_request(self, mock_request, params={}):
+    def send_request(self, mock_request, params=None):
         """
         Creates and returns a request with params set, and configures
         mock_request to return appropriate values.
         """
-        request = RequestFactory().get("dummy_url", params)
+        request = RequestFactory().get("dummy_url", params if params else {})
         request.user = self.student
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id

@@ -236,7 +236,7 @@ class ViewsTestCaseMixin(object):
             data["depth"] = 0
         self._set_mock_request_data(mock_request, data)
 
-    def create_thread_helper(self, mock_request, extra_data={}):
+    def create_thread_helper(self, mock_request, extra_data=None):
         """
         Issues a request to create a thread and verifies the result.
         """
@@ -279,7 +279,8 @@ class ViewsTestCaseMixin(object):
             "anonymous": ["false"],
             "title": ["Hello"],
         }
-        thread.update(extra_data)
+        if extra_data:
+            thread.update(extra_data)
         url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
                                                'course_id': self.course_id.to_deprecated_string()})
         response = self.client.post(url, data=thread)
@@ -293,7 +294,8 @@ class ViewsTestCaseMixin(object):
             'anonymous': False,
             'course_id': unicode(self.course_id),
         }
-        expected_data.update(extra_data)
+        if extra_data:
+            expected_data.update(extra_data)
         mock_request.assert_called_with(
             'post',
             '{prefix}/i4x-MITx-999-course-Robot_Super_Course/threads'.format(prefix=CS_PREFIX),

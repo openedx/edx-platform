@@ -15,6 +15,7 @@ class CourseTeam(models.Model):
     """This model represents team related info."""
 
     team_id = models.CharField(max_length=255, unique=True)
+    discussion_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -48,9 +49,11 @@ class CourseTeam(models.Model):
         """
 
         team_id = generate_unique_readable_id(name, cls.objects.all(), 'team_id')
+        discussion_id = 'team:' + team_id
 
         course_team = cls(
             team_id=team_id,
+            discussion_id=discussion_id,
             name=name,
             course_id=course_id,
             topic_id=topic_id if topic_id else '',

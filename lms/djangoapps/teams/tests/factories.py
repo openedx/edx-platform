@@ -15,5 +15,6 @@ class CourseTeamFactory(DjangoModelFactory):
     FACTORY_DJANGO_GET_OR_CREATE = ('team_id',)
 
     team_id = factory.Sequence('team-{0}'.format)
+    discussion_id = factory.Sequence('team:team-{0}'.format)
     name = "Awesome Team"
     description = "A simple description"
