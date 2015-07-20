@@ -236,20 +236,25 @@ def _section_certificates(course):
         dict
 
     """
-    example_cert_status = certs_api.example_certificates_status(course.id)
+    example_cert_status = None
+    html_cert_enabled = certs_api.has_html_certificates_enabled(course.id, course)
+    if html_cert_enabled:
+        can_enable_for_course = True
+    else:
+        example_cert_status = certs_api.example_certificates_status(course.id)
 
-    # Allow the user to enable self-generated certificates for students
-    # *only* once a set of example certificates has been successfully generated.
-    # If certificates have been misconfigured for the course (for example, if
-    # the PDF template hasn't been uploaded yet), then we don't want
-    # to turn on self-generated certificates for students!
-    can_enable_for_course = (
-        example_cert_status is not None and
-        all(
-            cert_status['status'] == 'success'
-            for cert_status in example_cert_status
+        # Allow the user to enable self-generated certificates for students
+        # *only* once a set of example certificates has been successfully generated.
+        # If certificates have been misconfigured for the course (for example, if
+        # the PDF template hasn't been uploaded yet), then we don't want
+        # to turn on self-generated certificates for students!
+        can_enable_for_course = (
+            example_cert_status is not None and
+            all(
+                cert_status['status'] == 'success'
+                for cert_status in example_cert_status
+            )
         )
-    )
     instructor_generation_enabled = settings.FEATURES.get('CERTIFICATES_INSTRUCTOR_GENERATION', False)
 
     return {
@@ -259,6 +264,7 @@ def _section_certificates(course):
         'can_enable_for_course': can_enable_for_course,
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
         'instructor_generation_enabled': instructor_generation_enabled,
+        'html_cert_enabled': html_cert_enabled,
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',
