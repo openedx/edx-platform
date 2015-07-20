@@ -494,9 +494,9 @@ class DashboardTest(ModuleStoreTestCase):
         """
         Check that the student dashboard makes use of course metadata caching.
 
-        The first time the student dashboard displays a specific course, it will
-        make a call to the module store. After that first request, though, the
-        course's metadata should be cached as a CourseOverview.
+        After enrolling a student in a course, that course's metadata should be
+        cached as a CourseOverview. The student dashboard should never have to make
+        calls to the modulestore.
 
         Arguments:
             modulestore_type (ModuleStoreEnum.Type): Type of modulestore to create
@@ -511,23 +511,21 @@ class DashboardTest(ModuleStoreTestCase):
             involve adding fields to CourseOverview so that loading a full
             CourseDescriptor isn't necessary.
         """
-        # Create a course, log in the user, and enroll them in the course.
+        # Create a course and log in the user.
         test_course = CourseFactory.create(default_store=modulestore_type)
         self.client.login(username="jack", password="test")
-        CourseEnrollment.enroll(self.user, test_course.id)
 
-        # The first request will result in a modulestore query.
+        # Enrolling the user in the course will result in a modulestore query.
         with check_mongo_calls(expected_mongo_calls):
-            response_1 = self.client.get(reverse('dashboard'))
-            self.assertEquals(response_1.status_code, 200)
+            CourseEnrollment.enroll(self.user, test_course.id)
 
         # Subsequent requests will only result in SQL queries to load the
         # CourseOverview object that has been created.
         with check_mongo_calls(0):
+            response_1 = self.client.get(reverse('dashboard'))
+            self.assertEquals(response_1.status_code, 200)
             response_2 = self.client.get(reverse('dashboard'))
             self.assertEquals(response_2.status_code, 200)
-            response_3 = self.client.get(reverse('dashboard'))
-            self.assertEquals(response_3.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})

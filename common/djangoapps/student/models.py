@@ -10,16 +10,19 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+from collections import defaultdict, OrderedDict
 from datetime import datetime, timedelta
+from functools import total_ordering
 import hashlib
+from importlib import import_module
 import json
 import logging
 from pytz import UTC
-import uuid
-from collections import defaultdict, OrderedDict
-import dogstats_wrapper as dog_stats_api
 from urllib import urlencode
+import uuid
 
+import analytics
+from config_models.models import ConfigurationModel
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
@@ -33,28 +36,21 @@ from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
-from config_models.models import ConfigurationModel
-from track import contexts
+import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
-from importlib import import_module
-
-from south.modelsinspector import add_introspection_rules
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-import lms.lib.comment_client as cc
-from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
-from functools import total_ordering
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from south.modelsinspector import add_introspection_rules
+from track import contexts
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
+import lms.lib.comment_client as cc
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from util.query import use_read_replica_if_available
 
-import analytics
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
@@ -1064,18 +1060,15 @@ class CourseEnrollment(models.Model):
         """
         # All the server-side checks for whether a user is allowed to enroll.
         try:
-            course = modulestore().get_course(course_key)
-        except ItemNotFoundError:
-            log.warning(
-                u"User %s failed to enroll in non-existent course %s",
-                user.username,
-                course_key.to_deprecated_string(),
-            )
-            raise NonExistentCourseError
+            course = CourseOverview.get_from_id(course_key)
+        except CourseOverview.DoesNotExist:
+            # This is here to preserve legacy behavior which allowed enrollment in courses
+            # announced before the start of content creation.
+            if check_access:
+                log.warning(u"User %s failed to enroll in non-existent course %s", user.username, unicode(course_key))
+                raise NonExistentCourseError
 
         if check_access:
-            if course is None:
-                raise NonExistentCourseError
             if CourseEnrollment.is_enrollment_closed(user, course):
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
@@ -1320,7 +1313,8 @@ class CourseEnrollment(models.Model):
 
     @property
     def course(self):
-        return modulestore().get_course(self.course_id)
+        # Deprecated. Please use the `course_overview` property instead.
+        return self.course_overview
 
     @property
     def course_overview(self):
@@ -1334,7 +1328,6 @@ class CourseEnrollment(models.Model):
             become stale.
        """
         if not self._course_overview:
-            from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
             try:
                 self._course_overview = CourseOverview.get_from_id(self.course_id)
             except (CourseOverview.DoesNotExist, IOError):

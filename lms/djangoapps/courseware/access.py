@@ -10,8 +10,8 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
-import logging
 from datetime import datetime, timedelta
+import logging
 import pytz
 
 from django.conf import settings
@@ -245,6 +245,58 @@ def _can_load_course_on_mobile(user, course):
     )
 
 
+def _can_enroll_courselike(user, courselike):
+    """
+    Ascertain if the user can enroll in the given courselike object.
+
+    Arguments:
+        user (User): The user attempting to enroll.
+        courselike (CourseDescriptor or CourseOverview): The object representing the
+            course in which the user is trying to enroll.
+
+    Returns:
+        AccessResponse, indicating whether the user can enroll.
+    """
+    enrollment_domain = courselike.enrollment_domain
+    # Courselike objects (e.g., course descriptors and CourseOverviews) have an attribute named `id`
+    # which actually points to a CourseKey. Sigh.
+    course_key = courselike.id
+
+    # If using a registration method to restrict enrollment (e.g., Shibboleth)
+    if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and enrollment_domain:
+        if user is not None and user.is_authenticated() and \
+                ExternalAuthMap.objects.filter(user=user, external_domain=enrollment_domain):
+            debug("Allow: external_auth of " + enrollment_domain)
+            reg_method_ok = True
+        else:
+            reg_method_ok = False
+    else:
+        reg_method_ok = True
+
+    # If the user appears in CourseEnrollmentAllowed paired with the given course key,
+    # they may enroll. Note that as dictated by the legacy database schema, the filter
+    # call includes a `course_id` kwarg which requires a CourseKey.
+    if user is not None and user.is_authenticated():
+        if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key):
+            return ACCESS_GRANTED
+
+    if _has_staff_access_to_descriptor(user, courselike, course_key):
+        return ACCESS_GRANTED
+
+    if courselike.invitation_only:
+        debug("Deny: invitation only")
+        return ACCESS_DENIED
+
+    now = datetime.now(UTC())
+    enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
+    enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
+    if reg_method_ok and enrollment_start < now < enrollment_end:
+        debug("Allow: in enrollment period")
+        return ACCESS_GRANTED
+
+    return ACCESS_DENIED
+
+
 def _has_access_course_desc(user, action, course):
     """
     Check if user has access to a course descriptor.
@@ -271,54 +323,7 @@ def _has_access_course_desc(user, action, course):
         return _has_access_descriptor(user, 'load', course, course.id)
 
     def can_enroll():
-        """
-        First check if restriction of enrollment by login method is enabled, both
-            globally and by the course.
-        If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap
-            was set by 'shib:https://idp.stanford.edu/", in addition to requirements below.
-        Rest of requirements:
-        (CourseEnrollmentAllowed always overrides)
-          or
-        (staff can always enroll)
-          or
-        Enrollment can only happen in the course enrollment period, if one exists, and
-        course is not invitation only.
-        """
-
-        # if using registration method to restrict (say shibboleth)
-        if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-            if user is not None and user.is_authenticated() and \
-                    ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
-                debug("Allow: external_auth of " + course.enrollment_domain)
-                reg_method_ok = True
-            else:
-                reg_method_ok = False
-        else:
-            reg_method_ok = True  # if not using this access check, it's always OK.
-
-        now = datetime.now(UTC())
-        start = course.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
-        end = course.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
-
-        # if user is in CourseEnrollmentAllowed with right course key then can also enroll
-        # (note that course.id actually points to a CourseKey)
-        # (the filter call uses course_id= since that's the legacy database schema)
-        # (sorry that it's confusing :( )
-        if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
-            if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
-                return ACCESS_GRANTED
-
-        if _has_staff_access_to_descriptor(user, course, course.id):
-            return ACCESS_GRANTED
-
-        # Invitation_only doesn't apply to CourseEnrollmentAllowed or has_staff_access_access
-        if course.invitation_only:
-            debug("Deny: invitation only")
-            return ACCESS_DENIED
-
-        if reg_method_ok and start < now < end:
-            debug("Allow: in enrollment period")
-            return ACCESS_GRANTED
+        return _can_enroll_courselike(user, course)
 
     def see_exists():
         """
@@ -412,6 +417,7 @@ def _can_load_course_overview(user, course_overview):
     )
 
 _COURSE_OVERVIEW_CHECKERS = {
+    'enroll': _can_enroll_courselike,
     'load': _can_load_course_overview,
     'load_mobile': lambda user, course_overview: (
         _can_load_course_overview(user, course_overview)
