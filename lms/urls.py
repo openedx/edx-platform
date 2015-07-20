@@ -86,6 +86,8 @@ urlpatterns = (
 
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
+
+    url('^api/grades_api/', include('grades_api.urls', namespace='grades_api'))
 )
 
 if settings.FEATURES["ENABLE_USER_REST_API"]:
