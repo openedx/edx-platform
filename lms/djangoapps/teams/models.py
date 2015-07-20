@@ -49,7 +49,7 @@ class CourseTeam(models.Model):
         """
 
         team_id = generate_unique_readable_id(name, cls.objects.all(), 'team_id')
-        discussion_id = 'team:' + team_id
+        discussion_id = 'team_id:' + team_id
 
         course_team = cls(
             team_id=team_id,

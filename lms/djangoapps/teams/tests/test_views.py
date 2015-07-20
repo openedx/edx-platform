@@ -376,7 +376,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
         team = self.post_create_team(status, self.build_team_data(name="New Team"), user=user)
         if status == 200:
             self.assertEqual(team['id'], 'new-team')
-            self.assertEqual(team['discussion_id'], 'team:new-team')
+            self.assertEqual(team['discussion_id'], 'team_id:new-team')
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
 
@@ -434,7 +434,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
             'id': 'fully-specified-team',
-            'discussion_id': 'team:fully-specified-team',
+            'discussion_id': 'team_id:fully-specified-team',
             'description': 'Another fantastic team'
         })
 
