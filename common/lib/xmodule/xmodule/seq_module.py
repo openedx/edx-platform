@@ -1,9 +1,13 @@
 import json
 import logging
 import warnings
+import pytz
+
+from datetime import datetime, timedelta
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -48,7 +52,37 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
+    is_time_limited = Boolean(
+        display_name=_("Is Time Limited"),
+        help=_(
+            "This setting indicates whether students have a limited time"
+            " to view or interact with this courseware component."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
 
+    default_time_limit_mins = Integer(
+        display_name=_("Time Limit in Minutes"),
+        help=_(
+            "The number of minutes available to users for viewing or interacting with this courseware component."
+        ),
+        default=None,
+        scope=Scope.settings,
+    )
+
+    is_proctored_enabled = Boolean(
+        display_name=_("Is Proctoring Enabled"),
+        help=_(
+            "This setting indicates whether this exam is a proctored exam."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+
+@XBlock.needs('proctoring')
+@XBlock.needs('user')
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -99,6 +133,7 @@ class SequenceModule(SequenceFields, XModule):
             else:
                 self.position = 1
             return json.dumps({'success': True})
+
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
@@ -111,6 +146,35 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
 
         fragment = Fragment()
+
+        if self.is_time_limited:
+            # Is this sequent part of a timed or proctored exam?
+            proctoring_service = self.runtime.service(self, 'proctoring')
+
+            # Is the feature turned on?
+            if proctoring_service.is_feature_enabled():
+                user_service = self.runtime.service(self, 'user')
+                user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
+                course_id = self.runtime.course_id
+                content_id = self.location
+
+                # See if the edx-proctoring subsystem wants to present
+                # a special view to the student rather
+                # than the actual sequence content
+                view_html = proctoring_service.get_student_view(
+                    user_id,
+                    course_id,
+                    content_id,
+                    {
+                        'display_name': self.display_name,
+                        'default_time_limit_mins': self.default_time_limit_mins,
+                    }
+                )
+
+                if view_html:
+                    # Are we blocking content for any reason
+                    fragment.add_content(view_html)
+                    return fragment
 
         for child in self.get_display_items():
             progress = child.get_progress()
@@ -139,7 +203,7 @@ class SequenceModule(SequenceFields, XModule):
                   'ajax_url': self.system.ajax_url,
                   }
 
-        fragment.add_content(self.system.render_template('seq_module.html', params))
+        fragment.add_content(self.system.render_template("seq_module.html", params))
 
         return fragment
 

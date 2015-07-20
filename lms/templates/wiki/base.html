@@ -6,6 +6,8 @@
 {% block bodyclass %}view-incourse view-wiki{% endblock %}
 
 {% block headextra %}
+  <script type="text/javascript" src="/jsi18n/"></script>
+  <script src="{% static 'js/vendor/backbone-min.js' %}"></script>
   {% compressed_css 'course' %}
 
   <script type="text/javascript">

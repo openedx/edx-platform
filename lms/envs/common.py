@@ -404,6 +404,9 @@ FEATURES = {
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
+    # Timed Proctored Exams
+    'ENABLE_PROCTORED_EXAMS': False,
+
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
     'ENABLE_OPENBADGES': False,
 
@@ -1117,7 +1120,7 @@ TEMPLATE_LOADERS = (
     'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
-    # 'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.app_directories.Loader',
 
 )
 
@@ -1209,11 +1212,18 @@ courseware_js = (
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
+    ['js/search/course/main.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
 courseware_search_js = ['js/search/course/main.js']
 
+proctoring_js = (
+    ['proctoring/js/models/*.js'] +
+    ['proctoring/js/collections/*.js'] +
+    ['proctoring/js/views/*.js'] +
+    ['proctoring/js/*.js']
+)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
@@ -1494,6 +1504,10 @@ PIPELINE_JS = {
             'js/src/logger.js',
         ],
         'output_filename': 'js/lms-application.js',
+    },
+    'proctoring': {
+        'source_filenames': proctoring_js,
+        'output_filename': 'js/lms-proctoring.js',
     },
     'courseware': {
         'source_filenames': courseware_js,
@@ -1913,6 +1927,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 ######################### CSRF #########################################
@@ -2555,3 +2572,12 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
+
+#### PROCTORING CONFIGURATION DEFAULTS
+
+PROCTORING_BACKEND_PROVIDER = {
+    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'options': {},
+}
+PROCTORING_SETTINGS = {}
+
