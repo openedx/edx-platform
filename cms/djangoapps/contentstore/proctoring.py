@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 def register_proctored_exams(course_key):
     """
-    Is typically when on a course published signal. The course is examined for sequences
+    This is typically called on a course published signal. The course is examined for sequences
     that are marked as timed exams. Then these are registered with the edx-proctoring
     subsystem. Likewise, if formerly registered exams are unmarked, then those
     registred exams are marked as inactive
