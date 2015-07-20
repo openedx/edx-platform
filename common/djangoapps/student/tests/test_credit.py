@@ -6,7 +6,6 @@ import datetime
 
 from mock import patch
 import pytz
-from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
