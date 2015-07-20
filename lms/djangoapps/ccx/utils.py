@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from edxmako.shortcuts import render_to_string  # pylint: disable=import-error
 from microsite_configuration import microsite  # pylint: disable=import-error
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
 from ccx_keys.locator import CCXLocator
@@ -240,38 +241,46 @@ def send_mail_to_student(student, param_dict):
 
 def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
     """
-    Get the relevant set of (CustomCourseForEdX, CcxMembership, Course)
+    Get the relevant set of (CustomCourseForEdX, CcxMembership, CourseOverview)
     triplets to be displayed on a student's dashboard.
     """
+    error_message_format = "User {0} enrolled in {2} course {1}"
+
     # only active memberships for now
     for membership in CcxMembership.memberships_for_user(user):
         ccx = membership.ccx
-        store = modulestore()
-        with store.bulk_operations(ccx.course_id):
-            course = store.get_course(ccx.course_id)
-            if course and not isinstance(course, ErrorDescriptor):
-                # if we are in a Microsite, then filter out anything that is not
-                # attributed (by ORG) to that Microsite
-                if course_org_filter and course_org_filter != course.location.org:
-                    continue
-                # Conversely, if we are not in a Microsite, then let's filter out any enrollments
-                # with courses attributed (by ORG) to Microsites
-                elif course.location.org in org_filter_out_set:
-                    continue
 
-                # If, somehow, we've got a ccx that has been created for a
-                # course with a deprecated ID, we must filter it out. Emit a
-                # warning to the log so we can clean up.
-                if course.location.deprecated:
-                    log.warning(
-                        "CCX %s exists for course %s with deprecated id",
-                        ccx,
-                        ccx.course_id
-                    )
-                    continue
+        try:
+            course_overview = CourseOverview.get_from_id(ccx.course_id)
+        except CourseOverview.DoesNotExist:
+            log.error(error_message_format.format(  # pylint: disable=logging-format-interpolation
+                user.username, ccx.course_id, "non-existent"
+            ))
+            continue
+        except IOError:
+            log.error(error_message_format.format(  # pylint: disable=logging-format-interpolation
+                user.username, ccx.course_id, "broken"
+            ))
+            continue
 
-                yield (ccx, membership, course)
-            else:
-                log.error("User {0} enrolled in {2} course {1}".format(  # pylint: disable=logging-format-interpolation
-                    user.username, ccx.course_id, "broken" if course else "non-existent"
-                ))
+        # if we are in a Microsite, then filter out anything that is not
+        # attributed (by ORG) to that Microsite
+        if course_org_filter and course_org_filter != course_overview.location.org:
+            continue
+        # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+        # with courses attributed (by ORG) to Microsites
+        elif course_overview.location.org in org_filter_out_set:
+            continue
+
+        # If, somehow, we've got a ccx that has been created for a
+        # course with a deprecated ID, we must filter it out. Emit a
+        # warning to the log so we can clean up.
+        if course_overview.location.deprecated:
+            log.warning(
+                "CCX %s exists for course %s with deprecated id",
+                ccx,
+                ccx.course_id
+            )
+            continue
+
+        yield (ccx, membership, course_overview)
