@@ -66,7 +66,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 1)
@@ -79,7 +79,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_icrv_xblock()
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
@@ -89,7 +89,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_icrv_xblock()
 
         with check_mongo_calls(3):
-            listen_for_course_publish(self.course.id)
+            on_course_publish(self.course.id)
 
     @mock.patch(
         'openedx.core.djangoapps.credit.tasks.set_credit_requirements',
@@ -107,7 +107,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
