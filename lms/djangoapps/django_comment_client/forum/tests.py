@@ -953,6 +953,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
+@patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
@@ -969,23 +970,36 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
             discussion_target="Discussion1"
         )
 
-    @patch('lms.lib.comment_client.utils.requests.request')
-    def test_courseware_data(self, mock_request):
-        request = RequestFactory().get("dummy_url")
+    def send_request(self, mock_request, params={}):
+        """
+        Creates and returns a request with params set, and configures
+        mock_request to return appropriate values.
+        """
+        request = RequestFactory().get("dummy_url", params)
         request.user = self.student
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id
         )
-
-        response = views.inline_discussion(
+        return views.inline_discussion(
             request, self.course.id.to_deprecated_string(), self.discussion1.discussion_id
         )
+
+    def verify_response(self, response):
+        """Verifies that the response contains the appropriate courseware_url and courseware_title"""
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
         expected_courseware_title = 'Chapter / Discussion1'
         self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
+
+    def test_courseware_data(self, mock_request):
+        self.verify_response(self.send_request(mock_request))
+
+    def test_context(self, mock_request):
+        response = self.send_request(mock_request, {'context': 'standalone'})
+        self.assertEqual(mock_request.call_args[1]['params']['context'], 'standalone')
+        self.verify_response(response)
 
 
 @patch('requests.request')
