@@ -376,6 +376,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
         team = self.post_create_team(status, self.build_team_data(name="New Team"), user=user)
         if status == 200:
             self.assertEqual(team['id'], 'new-team')
+            self.assertIn('discussion_topic_id', team)
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
 
@@ -422,8 +423,9 @@ class TestCreateTeamAPI(TeamAPITestCase):
             language='fr'
         ))
 
-        # Remove date_created because it changes between test runs
+        # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
+        del team['discussion_topic_id']
         self.assertEquals(team, {
             'name': 'Fully specified team',
             'language': 'fr',
@@ -453,7 +455,8 @@ class TestDetailTeamAPI(TeamAPITestCase):
     def test_access(self, user, status):
         team = self.get_team_detail(self.test_team_1.team_id, status, user=user)
         if status == 200:
-            self.assertEquals(team['description'], self.test_team_1.description)
+            self.assertEqual(team['description'], self.test_team_1.description)
+            self.assertEqual(team['discussion_topic_id'], self.test_team_1.discussion_topic_id)
 
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)

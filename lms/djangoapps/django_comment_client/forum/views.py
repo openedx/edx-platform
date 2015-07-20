@@ -149,6 +149,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
                     'flagged',
                     'unread',
                     'unanswered',
+                    'context',
                 ]
             )
         )
