@@ -91,7 +91,7 @@ class ProctoringFields(object):
     )
 
 
-class SequenceModule(SequenceFields, ProctoringFields, XModule):
+class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disable=abstract-method
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {
@@ -196,6 +196,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
 
 class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
+    """
+    A Sequences Descriptor object
+    """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
