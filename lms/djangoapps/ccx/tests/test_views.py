@@ -16,9 +16,11 @@ from courseware.tests.factories import StudentModuleFactory  # pylint: disable=i
 from courseware.tests.helpers import LoginEnrollmentTestCase  # pylint: disable=import-error
 from courseware.tabs import get_course_tab_list
 from django.core.urlresolvers import reverse
+from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
 from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
@@ -27,6 +29,7 @@ from student.tests.factories import (  # pylint: disable=import-error
 )
 
 from xmodule.x_module import XModuleMixin
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE)
@@ -653,6 +656,43 @@ class CCXCoachTabTestCase(ModuleStoreTestCase):
                 expected_result,
                 self.check_ccx_tab()
             )
+
+
+class TestStudentDashboardWithCCX(ModuleStoreTestCase):
+    """
+    Test to ensure that the student dashboard works for users enrolled in CCX
+    courses.
+    """
+
+    def setUp(self):
+        """
+        Set up courses and enrollments.
+        """
+        super(TestStudentDashboardWithCCX, self).setUp()
+
+        # Create a Draft Mongo and a Split Mongo course and enroll a student user in them.
+        self.student_password = "foobar"
+        self.student = UserFactory.create(username="test", password=self.student_password, is_staff=False)
+        self.draft_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        self.split_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        CourseEnrollment.enroll(self.student, self.draft_course.id)
+        CourseEnrollment.enroll(self.student, self.split_course.id)
+
+        # Create a CCX coach.
+        self.coach = AdminFactory.create()
+        role = CourseCcxCoachRole(self.split_course.id)
+        role.add_users(self.coach)
+
+        # Create a CCX course and enroll the user in it.
+        self.ccx = CcxFactory(course_id=self.split_course.id, coach=self.coach)
+        last_week = datetime.datetime.now(UTC()) - datetime.timedelta(days=7)
+        override_field_for_ccx(self.ccx, self.split_course, 'start', last_week)  # Required by self.ccx.has_started().
+        CcxMembershipFactory(ccx=self.ccx, student=self.student, active=True)
+
+    def test_load_student_dashboard(self):
+        self.client.login(username=self.student.username, password=self.student_password)
+        response = self.client.get(reverse('dashboard'))
+        self.assertEqual(response.status_code, 200)
 
 
 def flatten(seq):
