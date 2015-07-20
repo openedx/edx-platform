@@ -83,9 +83,11 @@ class CourseViewMixin(object):
         Determines if the user is staff or an instructor for the course.
         Always returns True if DEBUG mode is enabled.
         """
-        return (settings.DEBUG
-                or has_access(user, CourseStaffRole.ROLE, course)
-                or has_access(user, CourseInstructorRole.ROLE, course))
+        return bool(
+            settings.DEBUG
+            or has_access(user, CourseStaffRole.ROLE, course)
+            or has_access(user, CourseInstructorRole.ROLE, course)
+        )
 
     def check_course_permissions(self, user, course):
         """

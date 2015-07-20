@@ -316,5 +316,5 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         """
         Test for instructor access
         """
-        ret_val = has_instructor_access_for_class(self.instructor, self.course.id)
+        ret_val = bool(has_instructor_access_for_class(self.instructor, self.course.id))
         self.assertEquals(ret_val, True)
