@@ -130,6 +130,40 @@ class TestProctoredExams(ModuleStoreTestCase):
         exam = exams[0]
         self.assertEqual(exam['is_active'], False)
 
+    def test_dangling_exam(self):
+        """
+        Make sure we filter out all dangling items
+        """
+
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_mins=10,
+            is_proctored_enabled=True
+        )
+
+        listen_for_course_publish(self, self.course.id)
+
+        exams = get_all_exams_for_course(unicode(self.course.id))
+        self.assertEqual(len(exams), 1)
+
+        self.store.delete_item(chapter.location, self.user.id)
+
+        # republish course
+        listen_for_course_publish(self, self.course.id)
+
+        # look through exam table, the dangling exam
+        # should be disabled
+        exams = get_all_exams_for_course(unicode(self.course.id))
+        self.assertEqual(len(exams), 1)
+
+        exam = exams[0]
+        self.assertEqual(exam['is_active'], False)
+
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': False})
     def test_feature_flag_off(self):
         """

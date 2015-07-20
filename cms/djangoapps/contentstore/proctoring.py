@@ -21,6 +21,20 @@ from edx_proctoring.exceptions import (
 log = logging.getLogger(__name__)
 
 
+def _is_in_course_tree(item):
+    """
+    Check that the item is in the course tree.
+
+    It's possible that the item is not in the course tree
+    if its parent has been deleted and is now an orphan.
+    """
+    ancestor = item.get_parent()
+    while ancestor is not None and ancestor.location.category != "course":
+        ancestor = ancestor.get_parent()
+
+    return ancestor is not None
+
+
 def register_proctored_exams(course_key):
     """
     This is typically called on a course published signal. The course is examined for sequences
@@ -39,7 +53,7 @@ def register_proctored_exams(course_key):
         return
 
     # get all sequences, since they can be marked as timed/proctored exams
-    timed_exams = modulestore().get_items(
+    _timed_exams = modulestore().get_items(
         course_key,
         qualifiers={
             'category': 'sequential',
@@ -48,6 +62,13 @@ def register_proctored_exams(course_key):
             'is_time_limited': True,
         }
     )
+
+    # filter out any potential dangling sequences
+    timed_exams = [
+        timed_exam
+        for timed_exam in _timed_exams
+        if _is_in_course_tree(timed_exam)
+    ]
 
     # enumerate over list of sequences which are time-limited and
     # add/update any exam entries in edx-proctoring
