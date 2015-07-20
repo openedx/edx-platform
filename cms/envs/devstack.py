@@ -75,6 +75,9 @@ def should_show_debug_toolbar(_):
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
+################################ TOTA11Y ################################
+INSTALLED_APPS += ('tota11y',)
+MIDDLEWARE_CLASSES += ('tota11y.middleware.Tota11yMiddleware',)
 
 ################################ MILESTONES ################################
 FEATURES['MILESTONES_APP'] = True
