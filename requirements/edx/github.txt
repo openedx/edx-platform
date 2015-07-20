@@ -58,3 +58,6 @@ git+https://github.com/edx/ecommerce-api-client.git@1.0.0#egg=ecommerce-api-clie
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll
+
+# IONISx:
+-e git+https://github.com/IONISx/edx-grades-api@v1.0.0#egg=edx-grades-api

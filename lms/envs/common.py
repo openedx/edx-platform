@@ -1928,6 +1928,9 @@ INSTALLED_APPS = (
 
     # Reverse proxy
     'x_forwarded_for',
+
+    # Grades API
+    'grades_api',
 )
 
 ######################### CSRF #########################################
