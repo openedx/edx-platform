@@ -4,13 +4,12 @@ Asynchronous tasks for the LTI provider app.
 
 from django.dispatch import receiver
 import logging
-from requests.exceptions import RequestException
 
 from courseware.models import SCORE_CHANGED
 from lms import CELERY_APP
-from lti_provider.models import GradedAssignment
-import lti_provider.outcomes
+import lti_provider.outcomes as outcomes
 from lti_provider.views import parse_course_and_usage_keys
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.lti_provider")
 
@@ -48,51 +47,51 @@ def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
 def send_outcome(points_possible, points_earned, user_id, course_id, usage_id):
     """
     Calculate the score for a given user in a problem and send it to the
-    appropriate LTI consumer's outcome service.
+    appropriate LTI consumer's outcome service. This may involve sending
+    multiple score updates, depending on what LTI requests have been received.
     """
     course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
-    assignments = GradedAssignment.objects.filter(
-        user=user_id, course_key=course_key, usage_key=usage_key
+    problem_descriptor = modulestore().get_item(usage_key)
+
+    # Get all assignments involving the current problem for which the campus LMS
+    # is expecting a grade. There may be many possible graded assignments, if
+    # a problem has been added several times to a course at different
+    # granularities (such as the unit or the vertical).
+    assignments = outcomes.get_assignments_for_problem(
+        problem_descriptor, user_id, course_key
     )
 
-    # Calculate the user's score, on a scale of 0.0 - 1.0.
-    score = float(points_earned) / float(points_possible)
+    # Dictionary to hold the scores for each assignment. We already know the
+    # score for the problem that triggered this task.
+    scores = {usage_key: float(points_earned) / float(points_possible)}
 
-    # There may be zero or more assignment records. We would expect for there
-    # to be zero if the user/course/usage combination does not relate to a
-    # previous graded LTI launch. This can happen if an LTI consumer embeds some
-    # gradable content in a context that doesn't require a score (maybe by
-    # including an exercise as a sample that students may complete but don't
-    # count towards their grade).
-    # There could be more than one GradedAssignment record if the same content
-    # is embedded more than once in a single course. This would be a strange
-    # course design on the consumer's part, but we handle it by sending update
-    # messages for all launches of the content.
-    for assignment in assignments:
-        xml = lti_provider.outcomes.generate_replace_result_xml(
-            assignment.lis_result_sourcedid, score
+    # To find the score for a composite block (such as a vertical) we need to
+    # calculate the scores for the course. This is expensive, so we try to
+    # short-circuit it if we can. In the case where the graded launch contained
+    # only a single problem, and that problem is not a part of any other graded
+    # assignment, we can just use the score passed to this method by the signal
+    # handler.
+    if len(assignments) != 1 or problem_descriptor not in assignments:
+        # This is not the short-circuit case, so we need to calculate the score
+        # for at least one composite block. We do this by calculating the scores
+        # for all problems in the course, and then combining them to make up the
+        # composite score.
+        location_to_score = outcomes.get_scores_for_locations(
+            user_id, course_key
         )
-        try:
-            response = lti_provider.outcomes.sign_and_send_replace_result(assignment, xml)
-        except RequestException:
-            # failed to send result. 'response' is None, so more detail will be
-            # logged at the end of the method.
-            response = None
-            log.exception("Outcome Service: Error when sending result.")
+        for descriptor in assignments:
+            # A location could be part of multiple graded assignments
+            if descriptor.location not in scores:
+                earned, possible = outcomes.calculate_score(
+                    descriptor, location_to_score
+                )
+                if possible == 0:
+                    score = 0
+                else:
+                    score = earned / possible
+                scores[descriptor.location] = score
 
-        # If something went wrong, make sure that we have a complete log record.
-        # That way we can manually fix things up on the campus system later if
-        # necessary.
-        if not (response and lti_provider.outcomes.check_replace_result_response(response)):
-            log.error(
-                "Outcome Service: Failed to update score on LTI consumer. "
-                "User: %s, course: %s, usage: %s, score: %s, possible: %s "
-                "status: %s, body: %s",
-                user_id,
-                course_key,
-                usage_key,
-                points_earned,
-                points_possible,
-                response,
-                response.text if response else 'Unknown'
-            )
+    # Send score updates to the campus LMS for all relevant assignments.
+    for descriptor in assignments:
+        for assignment in assignments[descriptor]:
+            outcomes.send_score_update(assignment, scores[descriptor.location])

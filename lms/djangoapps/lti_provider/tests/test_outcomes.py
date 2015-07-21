@@ -194,9 +194,12 @@ class SendOutcomeTest(TestCase):
             block_type='problem',
             block_id='block_id'
         )
+        self.descriptor = MagicMock()
+        self.descriptor.location = self.usage_key
+        self.descriptor.get_parent = MagicMock(return_value=None)
         self.user = UserFactory.create()
-        self.points_possible = 10
-        self.points_earned = 3
+        self.points_possible = 10.0
+        self.points_earned = 3.0
         self.generate_xml_mock = self.setup_patch(
             'lti_provider.outcomes.generate_replace_result_xml',
             'replace result XML'
@@ -208,6 +211,12 @@ class SendOutcomeTest(TestCase):
         self.check_result_mock = self.setup_patch(
             'lti_provider.outcomes.check_replace_result_response',
             True
+        )
+        self.module_store = MagicMock()
+        self.module_store.get_item = MagicMock(return_value=self.descriptor)
+        self.check_result_mock = self.setup_patch(
+            'lti_provider.tasks.modulestore',
+            self.module_store
         )
         consumer = LtiConsumer(
             consumer_name='Lti Consumer Name',
@@ -240,7 +249,38 @@ class SendOutcomeTest(TestCase):
         self.addCleanup(new_patch.stop)
         return mock
 
-    def test_send_outcome(self):
+    @patch('lti_provider.outcomes.get_scores_for_locations')
+    def test_with_one_assignment(self, score_mock):
+        tasks.send_outcome(
+            self.points_possible,
+            self.points_earned,
+            self.user.id,
+            unicode(self.course_key),
+            unicode(self.usage_key)
+        )
+        self.assertFalse(score_mock.called)
+
+    @patch('lti_provider.outcomes.get_scores_for_locations')
+    def test_with_composite_assignment(self, score_mock):
+        leaf_key = BlockUsageLocator(
+            course_key=self.course_key,
+            block_type='problem',
+            block_id='leaf_problem'
+        )
+        leaf_descriptor = MagicMock()
+        leaf_descriptor.location = leaf_key
+        leaf_descriptor.get_parent = MagicMock(return_value=self.descriptor)
+        self.module_store.get_item = MagicMock(return_value=leaf_descriptor)
+        tasks.send_outcome(
+            self.points_possible,
+            self.points_earned,
+            self.user.id,
+            unicode(self.course_key),
+            unicode(leaf_key)
+        )
+        self.assertTrue(score_mock.called)
+
+    def test_score(self):
         tasks.send_outcome(
             self.points_possible,
             self.points_earned,
@@ -249,7 +289,34 @@ class SendOutcomeTest(TestCase):
             unicode(self.usage_key)
         )
         self.generate_xml_mock.assert_called_once_with('sourcedid', 0.3)
-        self.replace_result_mock.assert_called_once_with(self.assignment, 'replace result XML')
+
+    def test_integer_score(self):
+        tasks.send_outcome(
+            10,
+            1,
+            self.user.id,
+            unicode(self.course_key),
+            unicode(self.usage_key)
+        )
+        self.generate_xml_mock.assert_called_once_with('sourcedid', 0.1)
+
+    def test_scores_sent_for_multiple_assignments(self):
+        assignment2 = GradedAssignment(
+            user=self.user,
+            course_key=self.course_key,
+            usage_key=self.usage_key,
+            outcome_service=self.assignment.outcome_service,
+            lis_result_sourcedid='sourcedid2',
+        )
+        assignment2.save()
+        tasks.send_outcome(
+            self.points_possible,
+            self.points_earned,
+            self.user.id,
+            unicode(self.course_key),
+            unicode(self.usage_key)
+        )
+        self.assertEqual(self.generate_xml_mock.call_count, 2)
 
 
 class XmlHandlingTest(TestCase):
@@ -366,3 +433,279 @@ class XmlHandlingTest(TestCase):
             major_code='<imsx_codeMajor>failure</imsx_codeMajor>'
         )
         self.assertFalse(outcomes.check_replace_result_response(response))
+
+
+def create_descriptor_mock(parent, course_key, block_id):
+    """
+    Build a mock object for a content descriptor. This method assumes that
+    parent descriptors are created before child descriptors in order to properly
+    wire up the parent and child accessors.
+    """
+    desc = MagicMock()
+    desc.location = BlockUsageLocator(
+        course_key=course_key,
+        block_type='problem',
+        block_id=block_id,
+    )
+    desc.children = []
+    desc.get_children = MagicMock(return_value=desc.children)
+    desc.get_parent = MagicMock(return_value=parent)
+    if parent:
+        parent.children.append(desc)
+    return desc
+
+
+class TestAssignmentsForProblem(TestCase):
+    """
+    Test cases for the assignments_for_problem method in outcomes.py
+    """
+    def setUp(self):
+        super(TestAssignmentsForProblem, self).setUp()
+        self.course_key = CourseLocator(
+            org='some_org',
+            course='some_course',
+            run='some_run'
+        )
+        self.course_desc = create_descriptor_mock(None, self.course_key, 'course')
+        self.chapter_desc = create_descriptor_mock(self.course_desc, self.course_key, 'chapter')
+        self.section_desc = create_descriptor_mock(self.course_desc, self.course_key, 'section')
+        self.vertical_desc = create_descriptor_mock(self.section_desc, self.course_key, 'vertical')
+        self.unit_desc = create_descriptor_mock(self.vertical_desc, self.course_key, 'unit')
+        self.user = UserFactory.create()
+        self.user_id = self.user.id
+        self.outcome_service = self.create_outcome_service('outcomes')
+
+    def create_outcome_service(self, id_suffix):
+        """
+        Create and save a new OutcomeService model in the test database. The
+        OutcomeService model requires an LtiConsumer model, so we create one of
+        those as well. The method takes an ID string that is used to ensure that
+        unique fields do not conflict.
+        """
+        lti_consumer = LtiConsumer(
+            consumer_name='lti_consumer_name' + id_suffix,
+            consumer_key='lti_consumer_key' + id_suffix,
+            consumer_secret='lti_consumer_secret' + id_suffix,
+            instance_guid='lti_instance_guid' + id_suffix
+        )
+        lti_consumer.save()
+        outcome_service = OutcomeService(
+            lis_outcome_service_url='https://example.com/outcomes/' + id_suffix,
+            lti_consumer=lti_consumer
+        )
+        outcome_service.save()
+        return outcome_service
+
+    def create_graded_assignment(self, desc, result_id, outcome_service):
+        """
+        Create and save a new GradedAssignment model in the test database.
+        """
+        assignment = GradedAssignment(
+            user=self.user,
+            course_key=self.course_key,
+            usage_key=desc.location,
+            outcome_service=outcome_service,
+            lis_result_sourcedid=result_id
+        )
+        assignment.save()
+        return assignment
+
+    def test_with_no_graded_assignments(self):
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, self.user_id, self.course_key
+        )
+        self.assertEqual(len(assignments), 0)
+
+    def test_with_graded_unit(self):
+        self.create_graded_assignment(self.unit_desc, 'graded_unit', self.outcome_service)
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, self.user_id, self.course_key
+        )
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(len(assignments[self.unit_desc]), 1)
+        self.assertEqual(
+            assignments[self.unit_desc][0].lis_result_sourcedid,
+            'graded_unit'
+        )
+
+    def test_with_graded_vertical(self):
+        self.create_graded_assignment(self.vertical_desc, 'graded_vertical', self.outcome_service)
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, self.user_id, self.course_key
+        )
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(len(assignments[self.vertical_desc]), 1)
+        self.assertEqual(
+            assignments[self.vertical_desc][0].lis_result_sourcedid,
+            'graded_vertical'
+        )
+
+    def test_with_graded_unit_and_vertical(self):
+        self.create_graded_assignment(self.unit_desc, 'graded_unit', self.outcome_service)
+        self.create_graded_assignment(self.vertical_desc, 'graded_vertical', self.outcome_service)
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, self.user_id, self.course_key
+        )
+        self.assertEqual(len(assignments), 2)
+        self.assertEqual(len(assignments[self.unit_desc]), 1)
+        self.assertEqual(len(assignments[self.vertical_desc]), 1)
+        self.assertEqual(
+            assignments[self.unit_desc][0].lis_result_sourcedid,
+            'graded_unit'
+        )
+        self.assertEqual(
+            assignments[self.vertical_desc][0].lis_result_sourcedid,
+            'graded_vertical'
+        )
+
+    def test_with_unit_used_twice(self):
+        self.create_graded_assignment(self.unit_desc, 'graded_unit', self.outcome_service)
+        self.create_graded_assignment(self.unit_desc, 'graded_unit2', self.outcome_service)
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, self.user_id, self.course_key
+        )
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(len(assignments[self.unit_desc]), 2)
+        self.assertEqual(
+            assignments[self.unit_desc][0].lis_result_sourcedid,
+            'graded_unit'
+        )
+        self.assertEqual(
+            assignments[self.unit_desc][1].lis_result_sourcedid,
+            'graded_unit2'
+        )
+
+    def test_with_unit_graded_for_different_user(self):
+        self.create_graded_assignment(self.unit_desc, 'graded_unit', self.outcome_service)
+        other_user = UserFactory.create()
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, other_user.id, self.course_key
+        )
+        self.assertEqual(len(assignments), 0)
+
+    def test_with_unit_graded_for_multiple_consumers(self):
+        other_outcome_service = self.create_outcome_service('second_consumer')
+        self.create_graded_assignment(self.unit_desc, 'graded_unit', self.outcome_service)
+        self.create_graded_assignment(self.unit_desc, 'graded_unit2', other_outcome_service)
+        assignments = outcomes.get_assignments_for_problem(
+            self.unit_desc, self.user_id, self.course_key
+        )
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(len(assignments[self.unit_desc]), 2)
+        self.assertEqual(
+            assignments[self.unit_desc][0].lis_result_sourcedid,
+            'graded_unit'
+        )
+        self.assertEqual(
+            assignments[self.unit_desc][1].lis_result_sourcedid,
+            'graded_unit2'
+        )
+        self.assertEqual(
+            assignments[self.unit_desc][0].outcome_service,
+            self.outcome_service
+        )
+        self.assertEqual(
+            assignments[self.unit_desc][1].outcome_service,
+            other_outcome_service
+        )
+
+
+class TestCalculateScore(TestCase):
+    """
+    Test the method that calculates the score for a given block based on the
+    cumulative scores of its children. This test class uses a hard-coded block
+    hierarchy with scores as follows:
+                                                a
+                                       +--------+--------+
+                                       b                 c
+                        +--------------+-----------+     |
+                        d              e           f     g
+                     +-----+     +-----+-----+     |     |
+                     h     i     j     k     l     m     n
+                   (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
+
+    """
+    def setUp(self):
+        super(TestCalculateScore, self).setUp()
+        self.course_key = CourseLocator(
+            org='some_org',
+            course='some_course',
+            run='some_run'
+        )
+        self.desc_a = create_descriptor_mock(None, self.course_key, 'a')
+        self.desc_b = create_descriptor_mock(self.desc_a, self.course_key, 'b')
+        self.desc_c = create_descriptor_mock(self.desc_a, self.course_key, 'c')
+        self.desc_d = create_descriptor_mock(self.desc_b, self.course_key, 'd')
+        self.desc_e = create_descriptor_mock(self.desc_b, self.course_key, 'e')
+        self.desc_f = create_descriptor_mock(self.desc_b, self.course_key, 'f')
+        self.desc_g = create_descriptor_mock(self.desc_c, self.course_key, 'g')
+        self.desc_h = create_descriptor_mock(self.desc_d, self.course_key, 'h')
+        self.desc_i = create_descriptor_mock(self.desc_d, self.course_key, 'i')
+        self.desc_j = create_descriptor_mock(self.desc_e, self.course_key, 'j')
+        self.desc_k = create_descriptor_mock(self.desc_e, self.course_key, 'k')
+        self.desc_l = create_descriptor_mock(self.desc_e, self.course_key, 'l')
+        self.desc_m = create_descriptor_mock(self.desc_f, self.course_key, 'm')
+        self.desc_n = create_descriptor_mock(self.desc_g, self.course_key, 'n')
+
+        self.location_to_score = {
+            self.desc_h.location: self.create_score(2, 5),
+            self.desc_i.location: self.create_score(3, 5),
+            self.desc_j.location: self.create_score(0, 1),
+            self.desc_l.location: self.create_score(1, 3),
+            self.desc_n.location: self.create_score(3, 10),
+        }
+
+    def create_score(self, earned, possible):
+        """
+        Build a mock for the Score model. We are only concerned with the earned
+        and possible score fields for these tests.
+        """
+        score = MagicMock()
+        score.possible = possible
+        score.earned = earned
+        return score
+
+    def test_score_chapter(self):
+        earned, possible = outcomes.calculate_score(self.desc_a, self.location_to_score)
+        self.assertEqual(earned, 9)
+        self.assertEqual(possible, 24)
+
+    def test_score_section_many_leaves(self):
+        earned, possible = outcomes.calculate_score(self.desc_b, self.location_to_score)
+        self.assertEqual(earned, 6)
+        self.assertEqual(possible, 14)
+
+    def test_score_section_one_leaf(self):
+        earned, possible = outcomes.calculate_score(self.desc_c, self.location_to_score)
+        self.assertEqual(earned, 3)
+        self.assertEqual(possible, 10)
+
+    def test_score_vertical_two_leaves(self):
+        earned, possible = outcomes.calculate_score(self.desc_d, self.location_to_score)
+        self.assertEqual(earned, 5)
+        self.assertEqual(possible, 10)
+
+    def test_score_vertical_two_leaves_one_unscored(self):
+        earned, possible = outcomes.calculate_score(self.desc_e, self.location_to_score)
+        self.assertEqual(earned, 1)
+        self.assertEqual(possible, 4)
+
+    def test_score_vertical_no_score(self):
+        earned, possible = outcomes.calculate_score(self.desc_f, self.location_to_score)
+        self.assertEqual(earned, 0)
+        self.assertEqual(possible, 0)
+
+    def test_score_vertical_one_leaf(self):
+        earned, possible = outcomes.calculate_score(self.desc_g, self.location_to_score)
+        self.assertEqual(earned, 3)
+        self.assertEqual(possible, 10)
+
+    def test_score_leaf(self):
+        earned, possible = outcomes.calculate_score(self.desc_h, self.location_to_score)
+        self.assertEqual(earned, 2)
+        self.assertEqual(possible, 5)
+
+    def test_score_leaf_no_score(self):
+        earned, possible = outcomes.calculate_score(self.desc_m, self.location_to_score)
+        self.assertEqual(earned, 0)
+        self.assertEqual(possible, 0)
