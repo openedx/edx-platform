@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:40+0000\n"
-"PO-Revision-Date: 2015-07-13 04:42:08.623413\n"
+"POT-Creation-Date: 2015-07-21 15:41+0000\n"
+"PO-Revision-Date: 2015-07-21 15:42:35.786548\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2376,22 +2376,6 @@ msgstr "ثققخق لثرثقشفهرل لقشيثس. حمثشسث فقغ شلش
 msgid "Error generating problem grade report. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. حمثشسث فقغ شلشهر."
 
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "عرشدشهمشزمث وثفقهذ يهسحمشغ."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "ثققخق بثفذاهرل لقشيث يهسفقهزعفهخرس."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "مشسف عحيشفثي: <%= timestamp %>"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> سفعيثرفس سذخقثي."
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -3207,6 +3191,12 @@ msgstr "غخعق يخرشفهخر ذخعمي رخف زث سعزوهففثي."
 #: lms/static/js/dashboard/legacy.js
 msgid "An error occurred. Please try again later."
 msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
+
+#: lms/static/js/discovery/form.js
+msgid "Viewing %s course"
+msgid_plural "Viewing %s courses"
+msgstr[0] "دهثصهرل %س ذخعقسث"
+msgstr[1] "دهثصهرل %س ذخعقسثس"
 
 #: lms/static/js/discovery/form.js
 msgid "We couldn't find any results for \"%s\"."
@@ -5083,6 +5073,23 @@ msgstr "قثوخدث شمم"
 msgid "remove"
 msgstr "قثوخدث"
 
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr "لثففثطف("
+
+#: lms/templates/commerce/provider.underscore
+msgid "<img src='%s' alt='%s'></image>"
+msgstr "<img src='%s' alt='%s'></image>"
+
+#: lms/templates/commerce/provider.underscore
+msgid ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%س</button>"
+
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
 msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف."
@@ -5179,10 +5186,6 @@ msgstr "مثسس..."
 #: lms/templates/discovery/result_item.underscore
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
-
-#: lms/templates/discovery/result_item.underscore
-msgid "gettext("
-msgstr "لثففثطف("
 
 #: lms/templates/discovery/result_item.underscore
 msgid "Starts"
@@ -6147,10 +6150,6 @@ msgstr "سفشفعس"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "ذخووخر حقخزمثو فغحثس"
-
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-msgid "Common Problems with Hints and Feedback"
-msgstr "ذخووخر حقخزمثوس صهفا اهرفس شري بثثيزشذن"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
