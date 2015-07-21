@@ -119,6 +119,12 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_course_structure_mem_cache',
     },
+
+    # TODO me: Name this correctly.
+    'course_blocks_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_course_blocks_mem_cache',
+    }
 }
 
 # Make the keyedcache startup warnings go away

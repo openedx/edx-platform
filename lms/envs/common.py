@@ -43,10 +43,6 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
-from openedx.core.djangoapps.course_cache.course_transformations import (
-    MultiParentAccessRule,
-    VisibilityTransformation,
-)
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -1914,9 +1910,12 @@ INSTALLED_APPS = (
 
     'lms.djangoapps.lms_xblock',
 
+    # Course data caching
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
-    'openedx.core.djangoapps.course_cache',
+    'lms.djangoapps.lms_course_cache',  # TODO me: Change this to whatever final name of app is.
+
+    # Old course structure API
     'course_structure_api',
 
     # Mailchimp Syncing
@@ -2577,8 +2576,3 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
-
-# TODO me: Add a comment explaining what this is.
-ALL_COURSE_TRANSFORMATIONS = {
-    'visibility': VisibilityTransformation('visibility', MultiParentAccessRule.ACCESS_TO_ALL_REQUIRED)
-}

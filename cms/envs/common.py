@@ -756,9 +756,10 @@ INSTALLED_APPS = (
     # Additional problem types
     'edx_jsme',    # Molecular Structure
 
-    'openedx.core.djangoapps.content.course_overviews',
+    # Course data caching
     'openedx.core.djangoapps.content.course_structures',
-    'openedx.core.djangoapps.course_cache',
+    'openedx.core.djangoapps.content.course_overviews',
+    'lms.djangoapps.lms_course_cache',  # TODO me: Change this to whatever final name of app is.
 
     # Credit courses
     'openedx.core.djangoapps.credit',

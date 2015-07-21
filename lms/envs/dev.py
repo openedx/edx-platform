@@ -98,7 +98,7 @@ CACHES = {
         'LOCATION': 'edx_course_structure_mem_cache',
     },
 
-    # TODO me: Talk to Platform about values of BACKEND and LOCATION and update block_cache_operations accordingly.
+    # TODO me: Name this correctly.
     'course_blocks_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_course_blocks_mem_cache',
