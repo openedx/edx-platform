@@ -533,7 +533,7 @@ def dashboard(request):
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
-    all_course_modes, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
+    __, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
     course_modes_by_course = {
         course_id: {
             mode.slug: mode
@@ -596,11 +596,7 @@ def dashboard(request):
     #
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
-    verify_status_by_course = check_verify_status_by_course(
-        user,
-        course_enrollments,
-        all_course_modes
-    )
+    verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
     cert_statuses = {
         enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
         for enrollment in course_enrollments
