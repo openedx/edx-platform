@@ -12,6 +12,7 @@ from contentstore.signals import listen_for_course_publish
 from edx_proctoring.api import get_all_exams_for_course
 
 
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
 class TestProctoredExams(ModuleStoreTestCase):
     """
     Tests for the publishing of proctored exams
@@ -30,7 +31,6 @@ class TestProctoredExams(ModuleStoreTestCase):
             enable_proctored_exams=True
         )
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
     def test_publishing_proctored_exam(self):
         """
         Happy path testing to see that when a course is published which contains
@@ -62,7 +62,6 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_enabled)
         self.assertEqual(exam['is_active'], True)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
     def test_publishing_timed_exam(self):
         """
         Happy path testing to see that when a course is published which contains
@@ -94,7 +93,6 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_enabled)
         self.assertEqual(exam['is_active'], True)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
     def test_unpublishing_proctored_exam(self):
         """
         Make sure that if we publish and then unpublish a proctored exam,
