@@ -20,6 +20,7 @@
 # Wentao Han <wentao.han@gmail.com>, 2013
 # bnw, 2014
 # bnw, 2014
+# ifLab <webmaster@iflab.org>, 2015
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jiadong Zhang <fighting-dong@qq.com>, 2015
 # Jie Li <jie.li@anu.edu.au>, 2013
@@ -112,7 +113,7 @@
 # Hu Tong <buildmindht@outlook.com>, 2014
 # bnw, 2014
 # bnw, 2014
-# ifLab Bistu <webmaster@iflab.org>, 2014
+# ifLab <webmaster@iflab.org>, 2014-2015
 # j <786855796@qq.com>, 2015
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
@@ -245,10 +246,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:33+0000\n"
+"POT-Creation-Date: 2015-07-21 15:35+0000\n"
 "PO-Revision-Date: 2015-06-18 03:04+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/p/edx-platform/language/zh_CN/)\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -266,8 +267,6 @@ msgstr "论坛"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "问题"
 
@@ -276,7 +275,8 @@ msgstr "问题"
 msgid "Advanced"
 msgstr "高级"
 
-#: cms/templates/settings.html
+#: cms/djangoapps/contentstore/views/entrance_exam.py
+#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "入学考试"
 
@@ -314,7 +314,7 @@ msgstr "名称"
 #: cms/djangoapps/contentstore/views/videos.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video ID"
-msgstr ""
+msgstr "视频 ID"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: common/djangoapps/config_models/admin.py
@@ -346,11 +346,11 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
-msgstr ""
+msgstr "更新"
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
-msgstr ""
+msgstr "修改日期"
 
 #. Translators: this label indicates the name of the user who made this
 #. change:
@@ -727,8 +727,8 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"If you don't have an {platform_name} account yet, click <strong>Register "
-"Now</strong> at the top of the page."
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -4749,7 +4749,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/dashboard.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4861,6 +4861,34 @@ msgstr ""
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "浏览课程维基添加课程标题"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "Course does not start until {}"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You have unfulfilled milestones"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You do not have access to this course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You do not have access to this course on a mobile device"
+msgstr ""
+
+#: lms/djangoapps/courseware/masquerade.py
+msgid ""
+"There is no user with the username or email address {user_name} enrolled in "
+"this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/masquerade.py
+msgid ""
+"This type of component cannot be shown while viewing the course as a "
+"specific student."
+msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py
 #: lms/templates/courseware/courseware-error.html
@@ -5491,7 +5519,6 @@ msgstr "性别"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr "教育水平"
 
@@ -5511,28 +5538,22 @@ msgstr "群组"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Tasks' section."
+"The enrolled learner profile report is being created. To view the status of "
+"the report, see Pending Instructor Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Tasks' table for the status of the task. When completed, "
-"the report will be available for download in the table below."
+"This enrollment report is currently being created. To view the status of the"
+" report, see Pending Instructor Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Tasks' section."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Tasks' table for the status of the task. When completed, "
-"the report will be available for download in the table below."
+"The enrollment report is being created. This report contains information "
+"about learners who can enroll in the course. To view the status of the "
+"report, see Pending Instructor Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5591,29 +5612,28 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Tasks' section."
+"The detailed enrollment report is being created. To view the status of the "
+"report, see Pending Instructor Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"The detailed enrollment report is being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Tasks' section."
+"The executive summary report is being created. To view the status of the "
+"report, see Pending Instructor Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Tasks' section. When completed, the report will"
-" be available for download in the table below. You will be able to download "
-"the report when it is complete."
+"The executive summary report is currently being created. To view the status "
+"of the report, see Pending Instructor Tasks below. You will be able to "
+"download the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5667,28 +5687,28 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Tasks' section."
+"The grade report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A grade report generation task is already in progress. Check the 'Pending "
-"Tasks' table for the status of the task. When completed, the report will be "
-"available for download in the table below."
+"The grade report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Tasks' section."
+"The problem grade report is being created. To view the status of the report,"
+" see Pending Instructor Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending Tasks'"
-" table for the status of the task. When completed, the report will be "
-"available for download in the table below."
+"A problem grade report is already being generated. To view the status of the"
+" report, see Pending Instructor Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5820,13 +5840,12 @@ msgid "Data Download"
 msgstr "数据下载"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Analytics"
-msgstr "分析"
+msgid "For analytics about your course, go to {analytics_dashboard_name}."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Demographic data is now available in {dashboard_link}."
-msgstr "统计数据现已可通过{dashboard_link}查看。"
+msgid "Analytics"
+msgstr "分析"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Metrics"
@@ -6093,7 +6112,6 @@ msgid "Title"
 msgstr "标题"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "出生年份"
 
@@ -8972,9 +8990,7 @@ msgstr "页面无法找到"
 #: cms/templates/asset_index.html cms/templates/certificates.html
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
 msgid "Loading"
@@ -9109,6 +9125,11 @@ msgstr "访问你的{link_start}课程面板{link_end}来查看课程。"
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
 msgstr "课程导航"
+
+#: cms/templates/widgets/header.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
+msgid "Account"
+msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
@@ -9270,7 +9291,8 @@ msgstr "了解更多"
 msgid "Starts"
 msgstr "开始"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Dashboard"
 msgstr "课程面板"
 
@@ -9299,12 +9321,12 @@ msgid "Clear search"
 msgstr "清空搜索结果"
 
 #: lms/templates/dashboard.html
-msgid "Want to change your account settings?"
-msgstr "想要更改你的账户设置？"
+msgid "Find New Courses"
+msgstr ""
 
 #: lms/templates/dashboard.html
-msgid "Click the arrow next to your username above."
-msgstr "单击上方你用户名旁边的箭头。"
+msgid "Account Status Info"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Order History"
@@ -9893,26 +9915,22 @@ msgid "More options dropdown"
 msgstr "更多选择下拉列表"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/student_account/account_settings.html
-msgid "Account Settings"
-msgstr "账户设置"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "My Profile"
-msgstr "我的用户资料"
+msgid "Profile"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Shopping Cart"
 msgstr "购物车"
 
-#: lms/templates/navigation-edx.html lms/templates/register.html
-msgid "Register"
-msgstr "注册"
-
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Sign in"
 msgstr "登录"
+
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: lms/templates/register.html
+msgid "Register"
+msgstr "注册"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
@@ -9932,10 +9950,6 @@ msgstr "系统管理员"
 #: lms/templates/navigation.html
 msgid "Schools"
 msgstr "学校"
-
-#: lms/templates/navigation.html
-msgid "Register Now"
-msgstr "现在注册"
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -10480,12 +10494,12 @@ msgstr "Git动作"
 #. Translators: git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded."
-msgstr ""
+msgstr "没有git导入日志被记录。"
 
 #. Translators: git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded for this course."
-msgstr ""
+msgstr "此课程没有git导入日志被记录。"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -10947,11 +10961,25 @@ msgid "I completed the {course_title} course on {platform_name}."
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
+msgid ""
+"I completed a course on {platform_name}. Take a look at my certificate."
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Click the link to see my certificate."
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Tweet this Accomplishment. Pop up window."
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
@@ -11196,6 +11224,10 @@ msgstr "{chapter}, 当前章节"
 msgid "due {date}"
 msgstr "到期日{date}"
 
+#: lms/templates/courseware/accordion.html
+msgid "This section is graded."
+msgstr ""
+
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
@@ -11329,11 +11361,23 @@ msgid "View this course as:"
 msgstr "查看课程的身份："
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Specific student"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
-msgid "set preview mode"
+msgid "Username or email:"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
+msgid "Set preview mode"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
+msgid "You are now viewing the course as <i>{user_name}</i>."
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
@@ -11366,6 +11410,10 @@ msgstr ""
 
 #: lms/templates/courseware/courses.html
 msgid "{platform_name} Logo"
+msgstr ""
+
+#: lms/templates/courseware/courses.html
+msgid "List of Courses"
 msgstr ""
 
 #: lms/templates/courseware/courses.html
@@ -11634,74 +11682,6 @@ msgid "To send email, visit the Email section of the Instructor Dashboard."
 msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "No Analytics are available at this time."
-msgstr "目前没有可用的分析数据"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Student activity day by day"
-msgstr "学生的日常活动"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Day"
-msgstr "日"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Students"
-msgstr "学生"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Score distribution for problems"
-msgstr "问答问题的成绩分布"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Max"
-msgstr "最大"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Points Earned (Num Students)"
-msgstr "得分(学生数目)"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There is no data available to display at this time."
-msgstr "目前没有可用的数据"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"Loading the latest graphs for you; depending on your class size, this may "
-"take a few minutes."
-msgstr "正在为您加载最新统计图，因班级学员人数规模的差异，这个过程可能要花几分钟。"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Count of Students that Opened a Subsection"
-msgstr "统计开辟了子栏目的学生人数"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution per Problem"
-msgstr "每个问题的成绩分布"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There are no problems in this section."
-msgstr "本章没有问题"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Students answering correctly"
-msgstr "回答正确的学生"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Number of students"
-msgstr "学生数目"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
-"(shown here as an example):"
-msgstr ""
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Pending Instructor Tasks"
 msgstr "等待主讲教师处理"
 
@@ -11867,11 +11847,12 @@ msgid "Requirements for Course Credit"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You are no longer eligible for this course."
+msgid "{student_name}, you are no longer eligible for credit in this course."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "You have met the requirements for credit in this course."
+msgid ""
+"{student_name}, you have met the requirements for credit in this course."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12053,10 +12034,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm learning on {platform_name}:"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -13703,7 +13680,7 @@ msgstr "分数线："
 msgid ""
 "View detailed Git import logs for this course {link_start}by clicking "
 "here{link_end}."
-msgstr ""
+msgstr "查看本课程的详细Git导入日志，请点击{link_start}这里{link_end}。"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
@@ -14368,30 +14345,6 @@ msgstr ""
 msgid "Send me a copy of the invoice"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Score Distribution"
-msgstr "成绩分布"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr "下图显示的是您的班级中每个问答的成绩分布，问答由其链接地址指定。"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr "所显示的成绩尚未加权，所以，如果您的问答包含2个问题，系统显示的总分为2分。"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Loading problem list..."
-msgstr "加载问题列表……"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Gender Distribution"
-msgstr "性别分布"
-
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
 msgstr "教师面板"
@@ -14611,6 +14564,10 @@ msgid "Add CCX Coach"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There is no data available to display at this time."
+msgstr "目前没有可用的数据"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Use Reload Graphs to refresh the graphs."
 msgstr ""
 
@@ -14659,6 +14616,10 @@ msgid "Download Problem Data for all Problems as a CSV"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution per Problem"
+msgstr "每个问题的成绩分布"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
 msgstr "以CSV格式下载学生开放数据"
 
@@ -14669,6 +14630,10 @@ msgstr "以CSV格式下载学生成绩数据"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "This is a partial list, to view all students download as a csv."
 msgstr "这是一个部分列表，查看所有以CSV格式下载的学生信息"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There are no problems in this section."
+msgstr "本章没有问题"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
@@ -15430,6 +15395,10 @@ msgstr ""
 msgid "Discount Applied:"
 msgstr ""
 
+#: lms/templates/shoppingcart/receipt.html
+msgid "Students"
+msgstr "学生"
+
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
@@ -15664,6 +15633,10 @@ msgstr "请等待几秒钟后再刷新该页面。如果问题照旧，请向{em
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr " 目前{platform_name}平台的服务器已经超负荷"
+
+#: lms/templates/student_account/account_settings.html
+msgid "Account Settings"
+msgstr "账户设置"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
@@ -18779,10 +18752,6 @@ msgstr "导出"
 #: cms/templates/widgets/header.html
 msgid "Current Library:"
 msgstr "当前知识库："
-
-#: cms/templates/widgets/header.html
-msgid "Account"
-msgstr "账户"
 
 #: cms/templates/widgets/header.html
 msgid "Account Navigation"

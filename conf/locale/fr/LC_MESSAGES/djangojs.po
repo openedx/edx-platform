@@ -6,6 +6,7 @@
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
+# Axel Billot <axelbillot@gmail.com>, 2015
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Daniel Le Berre, 2015
@@ -109,10 +110,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:31+0000\n"
-"PO-Revision-Date: 2015-07-10 19:12+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
-"Language-Team: French (http://www.transifex.com/p/edx-platform/language/fr/)\n"
+"POT-Creation-Date: 2015-07-21 15:33+0000\n"
+"PO-Revision-Date: 2015-07-15 21:53+0000\n"
+"Last-Translator: moocit-france <contact@moocit.fr>\n"
+"Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1886,6 +1887,8 @@ msgid ""
 "Activating an item in this group will spool the video to the corresponding "
 "time point. To skip transcript, go to previous item."
 msgstr ""
+"L'activation d'un élément de ce groupe jouera la vidéo à partir de ce point."
+" Pour passer la transcription, allez à l'élément précédent."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
@@ -2495,22 +2498,6 @@ msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Erreur lors de la génération du rapport des notes. Merci d’essayer à "
 "nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Affichage des métriques non disponible"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Erreur lors de la récupération de la distribution des notes."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Dernière mise à jour: <%= timestamp %>"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> étudiants ont réussi."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3344,13 +3331,19 @@ msgid "An error occurred. Please try again later."
 msgstr "Une erreur est survenue. Veuillez essayer de nouveau plus tard."
 
 #: lms/static/js/discovery/form.js
+msgid "Viewing %s course"
+msgid_plural "Viewing %s courses"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/static/js/discovery/form.js
 msgid "We couldn't find any results for \"%s\"."
 msgstr "Nous ne trouvons pas de résultat pour \"%s\"."
 
 #: lms/static/js/discovery/form.js
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
-msgstr "Il y a eu une erreur, essayer de chercher à nouveau."
+msgstr "Une erreur est survenue, essayez à nouveau."
 
 #: lms/static/js/edxnotes/plugins/accessibility.js
 msgid "Focus grabber"
@@ -3412,7 +3405,7 @@ msgstr ""
 #. translated.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
-msgstr ""
+msgstr "[aucun tag]"
 
 #: lms/static/js/groups/views/cohort_discussions.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
@@ -4119,8 +4112,7 @@ msgstr "Erreur de la sauvegarde d'OpenAssessment"
 #: cms/static/js/base.js cms/templates/js/checklist.underscore
 msgid "This link will open in a new browser window/tab"
 msgstr ""
-"Le lien va s'ouvrir dans une nouvelle fenêtre ou un nouvel onglet du "
-"navigateur."
+"Ce lien s'ouvrira dans une nouvelle fenêtre ou onglet de votre navigateur"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -4850,8 +4842,8 @@ msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
-"Supprimer un livre est irréversible et toutes les références depuis le cours"
-" seront également détruites."
+"Supprimer un manuel est irréversible, toutes les références dans le cours "
+"seront également supprimées."
 
 #: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
@@ -5206,6 +5198,21 @@ msgstr "tout supprimer"
 msgid "remove"
 msgstr "supprimer"
 
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid "<img src='%s' alt='%s'></image>"
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
 msgstr "Merci ! Nous avons reçu votre paiement."
@@ -5302,10 +5309,6 @@ msgstr "Moins ..."
 #: lms/templates/discovery/result_item.underscore
 msgid "LEARN MORE"
 msgstr "EN SAVOIR PLUS"
-
-#: lms/templates/discovery/result_item.underscore
-msgid "gettext("
-msgstr ""
 
 #: lms/templates/discovery/result_item.underscore
 msgid "Starts"
@@ -6145,7 +6148,7 @@ msgstr ""
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
-msgstr ""
+msgstr "Retour au Tableau de bord"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
@@ -6237,10 +6240,6 @@ msgstr "statut"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "Types d'exercices classiques"
-
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-msgid "Common Problems with Hints and Feedback"
-msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -6761,7 +6760,7 @@ msgstr ""
 msgid ""
 "The following message will be displayed at the bottom of the courseware "
 "pages within your course:"
-msgstr ""
+msgstr "Le message suivant sera affiché au bas des pages du cours:"
 
 #: cms/templates/js/license-selector.underscore
 msgid "Creative Commons licensed content, with terms as follow:"

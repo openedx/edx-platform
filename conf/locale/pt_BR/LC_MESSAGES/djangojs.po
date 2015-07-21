@@ -104,7 +104,7 @@
 # Bruno Sette <brunosette@gmail.com>, 2015
 # Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
-# Felipe Lube de Bragança <felipe.lubra@gmail.com>, 2015
+# Felipe Lube de Bragança <inactive+felubra@transifex.com>, 2015
 # Fernando Nunes <fernubr@gmail.com>, 2015
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Francisco de Assis Ventura Filho <fra.ventura@gmail.com>, 2015
@@ -147,10 +147,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:31+0000\n"
-"PO-Revision-Date: 2015-07-13 01:26+0000\n"
-"Last-Translator: Renata Barboza-Murray\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/p/edx-platform/language/pt_BR/)\n"
+"POT-Creation-Date: 2015-07-21 15:33+0000\n"
+"PO-Revision-Date: 2015-07-20 00:03+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2420,22 +2420,6 @@ msgstr "Erro ao gerar notas. Por favor, tente novamente."
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Painel de indicadores indisponível."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Erro ao recuperar as distribuições de notas."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Última atualização: <%= timestamp %>"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> alunos avaliados."
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -3247,6 +3231,12 @@ msgstr "Sua doação não pôde ser enviada."
 #: lms/static/js/dashboard/legacy.js
 msgid "An error occurred. Please try again later."
 msgstr "Ocorreu um erro. Por favor, tente novamente mais tarde."
+
+#: lms/static/js/discovery/form.js
+msgid "Viewing %s course"
+msgid_plural "Viewing %s courses"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/static/js/discovery/form.js
 msgid "We couldn't find any results for \"%s\"."
@@ -5044,6 +5034,21 @@ msgstr ""
 msgid "remove"
 msgstr ""
 
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid "<img src='%s' alt='%s'></image>"
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
 msgstr ""
@@ -5134,10 +5139,6 @@ msgstr ""
 
 #: lms/templates/discovery/result_item.underscore
 msgid "LEARN MORE"
-msgstr ""
-
-#: lms/templates/discovery/result_item.underscore
-msgid "gettext("
 msgstr ""
 
 #: lms/templates/discovery/result_item.underscore
@@ -6021,10 +6022,6 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
-msgstr ""
-
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-msgid "Common Problems with Hints and Feedback"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:40+0000\n"
-"PO-Revision-Date: 2015-07-13 04:42:08.623413\n"
+"POT-Creation-Date: 2015-07-21 15:41+0000\n"
+"PO-Revision-Date: 2015-07-21 15:42:35.786548\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2490,23 +2490,6 @@ msgstr ""
 "Érrör générätïng prößlém grädé répört. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr ""
-"Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -3480,6 +3463,12 @@ msgid "An error occurred. Please try again later."
 msgstr ""
 "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: lms/static/js/discovery/form.js
+msgid "Viewing %s course"
+msgid_plural "Viewing %s courses"
+msgstr[0] "Vïéwïng %s çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgstr[1] "Vïéwïng %s çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/static/js/discovery/form.js
 msgid "We couldn't find any results for \"%s\"."
@@ -5654,6 +5643,24 @@ msgstr "rémövé äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "remove"
 msgstr "rémövé Ⱡ'σяєм ιρѕυ#"
 
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/commerce/provider.underscore
+msgid "<img src='%s' alt='%s'></image>"
+msgstr "<img src='%s' alt='%s'></image> Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/commerce/provider.underscore
+msgid ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%s</button> Ⱡ'σяєм "
+"ιρѕυм ∂#"
+
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
 msgstr ""
@@ -5762,10 +5769,6 @@ msgstr "LÉSS... Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/discovery/result_item.underscore
 msgid "LEARN MORE"
 msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/discovery/result_item.underscore
-msgid "gettext("
-msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/discovery/result_item.underscore
 msgid "Starts"
@@ -6885,12 +6888,6 @@ msgstr "stätüs Ⱡ'σяєм ιρѕυ#"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "Çömmön Prößlém Týpés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-msgid "Common Problems with Hints and Feedback"
-msgstr ""
-"Çömmön Prößléms wïth Hïnts änd Féédßäçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"

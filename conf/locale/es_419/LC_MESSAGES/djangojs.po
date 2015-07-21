@@ -11,6 +11,7 @@
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
+# Elias Estay <eestay@u.uchile.cl>, 2015
 # Felipe Schmidt M <fschmidt@cercano.cl>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Gerardo Laster, 2014
@@ -69,6 +70,7 @@
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Nuri Plans Toral <nplans@gmail.com>, 2014
+# Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # paul ochoa <palichis@solid-ec.org>, 2015
 # Thomas Alberto Castro Acosta <snaketh@gmail.com>, 2014
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
@@ -85,14 +87,15 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
+# Patricia Colmenares <patrusca38@hotmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:31+0000\n"
-"PO-Revision-Date: 2015-07-10 19:12+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
-"Language-Team: Spanish (Latin America) (http://www.transifex.com/p/edx-platform/language/es_419/)\n"
+"POT-Creation-Date: 2015-07-21 15:33+0000\n"
+"PO-Revision-Date: 2015-07-20 21:04+0000\n"
+"Last-Translator: Patricia Colmenares <patrusca38@hotmail.com>\n"
+"Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2319,7 +2322,7 @@ msgstr "Más"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "My Notes"
-msgstr "Mis Anotaciones"
+msgstr "Mis notas"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Instructor"
@@ -2470,22 +2473,6 @@ msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Error al generar el reporte de calificaciones. Por favor intente nuevamente."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Métrica no disponible para visualización"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Error al generar las distribuciones de calificaciones."
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Última actualización: <%= timestamp %>"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> estudiantes calificados."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3334,6 +3321,12 @@ msgstr "Su donación no pudo ser enviada."
 #: lms/static/js/dashboard/legacy.js
 msgid "An error occurred. Please try again later."
 msgstr "Ocurrió un error. Por favor intente nuevamente más tarde."
+
+#: lms/static/js/discovery/form.js
+msgid "Viewing %s course"
+msgid_plural "Viewing %s courses"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/static/js/discovery/form.js
 msgid "We couldn't find any results for \"%s\"."
@@ -5239,6 +5232,21 @@ msgstr "eliminar todo"
 msgid "remove"
 msgstr "eliminar"
 
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/discovery/result_item.underscore
+msgid "gettext("
+msgstr "gettext("
+
+#: lms/templates/commerce/provider.underscore
+msgid "<img src='%s' alt='%s'></image>"
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid ""
+"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
+"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
+msgstr ""
+
 #: lms/templates/commerce/receipt.underscore
 msgid "Thank you! We have received your payment."
 msgstr "Gracias! Hemos recibido su pago."
@@ -5335,10 +5343,6 @@ msgstr "MENOS..."
 #: lms/templates/discovery/result_item.underscore
 msgid "LEARN MORE"
 msgstr "APRENDER MAS"
-
-#: lms/templates/discovery/result_item.underscore
-msgid "gettext("
-msgstr "gettext("
 
 #: lms/templates/discovery/result_item.underscore
 msgid "Starts"
@@ -6326,10 +6330,6 @@ msgstr "estado"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "Tipos de problemas comunes"
-
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-msgid "Common Problems with Hints and Feedback"
-msgstr "Problemas comunes con las pistas y los comentarios"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"

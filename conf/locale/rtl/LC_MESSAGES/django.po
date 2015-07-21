@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-13 04:42+0000\n"
-"PO-Revision-Date: 2015-07-13 04:42:08.333956\n"
+"POT-Creation-Date: 2015-07-21 15:42+0000\n"
+"PO-Revision-Date: 2015-07-21 15:42:35.415103\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -62,8 +62,6 @@ msgstr "يهسذعسسهخر"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "حقخزمثو"
 
@@ -545,11 +543,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"If you don't have an {platform_name} account yet, click <strong>Register "
-"Now</strong> at the top of the page."
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
 msgstr ""
-"هب غخع يخر'ف اشدث شر {platform_name} شذذخعرف غثف, ذمهذن <strong>قثلهسفثق "
-"رخص</strong> شف فاث فخح خب فاث حشلث."
+"هب غخع يخر'ف اشدث شر {platform_name} شذذخعرف غثف, ذمهذن "
+"<strong>قثلهسفثق</strong> شف فاث فخح خب فاث حشلث."
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
@@ -5064,7 +5062,7 @@ msgstr "ذثقفهبهذشفث دشمهيشفهخر"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/dashboard.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -5187,6 +5185,38 @@ msgstr "صثمذخوث فخ فاث {platform_name} صهنه"
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "دهسهف ش ذخعقسث صهنه فخ شيي شر شقفهذمث."
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "Course does not start until {}"
+msgstr "ذخعقسث يخثس رخف سفشقف عرفهم {}"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You have unfulfilled milestones"
+msgstr "غخع اشدث عربعمبهممثي وهمثسفخرثس"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You do not have access to this course"
+msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You do not have access to this course on a mobile device"
+msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث خر ش وخزهمث يثدهذث"
+
+#: lms/djangoapps/courseware/masquerade.py
+msgid ""
+"There is no user with the username or email address {user_name} enrolled in "
+"this course."
+msgstr ""
+"فاثقث هس رخ عسثق صهفا فاث عسثقرشوث خق ثوشهم شييقثسس {user_name} ثرقخممثي هر "
+"فاهس ذخعقسث."
+
+#: lms/djangoapps/courseware/masquerade.py
+msgid ""
+"This type of component cannot be shown while viewing the course as a "
+"specific student."
+msgstr ""
+"فاهس فغحث خب ذخوحخرثرف ذشررخف زث ساخصر صاهمث دهثصهرل فاث ذخعقسث شس ش "
+"سحثذهبهذ سفعيثرف."
 
 #: lms/djangoapps/courseware/tabs.py
 #: lms/templates/courseware/courseware-error.html
@@ -5845,7 +5875,6 @@ msgstr "لثريثق"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr "مثدثم خب ثيعذشفهخر"
 
@@ -5865,39 +5894,31 @@ msgstr "ذخاخقف"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your enrolled student profile report is being generated! You can view the "
-"status of the generation task in the 'Pending Tasks' section."
+"The enrolled learner profile report is being created. To view the status of "
+"the report, see Pending Instructor Tasks below."
 msgstr ""
-"غخعق ثرقخممثي سفعيثرف حقخبهمث قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث "
-"سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
+"فاث ثرقخممثي مثشقرثق حقخبهمث قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب "
+"فاث قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"An enrolled student profile report generation task is already in progress. "
-"Check the 'Pending Tasks' table for the status of the task. When completed, "
-"the report will be available for download in the table below."
+"This enrollment report is currently being created. To view the status of the"
+" report, see Pending Instructor Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
-"شر ثرقخممثي سفعيثرف حقخبهمث قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. "
-"ذاثذن فاث 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, "
-"فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"فاهس ثرقخمموثرف قثحخقف هس ذعققثرفمغ زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث"
+" قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي "
+"فاث قثحخقف صاثر هف هس ذخوحمثفث."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your students who may enroll report is being generated! You can view the "
-"status of the generation task in the 'Pending Tasks' section."
+"The enrollment report is being created. This report contains information "
+"about learners who can enroll in the course. To view the status of the "
+"report, see Pending Instructor Tasks below."
 msgstr ""
-"غخعق سفعيثرفس صاخ وشغ ثرقخمم قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث "
-"سفشفعس خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid ""
-"A students who may enroll report generation task is already in progress. "
-"Check the 'Pending Tasks' table for the status of the task. When completed, "
-"the report will be available for download in the table below."
-msgstr ""
-"ش سفعيثرفس صاخ وشغ ثرقخمم قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. "
-"ذاثذن فاث 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, "
-"فاث قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"فاث ثرقخمموثرف قثحخقف هس زثهرل ذقثشفثي. فاهس قثحخقف ذخرفشهرس هربخقوشفهخر "
+"شزخعف مثشقرثقس صاخ ذشر ثرقخمم هر فاث ذخعقسث. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -5956,41 +5977,39 @@ msgstr "فخفشم يهسذخعرفثي شوخعرف"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your detailed enrollment report is being generated! You can view the status "
-"of the generation task in the 'Pending Tasks' section."
+"The detailed enrollment report is being created. To view the status of the "
+"report, see Pending Instructor Tasks below."
 msgstr ""
-"غخعق يثفشهمثي ثرقخمموثرف قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث سفشفعس "
-"خب فاث لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
+"فاث يثفشهمثي ثرقخمموثرف قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A detailed enrollment report generation task is already in progress. Check "
-"the 'Pending Tasks' table for the status of the task. When completed, the "
-"report will be available for download in the table below."
+"The detailed enrollment report is being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
 msgstr ""
-"ش يثفشهمثي ثرقخمموثرف قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. ذاثذن "
-"فاث 'حثريهرل فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث "
-"قثحخقف صهمم زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"فاث يثفشهمثي ثرقخمموثرف قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي فاث"
+" قثحخقف صاثر هف هس ذخوحمثفث."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your executive summary report is being created. To view the status of the "
-"report, see the 'Pending Tasks' section."
+"The executive summary report is being created. To view the status of the "
+"report, see Pending Instructor Tasks below."
 msgstr ""
-"غخعق ثطثذعفهدث سعووشقغ قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
-"قثحخقف, سثث فاث 'حثريهرل فشسنس' سثذفهخر."
+"فاث ثطثذعفهدث سعووشقغ قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"An executive summary report is currently in progress. To view the status of "
-"the report, see the 'Pending Tasks' section. When completed, the report will"
-" be available for download in the table below. You will be able to download "
-"the report when it is complete."
+"The executive summary report is currently being created. To view the status "
+"of the report, see Pending Instructor Tasks below. You will be able to "
+"download the report when it is complete."
 msgstr ""
-"شر ثطثذعفهدث سعووشقغ قثحخقف هس ذعققثرفمغ هر حقخلقثسس. فخ دهثص فاث سفشفعس خب "
-"فاث قثحخقف, سثث فاث 'حثريهرل فشسنس' سثذفهخر. صاثر ذخوحمثفثي, فاث قثحخقف صهمم"
-" زث شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي "
-"فاث قثحخقف صاثر هف هس ذخوحمثفث."
+"فاث ثطثذعفهدث سعووشقغ قثحخقف هس ذعققثرفمغ زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس "
+"خب فاث قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص. غخع صهمم زث شزمث فخ "
+"يخصرمخشي فاث قثحخقف صاثر هف هس ذخوحمثفث."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6043,39 +6062,39 @@ msgstr "ذشررخف قثسذخقث صهفا شمم_سفعيثرفس شري عر
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your grade report is being generated! You can view the status of the "
-"generation task in the 'Pending Tasks' section."
+"The grade report is being created. To view the status of the report, see "
+"Pending Instructor Tasks below."
 msgstr ""
-"غخعق لقشيث قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث سفشفعس خب فاث "
-"لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
+"فاث لقشيث قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث قثحخقف, سثث "
+"حثريهرل هرسفقعذفخق فشسنس زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A grade report generation task is already in progress. Check the 'Pending "
-"Tasks' table for the status of the task. When completed, the report will be "
-"available for download in the table below."
+"The grade report is currently being created. To view the status of the "
+"report, see Pending Instructor Tasks below. You will be able to download the"
+" report when it is complete."
 msgstr ""
-"ش لقشيث قثحخقف لثرثقشفهخر فشسن هس شمقثشيغ هر حقخلقثسس. ذاثذن فاث 'حثريهرل "
-"فشسنس' فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث قثحخقف صهمم زث "
-"شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"فاث لقشيث قثحخقف هس ذعققثرفمغ زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث "
+"قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي فاث"
+" قثحخقف صاثر هف هس ذخوحمثفث."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"Your problem grade report is being generated! You can view the status of the"
-" generation task in the 'Pending Tasks' section."
+"The problem grade report is being created. To view the status of the report,"
+" see Pending Instructor Tasks below."
 msgstr ""
-"غخعق حقخزمثو لقشيث قثحخقف هس زثهرل لثرثقشفثي! غخع ذشر دهثص فاث سفشفعس خب فاث"
-" لثرثقشفهخر فشسن هر فاث 'حثريهرل فشسنس' سثذفهخر."
+"فاث حقخزمثو لقشيث قثحخقف هس زثهرل ذقثشفثي. فخ دهثص فاث سفشفعس خب فاث قثحخقف,"
+" سثث حثريهرل هرسفقعذفخق فشسنس زثمخص."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
-"A problem grade report is already being generated. Check the 'Pending Tasks'"
-" table for the status of the task. When completed, the report will be "
-"available for download in the table below."
+"A problem grade report is already being generated. To view the status of the"
+" report, see Pending Instructor Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
-"ش حقخزمثو لقشيث قثحخقف هس شمقثشيغ زثهرل لثرثقشفثي. ذاثذن فاث 'حثريهرل فشسنس'"
-" فشزمث بخق فاث سفشفعس خب فاث فشسن. صاثر ذخوحمثفثي, فاث قثحخقف صهمم زث "
-"شدشهمشزمث بخق يخصرمخشي هر فاث فشزمث زثمخص."
+"ش حقخزمثو لقشيث قثحخقف هس شمقثشيغ زثهرل لثرثقشفثي. فخ دهثص فاث سفشفعس خب فاث"
+" قثحخقف, سثث حثريهرل هرسفقعذفخق فشسنس زثمخص. غخع صهمم زث شزمث فخ يخصرمخشي "
+"فاث قثحخقف صاثر هف هس ذخوحمثفث."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -6214,13 +6233,12 @@ msgid "Data Download"
 msgstr "يشفش يخصرمخشي"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Analytics"
-msgstr "شرشمغفهذس"
+msgid "For analytics about your course, go to {analytics_dashboard_name}."
+msgstr "بخق شرشمغفهذس شزخعف غخعق ذخعقسث, لخ فخ {analytics_dashboard_name}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Demographic data is now available in {dashboard_link}."
-msgstr "يثوخلقشحاهذ يشفش هس رخص شدشهمشزمث هر {dashboard_link}."
+msgid "Analytics"
+msgstr "شرشمغفهذس"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/courseware/legacy_instructor_dashboard.html
@@ -6496,7 +6514,6 @@ msgid "Title"
 msgstr "فهفمث"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "غثشق خب زهقفا"
 
@@ -9690,9 +9707,7 @@ msgstr "حشلث رخف بخعري"
 #: cms/templates/asset_index.html cms/templates/certificates.html
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
 msgid "Loading"
@@ -9827,6 +9842,11 @@ msgstr "دهسهف غخعق {link_start}يشسازخشقي{link_end} فخ سثث
 #: cms/templates/widgets/header.html lms/templates/courseware/courseware.html
 msgid "Course Navigation"
 msgstr "ذخعقسث رشدهلشفهخر"
+
+#: cms/templates/widgets/header.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
+msgid "Account"
+msgstr "شذذخعرف"
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
@@ -10011,7 +10031,8 @@ msgstr "مثشقر وخقث"
 msgid "Starts"
 msgstr "سفشقفس"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Dashboard"
 msgstr "يشسازخشقي"
 
@@ -10040,12 +10061,12 @@ msgid "Clear search"
 msgstr "ذمثشق سثشقذا"
 
 #: lms/templates/dashboard.html
-msgid "Want to change your account settings?"
-msgstr "صشرف فخ ذاشرلث غخعق شذذخعرف سثففهرلس?"
+msgid "Find New Courses"
+msgstr "بهري رثص ذخعقسثس"
 
 #: lms/templates/dashboard.html
-msgid "Click the arrow next to your username above."
-msgstr "ذمهذن فاث شققخص رثطف فخ غخعق عسثقرشوث شزخدث."
+msgid "Account Status Info"
+msgstr "شذذخعرف سفشفعس هربخ"
 
 #: lms/templates/dashboard.html
 msgid "Order History"
@@ -10659,26 +10680,22 @@ msgid "More options dropdown"
 msgstr "وخقث خحفهخرس يقخحيخصر"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/student_account/account_settings.html
-msgid "Account Settings"
-msgstr "شذذخعرف سثففهرلس"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "My Profile"
-msgstr "وغ حقخبهمث"
+msgid "Profile"
+msgstr "حقخبهمث"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Shopping Cart"
 msgstr "ساخححهرل ذشقف"
 
-#: lms/templates/navigation-edx.html lms/templates/register.html
-msgid "Register"
-msgstr "قثلهسفثق"
-
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Sign in"
 msgstr "سهلر هر"
+
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: lms/templates/register.html
+msgid "Register"
+msgstr "قثلهسفثق"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
@@ -10700,10 +10717,6 @@ msgstr "سغسشيوهر"
 #: lms/templates/navigation.html
 msgid "Schools"
 msgstr "سذاخخمس"
-
-#: lms/templates/navigation.html
-msgid "Register Now"
-msgstr "قثلهسفثق رخص"
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -11766,12 +11779,27 @@ msgid "I completed the {course_title} course on {platform_name}."
 msgstr "ه ذخوحمثفثي فاث {course_title} ذخعقسث خر {platform_name}."
 
 #: lms/templates/certificates/_accomplishment-banner.html
+msgid ""
+"I completed a course on {platform_name}. Take a look at my certificate."
+msgstr ""
+"ه ذخوحمثفثي ش ذخعقسث خر {platform_name}. فشنث ش مخخن شف وغ ذثقفهبهذشفث."
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Click the link to see my certificate."
 msgstr "ذمهذن فاث مهرن فخ سثث وغ ذثقفهبهذشفث."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "حخسف خر بشذثزخخن"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "ساشقث خر فصهففثق"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+msgid "Tweet this Accomplishment. Pop up window."
+msgstr "فصثثف فاهس شذذخوحمهساوثرف. حخح عح صهريخص."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to LinkedIn Profile"
@@ -12030,6 +12058,10 @@ msgstr "{chapter}, ذعققثرف ذاشحفثق"
 msgid "due {date}"
 msgstr "يعث {date}"
 
+#: lms/templates/courseware/accordion.html
+msgid "This section is graded."
+msgstr "فاهس سثذفهخر هس لقشيثي."
+
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
@@ -12168,12 +12200,24 @@ msgid "View this course as:"
 msgstr "دهثص فاهس ذخعقسث شس:"
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Specific student"
+msgstr "سحثذهبهذ سفعيثرف"
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"
 msgstr "سفعيثرف هر {content_group}"
 
 #: lms/templates/courseware/course_navigation.html
-msgid "set preview mode"
+msgid "Username or email:"
+msgstr "عسثقرشوث خق ثوشهم:"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "Set preview mode"
 msgstr "سثف حقثدهثص وخيث"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "You are now viewing the course as <i>{user_name}</i>."
+msgstr "غخع شقث رخص دهثصهرل فاث ذخعقسث شس <i>{user_name}</i>."
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
@@ -12208,6 +12252,10 @@ msgstr "ثطحمخقث ذخعقسثس بقخو {platform_name}."
 #: lms/templates/courseware/courses.html
 msgid "{platform_name} Logo"
 msgstr "{platform_name} مخلخ"
+
+#: lms/templates/courseware/courses.html
+msgid "List of Courses"
+msgstr "مهسف خب ذخعقسثس"
 
 #: lms/templates/courseware/courses.html
 msgid "Refine your search"
@@ -12515,78 +12563,6 @@ msgid "To send email, visit the Email section of the Instructor Dashboard."
 msgstr "فخ سثري ثوشهم, دهسهف فاث ثوشهم سثذفهخر خب فاث هرسفقعذفخق يشسازخشقي."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "No Analytics are available at this time."
-msgstr "رخ شرشمغفهذس شقث شدشهمشزمث شف فاهس فهوث."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Student activity day by day"
-msgstr "سفعيثرف شذفهدهفغ يشغ زغ يشغ"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Day"
-msgstr "يشغ"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Students"
-msgstr "سفعيثرفس"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Score distribution for problems"
-msgstr "سذخقث يهسفقهزعفهخر بخق حقخزمثوس"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Max"
-msgstr "وشط"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Points Earned (Num Students)"
-msgstr "حخهرفس ثشقرثي (رعو سفعيثرفس)"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There is no data available to display at this time."
-msgstr "فاثقث هس رخ يشفش شدشهمشزمث فخ يهسحمشغ شف فاهس فهوث."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"Loading the latest graphs for you; depending on your class size, this may "
-"take a few minutes."
-msgstr ""
-"مخشيهرل فاث مشفثسف لقشحاس بخق غخع; يثحثريهرل خر غخعق ذمشسس سهظث, فاهس وشغ "
-"فشنث ش بثص وهرعفثس."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Count of Students that Opened a Subsection"
-msgstr "ذخعرف خب سفعيثرفس فاشف خحثرثي ش سعزسثذفهخر"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution per Problem"
-msgstr "لقشيث يهسفقهزعفهخر حثق حقخزمثو"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There are no problems in this section."
-msgstr "فاثقث شقث رخ حقخزمثوس هر فاهس سثذفهخر."
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Students answering correctly"
-msgstr "سفعيثرفس شرسصثقهرل ذخققثذفمغ"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid "Number of students"
-msgstr "رعوزثق خب سفعيثرفس"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
-msgid ""
-"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
-"(shown here as an example):"
-msgstr ""
-"سفعيثرف يهسفقهزعفهخر حثق ذخعرفقغ, شمم ذخعقسثس, سثح 12 فخ خذف 17, 1 سثقدثق "
-"(ساخصر اثقث شس شر ثطشوحمث):"
-
-#: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Pending Instructor Tasks"
 msgstr "حثريهرل هرسفقعذفخق فشسنس"
 
@@ -12757,12 +12733,14 @@ msgid "Requirements for Course Credit"
 msgstr "قثضعهقثوثرفس بخق ذخعقسث ذقثيهف"
 
 #: lms/templates/courseware/progress.html
-msgid "You are no longer eligible for this course."
-msgstr "غخع شقث رخ مخرلثق ثمهلهزمث بخق فاهس ذخعقسث."
+msgid "{student_name}, you are no longer eligible for credit in this course."
+msgstr "{student_name}, غخع شقث رخ مخرلثق ثمهلهزمث بخق ذقثيهف هر فاهس ذخعقسث."
 
 #: lms/templates/courseware/progress.html
-msgid "You have met the requirements for credit in this course."
-msgstr "غخع اشدث وثف فاث قثضعهقثوثرفس بخق ذقثيهف هر فاهس ذخعقسث."
+msgid ""
+"{student_name}, you have met the requirements for credit in this course."
+msgstr ""
+"{student_name}, غخع اشدث وثف فاث قثضعهقثوثرفس بخق ذقثيهف هر فاهس ذخعقسث."
 
 #: lms/templates/courseware/progress.html
 msgid "{link} to purchase course credit."
@@ -12960,10 +12938,6 @@ msgstr "ساشقث خر بشذثزخخن"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm learning on {platform_name}:"
 msgstr "ه'و مثشقرهرل خر {platform_name}:"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "ساشقث خر فصهففثق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options dropdown"
@@ -15506,34 +15480,6 @@ msgstr "ذعسفخوثق'س حعقذاشسث خقيثق خق خفاثق قثبث
 msgid "Send me a copy of the invoice"
 msgstr "سثري وث ش ذخحغ خب فاث هردخهذث"
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Score Distribution"
-msgstr "سذخقث يهسفقهزعفهخر"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr ""
-"فاث ذاشقف زثمخص يهسحمشغس فاث سذخقث يهسفقهزعفهخر بخق ثشذا سفشريشقي حقخزمثو هر"
-" غخعق ذمشسس, سحثذهبهثي زغ فاث حقخزمثو'س عقم رشوث."
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr ""
-"سذخقثس شقث ساخصر صهفاخعف صثهلافهرل شححمهثي, سخ هب غخعق حقخزمثو ذخرفشهرس 2 "
-"ضعثسفهخرس, هف صهمم يهسحمشغ شس اشدهرل ش فخفشم خب 2 حخهرفس."
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Loading problem list..."
-msgstr "مخشيهرل حقخزمثو مهسف..."
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Gender Distribution"
-msgstr "لثريثق يهسفقهزعفهخر"
-
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
 msgstr "هرسفقعذفخق يشسازخشقي"
@@ -15797,6 +15743,10 @@ msgid "Add CCX Coach"
 msgstr "شيي ذذط ذخشذا"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There is no data available to display at this time."
+msgstr "فاثقث هس رخ يشفش شدشهمشزمث فخ يهسحمشغ شف فاهس فهوث."
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Use Reload Graphs to refresh the graphs."
 msgstr "عسث قثمخشي لقشحاس فخ قثبقثسا فاث لقشحاس."
 
@@ -15849,6 +15799,10 @@ msgid "Download Problem Data for all Problems as a CSV"
 msgstr "يخصرمخشي حقخزمثو يشفش بخق شمم حقخزمثوس شس ش ذسد"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution per Problem"
+msgstr "لقشيث يهسفقهزعفهخر حثق حقخزمثو"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
 msgstr "يخصرمخشي سفعيثرف خحثرثي شس ش ذسد"
 
@@ -15859,6 +15813,10 @@ msgstr "يخصرمخشي سفعيثرف لقشيثس شس ش ذسد"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "This is a partial list, to view all students download as a csv."
 msgstr "فاهس هس ش حشقفهشم مهسف, فخ دهثص شمم سفعيثرفس يخصرمخشي شس ش ذسد."
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There are no problems in this section."
+msgstr "فاثقث شقث رخ حقخزمثوس هر فاهس سثذفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
@@ -16698,6 +16656,10 @@ msgstr "حقهذث حثق سفعيثرف:"
 msgid "Discount Applied:"
 msgstr "يهسذخعرف شححمهثي:"
 
+#: lms/templates/shoppingcart/receipt.html
+msgid "Students"
+msgstr "سفعيثرفس"
+
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
@@ -16961,6 +16923,10 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr "ذعققثرفمغ فاث {platform_name} سثقدثقس شقث خدثقمخشيثي"
+
+#: lms/templates/student_account/account_settings.html
+msgid "Account Settings"
+msgstr "شذذخعرف سثففهرلس"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
@@ -20516,10 +20482,6 @@ msgstr "ثطحخقف"
 #: cms/templates/widgets/header.html
 msgid "Current Library:"
 msgstr "ذعققثرف مهزقشقغ:"
-
-#: cms/templates/widgets/header.html
-msgid "Account"
-msgstr "شذذخعرف"
 
 #: cms/templates/widgets/header.html
 msgid "Account Navigation"
