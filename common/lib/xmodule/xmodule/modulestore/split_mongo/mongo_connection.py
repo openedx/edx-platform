@@ -271,12 +271,10 @@ class MongoConnection(object):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
         """
-        if kwargs.get('replicaSet') is None:
-            kwargs.pop('replicaSet', None)
-            mongo_class = pymongo.MongoClient
-        else:
-            mongo_class = pymongo.MongoReplicaSetClient
-        _client = mongo_class(
+        # Set the write concern to 1 (data has been written to the primary) to ensure data integrity.
+        kwargs['w'] = kwargs.get('w', 1)
+
+        _client = pymongo.MongoClient(
             host=host,
             port=port,
             tz_aware=tz_aware,
@@ -294,13 +292,6 @@ class MongoConnection(object):
         self.structures = self.database[collection + '.structures']
         self.definitions = self.database[collection + '.definitions']
 
-        # every app has write access to the db (v having a flag to indicate r/o v write)
-        # Force mongo to report errors, at the expense of performance
-        # pymongo docs suck but explanation:
-        # http://api.mongodb.org/java/2.10.1/com/mongodb/WriteConcern.html
-        self.course_index.write_concern = {'w': 1}
-        self.structures.write_concern = {'w': 1}
-        self.definitions.write_concern = {'w': 1}
 
     def heartbeat(self):
         """
@@ -404,7 +395,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("insert_structure", course_context) as tagger:
             tagger.measure("blocks", len(structure["blocks"]))
-            self.structures.insert(structure_to_mongo(structure, course_context))
+            self.structures.insert_one(structure_to_mongo(structure, course_context))
 
     def get_course_index(self, key, ignore_case=False):
         """
@@ -454,7 +445,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("insert_course_index", course_context):
             course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.insert(course_index)
+            self.course_index.insert_one(course_index)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):
         """
@@ -477,7 +468,7 @@ class MongoConnection(object):
                     'run': course_index['run'],
                 }
             course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.update(query, course_index, upsert=False,)
+            self.course_index.update_one(query, {'$set': course_index}, upsert=False)
 
     def delete_course_index(self, course_key):
         """
@@ -488,7 +479,7 @@ class MongoConnection(object):
                 key_attr: getattr(course_key, key_attr)
                 for key_attr in ('org', 'course', 'run')
             }
-            return self.course_index.remove(query)
+            return self.course_index.delete_many(query)
 
     def get_definition(self, key, course_context=None):
         """
@@ -516,7 +507,7 @@ class MongoConnection(object):
         with TIMER.timer("insert_definition", course_context) as tagger:
             tagger.measure('fields', len(definition['fields']))
             tagger.tag(block_type=definition['block_type'])
-            self.definitions.insert(definition)
+            self.definitions.insert_one(definition)
 
     def ensure_indexes(self):
         """

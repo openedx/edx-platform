@@ -558,8 +558,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            # Remove the replicaSet parameter.
-            kwargs.pop('replicaSet', None)
+            # Set the write concern to 1 (data has been written to the primary) to ensure data integrity.
+            kwargs['w'] = kwargs.get('w', 1)
 
             self.database = MongoProxy(
                 pymongo.database.Database(
@@ -585,9 +585,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 self.database.authenticate(user, password)
 
         do_connection(**doc_store_config)
-
-        # Force mongo to report errors, at the expense of performance
-        self.collection.write_concern = {'w': 1}
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -616,6 +613,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns the wire version for mongo. Only used to unit tests which instrument the connection.
         """
         self.database.connection._ensure_connected()
+        # TODO bbeggs max_wire_version if deprecated... Replace? Remove?
         return self.database.connection.max_wire_version
 
     def _drop_database(self):
@@ -626,7 +624,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # drop the assets
         super(MongoModuleStore, self)._drop_database()
 
-        connection = self.collection.database.connection
+        connection = self.collection.database.client
         connection.drop_database(self.collection.database.proxied_object)
         connection.close()
 
@@ -1066,7 +1064,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         else:
             course_query = {'_id': location.to_deprecated_son()}
-        course = self.collection.find_one(course_query, fields={'_id': True})
+        course = self.collection.find_one(course_query)
         if course:
             return SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
         else:
@@ -1227,7 +1225,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ('_id.course', re.compile(u'^{}$'.format(course_id.course), re.IGNORECASE)),
             ('_id.category', 'course'),
         ])
-        courses = self.collection.find(course_search_location, fields=('_id'))
+        courses = self.collection.find(course_search_location)
         if courses.count() > 0:
             raise DuplicateCourseError(course_id, courses[0]['_id'])
 
@@ -1393,14 +1391,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         bulk_record.dirty = True
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
-        result = self.collection.update(
+        result = self.collection.update_one(
             {'_id': location.to_deprecated_son()},
             {'$set': update},
-            multi=False,
-            upsert=allow_not_found,
-            w=1,  # wait until primary commits
+            upsert=True,
         )
-        if result['n'] == 0:
+        if result.raw_result['n'] == 0:
             raise ItemNotFoundError(location)
 
     def _update_ancestors(self, location, update):
@@ -1530,10 +1526,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     bulk_record.dirty = True
                     # The parent is an orphan, so remove all the children including
                     # the location whose parent we are looking for from orphan parent
-                    self.collection.update(
+                    self.collection.update_one(
                         {'_id': parent_loc.to_deprecated_son()},
                         {'$set': {'definition.children': []}},
-                        multi=False,
                         upsert=True,
                     )
                 elif ancestor_loc.category == 'course':
@@ -1727,13 +1722,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             else:
                 # Course exists, so create matching assets document.
                 course_assets = {'course_id': unicode(course_key), 'assets': {}}
-                doc_id = self.asset_collection.insert(course_assets)
+                doc_id = self.asset_collection.insert_one(course_assets).inserted_id
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
             # Ensure that no data exists before updating the format.
             assert len(course_assets['assets']) == 0
             # Update the format to a dict.
-            self.asset_collection.update(
+            self.asset_collection.update_one(
                 {'_id': doc_id},
                 {'$set': {'assets': {}}}
             )
@@ -1767,7 +1762,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             updates_by_type[self._make_mongo_asset_key(asset_type)] = assets.as_list()
 
         # Update the document.
-        self.asset_collection.update(
+        #TODO BBEGGS should this be an upsert?
+        self.asset_collection.update_one(
             {'_id': course_assets.doc_id},
             {'$set': updates_by_type}
         )
@@ -1817,9 +1813,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         source_assets = self._find_course_assets(source_course_key)
         dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': unicode(dest_course_key)}
-        self.asset_collection.remove({'course_id': unicode(dest_course_key)})
+        self.asset_collection.delete_one({'course_id': unicode(dest_course_key)})
         # Update the document.
-        self.asset_collection.insert(dest_assets)
+        self.asset_collection.insert_one(dest_assets)
 
     @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
@@ -1847,7 +1843,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Generate a Mongo doc from the metadata and update the course asset info.
         all_assets[asset_idx] = md.to_storable()
 
-        self.asset_collection.update(
+        self.asset_collection.update_one(
             {'_id': course_assets.doc_id},
             {"$set": {self._make_mongo_asset_key(asset_key.asset_type): all_assets}}
         )
@@ -1871,7 +1867,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         all_asset_info.pop(asset_idx)
 
         # Update the document.
-        self.asset_collection.update(
+        self.asset_collection.update_one(
             {'_id': course_assets.doc_id},
             {'$set': {self._make_mongo_asset_key(asset_key.asset_type): all_asset_info}}
         )
@@ -1890,7 +1886,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # A single document exists per course to store the course asset metadata.
         try:
             course_assets = self._find_course_assets(course_key)
-            self.asset_collection.remove(course_assets.doc_id)
+            self.asset_collection.delete_one(course_assets.doc_id)
         except ItemNotFoundError:
             # When deleting asset metadata, if a course's asset metadata is not present, no big deal.
             pass

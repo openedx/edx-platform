@@ -678,7 +678,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Closes any open connections to the underlying databases
         """
-        self.db.connection.close()
+        self.db.client.close()
 
     def mongo_wire_version(self):
         """
@@ -694,7 +694,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # drop the assets
         super(SplitMongoModuleStore, self)._drop_database()
 
-        connection = self.db.connection
+        connection = self.db.client
         connection.drop_database(self.db.name)
         connection.close()
 

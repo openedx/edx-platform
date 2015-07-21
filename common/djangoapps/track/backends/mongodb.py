@@ -89,7 +89,7 @@ class MongoBackend(BaseBackend):
     def send(self, event):
         """Insert the event in to the Mongo collection"""
         try:
-            self.collection.insert(event, manipulate=False)
+            self.collection.insert_one(event)
         except (PyMongoError, BSONError):
             # The event will be lost in case of a connection error or any error
             # that occurs when trying to insert the event into Mongo.

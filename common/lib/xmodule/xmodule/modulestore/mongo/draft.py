@@ -164,7 +164,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
-        self.collection.remove(course_query, multi=True)
+        self.collection.delete_many(course_query)
         self.delete_all_asset_metadata(course_key, user_id)
 
         self._emit_course_deleted_signal(course_key)
@@ -434,7 +434,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             try:
-                self.collection.insert(item)
+                self.collection.insert_one(item)
             except pymongo.errors.DuplicateKeyError:
                 # prevent re-creation of DRAFT versions, unless explicitly requested to ignore
                 if not ignore_if_draft:
@@ -637,7 +637,7 @@ class DraftModuleStore(MongoModuleStore):
         if len(to_be_deleted) > 0:
             bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
     @memoize_in_request_cache('request_cache')
     def has_changes(self, xblock):
@@ -741,7 +741,7 @@ class DraftModuleStore(MongoModuleStore):
         bulk_record = self._get_bulk_ops_record(course_key)
         if len(to_be_deleted) > 0:
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}})
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
         self._flag_publish_event(course_key)
 
