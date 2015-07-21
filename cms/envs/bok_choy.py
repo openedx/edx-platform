@@ -1,9 +1,9 @@
 """
-Settings for Bok Choy tests that are used for running CMS and LMS.
+Settings for Bok Choy tests that are used when running Studio.
 
 Bok Choy uses two different settings files:
 1. test_static_optimized is used when invoking collectstatic
-2. bok_choy is used when running CMS and LMS
+2. bok_choy is used when running the tests
 
 Note: it isn't possible to have a single settings file, because Django doesn't
 support both generating static assets to a directory and also serving static

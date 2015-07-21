@@ -34,16 +34,11 @@ from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
 </div>
 <%block name="headextra">
     <%static:css group='style-course'/>
+</%block>
 
-    <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
-
-    <script>
-          (function (require) {
-            require(['js/student_profile/views/learner_profile_factory'], function(setupLearnerProfile) {
-                var options = ${ json.dumps(data, cls=EscapedEdxJSONEncoder) };
-                setupLearnerProfile(options);
-            });
-          }).call(this, require || RequireJS.require);
-    </script>
-
+<%block name="js_extra">
+<%static:require_module module_name="js/student_profile/views/learner_profile_factory" class_name="LearnerProfileFactory">
+    var options = ${ json.dumps(data, cls=EscapedEdxJSONEncoder) };
+    LearnerProfileFactory(options);
+</%static:require_module>
 </%block>

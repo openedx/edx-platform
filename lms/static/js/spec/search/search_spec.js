@@ -13,8 +13,8 @@ define([
     'js/search/dashboard/views/search_form',
     'js/search/course/views/search_results_view',
     'js/search/dashboard/views/search_results_view',
-    'js/search/course/search_app',
-    'js/search/dashboard/search_app'
+    'js/search/course/course_search_factory',
+    'js/search/dashboard/dashboard_search_factory'
 ], function(
     $,
     Sinon,
@@ -30,8 +30,8 @@ define([
     DashSearchForm,
     CourseSearchResultsView,
     DashSearchResultsView,
-    CourseSearchApp,
-    DashSearchApp
+    CourseSearchFactory,
+    DashboardSearchFactory
 ) {
     'use strict';
 
@@ -681,13 +681,7 @@ define([
 
                 this.server = Sinon.fakeServer.create();
                 var courseId = 'a/b/c';
-                this.app = new CourseSearchApp(
-                    courseId,
-                    SearchRouter,
-                    CourseSearchForm,
-                    SearchCollection,
-                    CourseSearchResultsView
-                );
+                CourseSearchFactory(courseId);
                 spyOn(Backbone.history, 'navigate');
                 this.$contentElement = $('#course-content');
                 this.$searchResults = $('#courseware-search-results');
@@ -718,12 +712,7 @@ define([
                 loadTemplates.call(this);
 
                 this.server = Sinon.fakeServer.create();
-                this.app = new DashSearchApp(
-                    SearchRouter,
-                    DashSearchForm,
-                    SearchCollection,
-                    DashSearchResultsView
-                );
+                DashboardSearchFactory();
 
                 spyOn(Backbone.history, 'navigate');
                 this.$contentElement = $('#my-courses');
