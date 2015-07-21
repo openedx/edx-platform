@@ -10,10 +10,11 @@ if Backbone?
       "click .discussion-paginator a": "navigateToPage"
 
     page_re: /\?discussion_page=(\d+)/
-    initialize: ->
+    initialize: (options) ->
       @toggleDiscussionBtn = @$(".discussion-show")
       # Set the page if it was set in the URL. This is used to allow deep linking to pages
       match = @page_re.exec(window.location.href)
+      @context = options.context or "course"  # allowed values are "course" or "standalone"
       if match
         @page = parseInt(match[1])
       else
@@ -105,6 +106,7 @@ if Backbone?
           el: @$("article#thread_#{thread.id}"),
           model: thread,
           mode: "inline",
+          context: @context,
           course_settings: @course_settings,
           topicId: discussionId
         )
@@ -141,6 +143,7 @@ if Backbone?
         el: article,
         model: thread,
         mode: "inline",
+        context: @context,
         course_settings: @course_settings,
         topicId: @$el.data("discussion-id")
       )

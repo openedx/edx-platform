@@ -4,6 +4,7 @@ Teams pages.
 """
 
 from .course_page import CoursePage
+from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
 
 from .fields import FieldsMixin
@@ -179,3 +180,50 @@ class CreateTeamPage(CoursePage, FieldsMixin):
         """Click on cancel team button"""
         self.q(css='.create-team .action-cancel').first.click()
         self.wait_for_ajax()
+
+
+class TeamPage(CoursePage, PaginatedUIMixin):
+    """
+    The page for a specific Team within the Teams tab
+    """
+    def __init__(self, browser, course_id, team=None):
+        """
+        Set up `self.url_path` on instantiation, since it dynamically
+        reflects the current team.
+        """
+        super(TeamPage, self).__init__(browser, course_id)
+        self.team = team
+        if self.team:
+            self.url_path = "teams/#teams/{topic_id}/{team_id}".format(
+                topic_id=self.team['topic_id'], team_id=self.team['id']
+            )
+
+    def is_browser_on_page(self):
+        """Check if we're on the teams list page for a particular team."""
+        if self.team:
+            if not self.url.endswith(self.url_path):
+                return False
+        return self.q(css='.team-profile').present
+
+    @property
+    def discussion_id(self):
+        """Get the id of the discussion module on the page"""
+        return self.q(css='div.discussion-module').attrs('data-discussion-id')[0]
+
+    @property
+    def discussion_page(self):
+        """Get the discussion as a bok_choy page object"""
+        if not hasattr(self, '_discussion_page'):
+            # pylint: disable=attribute-defined-outside-init
+            self._discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+        return self._discussion_page
+
+    @property
+    def team_name(self):
+        """Get the team's name as displayed in the page header"""
+        return self.q(css='.page-header .page-title')[0].text
+
+    @property
+    def team_description(self):
+        """Get the team's description as displayed in the page header"""
+        return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text

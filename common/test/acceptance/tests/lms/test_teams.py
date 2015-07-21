@@ -4,14 +4,19 @@ Acceptance tests for the teams feature.
 import json
 
 from nose.plugins.attrib import attr
+from uuid import uuid4
 
 from ..helpers import UniqueCourseTest
-from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
-from ...pages.lms.tab_nav import TabNavPage
+from ...fixtures.discussion import (
+    Thread,
+    MultipleThreadFixture
+)
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
+from ...pages.lms.tab_nav import TabNavPage
+from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
 
 
 class TeamsTabBase(UniqueCourseTest):
@@ -25,6 +30,33 @@ class TeamsTabBase(UniqueCourseTest):
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
         return [{u"description": str(i), u"name": str(i), u"id": i} for i in xrange(num_topics)]
+
+    def create_teams(self, topic, num_teams):
+        """Create `num_teams` teams belonging to `topic`."""
+        teams = []
+        for i in xrange(num_teams):
+            team = {
+                'course_id': self.course_id,
+                'topic_id': topic['id'],
+                'name': 'Team {}'.format(i),
+                'description': 'Description {}'.format(i)
+            }
+            response = self.course_fixture.session.post(
+                LMS_BASE_URL + '/api/team/v0/teams/',
+                data=json.dumps(team),
+                headers=self.course_fixture.headers
+            )
+            teams.append(json.loads(response.text))
+        return teams
+
+    def create_membership(self, username, team_id):
+        """Assign `username` to `team_id`."""
+        response = self.course_fixture.session.post(
+            LMS_BASE_URL + '/api/team/v0/team_membership/',
+            data=json.dumps({'username': username, 'team_id': team_id}),
+            headers=self.course_fixture.headers
+        )
+        return json.loads(response.text)
 
     def set_team_configuration(self, configuration, enroll_in_course=True, global_staff=False):
         """
@@ -272,33 +304,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
 
-    def create_teams(self, num_teams):
-        """Create `num_teams` teams belonging to `self.topic`."""
-        teams = []
-        for i in xrange(num_teams):
-            team = {
-                'course_id': self.course_id,
-                'topic_id': self.topic['id'],
-                'name': 'Team {}'.format(i),
-                'description': 'Description {}'.format(i)
-            }
-            response = self.course_fixture.session.post(
-                LMS_BASE_URL + '/api/team/v0/teams/',
-                data=json.dumps(team),
-                headers=self.course_fixture.headers
-            )
-            teams.append(json.loads(response.text))
-        return teams
-
-    def create_membership(self, username, team_id):
-        """Assign `username` to `team_id`."""
-        response = self.course_fixture.session.post(
-            LMS_BASE_URL + '/api/team/v0/team_membership/',
-            data=json.dumps({'username': username, 'team_id': team_id}),
-            headers=self.course_fixture.headers
-        )
-        return json.loads(response.text)
-
     def verify_page_header(self):
         """Verify that the page header correctly reflects the current topic's name and description."""
         self.assertEqual(self.browse_teams_page.header_topic_name, self.topic['name'])
@@ -380,7 +385,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And I should see a button to add a team
         And I should not see a pagination footer
         """
-        teams = self.create_teams(self.TEAMS_PAGE_SIZE)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1-10 out of 10 total')
@@ -403,7 +408,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And when I click on the previous page button
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.TEAMS_PAGE_SIZE + 1)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_on_page(1, teams, 'Showing 1-10 out of 11 total', True)
@@ -425,7 +430,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         When I input the first page
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.TEAMS_PAGE_SIZE + 10)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
@@ -445,7 +450,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And I should see the team for that topic
         And I should see that the team card shows my membership
         """
-        teams = self.create_teams(1)
+        teams = self.create_teams(self.topic, 1)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_teams(teams)
@@ -615,23 +620,18 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see the Create Team header and form
         When I fill all the fields present with appropriate data
         And I click Create button
-        Then I should see teams list page with newly created team.
+        Then I should see the page for my team
         """
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
         self.verify_and_navigate_to_create_team_page()
 
         self.fill_create_form()
         self.create_team_page.submit_form()
 
-        self.assertTrue(self.browse_teams_page.is_browser_on_page())
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1 out of 1 total')
-        # Verify the newly created team content.
-        team_card = self.browse_teams_page.team_cards.results[0]
-        self.assertEqual(team_card.find_element_by_css_selector('.card-title').text, self.team_name)
-        self.assertEqual(
-            team_card.find_element_by_css_selector('.card-description').text,
-            'The Avengers are a fictional team of superheroes.'
-        )
+        # Verify that the page is shown for the new team
+        team_page = TeamPage(self.browser, self.course_id)
+        team_page.wait_for_page()
+        self.assertEqual(team_page.team_name, self.team_name)
+        self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
 
     def test_user_can_cancel_the_team_creation(self):
         """
@@ -649,3 +649,47 @@ class CreateTeamTest(TeamsTabBase):
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+
+
+@attr('shard_5')
+class TeamPageTest(TeamsTabBase):
+    """Tests for viewing a specific team"""
+    def setUp(self):
+        super(TeamPageTest, self).setUp()
+        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.team = self.create_teams(self.topic, 1)[0]
+        self.create_membership(self.user_info['username'], self.team['id'])
+        self.team_page = TeamPage(self.browser, self.course_id, self.team)
+
+    def setup_thread(self):
+        """
+        Set up the discussion thread for the team.
+        """
+        thread = Thread(
+            id="test_thread_{}".format(uuid4().hex),
+            commentable_id=self.team['discussion_topic_id'],
+            body="Dummy text body."
+        )
+        thread_fixture = MultipleThreadFixture([thread])
+        thread_fixture.push()
+        return thread
+
+    def test_discussion_on_team_page(self):
+        """
+        Scenario: Team Page renders a team discussion.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        When a thread exists in the team's discussion
+        And I visit the Team page for that team
+        Then I should see a discussion with the correct discussion_id
+        And I should see the existing thread
+        """
+        thread = self.setup_thread()
+        self.team_page.visit()
+        self.assertEqual(self.team_page.discussion_id, self.team['discussion_topic_id'])
+        discussion = self.team_page.discussion_page
+        self.assertTrue(discussion.is_browser_on_page())
+        self.assertTrue(discussion.is_discussion_expanded())
+        self.assertEqual(discussion.get_num_displayed_threads(), 1)
+        self.assertTrue(discussion.has_thread(thread['id']))
