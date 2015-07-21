@@ -580,7 +580,7 @@
         'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs/tags_spec.js',
         'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
-        'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_visibility_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
         'lms/include/js/spec/edxnotes/models/note_spec.js',
         'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',

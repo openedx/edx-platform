@@ -1,10 +1,9 @@
 define([
-    'jquery', 'annotator_1.2.9', 'common/js/spec_helpers/ajax_helpers', 'js/edxnotes/views/visibility_decorator',
-    'js/edxnotes/views/toggle_notes_factory', 'js/spec/edxnotes/helpers',
+    'jquery', 'underscore', 'annotator_1.2.9', 'common/js/spec_helpers/ajax_helpers',
+    'js/edxnotes/views/notes_visibility_factory', 'js/spec/edxnotes/helpers',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(
-    $, Annotator, AjaxHelpers, VisibilityDecorator, ToggleNotesFactory, Helpers,
-    customMatchers
+    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, Helpers, customMatchers
 ) {
     'use strict';
     describe('EdxNotes ToggleNotesFactory', function() {
@@ -23,13 +22,13 @@ define([
                 'js/fixtures/edxnotes/edxnotes_wrapper.html',
                 'js/fixtures/edxnotes/toggle_notes.html'
             );
-            VisibilityDecorator.factory(
+            NotesVisibilityFactory.VisibilityDecorator.factory(
                 document.getElementById('edx-notes-wrapper-123'), params, true
             );
-            VisibilityDecorator.factory(
+            NotesVisibilityFactory.VisibilityDecorator.factory(
                 document.getElementById('edx-notes-wrapper-456'), params, true
             );
-            this.toggleNotes = ToggleNotesFactory(true, '/test_url');
+            this.toggleNotes = NotesVisibilityFactory.ToggleVisibilityView(true, '/test_url');
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
@@ -37,7 +36,7 @@ define([
         });
 
         afterEach(function () {
-            VisibilityDecorator._setVisibility(null);
+            NotesVisibilityFactory.VisibilityDecorator._setVisibility(null);
             _.invoke(Annotator._instances, 'destroy');
             $('.annotator-notice').remove();
         });
