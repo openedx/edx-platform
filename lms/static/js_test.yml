@@ -62,6 +62,22 @@ lib_paths:
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/date.js
     - xmodule_js/common_static/js/vendor/moment.min.js
+    - xmodule_js/common_static/coffee/src/discussion/discussion_module_view.js
+    - xmodule_js/common_static/coffee/src/discussion/templates.js
+    - xmodule_js/common_static/coffee/src/discussion/utils.js
+    - xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings.js
+    - xmodule_js/common_static/coffee/src/discussion/models/discussion_user.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_edit_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_list_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_profile_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/discussion_user_profile_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/new_post_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/thread_response_edit_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view.js
+    - xmodule_js/common_static/coffee/src/discussion/views/thread_response_view.js
 
 # Paths to source JavaScript files
 src_paths:

@@ -83,6 +83,9 @@
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
 
+            // Discussion classes loaded explicitly until they are converted to use RequireJS
+            'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
+
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
@@ -520,6 +523,37 @@
             'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            // Discussions
+            'DiscussionModuleView': {
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'URI',
+                    'xmodule_js/common_static/coffee/src/discussion/templates',
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
+                    'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_edit_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_list_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_profile_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_user_profile_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/new_post_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/thread_response_edit_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/thread_response_view'
+                ],
+                exports: 'DiscussionModuleView',
+                init: function() {
+                    // Force window.URI to be set as DiscussionModuleView expects to find it
+                    // TODO: find a more general way to do this
+                    window.URI = require('URI');
+                }
             }
         }
     });
