@@ -30,8 +30,9 @@
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
+            'backbone-super': 'js/vendor/backbone-super',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
-            "backbone-super": "js/vendor/backbone-super",
+            'mustache': 'xmodule_js/common_static/js/vendor/mustache',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
             'xmodule': 'xmodule_js/src/xmodule',
@@ -82,6 +83,23 @@
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
+
+            // Discussion classes loaded explicitly until they are converted to use RequireJS
+            'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
+            'xmodule_js/common_static/coffee/src/discussion/utils': 'xmodule_js/common_static/coffee/src/discussion/utils',
+            'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings': 'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
+            'xmodule_js/common_static/coffee/src/discussion/models/discussion_user': 'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_edit_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_edit_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_list_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_list_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_profile_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_profile_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_user_profile_view': 'xmodule_js/common_static/coffee/src/discussion/views/discussion_user_profile_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/new_post_view': 'xmodule_js/common_static/coffee/src/discussion/views/new_post_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/thread_response_edit_view': 'xmodule_js/common_static/coffee/src/discussion/views/thread_response_edit_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view': 'xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view',
+            'xmodule_js/common_static/coffee/src/discussion/views/thread_response_view': 'xmodule_js/common_static/coffee/src/discussion/views/thread_response_view',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
@@ -192,7 +210,7 @@
                 exports: 'Backbone.Paginator'
             },
             "backbone-super": {
-                deps: ["backbone"],
+                deps: ["backbone"]
             },
             'youtube': {
                 exports: 'YT'
@@ -417,7 +435,7 @@
                 exports: 'edx.verify_student.IntroStepView',
                 deps: [
                     'jquery',
-                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/step_view'
                 ]
             },
             'js/verify_student/views/make_payment_step_view': {
@@ -429,7 +447,7 @@
                     'jquery.cookie',
                     'jquery.url',
                     'string_utils',
-                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/step_view'
                 ]
             },
             'js/verify_student/views/payment_confirmation_step_view': {
@@ -438,7 +456,7 @@
                     'jquery',
                     'underscore',
                     'gettext',
-                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/step_view'
                 ]
             },
             'js/verify_student/views/face_photo_step_view': {
@@ -475,14 +493,14 @@
                 exports: 'edx.verify_student.EnrollmentConfirmationStepView',
                 deps: [
                     'jquery',
-                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/step_view'
                 ]
             },
             'js/verify_student/views/reverify_success_step_view': {
                 exports: 'edx.verify_student.ReverifySuccessStepView',
                 deps: [
                     'jquery',
-                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/step_view'
                 ]
             },
             'js/verify_student/views/pay_and_verify_view': {
@@ -520,6 +538,120 @@
             'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            // Discussions
+            'xmodule_js/common_static/coffee/src/discussion/utils': {
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'mustache',
+                    'gettext',
+                    'URI'
+                ],
+                exports: 'DiscussionUtil',
+                init: function() {
+                    // Set global variables that the discussion code is expecting to be defined
+                    window.Backbone = require('backbone');
+                    window.Mustache = require('mustache');
+                }
+            },
+            'xmodule_js/common_static/coffee/src/discussion/content': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'Content'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/discussion': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'Discussion'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionCourseSettings'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/models/discussion_user': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionUser'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionContentView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_edit_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionThreadEditView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_list_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionThreadListView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_profile_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionThreadProfileView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionThreadShowView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionThreadView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/discussion_user_profile_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionUserProfileView'
+            },
+            'DiscussionModuleView': {
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'URI',
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/content',
+                    'xmodule_js/common_static/coffee/src/discussion/discussion',
+                    'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
+                    'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_edit_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_list_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_profile_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_user_profile_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/new_post_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/thread_response_edit_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view',
+                    'xmodule_js/common_static/coffee/src/discussion/views/thread_response_view'
+                ],
+                exports: 'DiscussionModuleView',
+                init: function() {
+                    // Force window.URI to be set as DiscussionModuleView expects to find it
+                    // TODO: find a more general way to do this
+                    window.URI = require('URI');
+                }
             }
         }
     });
@@ -527,12 +659,6 @@
     // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
     define([
         // Run the LMS tests
-        'lms/include/teams/js/spec/teams_factory_spec.js',
-        'lms/include/teams/js/spec/topic_card_spec.js',
-        'lms/include/teams/js/spec/topic_collection_spec.js',
-        'lms/include/teams/js/spec/topics_spec.js',
-        'lms/include/teams/js/spec/teams_spec.js',
-        'lms/include/teams/js/spec/teams_tab_spec.js',
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
@@ -603,7 +729,14 @@
         'lms/include/js/spec/discovery/views/refine_sidebar_spec.js',
         'lms/include/js/spec/discovery/views/search_form_spec.js',
         'lms/include/js/spec/discovery/discovery_factory_spec.js',
-        'lms/include/js/spec/ccx/schedule_spec.js'
+        'lms/include/js/spec/ccx/schedule_spec.js',
+        'lms/include/teams/js/spec/team_discussion_spec.js',
+        'lms/include/teams/js/spec/teams_factory_spec.js',
+        'lms/include/teams/js/spec/teams_spec.js',
+        'lms/include/teams/js/spec/teams_tab_spec.js',
+        'lms/include/teams/js/spec/topic_card_spec.js',
+        'lms/include/teams/js/spec/topic_collection_spec.js',
+        'lms/include/teams/js/spec/topics_spec.js'
     ]);
 
 }).call(this, requirejs, define);

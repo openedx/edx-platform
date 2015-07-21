@@ -2,8 +2,9 @@ define([
     'jquery',
     'backbone',
     'common/js/spec_helpers/ajax_helpers',
-    'teams/js/views/teams_tab'
-], function ($, Backbone, AjaxHelpers, TeamsTabView) {
+    'teams/js/views/teams_tab',
+    'URI'
+], function ($, Backbone, AjaxHelpers, TeamsTabView, URI) {
     'use strict';
 
     describe('TeamsTab', function () {
@@ -33,14 +34,14 @@ define([
                     results: [{
                         description: 'test description',
                         name: 'test topic',
-                        id: 'test_id',
+                        id: 'test_topic',
                         team_count: 0
                     }]
                 },
-                topic_url: 'api/topics/topic_id,course_id',
-                topics_url: 'topics_url',
-                teams_url: 'teams_url',
-                course_id: 'test/course/id'
+                topicsUrl: 'api/topics/',
+                topicUrl: 'api/topics/topic_id,test/course/id',
+                teamsUrl: 'api/teams/',
+                courseID: 'test/course/id'
             }).render();
             Backbone.history.start();
             spyOn($.fn, 'focus');
@@ -55,26 +56,37 @@ define([
             expectContent('This is the new Teams tab.');
         });
 
-        it('can switch tabs', function () {
-            teamsTabView.$('a.nav-item[data-url="browse"]').click();
-            expectContent('test description');
-            teamsTabView.$('a.nav-item[data-url="teams"]').click();
-            expectContent('This is the new Teams tab.');
-        });
+        describe('Navigation', function () {
+            it('can switch tabs', function () {
+                teamsTabView.$('a.nav-item[data-url="browse"]').click();
+                expectContent('test description');
+                teamsTabView.$('a.nav-item[data-url="teams"]').click();
+                expectContent('This is the new Teams tab.');
+            });
 
-        it('displays and focuses an error message when trying to navigate to a nonexistent route', function () {
-            teamsTabView.router.navigate('test', {trigger: true});
-            expectError('The page "test" could not be found.');
-            expectFocus(teamsTabView.$('.warning'));
-        });
+            it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
+                teamsTabView.router.navigate('no_such_page', {trigger: true});
+                expectError('The page "no_such_page" could not be found.');
+                expectFocus(teamsTabView.$('.warning'));
+            });
 
-        it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
-            var requests = AjaxHelpers.requests(this);
-            teamsTabView.router.navigate('topics/test', {trigger: true});
-            AjaxHelpers.expectRequest(requests, 'GET', 'api/topics/test,course_id', null);
-            AjaxHelpers.respondWithError(requests, 404);
-            expectError('The topic "test" could not be found.');
-            expectFocus(teamsTabView.$('.warning'));
+            it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
+                var requests = AjaxHelpers.requests(this);
+                teamsTabView.router.navigate('topics/no_such_topic', {trigger: true});
+                AjaxHelpers.expectRequest(requests, 'GET', 'api/topics/no_such_topic,test/course/id', null);
+                AjaxHelpers.respondWithError(requests, 404);
+                expectError('The topic "no_such_topic" could not be found.');
+                expectFocus(teamsTabView.$('.warning'));
+            });
+
+            it('displays and focuses an error message when trying to navigate to a nonexistent team', function () {
+                var requests = AjaxHelpers.requests(this);
+                teamsTabView.router.navigate('teams/test_topic/no_such_team', {trigger: true});
+                AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team', null);
+                AjaxHelpers.respondWithError(requests, 404);
+                expectError('The team "no_such_team" could not be found.');
+                expectFocus(teamsTabView.$('.warning'));
+            });
         });
     });
 });

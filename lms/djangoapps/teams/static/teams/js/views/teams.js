@@ -12,8 +12,10 @@
             },
 
             initialize: function (options) {
+                this.topic = options.topic;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
+                    topic: options.topic,
                     maxTeamSize: options.maxTeamSize
                 });
                 PaginatedView.prototype.initialize.call(this);

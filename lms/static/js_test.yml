@@ -58,6 +58,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
+    - xmodule_js/common_static/js/vendor/mustache.js
     - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/date.js
@@ -68,6 +69,7 @@ src_paths:
     - js
     - common/js
     - teams/js
+    - xmodule_js/common_static/coffee
 
 # Paths to spec (test) JavaScript files
 spec_paths:

@@ -2,7 +2,7 @@ define([
     'teams/js/collections/team', 'teams/js/views/teams'
 ], function (TeamCollection, TeamsView) {
     'use strict';
-    describe('TeamsView', function () {
+    describe('Teams View', function () {
         var teamsView, teamCollection, initialTeams,
             createTeams = function (startIndex, stopIndex) {
                 return _.map(_.range(startIndex, stopIndex + 1), function (i) {
