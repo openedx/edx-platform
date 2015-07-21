@@ -1016,3 +1016,9 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 ################################ Deprecated Blocks Info ################################
 
 DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+
+
+################################ Settings for Microsites ################################
+
+### Select an implementation for the microsite backend
+MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.SettingsFileMicrositeBackend'

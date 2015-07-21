@@ -2555,3 +2555,9 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
+
+
+################################ Settings for Microsites ################################
+
+### Select an implementation for the microsite backend
+MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.SettingsFileMicrositeBackend'
