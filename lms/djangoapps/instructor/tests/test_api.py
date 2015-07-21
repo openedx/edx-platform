@@ -85,7 +85,7 @@ REPORTS_DATA = (
         'extra_instructor_api_kwargs': {}
     },
     {
-        'report_type': 'enrolled student profile',
+        'report_type': 'enrolled learner profile',
         'instructor_api_endpoint': 'get_students_features',
         'task_api_endpoint': 'instructor_task.api.submit_calculate_students_features_csv',
         'extra_instructor_api_kwargs': {'csv': '/csv'}
@@ -97,7 +97,7 @@ REPORTS_DATA = (
         'extra_instructor_api_kwargs': {}
     },
     {
-        'report_type': 'students who may enroll',
+        'report_type': 'enrollment',
         'instructor_api_endpoint': 'get_students_who_may_enroll',
         'task_api_endpoint': 'instructor_task.api.submit_calculate_may_enroll_csv',
         'extra_instructor_api_kwargs': {},
@@ -2306,7 +2306,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.client.get(url, {})
         res_json = json.loads(response.content)
         self.assertIn('status', res_json)
-        self.assertNotIn('already in progress', res_json['status'])
+        self.assertNotIn('currently being created', res_json['status'])
         # CSV generation already in progress:
         with patch('instructor_task.api.submit_calculate_may_enroll_csv') as submit_task_function:
             error = AlreadyRunningError()
@@ -2314,7 +2314,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             response = self.client.get(url, {})
             res_json = json.loads(response.content)
             self.assertIn('status', res_json)
-            self.assertIn('already in progress', res_json['status'])
+            self.assertIn('currently being created', res_json['status'])
 
     def test_access_course_finance_admin_with_invalid_course_key(self):
         """
@@ -2398,7 +2398,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.client.login(username=self.instructor.username, password='test')
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content)
 
     def test_bulk_purchase_detailed_report(self):
         """
@@ -2448,7 +2448,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content)
 
     def test_create_registration_code_without_invoice_and_order(self):
         """
@@ -2470,7 +2470,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content)
 
     def test_invoice_payment_is_still_pending_for_registration_codes(self):
         """
@@ -2495,7 +2495,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         url = reverse('get_enrollment_report', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
-        self.assertIn('Your detailed enrollment report is being generated!', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content)
 
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
@@ -2549,9 +2549,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your {report_type} report is being generated!" \
-                         " You can view the status of the generation task" \
-                         " in the 'Pending Tasks' section.".format(report_type=report_type)
+        success_status = "The {report_type} report is being created.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2570,9 +2568,10 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your {report_type} report is being created." \
-                         " To view the status of the report, see the 'Pending Tasks'" \
-                         " section.".format(report_type=report_type)
+        success_status = "The {report_type} report is being created." \
+                         " To view the status of the report, see Pending" \
+                         " Instructor Tasks" \
+                         " below".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2592,11 +2591,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         with patch(task_api_endpoint) as mock:
             mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
-        already_running_status = "An {report_type} report is currently in progress." \
-                                 " To view the status of the report, see the 'Pending Tasks' section." \
-                                 " When completed, the report will be available for download in the table below." \
-                                 " You will be able to download the" \
-                                 " report when it is complete.".format(report_type=report_type)
+        already_running_status = "The {report_type} report is currently being created." \
+                                 " To view the status of the report, see Pending Instructor Tasks below." \
+                                 " You will be able to download the report" \
+                                 " when it is" \
+                                 " complete.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
 
     def test_get_student_progress_url(self):
