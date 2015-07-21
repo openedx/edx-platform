@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from django.test.utils import override_settings
+from request_cache.middleware import RequestCache
 from student.tests.factories import AdminFactory  # pylint: disable=import-error
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
@@ -66,6 +67,8 @@ class TestFieldOverrides(ModuleStoreTestCase):
         get_ccx.return_value = ccx
         self.addCleanup(patch.stop)
 
+        self.addCleanup(RequestCache.clear_request_cache)
+
         # Apparently the test harness doesn't use LmsFieldStorage, and I'm not
         # sure if there's a way to poke the test harness to do so.  So, we'll
         # just inject the override field storage in this brute force manner.
@@ -97,7 +100,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
             dummy = chapter.start
 
@@ -107,7 +110,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx.course.get_children()[0]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
             dummy1 = chapter.start
             dummy2 = chapter.start
