@@ -10,6 +10,7 @@ from lms.lib.comment_client import Thread
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.models import all_permissions_for_user_in_course
+from teams.models import CourseTeam
 
 
 def has_permission(user, permission, course_id=None):
@@ -27,7 +28,7 @@ def has_permission(user, permission, course_id=None):
     return permission in all_permissions
 
 
-CONDITIONS = ['is_open', 'is_author', 'is_question_author']
+CONDITIONS = ['is_open', 'is_author', 'is_question_author', 'is_team_member_if_applicable']
 
 
 def _check_condition(user, condition, content):
@@ -55,10 +56,35 @@ def _check_condition(user, condition, content):
         except KeyError:
             return False
 
+    def check_team_member(user, content):
+        """
+        If the content has a commentable_id, verifies that either it is not associated with a team,
+        or if it is, that the user is a member of that team.
+        """
+        if not content:
+            return False
+        try:
+            commentable_id = content['commentable_id']
+            request_cache_dict = RequestCache.get_request_cache().data
+            cache_key = "django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
+            if cache_key in request_cache_dict:
+                return request_cache_dict[cache_key]
+            team = CourseTeam.objects.get(discussion_id=commentable_id)
+            passes_condition = team.users.filter(id=user.id).count() > 0
+            request_cache_dict[cache_key] = passes_condition
+        except KeyError:
+            passes_condition = False
+        except CourseTeam.DoesNotExist:
+            passes_condition = True
+            request_cache_dict[cache_key] = passes_condition
+
+        return passes_condition
+
     handlers = {
         'is_open': check_open,
         'is_author': check_author,
         'is_question_author': check_question_author,
+        'is_team_member_if_applicable': check_team_member
     }
 
     return handlers[condition](user, content)
@@ -88,30 +114,28 @@ def _check_conditions_permissions(user, permissions, course_id, content):
 
 VIEW_PERMISSIONS = {
     'update_thread': ['edit_content', ['update_thread', 'is_open', 'is_author']],
-    'create_comment': [["create_comment", "is_open"]],
+    'create_comment': [["create_comment", "is_open", "is_team_member_if_applicable"]],
     'delete_thread': ['delete_thread', ['update_thread', 'is_author']],
     'update_comment': ['edit_content', ['update_comment', 'is_open', 'is_author']],
     'endorse_comment': ['endorse_comment', 'is_question_author'],
     'openclose_thread': ['openclose_thread'],
-    'create_sub_comment': [['create_sub_comment', 'is_open']],
+    'create_sub_comment': [['create_sub_comment', 'is_open', 'is_team_member_if_applicable']],
     'delete_comment': ['delete_comment', ['update_comment', 'is_open', 'is_author']],
-    'vote_for_comment': [['vote', 'is_open']],
-    'undo_vote_for_comment': [['unvote', 'is_open']],
-    'vote_for_thread': [['vote', 'is_open']],
-    'flag_abuse_for_thread': ['vote'],
-    'un_flag_abuse_for_thread': ['vote'],
-    'flag_abuse_for_comment': ['vote'],
-    'un_flag_abuse_for_comment': ['vote'],
-    'undo_vote_for_thread': [['unvote', 'is_open']],
+    'vote_for_comment': [['vote', 'is_open', 'is_team_member_if_applicable']],
+    'undo_vote_for_comment': [['unvote', 'is_open', 'is_team_member_if_applicable']],
+    'vote_for_thread': [['vote', 'is_open', 'is_team_member_if_applicable']],
+    'flag_abuse_for_thread': [['vote', 'is_team_member_if_applicable']],
+    'un_flag_abuse_for_thread': [['vote', 'is_team_member_if_applicable']],
+    'flag_abuse_for_comment': [['vote', 'is_team_member_if_applicable']],
+    'un_flag_abuse_for_comment': [['vote', 'is_team_member_if_applicable']],
+    'undo_vote_for_thread': [['unvote', 'is_open', 'is_team_member_if_applicable']],
     'pin_thread': ['openclose_thread'],
     'un_pin_thread': ['openclose_thread'],
-    'follow_thread': ['follow_thread'],
-    'follow_commentable': ['follow_commentable'],
-    'follow_user': ['follow_user'],
-    'unfollow_thread': ['unfollow_thread'],
-    'unfollow_commentable': ['unfollow_commentable'],
-    'unfollow_user': ['unfollow_user'],
-    'create_thread': ['create_thread'],
+    'follow_thread': [['follow_thread', 'is_team_member_if_applicable']],
+    'follow_commentable': [['follow_commentable', 'is_team_member_if_applicable']],
+    'unfollow_thread': [['unfollow_thread', 'is_team_member_if_applicable']],
+    'unfollow_commentable': [['unfollow_commentable', 'is_team_member_if_applicable']],
+    'create_thread': [['create_thread', 'is_team_member_if_applicable']],
 }
 
 
