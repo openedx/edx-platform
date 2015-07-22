@@ -415,6 +415,9 @@ FEATURES = {
 
     # Enable the max score cache to speed up grading
     'ENABLE_MAX_SCORE_CACHE': True,
+
+    # New onboarding feature
+    'ENABLE_ONBOARDING': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1931,6 +1934,9 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    # Onboarding
+    'onboarding',
 
     'xblock_django',
 )
