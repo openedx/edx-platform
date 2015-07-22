@@ -15,6 +15,9 @@ import logging
 from monkey_patch import django_utils_translation
 import analytics
 
+from edx_proctoring.runtime import set_runtime_service
+from student.models import get_profile_dict_for_user
+
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +45,10 @@ def run():
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+
+    # register any callbacks that we need to support in edx_proctoring
+    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+        set_runtime_service('profile', get_profile_dict_for_user)
 
 
 def add_mimetypes():
