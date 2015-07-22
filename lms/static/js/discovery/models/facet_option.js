@@ -4,13 +4,12 @@ define(['backbone'], function (Backbone) {
     'use strict';
 
     return Backbone.Model.extend({
+        idAttribute: 'term',
         defaults: {
-            query: '',
-            type: 'search_string'
-        },
-
-        cleanModelView: function() {
-            this.destroy();
+            facet: '',
+            term: '',
+            count: 0,
+            selected: false
         }
     });
 

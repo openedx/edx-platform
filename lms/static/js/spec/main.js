@@ -591,7 +591,18 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/discovery/discovery_spec.js',
+        'lms/include/js/spec/discovery/collections/filters_spec.js',
+        'lms/include/js/spec/discovery/models/course_card_spec.js',
+        'lms/include/js/spec/discovery/models/course_directory_spec.js',
+        'lms/include/js/spec/discovery/models/facet_option_spec.js',
+        'lms/include/js/spec/discovery/models/filter_spec.js',
+        'lms/include/js/spec/discovery/models/search_state_spec.js',
+        'lms/include/js/spec/discovery/views/course_card_spec.js',
+        'lms/include/js/spec/discovery/views/courses_listing_spec.js',
+        'lms/include/js/spec/discovery/views/filter_bar_spec.js',
+        'lms/include/js/spec/discovery/views/refine_sidebar_spec.js',
+        'lms/include/js/spec/discovery/views/search_form_spec.js',
+        'lms/include/js/spec/discovery/discovery_factory_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js'
     ]);
 

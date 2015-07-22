@@ -1,70 +1,96 @@
 ;(function (define) {
     'use strict';
 
-    define(['backbone', 'js/discovery/collection', 'js/discovery/form', 'js/discovery/result_list_view',
-            'js/discovery/filter_bar_view', 'js/discovery/search_facets_view'],
-        function(Backbone, Collection, Form, ResultListView, FilterBarView, FacetsBarView) {
+    define(['backbone', 'js/discovery/models/search_state', 'js/discovery/collections/filters',
+        'js/discovery/views/search_form', 'js/discovery/views/courses_listing',
+        'js/discovery/views/filter_bar', 'js/discovery/views/refine_sidebar'],
+        function(Backbone, SearchState, Filters, SearchForm, CoursesListing, FilterBar, RefineSidebar) {
 
             return function (meanings, searchQuery) {
-                //facet types configuration - set default display names
-                var facetsTypes = meanings;
 
-                var collection = new Collection([]);
-                var results = new ResultListView({ collection: collection });
-                var dispatcher = _.clone(Backbone.Events);
-                var form = new Form();
-                var filters = new FilterBarView();
-                var facetsBarView = new FacetsBarView(facetsTypes);
+                var dispatcher = _.extend({}, Backbone.Events);
+                var search = new SearchState();
+                var filters = new Filters();
+                var listing = new CoursesListing({ model: search.discovery });
+                var form = new SearchForm();
+                var filterBar = new FilterBar({ collection: filters });
+                var refineSidebar = new RefineSidebar({
+                    collection: search.discovery.facetOptions,
+                    meanings: meanings
+                });
 
                 dispatcher.listenTo(form, 'search', function (query) {
+                    filters.reset();
                     form.showLoadingIndicator();
-                    filters.changeQueryFilter(query);
+                    search.performSearch(query, filters.getTerms());
                 });
 
-                dispatcher.listenTo(filters, 'search', function (searchTerm, facets) {
-                    collection.performSearch(searchTerm, facets);
+                dispatcher.listenTo(refineSidebar, 'selectOption', function (type, query, name) {
                     form.showLoadingIndicator();
-                });
-
-                dispatcher.listenTo(filters, 'clear', function () {
-                    form.clearSearch();
-                    collection.performSearch();
-                    filters.hideClearAllButton();
-                });
-
-                dispatcher.listenTo(results, 'next', function () {
-                    collection.loadNextPage();
-                    form.showLoadingIndicator();
-                });
-
-                dispatcher.listenTo(collection, 'search', function () {
-                    if (collection.length > 0) {
-                        form.showFoundMessage(collection.totalCount);
-                        results.render();
+                    if (filters.get(type)) {
+                        removeFilter(type);
                     }
                     else {
-                        form.showNotFoundMessage(collection.searchTerm);
+                        filters.add({type: type, query: query, name: name});
+                        search.refineSearch(filters.getTerms());
                     }
-                    facetsBarView.renderFacets(collection.facets);
-                    form.hideLoadingIndicator();
                 });
 
-                dispatcher.listenTo(collection, 'next', function () {
-                    results.renderNext();
-                    form.hideLoadingIndicator();
+                dispatcher.listenTo(filterBar, 'clearFilter', removeFilter);
+
+                dispatcher.listenTo(filterBar, 'clearAll', function () {
+                    form.doSearch('');
                 });
 
-                dispatcher.listenTo(collection, 'error', function () {
+                dispatcher.listenTo(listing, 'next', function () {
+                    search.loadNextPage()
+                });
+
+                dispatcher.listenTo(search, 'next', function () {
+                    listing.renderNext();
+                });
+
+                dispatcher.listenTo(search, 'search', function (query, total) {
+                    if (total > 0) {
+                        form.showFoundMessage(total);
+                        if (query) {
+                            filters.add(
+                                {type: 'search_query', query: query, name: quote(query)},
+                                {merge: true}
+                            );
+                        }
+                    }
+                    else {
+                        form.showNotFoundMessage(query);
+                        filters.reset();
+                    }
+                    form.hideLoadingIndicator();
+                    listing.render();
+                    refineSidebar.render();
+                });
+
+                dispatcher.listenTo(search, 'error', function () {
                     form.showErrorMessage();
                     form.hideLoadingIndicator();
                 });
 
-                dispatcher.listenTo(facetsBarView, 'addFilter', function (data) {
-                    filters.addFilter(data);
-                });
-
                 // kick off search on page refresh
                 form.doSearch(searchQuery);
+
+                function removeFilter(type) {
+                    form.showLoadingIndicator();
+                    filters.remove(type);
+                    if (type === 'search_query') {
+                        form.doSearch('');
+                    }
+                    else {
+                        search.refineSearch(filters.getTerms());
+                    }
+                }
+
+                function quote(string) {
+                    return '"'+string+'"';
+                }
 
             };
 

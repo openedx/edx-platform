@@ -217,7 +217,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
         # assert that the course discovery UI is not present
         self.assertNotIn('Search for a course', response.content)
-        self.assertNotIn('<aside aria-label="Refine your search" class="search-facets phone-menu">', response.content)
+        self.assertNotIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
 
         # make sure we have the special css class on the section
         self.assertIn('<div class="courses no-course-discovery"', response.content)
@@ -241,7 +241,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
         # assert that the course discovery UI is present
         self.assertIn('Search for a course', response.content)
-        self.assertIn('<aside aria-label="Refine your search" class="search-facets phone-menu">', response.content)
+        self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
         self.assertIn('<div class="courses"', response.content)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
