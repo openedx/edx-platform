@@ -15,8 +15,8 @@ class CourseTeam(models.Model):
     """This model represents team related info."""
 
     team_id = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=255, db_index=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
