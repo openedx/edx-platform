@@ -14,6 +14,7 @@ from instructor_task.api import (
     submit_reset_problem_attempts_for_all_students,
     submit_delete_problem_state_for_all_students,
     submit_bulk_course_email,
+    submit_calculate_problem_responses_csv,
     submit_calculate_students_features_csv,
     submit_cohort_students,
     submit_detailed_enrollment_features_csv,
@@ -200,6 +201,14 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             self.create_task_request(self.instructor),
             self.course.id,
             email_id
+        )
+        self._test_resubmission(api_call)
+
+    def test_submit_calculate_problem_responses(self):
+        api_call = lambda: submit_calculate_problem_responses_csv(
+            self.create_task_request(self.instructor),
+            self.course.id,
+            problem_location=''
         )
         self._test_resubmission(api_call)
 
