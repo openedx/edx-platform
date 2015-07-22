@@ -47,5 +47,4 @@ git+https://github.com/edx/edx-lint.git@8bf82a32ecb8598c415413df66f5232ab8d974e9
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 
 # IONISx:
--e git+https://github.com/IONISx/django-storages.git@aws-custom-host#egg=django-storages
 -e git+https://github.com/IONISx/edx-grades-api@67a13915722fb7e3b748542aa9a081d840e0be23#egg=edx-grades-api
