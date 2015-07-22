@@ -7,22 +7,27 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
+from courseware.courses import course_image_url
+from edxmako.shortcuts import render_to_response
+from edxmako.template import Template
+from eventtracking import tracker
+from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from microsite_configuration import microsite
-from edxmako.shortcuts import render_to_response
-from eventtracking import tracker
-from xmodule.modulestore.django import modulestore
 from student.models import LinkedInAddToProfileConfiguration
-from courseware.courses import course_image_url
 from util import organizations_helpers as organization_api
+from xmodule.modulestore.django import modulestore
+
 from certificates.api import (
     get_active_web_certificate,
     get_certificate_url,
     emit_certificate_event,
-    has_html_certificates_enabled
+    has_html_certificates_enabled,
+    get_certificate_template
 )
 from certificates.models import (
     GeneratedCertificate,
@@ -30,7 +35,6 @@ from certificates.models import (
     CertificateSocialNetworks,
     BadgeAssertion
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -401,4 +405,11 @@ def render_html_view(request, user_id, course_id):
     context.update(course.cert_html_view_overrides)
 
     # FINALLY, generate and send the output the client
+    if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
+        custom_template = get_certificate_template(course_key, user_certificate.mode)
+        if custom_template:
+            template = Template(custom_template)
+            context = RequestContext(request, context)
+            return HttpResponse(template.render(context))
+
     return render_to_response("certificates/valid.html", context)
