@@ -1097,6 +1097,9 @@ FOOTER_CACHE_TIMEOUT = 30 * 60
 # Max age cache control header for the footer (controls browser caching).
 FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
 
+# Credit api notification cache timeout
+CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
+
 ################################# Deprecation warnings #####################
 
 # Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
@@ -2572,3 +2575,7 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
+
+# Credit notifications settings
+NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
+NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"

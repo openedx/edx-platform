@@ -1,0 +1,16 @@
+<%! from django.utils.translation import ugettext as _ %>
+${_("Hi {name},").format(name=full_name)}
+
+${_("Congratulations! You are eligible to receive university credit from edX and our partners!")}
+
+${_("Click on the link below to get your credit now")}
+
+${dashboard_link}
+
+${_("Credit from can help you get a jump start on your university degree, finish a degree already started, or fulfill requirements at a different academic institution.")}
+
+${_('To get university credit for {course_name}, simply go to your edX dashboard and click the yellow "Get Credit" button. No application, transcript, or grade report is required.').format(course_name=course_name)}
+
+${_("We hope you enjoyed the course, and we hope to see you in future edX courses!")}
+
+${_("The edX team")}
