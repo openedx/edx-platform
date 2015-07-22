@@ -557,9 +557,9 @@ class TestGetMembershipTriplets(ModuleStoreTestCase):
         self.make_ccx_membership()
         triplets = self.call_fut()
         self.assertEqual(len(triplets), 1)
-        ccx, membership, course = triplets[0]
+        ccx, membership, course_overview = triplets[0]
         self.assertEqual(ccx.id, self.ccx.id)
-        self.assertEqual(unicode(course.id), unicode(self.course.id))
+        self.assertEqual(unicode(course_overview.id), unicode(self.course.id))
         self.assertEqual(membership.student, self.user)
 
     def test_has_membership_org_filtered(self):
