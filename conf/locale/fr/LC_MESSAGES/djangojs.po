@@ -110,7 +110,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-21 15:33+0000\n"
+"POT-Creation-Date: 2015-07-22 17:43+0000\n"
 "PO-Revision-Date: 2015-07-15 21:53+0000\n"
 "Last-Translator: moocit-france <contact@moocit.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -2421,14 +2421,32 @@ msgstr "Balises : "
 msgid "name"
 msgstr "nom"
 
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open_slots"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "%(member_count)s / %(max_member_count)s Member"
+msgid_plural "%(member_count)s / %(max_member_count)s Members"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "View %(span_start)s %(team_name)s %(span_end)s"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Create new team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Course teams are organized into topics created by course instructors. Try to"
-" join others in an existing team before you decide to create a new team!"
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2441,6 +2459,14 @@ msgstr "Mes équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The page \"%(route)s\" could not be found."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The topic \"%(topic)s\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
@@ -3349,14 +3375,30 @@ msgstr "Une erreur est survenue, essayez à nouveau."
 msgid "Focus grabber"
 msgstr ""
 
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
 msgstr ""
 "Une erreur est survenue. Assurez-vous que vous êtes bien connecté à Internet"
 " et essayez de rafraîchir la page."
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Hide notes"
+msgstr "Masquer les notes"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes visible"
+msgstr "Notes visibles"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Show notes"
+msgstr "Afficher les notes"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes hidden"
+msgstr "Notes masquées"
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -3368,22 +3410,6 @@ msgstr ""
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
 msgstr "Onglet en cours"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hide notes"
-msgstr "Masquer les notes"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes visible"
-msgstr "Notes visibles"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Show notes"
-msgstr "Afficher les notes"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes hidden"
-msgstr "Notes masquées"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
