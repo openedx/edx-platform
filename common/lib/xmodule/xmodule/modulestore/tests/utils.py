@@ -172,4 +172,5 @@ class ProceduralCourseTestMixin(object):
                 )
                 descend(child, stack[1:])
 
-        descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
+        with self.store.bulk_operations(self.course.id):
+            descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
