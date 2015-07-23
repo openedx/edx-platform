@@ -18,6 +18,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
+from student.roles import (
+    GlobalStaff, CourseRole, OrgRole,
+    CourseStaffRole, CourseInstructorRole,
+    OrgStaffRole, OrgInstructorRole
+)
 
 from embargo.models import (
     RestrictedCourse, Country, CountryAccessRule,
@@ -166,7 +171,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
             # (restricted course, but pass all the checks)
             # This is the worst case, so it will hit all of the
             # caching code.
-            with self.assertNumQueries(3):
+            with self.assertNumQueries(4):
                 embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
 
             with self.assertNumQueries(0):
@@ -181,6 +186,45 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
         with self.assertNumQueries(0):
             embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+
+    @ddt.data(
+        GlobalStaff,
+        CourseStaffRole,
+        CourseInstructorRole,
+        OrgStaffRole,
+        OrgInstructorRole,
+    )
+    def test_staff_access_country_block(self, staff_role_cls):
+        # Add a country to the blacklist
+        CountryAccessRule.objects.create(
+            rule_type=CountryAccessRule.BLACKLIST_RULE,
+            restricted_course=self.restricted_course,
+            country=Country.objects.get(country='US')
+        )
+
+        # Appear to make a request from an IP in the blocked country
+        with self._mock_geoip('US'):
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+
+        # Expect that the user is blocked, because the user isn't staff
+        self.assertFalse(result, msg="User should not have access because the user isn't staff.")
+
+        # Instantiate the role, configuring it for this course or org
+        if issubclass(staff_role_cls, CourseRole):
+            staff_role = staff_role_cls(self.course.id)
+        elif issubclass(staff_role_cls, OrgRole):
+            staff_role = staff_role_cls(self.course.id.org)
+        else:
+            staff_role = staff_role_cls()
+
+        # Add the user to the role
+        staff_role.add_users(self.user)
+
+        # Now the user should have access
+        with self._mock_geoip('US'):
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+
+        self.assertTrue(result, msg="User should have access because the user is staff.")
 
     @contextmanager
     def _mock_geoip(self, country_code):
