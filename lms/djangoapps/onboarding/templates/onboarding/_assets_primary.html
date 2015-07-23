@@ -1,0 +1,27 @@
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%static:css group='style-onboarding'/>
+
+<script type="text/javascript" src="/i18n.js"></script>
+
+% if disable_courseware_js:
+  <%static:js group='base_vendor'/>
+  <%static:js group='base_application'/>
+% else:
+  <%static:js group='main_vendor'/>
+  <%static:js group='application'/>
+  <%static:js group='module-js'/>
+% endif
+
+<script>
+  window.baseUrl = "${settings.STATIC_URL}";
+  (function (require) {
+    require.config({
+        baseUrl: window.baseUrl
+    });
+  }).call(this, require || RequireJS.require);
+</script>
+<script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>

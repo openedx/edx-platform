@@ -1,0 +1,11 @@
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%include file="widgets/optimizely.html" />
+<%include file="widgets/segment-io.html" />
+<%include file="${google_analytics_file}" />
+<meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+
+<%block name="_head_analytics_extra"/>
