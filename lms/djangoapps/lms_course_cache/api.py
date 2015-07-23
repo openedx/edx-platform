@@ -19,28 +19,30 @@ def _get_cache_interface():
     global _cache_interface
     if not _cache_interface:
         _cache_interface = CourseCacheInterface(
-            get_cache('course_blocks_cache'),  # TODO: For Django 1.7+, use django.core.caches[cache_name].
-            LMS_COURSE_TRANSFORMATIONS
+            get_cache('default'),  # TODO: For Django 1.7+, use django.core.caches[cache_name].
+            'lms.djangoapps.lms_course_cache.course.',
+            'lms.djangoapps.lms_course_cache.block.',
+            LMS_COURSE_TRANSFORMATIONS,
         )
     return _cache_interface
 
 
-def get_course_blocks(user, course_key, root_block_key=None, transformations=LMS_COURSE_TRANSFORMATIONS):
+def get_course_blocks(user, course_key, transformations=LMS_COURSE_TRANSFORMATIONS, root_block_key=None):
     """
     Arguments:
         user (User)
         course_key (CourseKey): Course to which desired blocks belong.
+        transformations (list[Transformation])
         root_block_key (UsageKey): Usage key for root block in the subtree
             for which block information will be returned. Passing in the usage
             key of a course will return the entire user-specific course
             hierarchy.
-        transformations (list[Transformation])
 
     Returns:
         (CourseBlockStructure, dict[UsageKey: CourseBlockData])
     """
     return _get_cache_interface().get_course_blocks(
-        user, course_key, root_block_key, transformations
+        user, course_key, transformations, root_block_key,
     )
 
 

@@ -46,7 +46,7 @@ def _traverse_generic(
     # While there are more nodes on the stack...
     while stack:
 
-        # Take the top of the stack.
+        # Take a node off the top of the stack.
         curr_node = stack.pop()
 
         # If we're doing a topological traversal, then make sure all the node's
@@ -60,10 +60,6 @@ def _traverse_generic(
 
         visited.add(curr_node)
 
-        # Return the result it if it satisfies the predicate.
-        if predicate(curr_node):
-            yield get_result(curr_node)
-
         # Add its unvisited children to the stack in reverse order so that
         # they are popped off in their original order.
         unvisited_children = list(
@@ -73,6 +69,11 @@ def _traverse_generic(
         )
         unvisited_children.reverse()
         stack.extend(unvisited_children)
+
+        # Return the result it if it satisfies the predicate.
+        # TODO: Explain that we have to do this *after* calling get_children in order to make remove_block_if work.
+        if predicate(curr_node):
+            yield get_result(curr_node)
 
 
 def traverse_depth_first(

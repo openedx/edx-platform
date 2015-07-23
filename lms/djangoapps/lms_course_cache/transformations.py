@@ -13,21 +13,21 @@ class VisibilityTransformation(CourseStructureTransformation):
     """
     ...
     """
-    def collect(self, course_root_block, get_children, get_parents):
+    def collect(self, course_root_xblock, get_children, get_parents):
         """
         Computes any information for each XBlock that's necessary to execute
         this transformation's apply method.
 
         Arguments:
-            course_root_block (XBlock): Root block of entire course hierarchy.
+            course_root_xblock (XBlock): Root block of entire course hierarchy.
             get_children (XBlock -> list[XBlock])
             get_parents (XBlock -> list[XBlock])
 
         Returns:
             dict[UsageKey: dict]
         """
-        block_gen = traverse_topologically(
-            start_node=course_root_block,
+        xblock_gen = traverse_topologically(
+            start_node=course_root_xblock,
             get_parents=get_parents,
             get_children=get_children,
         )
@@ -36,15 +36,15 @@ class VisibilityTransformation(CourseStructureTransformation):
             else all
         )
         result_dict = {}
-        for block in block_gen:
+        for xblock in xblock_gen:
             # We know that all of the the block's parents have already been
             # visited because we're iterating over the result of a topological
             # sort.
-            result_dict[block.usage_key] = {
+            result_dict[xblock.location] = {
                 'visible_to_staff_only':
-                    block.visible_to_staff_only or compose_parent_access(
-                        result_dict[parent.usage_key]['visible_to_staff_only']
-                        for parent in get_parents(block)
+                    xblock.visible_to_staff_only or compose_parent_access(
+                        result_dict[parent.location]['visible_to_staff_only']
+                        for parent in get_parents(xblock)
                     )
             }
         return result_dict
@@ -60,7 +60,7 @@ class VisibilityTransformation(CourseStructureTransformation):
             block_data (dict[UsageKey: CourseBlockData])
         """
         if not _has_access_to_course(user, 'staff', course_key):
-            block_structure.remove_if(
+            block_structure.remove_block_if(
                 lambda usage_key: (
                     block_data[usage_key].get_transformation_data(
                         self, 'visible_to_staff_only'
