@@ -18,12 +18,12 @@
     @extend %reset-headings;
 
     &.emphasized {
-        color: $headings-primary-color;
+        color: $headings-emphasized-color;
         font-weight: $headings-font-weight-bold;
     }
 
     &.de-emphasized {
-        color: $headings-secondary-color;
+        color: $headings-de-emphasized-color;
     }
 }
 
@@ -44,37 +44,33 @@
 // Level one heading
 .hd-1 {
     margin-bottom: spacing-vertical(small);
-    font-size: font-size(xxx-large);
-    line-height: line-height(xx-large);
+    font-size: font-size(xxxx-large);
+    line-height: line-height(xxx-large);
 }
 
 
 // Level two heading
 .hd-2 {
     margin-bottom: spacing-vertical(small);
-    font-size: font-size(xx-large);
-    line-height: line-height(x-large);
+    font-size: font-size(xxx-large);
+    line-height: line-height(xx-large);
 }
 
 
 // Level three heading
 .hd-3 {
     margin-bottom: spacing-vertical(x-small);
-    font-size: font-size(x-large);
-    line-height: line-height(large);
-
-    &.de-emphasized {
-        color: palette(grayscale, base);
-    }
+    font-size: font-size(xx-large);
+    line-height: line-height(x-large);
 }
 
 
 // Level four heading
 .hd-4 {
     margin-bottom: spacing-vertical(x-small);
-    font-weight: font-weight(semi-bold);
-    font-size: font-size(large);
-    line-height: line-height(mid-small);
+    font-weight: font-weight(bold);
+    font-size: font-size(x-large);
+    line-height: line-height(small);
 }
 
 
@@ -82,8 +78,8 @@
 .hd-5 {
     margin-bottom: spacing-vertical(x-small);
     font-weight: font-weight(bold);
-    font-size: font-size(mid-large);
-    line-height: line-height(mid-large);
+    font-size: font-size(large);
+    line-height: line-height(large);
 }
 
 
@@ -91,12 +87,14 @@
 .hd-6 {
     margin-bottom: spacing-vertical(x-small);
     font-size: font-size(small);
-    line-height: line-height(mid-small);
+    line-height: line-height(small);
+    letter-spacing: letter-spacing(x-loose);
 }
 
 // Level seven heading
 .hd-7 {
     margin-bottom: spacing-vertical(x-small);
     font-size: font-size(x-small);
-    line-height: line-height(small);
+    line-height: line-height(x-small);
+    letter-spacing: letter-spacing(x-loose);
 }

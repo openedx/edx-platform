@@ -1,0 +1,51 @@
+@function get-keys($keys, $counter) {
+  $return: ();
+  @for $i from 1 to $counter {
+    $return: append($return, nth($keys, $i));
+  }
+  @return $return;
+}
+
+@function map-set($map, $key, $value) {
+  @return map-merge($map, ($key: $value));
+}
+
+@function map-set-deep($map, $keys, $value) {
+  $private-sassy-maps-suppress-warnings: true !global;
+  $length: length($keys);
+  $get-keys: ();
+  $map-level: ();
+
+
+  @if $length > 1 {
+    $get-keys: get-keys($keys, $length);
+    $map-level: map-get-deep($map, $get-keys);
+  }
+  $merge: (nth($keys, $length): $value);
+  @if $map-level {
+    $merge: map-merge($map-level, $merge);
+  }
+  @for $i from ($length * -1 + 1) through -1 {
+    $j: abs($i);
+    $key: nth($keys, $j);
+    //
+    // @debug $get-keys;
+    @if $j > 1 {
+      $get-keys: get-keys($keys, $j);
+      $map-level: map-get-deep($map, $get-keys);
+      @if $map-level {
+        $merge: map-merge($map-level, ($key: $merge));
+      }
+      @else {
+        $merge: ($key: $merge);
+      }
+    }
+    @else {
+      $merge: ($key: $merge);
+    }
+  }
+  $map: map-merge($map, $merge);
+
+  $private-sassy-maps-suppress-warnings: false !global;
+  @return $map;
+}

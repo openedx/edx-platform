@@ -14,6 +14,21 @@
 @import 'utilities';
 
 // ------------------------------
+// #COMPONENTS
+// ------------------------------
+@import '../../../../static/pattern-library/sass/components/colors';
+@import '../../../../static/pattern-library/sass/components/buttons';
+@import '../../../../static/pattern-library/sass/components/headings';
+@import '../../../../static/pattern-library/sass/components/copy';
+@import '../../../../static/pattern-library/sass/components/forms';
+@import '../../../../static/pattern-library/sass/components/grid';
+@import '../../../../static/pattern-library/sass/components/layouts';
+@import '../../../../static/pattern-library/sass/components/depth';
+
+@import 'components';
+
+// #HACK (@talbs) - moving base partials after components for ui depth extends
+// ------------------------------
 // #BASE
 // ------------------------------
 @import '../../../../static/pattern-library/sass/base/normalize';
@@ -21,16 +36,6 @@
 @import '../../../../static/pattern-library/sass/base/typography';
 
 @import 'base';
-
-// ------------------------------
-// #COMPONENTS
-// ------------------------------
-@import '../../../../static/pattern-library/sass/components/colors';
-@import '../../../../static/pattern-library/sass/components/buttons';
-@import '../../../../static/pattern-library/sass/components/headings';
-@import '../../../../static/pattern-library/sass/components/copy';
-
-@import 'components';
 
 // ------------------------------
 // #LAYOUTS

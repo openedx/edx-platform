@@ -1,0 +1,700 @@
+// ------------------------------
+// edX Pattern Library: Components - Layouts
+
+// About: Contains base settings and options for the preset default Pattern Library UI Layouts.
+// ----------------------------
+
+// #CONFIG
+// #GLOBALS
+// #UTILITY
+// #CANNED - IN VIEW
+// #CANNED - VIEW
+
+// ----------------------------
+
+// ----------------------------
+// #CONFIG
+// ----------------------------
+$susy-flush:            layout($susy-default inside); // set susy to make columns flush
+$susy-reversed:         layout($susy-default $grid-direction-reversed); // set susy to make columns display in reverse order
+$susy-view:             layout($susy-default auto); // set susy to make columns view display in reverse order
+$susy-view-flush:       layout($susy-default auto inside); // set susy to make view columns display in reverse order
+$susy-view-reversed:    layout($susy-default auto $grid-direction-reversed); // set susy to make view columns display in reverse order
+
+// ----------------------------
+// #GLOBALS
+// ----------------------------
+
+
+// ----------------------------
+// #UTILITY
+// ----------------------------
+
+// CASE: Layout with gutter-separated columns
+%layout-default {
+    @include container($susy-default);
+}
+
+// CASE: Layout with flush columns
+%layout-flush {
+    @include container($susy-flush);
+}
+
+// CASE: Layout with reversed columns
+%layout-reversed {
+    @include container($susy-reversed);
+}
+
+// CASE: View-based layout
+%layout-view {
+    @include container($susy-view);
+}
+
+// CASE: View-based layout with flush columns
+%layout-view-flush {
+    @include container($susy-view-flush);
+}
+
+// CASE: View-based layout with reversed columns
+%layout-view-reversed {
+    @include container($susy-view-reversed);
+}
+
+
+// basic layout column
+%layout-column {
+    @include span(full); // plan for mobile first
+}
+
+// ----------------------------
+// #CANNED - IN VIEW
+// ----------------------------
+
+// basic layout
+.layout {
+    @extend %layout-default;
+}
+
+// basic layout - flush
+.layout-flush {
+    @extend %layout-flush;
+}
+
+// basic columns
+.layout-col {
+    @extend %layout-column;
+}
+
+// Full Layout
+.layout-full {
+    @extend %layout-default;
+
+    .layout-col-a,
+    .layout-col-b,
+    .layout-col-c,
+    .layout-col-d {
+        @include span(full);
+    }
+}
+
+// 1/4 + 3/4 Layout
+.layout-1q3q {
+
+    // CASE: standard layout
+    &.layout {
+        @extend %layout-default;
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(9 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-flush {
+        @extend %layout-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-flush) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(9 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-reversed {
+        @extend %layout-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-reversed) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(9 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/3 + 1/3 + 1/3 Layout
+.layout-1t1t1t {
+
+    // CASE: standard layout
+    &.layout {
+        @extend %layout-default;
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .layout-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(4 of 12);
+            }
+
+            .layout-col-c {
+                @include span(4 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-flush {
+        @extend %layout-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-flush) {
+
+            .layout-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(4 of 12);
+            }
+
+            .layout-col-c {
+                @include span(4 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-reversed {
+        @extend %layout-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-reversed) {
+
+            .layout-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(4 of 12);
+            }
+
+            .layout-col-c {
+                @include span(4 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/3 + 2/3 Layout
+.layout-1t2t {
+
+    // CASE: standard layout
+    &.layout {
+        @extend %layout-default;
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .layout-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(8 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-flush {
+        @extend %layout-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-flush) {
+
+            .layout-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(8 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-reversed {
+        @extend %layout-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-reversed) {
+
+            .layout-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(8 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/2 + 1/2 Layout
+.layout-1h1h {
+
+    // CASE: standard layout
+    &.layout {
+        @extend %layout-default;
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .layout-col-a {
+                @include span(6 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-flush {
+        @extend %layout-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-flush) {
+
+            .layout-col-a {
+                @include span(6 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-reversed {
+        @extend %layout-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-reversed) {
+
+            .layout-col-a {
+                @include span(6 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/4 + 1/2 + 1/4 Layout
+.layout-1q1h1q {
+
+    // CASE: standard layout
+    &.layout {
+        @extend %layout-default;
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(6 of 12);
+            }
+
+            .layout-col-c {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-flush {
+        @extend %layout-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-flush) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(6 of 12);
+            }
+
+            .layout-col-c {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-reversed {
+        @extend %layout-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-reversed) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(6 of 12);
+            }
+
+            .layout-col-c {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/4 + 1/4 + 1/2 Layout
+.layout-1q1q1h {
+
+    // CASE: standard layout
+    &.layout {
+        @extend %layout-default;
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(3 of 12);
+            }
+
+            .layout-col-c {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-flush {
+        @extend %layout-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-flush) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(3 of 12);
+            }
+
+            .layout-col-c {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-reversed {
+        @extend %layout-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-reversed) {
+
+            .layout-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-col-b {
+                @include span(3 of 12);
+            }
+
+            .layout-col-c {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+}
+
+// ----------------------------
+// #CANNED - VIEW
+// ----------------------------
+// 1/2 + 1/2 View Layout
+.layout-view-1h1h {
+
+    // CASE: standard layout
+    &.layout-view {
+        @extend %layout-view;
+        @include susy-breakpoint($bp-screen-md, $susy-view) {
+
+            .layout-view-col-a {
+                @include span(6 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-view-flush {
+        @extend %layout-view-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-view-flush) {
+
+            .layout-view-col-a {
+                @include span(6 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-view-reversed {
+        @extend %layout-view-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-view-reversed) {
+
+            .layout-view-col-a {
+                @include span(6 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(6 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/3 + 1/3 + 1/3 View Layout
+.layout-view-1t1t1t {
+
+    // CASE: standard layout
+    &.layout-view {
+        @extend %layout-view;
+        @include susy-breakpoint($bp-screen-md, $susy-view) {
+
+            .layout-view-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(4 of 12);
+            }
+
+            .layout-view-col-c {
+                @include span(4 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-view-flush {
+        @extend %layout-view-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-view-flush) {
+
+            .layout-view-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(4 of 12);
+            }
+
+            .layout-view-col-c {
+                @include span(4 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-view-reversed {
+        @extend %layout-view-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-view-reversed) {
+
+            .layout-view-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(4 of 12);
+            }
+
+            .layout-view-col-c {
+                @include span(4 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/4 + 1/2 + 1/4 View Layout
+.layout-view-1q1h1q {
+
+    // CASE: standard layout
+    &.layout-view {
+        @extend %layout-view;
+        @include susy-breakpoint($bp-screen-md, $susy-view) {
+
+            .layout-view-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(6 of 12);
+            }
+
+            .layout-view-col-c {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-view-flush {
+        @extend %layout-view-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-view-flush) {
+
+            .layout-view-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(6 of 12);
+            }
+
+            .layout-view-col-c {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-view-reversed {
+        @extend %layout-view-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-view-reversed) {
+
+            .layout-view-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(6 of 12);
+            }
+
+            .layout-view-col-c {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/3 + 2/3 View Layout
+.layout-view-1t2t {
+
+    // CASE: standard layout
+    &.layout-view {
+        @extend %layout-view;
+        @include susy-breakpoint($bp-screen-md, $susy-view) {
+
+            .layout-view-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(8 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-view-flush {
+        @extend %layout-view-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-view-flush) {
+
+            .layout-view-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(8 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-view-reversed {
+        @extend %layout-view-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-view-reversed) {
+
+            .layout-view-col-a {
+                @include span(4 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(8 of 12 last);
+            }
+        }
+    }
+}
+
+// 1/4 + 3/4 View Layout
+.layout-view-1q3q {
+
+    // CASE: standard layout
+    &.layout-view {
+        @extend %layout-view;
+        @include susy-breakpoint($bp-screen-md, $susy-view) {
+
+            .layout-view-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(9 of 12 last);
+            }
+        }
+    }
+
+    // CASE: flush layout
+    &.layout-view-flush {
+        @extend %layout-view-flush;
+        @include susy-breakpoint($bp-screen-md, $susy-view-flush) {
+
+            .layout-view-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(9 of 12 last);
+            }
+        }
+    }
+
+    // CASE: reversed layout
+    &.layout-view-reversed {
+        @extend %layout-view-reversed;
+        @include susy-breakpoint($bp-screen-md, $susy-view-reversed) {
+
+            .layout-view-col-a {
+                @include span(3 of 12 first);
+            }
+
+            .layout-view-col-b {
+                @include span(9 of 12 last);
+            }
+        }
+    }
+}

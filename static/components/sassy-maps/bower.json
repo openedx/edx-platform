@@ -1,0 +1,23 @@
+{
+  "name": "sassy-maps",
+  "version": "0.4.0",
+  "authors": [
+    "Sam Richard <snugug@gmail.com>"
+  ],
+  "main": "sass/_sassy-maps.scss",
+  "devDependencies": {},
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "components",
+    "tests",
+    "Gemfile",
+    "images",
+    "fonts",
+    "js",
+    "package.json",
+    "config.*",
+    "*.gem"
+  ]
+}

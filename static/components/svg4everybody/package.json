@@ -1,0 +1,12 @@
+{
+	"name" : "svg4everybody",
+	"description" : "Use external SVG spritemaps today",
+	"homepage" : "https://github.com/jonathantneal/svg4everybody",
+	"keywords" : ["svg", "sprites", "spritemaps", "symbol", "defs", "ie8", "ie9", "external", "icon", "fallback"],
+	"author" : "Jonathan Neal <https://github.com/jonathantneal>",
+	"contributors" : [],
+	"dependencies" : [],
+	"main": "svg4everybody.js",
+	"repository" : {"type": "git", "url": "git@github.com:jonathantneal/svg4everybody.git"},
+	"version" : "1.0.0"
+}
