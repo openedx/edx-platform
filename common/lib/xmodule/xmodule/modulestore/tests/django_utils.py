@@ -371,54 +371,54 @@ class ModuleStoreTestCase(TestCase):
         """
         Create an equivalent to the toy xml course
         """
-#        with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
-        self.toy_loc = self.create_sample_course(  # pylint: disable=attribute-defined-outside-init
-            org, course, run, TOY_BLOCK_INFO_TREE,
-            {
-                "textbooks": [["Textbook", "https://s3.amazonaws.com/edx-textbooks/guttag_computation_v3/"]],
-                "wiki_slug": "toy",
-                "display_name": "Toy Course",
-                "graded": True,
-                "discussion_topics": {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
-                "graceperiod": datetime.timedelta(days=2, seconds=21599),
-                "start": datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
-                "xml_attributes": {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
-                "pdf_textbooks": [
-                    {
-                        "tab_title": "Sample Multi Chapter Textbook",
-                        "id": "MyTextbook",
-                        "chapters": [
-                            {"url": "/static/Chapter1.pdf", "title": "Chapter 1"},
-                            {"url": "/static/Chapter2.pdf", "title": "Chapter 2"}
-                        ]
-                    }
-                ],
-                "course_image": "just_a_test.jpg",
-            }
-        )
-        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.toy_loc):
-            self.store.create_item(
-                self.user.id, self.toy_loc, "about", block_id="short_description",
-                fields={"data": "A course about toys."}
+        with self.store.bulk_operations(self.store.make_course_key(org, course, run), emit_signals=False):
+            self.toy_loc = self.create_sample_course(  # pylint: disable=attribute-defined-outside-init
+                org, course, run, TOY_BLOCK_INFO_TREE,
+                {
+                    "textbooks": [["Textbook", "https://s3.amazonaws.com/edx-textbooks/guttag_computation_v3/"]],
+                    "wiki_slug": "toy",
+                    "display_name": "Toy Course",
+                    "graded": True,
+                    "discussion_topics": {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
+                    "graceperiod": datetime.timedelta(days=2, seconds=21599),
+                    "start": datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+                    "xml_attributes": {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
+                    "pdf_textbooks": [
+                        {
+                            "tab_title": "Sample Multi Chapter Textbook",
+                            "id": "MyTextbook",
+                            "chapters": [
+                                {"url": "/static/Chapter1.pdf", "title": "Chapter 1"},
+                                {"url": "/static/Chapter2.pdf", "title": "Chapter 2"}
+                            ]
+                        }
+                    ],
+                    "course_image": "just_a_test.jpg",
+                }
             )
-            self.store.create_item(
-                self.user.id, self.toy_loc, "about", block_id="effort",
-                fields={"data": "6 hours"}
-            )
-            self.store.create_item(
-                self.user.id, self.toy_loc, "about", block_id="end_date",
-                fields={"data": "TBD"}
-            )
-            self.store.create_item(
-                self.user.id, self.toy_loc, "course_info", "handouts",
-                fields={"data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>"}
-            )
-            self.store.create_item(
-                self.user.id, self.toy_loc, "static_tab", "resources",
-                fields={"display_name": "Resources"},
-            )
-            self.store.create_item(
-                self.user.id, self.toy_loc, "static_tab", "syllabus",
-                fields={"display_name": "Syllabus"},
-            )
-        return self.toy_loc
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.toy_loc):
+                self.store.create_item(
+                    self.user.id, self.toy_loc, "about", block_id="short_description",
+                    fields={"data": "A course about toys."}
+                )
+                self.store.create_item(
+                    self.user.id, self.toy_loc, "about", block_id="effort",
+                    fields={"data": "6 hours"}
+                )
+                self.store.create_item(
+                    self.user.id, self.toy_loc, "about", block_id="end_date",
+                    fields={"data": "TBD"}
+                )
+                self.store.create_item(
+                    self.user.id, self.toy_loc, "course_info", "handouts",
+                    fields={"data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>"}
+                )
+                self.store.create_item(
+                    self.user.id, self.toy_loc, "static_tab", "resources",
+                    fields={"display_name": "Resources"},
+                )
+                self.store.create_item(
+                    self.user.id, self.toy_loc, "static_tab", "syllabus",
+                    fields={"display_name": "Syllabus"},
+                )
+            return self.toy_loc
