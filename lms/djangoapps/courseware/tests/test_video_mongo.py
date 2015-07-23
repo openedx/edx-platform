@@ -3,6 +3,7 @@
 import ddt
 import itertools
 import json
+import textwrap
 from collections import OrderedDict
 
 from lxml import etree
@@ -17,6 +18,7 @@ from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.tests.test_import import DummySystem
+from xmodule.contentstore.django import contentstore
 
 from edxval.api import (
     create_profile, create_video, get_video_info, ValCannotCreateError, ValVideoNotFoundError
@@ -473,7 +475,29 @@ class TestGetHtmlMethod(BaseTestXmodule):
         self.assertIn("example_source.mp4", self.item_descriptor.render(STUDENT_VIEW).content)
 
     @patch('edxval.api.get_video_info')
-    def test_get_html_with_mocked_edx_video_id(self, mock_get_video_info):
+    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    def test_get_html_with_mocked_edx_video_id(self, mock_get_transcript, mock_get_video_info):
+
+        def mock_requests_youtube(*args, **kwargs):
+            """
+            Returns mock responses for the youtube API.
+            """
+            # pylint: disable=unused-argument
+            response_transcript_list = '<transcript_list></transcript_list>'
+            response_transcript = textwrap.dedent("""
+            <transcript>
+                <text start="100" dur="100">subs #1</text>
+                <text start="200" dur="40">subs #2</text>
+                <text start="240" dur="140">subs #3</text>
+            </transcript>
+            """)
+            if kwargs == {'params': {'lang': 'en', 'v': 'test_video_youtube'}}:
+                return Mock(status_code=200, text=response_transcript, content=response_transcript)
+            elif kwargs == {'params': {'type': 'list', 'v': 'test_video_youtube'}}:
+                return Mock(status_code=200, text=response_transcript_list, content=response_transcript_list)
+            return Mock(status_code=404, text='')
+
+        mock_get_transcript.side_effect = mock_requests_youtube
         mock_get_video_info.return_value = {
             'url': '/edxval/video/example',
             'edx_video_id': u'example',
@@ -485,14 +509,19 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     'file_size': 25556,
                     'bitrate': 9600,
                     'profile': u'desktop_mp4'
+                },
+                {
+                    'url': u'test_video_youtube',
+                    'file_size': 0,
+                    'bitrate': 0,
+                    'profile': u'youtube'
                 }
             ]
         }
-
         SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
-            sub="a_sub_file.srt.sjson" source="{source}"
+            source="{source}"
             download_video="{download_video}"
             start_time="01:00:03" end_time="01:00:10"
             edx_video_id="{edx_video_id}"
@@ -519,6 +548,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         # Video found for edx_video_id
         metadata = self.default_metadata_dict
+        metadata["streams"] = "1.00:test_video_youtube"
+        metadata["sub"] = "test_video_youtube"
         metadata['autoplay'] = False
         metadata['sources'] = ""
         initial_context = {
@@ -547,10 +578,18 @@ class TestGetHtmlMethod(BaseTestXmodule):
             sources=data['sources'],
             edx_video_id=data['edx_video_id']
         )
+
         self.initialize_module(data=DATA)
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
+        item = self.store.get_item(self.item_descriptor.location)
+        self.assertEqual(item.sub, "test_video_youtube")
+        assets, count = contentstore().get_all_content_for_course(self.course.id)
+        self.assertIn("test_video_youtube", assets[0]['displayname'])
+        self.assertEqual(count, 1)
+
         expected_context = dict(initial_context)
+
         expected_context['metadata'].update({
             'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation/__lang__'

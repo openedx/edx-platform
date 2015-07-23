@@ -109,7 +109,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
-    user = Mock(name='get_test_system.user', is_staff=False)
+    user = Mock(name='get_test_system.user', is_staff=False, id=1)
 
     descriptor_system = get_test_descriptor_system()
 

@@ -24,6 +24,8 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.cache import cache
 
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xblock.core import XBlock
@@ -37,7 +39,11 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.exceptions import NotFoundError
 
-from .transcripts_utils import VideoTranscriptsMixin
+from .transcripts_utils import (
+    VideoTranscriptsMixin,
+    download_youtube_subs,
+    GetTranscriptsFromYouTubeException
+)
 from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
 from .bumper_utils import bumperize
 from .video_xfields import VideoFields
@@ -191,6 +197,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         download_video_link = None
         branding_info = None
         youtube_streams = ""
+        youtube_sub = ''
 
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
@@ -199,6 +206,25 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             try:
                 val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
                 val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
+
+                # download youtube transcript for html5 video
+                if not self.sub and val_video_urls["youtube"]:
+                    #cache the transcript request
+                    cache_key = 'html5_' + val_video_urls["youtube"]
+                    html5_transcript_cache = cache.get(cache_key)
+                    if not html5_transcript_cache:
+                        try:
+                            download_youtube_subs(val_video_urls["youtube"], self, settings)
+                            item = self.runtime.modulestore.get_item(self.location)
+                            youtube_sub = val_video_urls["youtube"]
+                            item.sub = youtube_sub
+                            user = User.objects.get(id=self.system.user_id)
+                            item.save_with_metadata(user)
+                            transcript_found = True
+                        except GetTranscriptsFromYouTubeException:
+                            transcript_found = False
+
+                        cache.set(cache_key, {'youtube_hit': True, 'found': transcript_found})
 
                 # VAL will always give us the keys for the profiles we asked for, but
                 # if it doesn't have an encoded video entry for that Video + Profile, the
@@ -275,7 +301,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'streams': self.youtube_streams,
-            'sub': self.sub,
+            'sub': self.sub or youtube_sub,
             'sources': sources,
 
             # This won't work when we move to data that
