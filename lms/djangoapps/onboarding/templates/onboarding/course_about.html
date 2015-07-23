@@ -1,0 +1,10 @@
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="/page_skeleton.html" />
+
+<h1>edX course about!</h1>
+
+<p>This is the ${course_key_string} course!</p>
