@@ -82,7 +82,6 @@ class SequenceFields(object):
 
 
 @XBlock.needs('proctoring')
-@XBlock.needs('user')
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -153,8 +152,11 @@ class SequenceModule(SequenceFields, XModule):
 
             # Is the feature turned on?
             if proctoring_service.is_feature_enabled():
-                user_service = self.runtime.service(self, 'user')
-                user_id = user_service.get_current_user().opt_attrs['edx-platform.user_id']
+                user_id = self.runtime.user.id
+                user_role_in_course = self.runtime.get_user_role(
+                    user=self.runtime.user,
+                    course_id=self.runtime.course_id
+                )
                 course_id = self.runtime.course_id
                 content_id = self.location
 
@@ -162,13 +164,14 @@ class SequenceModule(SequenceFields, XModule):
                 # a special view to the student rather
                 # than the actual sequence content
                 view_html = proctoring_service.get_student_view(
-                    user_id,
-                    course_id,
-                    content_id,
-                    {
+                    user_id=user_id,
+                    course_id=course_id,
+                    content_id=content_id,
+                    context={
                         'display_name': self.display_name,
-                        'default_time_limit_mins': self.default_time_limit_mins,
-                    }
+                        'default_time_limit_mins': self.default_time_limit_mins
+                    },
+                    user_role=user_role_in_course
                 )
 
                 if view_html:
