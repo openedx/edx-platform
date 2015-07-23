@@ -18,7 +18,6 @@ import dogstats_wrapper as dog_stats_api
 
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator
 from xblock.core import XBlock
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from xmodule.tabs import CourseTab
@@ -122,7 +121,7 @@ class CourseFactory(XModuleFactory):
         default_store_override = kwargs.pop('default_store', None)
 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            course_key = CourseLocator(org=org, course=number, run=run)
+            course_key = store.make_course_key(org, number, run)
             with store.bulk_operations(course_key, emit_signals=emit_signals):
                 if default_store_override is not None:
                     with store.default_store(default_store_override):
