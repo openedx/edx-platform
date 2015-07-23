@@ -662,8 +662,16 @@ def dashboard(request):
             user, course_org_filter, org_filter_out_set
         )
 
+    if 'notlive' in request.GET:
+        redirect_message = _("The course you are looking for does not start until {0}.").format(
+            request.GET['notlive']
+        )
+    else:
+        redirect_message = ''
+
     context = {
         'enrollment_message': enrollment_message,
+        'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
         'course_optouts': course_optouts,
         'message': message,
