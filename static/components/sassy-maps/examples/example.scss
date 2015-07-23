@@ -1,0 +1,46 @@
+@import "sassy-maps";
+
+$map: (400: "value", "key2": "value2", "key3": ("foo": "bar", "baz": ("waldo": "qux"), 'steve': 'perry'), "bob": "george");
+// @debug $map;
+$string: inspect($map);
+// @debug type-of($string);
+// @debug $string;
+
+$map: map-set($map, 'key2', 'value3');
+// @debug $map;
+
+@debug map-get-deep($map, 'key4', 'nine', 'eight');
+
+@debug $map;
+$map: map-set-deep($map, ('key3' 'baz' 'waldo'), "molly");
+$map: map-set-deep($map, ('key3' 'baz' 'qux'), 'quark');
+$map: map-set-deep($map, ('key3' 'jedi' 'vader'), 'red');
+$map: map-set-deep($map, ('key3' 'jedi' 'luke'), 'green');
+$map: map-set-deep($map, ('key4' 'nine' 'eight'), 'seven');
+@debug $map;
+
+@import "memo";
+
+@include memo-set(singularity, 2 .75 split, 50%);
+@include memo-set(singularity, 2 .5 split, 75%);
+
+@import "memo";
+
+$memo-exists: function-exists(memo-get) and function-exists(memo-set);
+
+@function percentage($target, $context) {
+  $result: memo-get(percentage, $target $context);
+
+  @if not ($memo-exists and $result != null) {
+    $result: $target / $context * 100%;
+    $holder: memo-set(percentage, $target $context, $result);
+  }
+
+  @return $result;
+}
+
+$half: percentage(20px, 40px);
+$half-again: percentage(20px, 40px);
+
+@debug $Memoization-Table;
+@debug memo-get(singularity, 2 .75 split);

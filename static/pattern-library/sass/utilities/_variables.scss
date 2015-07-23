@@ -22,25 +22,27 @@ $em-base: 16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs
 // #GRID
 // ----------------------------
 // grid - baseline
-$baseline:               20;
-$baseline-vertical:      ($baseline*2);
-$baseline-horizontal:    $baseline;
+$baseline:                   20 !default;
+$baseline-vertical:          ($baseline*2) !default;
+$baseline-horizontal:        $baseline !default;
 
-$susy: (
-    use-custom clearfix: true,
-    global-box-sizing: border-box,
-    math: fluid,
-    output: float,
-    columns: 12,
-    gutters: .5,
-    container: rem(1170),
-);
+// grid - dimensions
+$grid-max-width:             rem(1170) !default;
+$grid-column-count:          12 !default;
+$grid-gutter-width:          (1/3) !default;  // set to fraction to be proportional to fluid column widths (see - http://susydocs.oddbird.net/en/latest/settings/#gutters)
+$grid-container-position:    center !default;
+$grid-gutter-position:       after !default;
+$grid-manual-gutter-position: inside !default;
+$grid-column-width:          false !default;  // set to false for fluid columns by default (see - http://susydocs.oddbird.net/en/latest/settings/#column-width)
+$grid-debug-color:           rgba(203, 89, 141, 0.33) !default;
+$grid-debug-color-alt:       rgba(0, 121, 188, 0.33) !default;
 
 // grid - breakpoints
-$bp-small:  320px;
-$bp-medium: 768px;
-$bp-large:  1024px;
-$bp-huge:   1280px;
+$bp-screen-sm:                320px !default;
+$bp-screen-md:                768px !default;
+$bp-screen-lg:                1024px !default;
+$bp-screen-xl:               1280px !default;
+
 
 // ----------------------------
 // #COLORS
@@ -57,15 +59,15 @@ $blue:                      rgb(0, 121, 188);
 $pink:                      rgb(203, 89, 141);
 
 // colors: brand
-$brand-primary:             $blue;
-$brand-primary-accent:      rgb(14, 166, 236);
-$brand-secondary:           $pink;
-$brand-secondary-accent:    rgb(242, 108, 170);
+$brand-primary:             $blue !default;
+$brand-primary-accent:      rgb(14, 166, 236) !default;
+$brand-secondary:           $pink !default;
+$brand-secondary-accent:    rgb(242, 108, 170) !default;
 
 // colors: utilities
-$success: $green;
-$warning: $yellow;
-$error: $red;
+$success: $green !default;
+$warning: $yellow !default;
+$error: $red !default;
 
 // colors: palettes
 $palettes: (
@@ -90,6 +92,7 @@ $palettes: (
         base:       $gray,
         light:      tint($gray, 50%),
         x-light:    tint($gray, 75%),
+        xx-light:   tint($gray, 85%),
         white:      tint($gray, 97%),
         white-t:    tint($gray, 100%),
         dark:       shade($gray, 40%),
@@ -104,6 +107,7 @@ $palettes: (
         base:       $gray-cool,
         light:      tint($gray-cool, 50%),
         x-light:    tint($gray-cool, 75%),
+        xx-light:   tint($gray-cool, 85%),
         dark:       shade($gray-cool, 50%),
         x-dark:     shade($gray-cool, 75%),
         trans:      transparentize($gray-cool, 0.50),
@@ -113,105 +117,121 @@ $palettes: (
     success: (
         base:       $success,
         light:      tint($success, 33%),
-        dark:       shade($success, 33%)
+        dark:       shade($success, 33%),
+        trans:      transparentize($success, 0.50),
+        x-trans:    transparentize($success, 0.75),
+        xx-trans:   transparentize($success, 0.95)
     ),
     error: (
         base:       $error,
         light:      tint($error, 33%),
-        dark:       shade($error, 33%)
+        dark:       shade($error, 33%),
+        trans:      transparentize($error, 0.50),
+        x-trans:    transparentize($error, 0.75),
+        xx-trans:   transparentize($error, 0.95)
     ),
     warning: (
         base:       $warning,
         light:      tint($warning, 33%),
-        dark:       shade($warning, 33%)
+        dark:       shade($warning, 33%),
+        trans:      transparentize($warning, 0.50),
+        x-trans:    transparentize($warning, 0.75),
+        xx-trans:   transparentize($warning, 0.95)
     ),
 );
+
+// shadows
+// using black-t because using a gray looks weird when it appears over black
+$shadow: transparentize(palette(grayscale, black-t), .5);
+
 
 // ----------------------------
 // #TYPOGRAPHY
 // ----------------------------
+
+$font-path: '../fonts' !default;
+
 // typography: config
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Light-webfont',
+    '#{$font-path}/OpenSans/OpenSans-Light-webfont',
     300,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-LightItalic-webfont',
+    '#{$font-path}/OpenSans/OpenSans-LightItalic-webfont',
     300,
     italic,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Regular-webfont',
+    '#{$font-path}/OpenSans/OpenSans-Regular-webfont',
     400,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Italic-webfont',
+    '#{$font-path}/OpenSans/OpenSans-Italic-webfont',
     400,
     italic,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Semibold-webfont',
+    '#{$font-path}/OpenSans/OpenSans-Semibold-webfont',
     600,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-SemiboldItalic-webfont',
+    '#{$font-path}/OpenSans/OpenSans-SemiboldItalic-webfont',
     600,
     italic,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Bold-webfont',
+    '#{$font-path}/OpenSans/OpenSans-Bold-webfont',
     700,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-BoldItalic-webfont',
+    '#{$font-path}/OpenSans/OpenSans-BoldItalic-webfont',
     700,
     italic,
     $file-formats: woff woff2 ttf
 );
 
 // typography: config - stacks
-$font-family-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-family-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
-
-// typography: config - scale
-$modular-scale-ratio: $perfect-fourth;
+$font-family-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif !default;
+$font-family-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace !default;
 
 // typography: sizes
 $font-sizes: (
-    xxx-large:      38,
-    xx-large:       28,
-    x-large:        24,
-    large:          21,
-    mid-large:      18,
+    xxxx-large:     38,
+    xxx-large:      28,
+    xx-large:       24,
+    x-large:        21,
+    large:          18,
     base:           16,
     small:          14,
     x-small:        12,
+    xx-small:       11,
+    xxx-small:      10,
 );
 
 // typography: line-height
 $line-heights: (
+    xxx-large:      1.40,
     xx-large:       1.40,
-    x-large:        1.40,
-    large:          1.50,
-    mid-large:      1.60,
-    mid-small:      1.60,
-    small:          1.5,
+    x-large:        1.50,
+    large:          1.60,
     base:           1.5,
+    small:          1.60,
+    x-small:        1.5,
     none:           0
 );
 
@@ -221,8 +241,7 @@ $font-weights: (
     light:          300,
     x-light:        200,
     semi-bold:      600,
-    bold:           700,
-    x-bold:         800
+    bold:           700
 );
 
 // typography: letter-spacing
@@ -231,10 +250,11 @@ $letter-spacing: (
     xx-tight:       -3,
     x-tight:        -2,
     tight:          -.095,
-    loose:          -.075,
-    x-loose:        -.025,
-    xx-loose:       3
+    loose:          .5,
+    x-loose:        1,
+    xx-loose:       2
 );
+
 
 // ----------------------------
 // #DEPTH
@@ -254,7 +274,7 @@ $spacing-vertical: (
     mid-small:  ($baseline-vertical*0.75),
     small:      ($baseline-vertical/2),
     x-small:    ($baseline-vertical/4),
-    xx-small:    ($baseline-vertical/8),
+    xx-small:   ($baseline-vertical/8),
     mid-large:  ($baseline-vertical*1.5),
     large:      ($baseline-vertical*2),
     x-large:    ($baseline-vertical*4)
@@ -284,62 +304,124 @@ $timing: (
     xx-fast:    0.125s
 );
 
+
+// ----------------------------
+// #FORMS
+// ----------------------------
+// form inputs: heights
+// values are "rows" which maps to line-height
+// primarily used in textareas
+$input-height: (
+    short:          5,
+    base:           10,
+    tall:           15
+);
+
+// form inputs: widths
+$input-width: (
+    short:          150,
+    base:           300,
+    wide:           450,
+    block:          null // value here is irrelevant but required. Null is easy to understand.
+);
+
+
 // ----------------------------
 // #APPLICATIONS
 // ----------------------------
-// scaffolding
-$view-bg: palette(grayscale, xx-light);
-
 // base component settings
-$component-focus-color: inherit;
-$component-focus-bg: palette(primary, x-light);
-$component-active-color: palette(grayscale, white);
-$component-active-bg: palette(primary, base);
+$component-focus-color: inherit !default;
+$component-focus-bg: palette(primary, x-light) !default;
+$component-active-color: palette(grayscale, white) !default;
+$component-active-bg: palette(primary, base) !default;
 
 // base text settings
-$text-base-font-family: $font-family-sans-serif;
-$text-base-color: palette(grayscale, dark);
-$text-base-font-weight: font-weight(normal);
-$text-base-focus-color: palette(grayscale, x-dark);
+$text-base-font-family: $font-family-sans-serif !default;
+$text-base-color: palette(grayscale, x-dark) !default;
+$text-base-font-weight: font-weight(normal) !default;
+$text-base-focus-color: palette(grayscale, black-t) !default;
 
-$text-emphasized-color: palette(grayscale, x-dark);
-$text-emphasized-font-weight: font-weight(normal);
+$text-emphasized-color: palette(grayscale, black-t) !default;
+$text-emphasized-font-weight: font-weight(normal) !default;
 
-$text-de-emphasized-color: palette(grayscale, base);
-$text-de-emphasized-font-weight: font-weight(normal);
+$text-de-emphasized-color: palette(grayscale, dark) !default;
+$text-de-emphasized-font-weight: font-weight(normal) !default;
 
 // links
-$link-color: palette(primary, base);
-$link-focus-color: palette(primary, sat);
-$link-visited-color: palette(primary, dark);
+$link-color: palette(primary, dark) !default;
+$link-focus-color: palette(primary, base) !default;
+$link-visited-color: palette(primary, dark) !default;
 
 // headings
-$headings-font-weight-normal: font-weight(normal);
-$headings-font-weight-bold: font-weight(semi-bold);
-$headings-font-weight-x-bold: font-weight(bold);
+$headings-font-weight-normal: font-weight(normal) !default;
+$headings-font-weight-bold: font-weight(semi-bold) !default;
+$headings-font-weight-x-bold: font-weight(bold) !default;
 
-$headings-base-font-family: $font-family-sans-serif;
-$headings-base-font-weight: $headings-font-weight-normal;
-$headings-base-color: palette(grayscale, x-dark);
+$headings-base-font-family: $font-family-sans-serif !default;
+$headings-base-font-weight: $headings-font-weight-normal !default;
+$headings-base-color: palette(grayscale, x-dark) !default;
 
-$headings-primary-font-family: $font-family-sans-serif;
-$headings-primary-color: palette(grayscale, black);
+$headings-emphasized-font-family: $font-family-sans-serif !default;
+$headings-emphasized-color: palette(grayscale, black-t) !default;
 
-$headings-secondary-font-family: $font-family-sans-serif;
-$headings-secondary-color: palette(grayscale, base);
+$headings-de-emphasized-font-family: $font-family-sans-serif !default;
+$headings-de-emphasized-color: palette(grayscale, dark) !default;
 
 // buttons
-$buttons-border-style: solid;
-$buttons-border-size: 1px;
-$buttons-elevated-shadow: 3px;
-$buttons-border-radius: 3px;
-$buttons-font-weight: font-weight(semi-bold);
+$buttons-border-style: solid !default;
+$buttons-border-size: 1px !default;
+$buttons-elevated-shadow: 3px !default;
+$buttons-border-radius: 3px !default;
+$buttons-font-weight: font-weight(semi-bold) !default;
+
+// forms
+$label-color: $text-base-color !default;
+$label-color-active: palette(grayscale, x-dark) !default;
+
+$input-placeholder-text: palette(grayscale-cool, light) !default;
+
+$input-background-default: palette(grayscale, white) !default;
+$input-background-default-focus: $input-background-default !default;
+$input-check-radio-background-default: palette(grayscale-cool, x-light) !default;
+$input-check-radio-background-checked: palette(primary, base) !default;
+$input-border-default: palette(grayscale, x-light) !default;
+$input-border-default-focus: palette(primary, accent) !default;
+$input-control-color: palette(primary, base) !default;
+$input-text-default: palette(grayscale-cool, x-dark) !default;
+$input-text-default-hover: palette(grayscale-cool, x-dark) !default;
+
+$input-background-disabled: palette(grayscale-cool, x-light) !default;
+$input-border-disabled: palette(grayscale-cool, light) !default;
+$input-text-disabled: palette(grayscale-cool, light) !default;
+
+$input-alt-background: $transparent !default;
+$input-alt-border-focus: palette(grayscale, x-dark) !default;
+
+$input-slider-track-default: palette(grayscale, x-light) !default;
+$input-slider-border-default: $input-slider-track-default !default;
+$input-slider-border-default-radius: $buttons-border-radius !default;
+$input-slider-handle-default: palette(primary, light) !default;
+$input-slider-handle-default-hover: palette(primary, base) !default;
+$input-slider-default-focus: palette(primary, accent) !default;
+$input-slider-default-hover: palette(primary, x-accent) !default;
+$input-slider-track-disabled: palette(grayscale, x-light) !default;
+$input-slider-disabled-border: $input-slider-track-disabled !default;
+$input-slider-handle-disabled: palette(grayscale, base) !default;
+$input-slider-disabled-focus: palette(grayscale, light) !default;
+
+$input-progress-track: palette(grayscale, x-light) !default;
+$input-progress-border: $input-progress-track !default;
+$input-progress-border-radius: $buttons-border-radius !default;
+$input-progress-track-done: palette(primary, accent) !default;
+
+$field-tip-color: palette(grayscale-cool, dark) !default;
+$field-required-indicator-color: $label-color !default;
 
 // tables
-$table-cell-padding: spacing-vertical(small) spacing-horizontal(small);
-$table-condensed-cell-padding: spacing-vertical(x-small) spacing-horizontal(x-small);
-$table-bg: palette(grayscale, white);
-$table-accent-bg: palette(primary, accent);
-$table-focus-bg: $component-focus-bg;
-$table-active-bg: $component-active-bg;
-$table-border-color: palette(grayscale, x-light);
+$table-cell-padding: spacing-vertical(small) spacing-horizontal(small) !default;
+$table-condensed-cell-padding: spacing-vertical(x-small) spacing-horizontal(x-small) !default;
+$table-bg: palette(grayscale, white) !default;
+$table-accent-bg: palette(primary, accent) !default;
+$table-focus-bg: $component-focus-bg !default;
+$table-active-bg: $component-active-bg !default;
+$table-border-color: palette(grayscale, x-light) !default;

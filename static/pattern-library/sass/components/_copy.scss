@@ -28,8 +28,8 @@
 // ----------------------------
 // archetypes
 %copy-lead {
-    font-size: font-size(large);
-    line-height: line-height(mid-large);
+    font-size: font-size(x-large);
+    line-height: line-height(x-large);
 
     p,
     ol,
@@ -40,8 +40,8 @@
 }
 
 %copy-large {
-    font-size: font-size(mid-large);
-    line-height: line-height(mid-large);
+    font-size: font-size(large);
+    line-height: line-height(large);
 
     p,
     ol,
@@ -53,7 +53,7 @@
 
 %copy-base {
     font-size: font-size(base);
-    line-height: line-height(mid-large);
+    line-height: line-height(large);
 
     p,
     ol,
@@ -65,7 +65,7 @@
 
 %copy-meta {
     font-size: font-size(small);
-    line-height: line-height(mid-large);
+    line-height: line-height(large);
 
     p,
     ol,
@@ -77,7 +77,7 @@
 
 %copy-micro {
     font-size: font-size(x-small);
-    line-height: line-height(small);
+    line-height: line-height(x-small);
 
     p,
     ol,
