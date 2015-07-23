@@ -14,6 +14,7 @@ from pytz import UTC
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 
 from rest_framework.exceptions import PermissionDenied
 
@@ -47,7 +48,7 @@ from django_comment_common.models import (
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -63,9 +64,14 @@ def _remove_discussion_tab(course, user_id):
     course.tabs = [tab for tab in course.tabs if not tab.type == 'discussion']
     modulestore().update_item(course, user_id)
 
+def setUpModule():
+    reset_urls({"ENABLE_DISCUSSION_SERVICE": True})
+
+def tearDownModule():
+    reset_urls()
 
 @ddt.ddt
-class GetCourseTest(UrlResetMixin, ModuleStoreTestCase):
+class GetCourseTest(ModuleStoreTestCase):
     """Test for get_course"""
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -134,7 +140,7 @@ class GetCourseTest(UrlResetMixin, ModuleStoreTestCase):
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
-class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
+class GetCourseTopicsTest(ModuleStoreTestCase):
     """Test for get_course_topics"""
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -456,8 +462,9 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class GetThreadListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Test for get_thread_list"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetThreadListTest, self).setUp()
@@ -773,6 +780,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
 @ddt.ddt
 class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Test for get_comment_list"""
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetCommentListTest, self).setUp()
         httpretty.reset()
@@ -1183,8 +1191,9 @@ class GetCommentListTest(CommentsServiceMockMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class CreateThreadTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for create_thread"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(CreateThreadTest, self).setUp()
@@ -1417,8 +1426,9 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
 
 
 @ddt.ddt
-class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class CreateCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for create_comment"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(CreateCommentTest, self).setUp()
@@ -1670,8 +1680,9 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
 
 
 @ddt.ddt
-class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class UpdateThreadTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for update_thread"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(UpdateThreadTest, self).setUp()
@@ -1970,8 +1981,9 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
 
 
 @ddt.ddt
-class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class UpdateCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for update_comment"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(UpdateCommentTest, self).setUp()
@@ -2264,8 +2276,9 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTest
 
 
 @ddt.ddt
-class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class DeleteThreadTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for delete_thread"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(DeleteThreadTest, self).setUp()
@@ -2391,8 +2404,9 @@ class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestC
 
 
 @ddt.ddt
-class DeleteCommentTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class DeleteCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for delete_comment"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(DeleteCommentTest, self).setUp()

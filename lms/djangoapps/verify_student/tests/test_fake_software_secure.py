@@ -6,22 +6,24 @@ from django.test import TestCase
 
 from mock import patch
 from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from verify_student.models import SoftwareSecurePhotoVerification
 
+from django.conf import settings
 
-class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
+
+class SoftwareSecureFakeViewTest(TestCase):
     """
     Base class to test the fake software secure view.
     """
-    def setUp(self, **kwargs):
-        enable_software_secure_fake = kwargs.get('enable_software_secure_fake', False)
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SOFTWARE_SECURE_FAKE': enable_software_secure_fake}):
-            super(SoftwareSecureFakeViewTest, self).setUp('verify_student.urls')
-
+    def setUp(self):
         self.user = UserFactory.create(username="test", password="test")
         self.attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         self.client.login(username="test", password="test")
+        reset_urls(urlconf_modules=['verify_student.urls'])
+
+    def tearDown(self):
+        reset_urls()
 
 
 class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
@@ -30,7 +32,8 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
     'ENABLE_SOFTWARE_SECURE_FAKE' is not enabled.
     """
     def setUp(self):
-        super(SoftwareSecureFakeViewDisabledTest, self).setUp(enable_software_secure_fake=False)
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SOFTWARE_SECURE_FAKE': False}):
+            super(SoftwareSecureFakeViewDisabledTest, self).setUp()
 
     def test_get_method_without_enable_feature_flag(self):
         """
@@ -50,7 +53,8 @@ class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
     'ENABLE_SOFTWARE_SECURE_FAKE' is enabled.
     """
     def setUp(self):
-        super(SoftwareSecureFakeViewEnabledTest, self).setUp(enable_software_secure_fake=True)
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SOFTWARE_SECURE_FAKE': True}):
+            super(SoftwareSecureFakeViewEnabledTest, self).setUp()
 
     def test_get_method_without_logged_in_user(self):
         """

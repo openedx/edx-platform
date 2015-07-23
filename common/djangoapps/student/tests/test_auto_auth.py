@@ -5,7 +5,7 @@ from django_comment_common.models import (
     Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
 from django_comment_common.utils import seed_permissions_roles
 from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from mock import patch
@@ -14,7 +14,7 @@ import json
 
 
 @ddt.ddt
-class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
+class AutoAuthEnabledTestCase(TestCase):
     """
     Tests for the Auto auth view that we have for load testing.
     """
@@ -28,12 +28,16 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
     )
 
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({"AUTOMATIC_AUTH_FOR_TESTING": True})
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
+
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
-        # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
-        # value affects the contents of urls.py,
-        # so we need to call super.setUp() which reloads urls.py (because
-        # of the UrlResetMixin)
         super(AutoAuthEnabledTestCase, self).setUp()
         self.url = '/auto_auth'
         self.client = Client()
@@ -199,17 +203,20 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         return response
 
 
-class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
+class AutoAuthDisabledTestCase(TestCase):
     """
     Test that the page is inaccessible with default settings
     """
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({"AUTOMATIC_AUTH_FOR_TESTING": False})
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
 
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": False})
     def setUp(self):
-        # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
-        # value affects the contents of urls.py,
-        # so we need to call super.setUp() which reloads urls.py (because
-        # of the UrlResetMixin)
         super(AutoAuthDisabledTestCase, self).setUp()
         self.url = '/auto_auth'
         self.client = Client()

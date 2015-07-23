@@ -8,13 +8,13 @@ from django.conf import settings
 from mako.exceptions import TopLevelLookupException
 import ddt
 
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from embargo import messages
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
+class CourseAccessMessageViewTest(TestCase):
     """Tests for the courseware access message view.
 
     These end-points serve static content.
@@ -31,10 +31,17 @@ class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
     update the configuration appropriately).
 
     """
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({'EMBARGO': True}, ['embargo'])
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CourseAccessMessageViewTest, self).setUp('embargo')
+        super(CourseAccessMessageViewTest, self).setUp()
 
     @ddt.data(*messages.ENROLL_MESSAGES.keys())
     def test_enrollment_messages(self, msg_key):

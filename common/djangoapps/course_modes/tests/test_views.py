@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from embargo.test_utils import restrict_course
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
@@ -16,12 +16,21 @@ from student.models import CourseEnrollment
 from course_modes.models import CourseMode, Mode
 
 
+def setUpModule():
+    reset_urls(
+        feature_flag_overrides={'MODE_CREATION_FOR_TESTING': True, 'EMBARGO': True},
+        urlconf_modules=['course_modes.urls', 'embargo']
+    )
+
+def tearDownModule():
+    reset_urls()
+
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
+class CourseModeViewTest(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
-        super(CourseModeViewTest, self).setUp('course_modes.urls')
+        super(CourseModeViewTest, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
@@ -340,12 +349,12 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
+class TrackSelectionEmbargoTest(ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TrackSelectionEmbargoTest, self).setUp('embargo')
+        super(TrackSelectionEmbargoTest, self).setUp()
 
         # Create a course and course modes
         self.course = CourseFactory.create()

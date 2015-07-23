@@ -23,7 +23,7 @@ from course_modes.models import CourseMode
 from embargo.models import CountryAccessRule, Country, RestrictedCourse
 from enrollment.views import EnrollmentUserThrottle
 from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -804,17 +804,25 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestCase):
+class EnrollmentEmbargoTest(EnrollmentTestMixin, ModuleStoreTestCase):
     """Test that enrollment is blocked from embargoed countries. """
 
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({'EMBARGO': True}, ['embargo'])
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentEmbargoTest, self).setUp('embargo')
+        super(EnrollmentEmbargoTest, self).setUp()
 
         self.course = CourseFactory.create()
         # Load a CourseOverview. This initial load should result in a cache

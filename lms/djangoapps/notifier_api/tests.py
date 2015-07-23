@@ -15,14 +15,13 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
-from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
 @override_settings(EDX_API_KEY="test_api_key")
-class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
+class NotifierUsersViewSetTest(ModuleStoreTestCase):
     def setUp(self):
         super(NotifierUsersViewSetTest, self).setUp()
         self.courses = []

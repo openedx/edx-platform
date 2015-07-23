@@ -28,7 +28,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.roles import CourseSalesAdminRole
 from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
@@ -1659,15 +1659,23 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
+class RedeemCodeEmbargoTests(ModuleStoreTestCase):
     """Test blocking redeem code redemption based on country access rules. """
 
     USERNAME = 'bob'
     PASSWORD = 'test'
 
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({'EMBARGO': True}, ['embargo'])
+
+    @classmethod
+    def tearDownclass(cls):
+        reset_urls()
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(RedeemCodeEmbargoTests, self).setUp('embargo')
+        super(RedeemCodeEmbargoTests, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.user.username, password=self.PASSWORD)

@@ -23,12 +23,12 @@ from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
-from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.testing import reset_urls
 
 
 @ddt.ddt
-class StudentAccountUpdateTest(UrlResetMixin, TestCase):
+class StudentAccountUpdateTest(TestCase):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = u"heisenberg"
@@ -60,7 +60,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
     INVALID_KEY = u"123abc"
 
     def setUp(self):
-        super(StudentAccountUpdateTest, self).setUp("student_account.urls")
+        super(StudentAccountUpdateTest, self).setUp()
 
         # Create/activate a new account
         activation_key = create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
@@ -202,16 +202,24 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
 
 @ddt.ddt
-class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
+class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({'EMBARGO': True}, urlconf_modules=['embargo'])
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
+
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
+        super(StudentAccountLoginAndRegistrationTest, self).setUp()
         # For these tests, two third party auth providers are enabled by default:
         self.configure_google_provider(enabled=True)
         self.configure_facebook_provider(enabled=True)

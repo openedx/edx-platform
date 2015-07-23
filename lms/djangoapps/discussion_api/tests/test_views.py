@@ -19,12 +19,19 @@ from discussion_api.tests.utils import (
     make_minimal_cs_thread,
 )
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
+def setUpModule():
+    reset_urls({"ENABLE_DISCUSSION_SERVICE": True})
+
+def tearDownModule():
+    reset_urls()
+
+
+class DiscussionAPIViewTestMixin(CommentsServiceMockMixin):
     """
     Mixin for common code in tests of Discussion API views. This includes
     creation of common structures (e.g. a course, user, and enrollment), logging
