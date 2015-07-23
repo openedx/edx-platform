@@ -46,7 +46,6 @@ test:
     # to understand how multiple containers can be used to
     # run subsets of tests in parallel.
     - ./scripts/all-tests.sh:
-        timeout: 900  # if a command runs this many seconds without output, kill it
         parallel: true
 
   post:

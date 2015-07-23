@@ -85,9 +85,9 @@ case "$TEST_SUITE" in
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
         echo "Running safe template linter report."
-        paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
-        echo "Running safe commit linter report."
-        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
+        #paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
+        #echo "Running safe commit linter report."
+        #paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         echo "Running diff quality."
         paver run_quality -p 100 || EXIT=1
