@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="/page_skeleton.html" />
 
 <h1>edX home!</h1>
 
 <ul>
-    <li><a href="/onboarding/login">Login</a></li>
+    <li><a href="/login">Login</a></li>
     <li><a href="/onboarding/register">Register</a></li>
     <li><a href="/onboarding/course_discovery">Course Discovery</a></li>
 </ul>
-</body>
-</html>

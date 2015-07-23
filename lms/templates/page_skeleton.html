@@ -88,7 +88,7 @@ from branding import api as branding_api
 <%
   if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
-    header_file = 'theme-header.html'
+    header_file = '/components/header/header.html'
     google_analytics_file = 'theme-google-analytics.html'
 
     style_overrides_file = None
@@ -107,7 +107,7 @@ from branding import api as branding_api
 %>
 
   % if header_extra_file:
-    <%include file="${header_extra_file}" />
+    <%include file="/components/header/header.html" />
   % endif
 
   <%include file="widgets/optimizely.html" />
@@ -141,14 +141,7 @@ from branding import api as branding_api
 
     % if not disable_footer:
         <%block name="footer">
-          ## Can be overridden by child templates wanting to hide the footer.
-          % if theme_enabled() and not is_microsite():
-            <%include file="theme-footer.html" />
-          % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-              <%include file="footer-edx-v3.html" />
-          % else:
-            <%include file="${microsite.get_template_path('footer.html')}" />
-          % endif
+          <%include file="/components/footer/footer.html" />
         </%block>
     % endif
 

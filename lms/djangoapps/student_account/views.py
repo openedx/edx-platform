@@ -110,7 +110,10 @@ def login_and_registration_form(request, initial_mode="login"):
         'password_reset_form_desc': form_descriptions['password_reset'],
     }
 
-    return render_to_response('student_account/login_and_register.html', context)
+    if settings.FEATURES["ENABLE_PATTERN_LIBRARY"]:
+        return render_to_response('student_account/login_and_register_pattern_library.html', context)
+    else:
+        return render_to_response('student_account/login_and_register.html', context)
 
 
 @require_http_methods(['POST'])

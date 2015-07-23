@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="/page_skeleton.html" />
 
 <h1>edX course discovery!</h1>
 
@@ -12,7 +11,3 @@
     <li><a href="/onboarding/course/circuits-electronics-mitx-6-002x-0">MITx: Circuits & Electronics</a></li>
     <li><a href="/onboarding/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0">Harvardx: Science & Cooking</a></li>
 </ul>
-
-
-</body>
-</html>

@@ -324,7 +324,7 @@ FEATURES = {
     'ENABLE_COURSE_BLOCKS_NAVIGATION_API': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
 
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
@@ -418,6 +418,9 @@ FEATURES = {
 
     # New onboarding feature
     'ENABLE_ONBOARDING': True,
+
+    # Enable use of the pattern library where appropriate
+    'ENABLE_PATTERN_LIBRARY': True,
 }
 
 # Ignore static asset files on import which match this pattern
