@@ -61,8 +61,7 @@ from branding import api as branding_api
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
-  <%static:css group='style-vendor'/>
-  <%static:css group='style-main'/>
+  <%static:css group='style-onboarding'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>

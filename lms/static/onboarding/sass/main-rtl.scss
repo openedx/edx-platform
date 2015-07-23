@@ -1,0 +1,24 @@
+// ------------------------------
+// Open edX Onboarding: Main Style Compile
+
+// About: Sass compile for the Open edX Onboarding Elements.
+
+// NOTE: This is the right to left (RTL) configured style compile. It should mirror main-ltr w/ the exception of bi-app references.
+
+// ------------------------------
+// #VENDOR
+// ------------------------------
+@import '../../../../static/components/bourbon/app/assets/stylesheets/bourbon';
+@import '../../../../static/components/susy/sass/susy';
+@import '../../../../static/components/breakpoint-sass/stylesheets/breakpoint';
+@import '../../../../static/components/bi-app-sass/bi-app/bi-app-rtl';   // RTL support
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import '../../../../static/pattern-library/sass/utilities/variables-rtl';
+
+// ------------------------------
+// #BUILD
+// ------------------------------
+@import 'build';                                        // shared compile/build order for both LTR and RTL UI
