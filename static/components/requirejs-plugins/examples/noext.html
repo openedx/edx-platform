@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>RequireJS noext! plugin</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div id="wrapper">
+            <h1>RequireJS noext! plugin</h1>
+            <p>Helper for loading files without appending the &quot;.js&quot; extension.</p>
+            <p>
+                Note that it will append a query string &quot;noext=1&quot; to the URL to avoid inserting the JS extension.
+            </p>
+            <h2>Output:</h2>
+            <div id="output" style="border:1px solid #ccc; background:#f5f5f5; padding:10px 20px"></div>
+        </div>
+        <script src="../lib/require.js"></script>
+        <script>
+            require.config({
+                paths : {
+                    noext : '../src/noext' //alias to plugin
+                }
+            });
+
+            require(['noext!js/foo.bar', 'noext!js/foo'], function(foo1, foo2){
+                var out = document.getElementById('output');
+                //data is parsed into an object
+                out.innerHTML += '<p><b>foo.bar:<\/b> '+ foo1.msg +'<\/p>';
+                out.innerHTML += '<p><b>foo:<\/b> '+ foo2.msg +'<\/p>';
+            });
+        </script>
+    </body>
+</html>

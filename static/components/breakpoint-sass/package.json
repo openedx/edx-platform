@@ -1,0 +1,39 @@
+{
+  "name": "breakpoint-sass",
+  "version": "2.6.1",
+  "description": "Really Simple Media Queries with Sass",
+  "main": "stylesheets/_breakpoint.scss",
+  "eyeglass": {
+    "exports": "eyeglass-exports.js",
+    "name": "breakpoint"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [
+    "sass",
+    "responsive",
+    "rwd",
+    "eyeglass-module",
+    "breakpoint"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Team-Sass/breakpoint.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Team-Sass/breakpoint/issues"
+  },
+  "homepage": "https://github.com/Team-Sass/breakpoint",
+  "devDependencies": {
+    "diff": "^1.2.1",
+    "fs-extra": "^0.14.0",
+    "glob": "^4.3.2",
+    "node-sass": "^3.0.0"
+  }
+}

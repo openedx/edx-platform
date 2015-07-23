@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>RequireJS + WebFont Loader</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body{font-family:sans-serif}
+            .h3{font-size:1.2em}
+            .info{background-color:#cfc; border:2px solid #ada; padding:10px 20px;  margin:2em 0}
+            .wf-loading .f-1,
+            .wf-loading .f-2,
+            .wf-loading .f-3 {
+                /* avoid FOUC */
+                visibility:hidden;
+            }
+            .f-1{font-family:"Tangerine"}
+            .f-2{font-family:"Cantarell"}
+            .f-3{font-family:"Yanone Kaffeesatz"}
+        </style>
+    </head>
+    <script>
+        // add .wf-loading class to avoid FOUC
+        // use JS to add class to avoid hidding content if JS isn't available
+        document.documentElement.className += ' wf-loading';
+    </script>
+    <body>
+        <div id="wrapper">
+            <h1>RequireJS + WebFont Loader</h1>
+            <div class="info">
+                <p>
+                    Example of how to load webfonts using the <a href="https://code.google.com/apis/webfonts/docs/webfont_loader.html">Google WebFont Loader API</a>.
+                </p>
+                <h2 class="h3">Syntax</h2>
+                <p>
+                <code>font!google,families:[Tangerine,Cantarell]</code>
+                </p>
+                <p>
+                    You can load fonts from multiple vendors by splitting them with &quot;|&quot;.
+                </p>
+                <p>
+                <code>font!google,families:[Tangerine,Cantarell,Yanone Kaffeesatz:700]|typekit,id:123|monotype,projectId:555</code>
+                </p>
+                <p>
+                    Check the <a href="https://code.google.com/apis/webfonts/docs/webfont_loader.html">WebFont Loader API documentation</a> for available options.
+                </p>
+            </div>
+            <div id="sample">
+                <h2 class="f-1">Lorem Ipsum dolor</h2>
+                <p class="f-2">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+                <p class="f-3">
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+            </div>
+        </div>
+        <script src="../lib/require.js"></script>
+        <script>
+            require({
+                waitSeconds : 15, //make sure it is enough to load all scripts
+                paths : {
+                    //alias to plugins
+                    async : '../src/async',
+                    goog : '../src/goog',
+                    font : '../src/font',
+                    propertyParser : '../src/propertyParser'
+                }
+            });
+
+
+            require(['font!google,families:[Tangerine,Cantarell,Yanone Kaffeesatz:700]'], function(){
+                //fonts are loaded
+                var ready = document.createElement('div');
+                ready.className = 'f-1';
+                ready.innerHTML = 'All fonts loaded!';
+                ready.style.fontSize = '34px';
+                document.getElementById('sample').appendChild(ready);
+            });
+
+        </script>
+    </body>
+</html>

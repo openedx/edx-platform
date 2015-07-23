@@ -1501,6 +1501,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
+    'style-onboarding': {
+        'source_filenames': [
+            'onboarding/css/main-ltr.css',
+        ],
+        'output_filename': 'css/onboarding-style.css'
+    },
+    'style-onboarding-rtl': {
+        'source_filenames': [
+            'onboarding/css/main-rtl.css',
+        ],
+        'output_filename': 'css/onboarding-style-rtl.css'
+    },
 }
 
 

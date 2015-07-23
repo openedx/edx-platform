@@ -1,0 +1,39 @@
+{
+  "name": "susy",
+  "version": "2.2.5",
+  "description": "Sass power-tools for web layout.",
+  "authors": [
+    "Eric Suzanne <eric@oddbird.net>"
+  ],
+  "main": "sass/_susy.scss",
+  "homepage": "http://susy.oddbird.net",
+  "keywords": [
+    "layout",
+    "grid",
+    "sass",
+    "responsive",
+    "rwd",
+    "semantic"
+  ],
+  "license": "BSD-3-Clause",
+  "ignore": [
+    "**/.*",
+    "docs",
+    "test",
+    "Rakefile",
+    "*.json",
+    "*.gemspec"
+  ],
+  "devDependencies": {
+    "true": "2.0.0.alpha.3"
+  },
+  "_release": "2.2.5",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.2.5",
+    "commit": "3f6fad8be5cf64a31809e15d9888e9a9ac89fe57"
+  },
+  "_source": "git://github.com/ericam/susy.git",
+  "_target": "~2.2.5",
+  "_originalSource": "susy"
+}

@@ -19,3 +19,78 @@
         -moz-osx-font-smoothing: auto;
     }
 }
+
+// form fields
+// these should really be extends, but for some reason they weren't working.
+// there's some sort of limition on sass compilation when re-using extends with nested psueos
+// https://github.com/sass/libsass/issues/146 has more information
+@mixin input-track {
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+    @include transform-origin(center center);
+    width: 100%;
+    height: rem($baseline/2);
+    border: 0;
+    border-radius: $input-slider-border-default-radius;
+    background: $input-slider-track-default;
+    cursor: pointer;
+}
+
+@mixin input-track-hover {
+    background: $input-slider-default-hover;
+}
+
+@mixin input-thumb {
+    @include size(rem($baseline/2));
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+    border: 0;
+    border-radius: 50%;
+    background: $input-slider-handle-default;
+    -webkit-appearance: none;
+}
+
+@mixin input-thumb-hover {
+    @include size(rem($baseline));
+    margin-top: -(rem($baseline/3.25));
+    background: $input-slider-handle-default-hover;
+}
+
+@mixin input-progress-complete {
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+    @include input-track-hover;
+    border-radius: $input-progress-border-radius;
+}
+
+@mixin input-radio {
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+    @include margin-right(spacing-horizontal(small));
+    border: 1px solid $input-border-default;
+    border-radius: 50%;
+    background: $input-check-radio-background-default;
+    box-shadow: inset 0 0 0 3px palette(grayscale, white);
+}
+
+@mixin input-radio-checked {
+    border-color: transparent;
+    background: palette(grayscale, white);
+    box-shadow: inset 0 0 0 6px $input-check-radio-background-checked;
+}
+
+@mixin input-checkbox {
+    @include transition(all timing(xx-fast) ease-in-out 0s);
+    @include margin-right(spacing-horizontal(small));
+    border: 1px solid $input-border-default;
+    background: $input-check-radio-background-default;
+    box-shadow: inset 0 0 0 3px palette(grayscale, white);
+}
+
+@mixin input-checkbox-checked {
+    border-color: transparent;
+    background: palette(grayscale, white);
+    box-shadow: inset 0 0 0 6px $input-check-radio-background-checked;
+}
+
+@mixin input-radio-checkbox-disabled {
+    background: palette(grayscale, white);
+    box-shadow: none;
+    cursor: not-allowed;
+}

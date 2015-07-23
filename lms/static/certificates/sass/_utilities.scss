@@ -22,6 +22,8 @@ $cert-decorative-color-de-emphasized: palette(grayscale-cool, x-trans);
 $cert-decorative-color-emphasized: palette(grayscale-cool, mid-light);
 
 // typography: config
+$font-path: '../../fonts';
+
 @include font-face(
     'Domine',
     '../../certificates/fonts/Domine/Domine-Regular-webfont',

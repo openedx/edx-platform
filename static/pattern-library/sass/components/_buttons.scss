@@ -4,7 +4,6 @@
 // About: Contains base styling for demonstration and utility for buttons.
 // ----------------------------
 
-// #LAYOUT
 // #GLOBALS
 // #BASE (size)
 // #LARGE (size)
@@ -57,6 +56,10 @@
 .btn-base {
     padding: spacing-vertical(x-small) spacing-horizontal(base);
     font-size: font-size(base);
+
+    .icon {
+        @include size(font-size(base));
+    }
 }
 
 
@@ -65,7 +68,11 @@
 // ----------------------------
 .btn-large {
     padding: spacing-vertical(small) spacing-horizontal(mid-large);
-    font-size: font-size(mid-large);
+    font-size: font-size(large);
+
+    .icon {
+        @include size(font-size(large));
+    }
 }
 
 
@@ -75,6 +82,10 @@
 .btn-small {
     padding: spacing-vertical(x-small) spacing-horizontal(small);
     font-size: font-size(small);
+
+    .icon {
+        @include size(font-size(small));
+    }
 }
 
 
@@ -83,8 +94,12 @@
 // ----------------------------
 .btn-default {
     border-color: palette(primary, base);
-    // background: palette(grayscale, white);
+    background: palette(grayscale, white);
     color: palette(primary, base);
+
+    .icon {
+        fill: palette(primary, base);
+    }
 
     // STATE: hover and focus
     &:hover,
@@ -93,6 +108,10 @@
     &.is-focused {
         background: palette(primary, base);
         color: palette(grayscale, white);
+
+        .icon {
+            fill: palette(grayscale, white);
+        }
     }
 
     // STATE: is pressed or active
@@ -108,7 +127,11 @@
     &.is-disabled {
         border-color: palette(grayscale, light);
         background: palette(grayscale, white);
-        color: palette(grayscale, base);
+        color: palette(grayscale, dark);
+
+        .icon {
+            fill: palette(grayscale, base);
+        }
     }
 }
 
@@ -119,6 +142,10 @@
     border-color: palette(primary, base);
     background: palette(primary, base);
     color: palette(grayscale, white);
+
+    .icon {
+        fill: palette(grayscale, white);
+    }
 
     // STATE: hover and focus
     &:hover,
@@ -141,8 +168,12 @@
     &:disabled,
     &.is-disabled {
         border-color: palette(grayscale, light);
-        background: palette(grayscale, light);
-        color: palette(grayscale, base);
+        background: palette(grayscale, x-light);
+        color: palette(grayscale, dark);
+
+        .icon {
+            fill: palette(grayscale, base);
+        }
     }
 }
 
@@ -154,6 +185,10 @@
     border-color: $transparent;
     background: $transparent;
     color: palette(primary, base);
+
+    .icon {
+        fill: palette(primary, base);
+    }
 
     // STATE: hover and focus
     &:hover,
@@ -169,13 +204,21 @@
     &.is-active {
         border-color: palette(primary, base);
         color: palette(primary, base);
+
+        .icon {
+            fill: palette(primary, base);
+        }
     }
 
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
         border-color: palette(grayscale, light);
-        color: palette(grayscale, light);
+        color: palette(grayscale, dark);
+
+        .icon {
+            fill: palette(grayscale, light);
+        }
     }
 }
 
@@ -191,6 +234,12 @@
     border-color: $transparent;
     padding: 1px;
     background: $transparent;
+
+    &:disabled {
+        // disabled links shouldn't be in the interface
+        // plus, having them pass AA guidelines would make them no longer look disabled
+        display: none;
+    }
 }
 
 
@@ -202,6 +251,10 @@
     box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, dark);
     background: palette(primary, base);
     color: palette(grayscale, white);
+
+    .icon {
+        fill: palette(grayscale, white);
+    }
 
     // STATE: hover and focus
     &:hover,
@@ -226,7 +279,11 @@
         border-color: palette(grayscale, x-light);
         box-shadow: inset 0 -1px 0 palette(grayscale, light);
         background: palette(grayscale, x-light);
-        color: palette(grayscale, base);
+        color: palette(grayscale, dark);
+
+        .icon {
+            fill: palette(grayscale, base);
+        }
     }
 }
 
@@ -240,6 +297,10 @@
     background: $transparent;
     color: palette(primary, base);
 
+    .icon {
+        fill: palette(primary, base);
+    }
+
     // STATE: hover and focus
     &:hover,
     &.is-hovered,
@@ -247,8 +308,12 @@
     &.is-focused {
         border-color: palette(primary, base);
         box-shadow: inset 0 0 -$buttons-elevated-shadow 0 0 palette(primary, base);
-        color: palette(grayscale, white);
         background: palette(primary, accent);
+        color: palette(grayscale, white);
+
+        .icon {
+            fill: palette(grayscale, white);
+        }
     }
 
     // STATE: is pressed or active
@@ -265,7 +330,11 @@
         border-color: palette(grayscale, x-light);
         box-shadow: inset 0 -1px 0 palette(grayscale, light);
         background: palette(grayscale, x-light);
-        color: palette(grayscale, base);
+        color: palette(grayscale, dark);
+
+        .icon {
+            fill: palette(grayscale, base);
+        }
     }
 }
 
@@ -291,18 +360,6 @@
 
 
 // ----------------------------
-// #ICONS
-// ----------------------------
-.has-icon {
-
-}
-
-.has-icon-reverse {
-
-}
-
-
-// ----------------------------
 // #OVERLAY
 // ----------------------------
 .btn-overlay {
@@ -311,6 +368,10 @@
     color: palette(grayscale, white);
     font-weight: font-weight(semi-bold);
 
+    .icon {
+        fill: palette(grayscale, white);
+    }
+
     // STATE: hover and focus
     &:hover,
     &.is-hovered,
@@ -318,6 +379,10 @@
     &.is-focused {
         background: palette(grayscale, white);
         color: palette(primary, base);
+
+        .icon {
+            fill: palette(primary, base);
+        }
     }
 
     // STATE: is pressed or active
@@ -325,18 +390,30 @@
     &.is-pressed,
     &.is-active {
         color: palette(primary, dark);
+
+        .icon {
+            fill: palette(primary, dark);
+        }
     }
 
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
         border-color: palette(grayscale, trans);
-        color: palette(grayscale, x-light);
+        color: palette(grayscale, white);
+
+        .icon {
+            fill: palette(grayscale, x-light);
+        }
 
         &:hover {
             border-color: palette(grayscale, trans);
             background: $transparent;
-            color: palette(grayscale, x-light);
+            color: palette(grayscale, white);
+
+            .icon {
+                fill: palette(grayscale, x-light);
+            }
         }
     }
 }

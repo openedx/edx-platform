@@ -1,0 +1,50 @@
+$private-sassy-maps-suppress-warnings: false !default;
+
+//////////////////////////////
+// Map Get Deep
+//
+// Given a map and a list of keys, find the value at the given key
+//////////////////////////////
+@function map-get-deep($map, $keys...) {
+  @if length($keys) == 1 {
+    $keys: nth($keys, 1);
+  }
+  $warn: "#{nth($keys, 1)}";
+  $length: length($keys);
+  $get: map-get($map, nth($keys, 1));
+
+  @if $length > 1 {
+    @for $i from 2 through $length {
+      @if $get != null and type-of($get) == 'map' {
+        $warn: $warn + "->#{nth($keys, $i)}";
+        $get: map-get($get, nth($keys, $i));
+
+        @if $get == null {
+          @return map-get-deep-warning($warn, $get);
+        }
+      }
+      @else {
+        @return map-get-deep-warning($warn, $get);
+      }
+    }
+  }
+
+  @return $get;
+}
+
+//////////////////////////////
+// Map Get Deep Warning
+//
+// Displays a warning if the retrieved value is `null`
+//////////////////////////////
+@function map-get-deep-warning($warn, $get) {
+  @if not $private-sassy-maps-suppress-warnings {
+    @if $get == null {
+      @warn "Map has no value for key search `#{$warn}`";
+    }
+    @else if type-of($get) != 'map' {
+      @warn "Non-map value found for key search `#{$warn}`, cannot search for key `#{nth($keys, $i)}`";
+    }
+  }
+  @return null;
+}
