@@ -5,6 +5,8 @@
 
 <%inherit file="/page_skeleton.html" />
 
+## Page Content
+## ----------------------------
 <h1>edX home!</h1>
 
 <ul>
@@ -12,3 +14,35 @@
     <li><a href="/onboarding/register">Register</a></li>
     <li><a href="/onboarding/course_discovery">Course Discovery</a></li>
 </ul>
+
+## Page Metadata
+## ----------------------------
+<%block name="head">
+<%include file="_head_metadata.html" />
+<%include file="_head_analytics.html" />
+</%block>
+
+## Assets
+<%block name="assets_primary">
+<%include file="_assets_primary.html" />
+</%block>
+
+<%block name="assets_secondary">
+<%include file="_assets_secondary.html" />
+</%block>
+
+## UI Elements
+## ----------------------------
+<%block name="system_feedback">
+    <div class="wrapper-feedback">
+
+    </div>
+</%block>
+
+<%block name="header">
+<%include file="_header.html" />
+</%block>
+
+<%block name="footer">
+<%include file="_footer.html" />
+</%block>
