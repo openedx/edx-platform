@@ -64,6 +64,7 @@ def is_youtube_available():
         bool:
 
     """
+    return True
 
     youtube_api_urls = {
         'main': 'https://www.youtube.com/',
