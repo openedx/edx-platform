@@ -38,7 +38,8 @@ from django.core.urlresolvers import reverse
       <section>
         <form action="${create_ccx_url}" method="POST">
           <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-          <input name="name" placeholder="Name your CCX"/><br/>
+          <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+          <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
           <button id="create-ccx">Coach a new Custom Course for EdX</button>
         </form>
       </section>
