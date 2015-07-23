@@ -233,6 +233,7 @@ class ViewsTestCaseMixin(object):
         data = {
             "user_id": str(self.student.id),
             "closed": False,
+            "commentable_id": "non_team_dummy"
         }
         if include_depth:
             data["depth"] = 0
@@ -1013,13 +1014,15 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
+        commentable_id = "dummy_commentable_id"
         self._set_mock_request_data(mock_request, {
             "closed": False,
+            "commentable_id": commentable_id
         })
         # We have to get clever here due to Thread's setters and getters.
         # Patch won't work with it.
         try:
-            Thread.commentable_id = Mock()
+            Thread.commentable_id = commentable_id
             request = RequestFactory().post("dummy_url", {"body": text})
             request.user = self.student
             request.view_name = "create_comment"
@@ -1100,6 +1103,21 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
 @ddt.ddt
 @patch("lms.lib.comment_client.utils.requests.request")
 class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
+    # Most of the test points use the same ddt data.
+    # args: user, commentable_id, status_code
+    ddt_args = [
+        # Student in team can do operations on threads/comments within the team commentable.
+        ('student_in_team', 'team_commentable_id', 200),
+        # Non-team commentables can be edited by any student.
+        ('student_in_team', 'course_commentable_id', 200),
+        # Student not in team cannot do operations within the team commentable.
+        ('student_not_in_team', 'team_commentable_id', 401),
+        # Non-team commentables can be edited by any student.
+        ('student_not_in_team', 'course_commentable_id', 200),
+        # Moderators most be a member of the team for doing "student actions".
+        ('moderator', 'team_commentable_id', 401)
+    ]
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(TeamsPermissionsTestCase, self).setUp()
@@ -1131,6 +1149,12 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
 
         # Dummy commentable ID not linked to a team
         self.course_commentable_id="course_level_commentable"
+
+    def _setup_mock(self, user, mock_request, data):
+        user = getattr(self, user)
+        self._set_mock_request_data(mock_request, data)
+        self.client.login(username=user.username, password=self.password)
+        #return user, commentable_id
 
     @ddt.data(
         # student_in_team will be able to update his own post, regardless of team membership
@@ -1172,25 +1196,15 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(
-        ('student_in_team', 'team_commentable_id', 200),
-        ('student_in_team', 'course_commentable_id', 200),
-        ('student_not_in_team', 'team_commentable_id', 401),
-        ('student_not_in_team', 'course_commentable_id', 200),
-        ('moderator', 'team_commentable_id', 401),  # no special permissions for moderators (not in team)
-    )
+    @ddt.data(*ddt_args)
     @ddt.unpack
     def test_create_comment(self, user, commentable_id, status_code, mock_request):
         """
         Verify that create_comment is limited to members of the team.
         """
         commentable_id = getattr(self, commentable_id)
-        user = getattr(self, user)
-        self._set_mock_request_data(mock_request, {
-            "closed": False,
-            "commentable_id": commentable_id,
-        })
-        self.client.login(username=user.username, password=self.password)
+        self._setup_mock(user, mock_request, {"closed": False, "commentable_id": commentable_id})
+
         response = self.client.post(
             reverse(
                 "create_comment",
@@ -1203,26 +1217,17 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(
-        ('student_in_team', 'team_commentable_id', 200),
-        ('student_in_team', 'course_commentable_id', 200),
-        ('student_not_in_team', 'team_commentable_id', 401),
-        ('student_not_in_team', 'course_commentable_id', 200),
-        ('moderator', 'team_commentable_id', 401),  # no special permissions for moderators (not in team)
-    )
+    @ddt.data(*ddt_args)
     @ddt.unpack
     def test_create_sub_comment(self, user, commentable_id, status_code, mock_request):
         """
         Verify that create_subcomment is limited to members of the team.
         """
         commentable_id = getattr(self, commentable_id)
-        user = getattr(self, user)
-        self._set_mock_request_data(mock_request, {
-            "closed": False,
-            "commentable_id": commentable_id,
-            "thread_id": "dummy_thread"
-        })
-        self.client.login(username=user.username, password=self.password)
+        self._setup_mock(
+            user, mock_request,
+            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread"},
+        )
         response = self.client.post(
             reverse(
                 "create_sub_comment",
@@ -1235,26 +1240,17 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(
-        ('student_in_team', 'team_commentable_id', 200),
-        ('student_in_team', 'course_commentable_id', 200),
-        ('student_not_in_team', 'team_commentable_id', 401),
-        ('student_not_in_team', 'course_commentable_id', 200),
-        ('moderator', 'team_commentable_id', 401),  # no special permissions for moderators (not in team)
-    )
+    @ddt.data(*ddt_args)
     @ddt.unpack
     def test_comment_actions(self, user, commentable_id, status_code, mock_request):
         """
         Verify that voting and flagging of comments is limited to members of the team.
         """
         commentable_id = getattr(self, commentable_id)
-        user = getattr(self, user)
-        self._set_mock_request_data(mock_request, {
-            "closed": False,
-            "commentable_id": commentable_id,
-            "thread_id": "dummy_thread"
-        })
-        self.client.login(username=user.username, password=self.password)
+        self._setup_mock(
+            user, mock_request,
+            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread"},
+        )
         for action in ["upvote_comment", "downvote_comment", "un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
             response = self.client.post(
                 reverse(
@@ -1264,25 +1260,17 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             )
             self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(
-        ('student_in_team', 'team_commentable_id', 200),
-        ('student_in_team', 'course_commentable_id', 200),
-        ('student_not_in_team', 'team_commentable_id', 401),
-        ('student_not_in_team', 'course_commentable_id', 200),
-        ('moderator', 'team_commentable_id', 401),  # no special permissions for moderators (not in team)
-    )
+    @ddt.data(*ddt_args)
     @ddt.unpack
     def test_threads_actions(self, user, commentable_id, status_code, mock_request):
         """
         Verify that voting, flagging, and following of threads is limited to members of the team.
         """
         commentable_id = getattr(self, commentable_id)
-        user = getattr(self, user)
-        self._set_mock_request_data(mock_request, {
-            "closed": False,
-            "commentable_id": commentable_id,
-        })
-        self.client.login(username=user.username, password=self.password)
+        self._setup_mock(
+            user, mock_request,
+            {"closed": False, "commentable_id": commentable_id},
+        )
         for action in [
             "upvote_thread", "downvote_thread", "un_flag_abuse_for_thread", "flag_abuse_for_thread",
             "follow_thread", "unfollow_thread"
@@ -1295,60 +1283,39 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             )
             self.assertEqual(response.status_code, status_code)
 
-    # @ddt.data(
-    #     ('student_in_team', 'team_commentable_id', 200),
-    #     ('student_in_team', 'course_commentable_id', 200),
-    #     ('student_not_in_team', 'team_commentable_id', 401),
-    #     ('student_not_in_team', 'course_commentable_id', 200),
-    #     ('moderator', 'team_commentable_id', 401),  # no special permissions for moderators (not in team)
-    # )
-    # @ddt.unpack
-    # def test_create_thread(self, user, commentable_id, status_code, mock_request):
-    #     """
-    #     Verify that creation of threads is limited to members of the team.
-    #     """
-    #     commentable_id = getattr(self, commentable_id)
-    #     user = getattr(self, user)
-    #     self._set_mock_request_data(mock_request, {
-    #         "commentable_id": commentable_id
-    #     })
-    #     self.client.login(username=user.username, password=self.password)
-    #     response = self.client.post(
-    #         reverse(
-    #             "create_thread",
-    #             kwargs={
-    #                 "course_id": unicode(self.course.id),
-    #                 "commentable_id": commentable_id
-    #             }
-    #         ),
-    #         data={"body": "foo", "title": "foo", "thread_type": "discussion"}
-    #     )
-    #     self.assertEqual(response.status_code, status_code)
+    @ddt.data(*ddt_args)
+    @ddt.unpack
+    def test_create_thread(self, user, commentable_id, status_code, mock_request):
+        """
+        Verify that creation of threads is limited to members of the team.
+        """
+        commentable_id = getattr(self, commentable_id)
+        self._setup_mock(user, mock_request, {"commentable_id": commentable_id})
+        response = self.client.post(
+            reverse(
+                "create_thread",
+                kwargs={"course_id": unicode(self.course.id), "commentable_id": commentable_id}
+            ),
+            data={"body": "foo", "title": "foo", "thread_type": "discussion"}
+        )
+        self.assertEqual(response.status_code, status_code)
 
-    # @ddt.data(
-    #     ('student_in_team', 'team discussion', 200),
-    #     ('student_in_team', 'course level discussion topic', 200),
-    #     ('student_not_in_team', 'team discussion', 401),
-    #     ('student_not_in_team', 'course level discussion topic', 200),
-    #     ('moderator', 'team discussion', 401),  # no special permissions for moderators (not in team)
-    # )
-    # @ddt.unpack
-    # def test_commentable_actions(self, user, commentable_id, status_code, mock_request):
-    #     """
-    #     Verify that following of commentables is limited to members of the team.
-    #     """
-    #     user = getattr(self, user)
-    #     self._set_mock_request_data(mock_request, {
-    #     })
-    #     self.client.login(username=user.username, password=self.password)
-    #     for action in ["follow_commentable", "unfollow_commentable"]:
-    #         response = self.client.post(
-    #             reverse(
-    #                 action,
-    #                 kwargs={"course_id": unicode(self.course.id), "commentable_id": commentable_id}
-    #             )
-    #         )
-    #         self.assertEqual(response.status_code, status_code)
+    @ddt.data(*ddt_args)
+    @ddt.unpack
+    def test_commentable_actions(self, user, commentable_id, status_code, mock_request):
+        """
+        Verify that following of commentables is limited to members of the team.
+        """
+        commentable_id = getattr(self, commentable_id)
+        self._setup_mock(user, mock_request, {"commentable_id": commentable_id})
+        for action in ["follow_commentable", "unfollow_commentable"]:
+            response = self.client.post(
+                reverse(
+                    action,
+                    kwargs={"course_id": unicode(self.course.id), "commentable_id": commentable_id}
+                )
+            )
+            self.assertEqual(response.status_code, status_code)
 
 
 class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
