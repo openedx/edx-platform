@@ -67,11 +67,13 @@ class CourseCacheInterface(object):
         # If the structure is in the cache, then extract the requested sub-structure
         # and load the necessary block data.
         if full_block_structure:
+            print ' >>> cache hit! loading structure from cache...'
             block_structure = (
                 full_block_structure.get_sub_structure(root_block_key)
                 if root_block_key
                 else full_block_structure
             )
+            print ' >>> loading data from cache...'
             block_data_dict = self._get_cached_block_data_dict(
                 course_key,
                 block_structure.get_block_keys()
@@ -84,9 +86,13 @@ class CourseCacheInterface(object):
         # (4) Extract the requested sub-structure.
         # (5) Load the necessary block data.
         else:
+            print ' >>> cache miss! loading XBlocks from modulestore...'
             full_block_structure, xblock_dict = self._create_block_structure(course_key)
+            print ' >>> collecting...'
             block_data_dict = self._create_block_data_dict(full_block_structure, xblock_dict)
+            print ' >>> caching structure...'
             self._cache_block_structure(course_key, full_block_structure)
+            print ' >>> caching data...'
             self._cache_block_data_dict(block_data_dict)
             block_structure = (
                 full_block_structure.get_sub_structure(root_block_key)
@@ -95,10 +101,12 @@ class CourseCacheInterface(object):
             )
 
         # Apply transformations to course structure and data.
+        print ' >>> applying...'
         for transformation in transformations:
             transformation.apply(user, course_key, block_structure, block_data_dict)
 
         # Filter out blocks that were removed during transformation application.
+        print ' >>> filtering and returning...'
         return block_structure, _filter_block_data_dict(block_data_dict, block_structure)
 
     def _encode_course_key(self, course_key):

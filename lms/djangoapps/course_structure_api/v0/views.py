@@ -221,6 +221,9 @@ class CourseDetail(CourseViewMixin, RetrieveAPIView):
     serializer_class = serializers.CourseSerializer
 
     def get_object(self, queryset=None):
+        from lms_course_cache.api import clear_course_from_cache
+        print ' >>> clearing cache for ' + str(self.kwargs.get('course_id')) + '...'
+        clear_course_from_cache(self.kwargs.get('course_id'))
         return self.get_course_or_404()
 
 
@@ -262,6 +265,20 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
 
     @CourseViewMixin.course_check
     def get(self, request, **kwargs):
+
+        from lms_course_cache.api import get_course_blocks
+        from django.http import HttpResponse
+        # TODO me: remove all print statements with >>> in them
+        print ' >>> requested: ' + str(self.course_key)
+        struct, data = get_course_blocks(self.request.user, self.course_key)
+        print ' >>> serializing...'
+        s = '{{"structure": {}, "blocks": {{{}}}}}'.format(
+            str(struct),
+            ", ".join(['"{}": {}'.format(str(uk), str(d)) for uk, d in data.iteritems()])
+        )
+        print ' >>> done!'
+        return HttpResponse(s, content_type='text/plain')
+
         try:
             return Response(api.course_structure(self.course_key))
         except errors.CourseStructureNotAvailableError:
