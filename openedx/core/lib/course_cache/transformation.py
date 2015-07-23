@@ -25,20 +25,20 @@ class CourseStructureTransformation(object):
         """
         return set()
 
-    def collect(self, course_root_block, get_children, get_parents):
+    def collect(self, course_key, block_structure, xblock_dict):
         """
         Computes any information for each XBlock that's necessary to execute
         this transformation's apply method.
 
         Arguments:
-            course_root_block (XBlock): Root block of entire course hierarchy.
-            get_children (XBlock -> list[XBlock])
-            get_parents (XBlock -> list[XBlock])
+            course_key (CourseKey)
+            block_structure (CourseBlockStructure)
+            xblock_dict (dict[UsageKey: XBlock])
 
         Returns:
             dict[UsageKey: dict]
         """
-        return {}
+        return None
 
     def apply(self, user, course_key, block_structure, block_data):
         """

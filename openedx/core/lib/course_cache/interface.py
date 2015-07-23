@@ -198,12 +198,14 @@ class CourseCacheInterface(object):
         return {
             usage_key: CourseBlockData(
                 {
-                    required_field: getattr(xblock, required_field, None)
+                    required_field: getattr(xblock, required_field)
                     for required_field in required_fields
+                    if hasattr(xblock, required_field)
                 },
                 {
-                    transformation_id: transformation_data.get(usage_key, None)
+                    transformation_id: transformation_data[usage_key]
                     for transformation_id, transformation_data in collected_data.iteritems()
+                    if transformation_data
                 }
             )
             for usage_key, xblock in xblock_dict.iteritems()
@@ -397,7 +399,7 @@ class CourseBlockStructure(object):
             get_children=self.get_children,
         )
 
-    def _remove_block(self, usage_key, remove_orphans):
+    def remove_block(self, usage_key, remove_orphans):
         """
         Arguments:
             usage_key (UsageKey)
@@ -427,22 +429,13 @@ class CourseBlockStructure(object):
         # Remove adjacency list entry
         del adj[usage_key]
 
-    def remove_block(self, usage_key):
-        """
-        Arguments:
-            usage_key (UsageKey)
-
-        Raises:
-            KeyError if block does not exist in course structure.
-        """
-        # This is just a wrapper around _remove_block because we don't want to
-        # expose the remove_orphans option.
-        self._remove_block(usage_key, remove_orphans=True)
-
-    def remove_block_if(self, removal_condition):
+    def remove_block_if(self, removal_condition, remove_orphans):
         """
         Arguments:
             removal_condition (UsageKey -> bool)
+            remove_orphans (bool): If True, remove all blocks that become
+                orphans. Does not incur a significant performance hit.
+
         """
         # Trivial case: If the root block satisfies the removal condition, then
         # just remove the entire structure.
@@ -463,12 +456,12 @@ class CourseBlockStructure(object):
 
         for usage_key in traversal:
             is_orphan = not self._adj[usage_key].parents
-            if is_orphan or removal_condition(usage_key):
+            if (remove_orphans and is_orphan) or removal_condition(usage_key):
                 # Because we're doing a topological sort, removing blocks can
                 # only create orphans *later* in the traversal. So, we save time
                 # by passing remove_orphans=False and handling orphan removal
                 # ourselves.
-                self._remove_block(usage_key, remove_orphans=False)
+                self._remove_block(usage_key, False)
 
 
 class CourseBlockData(object):
@@ -500,16 +493,16 @@ class CourseBlockData(object):
         return '{{"block_fields": {{{}}}, {}}}'.format(
             ", ".join([
                 '"{}": "{}"'.format(str(key), value)
-                for key, value in (self._block_fields).iteritems()
+                for key, value in self._block_fields.iteritems()
             ]),
             ", ".join([
-                '"{}": {{{}}}'.format(key, (
+                '"{}": {{{}}}'.format(trans_id, (
                     ", ".join([
                         '"{}": "{}"'.format(k, v)
-                        for k, v in value.iteritems()
+                        for k, v in trans_data.iteritems()
                     ])
                 ))
-                for key, value in (self._transformation_data).iteritems()
+                for trans_id, trans_data in self._transformation_data.iteritems()
             ])
         )
 
@@ -540,7 +533,7 @@ class CourseBlockData(object):
             )
         else:
             raise KeyError(
-                "Data for transformation with ID {} not found.".format(
+                "No collected data for transformation of type {}.".format(
                     transformation.id
                 )
             )
