@@ -51,6 +51,8 @@ def permitted(fn):
                 content = cc.Thread.find(kwargs["thread_id"]).to_dict()
             elif "comment_id" in kwargs:
                 content = cc.Comment.find(kwargs["comment_id"]).to_dict()
+            elif "commentable_id" in kwargs:
+                content = cc.Commentable.find(kwargs["commentable_id"]).to_dict()
             else:
                 content = None
             return content
@@ -174,16 +176,21 @@ def create_thread(request, course_id, commentable_id):
     if 'body' not in post or not post['body'].strip():
         return JsonError(_("Body can't be empty"))
 
-    thread = cc.Thread(
-        anonymous=anonymous,
-        anonymous_to_peers=anonymous_to_peers,
-        commentable_id=commentable_id,
-        course_id=course_key.to_deprecated_string(),
-        user_id=request.user.id,
-        thread_type=post["thread_type"],
-        body=post["body"],
-        title=post["title"]
-    )
+    params = {
+        'anonymous': anonymous,
+        'anonymous_to_peers': anonymous_to_peers,
+        'commentable_id': commentable_id,
+        'course_id': course_key.to_deprecated_string(),
+        'user_id': request.user.id,
+        'thread_type': post["thread_type"],
+        'body': post["body"],
+        'title': post["title"],
+    }
+
+    if 'context' in post:
+        params['context'] = post['context']
+
+    thread = cc.Thread(**params)
 
     # Cohort the thread if required
     try:
@@ -603,16 +610,6 @@ def follow_commentable(request, course_id, commentable_id):
 @require_POST
 @login_required
 @permitted
-def follow_user(request, course_id, followed_user_id):
-    user = cc.User.from_django_user(request.user)
-    followed_user = cc.User.find(followed_user_id)
-    user.follow(followed_user)
-    return JsonResponse({})
-
-
-@require_POST
-@login_required
-@permitted
 def unfollow_thread(request, course_id, thread_id):
     """
     given a course id and thread id, stop following this thread
@@ -635,20 +632,6 @@ def unfollow_commentable(request, course_id, commentable_id):
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
     user.unfollow(commentable)
-    return JsonResponse({})
-
-
-@require_POST
-@login_required
-@permitted
-def unfollow_user(request, course_id, followed_user_id):
-    """
-    given a course id and user id, stop following this user
-    ajax only
-    """
-    user = cc.User.from_django_user(request.user)
-    followed_user = cc.User.find(followed_user_id)
-    user.unfollow(followed_user)
     return JsonResponse({})
 
 
