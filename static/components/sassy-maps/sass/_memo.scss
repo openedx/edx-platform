@@ -1,0 +1,31 @@
+@import "sassy-maps";
+
+$Memoization-Table: () !default;
+
+//////////////////////////////
+// Memoization Set
+//////////////////////////////
+@function memo-set($module, $key, $value) {
+  $module: "#{$module}";
+  $key: "#{$key}";
+
+  $Memoization-Table: map-set-deep($Memoization-Table, ($module $key), $value) !global;
+
+  @return true;
+}
+
+@mixin memo-set($module, $key, $value) {
+  $holder: memo-set($module, $key, $value);
+}
+
+//////////////////////////////
+// Memoization Get
+//////////////////////////////
+@function memo-get($module, $key) {
+  $module: "#{$module}";
+  $key: "#{$key}";
+  $private-sassy-maps-suppress-warnings: true !global;
+  $result: map-get-deep($Memoization-Table, $module, $key);
+  $private-sassy-maps-suppress-warnings: false !global;
+  @return $result;
+}

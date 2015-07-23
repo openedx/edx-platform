@@ -2,6 +2,5 @@
 // edX Pattern Library: Variables (LTR-centric)
 
 // grid - configuration (susy-based)
-$susy: (
-    flow: ltr,
-);
+$grid-direction-default:    ltr !default; // default grid direction
+$grid-direction-reversed:   rtl !default; // reversed grid direction (used for layouts)

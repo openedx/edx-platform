@@ -1,0 +1,375 @@
+// ------------------------------
+// edX Pattern Library: Components - Grid
+
+// About: Contains base settings and options for the default Pattern Library grid system.
+// ----------------------------
+
+// #CONFIG
+// #GLOBALS
+// #UTILITY
+// #CANNED
+// #CANNED - RESPONSIVE
+// #GALLERY
+// #GALLERY - CANNED
+// #GALLERY - CANNED + RESPONSIVE
+// #DEBUG
+
+// ----------------------------
+
+// ----------------------------
+// #CONFIG
+// ----------------------------
+// susy-based configuration (see http://susydocs.oddbird.net/en/latest/settings/)
+$susy: (
+    use-custom: (
+        background-options: false,
+        box-sizing: false,
+        breakpoint: true,
+        clearfix: true,
+        rem: true
+    ),
+    debug: (
+        color: $grid-debug-color,
+    ),
+    math: fluid,
+    output: float
+);
+
+// LAYOUT: set default susy settings
+// (gutters are handled outside of elements - by default)
+$susy-default: (
+    flow: $grid-direction-default,
+    column-width: $grid-column-width,
+    columns: $grid-column-count,
+    container-position: $grid-container-position,
+    container: $grid-max-width,
+    global-box-sizing: border-box,
+    gutters: $grid-gutter-width,
+    gutter-position: $grid-gutter-position
+);
+
+// LAYOUT: set susy settings especially for manually set grids in the DOM
+// (gutters are handled inside of elements - by default)
+$susy-manual: layout($susy-default $grid-manual-gutter-position);
+
+// LAYOUT: set debug settings
+$susy-debug: layout($susy-default show);
+
+
+// ----------------------------
+// #GLOBALS
+// ----------------------------
+// set basic grid settings for app
+@include layout($susy-default);
+
+
+// ----------------------------
+// #UTILITY
+// ----------------------------
+%grid-container {
+    @include container();
+}
+
+// grid rows - set visual break and document flow clear (clearfix)
+%grid-row {
+    @include break();
+    @include clearfix();
+}
+
+%grid-gallery {
+    @include break();
+    @include clearfix();
+}
+
+%grid-fill-col {
+    display: block;
+    width: 100%;
+}
+
+.grid-container {
+    @extend %grid-container;
+
+    .col.col-first {
+        @include first();
+    }
+
+    .col.col-last {
+        @include last();
+    }
+
+    .col.col-break {
+        @include break();
+    }
+
+    .col.col-omega {
+        @include omega();
+    }
+    .col.col-full {
+        @include full();
+    }
+
+    .col {
+
+        // make an object span the entirety of its col
+        .fill-col {
+            @extend %grid-fill-col;
+        }
+    }
+}
+
+.row {
+    @extend %grid-row;
+}
+
+// break grid's columns to a new line
+.grid-break {
+    @include break();
+}
+
+// don't break the columns to a new line
+.grid-unbreak {
+    @include nobreak();
+}
+
+
+// ----------------------------
+// #CANNED
+// ----------------------------
+.grid-manual {
+    @include layout($susy-manual, clean);
+
+    .row {
+        margin-right: -(gutter());
+        margin-left: -(gutter());
+    }
+
+    // column widths
+    @for $i from 1 through $grid-column-count {
+        .col-#{$i} {
+            @include span($i);
+        }
+    }
+
+    // shifts - before cols
+    @for $i from 1 through $grid-column-count {
+        .pre-#{$i} {
+            @include pre($i);
+        }
+    }
+
+    // shifts - after col
+    @for $i from 1 through $grid-column-count {
+        .post-#{$i} {
+            @include pre($i);
+        }
+    }
+}
+
+// ----------------------------
+// #CANNED + RESPONSIVE
+// ----------------------------
+.grid-manual {
+
+    // CASE: small screen bp
+    @for $i from 1 through $grid-column-count {
+        .sm-col-#{$i} {
+            @include susy-breakpoint($bp-screen-sm, $susy-manual) {
+                @include span($i);
+            }
+        }
+    }
+
+    // shifts - pre
+    @for $i from 1 through $grid-column-count {
+        .sm-pre-#{$i} {
+            @include susy-breakpoint($bp-screen-sm, $susy-manual) {
+                @include pre($i);
+            }
+        }
+    }
+
+    // shifts - post
+    @for $i from 1 through $grid-column-count {
+        .sm-post-#{$i} {
+            @include susy-breakpoint($bp-screen-sm, $susy-manual) {
+                @include post($i);
+            }
+        }
+    }
+
+    // CASE: medium screen bp
+    @for $i from 1 through $grid-column-count {
+        .md-col-#{$i} {
+            @include susy-breakpoint($bp-screen-md, $susy-manual) {
+                @include span($i);
+            }
+        }
+    }
+
+    // shifts - pre
+    @for $i from 1 through $grid-column-count {
+        .md-pre-#{$i} {
+            @include susy-breakpoint($bp-screen-md, $susy-manual) {
+                @include pre($i);
+            }
+        }
+    }
+
+    // shifts - post
+    @for $i from 1 through $grid-column-count {
+        .md-post-#{$i} {
+            @include susy-breakpoint($bp-screen-md, $susy-manual) {
+                @include post($i);
+            }
+        }
+    }
+
+    // CASE: large screen bp
+    @for $i from 1 through $grid-column-count {
+        .lg-col-#{$i} {
+            @include susy-breakpoint($bp-screen-lg, $susy-manual) {
+                @include span($i);
+            }
+        }
+    }
+
+    // shifts - pre
+    @for $i from 1 through $grid-column-count {
+        .lg-pre-#{$i} {
+            @include susy-breakpoint($bp-screen-lg, $susy-manual) {
+                @include pre($i);
+            }
+        }
+    }
+
+    // shifts - post
+    @for $i from 1 through $grid-column-count {
+        .lg-post-#{$i} {
+            @include susy-breakpoint($bp-screen-lg, $susy-manual) {
+                @include post($i);
+            }
+        }
+    }
+
+    // CASE: x-large screen bp
+    @for $i from 1 through $grid-column-count {
+        .xl-col-#{$i} {
+            @include susy-breakpoint($bp-screen-xl, $susy-manual) {
+                @include span($i);
+            }
+        }
+    }
+
+    // shifts - pre
+    @for $i from 1 through $grid-column-count {
+        .xl-pre-#{$i} {
+            @include susy-breakpoint($bp-screen-xl, $susy-manual) {
+                @include pre($i);
+            }
+        }
+    }
+
+    // shifts - post
+    @for $i from 1 through $grid-column-count {
+        .xl-post-#{$i} {
+            @include susy-breakpoint($bp-screen-xl, $susy-manual) {
+                @include post($i);
+            }
+        }
+    }
+}
+
+// ----------------------------
+// #GALLERY
+// ----------------------------
+.gallery {
+    @extend %grid-gallery;
+}
+
+// ----------------------------
+// #GALLERY - CANNED
+// ----------------------------
+.grid-manual {
+
+    .gallery {
+        @include layout($susy-default, clean);
+        @extend %reset-lists; // precautionary in case this is used on lists
+    }
+
+    // gallery items
+    @for $i from 1 through $grid-column-count {
+        .gallery-#{$i} {
+
+            .gallery-item {
+                @include gallery($i);
+            }
+        }
+    }
+}
+
+
+// ----------------------------
+// #GALLERY - CANNED + RESPONSIVE
+// ----------------------------
+.grid-manual {
+
+    // CASE: small screen bp
+    @for $i from 1 through $grid-column-count {
+        .sm-gallery-#{$i} {
+            @include susy-breakpoint($bp-screen-sm, $susy-default) {
+
+                .gallery-item {
+                    @include gallery($i);
+                }
+            }
+        }
+    }
+
+    // CASE: medium screen bp
+    @for $i from 1 through $grid-column-count {
+        .md-gallery-#{$i} {
+            @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+                .gallery-item {
+                    @include gallery($i);
+                }
+            }
+        }
+    }
+
+    // CASE: large screen bp
+    @for $i from 1 through $grid-column-count {
+        .lg-gallery-#{$i} {
+            @include susy-breakpoint($bp-screen-lg, $susy-default) {
+
+                .gallery-item {
+                    @include gallery($i);
+                }
+            }
+        }
+    }
+
+    // CASE: x-large screen bp
+    @for $i from 1 through $grid-column-count {
+        .xl-gallery-#{$i} {
+            @include susy-breakpoint($bp-screen-xl, $susy-default) {
+
+                .gallery-item {
+                    @include gallery($i);
+                }
+            }
+        }
+    }
+}
+
+
+// ----------------------------
+// #DEBUG
+// ----------------------------
+%grid-debug {
+    @include show-grid();
+}
+
+.grid-debug {
+    @extend %grid-debug;
+}

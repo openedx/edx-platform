@@ -1,0 +1,13 @@
+{
+  "name": "animate.css",
+  "version": "3.3.0",
+  "main": "./animate.css",
+  "ignore": [
+    ".*",
+    "src",
+    "*.yml",
+    "Gemfile",
+    "Gemfile.lock",
+    "*.md"
+  ]
+}

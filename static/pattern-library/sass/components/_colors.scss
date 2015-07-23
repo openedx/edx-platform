@@ -4,72 +4,6 @@
 // About: Contains base styling for demonstration and utility color palette stylng.
 // ----------------------------
 
-// #SWATCH LAYOUT
-// #SWATCH RENDERING
-// ----------------------------
-
-// ----------------------------
-// #SWATCH LAYOUT
-// ----------------------------
-.example {
-    @include transition(all timing(x-fast) ease-in-out);
-    border: 1px solid palette(grayscale, x-light);
-    border-radius: spacing-horizontal(xx-small);
-    margin-bottom: spacing-vertical(mid-small);
-    padding: spacing-vertical(x-small) spacing-horizontal(small);
-    box-shadow: 0 rem(2) rem(2) 0 palette(grayscale, xx-trans);
-    background: palette(grayscale, white);
-    color: palette(grayscale, white);
-
-    // STATE: hover, focus, and active
-    &:hover, &:focus, &:active {
-        @include transform(scale(1.05));
-        box-shadow: 0 rem(2) rem(2) 0 palette(grayscale, x-trans);
-    }
-}
-
-.swatch-color {
-    display: block;
-    margin-bottom: spacing-vertical(x-small);
-    padding: spacing-vertical(mid-large) spacing-horizontal(mid-small);
-    @include text-align(center);
-
-    .color-class {
-        font-size: font-size(small);
-        text-transform: lowercase;
-
-        // CASE: light text on dark bg
-        &.lod {
-            color: palette(grayscale, white);
-        }
-
-        // CASE: dark text on light bg
-        &.dol {
-            color: palette(grayscale, black);
-        }
-    }
-
-    // CASE: base color
-    &.base {
-
-        .color-class {
-            font-weight: font-weight(bold);
-        }
-    }
-}
-
-.swatch-meta {
-    padding: spacing-vertical(xx-small) spacing-horizontal(small);
-    white-space: nowrap;
-    font-size: font-size(small);
-    @include text-align(center);
-    color: palette(grayscale, dark);
-
-    .color-rgb {
-        @include ellipsis();
-    }
-}
-
 // ----------------------------
 // #SWATCH RENDERING
 // ----------------------------
@@ -147,6 +81,10 @@
         background: palette(grayscale, x-light);
     }
 
+    &.xx-light {
+        background: palette(grayscale, xx-light);
+    }
+
     &.white {
         background: palette(grayscale, white);
     }
@@ -197,6 +135,10 @@
 
     &.x-light {
         background: palette(grayscale-cool, x-light);
+    }
+
+    &.xx-light {
+        background: palette(grayscale-cool, xx-light);
     }
 
     &.dark {

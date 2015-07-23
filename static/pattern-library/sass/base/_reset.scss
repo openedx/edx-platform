@@ -35,9 +35,10 @@ video {
 }
 
 body {
+    @extend %depth-0;
     @include font-smoothing(on);
+    @extend %depth-0;
     color: $text-base-color;
-    background: $view-bg;
     font-size: font-size(base);
     font-family: $font-family-sans-serif;
 }
@@ -108,6 +109,10 @@ pre {
 
 .bg-replace {
     @extend %a11y-hide-image-text;
+}
+
+.is-hidden {
+    display: none;
 }
 
 [class^='wrapper'] {
