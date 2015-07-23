@@ -18,6 +18,7 @@ import dogstats_wrapper as dog_stats_api
 
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import CourseLocator
 from xblock.core import XBlock
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from xmodule.tabs import CourseTab
@@ -99,7 +100,11 @@ class CourseFactory(XModuleFactory):
     # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
-
+        """
+        Create and return a new course. For performance reasons, we do not emit
+        signals during this process, but if you need signals to run, you can
+        pass `emit_signals=True` to this method.
+        """
         # All class attributes (from this class and base classes) are
         # passed in via **kwargs. However, some of those aren't actual field values,
         # so pop those off for use separately
@@ -110,20 +115,23 @@ class CourseFactory(XModuleFactory):
         name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
         run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
+        emit_signals = kwargs.get('emit_signals', False)
 
         # Pass the metadata just as field=value pairs
         kwargs.update(kwargs.pop('metadata', {}))
         default_store_override = kwargs.pop('default_store', None)
 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            if default_store_override is not None:
-                with store.default_store(default_store_override):
+            course_key = CourseLocator(org=org, course=number, run=run)
+            with store.bulk_operations(course_key, emit_signals=emit_signals):
+                if default_store_override is not None:
+                    with store.default_store(default_store_override):
+                        new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+                else:
                     new_course = store.create_course(org, number, run, user_id, fields=kwargs)
-            else:
-                new_course = store.create_course(org, number, run, user_id, fields=kwargs)
 
-            last_course.loc = new_course.location
-            return new_course
+                last_course.loc = new_course.location
+                return new_course
 
 
 class LibraryFactory(XModuleFactory):
