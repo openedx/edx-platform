@@ -73,6 +73,7 @@ bin/
 *.scssc
 lms/static/css/
 lms/static/certificates/css/
+lms/static/onboarding/css/
 cms/static/css/
 
 ### Styling generated from templates
