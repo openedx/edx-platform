@@ -13,7 +13,7 @@
 %state-disabled {
     pointer-events: none;
     outline: none;
-    cursor: default;
+    cursor: not-allowed;
 }
 
 // presentational wrapper
@@ -110,7 +110,7 @@
 %reset-code {
     font-family: $font-family-monospace;
     font-size: font-size(base);
-    line-height: line-height(large);
+    line-height: line-height(x-large);
     color: $text-base-color;
 }
 
@@ -136,7 +136,7 @@
     // STATE: is disabled
     &:disabled,
     &.is-disabled {
-        display: none; // :)
+        display: none;
         color: palette(grayscale, light);
     }
 

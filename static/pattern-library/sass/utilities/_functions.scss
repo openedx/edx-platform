@@ -47,7 +47,7 @@
 // get letter spacing from defined map values
 @function letter-spacing($key) {
   @if map-has-key($letter-spacing, $key) {
-    @return map-get($letter-spacing, $key);
+    @return rem(map-get($letter-spacing, $key));
   }
 
   @warn "Unknown `#{$key}` in $letter-spacing.";
@@ -91,5 +91,29 @@
   }
 
   @warn "Unknown `#{$key}` in $spacing-horizontal.";
+  @return null;
+}
+
+// get input heights from defined map values
+@function input-height($key) {
+  @if map-has-key($input-height, $key) {
+    @return (map-get($input-height, $key) + rem);
+  }
+
+  @warn "Unknown `#{$key}` in $input-height.";
+  @return null;
+}
+
+// get input widths from defined map values
+@function input-width($key) {
+  @if map-has-key($input-width, $key) {
+    @if ($key == 'block') {
+      @return 100%;
+    } @else {
+      @return rem(map-get($input-width, $key));
+    }
+  }
+
+  @warn "Unknown `#{$key}` in $input-width.";
   @return null;
 }

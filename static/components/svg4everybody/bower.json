@@ -1,0 +1,20 @@
+{
+  "name": "svg4everybody",
+  "homepage": "https://github.com/jonathantneal/svg4everybody",
+  "authors": [
+    "Jonathan Neal <jonathantneal+github@gmail.com>"
+  ],
+  "description": "Use external SVG spritemaps today.",
+  "main": ["svg4everybody.min.js", "svg4everybody.ie8.min.js"],
+  "keywords": [
+    "svg",
+    "spritemaps",
+    "polyfill",
+    "ie"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jonathantneal/svg4everybody.git"
+  },
+  "license": "CC0 1.0"
+}
