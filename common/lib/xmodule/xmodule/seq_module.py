@@ -152,11 +152,9 @@ class SequenceModule(SequenceFields, XModule):
 
             # Is the feature turned on?
             if proctoring_service.is_feature_enabled():
-                user_id = self.runtime.user.id
-                user_role_in_course = self.runtime.get_user_role(
-                    user=self.runtime.user,
-                    course_id=self.runtime.course_id
-                )
+
+                user_id = self.runtime.user_id
+                user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
                 course_id = self.runtime.course_id
                 content_id = self.location
 
