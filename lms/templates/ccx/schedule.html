@@ -42,10 +42,10 @@
     <form>
       <div class="field datepair">
         ## Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
-        <label class="sr" for="ccx_dialog_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+        <label class="sr form-label" for="ccx_dialog_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
         <input placeholder="Date" class="date" type="text" name="date" id="ccx_dialog_date" size="11" />
         ## Translators: This explains to people using a screen reader how to interpret the format of HH:MM
-        <label class="sr" for="ccx_dialog_time">${_('Time format two digit hours colon two digit minutes')}</label>
+        <label class="sr form-label" for="ccx_dialog_time">${_('Time format two digit hours colon two digit minutes')}</label>
         <input placeholder="Time" class="time" type="text" name="time" id="ccx_dialog_time" size="6" />
       </div>
       <div class="field">
@@ -60,7 +60,7 @@
        aria-labelledby="ccx_schedule_save_changes_heading">
     <h2 id="ccx_schedule_save_changes_heading">${_('Save changes')}</h2>
     <form>
-      <p id="message_save">${_("You have unsaved changes.")}</p>
+      <p id="message_save" class="text-helper">${_("You have unsaved changes.")}</p>
       <div class="field">
         <br/>
         <button id="save-changes" aria-describedby="message_save">${_("Save changes")}</button>
@@ -69,26 +69,26 @@
   </div>
   <div class="ccx-sidebar-panel" id="ajax-error" tabindex="-1" role="region" aria-labelledby="ccx_schedule_error_message">
     <h2>${_('Error')}</h2>
-    <p id="ccx_schedule_error_message">${_("There was an error saving changes.")}</p>
+    <p id="ccx_schedule_error_message" class="text-helper">${_("There was an error saving changes.")}</p>
   </div>
   <div class="ccx-sidebar-panel" aria-labelledby="ccx_schedule_unit"
        id="ccx_schedule_unit_panel" role="region">
     <h2 id="ccx_schedule_unit">${_('Schedule a Unit')}</h2>
     <form role="form" id="add-unit" name="add-unit" class="ccx-form">
       <div class="field">
-        <label for="ccx_chapter"><b>${_('Section')}</b></label>
+        <label for="ccx_chapter" class="form-label"><b>${_('Section')}</b></label>
         <select name="chapter" id="ccx_chapter" ></select>
       </div>
       <div class="field">
-        <label for="ccx_sequential"><b>${_('Subsection')}</b></label>
+        <label for="ccx_sequential" class="form-label"><b>${_('Subsection')}</b></label>
         <select name="sequential" id="ccx_sequential"></select>
       </div>
       <div class="field">
-        <label for="ccx_vertical"><b>${_('Unit')}</b></label>
+        <label for="ccx_vertical" class="form-label"><b>${_('Unit')}</b></label>
         <select name="vertical" id="ccx_vertical"></select>
       </div>
       <div class="field datepair">
-        <label for="ccx_start_date">
+        <label for="ccx_start_date" class="form-label">
             <b>${_('Start Date')}</b>
             <span class="sr">
               ## Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
@@ -97,11 +97,11 @@
         </label>
         <input placeholder="yyyy-mm-dd" type="text" class="date" name="start_date" id="ccx_start_date" />
         ## Translators: This explains to people using a screen reader how to interpret the format of HH:MM
-        <label for="ccx_start_time" class="sr">${_('Start time format two digit hours colon two digit minutes')}</label>
+        <label for="ccx_start_time" class="sr form-label">${_('Start time format two digit hours colon two digit minutes')}</label>
         <input placeholder="time" type="text" class="time" name="start_time" id="ccx_start_time"/>
       </div>
       <div class="field datepair">
-        <label for="ccx_due_date">
+        <label for="ccx_due_date" class="form-label">
             <b>${_('Due Date')}</b> ${_('(Optional)')}
             <span class="sr">
                 ## Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
@@ -110,7 +110,7 @@
         </label>
         <input placeholder="yyyy-mm-dd" type="text" class="date" name="due_date" id="ccx_due_date"/>
         ## Translators: This explains to people using a screen reader how to interpret the format of HH:MM
-        <label for="ccx_due_time" class="sr">${_('Due Time format two digit hours colon two digit minutes')}</label>
+        <label for="ccx_due_time" class="sr form-label">${_('Due Time format two digit hours colon two digit minutes')}</label>
         <input placeholder="time" type="text" class="time" name="due_time" id="ccx_due_time"/>
       </div>
       <div class="field">
