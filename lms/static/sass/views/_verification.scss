@@ -245,42 +245,46 @@
     }
   }
   .report-receipt-provider {
-        @extend %ui-window;
-        border-top:3px solid $credit-color-base !important;
-        p {
-          padding: 0 $baseline $baseline/2 $baseline;
-          overflow: auto;
-        }
-        .bold_param {
-          padding: $baseline*.75 $baseline 0 $baseline;
-          font-weight: 600;
-        }
-        .bold_param span {
-          @include float(right);
-        }
-        div {
-          padding: 10px 20px;
-          margin: 0 0 15px;
-          overflow: auto;
-        }
-        div span {
-          @include float(right);
-          padding: 0;
-          margin: 0;
-        }
-        .complete-course {
-          @extend %btn-pl-primary-base;
-          @include float(right);
+    @extend %ui-window;
+    border-top: 3px solid $credit-color-base;
 
-          &.archived {
-            @extend %btn-pl-default-base;
-          }
-        }
-        .custom_instructions div {
-          @include float(left);
-        }
+    .provider-wrapper {
+      width: 70%;
+      @include float(left);
+      padding-left: $baseline;
+
+      .provider-info {
+        padding: $baseline $baseline $baseline 0;
+        font-weight: 600;
+      }
+      .provider-more-info {
+      }
+      .provider-instructions {
+      }
+    }
+
+    .provider-buttons-logos {
+      width: 30%;
+      @include float(right);
+      @include text-align(center);
+
+      .provider-logo {
+        padding: $baseline;
+      }
+      .provider-logo image {
+        width: 100px;
       }
 
+      .complete-order {
+        @include text-align(center);
+        padding: $baseline;
+      }
+      .complete-order button {
+        @extend %btn-pl-primary-base;
+        white-space: nowrap;
+      }
+    }
+  }
   // ====================
 
   // UI: help
