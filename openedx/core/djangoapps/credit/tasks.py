@@ -57,6 +57,9 @@ def _get_course_credit_requirements(course_key):
     """
     Returns the list of credit requirements for the given course.
 
+    This will also call into the edx-proctoring subsystem to also
+    produce proctored exam requirements for credit bearing courses
+
     It returns the minimum_grade_credit and also the ICRV checkpoints
     if any were added in the course
 
@@ -69,7 +72,10 @@ def _get_course_credit_requirements(course_key):
     """
     credit_xblock_requirements = _get_credit_course_requirement_xblocks(course_key)
     min_grade_requirement = _get_min_grade_requirement(course_key)
-    credit_requirements = min_grade_requirement + credit_xblock_requirements
+    proctored_exams_requirements = _get_proctoring_requirements(course_key)
+    credit_requirements = (
+        min_grade_requirement + credit_xblock_requirements + proctored_exams_requirements
+    )
     return credit_requirements
 
 
@@ -161,3 +167,44 @@ def _is_credit_requirement(xblock):
         return False
 
     return True
+
+
+def _get_proctoring_requirements(course_key):
+    """
+    Will return list of requirements regarding any exams that have been
+    marked as proctored exams. For credit-bearing courses, all
+    proctored exams must be validated and confirmed from a proctoring
+    standpoint. The passing grade on an exam is not enough.
+
+    Args:
+        course_key: The key of the course in question
+
+    Returns:
+        list of requirements dictionary, one per active proctored exam
+
+    """
+
+    # Note: Need to import here as there appears to be
+    # a circular reference happening when launching Studio
+    # process
+    from edx_proctoring.api import get_all_exams_for_course
+
+    requirements = [
+        {
+            'namespace': 'proctored_exam',
+            'name': 'proctored_exam_id:{id}'.format(id=exam['id']),
+            'display_name': exam['exam_name'],
+            'criteria': {},
+        }
+        for exam in get_all_exams_for_course(unicode(course_key))
+        if exam['is_proctored'] and exam['is_active']
+    ]
+
+    log_msg = (
+        'Registering the following as \'proctored_exam\' credit requirements: {log_msg}'.format(
+            log_msg=requirements
+        )
+    )
+    LOGGER.info(log_msg)
+
+    return requirements

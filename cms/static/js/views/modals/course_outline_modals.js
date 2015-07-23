@@ -13,7 +13,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor;
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor, TimedExaminationPreferenceEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events : {
@@ -257,7 +257,94 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+    TimedExaminationPreferenceEditor = AbstractEditor.extend({
+        templateName: 'timed-examination-preference-editor',
+        className: 'edit-settings-timed-examination',
 
+        events : {
+            'change #id_timed_examination': 'timedExamination',
+            'focusout #id_time_limit': 'timeLimitFocusout'
+        },
+        timeLimitFocusout: function(event) {
+            var selectedTimeLimit = $(event.currentTarget).val();
+            if (!this.isValidTimeLimit(selectedTimeLimit)) {
+                $(event.currentTarget).val("00:30");
+            }
+        },
+        timedExamination: function (event) {
+            event.preventDefault();
+            if (!$(event.currentTarget).is(':checked')) {
+                this.$('#id_exam_proctoring').attr('checked', false);
+                this.$('#id_time_limit').val('00:30');
+                this.$('#id_exam_proctoring').attr('disabled','disabled');
+                this.$('#id_time_limit').attr('disabled', 'disabled');
+            }
+            else {
+                this.$('#id_exam_proctoring').removeAttr('disabled');
+                this.$('#id_time_limit').removeAttr('disabled');
+            }
+            return true;
+        },
+        afterRender: function () {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.$('input.time').timepicker({
+                'timeFormat' : 'H:i',
+                'forceRoundTime': false
+            });
+            this.setExamTime(this.model.get('default_time_limit_minutes'));
+            this.setExamTmePreference(this.model.get('is_time_limited'));
+            this.setExamProctoring(this.model.get('is_proctored_enabled'));
+        },
+        setExamProctoring: function(value) {
+            this.$('#id_exam_proctoring').prop('checked', value);
+        },
+        setExamTime: function(value) {
+            var time = this.convertTimeLimitMinutesToString(value);
+            this.$('#id_time_limit').val(time);
+        },
+        setExamTmePreference: function (value) {
+            this.$('#id_timed_examination').prop('checked', value);
+            if (!this.$('#id_timed_examination').is(':checked')) {
+                this.$('#id_exam_proctoring').attr('disabled','disabled');
+                this.$('#id_time_limit').attr('disabled', 'disabled');
+            }
+        },
+        isExamTimeEnabled: function () {
+            return this.$('#id_timed_examination').is(':checked');
+        },
+        isValidTimeLimit: function(time_limit) {
+            var pattern = new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
+            return pattern.test(time_limit);
+        },
+        getExamTimeLimit: function () {
+            return this.$('#id_time_limit').val();
+        },
+        convertTimeLimitMinutesToString: function (timeLimitMinutes) {
+            var hoursStr = "" + Math.floor(timeLimitMinutes / 60);
+            var actualMinutesStr = "" + (timeLimitMinutes % 60);
+            hoursStr = "00".substring(0, 2 - hoursStr.length) + hoursStr;
+            actualMinutesStr = "00".substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
+            return hoursStr + ":" + actualMinutesStr;
+        },
+        convertTimeLimitToMinutes: function (time_limit) {
+            var time = time_limit.split(':');
+            var total_time = (parseInt(time[0]) * 60) + parseInt(time[1]);
+            return total_time;
+        },
+        isExamProctoringEnabled: function () {
+            return this.$('#id_exam_proctoring').is(':checked');
+        },
+        getRequestData: function () {
+            var time_limit = this.getExamTimeLimit();
+            return {
+                metadata: {
+                    'is_time_limited': this.isExamTimeEnabled(),
+                    'is_proctored_enabled': this.isExamProctoringEnabled(),
+                    'default_time_limit_minutes': this.convertTimeLimitToMinutes(time_limit)
+                }
+            };
+        }
+    });
     GradingEditor = AbstractEditor.extend({
         templateName: 'grading-editor',
         className: 'edit-settings-grading',
@@ -358,11 +445,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (xblockInfo.isChapter()) {
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
-                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor];
+                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
+
+                // since timed/proctored exams are optional
+                // we want it before the StaffLockEditor
+                // to keep it closer to the GradingEditor
+                if (options.enable_proctored_exams) {
+                    editors.push(TimedExaminationPreferenceEditor);
+                }
+
+                editors.push(StaffLockEditor);
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
             }
-
             return new SettingsXBlockModal($.extend({
                 editors: editors,
                 model: xblockInfo

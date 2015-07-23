@@ -8,10 +8,11 @@ from datetime import datetime
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.signals import listen_for_course_publish
-from xmodule.modulestore.django import SignalHandler
+from openedx.core.djangoapps.credit.signals import on_course_publish
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+
+from edx_proctoring.api import create_exam
 
 
 class TestTaskExecution(ModuleStoreTestCase):
@@ -44,7 +45,6 @@ class TestTaskExecution(ModuleStoreTestCase):
     def setUp(self):
         super(TestTaskExecution, self).setUp()
 
-        SignalHandler.course_published.disconnect(listen_for_course_publish)
         self.course = CourseFactory.create(start=datetime(2015, 3, 1))
 
     def test_task_adding_requirements_invalid_course(self):
@@ -53,7 +53,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         """
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self, self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
@@ -67,7 +67,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self, self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 1)
@@ -80,17 +80,100 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_icrv_xblock()
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self, self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
+
+    def test_proctored_exam_requirements(self):
+        """
+        Make sure that proctored exams are being registered as requirements
+        """
+
+        self.add_credit_course(self.course.id)
+        create_exam(
+            course_id=unicode(self.course.id),
+            content_id='foo',
+            exam_name='A Proctored Exam',
+            time_limit_mins=10,
+            is_proctored=True,
+            is_active=True
+        )
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEqual(len(requirements), 0)
+        on_course_publish(self.course.id)
+
+        # just inspect the proctored exam requirement
+        requirements = [
+            requirement
+            for requirement in get_credit_requirements(self.course.id)
+            if requirement['namespace'] == 'proctored_exam'
+        ]
+
+        self.assertEqual(len(requirements), 1)
+        self.assertEqual(requirements[0]['namespace'], 'proctored_exam')
+        self.assertEqual(requirements[0]['name'], 'proctored_exam_id:1')
+        self.assertEqual(requirements[0]['display_name'], 'A Proctored Exam')
+        self.assertEqual(requirements[0]['criteria'], {})
+
+    def test_proctored_exam_filtering(self):
+        """
+        Make sure that timed or inactive exams do not end up in the requirements table
+        """
+
+        self.add_credit_course(self.course.id)
+        create_exam(
+            course_id=unicode(self.course.id),
+            content_id='foo',
+            exam_name='A Proctored Exam',
+            time_limit_mins=10,
+            is_proctored=False,
+            is_active=True
+        )
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEqual(len(requirements), 0)
+
+        on_course_publish(self.course.id)
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEqual(len(requirements), 1)
+
+        # make sure we don't have a proctoring requirement
+        self.assertFalse([
+            requirement
+            for requirement in requirements
+            if requirement['namespace'] == 'proctored_exam'
+        ])
+
+        create_exam(
+            course_id=unicode(self.course.id),
+            content_id='foo2',
+            exam_name='A Proctored Exam',
+            time_limit_mins=10,
+            is_proctored=True,
+            is_active=False
+        )
+
+        on_course_publish(self.course.id)
+
+        requirements = get_credit_requirements(self.course.id)
+        self.assertEqual(len(requirements), 1)
+
+        # make sure we don't have a proctoring requirement
+        self.assertFalse([
+            requirement
+            for requirement in requirements
+            if requirement['namespace'] == 'proctored_exam'
+        ])
 
     def test_query_counts(self):
         self.add_credit_course(self.course.id)
         self.add_icrv_xblock()
 
         with check_mongo_calls(3):
-            listen_for_course_publish(self, self.course.id)
+            on_course_publish(self.course.id)
 
     @mock.patch(
         'openedx.core.djangoapps.credit.tasks.set_credit_requirements',
@@ -108,7 +191,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
-        listen_for_course_publish(self, self.course.id)
+        on_course_publish(self.course.id)
 
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 0)
