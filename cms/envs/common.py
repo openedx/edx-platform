@@ -689,11 +689,16 @@ COURSE_UTILITIES = [
                 'action_text': 'Check Captions',
                 'action_external': False,
             },
-            #{'short_description': 'Bulk view problem settings',
-            # 'long_description': 'This utility will allow you to view all section, subsection and problem settings in one page.',
-            # 'action_url': 'utility_bulksettings_handler',
-            # 'action_text': 'View Problem Settings',
-            # 'action_external': False,},
+            {
+                'short_description': 'Bulk view problem settings',
+                'long_description': (
+                    'This utility will allow you to view all section, subsection '
+                    'and problem settings in one page.'
+                ),
+                'action_url': 'utility_bulksettings_handler',
+                'action_text': 'View Problem Settings',
+                'action_external': False,
+            },
         ],
     }
 ]
