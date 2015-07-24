@@ -17,6 +17,11 @@ from django.utils.translation import ugettext as _
 
 <%block name="assets_primary">
 <%static:css group='style-onboarding'/>
+% for template_name in ["account", "access", "form_field", "login", "register", "institution_login", "institution_register", "password_reset", "hinted_login"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="student_account/${template_name}.underscore" />
+    </script>
+% endfor
 </%block>
 
 <%block name="system_feedback">
@@ -44,12 +49,4 @@ from django.utils.translation import ugettext as _
     <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
     <script src="${static.url('js/vendor/history.js')}"></script>
     <%static:js group='student_account'/>
-</%block>
-
-<%block name="header_extras">
-    % for template_name in ["account", "access", "form_field", "login", "register", "institution_login", "institution_register", "password_reset", "hinted_login"]:
-        <script type="text/template" id="${template_name}-tpl">
-            <%static:include path="student_account/${template_name}.underscore" />
-        </script>
-    % endfor
 </%block>

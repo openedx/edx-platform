@@ -10,26 +10,22 @@ from branding import api as branding_api
 %>
 
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 
     <head dir="${static.dir_rtl()}">
         <%block name="head">
-            <%block name="head_metadata">
-                <%include file="_head_metadata.html" />
-            </%block>
-            <%block name="head_analytics">
-                <%include file="_head_analytics.html" />
-            </%block>
+            <%include file="_head_metadata.html" />
+            <%block name="head_metadata" />
+            <%include file="_head_analytics.html" />
+            <%block name="head_analytics" />
         </%block>
 
-        <%block name="assets_primary">
-            <%include file="_assets_primary.html" />
-        </%block>
+        <%include file="_assets_primary.html" />
+        <%block name="assets_primary" />
     </head>
 
     <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-
-        <p>Hello</p>
 
         <div class="wrapper-window" dir="${static.dir_rtl()}">
             <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">${_("Skip to main content")}</a>
@@ -45,8 +41,7 @@ from branding import api as branding_api
             </div>
         </div>
 
-         <%block name="assets_secondary">
-             <%include file="_assets_secondary.html" />
-         </%block>
+         <%include file="_assets_secondary.html" />
+         <%block name="assets_secondary" />
      </body>
 </html>
