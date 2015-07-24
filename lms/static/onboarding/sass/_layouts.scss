@@ -161,3 +161,18 @@
 .wrapper-content {
     margin-bottom: spacing-vertical(base);
 }
+
+
+// ------------------------------
+// #COURSE DISCOVERY
+// ------------------------------
+
+.courses-list {
+    @include clearfix();
+
+    .card {
+        @include gallery(3 of 12);
+        height: 300px;
+        margin-bottom: 20px;
+    }
+}
