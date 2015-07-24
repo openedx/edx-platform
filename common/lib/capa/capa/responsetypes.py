@@ -860,7 +860,7 @@ class ChoiceResponse(LoncapaResponse):
         The hint information goes into the msg= in new_cmap for display.
         Each choice in the checkboxgroup can have 2 extended hints, matching the
         case that the student has or has not selected that choice:
-          <checkboxgroup label="Select the best snack" direction="vertical">
+          <checkboxgroup label="Select the best snack">
              <choice correct="true">Donut
                <choicehint selected="tRuE">A Hint!</choicehint>
                <choicehint selected="false">Another hint!</choicehint>
@@ -986,7 +986,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     to translate back to choice_0 name style for recording in the logs, so
     the logging is in terms of the regular names.
     """
-    # TODO: handle direction and randomize
+    # TODO: randomize
 
     human_name = _('Multiple Choice')
     tags = ['multiplechoiceresponse']
@@ -1336,7 +1336,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
 @registry.register
 class OptionResponse(LoncapaResponse):
     """
-    TODO: handle direction and randomize
+    TODO: handle randomize
     """
 
     human_name = _('Dropdown')
