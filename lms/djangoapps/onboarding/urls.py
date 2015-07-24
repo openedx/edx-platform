@@ -11,5 +11,5 @@ urlpatterns = patterns(
     'onboarding.views',
     url(r'^home$', HomePageView.as_view(), name='home_page'),
     url(r'^course_discovery$', CourseDiscoveryView.as_view(), name='course_discovery_page'),
-    url(r'^course/(?P<course_key_string>[^/]*)', CourseAboutView.as_view(), name='course_about_page'),
+    url(r'^course/(?P<org_string>[^/]*)/(?P<course_string>[^/]*)/(?P<run_string>[^/]*)', CourseAboutView.as_view(), name='course_about_page'),
 )

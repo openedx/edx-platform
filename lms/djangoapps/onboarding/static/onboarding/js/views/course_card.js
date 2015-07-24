@@ -3,21 +3,26 @@
  */
 ;(function (define) {
     'use strict';
-    define(['backbone', 'underscore', 'gettext', 'js/components/card/views/card'],
-        function (Backbone, _, gettext, CardView) {
-            var CourseCardView = CardView.extend({
-                action: function (event) {
-                    event.preventDefault();
-                    window.alert("Navigate to the course!");
+    define(['backbone', 'underscore', 'text!onboarding/templates/course-card.underscore'],
+        function (Backbone, _, course_card_template) {
+            var CourseCardView = Backbone.View.extend({
+
+                className: "card square-card",
+
+                render: function() {
+                    this.$el.html(_.template(course_card_template, {
+                        title: this.model.get('name'),
+                        description: '',
+                        image_url: this.model.get('image_url'),
+                        course_url: this.getCourseUrl()
+                    }));
+                    return this;
                 },
 
-                configuration: 'square_card',
-                cardClass: 'course-card',
-                title: function () { return this.model.get('name'); },
-                actionClass: 'action-view',
-                actionContent: function () {
-                    var screenReaderText = _.escape(gettext('View Course'));
-                    return '<span class="sr">' + screenReaderText + '</span><i class="icon fa fa-arrow-right" aria-hidden="true"></i>';
+                getCourseUrl: function() {
+                    return '/onboarding/course/' + this.model.get('org') + '/' +
+                        this.model.get('course') + '/' +
+                        this.model.get('run');
                 }
             });
 

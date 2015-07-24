@@ -3,62 +3,6 @@
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/page_skeleton.html" />
 
-## Page Content
-## ----------------------------
-<div class="wrapper-content">
-    <main class="content-main">
-        <h1>edX home!</h1>
-
-        <ul>
-            <li><a href="/login">Login</a></li>
-            <li><a href="/onboarding/register">Register</a></li>
-            <li><a href="/onboarding/course_discovery">Course Discovery</a></li>
-        </ul>
-    </main>
-</div>
-
-
-## Page Metadata
-## ----------------------------
-<%block name='bodyclass'>onboarding onboarding-home</%block>
-
-<%block name="head">
-<%include file="_head_metadata.html" />
-<%include file="_head_analytics.html" />
-</%block>
-
-
-## Assets
-<%block name="assets_primary">
-<%include file="_assets_primary.html" />
-</%block>
-<%block name="assets_secondary">
-<%include file="_assets_secondary.html" />
-</%block>
-
-
-## UI Elements
-## ----------------------------
-<%block name="system_feedback">
-    <div class="wrapper-feedback">
-
-    </div>
-</%block>
-
-<%block name="header">
-<%include file="_header.html" />
-</%block>
-
-<%block name="footer">
-<%include file="_footer.html" />
-</%block>
-
-<ul>
-    <li><a href="/login">Login</a></li>
-    <li><a href="/onboarding/register">Register</a></li>
-    <li><a href="/onboarding/course_discovery">Course Discovery</a></li>
-</ul>
-
 <div class="onboarding"></div>
 
 <%block name="js_extra">
