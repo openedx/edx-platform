@@ -3,45 +3,18 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 
-<%inherit file="/page_skeleton.html" />
+<%inherit file="/lms/common/base.html" />
+<%include file="onboarding_base.html" />
 
-## Page Content
-## ----------------------------
-<h1>edX course discovery!</h1>
+<%block name='bodyclass'>onboarding onboarding-course-listings</%block>
 
-<ul>
-    <li><a href="/onboarding/course/circuits-electronics-mitx-6-002x-0">MITx: Circuits & Electronics</a></li>
-    <li><a href="/onboarding/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0">Harvardx: Science & Cooking</a></li>
-</ul>
+<div class="wrapper-content">
+    <main class="content-main">
+        <h1>edX course discovery!</h1>
 
-## Page Metadata
-## ----------------------------
-<%block name="head">
-<%include file="_head_metadata.html" />
-<%include file="_head_analytics.html" />
-</%block>
-
-## Assets
-<%block name="assets_primary">
-<%include file="_assets_primary.html" />
-</%block>
-
-<%block name="assets_secondary">
-<%include file="_assets_secondary.html" />
-</%block>
-
-## UI Elements
-## ----------------------------
-<%block name="system_feedback">
-    <div class="wrapper-feedback">
-
-    </div>
-</%block>
-
-<%block name="header">
-<%include file="_header.html" />
-</%block>
-
-<%block name="footer">
-<%include file="_footer.html" />
-</%block>
+        <ul>
+            <li><a href="/onboarding/course/circuits-electronics-mitx-6-002x-0">MITx: Circuits & Electronics</a></li>
+            <li><a href="/onboarding/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0">Harvardx: Science & Cooking</a></li>
+        </ul>
+    </main>
+</div>

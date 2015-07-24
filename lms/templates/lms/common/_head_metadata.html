@@ -1,6 +1,11 @@
 ## mako
 
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+%>
+
 <%namespace name='static' file='/static_content.html'/>
 
 <meta charset="UTF-8">
