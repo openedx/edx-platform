@@ -51,7 +51,9 @@
     @include susy-breakpoint($bp-screen-md, $susy-default) {
 
         .wrapper-legal {
-            @extend %grid-row;
+            @include break();
+            @include clearfix();
+
 
             .copyright {
                 @include span(6 of 12 first);
@@ -64,7 +66,8 @@
         }
 
         .wrapper-about {
-            @extend %grid-row;
+            @include break();
+            @include clearfix();
         }
     }
 }
