@@ -14,6 +14,73 @@
 // ------------------------------
 // #HOMEPAGE
 // ------------------------------
+.onboarding-home {
+
+    // bad resets
+    .wrapper-header-global {
+        margin-bottom: 0;
+    }
+
+    .wrapper-content {
+        padding: 0;
+    }
+
+    .wrapper-introduction {
+        padding: spacing-vertical(base) spacing-horizontal(base);
+        margin-bottom: spacing-vertical(base);
+
+        background-color: red;
+        background-image:
+        linear-gradient(
+            to right,
+            palette(primary, base), palette(primary, accent)
+        );
+    }
+
+    .introduction {
+        @extend %grid-container;
+
+        .action {
+            margin-right: spacing-horizontal(small);
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        // bad reset
+        .btn-secondary {
+            color: palette(grayscale, white);
+        }
+    }
+
+    .introduction-hd,
+    .introduction-copy {
+        color: palette(grayscale, white);
+    }
+
+    .wrapper-courses {
+        margin-bottom: spacing-vertical(base);
+    }
+
+    .courses {
+        @extend %grid-container;
+    }
+
+    .wrapper-promos {
+        margin-bottom: spacing-vertical(base);
+    }
+
+    .promos {
+        @extend %grid-container;
+
+        .promo {
+            min-height: rem(300);
+            @extend %slat;
+            @include gallery(6);
+        }
+    }
+}
 
 
 // ------------------------------
