@@ -313,8 +313,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             )
         else:
             return Response({
-                'developer_message': "unsupported order_by value {}".format(order_by_input),
-                'user_message': _(u"The ordering {} is not supported").format(order_by_input),
+                'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
+                # Translators: 'ordering' is a string describing a way
+                # of ordering a list. For example, {ordering} may be
+                # 'name', indicating that the user wants to sort the
+                # list by lower case name.
+                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         queryset = queryset.order_by(order_by_field)
@@ -557,8 +561,12 @@ class TopicListView(GenericAPIView):
             topics = get_ordered_topics(course_module, ordering)
         else:
             return Response({
-                'developer_message': "unsupported order_by value {}".format(ordering),
-                'user_message': _(u"The ordering {} is not supported").format(ordering),
+                'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
+                # Translators: 'ordering' is a string describing a way
+                # of ordering a list. For example, {ordering} may be
+                # 'name', indicating that the user wants to sort the
+                # list by lower case name.
+                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=ordering),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         page = self.paginate_queryset(topics)

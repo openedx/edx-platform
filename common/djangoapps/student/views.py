@@ -663,8 +663,8 @@ def dashboard(request):
         )
 
     if 'notlive' in request.GET:
-        redirect_message = _("The course you are looking for does not start until {0}.").format(
-            request.GET['notlive']
+        redirect_message = _("The course you are looking for does not start until {date}.").format(
+            date=request.GET['notlive']
         )
     else:
         redirect_message = ''
