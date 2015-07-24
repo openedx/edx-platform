@@ -349,8 +349,9 @@ def _section_course_info(course, access):
         section_data['detailed_gitlogs_url'] = reverse('gitlogs_detail', kwargs={'course_id': unicode(course_key)})
 
     try:
+        sorted_cutoffs = sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True)
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
-        section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
+        section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
     # section_data['offline_grades'] = offline_grades_available(course_key)
