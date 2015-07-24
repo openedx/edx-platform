@@ -24,20 +24,6 @@ from django.utils.translation import ugettext as _
     </div>
 </%block>
 
-<%block name="js_extra">
-    <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
-    <script src="${static.url('js/vendor/history.js')}"></script>
-    <%static:js group='student_account'/>
-</%block>
-
-<%block name="header_extras">
-    % for template_name in ["account", "access", "form_field", "login", "register", "institution_login", "institution_register", "password_reset", "hinted_login"]:
-        <script type="text/template" id="${template_name}-tpl">
-            <%static:include path="student_account/${template_name}.underscore" />
-        </script>
-% endfor
-</%block>
-
 <h3>New login page!</h3>
 
 <div class="section-bkg-wrapper">
@@ -53,3 +39,17 @@ from django.utils.translation import ugettext as _
         data-password-reset-form-desc='${password_reset_form_desc|h}'
     />
 </div>
+
+<%block name="js_extra">
+    <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
+    <script src="${static.url('js/vendor/history.js')}"></script>
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="header_extras">
+    % for template_name in ["account", "access", "form_field", "login", "register", "institution_login", "institution_register", "password_reset", "hinted_login"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>

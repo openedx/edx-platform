@@ -152,7 +152,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     """
     # If the pattern library is enabled then render the new index page
     if settings.FEATURES["ENABLE_PATTERN_LIBRARY"]:
-        return render_to_response("lms/index.html", {})
+        return render_to_response("onboarding/index.html", {})
 
     if extra_context is None:
         extra_context = {}
