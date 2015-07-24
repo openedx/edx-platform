@@ -8,11 +8,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
-<link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
+##<link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
 <%def name="pagetitle()" />
 <%block name="title">
-    <title>${page_title_breadcrumbs(self.pagetitle())}</title>
+    ## <title>${page_title_breadcrumbs(self.pagetitle())}</title>
 </%block>
 
 <%block name="_head_metadata_extra"/>

@@ -1,8 +1,6 @@
 ## mako
-
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
-
 <%inherit file="/page_skeleton.html" />
 
 ## Page Content
@@ -18,6 +16,7 @@
 ## Page Metadata
 ## ----------------------------
 <%block name="head">
+yoyoyyoyo
 <%include file="_head_metadata.html" />
 <%include file="_head_analytics.html" />
 </%block>
@@ -26,6 +25,8 @@
 <%block name="assets_primary">
 <%include file="_assets_primary.html" />
 </%block>
+
+##<%include file="_assets_primary.html" />
 
 <%block name="assets_secondary">
 <%include file="_assets_secondary.html" />

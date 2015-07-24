@@ -8,36 +8,37 @@ from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
 from branding import api as branding_api
 %>
-
 <!DOCTYPE html>
 <html class="no-js" lang="en">
+DUDE
+<%block name="body">${self.body()}</%block>
 
-    <head dir="${static.dir_rtl()}">
-        <%block name="head">
-        <%block name="head_metadata"/>
-        <%block name="head_analytics"/>
-        </%block>
-
-        <%block name="assets_primary"/>
-    </head>
-
-    <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-
-        <div class="wrapper-window" dir="${static.dir_rtl()}">
-            <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">${_("Skip to main content")}</a>
-
-            <%block name="system_feedback"/>
-
-            <div class="wrapper-view">
-                <%block name="header"/>
-
-                <%block name="body">${self.body()}</%block>
-
-                <%block name="footer"/>
-            </div>
-        </div>
-
-        <%block name="assets_secondary"/>
-    </body>
+##     <head dir="${static.dir_rtl()}">
+##         <%block name="head">
+##             <%block name="head_metadata"/>
+##             <%block name="head_analytics"/>
+##         </%block>
+## 
+##         <%block name="assets_primary"/>
+##     </head>
+## 
+##     <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+## 
+##         <div class="wrapper-window" dir="${static.dir_rtl()}">
+##             <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">${_("Skip to main content")}</a>
+## 
+##             <%block name="system_feedback"/>
+## 
+##             <div class="wrapper-view">
+##                 <%block name="header"/>
+## 
+##                 <%block name="body">${self.body()}</%block>
+## 
+##                 <%block name="footer"/>
+##             </div>
+##         </div>
+## 
+##         <%block name="assets_secondary"/>
+##     </body>
 </html>
 
