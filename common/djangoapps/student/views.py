@@ -150,6 +150,10 @@ def index(request, extra_context=None, user=AnonymousUser()):
     extra_context is used to allow immediate display of certain modal windows, eg signup,
     as used by external_auth.
     """
+    # If the pattern library is enabled then render the new index page
+    if settings.FEATURES["ENABLE_PATTERN_LIBRARY"]:
+        return render_to_response("index_pattern_library.html", {})
+
     if extra_context is None:
         extra_context = {}
     # The course selection work is done in courseware.courses.
@@ -507,6 +511,9 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
+    """
+    Renders the dashboard.
+    """
     user = request.user
 
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)

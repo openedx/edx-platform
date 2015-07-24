@@ -1,0 +1,16 @@
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="/page_skeleton.html" />
+
+<div class="onboarding"></div>
+
+<%block name="js_extra">
+<%static:require_module module_name="onboarding/js/onboarding_factory" class_name="OnboardingFactory">
+    new OnboardingFactory({
+        discoveryUrl: "/api/course_structure/v0/courses"
+    });
+</%static:require_module>
+</%block>
