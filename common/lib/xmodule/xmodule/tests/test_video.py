@@ -582,3 +582,4 @@ class VideoCdnTest(unittest.TestCase):
         cdn_response.return_value = Mock(status_code=404)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
+

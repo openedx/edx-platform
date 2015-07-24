@@ -36,7 +36,8 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR
+    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
+    YOUTUBE_API_KEY,
 )
 from path import path
 from warnings import simplefilter
@@ -594,10 +595,10 @@ CELERY_QUEUES = {
 
 YOUTUBE = {
     # YouTube JavaScript API
-    'API': 'www.youtube.com/iframe_api',
+    'API': 'https://www.youtube.com/iframe_api',
 
-    # URL to test YouTube availability
-    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+    # URL to get YouTube metadata
+    'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
     # Current youtube api for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
@@ -867,4 +868,11 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
         'application/vnd.ms-excel',
         'application/vnd.ms-powerpoint',
     ],
+}
+
+
+XBLOCK_SETTINGS = {
+    'VideoModule': {
+        'YOUTUBE_API_KEY': YOUTUBE_API_KEY
+    }
 }
