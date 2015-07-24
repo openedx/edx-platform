@@ -60,7 +60,7 @@
     }
 
     .course-search {
-
+        @extend %grid-container;
     }
 
     .course-search-form {
