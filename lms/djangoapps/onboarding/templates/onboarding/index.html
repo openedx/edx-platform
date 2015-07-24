@@ -17,6 +17,10 @@ from django.utils.translation import ugettext as _
             <form method="get" action="/onboarding/courses">
               <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
               <button class="search-button" type="submit">
+                <div class="icon-display">
+                    <svg class="icon icon-play"><use xlink:href="/static/images/edx-svg/svgdefs.svg#icon-play"></use></svg>
+                    <span class="icon-text sr-only">Play</span>
+                </div>
                 <i class="icon fa fa-search" aria-hidden="true"></i>
               </button>
             </form>
