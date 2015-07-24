@@ -12,22 +12,24 @@ from branding import api as branding_api
 <!DOCTYPE html>
 <html class="no-js" lang="en">
 
-     <head dir="${static.dir_rtl()}">
-         <%block name="head">
-             <%block name="head_metadata">
-                 <%include file="_head_metadata.html" />
-             </%block>
-             <%block name="head_analytics">
-                 <%include file="_head_analytics.html" />
-             </%block>
-         </%block>
+    <head dir="${static.dir_rtl()}">
+        <%block name="head">
+            <%block name="head_metadata">
+                <%include file="_head_metadata.html" />
+            </%block>
+            <%block name="head_analytics">
+                <%include file="_head_analytics.html" />
+            </%block>
+        </%block>
 
-         <%block name="assets_primary">
-             <%include file="_assets_primary.html" />
-         </%block>
-     </head>
+        <%block name="assets_primary">
+            <%include file="_assets_primary.html" />
+        </%block>
+    </head>
 
     <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+
+        <p>Hello</p>
 
         <div class="wrapper-window" dir="${static.dir_rtl()}">
             <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">${_("Skip to main content")}</a>
