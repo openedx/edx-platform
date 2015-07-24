@@ -9,6 +9,10 @@
 // #GLOBAL ELEMENTS
 // ------------------------------
 // header
+.wrapper-header-global {
+    margin-bottom: spacing-vertical(base);
+}
+
 .header-global {
     @extend %grid-container;
 
@@ -77,4 +81,5 @@
 // ------------------------------
 .wrapper-content {
     @extend %grid-container;
+    margin-bottom: spacing-vertical(base);
 }

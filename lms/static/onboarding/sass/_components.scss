@@ -11,6 +11,7 @@
 // ------------------------------
 .wrapper-header-global {
     @extend %depth-1;
+    padding: spacing-vertical(small) spacing-horizontal(mid-small);
 }
 
 // ------------------------------
@@ -18,4 +19,5 @@
 // ------------------------------
 .wrapper-footer-global {
     @extend %depth-0;
+    padding: spacing-vertical(small) spacing-horizontal(mid-small);
 }
