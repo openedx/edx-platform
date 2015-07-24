@@ -1,12 +1,15 @@
 ## mako
 
+<%inherit file="/lms/common/base.html" />
+<%include file="onboarding_base.html" />
+<%namespace name='static' file='/static_content.html'/>
+
 <%!
   from django.utils.translation import ugettext as _
   from courseware.courses import course_image_url, get_course_about_section
 %>
-<%namespace name='static' file='/static_content.html'/>
 
-<%inherit file="/lms/common/base.html" />
+<%block name='bodyclass'>onboarding onboarding-course-detail</%block>
 
 <div class="wrapper-content">
     <main class="content-main">
@@ -23,35 +26,3 @@
 </div>
 
 <a class="action action-view" href="${course_url}">${_("Enroll Now")}</a>
-
-## Page Metadata
-## ----------------------------
-<%block name="head">
-<%include file="_head_metadata.html" />
-<%include file="_head_analytics.html" />
-</%block>
-
-## Assets
-<%block name="assets_primary">
-<%include file="_assets_primary.html" />
-</%block>
-
-<%block name="assets_secondary">
-<%include file="_assets_secondary.html" />
-</%block>
-
-## UI Elements
-## ----------------------------
-<%block name="system_feedback">
-    <div class="wrapper-feedback">
-
-    </div>
-</%block>
-
-<%block name="header">
-<%include file="_header.html" />
-</%block>
-
-<%block name="footer">
-<%include file="_footer.html" />
-</%block>

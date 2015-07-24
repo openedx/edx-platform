@@ -12,7 +12,7 @@
                 courses.setPage(1).done(function() {
                     var view = new OnboardingView(_.extend(options, {
                         collection: courses,
-                        el: $('.onboarding')
+                        el: options.el
                     }));
                     view.render();
                 });

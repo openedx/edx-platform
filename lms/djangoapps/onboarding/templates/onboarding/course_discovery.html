@@ -1,10 +1,12 @@
 ## mako
 
-<%! from django.utils.translation import ugettext as _ %>
-<%namespace name='static' file='/static_content.html'/>
-
 <%inherit file="/lms/common/base.html" />
 <%include file="onboarding_base.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
 
 <%block name='bodyclass'>onboarding onboarding-course-listings</%block>
 
