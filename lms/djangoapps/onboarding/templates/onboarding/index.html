@@ -12,6 +12,17 @@ from django.utils.translation import ugettext as _
 
 <div class="wrapper-content">
     <main class="content-main">
+        % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+          <div class="course-search">
+            <form method="get" action="/onboarding/courses">
+              <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
+              <button class="search-button" type="submit">
+                <i class="icon fa fa-search" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        % endif
+
         <div class="course-listing"></div>
     </main>
 </div>
