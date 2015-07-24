@@ -3,13 +3,19 @@
 
 // About: styling for specific UI components ranging from global to modular.
 
-// #MESSAGES
-// #IMAGES
+// #HEADER
+// #FOOTER
 
 // ------------------------------
-// #MESSAGES
+// #HEADER
 // ------------------------------
+.wrapper-header-global {
+    @extend %depth-1;
+}
 
 // ------------------------------
-// #IMAGES
+// #FOOTER
 // ------------------------------
+.wrapper-footer-global {
+    @extend %depth-0;
+}
