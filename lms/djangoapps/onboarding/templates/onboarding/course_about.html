@@ -8,10 +8,21 @@
 
 <%inherit file="/page_skeleton.html" />
 
-## Page Content
-## ----------------------------
-<h1>edX course about!</h1>
-<p>This is the ${course_key_string} course!</p>
+<div class="wrapper-content">
+    <main class="content-main">
+        <div class="course-image"><img src="${course_image_url(course)}" /></div>
+
+        <div class="course-about">
+            ${get_course_about_section(course, "overview")}
+        </div>
+    </main>
+<div class="course-image"><img src="${course_image_url(course)}" /></div>
+
+<div class="course-about">
+    ${get_course_about_section(course, "overview")}
+</div>
+
+<a class="action action-view" href="${course_url}">${_("Enroll Now")}</a>
 
 ## Page Metadata
 ## ----------------------------
