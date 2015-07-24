@@ -1115,13 +1115,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 simplefilter('ignore')
 
 ################################# Middleware ###################################
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
-)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -1209,9 +1202,31 @@ MIDDLEWARE_CLASSES = (
 # Clickjacking protection can be enabled by setting this to 'DENY'
 X_FRAME_OPTIONS = 'ALLOW'
 
-############################### Pipeline #######################################
+############################### PIPELINE #######################################
 
+# Process static files using RequireJS Optimizer
 STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+
+# List of finder classes that know how to find static files in various locations.
+# Note: the pipeline finder is included to be able to discover optimized files
+STATICFILES_FINDERS = [
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
+]
+
+# Don't use compression by default
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = None
+
+# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
+PIPELINE_COMPILE_INPLACE = True
+
+# Don't wrap JavaScript as there is code that depends upon updating the global namespace
+PIPELINE_DISABLE_WRAPPER = True
+
+# Specify the UglifyJS binary to use
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -1605,8 +1620,6 @@ PIPELINE_JS = {
     }
 }
 
-PIPELINE_DISABLE_WRAPPER = True
-
 # Compile all coffee files in course data directories if they are out of date.
 # TODO: Remove this once we move data into Mongo. This is only temporary while
 # course data directories are still in use.
@@ -1627,24 +1640,31 @@ if os.path.isdir(DATA_DIR):
                 os.system("coffee -c %s" % (js_dir / filename))
 
 
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
-
 STATICFILES_IGNORE_PATTERNS = (
-    "sass/*",
+    "*.py",
+    "*.pyc",
+    "*.html",
+
+    # It would be nice if we could do, for example, "**/*.scss",
+    # but these strings get passed down to the `fnmatch` module,
+    # which doesn't support that. :(
+    # http://docs.python.org/2/library/fnmatch.html
+    "sass/*.scss",
+    "sass/*/*.scss",
+    "sass/*/*/*.scss",
+    "sass/*/*/*/*.scss",
     "coffee/*.coffee",
     "coffee/*/*.coffee",
     "coffee/*/*/*.coffee",
     "coffee/*/*/*/*.coffee",
 
+    # Ignore tests
+    "spec",
+    "spec_helpers",
+
     # Symlinks used by js-test-tool
     "xmodule_js",
 )
-
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
-
-# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
-PIPELINE_COMPILE_INPLACE = True
 
 
 ################################# DJANGO-REQUIRE ###############################
