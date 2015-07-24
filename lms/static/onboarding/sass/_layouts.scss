@@ -9,30 +9,89 @@
 // #GLOBAL ELEMENTS
 // ------------------------------
 // header
+.wrapper-header-global {
+    margin-bottom: spacing-vertical(base);
+}
+
 .header-global {
     @extend %grid-container;
 
-    .header-global-title,
-    .nav-app,
-    .nav-user,
-    .nav-app-actions {
+    .header-global-app,
+    .header-global-actions {
         @include span(full);
+    }
+
+    .app-title {
+        margin: 0 0 spacing-vertical(small) 0;
+
+        .logo {
+            @extend %grid-fill-col;
+        }
+
+        .logo-img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+    }
+
+    .nav-app {
+        margin-bottom: spacing-vertical(small);
+    }
+
+    .nav-app-item {
+        display: block;
+        padding: spacing-vertical(x-small) spacing-horizontal(small);
+        border-top: rem(1) solid palette(grayscale, x-light);
+
+        &:first-child {
+            border-top: none;
+        }
     }
 
     // CASE: medium + breakpoints
     @include susy-breakpoint($bp-screen-md, $susy-default) {
 
-        .header-global-title {
-            @include span(2 of 12 first);
+        .header-global-app {
+            @include span(9 of 12 first);
+        }
+
+        .app-title {
+            margin-right: spacing-horizontal(mid-small);
+            margin-bottom: 0;
+        }
+
+        .nav-app,
+        .app-title {
+            display: inline-block;
+            vertical-align: top;
         }
 
         .nav-app {
-            @include span(7 of 12);
+            margin-top: spacing-vertical(small);
+            margin-bottom: 0;
         }
 
-        .nav-user,
-        .nav-app-actions {
+        .nav-app-item {
+            display: inline-block;
+            vertical-align: middle;
+            @include margin-right(spacing-horizontal(mid-small));
+
+            // reset from default
+            padding: 0;
+            border: none;
+
+            &:last-child {
+                @include margin-right(0);
+            }
+        }
+
+        .header-global-actions {
             @include span(3 of 12 last);
+        }
+
+        .nav-app-actions {
+            @include text-align(right);
         }
     }
 }
@@ -44,16 +103,31 @@
 
     .wrapper-legal,
     .wrapper-about {
-        @include span(full);
+        @extend %grid-row;
+    }
+
+    .wrapper-legal {
+        margin-bottom: spacing-vertical(mid-small);
+    }
+
+    .nav-legal {
+
+    }
+
+    .nav-legal-item {
+        display: block;
+        padding: spacing-vertical(x-small) spacing-horizontal(small);
+        border-top: rem(1) solid palette(grayscale, x-light);
+
+        &:first-child {
+            border-top: none;
+        }
     }
 
     // CASE: medium + breakpoints
     @include susy-breakpoint($bp-screen-md, $susy-default) {
 
         .wrapper-legal {
-            @include break();
-            @include clearfix();
-
 
             .copyright {
                 @include span(6 of 12 first);
@@ -63,11 +137,20 @@
                 @include span(6 of 12 last);
                 @include text-align(right);
             }
-        }
 
-        .wrapper-about {
-            @include break();
-            @include clearfix();
+            .nav-legal-item {
+                display: inline-block;
+                vertical-align: middle;
+                @include margin-right(spacing-horizontal(mid-small));
+
+                // reset from default
+                padding: 0;
+                border: none;
+
+                &:last-child {
+                    @include margin-right(0);
+                }
+            }
         }
     }
 }
@@ -77,4 +160,5 @@
 // ------------------------------
 .wrapper-content {
     @extend %grid-container;
+    margin-bottom: spacing-vertical(base);
 }

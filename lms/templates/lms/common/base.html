@@ -28,7 +28,9 @@ from branding import api as branding_api
     <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
 
         <div class="wrapper-window" dir="${static.dir_rtl()}">
-            <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">${_("Skip to main content")}</a>
+                <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">
+                    <span class="label">${_("Get to the learning already! Skip to main content")}</span>
+                </a>
 
             <%block name="system_feedback"/>
 

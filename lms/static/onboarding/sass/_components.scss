@@ -5,17 +5,57 @@
 
 // #HEADER
 // #FOOTER
+// #CONTENT
+// #MISC
 
 // ------------------------------
 // #HEADER
 // ------------------------------
 .wrapper-header-global {
     @extend %depth-1;
+    padding: spacing-vertical(small) spacing-horizontal(mid-small);
 }
 
 // ------------------------------
 // #FOOTER
 // ------------------------------
 .wrapper-footer-global {
-    @extend %depth-0;
+    padding: 0 spacing-horizontal(mid-small);
+}
+
+.footer-global {
+    border-top: rem(2) solid palette(grayscale, x-light);
+    padding-top: spacing-vertical(small);
+}
+
+// ------------------------------
+// #CONTENT
+// ------------------------------
+.wrapper-content {
+    padding: 0 spacing-horizontal(mid-small);
+}
+
+// ------------------------------
+// #MISC
+// ------------------------------
+.nav-skip {
+    @extend %depth--3;
+    @extend %a11y-hide;
+    display: block;
+    position: absolute;
+    left: 0;
+    top: -(spacing-vertical(x-large));
+    padding: spacing-vertical(mid-small) spacing-horizontal(mid-small);
+
+    // STATE: hover, and focus
+    &:hover, &:focus {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .label {
+        width: container();
+        margin: 0 auto;
+    }
 }
