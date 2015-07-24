@@ -1,0 +1,26 @@
+## mako
+
+<%inherit file="/lms/common/base.html" />
+<%include file="onboarding_base.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%block name='bodyclass'>onboarding onboarding-course-listings</%block>
+
+<div class="wrapper-content">
+    <main class="content-main">
+        <h1>edX course discovery!</h1>
+
+        <ul>
+            <li><a href="/onboarding/course/circuits-electronics-mitx-6-002x-0">MITx: Circuits & Electronics</a></li>
+            <li><a href="/onboarding/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0">Harvardx: Science & Cooking</a></li>
+        </ul>
+    </main>
+</div>
+
+<%block name="footer">
+<%include file="/lms/common/footer.html" />
+</%block>

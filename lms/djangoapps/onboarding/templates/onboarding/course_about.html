@@ -1,0 +1,32 @@
+## mako
+
+<%inherit file="/lms/common/base.html" />
+<%include file="onboarding_base.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+  from django.utils.translation import ugettext as _
+  from courseware.courses import course_image_url, get_course_about_section
+%>
+
+<%block name='bodyclass'>onboarding onboarding-course-detail</%block>
+
+<div class="wrapper-content">
+    <main class="content-main">
+        <div class="course-image"><img src="${course_image_url(course)}" /></div>
+
+        <div class="course-about">
+            ${get_course_about_section(course, "overview")}
+        </div>
+    </main>
+<div class="course-image"><img src="${course_image_url(course)}" /></div>
+
+<div class="course-about">
+    ${get_course_about_section(course, "overview")}
+</div>
+
+<a class="action action-view" href="${course_url}">${_("Enroll Now")}</a>
+
+<%block name="footer">
+<%include file="/lms/common/footer.html" />
+</%block>

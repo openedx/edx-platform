@@ -1,0 +1,5 @@
+{
+  "name": "sassy-maps",
+  "description": "Sassy Maps adds a variety of functions aimed at helping you work with Sass 3.3 maps much easier.",
+  "tags": ["maps", "dry", "performance", "code-quality", "memo", "memoization"]
+}

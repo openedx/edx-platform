@@ -36,7 +36,6 @@ class CourseViewMixin(object):
     """
     lookup_field = 'course_id'
     authentication_classes = (OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
 
     def get_course_or_404(self):
         """
@@ -219,6 +218,7 @@ class CourseDetail(CourseViewMixin, RetrieveAPIView):
           value is null.
     """
     serializer_class = serializers.CourseSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self, queryset=None):
         return self.get_course_or_404()
@@ -259,6 +259,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
           * children: If the block has child blocks, a list of IDs of the child
             blocks.
     """
+    permission_classes = (IsAuthenticated,)
 
     @CourseViewMixin.course_check
     def get(self, request, **kwargs):
@@ -293,6 +294,7 @@ class CourseGradingPolicy(CourseViewMixin, ListAPIView):
         * weight: The weight, or effect, of the assignment type on the learner's
           final grade.
     """
+    permission_classes = (IsAuthenticated,)
 
     allow_empty = False
 

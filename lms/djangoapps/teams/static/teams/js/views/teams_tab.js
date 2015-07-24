@@ -231,7 +231,7 @@
                        );
                    },
 
-                   topicNotFound: function (topicID) {
+                   courseNotFound: function (topicID) {
                        this.notFoundError(
                            interpolate(
                                gettext('The topic "%(topic)s" could not be found.'),

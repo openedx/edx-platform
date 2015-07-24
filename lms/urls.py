@@ -454,6 +454,12 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/{}/teams'.format(settings.COURSE_ID_PATTERN), include('teams.urls'), name="teams_endpoints"),
         )
 
+    if settings.FEATURES["ENABLE_ONBOARDING"]:
+        # Onboarding endpoints
+        urlpatterns += (
+            url(r'^onboarding/', include('onboarding.urls'), name="onboarding.views"),
+        )
+
     if settings.FEATURES.get('ENABLE_RENDER_XBLOCK_API'):
         # TODO (MA-789) This endpoint path still needs to be approved by the arch council.
         # Until then, keep the version at v0.

@@ -1,0 +1,127 @@
+// ------------------------------
+// edX Pattern Library: Components - UI Depth
+
+// About: Contains base settings and options for the preset default Pattern Library UI depth levels.
+// ----------------------------
+
+// #CONFIG
+// #UTILITY
+// #CANNED
+
+// ----------------------------
+
+// ----------------------------
+// #CONFIG
+// ----------------------------
+$depth--3-bg:   palette(grayscale-cool, x-dark)   !default;  // -3 depth level
+$depth--2-bg:   palette(grayscale-cool, dark)   !default;  // -2 depth level
+$depth--1-bg:   palette(grayscale, x-light)   !default;  // -1 depth level
+$depth-0-bg:    palette(grayscale, xx-light)   !default;  // -0 depth level
+$depth-1-bg:    palette(grayscale, white)   !default;  // +1 depth level
+$depth-2-bg:    palette(grayscale, white)   !default;  // +2 depth level
+
+// ----------------------------
+// #UTILITY
+// ----------------------------
+%depth--3 {
+    background: $depth--3-bg;
+}
+
+%depth--2 {
+    background: $depth--2-bg;
+}
+
+%depth--1 {
+    background: $depth--1-bg;
+}
+
+%depth-0 {
+    background: $depth-0-bg;
+}
+
+%depth-1 {
+    background: $depth-1-bg;
+}
+
+%depth-2 {
+    background: $depth-2-bg;
+    box-shadow: 0 1px 2px 1px palette(grayscale, x-trans);
+}
+
+// specific UI elements based on depth
+%well {
+    @extend %depth--1;
+    box-shadow: inset 0 1px 2px 1px palette(grayscale, x-trans);
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+%slat {
+    @extend %depth-1;
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+%card {
+    @extend %depth-2;
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+// zebra striped elements (direct children are affected)
+%zebra-stripe {
+
+    > * {
+
+        &:nth-child(odd) {
+            @extend %depth-0;
+        }
+
+        &:nth-child(even) {
+            @extend %depth-1;
+        }
+    }
+}
+
+// ----------------------------
+// #CANNED
+// ----------------------------
+
+// class-based
+.depth--3 {
+    @extend %depth--3;
+}
+
+.depth--2 {
+    @extend %depth--2;
+}
+
+.depth--1 {
+    @extend %depth--1;
+}
+
+.depth-0 {
+    @extend %depth-0;
+}
+
+.depth-1 {
+    @extend %depth-1;
+}
+
+.depth-2 {
+    @extend %depth-2;
+}
+
+// UI specifics
+.card {
+    @extend %card;
+}
+
+.slat {
+    @extend %slat;
+}
+
+.well {
+    @extend %well;
+}
+
+.zebra-stripe {
+    @extend %zebra-stripe;
+}

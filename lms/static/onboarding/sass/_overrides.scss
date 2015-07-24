@@ -1,0 +1,28 @@
+// ------------------------------
+// Open edX Onboarding: Overrides
+
+// About: Additional sass rules that must come at the end of the compilation for overriding purposes - either for temporary/specific developer styling needs or for known poorly scoped/written styling (aka shame CSS).
+
+// #TEMP
+// #DEVELOPERS
+// #SHAME
+
+// ------------------------------
+// #TEMP
+// ------------------------------
+.ui-temp {
+    @extend .hd-6;
+    padding: spacing-vertical(small) spacing-horizontal(mid-small);
+    @include text-align(center);
+    background: palette(warning, light) !important;
+    color: palette(warning, dark) !important;
+}
+
+// ------------------------------
+// #DEVELOPERS
+// ------------------------------
+
+// ------------------------------
+// #SHAME
+// ------------------------------
+

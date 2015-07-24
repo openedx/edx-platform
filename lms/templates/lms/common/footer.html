@@ -1,0 +1,27 @@
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<div class="wrapper-footer-global">
+    <footer class="footer-global" aria-label="View Footer" role="content-info">
+
+        <div class="wrapper-legal">
+            <p class="copyright copy copy-micro">© Your Platform Name Here.  All rights reserved except where noted.  EdX, Open edX and the edX and Open EdX logos are registered trademarks or trademarks of edX Inc.</p>
+
+            <nav class="nav-legal copy copy-micro" role="navigation" aria-label="Legal Information">
+                <a class="nav-legal-item" href="#">Privacy Policy</a>
+                <a class="nav-legal-item" href="#">Terms of Service</a>
+            </nav>
+        </div>
+
+        <div class="wrapper-about">
+            <div class="about">
+                <div class="about-powered">
+                    <span class="powered-img ui-temp">Powered by Open edX Image <a class="sr-only" href="https://open.edx.org/">Learn more about Open edX</a></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+

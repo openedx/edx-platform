@@ -1,0 +1,164 @@
+// ------------------------------
+// // Open edX Onboarding: Layouts
+
+// About: styling for generic layouts and responsive support.
+
+// #GLOBAL ELEMENTS
+
+// ------------------------------
+// #GLOBAL ELEMENTS
+// ------------------------------
+// header
+.wrapper-header-global {
+    margin-bottom: spacing-vertical(base);
+}
+
+.header-global {
+    @extend %grid-container;
+
+    .header-global-app,
+    .header-global-actions {
+        @include span(full);
+    }
+
+    .app-title {
+        margin: 0 0 spacing-vertical(small) 0;
+
+        .logo {
+            @extend %grid-fill-col;
+        }
+
+        .logo-img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+    }
+
+    .nav-app {
+        margin-bottom: spacing-vertical(small);
+    }
+
+    .nav-app-item {
+        display: block;
+        padding: spacing-vertical(x-small) spacing-horizontal(small);
+        border-top: rem(1) solid palette(grayscale, x-light);
+
+        &:first-child {
+            border-top: none;
+        }
+    }
+
+    // CASE: medium + breakpoints
+    @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+        .header-global-app {
+            @include span(9 of 12 first);
+        }
+
+        .app-title {
+            margin-right: spacing-horizontal(mid-small);
+            margin-bottom: 0;
+        }
+
+        .nav-app,
+        .app-title {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .nav-app {
+            margin-top: spacing-vertical(small);
+            margin-bottom: 0;
+        }
+
+        .nav-app-item {
+            display: inline-block;
+            vertical-align: middle;
+            @include margin-right(spacing-horizontal(mid-small));
+
+            // reset from default
+            padding: 0;
+            border: none;
+
+            &:last-child {
+                @include margin-right(0);
+            }
+        }
+
+        .header-global-actions {
+            @include span(3 of 12 last);
+        }
+
+        .nav-app-actions {
+            @include text-align(right);
+        }
+    }
+}
+
+
+// footer
+.footer-global {
+    @extend %grid-container;
+
+    .wrapper-legal,
+    .wrapper-about {
+        @extend %grid-row;
+    }
+
+    .wrapper-legal {
+        margin-bottom: spacing-vertical(mid-small);
+    }
+
+    .nav-legal {
+
+    }
+
+    .nav-legal-item {
+        display: block;
+        padding: spacing-vertical(x-small) spacing-horizontal(small);
+        border-top: rem(1) solid palette(grayscale, x-light);
+
+        &:first-child {
+            border-top: none;
+        }
+    }
+
+    // CASE: medium + breakpoints
+    @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+        .wrapper-legal {
+
+            .copyright {
+                @include span(6 of 12 first);
+            }
+
+            .nav-legal {
+                @include span(6 of 12 last);
+                @include text-align(right);
+            }
+
+            .nav-legal-item {
+                display: inline-block;
+                vertical-align: middle;
+                @include margin-right(spacing-horizontal(mid-small));
+
+                // reset from default
+                padding: 0;
+                border: none;
+
+                &:last-child {
+                    @include margin-right(0);
+                }
+            }
+        }
+    }
+}
+
+// ------------------------------
+// #ONBOARDING
+// ------------------------------
+.wrapper-content {
+    @extend %grid-container;
+    margin-bottom: spacing-vertical(base);
+}

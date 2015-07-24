@@ -324,7 +324,7 @@ FEATURES = {
     'ENABLE_COURSE_BLOCKS_NAVIGATION_API': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
 
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
@@ -415,6 +415,12 @@ FEATURES = {
 
     # Enable the max score cache to speed up grading
     'ENABLE_MAX_SCORE_CACHE': True,
+
+    # New onboarding feature
+    'ENABLE_ONBOARDING': True,
+
+    # Enable use of the pattern library where appropriate
+    'ENABLE_PATTERN_LIBRARY': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -496,7 +502,8 @@ MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
-                          COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
+                          COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+                          PROJECT_ROOT / 'djangoapps' / 'onboarding' / 'templates']
 
 # This is where Django Template lookup is defined. There are a few of these
 # still left lying around.
@@ -1470,6 +1477,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
+    'style-onboarding': {
+        'source_filenames': [
+            'onboarding/css/main-ltr.css',
+        ],
+        'output_filename': 'css/onboarding-style.css'
+    },
+    'style-onboarding-rtl': {
+        'source_filenames': [
+            'onboarding/css/main-rtl.css',
+        ],
+        'output_filename': 'css/onboarding-style-rtl.css'
+    },
 }
 
 
@@ -1932,6 +1951,9 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    # Onboarding
+    'onboarding',
 
     'xblock_django',
 )

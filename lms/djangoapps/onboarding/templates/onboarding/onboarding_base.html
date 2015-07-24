@@ -1,0 +1,16 @@
+## mako
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="header">
+<%include file="/lms/common/header.html" />
+</%block>
+
+<%block name="assets_primary">
+<%static:css group='style-onboarding'/>
+</%block>
+
+<%block name="system_feedback">
+    <div class="wrapper-feedback">
+    </div>
+</%block>

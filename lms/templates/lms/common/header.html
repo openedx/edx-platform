@@ -1,0 +1,28 @@
+## mako
+
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<div class="wrapper-header-global">
+    <header class="header-global" aria-labelledby="header-global-title" role="banner">
+        <div class="header-global-app">
+            <h1 class="app-title" id="app-title">
+                <a class="logo" href="/onboarding/home">
+                    <!-- <img class="logo-img" src="${static.url('/onboarding/images/logo-edx.svg')}" alt="Logo" /> -->
+                    <span class="logo-img ui-temp"> Logo</span>
+                </a>
+            </h1>
+
+            <nav class="nav-app" role="navigation" aria-label="Main Navigation">
+                <a class="nav-app-item btn btn-link btn-base" href="/onboarding/course_discovery">Courses</a>
+                <a class="nav-app-item btn btn-link btn-base" href="/onboarding/about">About</a>
+            </nav>
+        </div>
+
+        <div class="header-global-actions">
+            <nav class="nav-user ui-temp" role="navigation" aria-label="Account Navigation">
+                User/Account Navigation
+            </nav>
+        </div>
+    </header>
+</div>
