@@ -415,6 +415,9 @@ FEATURES = {
 
     # Enable the max score cache to speed up grading
     'ENABLE_MAX_SCORE_CACHE': True,
+
+    # Enable payment of E-Commerce orders via Braintree
+    'PAY_WITH_BRAINTREE': False,
 }
 
 # Ignore static asset files on import which match this pattern

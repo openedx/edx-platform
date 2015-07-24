@@ -1,0 +1,5 @@
+<form id="braintree-checkout" style="clear:both; background-color:white; padding-top: 2px;" method="post" action="<%= form_action_url %>">
+    <input type="hidden" name="basket_id" value="<%= basket_id %>">
+    <div id="payment-form" style="padding:0 5px; margin-bottom: 3px;"></div>
+    <button class="next action-primary payment-button" type="submit"><%= gettext( "Checkout" ) %></button>
+</form>
