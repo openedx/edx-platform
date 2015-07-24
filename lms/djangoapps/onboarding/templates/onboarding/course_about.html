@@ -5,6 +5,39 @@
 
 <%inherit file="/page_skeleton.html" />
 
+## Page Content
+## ----------------------------
 <h1>edX course about!</h1>
-
 <p>This is the ${course_key_string} course!</p>
+
+## Page Metadata
+## ----------------------------
+<%block name="head">
+<%include file="_head_metadata.html" />
+<%include file="_head_analytics.html" />
+</%block>
+
+## Assets
+<%block name="assets_primary">
+<%include file="_assets_primary.html" />
+</%block>
+
+<%block name="assets_secondary">
+<%include file="_assets_secondary.html" />
+</%block>
+
+## UI Elements
+## ----------------------------
+<%block name="system_feedback">
+    <div class="wrapper-feedback">
+
+    </div>
+</%block>
+
+<%block name="header">
+<%include file="_header.html" />
+</%block>
+
+<%block name="footer">
+<%include file="_footer.html" />
+</%block>

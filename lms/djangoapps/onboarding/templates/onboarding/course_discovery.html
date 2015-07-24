@@ -5,9 +5,44 @@
 
 <%inherit file="/page_skeleton.html" />
 
+## Page Content
+## ----------------------------
 <h1>edX course discovery!</h1>
 
 <ul>
     <li><a href="/onboarding/course/circuits-electronics-mitx-6-002x-0">MITx: Circuits & Electronics</a></li>
     <li><a href="/onboarding/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0">Harvardx: Science & Cooking</a></li>
 </ul>
+
+## Page Metadata
+## ----------------------------
+<%block name="head">
+<%include file="_head_metadata.html" />
+<%include file="_head_analytics.html" />
+</%block>
+
+## Assets
+<%block name="assets_primary">
+<%include file="_assets_primary.html" />
+</%block>
+
+<%block name="assets_secondary">
+<%include file="_assets_secondary.html" />
+</%block>
+
+## UI Elements
+## ----------------------------
+<%block name="system_feedback">
+    <div class="wrapper-feedback">
+
+    </div>
+</%block>
+
+<%block name="header">
+<%include file="_header.html" />
+</%block>
+
+<%block name="footer">
+<%include file="_footer.html" />
+</%block>
+
