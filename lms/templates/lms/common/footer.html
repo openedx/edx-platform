@@ -1,6 +1,12 @@
 ## mako
 
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from branding.api import get_footer
+
+footer = get_footer(is_secure=False)
+%>
+
 <%namespace name='static' file='/static_content.html'/>
 
 <div class="wrapper-footer-global">
@@ -18,7 +24,8 @@
         <div class="wrapper-about">
             <div class="about">
                 <div class="about-powered">
-                    <span class="powered-img ui-temp">Powered by Open edX Image <a class="sr-only" href="https://open.edx.org/">Learn more about Open edX</a></span>
+                    <img alt="organization logo" src="${footer['logo_image']}">
+                    <a class="sr-only" href="https://open.edx.org/">Learn more about Open edX</a>
                 </div>
             </div>
         </div>

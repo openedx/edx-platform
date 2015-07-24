@@ -1,6 +1,13 @@
 ## mako
 
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+
+from microsite_configuration import microsite
+from microsite_configuration.templatetags.microsite import platform_name
+
+import branding
+%>
 <%namespace name='static' file='/static_content.html'/>
 
 <div class="wrapper-header-global">
@@ -8,8 +15,7 @@
         <div class="header-global-app">
             <h1 class="app-title" id="app-title">
                 <a class="logo" href="/onboarding/home">
-                    <!-- <img class="logo-img" src="${static.url('/onboarding/images/logo-edx.svg')}" alt="Logo" /> -->
-                    <span class="logo-img ui-temp"> Logo</span>
+                    <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}" title="${platform_name()}" itemprop="url" />
                 </a>
             </h1>
 
