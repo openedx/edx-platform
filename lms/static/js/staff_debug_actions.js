@@ -1,35 +1,35 @@
 // Build StaffDebug object
-var StaffDebug = (function(){
+var StaffDebug = (function (){
 
   get_current_url = function() {
     return window.location.pathname;
-  }
+  };
 
   get_url = function(action){
     var pathname = this.get_current_url();
     var url = pathname.substr(0,pathname.indexOf('/courseware')) + '/instructor/api/' + action;
     return url;
-  }
+  };
 
   sanitized_string = function(string) {
     return string.replace(/[.*+?^:${}()|[\]\\]/g, "\\$&");
-  }
+  };
 
   get_user = function(locname){
     locname = sanitized_string(locname);
     var uname = $('#sd_fu_' + locname).val();
-    if (uname==""){
+    if (uname===""){
         uname =  $('#sd_fu_' + locname).attr('placeholder');
     }
     return uname;
-  }
+  };
 
   do_idash_action = function(action){
     var pdata = {
         'problem_to_reset': action.location,
         'unique_student_identifier': get_user(action.locationName),
         'delete_module': action.delete_module
-    }
+    };
     $.ajax({
         type: "GET",
         url: get_url(action.method),
@@ -39,13 +39,13 @@ var StaffDebug = (function(){
                 action.success_msg,
                 {user: data.student},
                 {interpolate: /\{(.+?)\}/g}
-            )
+            );
             var html = _.template(
                 '<p id="idash_msg" class="success">{text}</p>',
                 {text: text},
                 {interpolate: /\{(.+?)\}/g}
-            )
-            $("#result_"+action.locationName).html(html);
+            );
+            $("#result_"+sanitized_string(action.locationName)).html(html);
         },
         error: function(request, status, error) {
             var response_json;
@@ -61,17 +61,18 @@ var StaffDebug = (function(){
                     error: response_json.error
                 },
                 {interpolate: /\{(.+?)\}/g}
-            )
+            );
             var html = _.template(
                 '<p id="idash_msg" class="error">{text}</p>',
                 {text: text},
                 {interpolate: /\{(.+?)\}/g}
-            )
-            $("#result_"+action.locationName).html(html);
+            );
+            $("#result_"+sanitized_string(action.locationName)).html(html);
+
         },
         dataType: 'json'
     });
-  }
+  };
 
   reset = function(locname, location){
     this.do_idash_action({
@@ -82,7 +83,7 @@ var StaffDebug = (function(){
         error_msg: gettext('Failed to reset attempts.'),
         delete_module: false
     });
-  }
+  };
 
   sdelete = function(locname, location){
     this.do_idash_action({
@@ -93,7 +94,7 @@ var StaffDebug = (function(){
         error_msg: gettext('Failed to delete student state.'),
         delete_module: true
     });
-  }
+  };
 
   rescore = function(locname, location){
     this.do_idash_action({
@@ -104,7 +105,7 @@ var StaffDebug = (function(){
         error_msg: gettext('Failed to rescore problem.'),
         delete_module: false
     });
-  }
+  };
 
   return {
       reset: reset,
@@ -115,11 +116,11 @@ var StaffDebug = (function(){
       get_url: get_url,
       get_user: get_user,
       sanitized_string:sanitized_string
-  }
-})();
+  }; })();
 
 // Register click handlers
 $(document).ready(function() {
+
     var $courseContent = $('.course-content');
     $courseContent.on("click", '.staff-debug-reset', function() {
         StaffDebug.reset($(this).parent().data('location-name'), $(this).parent().data('location'));
