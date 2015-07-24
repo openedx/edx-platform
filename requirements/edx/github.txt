@@ -32,7 +32,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
+# -e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
@@ -45,7 +45,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/edx/i18n-tools.git@v0.1.1#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.5.1#egg=oauth2-provider
 -e git+https://github.com/edx/edx-val.git@v0.0.5#egg=edx-val
--e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
+# -e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
 -e git+https://github.com/edx/edx-search.git@release-2015-07-03#egg=edx-search
 -e git+https://github.com/edx/edx-milestones.git@release-2015-06-17#egg=edx-milestones
 git+https://github.com/edx/edx-lint.git@ed8c8d2a0267d4d42f43642d193e25f8bd575d9b#egg=edx_lint==0.2.3
