@@ -955,6 +955,9 @@ ADVANCED_COMPONENT_TYPES = [
     # embed public google drive documents and calendars within edX units
     'google-document',
     'google-calendar',
+
+    # In-course reverification checkpoint
+    'edx-reverification-block',
 ]
 
 # Adding components in this list will disable the creation of new problem for those
