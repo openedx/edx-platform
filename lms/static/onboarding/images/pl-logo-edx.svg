@@ -1,0 +1,7 @@
+<svg viewBox="0 0 403 188" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>edX</title>
+  <desc>the edX logo is comprised of a red letter e, grey d, and blue uppercase X, all slightly overlapping each other.  The d is slightly transparent.</desc>
+  <path id="e-path" stroke-width="1" stroke="none" fill="rgb(185, 0, 88)" fill-rule="evenodd" d="M32.1,127 H141.9 A71,71.5 0 1,0 137.3,143 H103 A42,42 0 0,1 32.1,127 M32.1,102.5 H112 A42,42 0 0,0 32.1,102.5"/>
+  <path id="x-path" stroke-width="1" stroke="none" fill="rgb(0, 162, 228)" fill-rule="evenodd" d="M228,1 H302 V31 H286 L315,67 L344,31 H328 V1 H401.5 V31 H385 L335.2,92.4 L387.5,156.8 H401.5 V187 H328 V156.8 H346.5 L315,117.4 L283,156.8 H302.0 V187 H228.5 V156.8 H243 L294.3,92.4 L244,30.5 H228 V1"/>
+  <path id="d-path" stroke-width="1" stroke="none" fill="rgb(55, 55, 60)" fill-rule="evenodd" opacity="0.65" d="M198.5,1 L248,1 V156.5 H269.8 V187 H217.5 V174 A71.7,71.7 0 1,1 218,55.5 V30.5 H198.5 V1 M218,114 A41,41.5 0 1,1 136.1,114 A40.5,40.5 0 1,1 218,114"/>
+</svg>

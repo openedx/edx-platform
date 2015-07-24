@@ -5,22 +5,25 @@
 
 <div class="wrapper-header-global">
     <header class="header-global" aria-labelledby="header-global-title" role="banner">
-        <h1 class="header-global-title" id="header-global-title">
-            <span class="app-logo">App Logo Here!</span>
-        </h1>
+        <div class="header-global-app">
+            <h1 class="app-title" id="app-title">
+                <a class="logo" href="/onboarding/home">
+                    <!-- <img class="logo-img" src="${static.url('/onboarding/images/logo-edx.svg')}" alt="Logo" /> -->
+                    <span class="logo-img ui-temp"> Logo</span>
+                </a>
+            </h1>
 
-        <nav class="nav-app" role="navigation" aria-label="Main Navigation">
-            <a class="nav-app-item" href="#">Navigation Link</a>
-            <a class="nav-app-item" href="#">Navigation Link</a>
-        </nav>
+            <nav class="nav-app" role="navigation" aria-label="Main Navigation">
+                <a class="nav-app-item btn btn-link btn-base" href="/onboarding/course_discovery">Courses</a>
+                <a class="nav-app-item btn btn-link btn-base" href="/onboarding/about">About</a>
+            </nav>
+        </div>
 
-        <nav class="nav-user" role="navigation" aria-label="Account Navigation">
-            User Navigation/Status
-        </nav>
-
-        <nav class="nav-app-actions" role="navigation" aria-label="Account Navigation">
-            <a class="nav-app-item action action-login" href="/login">Login</a>
-            <a class="nav-app-item action action-register" href="/register">Register</a>
-        </nav>
+        <div class="header-global-actions">
+            <nav class="nav-user ui-temp" role="navigation" aria-label="Account Navigation">
+                <a class="nav-app-item action action-login" href="/login">Login</a>
+                <a class="nav-app-item action action-register" href="/register">Register</a>
+            </nav>
+        </div>
     </header>
 </div>
