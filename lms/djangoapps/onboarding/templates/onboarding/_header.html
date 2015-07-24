@@ -3,4 +3,24 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 
-<strong>Header!</strong>
+<div class="wrapper-header-global">
+    <header class="header-global" aria-labelledby="header-global-title" role="banner">
+        <h1 class="header-global-title" id="header-global-title">
+
+        </h1>
+
+        <nav class="nav-app" role="navigation" aria-label="Main Navigation">
+            <a class="nav-app-item" href="#">Navigation Link</a>
+            <a class="nav-app-item" href="#">Navigation Link</a>
+        </nav>
+
+        <nav class="nav-user" role="navigation" aria-label="Account Navigation">
+            User Navigation/Status
+        </nav>
+
+        <nav class="nav-app-actions" role="navigation" aria-label="Account Navigation">
+            <a class="nav-app-item action action-login" href="#">Login</a>
+            <a class="nav-app-item action action-register" href="#">Register</a>
+        </nav>
+    </header>
+</div>
