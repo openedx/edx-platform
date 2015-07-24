@@ -10,6 +10,13 @@
 // ------------------------------
 // #TEMP
 // ------------------------------
+.ui-temp {
+    @extend .hd-6;
+    padding: spacing-vertical(small) spacing-horizontal(mid-small);
+    @include text-align(center);
+    background: palette(warning, light) !important;
+    color: palette(warning, dark) !important;
+}
 
 // ------------------------------
 // #DEVELOPERS
