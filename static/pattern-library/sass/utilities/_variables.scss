@@ -148,8 +148,8 @@ $shadow: transparentize(palette(grayscale, black-t), .5);
 // ----------------------------
 // #TYPOGRAPHY
 // ----------------------------
-
-$font-path: '../fonts' !default;
+// #HACK (@talbs) - manually changing font path in PL for platform static woes
+$font-path: '../../fonts' !default;
 
 // typography: config
 @include font-face(
