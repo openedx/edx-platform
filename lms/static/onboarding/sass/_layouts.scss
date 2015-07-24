@@ -3,8 +3,75 @@
 
 // About: styling for generic layouts and responsive support.
 
-// #DEFAULT
+// #GLOBAL ELEMENTS
 
 // ------------------------------
-// #DEFAULT
+// #GLOBAL ELEMENTS
 // ------------------------------
+// header
+.header-global {
+    @extend %grid-container;
+
+    .header-global-title,
+    .nav-app,
+    .nav-user,
+    .nav-app-actions {
+        @include span(full);
+    }
+
+    // CASE: medium + breakpoints
+    @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+        .header-global-title {
+            @include span(2 of 12 first);
+        }
+
+        .nav-app {
+            @include span(7 of 12);
+        }
+
+        .nav-user,
+        .nav-app-actions {
+            @include span(3 of 12 last);
+        }
+    }
+}
+
+
+// footer
+.footer-global {
+    @extend %grid-container;
+
+    .wrapper-legal,
+    .wrapper-about {
+        @include span(full);
+    }
+
+    // CASE: medium + breakpoints
+    @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+        .wrapper-legal {
+            @extend %grid-row;
+
+            .copyright {
+                @include span(6 of 12 first);
+            }
+
+            .nav-legal {
+                @include span(6 of 12 last);
+                @include text-align(right);
+            }
+        }
+
+        .wrapper-about {
+            @extend %grid-row;
+        }
+    }
+}
+
+// ------------------------------
+// #ONBOARDING
+// ------------------------------
+.wrapper-content {
+    @extend %grid-container;
+}
