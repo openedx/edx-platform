@@ -1323,9 +1323,11 @@ class TrueFalseResponse(MultipleChoiceResponse):
 
     def get_score(self, student_answers):
         correct = set(self.correct_choices)
-        answers = set(student_answers.get(self.answer_id, []))
+        answers = student_answers.get(self.answer_id, [])
+        if not isinstance(answers, list):
+            answers = [answers]
 
-        if correct == answers:
+        if correct == set(answers):
             return CorrectMap(self.answer_id, 'correct')
 
         return CorrectMap(self.answer_id, 'incorrect')
