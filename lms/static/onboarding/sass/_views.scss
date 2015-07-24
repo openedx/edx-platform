@@ -14,6 +14,123 @@
 // ------------------------------
 // #HOMEPAGE
 // ------------------------------
+.onboarding-home {
+
+    .wrapper-introduction {
+        padding: spacing-vertical(base) spacing-horizontal(base);
+        margin-bottom: spacing-vertical(base);
+
+        background-color: red;
+        background-image:
+        linear-gradient(
+            to right,
+            palette(primary, base), palette(primary, accent)
+        );
+    }
+
+    .introduction {
+        @extend %grid-container;
+
+        .action {
+            margin-right: spacing-horizontal(small);
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+
+    .introduction-hd,
+    .introduction-copy {
+        color: palette(grayscale, white);
+    }
+
+    .wrapper-courses {
+        margin-bottom: spacing-vertical(base);
+        padding: 0 spacing-horizontal(mid-small);
+    }
+
+    .courses {
+        @extend %grid-container;
+    }
+
+    .wrapper-course-search {
+        margin-bottom: spacing-vertical(base);
+        padding: 0 spacing-horizontal(mid-small);
+    }
+
+    .course-search {
+
+    }
+
+    .course-search-form {
+
+        .field-input,
+        .btn-primary {
+            @include span(full);
+        }
+
+        .btn-primary {
+
+            .icon {
+                margin-right: spacing-horizontal(small);
+            }
+        }
+
+        @include susy-breakpoint($bp-screen-md, $susy-default) {
+
+            .field-input {
+                @include span(8 of 12 first);
+            }
+
+            .btn-primary {
+                @include span(3 of 12 last);
+            }
+        }
+    }
+
+    .wrapper-promos {
+        padding: 0 spacing-horizontal(mid-small);
+        margin-bottom: spacing-vertical(base);
+    }
+
+    .promos {
+        @extend %grid-container;
+
+        .promo {
+            @include gallery(12);
+            min-height: rem(300);
+            @extend %slat;
+
+            @include susy-breakpoint($bp-screen-md, $susy-default) {
+                @include gallery(6);
+            }
+        }
+
+        .promo-action-hint {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+
+    // bad resets/overrides
+    .courses-paging-header,
+    .pagination {
+        display: none;
+    }
+
+    .introduction .btn-secondary {
+        color: palette(grayscale, white);
+    }
+
+    .wrapper-header-global {
+        margin-bottom: 0;
+    }
+
+    .wrapper-content {
+        padding: 0;
+    }
+}
 
 
 // ------------------------------
