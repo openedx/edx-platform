@@ -59,3 +59,31 @@
         margin: 0 auto;
     }
 }
+
+
+// ------------------------------
+// #CARDS
+// ------------------------------
+
+.card {
+
+    .card-image {
+        text-align: center;
+    }
+
+  img {
+    max-width: 100%;
+    opacity: .5;
+    height: 120px;
+    width: 120px;
+    border-radius: 200px;
+  }
+
+  &:hover {
+
+    img {
+        opacity: 1;
+    }
+  }
+
+}

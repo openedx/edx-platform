@@ -1,7 +1,7 @@
 <div class="wrapper-card-core">
     <div class="card-core">
-        <div class="card-image"><img src="<%- image_url %>" /></div>
-        <h3 class="card-title"><%- title %></h3>
+        <div class="card-image"><img src="<%- image_url %>" alt="Course image for <%- title %>""  /></div>
+        <h3 class="card-title title"><a class="action action-view" href="<%= course_url %>"><%- title %></a></h3>
         <p class="card-description"><%- description %></p>
     </div>
 </div>
