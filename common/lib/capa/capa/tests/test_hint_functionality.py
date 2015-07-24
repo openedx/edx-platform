@@ -338,7 +338,7 @@ class CheckboxHintsTestTracking(HintTest):
     <problem>
         <p>question</p>
         <choiceresponse>
-        <checkboxgroup direction="vertical">
+        <checkboxgroup>
             <choice correct="true">Apple
               <choicehint selected="true">A true</choicehint>
               <choicehint selected="false">A false</choicehint>

@@ -188,7 +188,7 @@ describe 'Markdown to xml extended hint checkbox', ->
     <problem>
     <p>Select all the fruits from the list</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the fruits from the list" direction="vertical">
+      <checkboxgroup label="Select all the fruits from the list">
         <choice correct="true">Apple
           <choicehint selected="true">You're right that apple is a fruit.</choicehint>
           <choicehint selected="false">Remember that apple is also a fruit.</choicehint></choice>
@@ -209,7 +209,7 @@ describe 'Markdown to xml extended hint checkbox', ->
 
     <p>Select all the vegetables from the list</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the vegetables from the list" direction="vertical">
+      <checkboxgroup label="Select all the vegetables from the list">
         <choice correct="false">Banana
           <choicehint selected="true">No, sorry, a banana is a fruit.</choicehint>
           <choicehint selected="false">poor banana.</choicehint></choice>
@@ -266,7 +266,7 @@ describe 'Markdown to xml extended hint checkbox', ->
     <problem>
     <p>Select all the fruits from the list</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the fruits from the list" direction="vertical">
+      <checkboxgroup label="Select all the fruits from the list">
         <choice correct="true">Apple
           <choicehint selected="true">You're right that apple is a fruit.</choicehint>
           <choicehint selected="false">Remember that apple is also a fruit.</choicehint></choice>
@@ -287,7 +287,7 @@ describe 'Markdown to xml extended hint checkbox', ->
 
     <p>Select all the vegetables from the list</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the vegetables from the list" direction="vertical">
+      <checkboxgroup label="Select all the vegetables from the list">
         <choice correct="false">Banana
           <choicehint selected="true">No, sorry, a banana is a fruit.</choicehint>
           <choicehint selected="false">poor banana.</choicehint></choice>
@@ -753,7 +753,7 @@ describe 'Markdown to xml extended hint with multiline hints', ->
     <problem>
     <p>Checkboxes</p>
     <choiceresponse>
-      <checkboxgroup label="Checkboxes" direction="vertical">
+      <checkboxgroup label="Checkboxes">
         <choice correct="true">A
           <choicehint selected="true">aaa</choicehint>
           <choicehint selected="false">bbb</choicehint></choice>
@@ -891,7 +891,7 @@ describe 'Markdown to xml extended hint with tricky syntax cases', ->
     <p>q1</p>
     <p>this [x]</p>
     <choiceresponse>
-      <checkboxgroup label="q1" direction="vertical">
+      <checkboxgroup label="q1">
         <choice correct="false">a [square]</choice>
         <choice correct="true">b {{ this hint passes through }}</choice>
       </checkboxgroup>
