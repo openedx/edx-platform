@@ -27,33 +27,35 @@ from django.utils.translation import ugettext as _
 
         <div class="wrapper-courses">
             <div class="courses">
-                <h2 class="hd-2">Courses you can start now!</h2>
+                <h2 class="hd-2">Enroll in one of our 1,000,000 courses today!</h2>
                 <div class="course-listing">
 
                 </div>
-
-                % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-                <div class="course-search">
-                    <h2 class="hd-4">Find a course that's right for you</h2>
-
-                    <form class="course-search-form" method="get" action="/onboarding/courses">
-                        <div class="field">
-                            <label class="field-label sr-only" for="course-search">Find a Course</label>
-                            <input class="field-input input-text" type="search" id="course-search-from-input" name="course-search-from-input" placeholder="Search for a course..." />
-                            <button class="btn btn-primary btn-small" type="submit">
-                                <svg class="icon icon-play"><use xlink:href="/static/images/edx-svg/svgdefs.svg#icon-play"></use></svg>
-                                Find me some courses</button>
-                        </div>
-                        </fieldset>
-                    </form>
-                </div>
-                % endif
             </div>
+        </div>
+
+        <div class="wrapper-course-search">
+           % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+            <div class="course-search">
+                <h2 class="hd-3">Are those not the courses you're looking for, Ben Kenobi?</h2>
+
+                <form class="course-search-form" method="get" action="/onboarding/courses">
+                    <div class="field">
+                        <label class="field-label sr-only" for="course-search">Find a Course</label>
+                        <input class="field-input input-text" type="search" id="course-search-from-input" name="course-search-from-input" placeholder="Search for a course..." />
+                        <button class="btn btn-primary btn-base" type="submit">
+                            <svg class="icon icon-search"><use xlink:href="/static/images/edx-svg/svgdefs.svg#icon-search"></use></svg>
+                            Find me some courses
+                        </button>
+                    </div>
+                </form>
+            </div>
+            % endif
         </div>
 
         <div class="wrapper-promos">
             <div class="promos">
-                <div class="promo promo-kit">
+                <div class="promo promo-kit gallery-item">
                     <h3 class="promo-hd hd-5">Hey, we like you too. Keep in touch, okay?</h3>
 
                     <div class="promo-copy copy copy-base">
@@ -61,10 +63,9 @@ from django.utils.translation import ugettext as _
                     </div>
 
                     <a href="" class="promo-action btn btn-default btn-base">Join Our Newsletter</a>
-                    <p class="copy copy-micro de-emphasized">Its cool, we won't like spam you or anything</p>
                 </div>
 
-                <div class="promo promo-contribute">
+                <div class="promo promo-contribute gallery-item">
                     <h3 class="promo-hd hd-5">Want to help us?</h3>
 
                     <div class="promo-copy copy copy-base">
