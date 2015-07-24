@@ -1,10 +1,11 @@
 define([
+    'jquery',
     'backbone',
     'underscore',
     'common/js/spec_helpers/ajax_helpers',
     'common/js/components/views/paginated_view',
     'common/js/components/collections/paging_collection'
-], function (Backbone, _, AjaxHelpers, PaginatedView, PagingCollection) {
+], function ($, Backbone, _, AjaxHelpers, PaginatedView, PagingCollection) {
     'use strict';
     describe('PaginatedView', function () {
         var TestItemView = Backbone.View.extend({

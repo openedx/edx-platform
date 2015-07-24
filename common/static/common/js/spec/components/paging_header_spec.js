@@ -1,7 +1,8 @@
 define([
+    'underscore',
     'common/js/components/views/paging_header',
     'common/js/components/collections/paging_collection'
-], function (PagingHeader, PagingCollection) {
+], function (_, PagingHeader, PagingCollection) {
         'use strict';
         describe('PagingHeader', function () {
             var pagingHeader,
