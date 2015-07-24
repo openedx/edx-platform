@@ -50,7 +50,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import reset_urls
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, ModuleStoreClassCleanupTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -1981,8 +1981,19 @@ class UpdateThreadTest(CommentsServiceMockMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-class UpdateCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
+class UpdateCommentTest(CommentsServiceMockMixin, ModuleStoreClassCleanupTestCase):
     """Tests for update_comment"""
+
+    @classmethod
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUpClass(cls):
+        super(UpdateCommentTest, cls).setUpClass()
+        cls.user = UserFactory.create()
+        cls.course = CourseFactory.create()
+        cls.course_with_disabled_forums = CourseFactory.create()
+        _remove_discussion_tab(cls.course_with_disabled_forums, cls.user.id)
+        CourseEnrollmentFactory.create(user=cls.user, course_id=cls.course.id)
+        CourseEnrollmentFactory.create(user=cls.user, course_id=cls.course_with_disabled_forums.id)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1990,23 +2001,22 @@ class UpdateCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
-        self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
-        self.course = CourseFactory.create()
 
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-
-    def register_comment(self, overrides=None, thread_overrides=None):
+    def register_comment(self, overrides=None, thread_overrides=None, course=None):
         """
         Make a comment with appropriate data overridden by the overrides
         parameter and register mock responses for both GET and PUT on its
         endpoint. Also mock GET for the related thread with thread_overrides.
         """
+        if course is None:
+            course = self.course
+
         cs_thread_data = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(self.course.id)
+            "course_id": unicode(course.id)
         })
         cs_thread_data.update(thread_overrides or {})
         self.register_get_thread_response(cs_thread_data)
@@ -2026,10 +2036,15 @@ class UpdateCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
 
     def test_empty(self):
         """Check that an empty update does not make any modifying requests."""
-        self.register_comment()
-        update_comment(self.request, "test_comment", {})
-        for request in httpretty.httpretty.latest_requests:
-            self.assertEqual(request.method, "GET")
+        print self.course
+        print self.course.id
+
+        with mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}):
+            self.register_comment()
+            # import pudb; pu.db
+            update_comment(self.request, "test_comment", {})
+            for request in httpretty.httpretty.latest_requests:
+                self.assertEqual(request.method, "GET")
 
     @ddt.data(None, "test_parent")
     def test_basic(self, parent_id):
@@ -2085,8 +2100,7 @@ class UpdateCommentTest(CommentsServiceMockMixin, ModuleStoreTestCase):
             update_comment(self.request, "test_comment", {})
 
     def test_discussions_disabled(self):
-        _remove_discussion_tab(self.course, self.user.id)
-        self.register_comment()
+        self.register_comment(course=self.course_with_disabled_forums)
         with self.assertRaises(Http404):
             update_comment(self.request, "test_comment", {})
 

@@ -198,6 +198,35 @@ TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
 )
 
 
+class ModuleStoreClassCleanupTestCase(TestCase):
+    """
+    Sometimes you want to create a course and know it will stick around between
+    setUp()s
+    """
+    MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+
+    @classmethod
+    def setUpClass(cls):
+        cls._settings_override = override_settings(MODULESTORE=cls.MODULESTORE)
+        cls._settings_override.__enter__()
+        XMODULE_FACTORY_LOCK.enable()
+        clear_existing_modulestores()
+        cls.store = modulestore()
+
+    @classmethod
+    def tearDownClass(cls):
+        ModuleStoreTestCase.drop_mongo_collections()  # refactor this
+        RequestCache().clear_request_cache()
+        XMODULE_FACTORY_LOCK.disable()
+        cls._settings_override.__exit__(None, None, None)
+
+    def setUp(self):
+        # When testing CCX, we should make sure that
+        # OverrideFieldData.provider_classes is always reset to `None` so
+        # that they're recalculated for every test
+        OverrideFieldData.provider_classes = None
+
+
 class ModuleStoreTestCase(TestCase):
     """
     Subclass for any test case that uses a ModuleStore.
@@ -255,7 +284,6 @@ class ModuleStoreTestCase(TestCase):
         clear_existing_modulestores()
 
         self.addCleanup(self.drop_mongo_collections)
-
         self.addCleanup(RequestCache().clear_request_cache)
 
         # Enable XModuleFactories for the space of this test (and its setUp).
