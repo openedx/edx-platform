@@ -3,20 +3,9 @@
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/page_skeleton.html" />
 
-## Page Content
-## ----------------------------
-<h1>edX home!</h1>
-
-<ul>
-    <li><a href="/login">Login</a></li>
-    <li><a href="/onboarding/register">Register</a></li>
-    <li><a href="/onboarding/course_discovery">Course Discovery</a></li>
-</ul>
-
 ## Page Metadata
 ## ----------------------------
 <%block name="head">
-yoyoyyoyo
 <%include file="_head_metadata.html" />
 <%include file="_head_analytics.html" />
 </%block>
@@ -25,9 +14,6 @@ yoyoyyoyo
 <%block name="assets_primary">
 <%include file="_assets_primary.html" />
 </%block>
-
-##<%include file="_assets_primary.html" />
-
 <%block name="assets_secondary">
 <%include file="_assets_secondary.html" />
 </%block>
@@ -47,3 +33,14 @@ yoyoyyoyo
 <%block name="footer">
 <%include file="_footer.html" />
 </%block>
+
+
+## Page Content
+## ----------------------------
+<h1>edX home!</h1>
+
+<ul>
+    <li><a href="/login">Login</a></li>
+    <li><a href="/onboarding/register">Register</a></li>
+    <li><a href="/onboarding/course_discovery">Course Discovery</a></li>
+</ul>
