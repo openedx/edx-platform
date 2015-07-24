@@ -33,7 +33,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Set up tests
         """
         super(TestInstructorDashboard, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}}
+        )
 
         self.course_mode = CourseMode(course_id=self.course.id,
                                       mode_slug="honor",
@@ -234,3 +236,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 expected_result,
                 'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
             )
+
+    def test_grade_cutoffs(self):
+        """
+        Verify that grade cutoffs are displayed in the correct order.
+        """
+        response = self.client.get(self.url)
+        self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
