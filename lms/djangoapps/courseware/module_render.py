@@ -37,7 +37,7 @@ from courseware.entrance_exams import (
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData, SharedFieldData
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError

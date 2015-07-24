@@ -35,7 +35,7 @@ class LmsFieldData(SplitFieldData):
             Scope.user_state: student_data,
             Scope.user_info: student_data,
             Scope.preferences: student_data,
-            RemoteScope.user_state: shared_data
+            RemoteScope.user_state: student_data
         })
 
     def __repr__(self):
@@ -52,13 +52,16 @@ class LmsFieldData(SplitFieldData):
         """
         return self._find_scope_in_mapping(remote_scope)
 
+    def _find_scope_in_mapping(self, scope):
+        return self._scope_mappings[scope]
+
     def get(self, block, name):
-        query = block.fields[name].query
-        if query is None:
+        queryable = block.fields[name].queryable
+        if queryable is None:
             return self._field_data(block, name).get(block, name)
         else:
-            field_data_cache = self._shared_field_data(query.remote_scope)
+            field_data_cache = self._shared_field_data(queryable.remote_scope)
             try:
-                return field_data_cache.get(block, name, remote=True)
+                return field_data_cache.get(block, name)
             except TypeError:
                 raise TypeError

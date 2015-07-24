@@ -40,10 +40,12 @@ from django.db import DatabaseError
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
-from xblock.fields import Scope, UserScope
+from xblock.fields import Scope, UserScope, RemoteScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
 from courseware.user_state_client import DjangoXBlockUserStateClient
+
+from student.models import user_by_anonymous_id
 
 log = logging.getLogger(__name__)
 
@@ -108,6 +110,7 @@ class DjangoKeyValueStore(KeyValueStore):
         Scope.user_state,
         Scope.preferences,
         Scope.user_info,
+        RemoteScope.user_state
     )
 
     def __init__(self, field_data_cache):
@@ -368,6 +371,7 @@ class UserStateCache(object):
             self.user.username,
             _all_usage_keys(xblocks, aside_types),
         )
+        print self.user.username
         for usage_key, field_state in block_field_state:
             self._cache[usage_key] = field_state
 
@@ -834,13 +838,19 @@ class FieldDataCache(object):
         Raises: KeyError if key isn't found in the cache
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and key.query is None:
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and key.queryable is None:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
 
         if key.scope not in self.cache:
             raise KeyError(key.field_name)
+
+        if key.queryable is not None:
+            user = user_by_anonymous_id(key.user_id)
+            print 'self user', self.user
+            print 'user:', user
+            raw_input()
 
         return self.cache[key.scope].get(key)
 
@@ -911,13 +921,15 @@ class FieldDataCache(object):
         Returns: bool
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and key.queryable is None:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
 
         if key.scope not in self.cache:
             return False
+        print 'in field data cache'
+        print key.user_id
 
         return self.cache[key.scope].has(key)
 
