@@ -1,0 +1,50 @@
+## coding=utf-8
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+from branding import api as branding_api
+%>
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+     <head dir="${static.dir_rtl()}">
+         <%block name="head">
+             <%block name="head_metadata">
+                 <%include file="_head_metadata.html" />
+             </%block>
+             <%block name="head_analytics">
+                 <%include file="_head_analytics.html" />
+             </%block>
+         </%block>
+
+         <%block name="assets_primary">
+             <%include file="_assets_primary.html" />
+         </%block>
+     </head>
+
+    <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+
+        <div class="wrapper-window" dir="${static.dir_rtl()}">
+            <a class="nav-skip" href="<%block name="nav_skip">#content-main</%block>">${_("Skip to main content")}</a>
+
+            <%block name="system_feedback"/>
+
+            <div class="wrapper-view">
+                <%block name="header"/>
+
+                ${self.body()}
+
+                <%block name="footer"/>
+            </div>
+        </div>
+
+         <%block name="assets_secondary">
+             <%include file="_assets_secondary.html" />
+         </%block>
+     </body>
+</html>

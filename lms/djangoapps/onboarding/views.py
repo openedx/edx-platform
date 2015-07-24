@@ -1,9 +1,10 @@
 """HTTP endpoints for the Teams API."""
 
 from django.shortcuts import render_to_response
-from django.http import Http404
-from django.conf import settings
 from django.views.generic.base import View
+
+from courseware import courses
+from opaque_keys.edx.keys import CourseKey
 
 
 class HomePageView(View):
@@ -63,11 +64,20 @@ class CourseAboutView(View):
     View methods related to the course about page.
     """
 
-    def get(self, request, course_key_string):
+    def get(self, request, org_string, course_string, run_string):
         """
         Renders the course about page.
         """
+        course_id = "{org}/{course}/{run}".format(
+            org=org_string, course=course_string, run=run_string
+        )
+        course_key = CourseKey.from_string(course_id)
+        course = courses.get_course(course_key)
         context = {
-            "course_key_string": course_key_string,
+            "course": course,
+            "org_name": org_string,
+            "course_name": course_string,
+            "run_name": run_string,
+            "course_url": "/courses/{course_key}".format(course_key=course_key),
         }
         return render_to_response("onboarding/course_about.html", context)

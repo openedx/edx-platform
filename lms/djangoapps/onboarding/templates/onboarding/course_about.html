@@ -1,49 +1,28 @@
 ## mako
 
-<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="/lms/common/base.html" />
+<%include file="onboarding_base.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%inherit file="/page_skeleton.html" />
+<%!
+  from django.utils.translation import ugettext as _
+  from courseware.courses import course_image_url, get_course_about_section
+%>
 
-## Page Content
-## ----------------------------
-<div class="wrapper-content">
-    <main class="content-main">
-        <h1>edX course about!</h1>
-        <p>This is the ${course_key_string} course!</p>
-    </main>
-</div>
-
-## Page Metadata
-## ----------------------------
 <%block name='bodyclass'>onboarding onboarding-course-detail</%block>
 
-<%block name="head">
-<%include file="_head_metadata.html" />
-<%include file="_head_analytics.html" />
-</%block>
+<div class="wrapper-content">
+    <main class="content-main">
+        <div class="course-image"><img src="${course_image_url(course)}" /></div>
 
-## Assets
-<%block name="assets_primary">
-<%include file="_assets_primary.html" />
-</%block>
+        <div class="course-about">
+            ${get_course_about_section(course, "overview")}
+        </div>
+    </main>
+<div class="course-image"><img src="${course_image_url(course)}" /></div>
 
-<%block name="assets_secondary">
-<%include file="_assets_secondary.html" />
-</%block>
+<div class="course-about">
+    ${get_course_about_section(course, "overview")}
+</div>
 
-## UI Elements
-## ----------------------------
-<%block name="system_feedback">
-    <div class="wrapper-feedback">
-
-    </div>
-</%block>
-
-<%block name="header">
-<%include file="_header.html" />
-</%block>
-
-<%block name="footer">
-<%include file="_footer.html" />
-</%block>
+<a class="action action-view" href="${course_url}">${_("Enroll Now")}</a>

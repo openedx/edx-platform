@@ -1,12 +1,15 @@
 ## mako
 
-<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="/lms/common/base.html" />
+<%include file="onboarding_base.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%inherit file="/page_skeleton.html" />
+<%!
+from django.utils.translation import ugettext as _
+%>
 
-## Page Content
-## ----------------------------
+<%block name='bodyclass'>onboarding onboarding-course-listings</%block>
+
 <div class="wrapper-content">
     <main class="content-main">
         <h1>edX course discovery!</h1>
@@ -17,38 +20,3 @@
         </ul>
     </main>
 </div>
-
-## Page Metadata
-## ----------------------------
-<%block name='bodyclass'>onboarding onboarding-course-listings</%block>
-
-<%block name="head">
-<%include file="_head_metadata.html" />
-<%include file="_head_analytics.html" />
-</%block>
-
-## Assets
-<%block name="assets_primary">
-<%include file="_assets_primary.html" />
-</%block>
-
-<%block name="assets_secondary">
-<%include file="_assets_secondary.html" />
-</%block>
-
-## UI Elements
-## ----------------------------
-<%block name="system_feedback">
-    <div class="wrapper-feedback">
-
-    </div>
-</%block>
-
-<%block name="header">
-<%include file="_header.html" />
-</%block>
-
-<%block name="footer">
-<%include file="_footer.html" />
-</%block>
-
