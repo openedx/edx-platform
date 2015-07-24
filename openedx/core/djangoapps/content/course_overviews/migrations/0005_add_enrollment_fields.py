@@ -82,7 +82,7 @@ class Migration(SchemaMigration):
             'has_any_active_web_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'primary_key': 'True', 'db_index': 'True'}),
             'invitation_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'lowest_passing_grade': ('django.db.models.fields.DecimalField', [], {'max_digits': '5', 'decimal_places': '2'}),
+            'lowest_passing_grade': ('django.db.models.fields.DecimalField', [], {'max_digits': '5', 'decimal_places': '2', 'null': 'True'}),
             'max_student_enrollments_allowed': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'mobile_available': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'social_sharing_url': ('django.db.models.fields.TextField', [], {'null': 'True'}),
