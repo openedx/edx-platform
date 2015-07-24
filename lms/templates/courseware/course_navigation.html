@@ -29,6 +29,7 @@ masquerade_group_id = masquerade.group_id if masquerade else None
 staff_selected = selected(not masquerade or masquerade.role != "student")
 specific_student_selected = selected(not staff_selected and masquerade.user_name)
 student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
+enrollment_url = reverse('courseenrollments')
 %>
 
 % if show_preview_menu:
@@ -64,6 +65,13 @@ student_selected = selected(not staff_selected and not specific_student_selected
                     ${_("You are now viewing the course as <i>{user_name}</i>.").format(user_name=masquerade_user_name)}
                 </p>
             </div>
+            % endif
+            % if user.is_staff and not CourseEnrollment.is_enrolled(user, course.id):
+              <button class="staff-register-button" data-endpoint="${enrollment_url}" data-course-id="${unicode(course.id)}">
+                ${_("Register for course")}
+              </button>
+              <span class="button-message">(This button is only visible to global staff users)</span>
+              <p class="post-register"></p>
             % endif
         </div>
     </nav>
@@ -131,7 +139,7 @@ student_selected = selected(not staff_selected and not specific_student_selected
 
     userNameElement.keypress(function(event) {
         if (event.keyCode === 13) {
-            // Avoid submitting the form on enter, since the submit action isn't implemented.  Instead, blur the
+            // Avoid submitting the form on enter, since the submit action isnt implemented.  Instead, blur the
             // element to trigger a change event in case the value was edited, which in turn will trigger an AJAX
             // request to update the masquerading data.
             userNameElement.blur();
@@ -168,7 +176,25 @@ student_selected = selected(not staff_selected and not specific_student_selected
                 alert('Error: cannot connect to server');
             }
         });
-    }
+    };
+    var $button = $(".staff-register-button");
+    $button.on('click', function(){
+      var endpoint = $button.data('endpoint'),
+          courseId = $button.data('course-id'),
+          courseData = {"course_details": {"course_id": courseId}};
+      $.ajax({
+        url: endpoint,
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(courseData),
+        success: function(data) {
+          $button.hide();
+          $(".button-message").text("Great! You're enrolled!");
+        },
+      });
+    });
+
 }());
 </script>
 % endif

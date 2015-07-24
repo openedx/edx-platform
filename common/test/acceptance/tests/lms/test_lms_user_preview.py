@@ -5,11 +5,78 @@ Tests the "preview" selector in the LMS that allows changing between Staff, Stud
 
 from ..helpers import UniqueCourseTest, create_user_partition_json
 from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.staff_view import StaffPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from xmodule.partitions.partitions import Group
 from textwrap import dedent
+
+
+class StaffViewEnrollmentButton(UniqueCourseTest):
+    """Tests for the global staff only enrollment button"""
+
+    USERNAME = "STAFF_TESTER"
+    EMAIL = "johndoe@example.com"
+
+    def setUp(self):
+        super(StaffViewEnrollmentButton, self).setUp()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        self.course_fixture = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name'],
+        )
+
+        self.course_fixture.install()
+
+    def test_register_for_course_with_button(self):
+        AutoAuthPage(
+            self.browser,
+            username=self.USERNAME,
+            email=self.EMAIL,
+            course_id=None,
+            staff=True,
+        ).visit()
+
+        # from nose.tools import set_trace; set_trace()
+
+        info_page = CourseInfoPage(self.browser, self.course_id)
+        info_page.visit()
+        self.assertTrue(info_page.q(css=".staff-register-button").present)
+        info_page.q(css=".staff-register-button").click()
+        info_page.wait_for_ajax()
+        self.assertFalse(info_page.q(css=".staff-register-button").visible)
+
+    def test_button_not_visible_if_registered_for_course(self):
+        AutoAuthPage(
+            self.browser,
+            username=self.USERNAME,
+            email=self.EMAIL,
+            course_id=self.course_id,
+            staff=True,
+        ).visit()
+
+        info_page = CourseInfoPage(self.browser, self.course_id)
+        info_page.visit()
+        self.assertFalse(info_page.q(css=".staff-register-button").present)
+
+    def test_button_not_visible_if_not_global_staff(self):
+        AutoAuthPage(
+            self.browser,
+            username=self.USERNAME,
+            email=self.EMAIL,
+            course_id=self.course_id,
+            staff=False,
+        ).visit()
+
+        info_page = CourseInfoPage(self.browser, self.course_id)
+        info_page.visit()
+        self.assertFalse(info_page.q(css=".staff-register-button").present)
 
 
 class StaffViewTest(UniqueCourseTest):
