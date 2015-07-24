@@ -17,7 +17,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.utils import strip_none
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -37,15 +37,17 @@ log = logging.getLogger(__name__)
 
 # pylint: disable=missing-docstring
 
+def setUpModule():
+    reset_urls({"ENABLE_DISCUSSION_SERVICE": True})
 
-class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
+def tearDownModule():
+    reset_urls()
+
+
+class ViewsExceptionTestCase(ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-
-        # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
-        # so we need to call super.setUp() which reloads urls.py (because
-        # of the UrlResetMixin)
         super(ViewsExceptionTestCase, self).setUp()
 
         # create a course
@@ -1106,15 +1108,11 @@ class UserProfileTestCase(ModuleStoreTestCase):
 
 
 @patch('requests.request')
-class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
+class CommentsServiceRequestHeadersTestCase(ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CommentsServiceRequestHeadersTestCase, self).setUp()
-
         username = "foo"
         password = "bar"
-
-        # Invoke UrlResetMixin
         super(CommentsServiceRequestHeadersTestCase, self).setUp(create_user=False)
         self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create(username=username, password=password)

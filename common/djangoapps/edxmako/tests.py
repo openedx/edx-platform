@@ -18,11 +18,10 @@ from edxmako.shortcuts import (
     open_source_footer_context_processor
 )
 from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
 
 
 @ddt.ddt
-class ShortcutsTests(UrlResetMixin, TestCase):
+class ShortcutsTests(TestCase):
     """
     Test the edxmako shortcuts file
     """

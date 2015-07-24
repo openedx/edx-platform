@@ -13,11 +13,18 @@ from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, set
 from student.tests.factories import UserFactory
 from edxmako.tests import mako_middleware_process_request
 from openedx.core.djangoapps.user_api.models import UserPreference
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
+
+
+def setUpModule():
+    reset_urls({"ENABLE_DISCUSSION_SERVICE": True})
+
+def tearDownModule():
+    reset_urls()
 
 
 @override_settings(SECRET_KEY="test secret key")
-class NotificationPrefViewTest(UrlResetMixin, TestCase):
+class NotificationPrefViewTest(TestCase):
     INITIALIZATION_VECTOR = "\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})

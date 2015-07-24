@@ -6,13 +6,12 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from util.testing import UrlResetMixin
 from student.tests.factories import UserFactory
 
 from student_profile.views import learner_profile_context
 
 
-class LearnerProfileViewTest(UrlResetMixin, TestCase):
+class LearnerProfileViewTest(TestCase):
     """ Tests for the student profile view. """
 
     USERNAME = "username"

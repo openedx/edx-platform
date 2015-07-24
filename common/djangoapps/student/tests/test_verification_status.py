@@ -21,21 +21,27 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
 from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification  # pylint: disable=import-error
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
+
+
+def setUpModule():
+    reset_urls(urlconf_modules=['verify_student.urls'])
+
+def tearDownModule():
+    reset_urls()
 
 
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
+class TestCourseVerificationStatus(ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
     PAST = datetime.now(UTC) - timedelta(days=5)
     FUTURE = datetime.now(UTC) + timedelta(days=5)
 
     def setUp(self):
-        # Invoke UrlResetMixin
-        super(TestCourseVerificationStatus, self).setUp('verify_student.urls')
+        super(TestCourseVerificationStatus, self).setUp()
 
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()

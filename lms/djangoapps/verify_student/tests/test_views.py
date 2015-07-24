@@ -37,7 +37,7 @@ from shoppingcart.models import Order, CertificateItem
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from verify_student.views import (
     checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
     _compose_message_reverification_email
@@ -62,6 +62,14 @@ render_mock = Mock(side_effect=mock_render_to_response)
 PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
 
 
+def setUpModule():
+    reset_urls(feature_flag_overrides={'EMBARGO': True}, urlconf_modules=['embargo'])
+
+def tearDownModule():
+    reset_urls()
+
+
+
 class StartView(TestCase):
     def start_url(self, course_id=""):
         return "/verify_student/{0}".format(urllib.quote(course_id))
@@ -79,7 +87,7 @@ class StartView(TestCase):
 
 
 @ddt.ddt
-class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
+class TestPayAndVerifyView(ModuleStoreTestCase):
     """
     Tests for the payment and verification flow views.
     """
@@ -93,7 +101,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TestPayAndVerifyView, self).setUp('embargo')
+        super(TestPayAndVerifyView, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result, msg="Could not log in")

@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.core.cache import cache as django_cache
 
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,7 +22,7 @@ from embargo.test_utils import restrict_course
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
+class EmbargoMiddlewareAccessTests(ModuleStoreTestCase):
     """Tests of embargo middleware country access rules.
 
     There are detailed unit tests for the rule logic in
@@ -33,9 +33,17 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'fred'
     PASSWORD = 'secret'
 
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({'EMBARGO': True}, ['embargo'])
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMiddlewareAccessTests, self).setUp('embargo')
+        super(EmbargoMiddlewareAccessTests, self).setUp()
         self.user = UserFactory(username=self.USERNAME, password=self.PASSWORD)
         self.course = CourseFactory.create()
         self.client.login(username=self.USERNAME, password=self.PASSWORD)

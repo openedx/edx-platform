@@ -38,11 +38,10 @@ from openedx.core.djangoapps.credit.models import (
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from util.testing import reset_urls
 
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
-
-from util.testing import UrlResetMixin
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
@@ -721,14 +720,19 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(statuses[0]["status"], expected_status)
 
 
-class CreditApiFeatureFlagTest(UrlResetMixin, TestCase):
+class CreditApiFeatureFlagTest(TestCase):
     """
     Base class to test the credit api urls.
     """
     def setUp(self, **kwargs):
         enable_credit_api = kwargs.get('enable_credit_api', False)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREDIT_API': enable_credit_api}):
-            super(CreditApiFeatureFlagTest, self).setUp('lms.urls')
+            super(CreditApiFeatureFlagTest, self).setUp()
+            reset_urls(urlconf_modules=['lms.urls'])
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from util.date_utils import to_timestamp
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credit import api
@@ -32,12 +32,19 @@ from openedx.core.djangoapps.credit.models import (
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 
 
+def setUpModule():
+    reset_urls(feature_flag_overrides={"ENABLE_CREDIT_API": True})
+
+def tearDownModule():
+    reset_urls()
+
+
 @ddt.ddt
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
     "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY
 })
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CreditProviderViewTests(UrlResetMixin, TestCase):
+class CreditProviderViewTests(TestCase):
     """
     Tests for HTTP end-points used to issue requests to credit providers
     and receive responses approving or denying requests.

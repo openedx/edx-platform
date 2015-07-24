@@ -26,14 +26,21 @@ from django_comment_common.models import (
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 
 
+def setUpModule():
+    reset_urls({"ENABLE_DISCUSSION_SERVICE": True})
+
+def tearDownModule():
+    reset_urls()
+
+
 @ddt.ddt
-class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
+class SerializerTestMixin(CommentsServiceMockMixin):
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(SerializerTestMixin, self).setUp()
@@ -402,7 +409,7 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):

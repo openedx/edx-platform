@@ -28,7 +28,7 @@ from embargo.models import (
     RestrictedCourse, Country, CountryAccessRule,
 )
 
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from embargo import api as embargo_api
 from embargo.exceptions import InvalidAccessPoint
 from mock import patch
@@ -236,12 +236,20 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
+class EmbargoMessageUrlApiTests(ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
+
+    @classmethod
+    def setUpClass(cls):
+        reset_urls({'EMBARGO': True}, ['embargo'])
+
+    @classmethod
+    def tearDownClass(cls):
+        reset_urls()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMessageUrlApiTests, self).setUp('embargo')
+        super(EmbargoMessageUrlApiTests, self).setUp()
         self.course = CourseFactory.create()
 
     def tearDown(self):

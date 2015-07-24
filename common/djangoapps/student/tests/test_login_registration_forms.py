@@ -7,7 +7,7 @@ from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from xmodule.modulestore.tests.factories import CourseFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -17,6 +17,16 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 # settings with the feature flag `ENABLE_THIRD_PARTY_AUTH`
 THIRD_PARTY_AUTH_BACKENDS = ["google-oauth2", "facebook"]
 THIRD_PARTY_AUTH_PROVIDERS = ["Google", "Facebook"]
+
+
+def setUpModule():
+    reset_urls(
+        feature_flag_overrides={"ENABLE_COMBINED_LOGIN_REGISTRATION": False},
+        urlconf_modules=['lms.urls']
+    )
+
+def tearDownModule():
+    reset_urls()
 
 
 def _third_party_login_url(backend_name, auth_entry, redirect_url=None):
@@ -38,11 +48,11 @@ def _finish_auth_url(params):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
+class LoginFormTest(ThirdPartyAuthTestMixin, ModuleStoreTestCase):
     """Test rendering of the login form. """
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
-        super(LoginFormTest, self).setUp('lms.urls')
+        super(LoginFormTest, self).setUp()
 
         self.url = reverse("signin_user")
         self.course = CourseFactory.create()
@@ -148,11 +158,11 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase)
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
+class RegisterFormTest(ThirdPartyAuthTestMixin, ModuleStoreTestCase):
     """Test rendering of the registration form. """
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
-        super(RegisterFormTest, self).setUp('lms.urls')
+        super(RegisterFormTest, self).setUp()
 
         self.url = reverse("register_user")
         self.course = CourseFactory.create()

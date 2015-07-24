@@ -21,7 +21,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
-from util.testing import UrlResetMixin
+from util.testing import reset_urls
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
@@ -34,6 +34,12 @@ log = logging.getLogger(__name__)
 CS_PREFIX = "http://localhost:4567/api/v1"
 
 # pylint: disable=missing-docstring
+
+def setUpModule():
+    reset_urls({"ENABLE_DISCUSSION_SERVICE": True})
+
+def tearDownModule():
+    reset_urls()
 
 
 class MockRequestSetupMixin(object):
@@ -315,7 +321,7 @@ class ViewsTestCaseMixin(object):
 
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request')
-class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
+class ViewsQueryCountTestCase(ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -365,13 +371,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
+class ViewsTestCase(ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
-        # so we need to call super.setUp() which reloads urls.py (because
-        # of the UrlResetMixin)
         super(ViewsTestCase, self).setUp(create_user=False)
         self.set_up_course()
 
@@ -844,7 +847,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, V
 
 
 @patch("lms.lib.comment_client.utils.requests.request")
-class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
+class ViewPermissionsTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ViewPermissionsTestCase, self).setUp()
