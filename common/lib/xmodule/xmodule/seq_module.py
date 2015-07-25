@@ -1,9 +1,8 @@
+# pylint: disable=abstract-method
+
 import json
 import logging
 import warnings
-import pytz
-
-from datetime import datetime, timedelta
 
 from lxml import etree
 
@@ -95,7 +94,7 @@ class ProctoringFields(object):
 
 
 @XBlock.wants('proctoring')
-class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disable=abstract-method
+class SequenceModule(SequenceFields, ProctoringFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {
