@@ -122,6 +122,8 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
+FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+
 # Don't actually send any requests to Software Secure for student identity
 # verification.
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
@@ -135,7 +137,7 @@ FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware', 'instructor',)
+LETTUCE_APPS = ('courseware', 'instructor')
 
 # Lettuce appears to have a bug that causes it to search
 # `instructor_task` when we specify the `instructor` app.

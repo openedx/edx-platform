@@ -173,6 +173,9 @@ FEATURES = {
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
 
+    # Timed Proctored Exams
+    'ENABLE_PROCTORED_EXAMS': False,
+
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
@@ -775,6 +778,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.credit',
 
     'xblock_django',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 
@@ -1040,11 +1046,10 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
 
-
 #### PROCTORING CONFIGURATION DEFAULTS
 
 PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'class': 'edx_proctoring.backends.null.NullBackendProvider',
     'options': {},
 }
 PROCTORING_SETTINGS = {}

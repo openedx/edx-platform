@@ -513,6 +513,60 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.reindex_button.click()
 
+    def open_exam_settings_dialog(self):
+        """
+        clicks on the settings button of subsection.
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+
+    def change_problem_release_date_in_studio(self):
+        """
+        Sets a new start date
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+        self.q(css="#start_date").fill("01/01/2030")
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_proctored(self):
+        """
+        Makes a Proctored exam.
+        """
+        self.q(css="#id_timed_examination").first.click()
+        self.q(css="#id_exam_proctoring").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def make_exam_timed(self):
+        """
+        Makes a timed exam.
+        """
+        self.q(css="#id_timed_examination").first.click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def proctoring_items_are_displayed(self):
+        """
+        Returns True if all the items are found.
+        """
+        # The Timed exam checkbox
+        if not self.q(css="#id_timed_examination").present:
+            return False
+
+        # The time limit field
+        if not self.q(css="#id_time_limit").present:
+            return False
+
+        # The Practice exam checkbox
+        if not self.q(css="#id_practice_exam").present:
+            return False
+
+        # The Proctored exam checkbox
+        if not self.q(css="#id_exam_proctoring").present:
+            return False
+
+        return True
+
     @property
     def bottom_add_section_button(self):
         """
