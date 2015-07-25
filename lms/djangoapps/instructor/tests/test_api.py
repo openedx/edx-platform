@@ -101,6 +101,12 @@ REPORTS_DATA = (
         'instructor_api_endpoint': 'get_students_who_may_enroll',
         'task_api_endpoint': 'instructor_task.api.submit_calculate_may_enroll_csv',
         'extra_instructor_api_kwargs': {},
+    },
+    {
+        'report_type': 'proctored exam results',
+        'instructor_api_endpoint': 'get_proctored_exam_results',
+        'task_api_endpoint': 'instructor_task.api.submit_proctored_exam_results_report',
+        'extra_instructor_api_kwargs': {},
     }
 )
 
@@ -223,6 +229,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('get_enrollment_report', {}),
             ('get_students_who_may_enroll', {}),
             ('get_exec_summary_report', {}),
+            ('get_proctored_exam_results', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -2309,6 +2316,29 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertNotIn('currently being created', res_json['status'])
         # CSV generation already in progress:
         with patch('instructor_task.api.submit_calculate_may_enroll_csv') as submit_task_function:
+            error = AlreadyRunningError()
+            submit_task_function.side_effect = error
+            response = self.client.get(url, {})
+            res_json = json.loads(response.content)
+            self.assertIn('status', res_json)
+            self.assertIn('currently being created', res_json['status'])
+
+    def test_get_student_exam_results(self):
+        """
+        Test whether get_proctored_exam_results returns an appropriate
+        status message when users request a CSV file.
+        """
+        url = reverse(
+            'get_proctored_exam_results',
+            kwargs={'course_id': unicode(self.course.id)}
+        )
+        # Successful case:
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('status', res_json)
+        self.assertNotIn('currently being created', res_json['status'])
+        # CSV generation already in progress:
+        with patch('instructor_task.api.submit_proctored_exam_results_report') as submit_task_function:
             error = AlreadyRunningError()
             submit_task_function.side_effect = error
             response = self.client.get(url, {})

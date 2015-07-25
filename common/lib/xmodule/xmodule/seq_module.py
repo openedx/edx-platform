@@ -1,9 +1,16 @@
+"""
+xModule implementation of a learning sequence
+"""
+
+# pylint: disable=abstract-method
+
 import json
 import logging
 import warnings
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -91,7 +98,9 @@ class ProctoringFields(object):
     )
 
 
-class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disable=abstract-method
+@XBlock.wants('proctoring')
+@XBlock.wants('credit')
+class SequenceModule(SequenceFields, ProctoringFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {
@@ -141,6 +150,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
             else:
                 self.position = 1
             return json.dumps({'success': True})
+
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
@@ -153,6 +163,56 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
         contents = []
 
         fragment = Fragment()
+
+        if self.is_time_limited:
+            # Is this sequent part of a timed or proctored exam?
+            proctoring_service = self.runtime.service(self, 'proctoring')
+            credit_service = self.runtime.service(self, 'credit')
+
+            # Is the feature turned on?
+            feature_enabled = (
+                proctoring_service and
+                proctoring_service.is_feature_enabled()
+            )
+            if feature_enabled:
+
+                user_id = self.runtime.user_id
+                user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
+                course_id = self.runtime.course_id
+                content_id = self.location
+
+                context = {
+                    'display_name': self.display_name,
+                    'default_time_limit_mins': (
+                        self.default_time_limit_minutes if
+                        self.default_time_limit_minutes else 0
+                    ),
+                    'is_practice_exam': self.is_practice_exam
+                }
+
+                # inject the user's credit requirements and fulfillments
+                if credit_service:
+                    credit_state = credit_service.get_credit_state(user_id, course_id)
+                    if credit_state:
+                        context.update({
+                            'credit_state': credit_state
+                        })
+
+                # See if the edx-proctoring subsystem wants to present
+                # a special view to the student rather
+                # than the actual sequence content
+                view_html = proctoring_service.get_student_view(
+                    user_id=user_id,
+                    course_id=course_id,
+                    content_id=content_id,
+                    context=context,
+                    user_role=user_role_in_course
+                )
+
+                if view_html:
+                    # Are we blocking content for any reason
+                    fragment.add_content(view_html)
+                    return fragment
 
         for child in self.get_display_items():
             progress = child.get_progress()
@@ -181,7 +241,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
                   'ajax_url': self.system.ajax_url,
                   }
 
-        fragment.add_content(self.system.render_template('seq_module.html', params))
+        fragment.add_content(self.system.render_template("seq_module.html", params))
 
         return fragment
 
