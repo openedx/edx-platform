@@ -1270,6 +1270,45 @@ def get_exec_summary_report(request, course_id):
     })
 
 
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_proctored_exam_results(request, course_id):
+    """
+    get the proctored exam resultsreport for the particular course.
+    """
+    query_features = [
+        'created',
+        'modified',
+        'started_at',
+        'exam_name',
+        'user_email',
+        'completed_at',
+        'external_id',
+        'allowed_time_limit_mins',
+        'status',
+        'attempt_code',
+        'is_sample_attempt',
+        'last_poll_timestamp',
+        'last_poll_ipaddr',
+    ]
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_proctored_exam_results_report(request, course_key, query_features)
+        status_response = _("The proctored exam results report is being created."
+                            " To view the status of the report, see Pending Instructor Tasks below.")
+    except AlreadyRunningError:
+        status_response = _(
+            "The proctored exam results report is currently being created."
+            " To view the status of the report, see Pending Instructor Tasks below."
+            " You will be able to download the report when it is complete."
+        )
+    return JsonResponse({
+        "status": status_response
+    })
+
+
 def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table

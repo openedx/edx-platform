@@ -28,7 +28,7 @@ def register_proctored_exams(course_key):
     This is typically called on a course published signal. The course is examined for sequences
     that are marked as timed exams. Then these are registered with the edx-proctoring
     subsystem. Likewise, if formerly registered exams are unmarked, then those
-    registred exams are marked as inactive
+    registered exams are marked as inactive
     """
 
     if not settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
@@ -76,6 +76,7 @@ def register_proctored_exams(course_key):
                 exam_name=timed_exam.display_name,
                 time_limit_mins=timed_exam.default_time_limit_minutes,
                 is_proctored=timed_exam.is_proctored_enabled,
+                is_practice_exam=timed_exam.is_practice_exam,
                 is_active=True
             )
             msg = 'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
@@ -87,6 +88,7 @@ def register_proctored_exams(course_key):
                 exam_name=timed_exam.display_name,
                 time_limit_mins=timed_exam.default_time_limit_minutes,
                 is_proctored=timed_exam.is_proctored_enabled,
+                is_practice_exam=timed_exam.is_practice_exam,
                 is_active=True
             )
             msg = 'Created new timed exam {exam_id}'.format(exam_id=exam_id)
