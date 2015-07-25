@@ -77,6 +77,8 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService
+from edx_proctoring.services import ProctoringService
+from openedx.core.djangoapps.credit.services import CreditService
 
 from .field_overrides import OverrideFieldData
 
@@ -178,12 +180,18 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                           section.url_name == active_section)
 
                 if not section.hide_from_toc:
+                    is_proctored_enabled = (
+                        getattr(section, 'is_proctored_enabled', False) and
+                        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+                    )
+
                     sections.append({'display_name': section.display_name_with_default,
                                      'url_name': section.url_name,
                                      'format': section.format if section.format is not None else '',
                                      'due': section.due,
                                      'active': active,
                                      'graded': section.graded,
+                                     'is_proctored_enabled': is_proctored_enabled,
                                      })
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
@@ -678,7 +686,9 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
+            "reverification": ReverificationService(),
+            'proctoring': ProctoringService(),
+            'credit': CreditService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

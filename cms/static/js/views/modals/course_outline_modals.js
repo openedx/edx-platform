@@ -278,8 +278,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 this.$('#id_time_limit').val('00:30');
                 this.$('#id_exam_proctoring').attr('disabled','disabled');
                 this.$('#id_time_limit').attr('disabled', 'disabled');
+                this.$('#id_practice_exam').attr('checked', false);
+                this.$('#id_practice_exam').attr('disabled','disabled');
             }
             else {
+                this.$('#id_practice_exam').removeAttr('disabled');
                 this.$('#id_exam_proctoring').removeAttr('disabled');
                 this.$('#id_time_limit').removeAttr('disabled');
             }
@@ -294,6 +297,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.setExamTime(this.model.get('default_time_limit_minutes'));
             this.setExamTmePreference(this.model.get('is_time_limited'));
             this.setExamProctoring(this.model.get('is_proctored_enabled'));
+            this.setPracticeExam(this.model.get('is_practice_exam'));
+        },
+        setPracticeExam: function(value) {
+            this.$('#id_practice_exam').prop('checked', value);
         },
         setExamProctoring: function(value) {
             this.$('#id_exam_proctoring').prop('checked', value);
@@ -307,10 +314,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (!this.$('#id_timed_examination').is(':checked')) {
                 this.$('#id_exam_proctoring').attr('disabled','disabled');
                 this.$('#id_time_limit').attr('disabled', 'disabled');
+                this.$('#id_practice_exam').attr('disabled', 'disabled');
             }
         },
         isExamTimeEnabled: function () {
             return this.$('#id_timed_examination').is(':checked');
+        },
+        isPracticeExam: function () {
+            return this.$('#id_practice_exam').is(':checked');
         },
         isValidTimeLimit: function(time_limit) {
             var pattern = new RegExp('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$');
@@ -338,6 +349,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var time_limit = this.getExamTimeLimit();
             return {
                 metadata: {
+                    'is_practice_exam': this.isPracticeExam(),
                     'is_time_limited': this.isExamTimeEnabled(),
                     'is_proctored_enabled': this.isExamProctoringEnabled(),
                     'default_time_limit_minutes': this.convertTimeLimitToMinutes(time_limit)

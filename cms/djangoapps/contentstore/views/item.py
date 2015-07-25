@@ -862,7 +862,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             xblock_info.update({
                 "is_proctored_enabled": xblock.is_proctored_enabled,
                 "is_time_limited": xblock.is_time_limited,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes
+                "default_time_limit_minutes": xblock.default_time_limit_minutes,
+                "is_practice_exam": xblock.is_practice_exam
             })
 
     # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.

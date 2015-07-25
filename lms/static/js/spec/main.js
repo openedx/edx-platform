@@ -287,6 +287,14 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
+            'js/courseware/base/views/proctored_exam_view': {
+                exports: 'edx.coursware.proctored_exam.ProctoredExamView',
+                deps: ['backbone', 'jquery', 'underscore']
+            },
+            'js/courseware/base/models/proctored_exam_model': {
+                exports: 'ProctoredExamModel',
+                deps: ['backbone']
+            },
             'js/models/notification': {
                 exports: 'NotificationModel',
                 deps: ['backbone']
@@ -603,6 +611,7 @@
         'lms/include/js/spec/discovery/views/refine_sidebar_spec.js',
         'lms/include/js/spec/discovery/views/search_form_spec.js',
         'lms/include/js/spec/discovery/discovery_factory_spec.js',
+        'lms/include/js/spec/courseware/proctored_exams_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js'
     ]);
 
