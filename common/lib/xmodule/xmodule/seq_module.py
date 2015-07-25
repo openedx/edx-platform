@@ -94,7 +94,7 @@ class ProctoringFields(object):
     )
 
 
-@XBlock.needs('proctoring')
+@XBlock.wants('proctoring')
 class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disable=abstract-method
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -164,7 +164,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
             proctoring_service = self.runtime.service(self, 'proctoring')
 
             # Is the feature turned on?
-            if proctoring_service.is_feature_enabled():
+            if proctoring_service and proctoring_service.is_feature_enabled():
 
                 user_id = self.runtime.user_id
                 user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
