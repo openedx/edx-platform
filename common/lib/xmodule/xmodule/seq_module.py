@@ -55,6 +55,7 @@ class SequenceFields(object):
         scope=Scope.content,
     )
 
+
 class ProctoringFields(object):
     """
     Fields that are specific to Proctored or Timed Exams
