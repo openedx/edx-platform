@@ -1,3 +1,7 @@
+"""
+xModule implementation of a learning sequence
+"""
+
 # pylint: disable=abstract-method
 
 import json
