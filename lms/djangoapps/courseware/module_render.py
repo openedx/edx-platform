@@ -180,7 +180,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                 if not section.hide_from_toc:
                     is_proctored_enabled = (
-                        section.is_proctored_enabled and
+                        getattr(section, 'is_proctored_enabled', False) and
                         settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
 
