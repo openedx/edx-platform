@@ -387,9 +387,17 @@ class PayAndVerifyView(View):
         verification_good_until = self._verification_valid_until(request.user)
 
         # get available payment processors
+        processors = []
         if relevant_course_mode.sku:
-            # transaction will be conducted via ecommerce service
-            processors = ecommerce_api_client(request.user).payment.processors.get()
+            # Process transaction with E-Commerce Service
+            if not settings.FEATURES.get('PAY_WITH_BRAINTREE', False):
+                processors = ecommerce_api_client(request.user).payment.processors.get()
+                try:
+                    # Remove the Braintree processor, since it cannot be
+                    # used like the others.
+                    processors.remove('braintree')
+                except ValueError:
+                    pass
         else:
             # transaction will be conducted using legacy shopping cart
             processors = [settings.CC_PROCESSOR_NAME]
@@ -418,6 +426,7 @@ class PayAndVerifyView(View):
             'verification_good_until': verification_good_until,
             'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
             'nav_hidden': True,
+            'braintree_enabled': settings.FEATURES.get('PAY_WITH_BRAINTREE', False),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -696,7 +705,7 @@ def checkout_with_ecommerce_service(user, course_key, course_mode, processor):  
         })
 
         # Pass the payment parameters directly from the API response.
-        return result.get('payment_data')
+        return result
     except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': course_id}
         log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
@@ -790,13 +799,6 @@ def create_order(request):
         )
     else:
         payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
-
-    if 'processor' not in request.POST:
-        # (XCOM-214) To be removed after release.
-        # the absence of this key in the POST payload indicates that the request was initiated from
-        # a stale js client, which expects a response containing only the 'payment_form_data' part of
-        # the payment data result.
-        payment_data = payment_data['payment_form_data']
     return HttpResponse(json.dumps(payment_data), content_type="application/json")
 
 

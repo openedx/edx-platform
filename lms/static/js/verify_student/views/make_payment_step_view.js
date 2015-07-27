@@ -64,6 +64,31 @@ var edx = edx || {};
             )({name: processorName, text: self._getPaymentButtonText(processorName)});
         },
 
+        renderBraintreeForm: function (basketData) {
+            var braintreeForm,
+                templateHtml = $('#braintree-tpl').html(),
+                paymentData = basketData.payment_data,
+                templateData = {
+                    basket_id: basketData.id,
+                    form_action_url: paymentData.payment_page_url,
+                    client_token: paymentData.payment_form_data.client_token,
+                    merchant_id: paymentData.payment_form_data.merchant_id
+                };
+            templateHtml += "<script>" +
+                "braintree.setup('<%= client_token %>', 'dropin', { container: 'payment-form' }); " +
+                "BraintreeData.setup('<%= merchant_id %>', 'braintree-checkout', BraintreeData.environments.production);" +
+                "</script>";
+
+            braintreeForm = _.template(templateHtml, templateData);
+            $('div.payment-buttons').append(braintreeForm);
+        },
+
+        handleCreateBasketError: function(xhr){
+            // TODO Be better!
+            alert('An error occurred!');
+            console.log(xhr);
+        },
+
         postRender: function() {
             var templateContext = this.templateContext(),
                 hasVisibleReqs = _.some(
@@ -73,6 +98,7 @@ var edx = edx || {};
                 // This a hack to appease /lms/static/js/spec/verify_student/pay_and_verify_view_spec.js,
                 // which does not load an actual template context.
                 processors = templateContext.processors || [],
+                braintreeEnabled = templateContext.braintreeEnabled,
                 self = this;
 
             // Track a virtual pageview, for easy funnel reconstruction.
@@ -104,10 +130,31 @@ var edx = edx || {};
                 self._getProductText( templateContext.courseModeSlug, templateContext.upgrade )
             );
 
-            // create a button for each payment processor
-            _.each(processors.reverse(), function(processorName) {
-                $( 'div.payment-buttons' ).append( self._getPaymentButtonHtml(processorName) );
-            });
+            if(braintreeEnabled){
+                // Create a basket, and get the payment parameters, from the server
+                var postData = {
+                        processor: 'braintree',
+                        contribution: this.getPaymentAmount(),
+                        course_id: this.stepData.courseKey
+                    };
+                
+                $.ajax({
+                    url: '/verify_student/create_order/',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': $.cookie('csrftoken')
+                    },
+                    data: postData,
+                    context: this,
+                    success: this.renderBraintreeForm,
+                    error: this.handleCreateBasketError
+                });
+            } else {
+                // create a button for each payment processor
+                _.each(processors.reverse(), function(processorName) {
+                    $( 'div.payment-buttons' ).append( self._getPaymentButtonHtml(processorName) );
+                });
+            }
 
             // Handle payment submission
             $( '.payment-button' ).on( 'click', _.bind( this.createOrder, this ) );
@@ -157,6 +204,8 @@ var edx = edx || {};
         },
 
         handleCreateOrderResponse: function( paymentData ) {
+            paymentData = paymentData.payment_data;
+
             // At this point, the basket has been created on the server,
             // and we've received signed payment parameters.
             // We need to dynamically construct a form using

@@ -33,11 +33,22 @@ from verify_student.views import PayAndVerifyView
             <%static:include path="verify_student/${template_name}.underscore" />
         </script>
     % endfor
+
+    %if settings.FEATURES.get('PAY_WITH_BRAINTREE', False):
+      <script type="text/template" id="braintree-tpl">
+          <%static:include path="verify_student/braintree.underscore" />
+      </script>
+    %endif
 </%block>
 <%block name="js_extra">
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
+
+  %if settings.FEATURES.get('PAY_WITH_BRAINTREE', False):
+    <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+    <script src="https://js.braintreegateway.com/v1/braintree-data.js"></script>
+  %endif
 </%block>
 
 <%block name="content">
@@ -75,6 +86,7 @@ from verify_student.views import PayAndVerifyView
       data-already-verified='${already_verified}'
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
+      data-braintree-enabled='${json.dumps(braintree_enabled)}'
     ></div>
 
     % if is_active:
