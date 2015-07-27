@@ -76,16 +76,19 @@ class Command(BaseCommand):
             user_state_client = DjangoXBlockUserStateClient()
             hist_modules = user_state_client.get_history(module.student.username, module.module_state_key)
 
-            for hist_module in hist_modules:
-                self.remove_studentmodulehistory_input_state(hist_module, save_changes)
+            try:
+                for hist_module in hist_modules:
+                    self.remove_studentmodulehistory_input_state(hist_module, save_changes)
 
-            if self.num_visited % 1000 == 0:
-                LOG.info(" Progress: updated %s of %s student modules", self.num_changed, self.num_visited)
-                LOG.info(
-                    " Progress: updated %s of %s student history modules",
-                    self.num_hist_changed,
-                    self.num_hist_visited
-                )
+                    if self.num_visited % 1000 == 0:
+                        LOG.info(" Progress: updated %s of %s student modules", self.num_changed, self.num_visited)
+                        LOG.info(
+                            " Progress: updated %s of %s student history modules",
+                            self.num_hist_changed,
+                            self.num_hist_visited
+                        )
+            except DjangoXBlockUserStateClient.DoesNotExist:
+                LOG.info("No history entries found for %s", module.module_state_key)
 
     @transaction.autocommit
     def remove_studentmodule_input_state(self, module, save_changes):

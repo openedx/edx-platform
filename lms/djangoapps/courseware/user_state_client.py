@@ -13,7 +13,7 @@ except ImportError:
 
 from django.contrib.auth.models import User
 from xblock.fields import Scope, ScopeBase
-from edx_user_state_client.interface import XBlockUserStateClient
+from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 from courseware.models import StudentModule, StudentModuleHistory
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import UsageKey
@@ -24,6 +24,21 @@ new_contract('UsageKey', UsageKey)
 class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
     An interface that uses the Django ORM StudentModule as a backend.
+
+    A note on the format of state storage:
+        The state for an xblock is stored as a serialized JSON dictionary. The model
+        field that it is stored in can also take on a value of ``None``. To preserve
+        existing analytic uses, we will preserve the following semantics:
+
+        A state of ``None`` means that the user hasn't ever looked at the xblock.
+        A state of ``"{}"`` means that the XBlock has at some point stored state for
+           the current user, but that that state has been deleted.
+        Otherwise, the dictionary contains all data stored for the user.
+
+        None of these conditions should violate the semantics imposed by
+        XBlockUserStateClient (for instance, once all fields have been deleted from
+        an XBlock for a user, the state will be listed as ``None`` by :meth:`get_history`,
+        even though the actual stored state in the database will be ``"{}"``).
     """
 
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
@@ -53,26 +68,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         self.user = user
 
-    def get_mod_date(self, username, block_key, scope=Scope.user_state, fields=None):
-        """
-        Get the last modification date for fields from the specified blocks.
-
-        Arguments:
-            username: The name of the user whose state should be deleted
-            block_key (UsageKey): The UsageKey identifying which xblock modification dates to retrieve.
-            scope (Scope): The scope to retrieve from.
-            fields: A list of fields to query. If None, delete all stored fields.
-                Specific implementations are free to return the same modification date
-                for all fields, if they don't store changes individually per field.
-                Implementations may omit fields for which data has not been stored.
-
-        Returns: list a dict of {field_name: modified_date} for each selected field.
-        """
-        results = self.get_mod_date_many(username, [block_key], scope, fields=fields)
-        return {
-            field: date for (_, field, date) in results
-        }
-
     def _get_student_modules(self, username, block_keys):
         """
         Retrieve the :class:`~StudentModule`s for the supplied ``username`` and ``block_keys``.
@@ -101,7 +96,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
     def get_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
-        Retrieve the stored XBlock state for a single xblock usage.
+        Retrieve the stored XBlock state for the specified XBlock usages.
 
         Arguments:
             username: The name of the user whose state should be retrieved
@@ -119,10 +114,22 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
-                state = {}
-            else:
-                state = json.loads(module.state)
-            yield (usage_key, state)
+                continue
+
+            state = json.loads(module.state)
+
+            # If the state is the empty dict, then it has been deleted, and so
+            # conformant UserStateClients should treat it as if it doesn't exist.
+            if state == {}:
+                continue
+
+            if fields is not None:
+                state = {
+                    field: state[field]
+                    for field in fields
+                    if field in state
+                }
+            yield XBlockUserState(username, usage_key, state, module.modified, scope)
 
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
@@ -143,7 +150,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # that were queried in get_many) so that if the score has
         # been changed by some other piece of the code, we don't overwrite
         # that score.
-        if self.user.username == username:
+        if self.user is not None and self.user.username == username:
             user = self.user
         else:
             user = User.objects.get(username=username)
@@ -185,7 +192,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
-                student_module.state = "{}"
+                student_module.state = None
             else:
                 current_state = json.loads(student_module.state)
                 for field in fields:
@@ -193,44 +200,25 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                         del current_state[field]
 
                 student_module.state = json.dumps(current_state)
+
             # We just read this object, so we know that we can do an update
             student_module.save(force_update=True)
-
-    def get_mod_date_many(self, username, block_keys, scope=Scope.user_state, fields=None):
-        """
-        Get the last modification date for fields from the specified blocks.
-
-        Arguments:
-            username: The name of the user whose state should be deleted
-            block_key (UsageKey): The UsageKey identifying which xblock modification dates to retrieve.
-            scope (Scope): The scope to retrieve from.
-            fields: A list of fields to query. If None, delete all stored fields.
-                Specific implementations are free to return the same modification date
-                for all fields, if they don't store changes individually per field.
-                Implementations may omit fields for which data has not been stored.
-
-        Yields: tuples of (block, field_name, modified_date) for each selected field.
-        """
-        if scope != Scope.user_state:
-            raise ValueError("Only Scope.user_state is supported")
-
-        student_modules = self._get_student_modules(username, block_keys)
-        for student_module, usage_key in student_modules:
-            if student_module.state is None:
-                continue
-
-            for field in json.loads(student_module.state):
-                yield (usage_key, field, student_module.modified)
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """
         Retrieve history of state changes for a given block for a given
         student.  We don't guarantee that history for many blocks will be fast.
 
+        If the specified block doesn't exist, raise :class:`~DoesNotExist`.
+
         Arguments:
-            username: The name of the user whose history should be retrieved
-            block_key (UsageKey): The UsageKey identifying which xblock state to update.
-            scope (Scope): The scope to load data from
+            username: The name of the user whose history should be retrieved.
+            block_key: The key identifying which xblock history to retrieve.
+            scope (Scope): The scope to load data from.
+
+        Yields:
+            XBlockUserState entries for each modification to the specified XBlock, from latest
+            to earliest.
         """
 
         if scope != Scope.user_state:
@@ -243,19 +231,32 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if len(student_modules) == 0:
             raise self.DoesNotExist()
 
-        history_entries = StudentModuleHistory.objects.filter(
+        history_entries = StudentModuleHistory.objects.prefetch_related('student_module').filter(
             student_module__in=student_modules
         ).order_by('-id')
 
-        # If no history records exist, let's force a save to get history started.
+        # If no history records exist, raise an error
         if not history_entries:
-            for student_module in student_modules:
-                student_module.save()
-            history_entries = StudentModuleHistory.objects.filter(
-                student_module__in=student_modules
-            ).order_by('-id')
+            raise self.DoesNotExist()
 
-        return history_entries
+        for history_entry in history_entries:
+            state = history_entry.state
+
+            # If the state is serialized json, then load it
+            if state is not None:
+                state = json.loads(state)
+
+            # If the state is empty, then for the purposes of `get_history`, it has been
+            # deleted, and so we list that entry as `None`.
+            if state == {}:
+                state = None
+
+            block_key = history_entry.student_module.module_state_key
+            block_key = block_key.map_into_course(
+                history_entry.student_module.course_id
+            )
+
+            yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
     def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
         """
