@@ -392,11 +392,11 @@ class UserStateCache(object):
 
         Returns: datetime if there was a modified date, or None otherwise
         """
-        return self._client.get_mod_date(
+        return self._client.get(
             self.user.username,
             kvs_key.block_scope_id,
             fields=[kvs_key.field_name],
-        ).get(kvs_key.field_name)
+        ).updated
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
