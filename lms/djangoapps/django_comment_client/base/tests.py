@@ -1110,7 +1110,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
 class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code
-    ddt_args = [
+    ddt_permissions_args = [
         # Student in team can do operations on threads/comments within the team commentable.
         ('student_in_team', 'team_commentable_id', 200),
         # Non-team commentables can be edited by any student.
@@ -1148,7 +1148,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             name=u'The Only Team',
             course_id=self.course.id,
             topic_id='topic_id',
-            discussion_id=self.team_commentable_id
+            discussion_topic_id=self.team_commentable_id
         )
         self.team.add_user(self.student_in_team)
 
@@ -1200,7 +1200,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_args)
+    @ddt.data(*ddt_permissions_args)
     @ddt.unpack
     def test_create_comment(self, user, commentable_id, status_code, mock_request):
         """
@@ -1221,7 +1221,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_args)
+    @ddt.data(*ddt_permissions_args)
     @ddt.unpack
     def test_create_sub_comment(self, user, commentable_id, status_code, mock_request):
         """
@@ -1244,7 +1244,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_args)
+    @ddt.data(*ddt_permissions_args)
     @ddt.unpack
     def test_comment_actions(self, user, commentable_id, status_code, mock_request):
         """
@@ -1264,7 +1264,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             )
             self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_args)
+    @ddt.data(*ddt_permissions_args)
     @ddt.unpack
     def test_threads_actions(self, user, commentable_id, status_code, mock_request):
         """
@@ -1285,9 +1285,9 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
             )
             self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_args)
+    @ddt.data(*ddt_permissions_args)
     @ddt.unpack
-    def test_create_thread(self, user, commentable_id, status_code, mock_request):
+    def test_create_thread(self, user, commentable_id, status_code, __):
         """
         Verify that creation of threads is limited to members of the team.
         """
@@ -1302,9 +1302,9 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_args)
+    @ddt.data(*ddt_permissions_args)
     @ddt.unpack
-    def test_commentable_actions(self, user, commentable_id, status_code, mock_request):
+    def test_commentable_actions(self, user, commentable_id, status_code, __):
         """
         Verify that following of commentables is limited to members of the team.
         """

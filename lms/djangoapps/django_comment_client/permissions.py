@@ -69,10 +69,12 @@ def _check_condition(user, condition, content):
             cache_key = "django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]
-            team = CourseTeam.objects.get(discussion_id=commentable_id)
+            team = CourseTeam.objects.get(discussion_topic_id=commentable_id)
             passes_condition = team.users.filter(id=user.id).count() > 0
             request_cache_dict[cache_key] = passes_condition
         except KeyError:
+            # We do not expect KeyError in production-- it usually indicates an improper test mock.
+            logging.warning("Did not find key commentable_id in content.")
             passes_condition = False
         except CourseTeam.DoesNotExist:
             passes_condition = True
