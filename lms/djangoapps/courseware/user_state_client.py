@@ -53,53 +53,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         self.user = user
 
-    def get(self, username, block_key, scope=Scope.user_state, fields=None):
-        """
-        Retrieve the stored XBlock state for a single xblock usage.
-
-        Arguments:
-            username: The name of the user whose state should be retrieved
-            block_key (UsageKey): The UsageKey identifying which xblock state to load.
-            scope (Scope): The scope to load data from
-            fields: A list of field values to retrieve. If None, retrieve all stored fields.
-
-        Returns:
-            dict: A dictionary mapping field names to values
-
-        Raises:
-            DoesNotExist if no entry is found.
-        """
-        try:
-            _usage_key, state = next(self.get_many(username, [block_key], scope, fields=fields))
-        except StopIteration:
-            raise self.DoesNotExist()
-
-        return state
-
-    def set(self, username, block_key, state, scope=Scope.user_state):
-        """
-        Set fields for a particular XBlock.
-
-        Arguments:
-            username: The name of the user whose state should be retrieved
-            block_key (UsageKey): The UsageKey identifying which xblock state to update.
-            state (dict): A dictionary mapping field names to values
-            scope (Scope): The scope to load data from
-        """
-        self.set_many(username, {block_key: state}, scope)
-
-    def delete(self, username, block_key, scope=Scope.user_state, fields=None):
-        """
-        Delete the stored XBlock state for a single xblock usage.
-
-        Arguments:
-            username: The name of the user whose state should be deleted
-            block_key (UsageKey): The UsageKey identifying which xblock state to delete.
-            scope (Scope): The scope to delete data from
-            fields: A list of fields to delete. If None, delete all stored fields.
-        """
-        return self.delete_many(username, [block_key], scope, fields=fields)
-
     def get_mod_date(self, username, block_key, scope=Scope.user_state, fields=None):
         """
         Get the last modification date for fields from the specified blocks.
@@ -157,7 +110,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             fields: A list of field values to retrieve. If None, retrieve all stored fields.
 
         Yields:
-            (UsageKey, field_state) tuples for each specified UsageKey in block_keys.
+            XBlockUserState tuples for each specified UsageKey in block_keys.
             field_state is a dict mapping field names to values.
         """
         if scope != Scope.user_state:
