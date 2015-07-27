@@ -9,3 +9,11 @@ class Commentable(models.Model):
 
     base_url = "{prefix}/commentables".format(prefix=settings.PREFIX)
     type = 'commentable'
+
+    def retrieve(self, *args, **kwargs):
+        """
+        Override default behavior because commentables don't actually exist in the comment service.
+        """
+        self.attributes["commentable_id"] = self.attributes["id"]
+        self.retrieved = True
+        return self

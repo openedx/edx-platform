@@ -56,7 +56,7 @@ class CreateThreadGroupIdTestCase(
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        self._set_mock_request_data(mock_request, {"commentable_id": commentable_id})
+        self._set_mock_request_data(mock_request, {})
         mock_request.return_value.status_code = 200
         request_data = {"body": "body", "title": "title", "thread_type": "discussion"}
         if pass_group_id:
@@ -964,7 +964,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         """
         Test to make sure unicode data in a thread doesn't break it.
         """
-        self._set_mock_request_data(mock_request, {"commentable_id": "non_team_dummy_id"})
+        self._set_mock_request_data(mock_request, {})
         request = RequestFactory().post("dummy_url", {"thread_type": "discussion", "body": text, "title": text})
         request.user = self.student
         request.view_name = "create_thread"
@@ -1292,7 +1292,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         Verify that creation of threads is limited to members of the team.
         """
         commentable_id = getattr(self, commentable_id)
-        self._setup_mock(user, mock_request, {"commentable_id": commentable_id})
+        self.client.login(username=getattr(self, user).username, password=self.password)
         response = self.client.post(
             reverse(
                 "create_thread",
@@ -1309,7 +1309,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         Verify that following of commentables is limited to members of the team.
         """
         commentable_id = getattr(self, commentable_id)
-        self._setup_mock(user, mock_request, {"commentable_id": commentable_id})
+        self.client.login(username=getattr(self, user).username, password=self.password)
         for action in ["follow_commentable", "unfollow_commentable"]:
             response = self.client.post(
                 reverse(
@@ -1335,8 +1335,7 @@ class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
     @patch('eventtracking.tracker.emit')
     @patch('lms.lib.comment_client.utils.requests.request')
-    def test_thread_event(self, mock_request, mock_emit):
-        self._set_mock_request_data(mock_request, {"commentable_id": "test_commentable"})
+    def test_thread_event(self, __, mock_emit):
         request = RequestFactory().post(
             "dummy_url", {
                 "thread_type": "discussion",
