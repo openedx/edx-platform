@@ -49,6 +49,7 @@ class Course(object):
             merged_mode.min_price = posted_mode.min_price
             merged_mode.currency = posted_mode.currency
             merged_mode.sku = posted_mode.sku
+            merged_mode.expiration_datetime = posted_mode.expiration_datetime
 
             merged_modes.add(merged_mode)
             merged_mode_keys.add(merged_mode.mode_slug)
