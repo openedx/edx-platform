@@ -159,6 +159,23 @@ def xml_store_config(data_dir, source_dirs=None):
 
     return store
 
+
+@patch('xmodule.modulestore.django.create_modulestore_instance')
+def drop_mongo_collections(mock_create):
+    """
+    If using a Mongo-backed modulestore & contentstore, drop the collections.
+    """
+    # Do not create the modulestore if it does not exist.
+    mock_create.return_value = None
+
+    module_store = modulestore()
+    if hasattr(module_store, '_drop_database'):
+        module_store._drop_database()  # pylint: disable=protected-access
+    _CONTENTSTORE.clear()
+    if hasattr(module_store, 'close_connections'):
+        module_store.close_connections()
+
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 # This is an XML only modulestore with only the toy course loaded
@@ -196,6 +213,71 @@ TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
     include_xml=False,
     store_order=[StoreConstructors.split, StoreConstructors.draft]
 )
+
+
+class SharedModuleStoreTestCase(TestCase):
+    """
+    Subclass for any test case that uses a ModuleStore that can be shared
+    between individual tests. This class ensures that the ModuleStore is cleaned
+    before/after the entire test case has run. Use this class if your tests
+    set up one or a small number of courses that individual tests do not modify.
+    If your tests modify contents in the ModuleStore, you should use
+    ModuleStoreTestCase instead.
+
+    How to use::
+
+        from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+        from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+        class MyModuleStoreTestCase(SharedModuleStoreTestCase):
+            @classmethod
+            def setUpClass(cls):
+                super(MyModuleStoreTestCase, cls).setUpClass()
+                cls.course = CourseFactory.create()
+
+            def setUp(self):
+                super(MyModuleStoreTestCase, self).setUp()
+                self.user = UserFactory.create()
+                CourseEnrollmentFactory.create(
+                    user=self.user, course_id=self.course.id
+                )
+
+    Important things to note:
+
+    1. You're creating the course in setUpClass(), *not* in setUp().
+    2. Any Django ORM operations should still happen in setUp(). Models created
+       in setUpClass() will *not* be cleaned up, and will leave side-effects
+       that can break other, completely unrelated test cases.
+
+    In Django 1.8, we will be able to use setUpTestData() to do class level init
+    for Django ORM models that will get cleaned up properly.
+    """
+    MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+
+    @classmethod
+    def setUpClass(cls):
+        super(SharedModuleStoreTestCase, cls).setUpClass()
+
+        cls._settings_override = override_settings(MODULESTORE=cls.MODULESTORE)
+        cls._settings_override.__enter__()
+        XMODULE_FACTORY_LOCK.enable()
+        clear_existing_modulestores()
+        cls.store = modulestore()
+
+    @classmethod
+    def tearDownClass(cls):
+        drop_mongo_collections()  # pylint: disable=no-value-for-parameter
+        RequestCache().clear_request_cache()
+        XMODULE_FACTORY_LOCK.disable()
+        cls._settings_override.__exit__(None, None, None)
+
+        super(SharedModuleStoreTestCase, cls).tearDownClass()
+
+    def setUp(self):
+        # OverrideFieldData.provider_classes is always reset to `None` so
+        # that they're recalculated for every test
+        OverrideFieldData.provider_classes = None
+        super(SharedModuleStoreTestCase, self).setUp()
 
 
 class ModuleStoreTestCase(TestCase):
@@ -254,8 +336,7 @@ class ModuleStoreTestCase(TestCase):
         # which will cause them to be re-created
         clear_existing_modulestores()
 
-        self.addCleanup(self.drop_mongo_collections)
-
+        self.addCleanup(drop_mongo_collections)
         self.addCleanup(RequestCache().clear_request_cache)
 
         # Enable XModuleFactories for the space of this test (and its setUp).
@@ -316,22 +397,6 @@ class ModuleStoreTestCase(TestCase):
             self.store.update_item(course, user_id)
         updated_course = self.store.get_course(course.id)
         return updated_course
-
-    @staticmethod
-    @patch('xmodule.modulestore.django.create_modulestore_instance')
-    def drop_mongo_collections(mock_create):
-        """
-        If using a Mongo-backed modulestore & contentstore, drop the collections.
-        """
-        # Do not create the modulestore if it does not exist.
-        mock_create.return_value = None
-
-        module_store = modulestore()
-        if hasattr(module_store, '_drop_database'):
-            module_store._drop_database()  # pylint: disable=protected-access
-        _CONTENTSTORE.clear()
-        if hasattr(module_store, 'close_connections'):
-            module_store.close_connections()
 
     def create_sample_course(self, org, course, run, block_info_tree=None, course_fields=None):
         """
