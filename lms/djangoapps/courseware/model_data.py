@@ -420,7 +420,6 @@ class UserStateCache(object):
             username = self.user.username
         else:
             username = remote_username
-            print username
 
         try:
             self._client.set_many(
@@ -431,7 +430,8 @@ class UserStateCache(object):
             log.exception("Saving user state failed for %s", username)
             raise KeyValueMultiSaveError([])
         finally:
-            self._cache.update(pending_updates)
+            if remote_username is None:
+                self._cache.update(pending_updates)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def get(self, kvs_key):
