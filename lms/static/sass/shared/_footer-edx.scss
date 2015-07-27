@@ -148,12 +148,12 @@ footer#footer-edx-v3 {
 
   @media print {
     .site-details p {
-      float: left;
+      @include float(left);
     }
 
     .openedx-link {
       margin: 0;
-      float: right;
+      @include float(right);
     }
   }
 
