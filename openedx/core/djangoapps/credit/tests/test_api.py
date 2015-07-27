@@ -316,6 +316,9 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(req_status[0]["status"], "failed")
 
     def test_satisfy_all_requirements(self):
+        """ Test the credit requirements, eligibility notification, email
+        content caching for a credit course.
+        """
         # Configure a course with two credit requirements
         self.add_credit_course()
         CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
@@ -364,9 +367,50 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Now the user should be eligible
         self.assertTrue(api.is_user_eligible_for_credit("bob", self.course_key))
 
-        # Credit eligible mail should be sent
+        # Credit eligibility email should be sent
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Course Credit Eligibility')
+
+        # Now verify them email content
+        email_payload_first = mail.outbox[0].attachments[0]._payload    # pylint: disable=protected-access
+
+        # Test that email has two payloads [multipart (plain text and html
+        # content), attached image]
+        self.assertEqual(len(email_payload_first), 2)
+        # pylint: disable=protected-access
+        self.assertIn('text/plain', email_payload_first[0]._payload[0]['Content-Type'])
+        # pylint: disable=protected-access
+        self.assertIn('text/html', email_payload_first[0]._payload[1]['Content-Type'])
+        self.assertIn('image/png', email_payload_first[1]['Content-Type'])
+
+        # Now check that html email content has same logo image 'Content-ID'
+        # as the attached logo image 'Content-ID'
+        email_image = email_payload_first[1]
+        html_content_first = email_payload_first[0]._payload[1]._payload    # pylint: disable=protected-access
+
+        # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
+        image_id = email_image.get('Content-ID', '')[1:-1]
+        self.assertIsNotNone(image_id)
+        self.assertIn(image_id, html_content_first)
+
+        # Delete the eligibility entries and satisfy the user's eligibility
+        # requirement again to trigger eligibility notification
+        CreditEligibility.objects.all().delete()
+        with self.assertNumQueries(12):
+            api.set_credit_requirement_status(
+                "bob",
+                self.course_key,
+                requirements[1]["namespace"],
+                requirements[1]["name"]
+            )
+
+        # Credit eligibility email should be sent
+        self.assertEqual(len(mail.outbox), 2)
+        # Now check that on sending eligibility notification again cached
+        # logo image is used
+        email_payload_second = mail.outbox[1].attachments[0]._payload   # pylint: disable=protected-access
+        html_content_second = email_payload_second[0]._payload[1]._payload    # pylint: disable=protected-access
+        self.assertIn(image_id, html_content_second)
 
         # The user should remain eligible even if the requirement status is later changed
         api.set_credit_requirement_status(
