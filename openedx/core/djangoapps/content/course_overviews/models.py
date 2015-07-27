@@ -5,6 +5,7 @@ Declaration of CourseOverview model
 import json
 
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.utils import IntegrityError
 from django.utils.translation import ugettext
 from model_utils.models import TimeStampedModel
 
@@ -172,7 +173,18 @@ class CourseOverview(TimeStampedModel):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
                 course_overview = cls._create_from_course(course)
-                course_overview.save()
+                try:
+                    course_overview.save()
+                except IntegrityError:
+                    # There is a rare race condition that will occur if
+                    # CourseOverview.get_from_id is called while a
+                    # another identical overview is already in the process
+                    # of being created.
+                    # One of the overviews will be saved normally, while the
+                    # other one will cause an IntegrityError because it tries
+                    # to save a duplicate.
+                    # (see: https://openedx.atlassian.net/browse/TNL-2854).
+                    pass
                 return course_overview
             elif course is not None:
                 raise IOError(
