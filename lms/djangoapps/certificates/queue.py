@@ -4,6 +4,7 @@ import random
 import logging
 import lxml.html
 from lxml.etree import XMLSyntaxError, ParserError  # pylint:disable=no-name-in-module
+from uuid import uuid4
 
 from django.test.client import RequestFactory
 from django.conf import settings
@@ -336,7 +337,12 @@ class XQueueCertInterface(object):
                     }
                     if template_file:
                         contents['template_pdf'] = template_file
-                    new_status = status.generating if generate_pdf else status.downloadable
+                    if generate_pdf:
+                        new_status = status.generating
+                    else:
+                        new_status = status.downloadable
+                        cert.verify_uuid = uuid4().hex
+
                     cert.status = new_status
                     cert.save()
 
