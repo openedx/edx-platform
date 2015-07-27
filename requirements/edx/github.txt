@@ -31,6 +31,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
 # custom opaque-key implementations for ccx
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
+git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
