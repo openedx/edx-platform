@@ -15,6 +15,7 @@ TEMPLATE_DEBUG = True
 SITE_NAME = 'localhost:8000'
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
+HTTPS = 'off'
 
 ################################ LOGGERS ######################################
 
