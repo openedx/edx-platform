@@ -557,6 +557,17 @@
         @include float(right);
       }
 
+      .pending-credit-btn{
+        @include float(right);
+      }
+
+      .denied-credit-btn{
+        @include float(right);
+      }
+      .credit-request-pending-msg{
+        display: inline-block;
+      }
+
       .credit-btn {
         @extend %btn-pl-yellow-base;
         background-image: none ;
