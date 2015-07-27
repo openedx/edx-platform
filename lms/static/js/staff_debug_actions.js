@@ -45,7 +45,7 @@ var StaffDebug = (function(){
                 {text: text},
                 {interpolate: /\{(.+?)\}/g}
             )
-            $("#result_"+action.locationName).html(html);
+            $("#result_"+sanitized_string(action.locationName)).html(html);
         },
         error: function(request, status, error) {
             var response_json;
@@ -67,7 +67,7 @@ var StaffDebug = (function(){
                 {text: text},
                 {interpolate: /\{(.+?)\}/g}
             )
-            $("#result_"+action.locationName).html(html);
+            $("#result_"+sanitized_string(action.locationName)).html(html);
         },
         dataType: 'json'
     });
