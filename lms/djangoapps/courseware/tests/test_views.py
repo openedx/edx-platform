@@ -3,6 +3,7 @@
 Tests courseware views.py
 """
 import cgi
+from urllib import urlencode
 import ddt
 import json
 import unittest
@@ -83,10 +84,11 @@ class TestJumpTo(ModuleStoreTestCase):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
+            activate_block_id=urlencode({'activate_block_id': unicode(section.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -105,10 +107,11 @@ class TestJumpTo(ModuleStoreTestCase):
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
+            activate_block_id=urlencode({'activate_block_id': unicode(module1.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -118,10 +121,11 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
+            activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -145,10 +149,11 @@ class TestJumpTo(ModuleStoreTestCase):
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1'.format(
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
+            activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
@@ -1084,6 +1089,23 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         ), resp.content)
 
 
+class ActivateIDCheckerBlock(XBlock):
+    """
+    XBlock for checking for an activate_block_id entry in the render context.
+    """
+    # We don't need actual children to test this.
+    has_children = False
+
+    def student_view(self, context):
+        """
+        A student view that displays the activate_block_id context variable.
+        """
+        result = Fragment()
+        if 'activate_block_id' in context:
+            result.add_content(u"Activate Block ID: {block_id}</p>".format(block_id=context['activate_block_id']))
+        return result
+
+
 class ViewCheckerBlock(XBlock):
     """
     XBlock for testing user state in views.
@@ -1156,6 +1178,34 @@ class TestIndexView(ModuleStoreTestCase):
         # Trigger the assertions embedded in the ViewCheckerBlocks
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+
+    @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
+    def test_activate_block_id(self):
+        user = UserFactory()
+
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(parent=course, category='chapter')
+        section = ItemFactory.create(parent=chapter, category='sequential', display_name="Sequence")
+        vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
+        ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
+
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+
+        request = RequestFactory().get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': chapter.url_name,
+                    'section': section.url_name,
+                }
+            ) + '?activate_block_id=test_block_id'
+        )
+        request.user = user
+        mako_middleware_process_request(request)
+
+        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        self.assertIn("Activate Block ID: test_block_id", response.content)
 
 
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
