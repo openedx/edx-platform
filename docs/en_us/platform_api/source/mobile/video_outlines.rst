@@ -1,5 +1,5 @@
 ##################################################
-Mobile Video Outlines API Module
+Mobile Video Outlines API
 ##################################################
 
 This page describes how to use the Mobile Video Outlines API to

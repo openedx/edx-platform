@@ -134,6 +134,7 @@ class FormDescriptionTest(TestCase):
 class StudentViewShimTest(TestCase):
     "Tests of the student view shim."
     def setUp(self):
+        super(StudentViewShimTest, self).setUp()
         self.captured_request = None
 
     def test_strip_enrollment_action(self):

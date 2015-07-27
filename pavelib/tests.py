@@ -3,7 +3,7 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs, call_task
+from paver.easy import sh, task, cmdopts, needs, call_task, no_help
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from optparse import make_option
@@ -33,6 +33,7 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 def test_system(options):
     """
@@ -49,6 +50,7 @@ def test_system(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
         'skip_clean': getattr(options, 'skip_clean', False),
+        'pdb': getattr(options, 'pdb', False),
     }
 
     if test_id:
@@ -85,6 +87,7 @@ def test_system(options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 def test_lib(options):
     """
@@ -100,6 +103,7 @@ def test_lib(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
         'skip_clean': getattr(options, 'skip_clean', False),
+        'pdb': getattr(options, 'pdb', False),
     }
 
     if test_id:
@@ -129,6 +133,7 @@ def test_lib(options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
 ])
 def test_python(options):
     """
@@ -140,6 +145,7 @@ def test_python(options):
         'verbosity': getattr(options, 'verbosity', 1),
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
+        'pdb': getattr(options, 'pdb', False),
     }
 
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
@@ -158,6 +164,7 @@ def test_python(options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
 ])
 def test(options):
     """
@@ -167,6 +174,7 @@ def test(options):
         'verbosity': getattr(options, 'verbosity', 1),
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
+        'pdb': getattr(options, 'pdb', False),
     }
     # Subsuites to be added to the main suite
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
@@ -202,6 +210,28 @@ def coverage(options):
             ))
 
     call_task('diff_coverage', options=dict(options))
+
+
+@no_help
+@task
+@needs('pavelib.prereqs.install_prereqs')
+def combine_jenkins_coverage():
+    """
+    Combine coverage reports from jenkins build flow.
+    """
+    coveragerc = Env.REPO_ROOT / 'test_root' / '.jenkins-coveragerc'
+
+    for directory in Env.LIB_TEST_DIRS + ['cms', 'lms']:
+        report_dir = Env.REPORT_DIR / directory
+
+        # Only try to combine the coverage if we've run the tests.
+        if report_dir.isdir():
+            sh(
+                "cd {} && coverage combine --rcfile={}".format(
+                    report_dir,
+                    coveragerc,
+                )
+            )
 
 
 @task

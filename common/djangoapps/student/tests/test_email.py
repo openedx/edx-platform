@@ -176,6 +176,7 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
     """Test sending a reactivation email to a user"""
 
     def setUp(self):
+        super(ReactivationEmailTests, self).setUp()
         self.user = UserFactory.create()
         self.unregisteredUser = UserFactory.create()
         self.registration = RegistrationFactory.create(user=self.user)
@@ -373,6 +374,7 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
 class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
     """Test that confirmation of email change requests function even in the face of exceptions thrown while sending email"""
     def setUp(self):
+        super(EmailChangeConfirmationTests, self).setUp()
         self.user = UserFactory.create()
         self.profile = UserProfile.objects.get(user=self.user)
         self.req_factory = RequestFactory()

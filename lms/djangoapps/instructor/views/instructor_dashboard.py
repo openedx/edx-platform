@@ -24,7 +24,7 @@ from util.keyword_substitution import get_keywords_supported
 from mock import patch
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from xmodule_modifiers import wrap_xblock
+from openedx.core.lib.xblock_utils import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
@@ -450,6 +450,7 @@ def _section_data_download(course, access):
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
+        'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 

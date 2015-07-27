@@ -69,7 +69,7 @@ function refereshPageMessage() {
 }
 
 var submitToPaymentProcessing = function() {
-  $("#pay_button").addClass('is-disabled').attr('aria-disabled', true);
+  $(".payment-button").addClass('is-disabled').attr('aria-disabled', true);
   var contribution_input = $("input[name='contribution']:checked")
   var contribution = 0;
   if(contribution_input.attr('id') == 'contribution-other') {
@@ -96,7 +96,7 @@ var submitToPaymentProcessing = function() {
       }
     },
     error:function(xhr,status,error) {
-      $("#pay_button").removeClass('is-disabled').attr('aria-disabled', false);
+      $(".payment-button").removeClass('is-disabled').attr('aria-disabled', false);
       showSubmissionError()
     }
   });
@@ -290,7 +290,7 @@ function waitForFlashLoad(func, flash_object) {
 
 $(document).ready(function() {
   $(".carousel-nav").addClass('sr');
-  $("#pay_button").click(function(){
+  $(".payment-button").click(function(){
       analytics.pageview("Payment Form");
       submitToPaymentProcessing();
   });
@@ -306,7 +306,7 @@ $(document).ready(function() {
   // prevent browsers from keeping this button checked
   $("#confirm_pics_good").prop("checked", false)
   $("#confirm_pics_good").change(function() {
-      $("#pay_button").toggleClass('disabled');
+      $(".payment-button").toggleClass('disabled');
       $("#reverify_button").toggleClass('disabled');
       $("#midcourse_reverify_button").toggleClass('disabled');
   });

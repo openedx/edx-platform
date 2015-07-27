@@ -25,9 +25,7 @@ class CountryMiddlewareTests(TestCase):
         self.request_factory = RequestFactory()
         self.patcher = patch.object(pygeoip.GeoIP, 'country_code_by_addr', self.mock_country_code_by_addr)
         self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
+        self.addCleanup(self.patcher.stop)
 
     def mock_country_code_by_addr(self, ip_addr):
         """

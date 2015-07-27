@@ -5,6 +5,7 @@ import ddt
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -25,6 +26,7 @@ from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
 from certificates.tests.factories import GeneratedCertificateFactory
 
 
+@attr('shard_1')
 class CertificateDownloadableStatusTests(ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
 
@@ -104,6 +106,7 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
         )
 
 
+@attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(ModuleStoreTestCase):
     """Tests for generating certificates for students. """
@@ -164,6 +167,7 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
             yield mock_send_to_queue
 
 
+@attr('shard_1')
 @ddt.ddt
 class CertificateGenerationEnabledTest(TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
@@ -225,6 +229,7 @@ class CertificateGenerationEnabledTest(TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
+@attr('shard_1')
 class GenerateExampleCertificatesTest(TestCase):
     """Test generation of example certificates. """
 

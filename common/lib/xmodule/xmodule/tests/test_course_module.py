@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
+import itertools
 
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
@@ -277,3 +278,73 @@ class DiscussionTopicsTestCase(unittest.TestCase):
     def test_default_discussion_topics(self):
         d = get_dummy_course('2012-12-02T12:00')
         self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
+
+
+class TeamsConfigurationTestCase(unittest.TestCase):
+    """
+    Tests for the configuration of teams and the helper methods for accessing them.
+    """
+
+    def setUp(self):
+        super(TeamsConfigurationTestCase, self).setUp()
+        self.course = get_dummy_course('2012-12-02T12:00')
+        self.course.teams_configuration = dict()
+        self.count = itertools.count()
+
+    def add_team_configuration(self, max_team_size=3, topics=None):
+        """ Add a team configuration to the course. """
+        teams_configuration = {}
+        teams_configuration["topics"] = [] if topics is None else topics
+        if max_team_size is not None:
+            teams_configuration["max_team_size"] = max_team_size
+        self.course.teams_configuration = teams_configuration
+
+    def make_topic(self):
+        """ Make a sample topic dictionary. """
+        next_num = self.count.next()
+        topic_id = "topic_id_{}".format(next_num)
+        display_name = "Display Name {}".format(next_num)
+        description = "Description {}".format(next_num)
+        return {"display_name": display_name, "description": description, "id": topic_id}
+
+    def test_teams_enabled_new_course(self):
+        # Make sure we can detect when no teams exist.
+        self.assertFalse(self.course.teams_enabled)
+
+        # add topics
+        self.add_team_configuration(max_team_size=4, topics=[self.make_topic()])
+        self.assertTrue(self.course.teams_enabled)
+
+        # remove them again
+        self.add_team_configuration(max_team_size=4, topics=[])
+        self.assertFalse(self.course.teams_enabled)
+
+    def test_teams_enabled_max_size_only(self):
+        self.add_team_configuration(max_team_size=4)
+        self.assertFalse(self.course.teams_enabled)
+
+    def test_teams_enabled_no_max_size(self):
+        self.add_team_configuration(max_team_size=None, topics=[self.make_topic()])
+        self.assertTrue(self.course.teams_enabled)
+
+    def test_teams_max_size_no_teams_configuration(self):
+        self.assertIsNone(self.course.teams_max_size)
+
+    def test_teams_max_size_with_teams_configured(self):
+        size = 4
+        self.add_team_configuration(max_team_size=size, topics=[self.make_topic(), self.make_topic()])
+        self.assertTrue(self.course.teams_enabled)
+        self.assertEqual(size, self.course.teams_max_size)
+
+    def test_teams_topics_no_teams(self):
+        self.assertIsNone(self.course.teams_topics)
+
+    def test_teams_topics_no_topics(self):
+        self.add_team_configuration(max_team_size=4)
+        self.assertEqual(self.course.teams_topics, [])
+
+    def test_teams_topics_with_topics(self):
+        topics = [self.make_topic(), self.make_topic()]
+        self.add_team_configuration(max_team_size=4, topics=topics)
+        self.assertTrue(self.course.teams_enabled)
+        self.assertEqual(self.course.teams_topics, topics)

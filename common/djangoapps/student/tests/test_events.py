@@ -146,3 +146,12 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         with self.assertRaises(IntegrityError):
             self.user.save()
         self.assert_no_events_were_emitted()
+
+    def test_no_first_and_last_name_events(self):
+        """
+        Verify that first_name and last_name events are not emitted.
+        """
+        self.user.first_name = "Donald"
+        self.user.last_name = "Duck"
+        self.user.save()
+        self.assert_no_events_were_emitted()

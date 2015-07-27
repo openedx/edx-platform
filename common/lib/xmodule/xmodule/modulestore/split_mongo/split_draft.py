@@ -213,7 +213,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 parent_loc = self.get_parent_location(branched_location)
                 SplitMongoModuleStore.delete_item(self, branched_location, user_id)
                 # publish parent w/o child if deleted element is direct only (not based on type of parent)
-                if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
+                if (
+                        branch == ModuleStoreEnum.BranchName.draft and
+                        branched_location.block_type in DIRECT_ONLY_CATEGORIES and parent_loc
+                ):
+                    # will publish if its not an orphan
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def _map_revision_to_branch(self, key, revision=None):
@@ -494,11 +498,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 block_id = self.DEFAULT_ROOT_LIBRARY_BLOCK_ID
             new_usage_key = course_key.make_usage_key(block_type, block_id)
 
+            # Only the course import process calls import_xblock(). If the branch setting is published_only,
+            # then the non-draft blocks are being imported.
             if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                # override existing draft (PLAT-297, PLAT-299). NOTE: this has the effect of removing
-                # any local changes w/ the import.
+                # Override any existing drafts (PLAT-297, PLAT-299). This import/publish step removes
+                # any local changes during the course import.
                 draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
+                    # Importing the block and publishing the block links the draft & published blocks' version history.
                     draft_block = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
                     return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This module contains celery task functions for handling the sending of bulk email
 to a course.
@@ -161,7 +162,7 @@ def _get_course_email_context(course):
         settings.SITE_NAME,
         reverse('course_root', kwargs={'course_id': course_id})
     )
-    image_url = 'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
+    image_url = u'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
     email_context = {
         'course_title': course_title,
         'course_url': course_url,
@@ -787,7 +788,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
     # needs to be returned back to Celery.  If it fails, we return the existing
     # exception.
     try:
-        send_course_email.retry(
+        retry_task = send_course_email.retry(
             args=[
                 entry_id,
                 email_id,
@@ -800,6 +801,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
             max_retries=max_retries,
             throw=True,
         )
+        raise retry_task
     except RetryTaskError as retry_error:
         # If the retry call is successful, update with the current progress:
         log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
@@ -814,7 +816,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
         log.exception(u'Task %s: email with id %d caused send_course_email task to fail to retry. To list: %s',
                       task_id, email_id, [i['email'] for i in to_list])
         num_failed = len(to_list)
-        subtask_status.increment(subtask_status, failed=num_failed, state=FAILURE)
+        subtask_status.increment(failed=num_failed, state=FAILURE)
         return subtask_status, retry_exc
 
 

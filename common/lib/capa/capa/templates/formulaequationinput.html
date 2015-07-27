@@ -4,23 +4,14 @@
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value|h}"
         aria-label="${label}"
+        aria-describedby="${id}_status"
         % if size:
         size="${size}"
         % endif
         />
 
-      <p class="status" 
-         %if status != 'unsubmitted':
-         aria-hidden="true"
-         %endif
-         >
-          <span class="sr equation">
-              %if value:
-              ${value|h}
-              % else:
-              ${label}
-              %endif
-          </span> - ${status.display_name}
+      <p class="status" id="${id}_status">
+           ${status.display_name}
       </p>
 
       <div id="input_${id}_preview" class="equation">

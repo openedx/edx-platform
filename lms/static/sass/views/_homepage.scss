@@ -18,9 +18,10 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
       @extend %ui-no-list;
 
       .courses-listing-item {
+        @include rtl() { $layout-direction: "RTL"; }
         @include fill-parent();
-        max-height: $course-card-height;
         margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+        max-height: $course-card-height;
 
         @include media($bp-medium) {
           @include span-columns(4); // 4 of 8

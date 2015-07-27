@@ -3,33 +3,53 @@
 define([
     'backbone', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs_list',
     'js/edxnotes/views/tabs/recent_activity', 'js/edxnotes/views/tabs/course_structure',
-    'js/edxnotes/views/tabs/search_results'
+    'js/edxnotes/views/tabs/search_results', 'js/edxnotes/views/tabs/tags'
 ], function (
     Backbone, TabsCollection, TabsListView, RecentActivityView, CourseStructureView,
-    SearchResultsView
+    SearchResultsView, TagsView
 ) {
     var NotesPageView = Backbone.View.extend({
         initialize: function (options) {
+            var scrollToTag, tagsModel;
+
             this.options = options;
             this.tabsCollection = new TabsCollection();
+
+            // Must create the Tags view first to get the "scrollToTag" method.
+            this.tagsView = new TagsView({
+                el: this.el,
+                collection: this.collection,
+                tabsCollection: this.tabsCollection
+            });
+
+            scrollToTag = this.tagsView.scrollToTag;
+
+            // Remove the Tags model from the tabs collection because it should not appear first.
+            tagsModel = this.tabsCollection.shift();
 
             this.recentActivityView = new RecentActivityView({
                 el: this.el,
                 collection: this.collection,
-                tabsCollection: this.tabsCollection
+                tabsCollection: this.tabsCollection,
+                scrollToTag: scrollToTag
             });
 
             this.courseStructureView = new CourseStructureView({
                 el: this.el,
                 collection: this.collection,
-                tabsCollection: this.tabsCollection
+                tabsCollection: this.tabsCollection,
+                scrollToTag: scrollToTag
             });
+
+            // Add the Tags model after the Course Structure model.
+            this.tabsCollection.push(tagsModel);
 
             this.searchResultsView = new SearchResultsView({
                 el: this.el,
                 tabsCollection: this.tabsCollection,
                 debug: this.options.debug,
-                createTabOnInitialization: false
+                createTabOnInitialization: false,
+                scrollToTag: scrollToTag
             });
 
             this.tabsView = new TabsListView({collection: this.tabsCollection});

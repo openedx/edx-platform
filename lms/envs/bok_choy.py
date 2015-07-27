@@ -55,8 +55,7 @@ MEDIA_URL = "/static/uploads/"
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'cache'
-BROKER_TRANSPORT = 'memory'
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
@@ -94,6 +93,12 @@ FEATURES['MILESTONES_APP'] = True
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 
+# Enable student notes
+FEATURES['ENABLE_EDXNOTES'] = True
+
+# Enable teams feature
+FEATURES['ENABLE_TEAMS'] = True
+
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 
@@ -120,6 +125,10 @@ PASSWORD_COMPLEXITY = {}
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+
+# Enable dashboard search for tests
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index

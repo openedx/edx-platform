@@ -6,8 +6,8 @@ define([
      'js/edxnotes/plugins/events', 'js/edxnotes/plugins/accessibility',
      'js/edxnotes/plugins/caret_navigation'
 ], function ($, _, Annotator, NotesLogger) {
-    var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation'],
-        getOptions, setupPlugins, updateHeaders, getAnnotator;
+    var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
+        getOptions, setupPlugins, getAnnotator;
 
     /**
      * Returns options for the annotator.

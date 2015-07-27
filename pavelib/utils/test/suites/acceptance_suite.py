@@ -38,10 +38,11 @@ class AcceptanceTest(TestSuite):
 
         cmd = (
             "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
-            "--debug-mode --verbosity {verbosity} {report_args} {extra_args}".format(
+            "--debug-mode --verbosity {verbosity} {pdb}{report_args} {extra_args}".format(
                 default_store=self.default_store,
                 system=self.system,
                 verbosity=self.verbosity,
+                pdb="--pdb " if self.pdb else "",
                 report_args=report_args,
                 extra_args=self.extra_args,
             )

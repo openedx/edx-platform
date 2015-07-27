@@ -1,5 +1,5 @@
 ##################################################
-Mobile Course Information API Module
+Mobile Course Information API
 ##################################################
 
 This page describes how to use the Mobile Course Information API

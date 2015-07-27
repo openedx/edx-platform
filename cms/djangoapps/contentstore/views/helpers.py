@@ -25,6 +25,17 @@ from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['edge', 'event', 'landing']
 
+# Note: Grader types are used throughout the platform but most usages are simply in-line
+# strings.  In addition, new grader types can be defined on the fly anytime one is needed
+# (because they're just strings). This dict is an attempt to constrain the sprawl in Studio.
+GRADER_TYPES = {
+    "HOMEWORK": "Homework",
+    "LAB": "Lab",
+    "ENTRANCE_EXAM": "Entrance Exam",
+    "MIDTERM_EXAM": "Midterm Exam",
+    "FINAL_EXAM": "Final Exam"
+}
+
 
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
@@ -173,6 +184,18 @@ def usage_key_with_run(usage_key_string):
     return usage_key
 
 
+def remove_entrance_exam_graders(course_key, user):
+    """
+    Removes existing entrance exam graders attached to the specified course
+    Typically used when adding/removing an entrance exam.
+    """
+    grading_model = CourseGradingModel.fetch(course_key)
+    graders = grading_model.graders
+    for i, grader in enumerate(graders):
+        if grader['type'] == GRADER_TYPES['ENTRANCE_EXAM']:
+            CourseGradingModel.delete_grader(course_key, i, user)
+
+
 def create_xblock(parent_locator, user, category, display_name, boilerplate=None, is_entrance_exam=False):
     """
     Performs the actual grunt work of creating items/xblocks -- knows nothing about requests, views, etc.
@@ -228,11 +251,14 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # Entrance Exams: Grader assignment
         if settings.FEATURES.get('ENTRANCE_EXAMS', False):
-            course = store.get_course(usage_key.course_key)
+            course_key = usage_key.course_key
+            course = store.get_course(course_key)
             if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:
                 if category == 'sequential' and parent_locator == course.entrance_exam_id:
+                    # Clean up any pre-existing entrance exam graders
+                    remove_entrance_exam_graders(course_key, user)
                     grader = {
-                        "type": "Entrance Exam",
+                        "type": GRADER_TYPES['ENTRANCE_EXAM'],
                         "min_count": 0,
                         "drop_count": 0,
                         "short_label": "Entrance",

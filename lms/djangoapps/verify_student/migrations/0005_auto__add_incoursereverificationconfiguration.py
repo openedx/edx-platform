@@ -97,7 +97,7 @@ class Migration(SchemaMigration):
         },
         'verify_student.verificationcheckpoint': {
             'Meta': {'unique_together': "(('course_id', 'checkpoint_name'),)", 'object_name': 'VerificationCheckpoint'},
-            'checkpoint_name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
+            'checkpoint_name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'photo_verification': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['verify_student.SoftwareSecurePhotoVerification']", 'symmetrical': 'False'})
@@ -115,4 +115,3 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['verify_student']
-

@@ -49,7 +49,8 @@ function (HTML5Video, Resizer) {
             update: update,
             figureOutStartEndTime: figureOutStartEndTime,
             figureOutStartingTime: figureOutStartingTime,
-            updatePlayTime: updatePlayTime
+            updatePlayTime: updatePlayTime,
+            logStopVideo:logStopVideo
         };
 
     VideoPlayer.prototype = methodsDict;
@@ -348,6 +349,8 @@ function (HTML5Video, Resizer) {
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
                     end: true
                 });
+                // Emit `stop_video` event
+                this.videoPlayer.logStopVideo();
             }
         }
     }
@@ -531,12 +534,7 @@ function (HTML5Video, Resizer) {
 
     function onEnded() {
         var time = this.videoPlayer.duration();
-        this.videoPlayer.log(
-            'stop_video',
-            {
-                currentTime: this.videoPlayer.currentTime
-            }
-        );
+        this.videoPlayer.logStopVideo();
 
         this.trigger('videoControl.pause', null);
         this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
@@ -591,6 +589,15 @@ function (HTML5Video, Resizer) {
 
     function handlePlaybackQualityChange(value) {
         this.videoPlayer.player.setPlaybackQuality(value);
+    }
+
+    function logStopVideo(){
+        this.videoPlayer.log(
+            'stop_video',
+            {
+                currentTime: this.videoPlayer.currentTime
+            }
+        );
     }
 
     function onPlaybackQualityChange() {

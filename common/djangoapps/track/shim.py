@@ -31,7 +31,10 @@ class LegacyFieldMappingProcessor(object):
             remove_shim_context(event)
 
         if 'data' in event:
-            event['event'] = event['data']
+            if context.get('event_source', '') == 'browser' and isinstance(event['data'], dict):
+                event['event'] = json.dumps(event['data'])
+            else:
+                event['event'] = event['data']
             del event['data']
         else:
             event['event'] = {}
@@ -103,7 +106,8 @@ class VideoEventProcessor(object):
         if name not in NAME_TO_EVENT_TYPE_MAP:
             return
 
-        # Convert edx.video.seeked to edx.video.positiion.changed
+        # Convert edx.video.seeked to edx.video.position.changed because edx.video.seeked was not intended to actually
+        # ever be emitted.
         if name == "edx.video.seeked":
             event['name'] = "edx.video.position.changed"
 

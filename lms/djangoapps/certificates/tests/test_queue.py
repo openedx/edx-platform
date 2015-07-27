@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 import json
 from mock import patch, Mock
+from nose.plugins.attrib import attr
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -24,6 +25,7 @@ from certificates.queue import XQueueCertInterface
 from certificates.models import ExampleCertificateSet, ExampleCertificate
 
 
+@attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
@@ -53,6 +55,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
 
 
+@attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceExampleCertificateTest(TestCase):
     """Tests for the XQueue interface for certificate generation. """

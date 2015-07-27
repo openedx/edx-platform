@@ -56,15 +56,15 @@ site_status_msg = get_site_status_msg(course_id)
     <nav aria-label="Main" class="nav-main">
       <ul class="left nav-global authenticated">
         <%block name="navigation_global_links_authenticated">
-            <li class="nav-global-01">
-              <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
-            </li>
-            <li class="nav-global-02">
-              <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
-            </li>
-            <li class="nav-global-03">
-              <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
-            </li>
+          <li class="nav-global-01">
+            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+          </li>
+          <li class="nav-global-02">
+            <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
+          </li>
+          <li class="nav-global-03">
+            <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
+          </li>
         </%block>
       </ul>
     </nav>
@@ -145,8 +145,8 @@ site_status_msg = get_site_status_msg(course_id)
   </div>
 </header>
 % if course:
-<!--[if lte IE 8]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
+<!--[if lte IE 9]>
+<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/chrome" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>')}</div>
 <![endif]-->
 % endif
 

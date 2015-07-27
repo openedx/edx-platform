@@ -16,6 +16,7 @@ class StubLtiServiceTest(unittest.TestCase):
     Used for lettuce BDD tests in lms/courseware/features/lti.feature
     """
     def setUp(self):
+        super(StubLtiServiceTest, self).setUp()
         self.server = StubLtiService()
         self.uri = 'http://127.0.0.1:{}/'.format(self.server.port)
         self.launch_uri = self.uri + 'correct_lti_endpoint'

@@ -57,8 +57,10 @@ class TestStatus(TestCase):
         Fake course ids, since we don't have to have full django
         settings (common tests run without the lms settings imported)
         """
+        super(TestStatus, self).setUp()
         self.full_id = 'edX/full/2012_Fall'
         self.toy_id = 'edX/toy/2012_Fall'
+        self.addCleanup(self.remove_status_file)
 
     def create_status_file(self, contents):
         """
@@ -78,9 +80,6 @@ class TestStatus(TestCase):
         """Delete the status file if it exists"""
         if os.path.exists(settings.STATUS_MESSAGE_PATH):
             os.remove(settings.STATUS_MESSAGE_PATH)
-
-    def tearDown(self):
-        self.remove_status_file()
 
     @ddt.data(*checks)
     @ddt.unpack

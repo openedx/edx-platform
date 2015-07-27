@@ -27,7 +27,7 @@ from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from xblock_django.user_service import DjangoXBlockUserService
@@ -310,11 +310,14 @@ class GetItemTest(ItemTest):
         )
 
 
+@ddt.ddt
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
-    def test_delete_static_page(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_delete_static_page(self, store):
+        course = CourseFactory.create(default_store=store)
         # Add static tab
-        resp = self.create_xblock(category='static_tab')
+        resp = self.create_xblock(category='static_tab', parent_usage_key=course.location)
         usage_key = self.response_usage_key(resp)
 
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).

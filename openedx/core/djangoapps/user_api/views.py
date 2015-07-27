@@ -102,6 +102,14 @@ class LoginSessionView(APIView):
             }
         )
 
+        form_desc.add_field(
+            "remember",
+            field_type="checkbox",
+            label=_("Remember me"),
+            default=False,
+            required=False,
+        )
+
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
     @method_decorator(require_post_params(["email", "password"]))
@@ -573,22 +581,13 @@ class RegistrationView(APIView):
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the country in which the user lives.
         country_label = _(u"Country")
-
-        sorted_countries = sorted(
-            countries.countries, key=lambda(__, name): unicode(name)
-        )
-        options = [
-            (country_code, unicode(country_name))
-            for country_code, country_name in sorted_countries
-        ]
-
         error_msg = _(u"Please select your Country.")
 
         form_desc.add_field(
             "country",
             label=country_label,
             field_type="select",
-            options=options,
+            options=list(countries),
             include_default_option=True,
             required=required,
             error_messages={

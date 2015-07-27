@@ -7,7 +7,27 @@ import re
 
 from .utils.envs import Env
 
-ALL_SYSTEMS = 'lms,cms,common'
+ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
+
+
+def top_python_dirs(dirname):
+    """
+    Find the directories to start from in order to find all the Python files in `dirname`.
+    """
+    top_dirs = []
+
+    dir_init = os.path.join(dirname, "__init__.py")
+    if os.path.exists(dir_init):
+        top_dirs.append(dirname)
+
+    for directory in ['djangoapps', 'lib']:
+        subdir = os.path.join(dirname, directory)
+        subdir_init = os.path.join(subdir, "__init__.py")
+        if os.path.exists(subdir) and not os.path.exists(subdir_init):
+            dirs = os.listdir(subdir)
+            top_dirs.extend(d for d in dirs if os.path.isdir(os.path.join(subdir, d)))
+
+    return top_dirs
 
 
 @task
@@ -27,13 +47,7 @@ def find_fixme(options):
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        apps = [system]
-
-        for directory in ['djangoapps', 'lib']:
-            dirs = os.listdir(os.path.join(system, directory))
-            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
-
-        apps_list = ' '.join(apps)
+        apps_list = ' '.join(top_python_dirs(system))
 
         pythonpath_prefix = (
             "PYTHONPATH={system}:{system}/lib"
@@ -88,13 +102,7 @@ def run_pylint(options):
         if errors:
             flags.append("--errors-only")
 
-        apps = [system]
-
-        for directory in ['lib']:
-            dirs = os.listdir(os.path.join(system, directory))
-            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
-
-        apps_list = ' '.join(apps)
+        apps_list = ' '.join(top_python_dirs(system))
 
         pythonpath_prefix = (
             "PYTHONPATH={system}:{system}/djangoapps:{system}/"

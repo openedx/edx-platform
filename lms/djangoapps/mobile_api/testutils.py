@@ -16,16 +16,20 @@ from mock import patch
 from unittest import skip
 
 from rest_framework.test import APITestCase
+
 from django.core.urlresolvers import reverse
 
-from opaque_keys.edx.keys import CourseKey
-from courseware.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
+from opaque_keys.edx.keys import CourseKey
+
+from courseware.tests.factories import UserFactory
 from student import auth
 from student.models import CourseEnrollment
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from mobile_api.test_milestones import MobileAPIMilestonesMixin
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
@@ -126,7 +130,7 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
 
 
 @ddt.ddt
-class MobileCourseAccessTestMixin(object):
+class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     """
     Test Mixin for testing APIs marked with mobile_course_access.
     (Use MobileEnrolledCourseAccessTestMixin when verify_enrolled is set to True.)

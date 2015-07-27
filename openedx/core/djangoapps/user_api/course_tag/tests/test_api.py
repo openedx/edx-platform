@@ -13,6 +13,7 @@ class TestCourseTagAPI(TestCase):
     Test the user service
     """
     def setUp(self):
+        super(TestCourseTagAPI, self).setUp()
         self.user = UserFactory.create()
         self.course_id = SlashSeparatedCourseKey('test_org', 'test_course_number', 'test_run')
         self.test_key = 'test_key'

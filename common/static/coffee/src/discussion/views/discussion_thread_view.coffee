@@ -125,7 +125,7 @@ if Backbone?
           resp_limit: responseLimit if responseLimit
         $elem: elem
         $loading: elem
-        takeFocus: true
+        takeFocus: false
         complete: =>
           @responsesRequest = null
         success: (data, textStatus, xhr) =>

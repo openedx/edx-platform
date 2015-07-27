@@ -1,6 +1,7 @@
 """Tests for the resubmit_error_certificates management command. """
 import ddt
 from django.core.management.base import CommandError
+from nose.plugins.attrib import attr
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -10,6 +11,7 @@ from certificates.management.commands import resubmit_error_certificates
 from certificates.models import GeneratedCertificate, CertificateStatuses
 
 
+@attr('shard_1')
 @ddt.ddt
 class ResubmitErrorCertificatesTest(ModuleStoreTestCase):
     """Tests for the resubmit_error_certificates management command. """

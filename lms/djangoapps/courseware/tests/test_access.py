@@ -4,6 +4,7 @@ import pytz
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
@@ -28,6 +29,7 @@ from util.milestones_helpers import (
 # pylint: disable=protected-access
 
 
+@attr('shard_1')
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the various access controls on the student dashboard
@@ -41,6 +43,16 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.global_staff = UserFactory(is_staff=True)
         self.course_staff = StaffFactory(course_key=self.course.course_key)
         self.course_instructor = InstructorFactory(course_key=self.course.course_key)
+
+    def verify_access(self, mock_unit, student_should_have_access):
+        """ Verify the expected result from _has_access_descriptor """
+        self.assertEqual(
+            student_should_have_access,
+            access._has_access_descriptor(self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key)
+        )
+        self.assertTrue(
+            access._has_access_descriptor(self.course_staff, 'load', mock_unit, course_key=self.course.course_key)
+        )
 
     def test_has_access_to_course(self):
         self.assertFalse(access._has_access_to_course(
@@ -133,41 +145,73 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.category = "problem"
 
-        def verify_access(student_should_have_access):
-            """ Verify the expected result from _has_access_descriptor """
-            self.assertEqual(student_should_have_access, access._has_access_descriptor(
-                self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key)
-            )
-            # staff always has access
-            self.assertTrue(access._has_access_descriptor(
-                self.course_staff, 'load', mock_unit, course_key=self.course.course_key)
-            )
-
         # No start date, staff lock on
         mock_unit.visible_to_staff_only = True
-        verify_access(False)
+        self.verify_access(mock_unit, False)
 
         # No start date, staff lock off.
         mock_unit.visible_to_staff_only = False
-        verify_access(True)
+        self.verify_access(mock_unit, True)
 
         # Start date in the past, staff lock on.
         mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         mock_unit.visible_to_staff_only = True
-        verify_access(False)
+        self.verify_access(mock_unit, False)
 
         # Start date in the past, staff lock off.
         mock_unit.visible_to_staff_only = False
-        verify_access(True)
+        self.verify_access(mock_unit, True)
 
         # Start date in the future, staff lock on.
         mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
         mock_unit.visible_to_staff_only = True
-        verify_access(False)
+        self.verify_access(mock_unit, False)
 
         # Start date in the future, staff lock off.
         mock_unit.visible_to_staff_only = False
-        verify_access(False)
+        self.verify_access(mock_unit, False)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch('courseware.access.get_current_request_hostname', Mock(return_value='preview.localhost'))
+    def test__has_access_descriptor_in_preview_mode(self):
+        """
+        Tests that descriptor has access in preview mode.
+        """
+        mock_unit = Mock(user_partitions=[])
+        mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
+
+        # No start date.
+        mock_unit.visible_to_staff_only = False
+        self.verify_access(mock_unit, True)
+
+        # Start date in the past.
+        mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        self.verify_access(mock_unit, True)
+
+        # Start date in the future.
+        mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
+        self.verify_access(mock_unit, True)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch('courseware.access.get_current_request_hostname', Mock(return_value='localhost'))
+    def test__has_access_descriptor_when_not_in_preview_mode(self):
+        """
+        Tests that descriptor has no access when start date in future & without preview.
+        """
+        mock_unit = Mock(user_partitions=[])
+        mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
+
+        # No start date.
+        mock_unit.visible_to_staff_only = False
+        self.verify_access(mock_unit, True)
+
+        # Start date in the past.
+        mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        self.verify_access(mock_unit, True)
+
+        # Start date in the future.
+        mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
+        self.verify_access(mock_unit, False)
 
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
@@ -327,6 +371,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@attr('shard_1')
 class UserRoleTestCase(TestCase):
     """
     Tests for user roles.

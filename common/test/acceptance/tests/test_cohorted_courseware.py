@@ -20,7 +20,7 @@ from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 from bok_choy.promise import EmptyPromise
 
 
-@attr('shard_1')
+@attr('shard_5')
 class EndToEndCohortedCoursewareTest(ContainerBase):
 
     def setUp(self, is_staff=True):

@@ -3,6 +3,7 @@ Acceptance tests for Content Libraries in Studio
 """
 from ddt import ddt, data
 from flaky import flaky
+from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import XBlockFixtureDesc
@@ -12,6 +13,7 @@ from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.users import LibraryUsersPage
 
 
+@attr('shard_4')
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -183,6 +185,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
+@attr('shard_4')
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """

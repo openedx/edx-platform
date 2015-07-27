@@ -162,7 +162,10 @@ FEATURES = {
     'DASHBOARD_SHARE_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
-    }
+    },
+
+    # Teams feature
+    'ENABLE_TEAMS': False,
 }
 
 ENABLE_JASMINE = False
@@ -475,35 +478,11 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-app.css',
     },
-    'style-app-extend1': {
-        'source_filenames': [
-            'sass/style-app-extend1.css',
-        ],
-        'output_filename': 'css/cms-style-app-extend1.css',
-    },
     'style-app-rtl': {
         'source_filenames': [
             'sass/style-app-rtl.css',
         ],
         'output_filename': 'css/cms-style-app-rtl.css',
-    },
-    'style-app-extend1-rtl': {
-        'source_filenames': [
-            'sass/style-app-extend1-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-app-extend1-rtl.css',
-    },
-    'style-xmodule': {
-        'source_filenames': [
-            'sass/style-xmodule.css',
-        ],
-        'output_filename': 'css/cms-style-xmodule.css',
-    },
-    'style-xmodule-rtl': {
-        'source_filenames': [
-            'sass/style-xmodule-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-xmodule-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -811,19 +790,42 @@ TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
 EVENT_TRACKING_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
-    'logger': {
-        'ENGINE': 'eventtracking.backends.logger.LoggerBackend',
+    'tracking_logs': {
+        'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
         'OPTIONS': {
-            'name': 'tracking',
-            'max_event_size': TRACK_MAX_EVENT,
+            'backends': {
+                'logger': {
+                    'ENGINE': 'eventtracking.backends.logger.LoggerBackend',
+                    'OPTIONS': {
+                        'name': 'tracking',
+                        'max_event_size': TRACK_MAX_EVENT,
+                    }
+                }
+            },
+            'processors': [
+                {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
+                {'ENGINE': 'track.shim.VideoEventProcessor'}
+            ]
+        }
+    },
+    'segmentio': {
+        'ENGINE': 'eventtracking.backends.routing.RoutingBackend',
+        'OPTIONS': {
+            'backends': {
+                'segment': {'ENGINE': 'eventtracking.backends.segment.SegmentBackend'}
+            },
+            'processors': [
+                {
+                    'ENGINE': 'eventtracking.processors.whitelist.NameWhitelistProcessor',
+                    'OPTIONS': {
+                        'whitelist': []
+                    }
+                }
+            ]
         }
     }
 }
-EVENT_TRACKING_PROCESSORS = [
-    {
-        'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
-    }
-]
+EVENT_TRACKING_PROCESSORS = []
 
 #### PASSWORD POLICY SETTINGS #####
 

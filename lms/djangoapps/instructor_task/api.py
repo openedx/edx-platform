@@ -20,6 +20,7 @@ from instructor_task.tasks import (
     delete_problem_state,
     send_bulk_course_email,
     calculate_grades_csv,
+    calculate_problem_grade_report,
     calculate_students_features_csv,
     get_student_responses,
     get_student_forums_usage,
@@ -379,7 +380,19 @@ def submit_course_forums_usage_task(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-# pylint: disable=invalid-name
+def submit_problem_grade_report(request, course_key):
+    """
+    Submits a task to generate a CSV grade report containing problem
+    values.
+    """
+    task_type = 'grade_problems'
+    task_class = calculate_problem_grade_report
+    task_input = {}
+    task_key = ""
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+>>>>>>> release-2015-05-18
 def submit_calculate_students_features_csv(request, course_key, features):
     """
     Submits a task to generate a CSV containing student profile info.

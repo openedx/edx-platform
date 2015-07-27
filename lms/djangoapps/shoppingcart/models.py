@@ -1751,7 +1751,7 @@ class CertificateItem(OrderItem):
 
         if is_enrollment_mode_verified:
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
+            path = reverse('verify_student_verify_now', kwargs={'course_id': unicode(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
             verification_reminder = _(

@@ -19,6 +19,7 @@ class UserServiceTestCase(TestCase):
     Tests for the DjangoXBlockUserService.
     """
     def setUp(self):
+        super(UserServiceTestCase, self).setUp()
         self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
         self.anon_user = AnonymousUserFactory()

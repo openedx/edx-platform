@@ -28,6 +28,13 @@ class ContentFactory(factory.Factory):
     closed = False
     votes = {"up_count": 0}
 
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # The discussion code assumes that user_id is a string. This ensures that it always will be.
+        if 'user_id' in kwargs:
+            kwargs['user_id'] = str(kwargs['user_id'])
+        return kwargs
+
 
 class Thread(ContentFactory):
     thread_type = "discussion"
@@ -117,6 +124,16 @@ class SingleThreadViewFixture(DiscussionContentFixture):
             "threads": json.dumps({self.thread['id']: self.thread}),
             "comments": json.dumps(self._get_comment_map())
         }
+
+
+class MultipleThreadFixture(DiscussionContentFixture):
+
+    def __init__(self, threads):
+        self.threads = threads
+
+    def get_config_data(self):
+        threads_list = {thread['id']: thread for thread in self.threads}
+        return {"threads": json.dumps(threads_list), "comments": '{}'}
 
 
 class UserProfileViewFixture(DiscussionContentFixture):

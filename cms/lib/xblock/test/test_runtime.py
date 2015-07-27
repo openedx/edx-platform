@@ -12,6 +12,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
+        super(TestHandlerUrl, self).setUp()
         self.block = Mock()
 
     def test_trailing_characters(self):

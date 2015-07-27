@@ -9,6 +9,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from mock import patch
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
@@ -31,6 +32,7 @@ from courseware.models import StudentModule
 USER_COUNT = 11
 
 
+@attr('shard_1')
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py

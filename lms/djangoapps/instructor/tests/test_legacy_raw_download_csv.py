@@ -5,11 +5,13 @@ Create course and answer a problem to test raw grade CSV
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from student.roles import CourseStaffRole
 
 
+@attr('shard_1')
 class TestRawGradeCSV(TestSubmittingProblems):
     """
     Tests around the instructor dashboard raw grade CSV

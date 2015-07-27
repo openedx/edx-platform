@@ -21,6 +21,7 @@ class CourseCreatorView(TestCase):
 
     def setUp(self):
         """ Test case setup """
+        super(CourseCreatorView, self).setUp()
         self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
         self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
         self.admin.is_staff = True

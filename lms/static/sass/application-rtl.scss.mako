@@ -1,5 +1,3 @@
-## Note: This Sass infrastructure is repeated in application-extend1 and application-extend2, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
-
 // lms - css application architecture
 // ====================
 
@@ -28,31 +26,5 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
-@import 'base/base';
+@import 'build-lms'; // shared app style assets/rendering
 
-// base - assets
-@import 'base/font_face';
-@import 'base/extends';
-@import 'base/animations';
-
-// base - starter
-@import 'base/base';
-
-// base - elements
-@import 'elements/typography';
-@import 'elements/controls';
-
-// shared - course
-@import 'shared/fields';
-@import 'shared/forms';
-@import 'shared/footer';
-@import 'shared/header';
-@import 'shared/course_object';
-@import 'shared/course_filter';
-@import 'shared/modal';
-@import 'shared/activation_messages';
-@import 'shared/unsubscribe';
-
-@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
-@import 'shame';     // used for any bad-form/orphaned scss
-## NOTE: needed here for cascade and dependency purposes, but not a great permanent solution
