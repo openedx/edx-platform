@@ -1,5 +1,6 @@
 """ Commerce API v1 view tests. """
 from datetime import datetime
+import itertools
 import json
 
 import ddt
@@ -157,6 +158,34 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         # The existing CourseMode should have been removed.
         self.assertFalse(CourseMode.objects.filter(id=self.course_mode.id).exists())
+
+    @ddt.data(*itertools.product(
+        ('honor', 'audit', 'verified', 'professional', 'no-id-professional'),
+        (datetime.now(), None),
+    ))
+    @ddt.unpack
+    def test_update_professional_expiration(self, mode_slug, expiration_datetime):
+        """ Verify that pushing a mode with a professional certificate and an expiration datetime
+        will be rejected (this is not allowed). """
+        permission = Permission.objects.get(name='Can change course mode')
+        self.user.user_permissions.add(permission)
+
+        mode = self._serialize_course_mode(
+            CourseMode(
+                mode_slug=mode_slug,
+                min_price=500,
+                currency=u'USD',
+                sku=u'ABC123',
+                expiration_datetime=expiration_datetime
+            )
+        )
+        course_id = unicode(self.course.id)
+        payload = {u'id': course_id, u'modes': [mode]}
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
+
+        expected_status = 400 if CourseMode.is_professional_slug(mode_slug) and expiration_datetime is not None else 200
+        response = self.client.put(path, json.dumps(payload), content_type=JSON_CONTENT_TYPE)
+        self.assertEqual(response.status_code, expected_status)
 
     def assert_can_create_course(self, **request_kwargs):
         """ Verify a course can be created by the view. """
