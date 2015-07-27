@@ -4,6 +4,7 @@ Add and create new modes for running courses on this particular LMS
 import pytz
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from collections import namedtuple, defaultdict
 from django.utils.translation import ugettext_lazy as _
@@ -106,8 +107,19 @@ class CourseMode(models.Model):
         """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
 
+    def clean(self):
+        """
+        Object-level validation - implemented in this method so DRF serializers
+        catch errors in advance of a save() attempt.
+        """
+        if self.is_professional_slug(self.mode_slug) and self.expiration_datetime is not None:
+            raise ValidationError(
+                _(u"Professional education modes are not allowed to have expiration_datetime set.")
+            )
+
     def save(self, force_insert=False, force_update=False, using=None):
         # Ensure currency is always lowercase.
+        self.clean()  # ensure object-level validation is performed before we save.
         self.currency = self.currency.lower()
         super(CourseMode, self).save(force_insert, force_update, using)
 
