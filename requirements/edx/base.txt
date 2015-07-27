@@ -51,7 +51,7 @@ Markdown==2.2.1
 --allow-external meliae
 --allow-unverified meliae
 meliae==0.4.0
-mongoengine==0.7.10
+mongoengine==0.10.0
 networkx==1.7
 nose==1.3.3
 oauthlib==0.7.2
