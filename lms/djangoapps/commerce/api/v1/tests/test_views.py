@@ -1,4 +1,5 @@
 """ Commerce API v1 view tests. """
+from datetime import datetime
 import json
 
 import ddt
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from rest_framework.utils.encoders import JSONEncoder
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -31,12 +33,17 @@ class CourseApiViewTestMixin(object):
     @staticmethod
     def _serialize_course_mode(course_mode):
         """ Serialize a CourseMode to a dict. """
+        # encode the datetime (if nonempty) using DRF's encoder, simplifying
+        # equality assertions.
+        expires = course_mode.expiration_datetime
+        if expires is not None:
+            expires = JSONEncoder().default(expires)
         return {
             u'name': course_mode.mode_slug,
             u'currency': course_mode.currency.lower(),
             u'price': course_mode.min_price,
             u'sku': course_mode.sku,
-            u'expires': course_mode.expiration_datetime,
+            u'expires': expires,
         }
 
 
@@ -112,7 +119,14 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         """ Verify the view supports updating a course. """
         permission = Permission.objects.get(name='Can change course mode')
         self.user.user_permissions.add(permission)
-        expected_course_mode = CourseMode(mode_slug=u'verified', min_price=200, currency=u'USD', sku=u'ABC123')
+        expiration_datetime = datetime.now()
+        expected_course_mode = CourseMode(
+            mode_slug=u'verified',
+            min_price=200,
+            currency=u'USD',
+            sku=u'ABC123',
+            expiration_datetime=expiration_datetime
+        )
         expected = {
             u'id': unicode(self.course.id),
             u'modes': [self._serialize_course_mode(expected_course_mode)]
