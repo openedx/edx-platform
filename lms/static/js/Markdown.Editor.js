@@ -17,48 +17,95 @@
             isOpera: /opera/.test(nav.userAgent.toLowerCase())
         };
 
+    var defaultsStrings = {
+        bold: "Strong <strong> Ctrl+B",
+        boldexample: "strong text",
+
+        italic: "Emphasis <em> Ctrl+I",
+        italicexample: "emphasized text",
+
+        link: "Hyperlink <a> Ctrl+L",
+        linkdescription: "enter link description here",
+        linkdialog: "<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>",
+
+        quote: "Blockquote <blockquote> Ctrl+Q",
+        quoteexample: "Blockquote",
+
+        code: "Code Sample <pre><code> Ctrl+K",
+        codeexample: "enter code here",
+
+        image: "Image <img> Ctrl+G",
+        imagedescription: "enter image description here",
+        imagedialog: "<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br>Need <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a></p>",
+
+        olist: "Numbered List <ol> Ctrl+O",
+        ulist: "Bulleted List <ul> Ctrl+U",
+        litem: "List item",
+
+        heading: "Heading <h1>/<h2> Ctrl+H",
+        headingexample: "Heading",
+
+        hr: "Horizontal Rule <hr> Ctrl+R",
+
+        undo: "Undo - Ctrl+Z",
+        redo: "Redo - Ctrl+Y",
+        redomac: "Redo - Ctrl+Shift+Z",
+
+        help: "Markdown Editing Help"
+    };
+
 
     // -------------------------------------------------------------------
     //  YOUR CHANGES GO HERE
     //
-    // I've tried to localize the things you are likely to change to 
+    // I've tried to localize the things you are likely to change to
     // this area.
     // -------------------------------------------------------------------
-
-    // The text that appears on the upper part of the dialog box when
-    // entering links.
-    var linkDialogText = "<p><b>" + gettext("Insert Hyperlink") + "</b></p><p>http://example.com/ " +
-	// Translators: Please keep the quotation marks (") around this text
-	gettext("\"optional title\"") + "</p>";
-    var imageDialogText = "<p><b>" + gettext("Insert Image (upload file or type url)") + "</b></p><p>http://example.com/images/diagram.jpg " +
-	// Translators: Please keep the quotation marks (") around this text
-	gettext("\"optional title\"") + "<br><br></p>";
 
     // The default text that appears in the dialog input box when entering
     // links.
     var imageDefaultText = "http://";
     var linkDefaultText = "http://";
 
-    var defaultHelpHoverTitle = gettext("Markdown Editing Help");
-
     // -------------------------------------------------------------------
     //  END OF YOUR CHANGES
     // -------------------------------------------------------------------
 
-    // help, if given, should have a property "handler", the click handler for the help button,
-    // and can have an optional property "title" for the button's tooltip (defaults to "Markdown Editing Help").
-    // If help isn't given, not help button is created.
+    // options, if given, can have the following properties:
+    //   options.helpButton = { handler: yourEventHandler }
+    //   options.strings = { italicexample: "slanted text" }
+    // `yourEventHandler` is the click handler for the help button.
+    // If `options.helpButton` isn't given, not help button is created.
+    // `options.strings` can have any or all of the same properties as
+    // `defaultStrings` above, so you can just override some string displayed
+    // to the user on a case-by-case basis, or translate all strings to
+    // a different language.
+    //
+    // For backwards compatibility reasons, the `options` argument can also
+    // be just the `helpButton` object, and `strings.help` can also be set via
+    // `helpButton.title`. This should be considered legacy.
     //
     // The constructed editor object has the methods:
     // - getConverter() returns the markdown converter object that was passed to the constructor
     // - run() actually starts the editor; should be called after all necessary plugins are registered. Calling this more than once is a no-op.
     // - refreshPreview() forces the preview to be updated. This method is only available after run() was called.
-    Markdown.Editor = function (markdownConverter, idPostfix, help, imageUploadHandler) {
+    Markdown.Editor = function (markdownConverter, idPostfix, options) {
+        
+        options = options || {};
+
+        if (typeof options.handler === "function") { //backwards compatible behavior
+            options = { helpButton: options };
+        }
+        options.strings = options.strings || {};
+        if (options.helpButton) {
+            options.strings.help = options.strings.help || options.helpButton.title;
+        }
+        var getString = function (identifier) { return options.strings[identifier] || defaultsStrings[identifier]; }
 
         idPostfix = idPostfix || "";
 
         var hooks = this.hooks = new Markdown.HookCollection();
-        hooks.addNoop("onPreviewPush");       // called with no arguments after the preview has been refreshed
+        hooks.addNoop("onPreviewRefresh");       // called with no arguments after the preview has been refreshed
         hooks.addNoop("postBlockquoteCreation"); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
         hooks.addFalse("insertImageDialog");     /* called with one parameter: a callback to be called with the URL of the image. If the application creates
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
@@ -75,8 +122,8 @@
                 return; // already initialized
 
             panels = new PanelCollection(idPostfix);
-            var commandManager = new CommandManager(hooks);
-            var previewManager = new PreviewManager(markdownConverter, panels, function (text, previewSet) { hooks.onPreviewPush(text, previewSet); });
+            var commandManager = new CommandManager(hooks, getString, markdownConverter);
+            var previewManager = new PreviewManager(markdownConverter, panels, function () { hooks.onPreviewRefresh(); });
             var undoManager, uiManager;
 
             if (!/\?noundo/.test(doc.location.href)) {
@@ -92,7 +139,7 @@
                 }
             }
 
-            uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help, imageUploadHandler);
+            uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, options.helpButton, getString);
             uiManager.setUndoRedoButtonStates();
 
             var forceRefresh = that.refreshPreview = function () { previewManager.refresh(true); };
@@ -164,7 +211,7 @@
             beforeReplacer = function (s) { that.before += s; return ""; }
             afterReplacer = function (s) { that.after = s + that.after; return ""; }
         }
-        
+
         this.selection = this.selection.replace(/^(\s*)/, beforeReplacer).replace(/(\s*)$/, afterReplacer);
     };
 
@@ -185,7 +232,7 @@
         var regexText;
         var replacementText;
 
-        // chrome bug ... documented at: http://meta.stackoverflow.com/questions/63307/blockquote-glitch-in-editor-in-chrome-6-and-7/65985#65985
+        // chrome bug ... documented at: http://meta.stackexchange.com/questions/63307/blockquote-glitch-in-editor-in-chrome-6-and-7/65985#65985
         if (navigator.userAgent.match(/Chrome/)) {
             "X".match(/()./);
         }
@@ -232,14 +279,14 @@
         }
     };
 
-    // end of Chunks 
+    // end of Chunks
 
     // A collection of the important regions on the page.
     // Cached so we don't have to keep traversing the DOM.
     // Also holds ieCachedRange and ieCachedScrollTop, where necessary; working around
     // this issue:
     // Internet explorer has problems with CSS sprite buttons that use HTML
-    // lists.  When you click on the background image "button", IE will 
+    // lists.  When you click on the background image "button", IE will
     // select the non-existent link text and discard the selection in the
     // textarea.  The solution to this is to cache the textarea selection
     // on the button's mousedown event and set a flag.  In the part of the
@@ -521,13 +568,13 @@
 
             var handled = false;
 
-            if (event.ctrlKey || event.metaKey) {
+            if ((event.ctrlKey || event.metaKey) && !event.altKey) {
 
                 // IE and Opera do not support charCode.
                 var keyCode = event.charCode || event.keyCode;
                 var keyCodeChar = String.fromCharCode(keyCode);
 
-                switch (keyCodeChar) {
+                switch (keyCodeChar.toLowerCase()) {
 
                     case "y":
                         undoObj.redo();
@@ -584,7 +631,7 @@
                     setMode("escape");
                 }
                 else if ((keyCode < 16 || keyCode > 20) && keyCode != 91) {
-                    // 16-20 are shift, etc. 
+                    // 16-20 are shift, etc.
                     // 91: left window key
                     // I think this might be a little messed up since there are
                     // a lot of nonprinting keys above 20.
@@ -597,7 +644,7 @@
             util.addEvent(panels.input, "keypress", function (event) {
                 // keyCode 89: y
                 // keyCode 90: z
-                if ((event.ctrlKey || event.metaKey) && (event.keyCode == 89 || event.keyCode == 90)) {
+                if ((event.ctrlKey || event.metaKey) && !event.altKey && (event.keyCode == 89 || event.keyCode == 90)) {
                     event.preventDefault();
                 }
             });
@@ -728,7 +775,7 @@
 
                 if (panels.ieCachedRange)
                     stateObj.scrollTop = panels.ieCachedScrollTop; // this is set alongside with ieCachedRange
-                
+
                 panels.ieCachedRange = null;
 
                 this.setInputAreaSelection();
@@ -773,7 +820,7 @@
         this.init();
     };
 
-    function PreviewManager(converter, panels, previewPushCallback) {
+    function PreviewManager(converter, panels, previewRefreshCallback) {
 
         var managerObj = this;
         var timeout;
@@ -932,7 +979,8 @@
             var emptyTop = position.getTop(panels.input) - getDocScrollTop();
 
             if (panels.preview) {
-                previewPushCallback(text, previewSet);
+                previewSet(text);
+                previewRefreshCallback();
             }
 
             setPanelScrollTops();
@@ -1014,7 +1062,7 @@
     // callback: The function which is executed when the prompt is dismissed, either via OK or Cancel.
     //      It receives a single argument; either the entered text (if OK was chosen) or null (if Cancel
     //      was chosen).
-    ui.prompt = function (text, defaultInputText, callback, imageUploadHandler) {
+    ui.prompt = function (text, defaultInputText, callback) {
 
         // These variables need to be declared at this level since they are used
         // in multiple functions.
@@ -1031,7 +1079,9 @@
         var checkEscape = function (key) {
             var code = (key.charCode || key.keyCode);
             if (code === 27) {
+                if (key.stopPropagation) key.stopPropagation();
                 close(true);
+                return false;
             }
         };
 
@@ -1039,7 +1089,7 @@
         // isCancel is true if we don't care about the input text.
         // isCancel is false if we are going to keep the text.
         var close = function (isCancel) {
-            util.removeEvent(doc.body, "keydown", checkEscape);
+            util.removeEvent(doc.body, "keyup", checkEscape);
             var text = input.value;
 
             if (isCancel) {
@@ -1048,10 +1098,8 @@
             else {
                 // Fixes common pasting errors.
                 text = text.replace(/^http:\/\/(https?|ftp):\/\//, '$1://');
-                // doesn't change url if started with '/' (local)
-                if (!/^(?:https?|ftp):\/\//.test(text) && text.charAt(0) != '/') {
+                if (!/^(?:https?|ftp):\/\//.test(text))
                     text = 'http://' + text;
-                }
             }
 
             dialog.parentNode.removeChild(dialog);
@@ -1067,7 +1115,6 @@
 
             // The main dialog box.
             dialog = doc.createElement("div");
-            dialog.setAttribute("role", "dialog");
             dialog.className = "wmd-prompt-dialog";
             dialog.style.padding = "10px;";
             dialog.style.position = "fixed";
@@ -1102,21 +1149,6 @@
             style.marginLeft = style.marginRight = "auto";
             form.appendChild(input);
 
-            // The choose file button if prompt type is 'image'
-
-            if (imageUploadHandler) {
-              var chooseFile = doc.createElement("input");
-              chooseFile.type = "file";
-              chooseFile.name = "file-upload";
-              chooseFile.id = "file-upload";
-              chooseFile.onchange = function() {
-                imageUploadHandler(this, input);
-              };
-              form.appendChild(doc.createElement("br"));
-              form.appendChild(chooseFile);
-            }
-
-
             // The ok button
             var okButton = doc.createElement("input");
             okButton.type = "button";
@@ -1141,7 +1173,7 @@
             form.appendChild(okButton);
             form.appendChild(cancelButton);
 
-            util.addEvent(doc.body, "keydown", checkEscape);
+            util.addEvent(doc.body, "keyup", checkEscape);
             dialog.style.top = "50%";
             dialog.style.left = "50%";
             dialog.style.display = "block";
@@ -1182,7 +1214,7 @@
         }, 0);
     };
 
-    function UIManager(postfix, panels, undoManager, previewManager, commandManager, helpOptions, imageUploadHandler) {
+    function UIManager(postfix, panels, undoManager, previewManager, commandManager, helpOptions, getString) {
 
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
@@ -1310,7 +1342,7 @@
                 //
                 // var link = CreateLinkDialog();
                 // makeMarkdownLink(link);
-                // 
+                //
                 // Instead of this straightforward method of handling a
                 // dialog I have to pass any code which would execute
                 // after the dialog is dismissed (e.g. link creation)
@@ -1381,18 +1413,6 @@
                         doClick(this);
                         return false;
                     }
-                    util.addEvent(button, "keydown", function(event) {
-                        var keyCode = event.charCode || event.keyCode;
-                        if (keyCode == 32 || keyCode == 13) {
-                            if (event.preventDefault) {
-                                event.preventDefault();
-                            }
-                            if (window.event) {
-                                window.event.returnValue = false;
-                            }
-                            doClick(button);
-                        }
-                    })
                 }
             }
             else {
@@ -1415,16 +1435,13 @@
             var disabledYShift = "-20px";
             var highlightYShift = "-40px";
 
-            var buttonRow = document.createElement("div");
-            buttonRow.setAttribute("role", "toolbar");
+            var buttonRow = document.createElement("ul");
             buttonRow.id = "wmd-button-row" + postfix;
             buttonRow.className = 'wmd-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
             var makeButton = function (id, title, XShift, textOp) {
-                var button = document.createElement("span");
-                button.setAttribute("role", "button");
-                button.tabIndex = 0;
+                var button = document.createElement("li");
                 button.className = "wmd-button";
                 button.style.left = xPosition + "px";
                 xPosition += 25;
@@ -1440,47 +1457,46 @@
                 return button;
             };
             var makeSpacer = function (num) {
-                var spacer = document.createElement("span");
-                spacer.setAttribute("role", "separator");
+                var spacer = document.createElement("li");
                 spacer.className = "wmd-spacer wmd-spacer" + num;
                 spacer.id = "wmd-spacer" + num + postfix;
                 buttonRow.appendChild(spacer);
                 xPosition += 25;
             }
 
-            buttons.bold = makeButton("wmd-bold-button", gettext("Bold (Ctrl+B)"), "0px", bindCommand("doBold"));
-            buttons.italic = makeButton("wmd-italic-button", gettext("Italic (Ctrl+I)"), "-20px", bindCommand("doItalic"));
+            buttons.bold = makeButton("wmd-bold-button", getString("bold"), "0px", bindCommand("doBold"));
+            buttons.italic = makeButton("wmd-italic-button", getString("italic"), "-20px", bindCommand("doItalic"));
             makeSpacer(1);
-            buttons.link = makeButton("wmd-link-button", gettext("Hyperlink (Ctrl+L)"), "-40px", bindCommand(function (chunk, postProcessing) {
+            buttons.link = makeButton("wmd-link-button", getString("link"), "-40px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
             }));
-            buttons.quote = makeButton("wmd-quote-button", gettext("Blockquote (Ctrl+Q)"), "-60px", bindCommand("doBlockquote"));
-            buttons.code = makeButton("wmd-code-button", gettext("Code Sample (Ctrl+K)"), "-80px", bindCommand("doCode"));
-            buttons.image = makeButton("wmd-image-button", gettext("Image (Ctrl+G)"), "-100px", bindCommand(function (chunk, postProcessing) {
-                return this.doLinkOrImage(chunk, postProcessing, true, imageUploadHandler);
+            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-60px", bindCommand("doBlockquote"));
+            buttons.code = makeButton("wmd-code-button", getString("code"), "-80px", bindCommand("doCode"));
+            buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
+                return this.doLinkOrImage(chunk, postProcessing, true);
             }));
             makeSpacer(2);
-            buttons.olist = makeButton("wmd-olist-button", gettext("Numbered List (Ctrl+O)"), "-120px", bindCommand(function (chunk, postProcessing) {
+            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-120px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton("wmd-ulist-button", gettext("Bulleted List (Ctrl+U)"), "-140px", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-140px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton("wmd-heading-button", gettext("Heading (Ctrl+H)"), "-160px", bindCommand("doHeading"));
-            buttons.hr = makeButton("wmd-hr-button", gettext("Horizontal Rule (Ctrl+R)"), "-180px", bindCommand("doHorizontalRule"));
+            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-160px", bindCommand("doHeading"));
+            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-180px", bindCommand("doHorizontalRule"));
             makeSpacer(3);
-            buttons.undo = makeButton("wmd-undo-button", gettext("Undo (Ctrl+Z)"), "-200px", null);
+            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-200px", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
-                gettext("Redo (Ctrl+Y)") :
-                gettext("Redo (Ctrl+Shift+Z)"); // mac and other non-Windows platforms
+                getString("redo") :
+                getString("redomac"); // mac and other non-Windows platforms
 
             buttons.redo = makeButton("wmd-redo-button", redoTitle, "-220px", null);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {
-                var helpButton = document.createElement("span");
+                var helpButton = document.createElement("li");
                 var helpButtonImage = document.createElement("span");
                 helpButton.appendChild(helpButtonImage);
                 helpButton.className = "wmd-button wmd-help-button";
@@ -1488,7 +1504,7 @@
                 helpButton.XShift = "-240px";
                 helpButton.isHelp = true;
                 helpButton.style.right = "0px";
-                helpButton.title = helpOptions.title || defaultHelpHoverTitle;
+                helpButton.title = getString("help");
                 helpButton.onclick = helpOptions.handler;
 
                 setupButton(helpButton, true);
@@ -1510,8 +1526,10 @@
 
     }
 
-    function CommandManager(pluginHooks) {
+    function CommandManager(pluginHooks, getString, converter) {
         this.hooks = pluginHooks;
+        this.getString = getString;
+        this.converter = converter;
     }
 
     var commandProto = CommandManager.prototype;
@@ -1541,11 +1559,11 @@
     };
 
     commandProto.doBold = function (chunk, postProcessing) {
-        return this.doBorI(chunk, postProcessing, 2, gettext("strong text"));
+        return this.doBorI(chunk, postProcessing, 2, this.getString("boldexample"));
     };
 
     commandProto.doItalic = function (chunk, postProcessing) {
-        return this.doBorI(chunk, postProcessing, 1, gettext("emphasized text"));
+        return this.doBorI(chunk, postProcessing, 1, this.getString("italicexample"));
     };
 
     // chunk: The selected region that will be enclosed with */**
@@ -1621,7 +1639,56 @@
 
         var defs = "";
         var regex = /(\[)((?:\[[^\]]*\]|[^\[\]])*)(\][ ]?(?:\n[ ]*)?\[)(\d+)(\])/g;
+        
+        // The above regex, used to update [foo][13] references after renumbering,
+        // is much too liberal; it can catch things that are not actually parsed
+        // as references (notably: code). It's impossible to know which matches are
+        // real references without performing a markdown conversion, so that's what
+        // we do. All matches are replaced with a unique reference number, which is
+        // given a unique link. The uniquifier in both cases is the character offset
+        // of the match inside the source string. The modified version is then sent
+        // through the Markdown renderer. Because link reference are stripped during
+        // rendering, the unique link is present in the rendered version if and only
+        // if the match at its offset was in fact rendered as a link or image.
+        var complete = chunk.before + chunk.selection + chunk.after;
+        var rendered = this.converter.makeHtml(complete);
+        var testlink = "http://this-is-a-real-link.biz/";
+        
+        // If our fake link appears in the rendered version *before* we have added it,
+        // this probably means you're a Meta Stack Exchange user who is deliberately
+        // trying to break this feature. You can still break this workaround if you
+        // attach a plugin to the converter that sometimes (!) inserts this link. In
+        // that case, consider yourself unsupported.
+        while (rendered.indexOf(testlink) != -1)
+            testlink += "nicetry/";
+        
+        var fakedefs = "\n\n";
 
+        // the regex is tested on the (up to) three chunks separately, and on substrings,
+        // so in order to have the correct offsets to check against okayToModify(), we
+        // have to keep track of how many characters are in the original source before
+        // the substring that we're looking at. Note that doLinkOrImage aligns the selection
+        // on potential brackets, so there should be no major breakage from the chunk
+        // separation.
+        var skippedChars = 0;
+
+        var uniquified = complete.replace(regex, function uniquify(wholeMatch, before, inner, afterInner, id, end, offset) {
+            skippedChars += offset;
+            fakedefs += " [" + skippedChars + "]: " + testlink + skippedChars + "/unicorn\n";
+            skippedChars += before.length;
+            inner = inner.replace(regex, uniquify);
+            skippedChars -= before.length;
+            var result = before + inner + afterInner + skippedChars + end;
+            skippedChars -= offset;
+            return result;
+        });
+        
+        rendered = this.converter.makeHtml(uniquified + fakedefs);
+        
+        var okayToModify = function(offset) {
+            return rendered.indexOf(testlink + offset + "/unicorn") !== -1;
+        }
+        
         var addDefNumber = function (def) {
             refNumber++;
             def = def.replace(/^[ ]{0,3}\[(\d+)\]:/, "  [" + refNumber + "]:");
@@ -1633,8 +1700,12 @@
         //    of regex, inner is always a proper substring of wholeMatch, and
         // b) more than one level of nesting is neither supported by the regex
         //    nor making a lot of sense (the only use case for nesting is a linked image)
-        var getLink = function (wholeMatch, before, inner, afterInner, id, end) {
+        var getLink = function (wholeMatch, before, inner, afterInner, id, end, offset) {
+            if (!okayToModify(skippedChars + offset))
+                return wholeMatch;
+            skippedChars += offset + before.length;
             inner = inner.replace(regex, getLink);
+            skippedChars -= offset + before.length;
             if (defsToAdd[id]) {
                 addDefNumber(defsToAdd[id]);
                 return before + inner + afterInner + refNumber + end;
@@ -1642,14 +1713,18 @@
             return wholeMatch;
         };
 
+        var len = chunk.before.length;
         chunk.before = chunk.before.replace(regex, getLink);
-
+        skippedChars += len;
+        
+        len = chunk.selection.length;
         if (linkDef) {
             addDefNumber(linkDef);
         }
         else {
             chunk.selection = chunk.selection.replace(regex, getLink);
         }
+        skippedChars += len;        
 
         var refOut = refNumber;
 
@@ -1671,23 +1746,52 @@
     // sure the URL and the optinal title are "nice".
     function properlyEncoded(linkdef) {
         return linkdef.replace(/^\s*(.*?)(?:\s+"(.+)")?\s*$/, function (wholematch, link, title) {
-            link = link.replace(/\?.*$/, function (querypart) {
-                return querypart.replace(/\+/g, " "); // in the query string, a plus and a space are identical
-            });
-            link = decodeURIComponent(link); // unencode first, to prevent double encoding
-            link = encodeURI(link).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29');
-            link = link.replace(/\?.*$/, function (querypart) {
-                return querypart.replace(/\+/g, "%2b"); // since we replaced plus with spaces in the query part, all pluses that now appear where originally encoded
-            });
+            
+            var inQueryString = false;
+
+            // Having `[^\w\d-./]` in there is just a shortcut that lets us skip
+            // the most common characters in URLs. Replacing that it with `.` would not change
+            // the result, because encodeURI returns those characters unchanged, but it
+            // would mean lots of unnecessary replacement calls. Having `[` and `]` in that
+            // section as well means we do *not* enocde square brackets. These characters are
+            // a strange beast in URLs, but if anything, this causes URLs to be more readable,
+            // and we leave it to the browser to make sure that these links are handled without
+            // problems.
+            link = link.replace(/%(?:[\da-fA-F]{2})|\?|\+|[^\w\d-./[\]]/g, function (match) {
+                // Valid percent encoding. Could just return it as is, but we follow RFC3986
+                // Section 2.1 which says "For consistency, URI producers and normalizers
+                // should use uppercase hexadecimal digits for all percent-encodings."
+                // Note that we also handle (illegal) stand-alone percent characters by
+                // replacing them with "%25"
+                if (match.length === 3 && match.charAt(0) == "%") {
+                    return match.toUpperCase();
+                }
+                switch (match) {
+                    case "?":
+                        inQueryString = true;
+                        return "?";
+                        break;
+                    
+                    // In the query string, a plus and a space are identical -- normalize.
+                    // Not strictly necessary, but identical behavior to the previous version
+                    // of this function.
+                    case "+":
+                        if (inQueryString)
+                            return "%20";
+                        break;
+                }
+                return encodeURI(match);
+            })
+            
             if (title) {
                 title = title.trim ? title.trim() : title.replace(/^\s*/, "").replace(/\s*$/, "");
-                title = $.trim(title).replace(/"/g, "quot;").replace(/\(/g, "&#40;").replace(/\)/g, "&#41;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                title = title.replace(/"/g, "quot;").replace(/\(/g, "&#40;").replace(/\)/g, "&#41;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
             }
             return title ? link + ' "' + title + '"' : link;
         });
     }
 
-    commandProto.doLinkOrImage = function (chunk, postProcessing, isImage, imageUploadHandler) {
+    commandProto.doLinkOrImage = function (chunk, postProcessing, isImage) {
 
         chunk.trimWhitespace();
         chunk.findTags(/\s*!?\[/, /\][ ]?(?:\n[ ]*)?(\[.*?\])?/);
@@ -1748,10 +1852,10 @@
 
                     if (!chunk.selection) {
                         if (isImage) {
-                            chunk.selection = gettext("enter image description here");
+                            chunk.selection = that.getString("imagedescription");
                         }
                         else {
-                            chunk.selection = gettext("enter link description here");
+                            chunk.selection = that.getString("linkdescription");
                         }
                     }
                 }
@@ -1762,10 +1866,10 @@
 
             if (isImage) {
                 if (!this.hooks.insertImageDialog(linkEnteredCallback))
-                    ui.prompt(imageDialogText, imageDefaultText, linkEnteredCallback, imageUploadHandler);
+                    ui.prompt(this.getString("imagedialog"), imageDefaultText, linkEnteredCallback);
             }
             else {
-                ui.prompt(linkDialogText, linkDefaultText, linkEnteredCallback);
+                ui.prompt(this.getString("linkdialog"), linkDefaultText, linkEnteredCallback);
             }
             return true;
         }
@@ -1832,7 +1936,7 @@
             });
 
         chunk.selection = chunk.selection.replace(/^(\s|>)+$/, "");
-        chunk.selection = chunk.selection || gettext("Blockquote");
+        chunk.selection = chunk.selection || this.getString("quoteexample");
 
         // The original code uses a regular expression to find out how much of the
         // text *directly before* the selection already was a blockquote:
@@ -1859,7 +1963,7 @@
         //
         // Since this is essentially a backwards-moving regex, it's susceptible to
         // catstrophic backtracking and can cause the browser to hang;
-        // see e.g. http://meta.stackoverflow.com/questions/9807.
+        // see e.g. http://meta.stackexchange.com/questions/9807.
         //
         // Hence we replaced this by a simple state machine that just goes through the
         // lines and checks for a), b), and c).
@@ -1989,7 +2093,7 @@
 
             if (!chunk.selection) {
                 chunk.startTag = "    ";
-                chunk.selection = gettext("enter code here");
+                chunk.selection = this.getString("codeexample");
             }
             else {
                 if (/^[ ]{0,3}\S/m.test(chunk.selection)) {
@@ -1999,7 +2103,7 @@
                         chunk.before += "    ";
                 }
                 else {
-                    chunk.selection = chunk.selection.replace(/^[ ]{4}/gm, "");
+                    chunk.selection = chunk.selection.replace(/^(?:[ ]{4}|[ ]{0,3}\t)/gm, "");
                 }
             }
         }
@@ -2012,7 +2116,7 @@
             if (!chunk.startTag && !chunk.endTag) {
                 chunk.startTag = chunk.endTag = "`";
                 if (!chunk.selection) {
-                    chunk.selection = gettext("enter code here");
+                    chunk.selection = this.getString("codeexample");
                 }
             }
             else if (chunk.endTag && !chunk.startTag) {
@@ -2106,7 +2210,7 @@
             });
 
         if (!chunk.selection) {
-            chunk.selection = gettext("List item");
+            chunk.selection = this.getString("litem");
         }
 
         var prefix = getItemPrefix();
@@ -2138,7 +2242,7 @@
         // make a level 2 hash header around some default text.
         if (!chunk.selection) {
             chunk.startTag = "## ";
-            chunk.selection = gettext("Heading");
+            chunk.selection = this.getString("headingexample");
             chunk.endTag = " ##";
             return;
         }
