@@ -109,8 +109,7 @@ class DjangoKeyValueStore(KeyValueStore):
         Scope.user_state_summary,
         Scope.user_state,
         Scope.preferences,
-        Scope.user_info,
-        RemoteScope.user_state
+        Scope.user_info
     )
 
     def __init__(self, field_data_cache):
@@ -403,7 +402,7 @@ class UserStateCache(object):
         ).get(kvs_key.field_name)
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
-    def set_many(self, kv_dict):
+    def set_many(self, kv_dict, remote_username=None):
         """
         Set the specified fields to the supplied values.
 
@@ -417,13 +416,19 @@ class UserStateCache(object):
 
             pending_updates[cache_key][kvs_key.field_name] = value
 
+        if remote_username is None:
+            username = self.user.username
+        else:
+            username = remote_username
+            print username
+
         try:
             self._client.set_many(
-                self.user.username,
+                username,
                 pending_updates
             )
         except DatabaseError:
-            log.exception("Saving user state failed for %s", self.user.username)
+            log.exception("Saving user state failed for %s", username)
             raise KeyValueMultiSaveError([])
         finally:
             self._cache.update(pending_updates)
@@ -504,6 +509,9 @@ class UserStateCache(object):
             student_module.grade = score
             student_module.max_grade = max_score
             student_module.save()
+
+    def remote_get(self, username, block_key, fields):
+        return self._client.get(username, block_key, Scope.user_state, fields)
 
     def __len__(self):
         return len(self._cache)
@@ -848,9 +856,10 @@ class FieldDataCache(object):
 
         if key.queryable is not None:
             user = user_by_anonymous_id(key.user_id)
-            print 'self user', self.user
-            print 'user:', user
-            raw_input()
+            return self.cache[key.scope].remote_get(
+                user.username, 
+                key.block_scope_id, 
+                [key.field_name])[key.field_name]
 
         return self.cache[key.scope].get(key)
 
@@ -867,9 +876,11 @@ class FieldDataCache(object):
 
         saved_fields = []
         by_scope = defaultdict(dict)
+        by_user_scope = defaultdict(dict)
+
         for key, value in kv_dict.iteritems():
 
-            if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+            if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and key.queryable is None:
                 # If we're getting user data, we expect that the key matches the
                 # user we were constructed for.
                 assert key.user_id == self.user.id
@@ -877,7 +888,11 @@ class FieldDataCache(object):
             if key.scope not in self.cache:
                 continue
 
-            by_scope[key.scope][key] = value
+            if key.queryable is None:
+                by_scope[key.scope][key] = value
+            else:
+                by_user_scope[key.user_id] = defaultdict(dict)
+                by_user_scope[key.user_id][key.scope][key] = value
 
         for scope, set_many_data in by_scope.iteritems():
             try:
@@ -888,6 +903,15 @@ class FieldDataCache(object):
             except KeyValueMultiSaveError as exc:
                 log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
                 raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
+
+        for user_id, by_scope_data in by_user_scope.iteritems():
+            user = user_by_anonymous_id(user_id)
+            for scope, set_many_data in by_scope_data.iteritems():
+                try:
+                    self.cache[scope].set_many(set_many_data, user.username)
+                except KeyValueMultiSaveError as exc:
+                    log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
+                    raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
 
     @contract(key=DjangoKeyValueStore.Key)
     def delete(self, key):
@@ -928,8 +952,6 @@ class FieldDataCache(object):
 
         if key.scope not in self.cache:
             return False
-        print 'in field data cache'
-        print key.user_id
 
         return self.cache[key.scope].has(key)
 
