@@ -75,7 +75,6 @@ pysrt==0.4.7
 PyYAML==3.10
 requests==2.3.0
 requests-oauthlib==0.4.1
-rfc6266==0.0.4
 scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
