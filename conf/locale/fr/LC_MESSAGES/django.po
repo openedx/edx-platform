@@ -176,7 +176,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-22 17:45+0000\n"
+"POT-Creation-Date: 2015-07-27 13:47+0000\n"
 "PO-Revision-Date: 2015-06-19 17:16+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -688,6 +688,10 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Value of the enrollment attribute"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The course you are looking for does not start until {date}."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -3223,6 +3227,16 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Proctored Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed and proctored exams are "
+"enabled in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
 msgstr ""
 
@@ -3798,6 +3812,44 @@ msgstr "Est un examen d'entrée"
 msgid ""
 "Tag this course module as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Time Limited"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether students have a limited time to view or "
+"interact with this courseware component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Time Limit in Minutes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"The number of minutes available to students for viewing or interacting with "
+"this courseware component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Proctoring Enabled"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "This setting indicates whether this exam is a proctored exam."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Practice Exam"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether this exam is for testing purposes only. "
+"Practice exams are not verified."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -8019,8 +8071,12 @@ msgstr ""
 msgid "last_activity is not yet supported"
 msgstr ""
 
+#. Translators: 'ordering' is a string describing a way
+#. of ordering a list. For example, {ordering} may be
+#. 'name', indicating that the user wants to sort the
+#. list by lower case name.
 #: lms/djangoapps/teams/views.py
-msgid "The ordering {} is not supported"
+msgid "The ordering {ordering} is not supported"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -12723,22 +12779,21 @@ msgstr "Bonjour {name},"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive university credit from edX "
-"partners! Click {link} to get your credit now."
+"Congratulations! You are eligible to receive course credit for successfully "
+"completing your edX course! Click {link} to get your credit now."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Credit from can help you get a jump start on your university degree, finish "
-"a degree already started, or fulfill requirements at a different academic "
-"institution."
+"Course credit can help you get a jump start on your university degree, "
+"finish a degree already started, or fulfill requirements at a different "
+"academic institution."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get university credit for {course_name}, simply go to your {link} and "
-"click the yellow \"Get Credit\" button. No application, transcript, or grade"
-" report is required."
+"To get course credit, simply go to your {link} and click the <b>Get "
+"Credit</b> button. No application, transcript, or grade report is required."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -12752,7 +12807,7 @@ msgid "The edX team"
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid "Find more edX courses you can take for university credit."
+msgid "For more information on credit at edX, click {link}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
