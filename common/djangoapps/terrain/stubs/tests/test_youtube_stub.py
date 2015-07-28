@@ -10,6 +10,7 @@ from ..youtube import StubYouTubeService
 class StubYouTubeServiceTest(unittest.TestCase):
 
     def setUp(self):
+        super(StubYouTubeServiceTest, self).setUp()
         self.server = StubYouTubeService()
         self.url = "http://127.0.0.1:{0}/".format(self.server.port)
         self.server.config['time_to_response'] = 0.0
@@ -19,6 +20,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
         response = requests.get(self.url + 'unused_url')
         self.assertEqual("Unused url", response.content)
 
+    @unittest.skip('Failing intermittently due to inconsistent responses from YT. See TE-871')
     def test_video_url(self):
         response = requests.get(
             self.url + 'test_youtube/OEoXaMPEzfM?v=2&alt=jsonc&callback=callback_func'

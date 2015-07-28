@@ -253,6 +253,11 @@ THIRD_PARTY_AUTH = {
     },
 }
 
+AUTHENTICATION_BACKENDS += (
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.facebook.FacebookOAuth2'
+)
+
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True

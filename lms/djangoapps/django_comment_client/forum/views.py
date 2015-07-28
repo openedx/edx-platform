@@ -77,7 +77,7 @@ def make_course_settings(course):
 def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
-    if something goes wrong.
+    if something goes wrong. It may also raise ValueError if the group_id is invalid.
     """
     default_query_params = {
         'page': 1,
@@ -109,17 +109,25 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
+    is_cohorted = is_commentable_cohorted(course_key, discussion_id)
 
-    if group_id == "all":
+    if group_id in ("all", "None"):
         group_id = None
 
-    if not group_id:
-        if not cached_has_permission(request.user, "see_all_cohorts", course_key):
-            group_id = get_cohort_id(request.user, course_key)
-            if not group_id and get_cohorted_threads_privacy(course_key) == 'cohort-only':
-                default_query_params['exclude_groups'] = True
+    if not cached_has_permission(request.user, "see_all_cohorts", course_key):
+        group_id = get_cohort_id(request.user, course_key)
+        if not group_id and get_cohorted_threads_privacy(course_key) == 'cohort-only':
+            default_query_params['exclude_groups'] = True
 
     if group_id:
+        group_id = int(group_id)
+        try:
+            CourseUserGroup.objects.get(course_id=course_key, id=group_id)
+        except CourseUserGroup.DoesNotExist:
+            if not is_cohorted:
+                group_id = None
+            else:
+                raise ValueError("Invalid Group ID")
         default_query_params["group_id"] = group_id
 
     #so by default, a moderator sees all items, and a student sees his cohort
@@ -143,6 +151,9 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
         )
     )
 
+    if not is_cohorted:
+        query_params.pop('group_id', None)
+
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
     threads = _set_group_names(course_key, threads)
 
@@ -153,12 +164,12 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     return threads, query_params
 
 
-def _set_group_names(course_id, threads):
+def _set_group_names(course_key, threads):
     """ Adds group name if the thread has a group id"""
 
     for thread in threads:
-        if thread.get('group_id'):
-            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+        if thread.get('group_id') and is_commentable_cohorted(course_key, thread):
+            thread['group_name'] = get_cohort_by_id(course_key, thread.get('group_id')).name
             thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
         else:
             thread['group_name'] = ""
@@ -229,7 +240,7 @@ def forum_form_discussion(request, course_key):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course)
 
     user = cc.User.from_django_user(request.user)
