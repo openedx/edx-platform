@@ -97,7 +97,7 @@ def _get_min_grade_requirement(course_key):
             {
                 "namespace": "grade",
                 "name": "grade",
-                "display_name": "Grade",
+                "display_name": "Minimum Grade",
                 "criteria": {
                     "min_grade": getattr(course, "minimum_grade_credit")
                 },
