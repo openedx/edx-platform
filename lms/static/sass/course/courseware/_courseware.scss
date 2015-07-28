@@ -113,6 +113,19 @@ div.course-wrapper {
         font-size: 26px;
         font-weight: 600;
       }
+      h4 {
+        margin: 20px 0;
+        font-weight: 600;
+        b.success {
+          color: #2B8048;
+        }
+        b.success {
+          color: #2B8048;
+        }
+        b.failure {
+          color: #CB4765;
+        }
+      }
       p {
         color: #797676;
         strong {
@@ -142,12 +155,34 @@ div.course-wrapper {
         border-left: 4px solid #b30101 !important;
         margin: 0 auto;
       }
+      &.success {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
+      &.failure {
+        border-left: 4px solid #C93B34 !important;
+        margin: 0 auto;
+      }
     }
     div.proctored-exam {
       @extend .timed-exam;
       .proctored-exam-message {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
         padding-top: 25px;
+      }
+      button {
+        background: #126F9A;
+        color: $white;
+        font-size: 16px;
+        padding: 16px 30px;
+        font-weight: 200;
+        border: none;
+        &:hover {
+          background-color: #035E88;
+        }
+      }
+      hr {
+        border-bottom: 1px solid rgb(207, 216, 220);
       }
       .gated-sequence {
         border-bottom: 2px solid rgb(207, 216, 220);
@@ -191,22 +226,41 @@ div.course-wrapper {
     .footer-sequence {
       padding: 30px 0px 20px 0px;
       border-bottom: ($baseline/10) solid #CFD9DD;
+      hr {
+        border-bottom: 1px solid rgb(207, 216, 220);
+      }
+      .clearfix {
+        clear: both;
+      }
       h4 {
         margin-bottom: 12px;
         font-size: 22px;
         font-weight: 400;
       }
       span {
+        margin-bottom: 10px;
+        display: inline-block;
         font-weight: 600;
+      }
+      p.proctored-exam-option {
+        float: left;
+        width: 80%;
+        margin-bottom: 25px;
+
+      }
+      a.contest-review {
+        float: right;
+        font-size: 12px;
+        margin: 0;
+        width: 20%;
+        text-align: right;
       }
       p {
         margin-bottom: ($baseline/20);
         color: #797676;
       }
-      .proctored-exam-option{
-        border-top: 2px solid rgb(207, 216, 220);
+      .padding-top{
         padding: ($baseline/2) 0;
-        border-bottom: 2px solid rgb(207, 216, 220);
       }
     }
     .border-b-0 {
