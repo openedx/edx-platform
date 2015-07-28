@@ -12,4 +12,4 @@
 -e git+https://github.com/OfficeDev/xblock-officemix/@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock_officemix-master
 -e git+https://github.com/edx/edx-notifications.git@4e3323da6775a101da5d8beab80c231278df69d2#egg=edx-notifications
 -e git+https://github.com/open-craft/problem-builder.git@f42c7c572c7c9e5155062f3f1874714abf63e92a#egg=problem-builder
--e git+https://github.com/open-craft/xblock-group-project-v2.git@96337508db7d0b2b9e1ace963b48476ff3275d93#egg=xblock-group-project-v2
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@3c4b014a2de30e1747ea8c1c8bf51a2060e5868a#egg=xblock-group-project-v2
