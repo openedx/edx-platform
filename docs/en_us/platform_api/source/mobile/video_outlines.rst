@@ -1,18 +1,18 @@
 ##################################################
-Mobile Video Outlines API
+Mobile API Video Outlines Resource
 ##################################################
 
-This page describes how to use the Mobile Video Outlines API to
-complete these actions:
+With the Mobile API **Video Outlines** resource, you can complete the
+following tasks.
 
-* `Get the Video List`_
-* `Get a Video Transcript`_
+* :ref:`Get a list of all videos in the course <Get the Video List>`.
+* :ref:`Get a transcript for a specified video and language <Get a Video Transcript>`.
 
 .. _Get the Video List:
 
-*******************
-Get the Video List
-*******************
+**************************
+Get the Course Video List
+**************************
 
 .. autoclass:: mobile_api.video_outlines.views.VideoSummaryList
 
@@ -71,7 +71,3 @@ Get a Video Transcript
 ***********************
 
 .. autoclass:: mobile_api.video_outlines.views.VideoTranscripts
-    
-**Response Values**
-
-An HttpResponse with an SRT file download.

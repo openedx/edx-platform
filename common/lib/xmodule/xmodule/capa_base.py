@@ -143,9 +143,10 @@ class CapaFields(object):
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
-        help=_("Defines how often inputs are randomized when a student loads the problem. "
-               "This setting only applies to problems that can have randomly generated numeric values. "
-               "A default value can be set in Advanced Settings."),
+        help=_(
+            'Defines when to randomize the variables specified in the associated Python script. '
+            'For problems that do not randomize values, specify \"Never\". '
+        ),
         default=RANDOMIZATION.NEVER,
         scope=Scope.settings,
         values=[
@@ -469,7 +470,7 @@ class CapaMixin(CapaFields):
 
         # If the problem is closed (and not a survey question with max_attempts==0),
         # then do NOT show the reset button.
-        if (self.closed() and not is_survey_question):
+        if self.closed() and not is_survey_question:
             return False
 
         # Button only shows up for randomized problems if the question has been submitted

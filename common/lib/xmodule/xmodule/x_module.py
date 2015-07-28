@@ -278,6 +278,10 @@ class XModuleMixin(XModuleFields, XBlock):
     # (like a practice problem).
     has_score = False
 
+    # Whether this module can be displayed in read-only mode.  It is safe to set this to True if
+    # all user state is handled through the FieldData API.
+    show_in_read_only_mode = False
+
     # Class level variable
 
     # True if this descriptor always requires recalculation of grades, for
@@ -371,7 +375,7 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         result = {}
         for field in self.fields.values():
-            if (field.scope == scope and field.is_set_on(self)):
+            if field.scope == scope and field.is_set_on(self):
                 result[field.name] = field.read_json(self)
         return result
 
@@ -760,6 +764,7 @@ class XModule(HTMLSnippet, XModuleMixin):  # pylint: disable=abstract-method
     entry_point = "xmodule.v1"
 
     has_score = descriptor_attr('has_score')
+    show_in_read_only_mode = descriptor_attr('show_in_read_only_mode')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
     _dirty_fields = descriptor_attr('_dirty_fields')

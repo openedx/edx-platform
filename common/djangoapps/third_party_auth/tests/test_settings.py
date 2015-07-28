@@ -21,10 +21,10 @@ _SETTINGS_MAP = {
 class SettingsUnitTest(testutil.TestCase):
     """Unit tests for settings management code."""
 
-    # Allow access to protected methods (or module-protected methods) under
-    # test. pylint: disable-msg=protected-access
+    # Allow access to protected methods (or module-protected methods) under test.
+    # pylint: disable=protected-access
     # Suppress sprurious no-member warning on fakes.
-    # pylint: disable-msg=no-member
+    # pylint: disable=no-member
 
     def setUp(self):
         super(SettingsUnitTest, self).setUp()

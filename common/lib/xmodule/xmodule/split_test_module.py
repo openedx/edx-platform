@@ -375,6 +375,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
     mako_template = "widgets/metadata-only-edit.html"
 
+    show_in_read_only_mode = True
+
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
     get_content_titles = module_attr('get_content_titles')

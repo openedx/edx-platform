@@ -80,9 +80,12 @@ class Command(BaseCommand):
                 self.remove_studentmodulehistory_input_state(hist_module, save_changes)
 
             if self.num_visited % 1000 == 0:
-                LOG.info(" Progress: updated {0} of {1} student modules".format(self.num_changed, self.num_visited))
-                LOG.info(" Progress: updated {0} of {1} student history modules".format(self.num_hist_changed,
-                                                                                        self.num_hist_visited))
+                LOG.info(" Progress: updated %s of %s student modules", self.num_changed, self.num_visited)
+                LOG.info(
+                    " Progress: updated %s of %s student history modules",
+                    self.num_hist_changed,
+                    self.num_hist_visited
+                )
 
     @transaction.autocommit
     def remove_studentmodule_input_state(self, module, save_changes):
@@ -90,9 +93,11 @@ class Command(BaseCommand):
         module_state = module.state
         if module_state is None:
             # not likely, since we filter on it.  But in general...
-            LOG.info("No state found for {type} module {id} for student {student} in course {course_id}"
-                     .format(type=module.module_type, id=module.module_state_key,
-                             student=module.student.username, course_id=module.course_id))
+            LOG.info(
+                "No state found for %s module %s for student %s in course %s",
+                module.module_type, module.module_state_key,
+                module.student.username, module.course_id
+            )
             return
 
         state_dict = json.loads(module_state)
@@ -116,9 +121,11 @@ class Command(BaseCommand):
         module_state = module.state
         if module_state is None:
             # not likely, since we filter on it.  But in general...
-            LOG.info("No state found for {type} module {id} for student {student} in course {course_id}"
-                     .format(type=module.module_type, id=module.module_state_key,
-                             student=module.student.username, course_id=module.course_id))
+            LOG.info(
+                "No state found for %s module %s for student %s in course %s",
+                module.module_type, module.module_state_key,
+                module.student.username, module.course_id
+            )
             return
 
         state_dict = json.loads(module_state)
@@ -142,10 +149,13 @@ class Command(BaseCommand):
             raise CommandError("missing idlist file")
         idlist_path = args[0]
         save_changes = options['save_changes']
-        LOG.info("Starting run:  reading from idlist file {0}; save_changes = {1}".format(idlist_path, save_changes))
+        LOG.info("Starting run:  reading from idlist file %s; save_changes = %s", idlist_path, save_changes)
 
         self.fix_studentmodules_in_list(save_changes, idlist_path)
 
-        LOG.info("Finished run:  updating {0} of {1} student modules".format(self.num_changed, self.num_visited))
-        LOG.info("Finished run:  updating {0} of {1} student history modules".format(self.num_hist_changed,
-                                                                                     self.num_hist_visited))
+        LOG.info("Finished run:  updating %s of %s student modules", self.num_changed, self.num_visited)
+        LOG.info(
+            "Finished run:  updating %s of %s student history modules",
+            self.num_hist_changed,
+            self.num_hist_visited
+        )

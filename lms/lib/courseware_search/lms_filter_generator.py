@@ -72,7 +72,7 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
                     course_key = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
 
                 # Staff user looking at course as staff user
-                if get_user_role(user, course_key) == 'staff':
+                if get_user_role(user, course_key) in ('instructor', 'staff'):
                     return filter_dictionary
                 # Need to check course exist (if course gets deleted enrollments don't get cleaned up)
                 course = modulestore().get_course(course_key)

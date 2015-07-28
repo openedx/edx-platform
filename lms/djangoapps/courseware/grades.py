@@ -230,14 +230,16 @@ def answer_distributions(course_key):
                 answer_counts[(url, display_name, problem_part_id)][answer] += 1
 
         except (ItemNotFoundError, InvalidKeyError):
-            msg = "Answer Distribution: Item {} referenced in StudentModule {} " + \
-                  "for user {} in course {} not found; " + \
-                  "This can happen if a student answered a question that " + \
-                  "was later deleted from the course. This answer will be " + \
-                  "omitted from the answer distribution CSV."
-            log.warning(
-                msg.format(module.module_state_key, module.id, module.student_id, course_key)
+            msg = (
+                "Answer Distribution: Item {} referenced in StudentModule {} " +
+                "for user {} in course {} not found; " +
+                "This can happen if a student answered a question that " +
+                "was later deleted from the course. This answer will be " +
+                "omitted from the answer distribution CSV."
+            ).format(
+                module.module_state_key, module.id, module.student_id, course_key
             )
+            log.warning(msg)
             continue
 
     return answer_counts

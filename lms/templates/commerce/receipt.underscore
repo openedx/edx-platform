@@ -73,6 +73,9 @@
               </p>
             </div>
         <% } %>
+
+        <div class="report report-receipt report-receipt-provider hidden" id="receipt-provider"></div>
+
       </div>
     </div>
     <% } else { %>

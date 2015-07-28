@@ -462,7 +462,7 @@ def get_or_create_sjson(item, transcripts):
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
         sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
-    except (NotFoundError):  # generating sjson from srt
+    except NotFoundError:  # generating sjson from srt
         generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
     sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     return sjson_transcript

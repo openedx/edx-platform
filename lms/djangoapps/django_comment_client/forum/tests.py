@@ -2,7 +2,6 @@ import json
 import logging
 
 import ddt
-from django.core import cache
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
@@ -317,11 +316,11 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
     @ddt.data(
         # old mongo with cache
-        (ModuleStoreEnum.Type.mongo, 1, 7, 5, 12, 7),
-        (ModuleStoreEnum.Type.mongo, 50, 7, 5, 12, 7),
+        (ModuleStoreEnum.Type.mongo, 1, 7, 5, 13, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 7, 5, 13, 8),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 12, 7),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 12, 7),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 13, 8),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 13, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(

@@ -20,7 +20,7 @@ from opaque_keys import InvalidKeyError
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseAccessRole
 
     email = forms.EmailField(required=True)
@@ -123,7 +123,7 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         model = LinkedInAddToProfileConfiguration
 
     # Exclude deprecated fields

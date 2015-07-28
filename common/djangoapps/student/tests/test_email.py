@@ -11,11 +11,11 @@ from student.views import (
 from student.models import UserProfile, PendingEmailChange
 from django.core.urlresolvers import reverse
 from django.core import mail
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request

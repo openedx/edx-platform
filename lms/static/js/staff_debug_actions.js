@@ -11,7 +11,12 @@ var StaffDebug = (function(){
     return url;
   }
 
+  sanitized_string = function(string) {
+    return string.replace(/[.*+?^:${}()|[\]\\]/g, "\\$&");
+  }
+
   get_user = function(locname){
+    locname = sanitized_string(locname);
     var uname = $('#sd_fu_' + locname).val();
     if (uname==""){
         uname =  $('#sd_fu_' + locname).attr('placeholder');
@@ -108,7 +113,8 @@ var StaffDebug = (function(){
       do_idash_action: do_idash_action,
       get_current_url: get_current_url,
       get_url: get_url,
-      get_user: get_user
+      get_user: get_user,
+      sanitized_string:sanitized_string
   }
 })();
 

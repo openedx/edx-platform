@@ -1,7 +1,7 @@
 """
 Single page performance tests for LMS.
 """
-from bok_choy.web_app_test import WebAppTest, with_cache
+from bok_choy.web_app_test import with_cache
 from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.dashboard import DashboardPage

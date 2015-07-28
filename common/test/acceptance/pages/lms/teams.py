@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Teams page.
+Teams pages.
 """
 
 from .course_page import CoursePage
@@ -9,6 +9,8 @@ from ..common.paging import PaginatedUIMixin
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
+TEAMS_LINK_CSS = '.action-view'
+TEAMS_HEADER_CSS = '.teams-header'
 
 
 class TeamsPage(CoursePage):
@@ -53,3 +55,50 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
     def topic_cards(self):
         """Return a list of the topic cards present on the page."""
         return self.q(css=TOPIC_CARD_CSS).results
+
+    def browse_teams_for_topic(self, topic_name):
+        """
+        Show the teams list for `topic_name`.
+        """
+        self.q(css=TEAMS_LINK_CSS).filter(
+            text='View Teams in the {topic_name} Topic'.format(topic_name=topic_name)
+        )[0].click()
+        self.wait_for_ajax()
+
+
+class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
+    """
+    The paginated UI for browsing teams within a Topic on the Teams
+    page.
+    """
+    def __init__(self, browser, course_id, topic):
+        """
+        Set up `self.url_path` on instantiation, since it dynamically
+        reflects the current topic.  Note that `topic` is a dict
+        representation of a topic following the same convention as a
+        course module's topic.
+        """
+        super(BrowseTeamsPage, self).__init__(browser, course_id)
+        self.topic = topic
+        self.url_path = "teams/#topics/{topic_id}".format(topic_id=self.topic['id'])
+
+    def is_browser_on_page(self):
+        """Check if we're on the teams list page for a particular topic."""
+        has_correct_url = self.url.endswith(self.url_path)
+        teams_list_view_present = self.q(css='.teams-main').present
+        return has_correct_url and teams_list_view_present
+
+    @property
+    def header_topic_name(self):
+        """Get the topic name displayed by the page header"""
+        return self.q(css=TEAMS_HEADER_CSS + ' .page-title')[0].text
+
+    @property
+    def header_topic_description(self):
+        """Get the topic description displayed by the page header"""
+        return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text
+
+    @property
+    def team_cards(self):
+        """Get all the team cards on the page."""
+        return self.q(css='.team-card')

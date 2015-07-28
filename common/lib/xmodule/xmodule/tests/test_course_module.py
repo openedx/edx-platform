@@ -241,25 +241,25 @@ class IsNewCourseTestCase(unittest.TestCase):
 
     def test_is_newish(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=False)
-        assert(descriptor.is_newish is False)
+        assert descriptor.is_newish is False
 
         descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=True)
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2013-01-15T12:00')
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2013-03-01T12:00')
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
         descriptor = get_dummy_course(start='2012-10-15T12:00')
-        assert(descriptor.is_newish is False)
+        assert descriptor.is_newish is False
 
         descriptor = get_dummy_course(start='2012-12-31T12:00')
-        assert(descriptor.is_newish is True)
+        assert descriptor.is_newish is True
 
     def test_end_date_text(self):
         # No end date set, returns empty string.

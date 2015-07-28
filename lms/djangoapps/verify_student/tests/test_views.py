@@ -17,7 +17,6 @@ from mock import patch, Mock, ANY
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
@@ -33,7 +32,6 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
 from embargo.test_utils import restrict_course
-from microsite_configuration import microsite
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from shoppingcart.models import Order, CertificateItem
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -42,11 +40,12 @@ from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 from verify_student.views import (
     checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
-    _send_email, _compose_message_reverification_email
+    _compose_message_reverification_email
 )
 from verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationCheckpoint,
-    InCourseReverificationConfiguration, VerificationStatus
+    VerificationDeadline, SoftwareSecurePhotoVerification,
+    VerificationCheckpoint, InCourseReverificationConfiguration,
+    VerificationStatus
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -614,15 +613,15 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_contribution_amount(response, "12.34")
 
     def test_verification_deadline(self):
-        # Set a deadline on the course mode
+        deadline = datetime(2999, 1, 2, tzinfo=pytz.UTC)
         course = self._create_course("verified")
-        mode = CourseMode.objects.get(
-            course_id=course.id,
-            mode_slug="verified"
-        )
-        expiration = datetime(2999, 1, 2, tzinfo=pytz.UTC)
-        mode.expiration_datetime = expiration
-        mode.save()
+
+        # Set a deadline on the course mode AND on the verification deadline model.
+        # This simulates the common case in which the upgrade deadline (course mode expiration)
+        # and the verification deadline are the same.
+        # NOTE: we used to use the course mode expiration datetime for BOTH of these deadlines,
+        # before the VerificationDeadline model was introduced.
+        self._set_deadlines(course.id, upgrade_deadline=deadline, verification_deadline=deadline)
 
         # Expect that the expiration date is set
         response = self._get_page("verify_student_start_flow", course.id)
@@ -630,20 +629,79 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(data['verification_deadline'], "Jan 02, 2999 at 00:00 UTC")
 
     def test_course_mode_expired(self):
+        deadline = datetime(1999, 1, 2, tzinfo=pytz.UTC)
         course = self._create_course("verified")
-        mode = CourseMode.objects.get(
-            course_id=course.id,
-            mode_slug="verified"
-        )
-        expiration = datetime(1999, 1, 2, tzinfo=pytz.UTC)
-        mode.expiration_datetime = expiration
-        mode.save()
+
+        # Set the upgrade deadline (course mode expiration) and verification deadline
+        # to the same value.  This used to be the default when we used the expiration datetime
+        # for BOTH values.
+        self._set_deadlines(course.id, upgrade_deadline=deadline, verification_deadline=deadline)
 
         # Need to be enrolled
         self._enroll(course.id, "verified")
 
         # The course mode has expired, so expect an explanation
         # to the student that the deadline has passed
+        response = self._get_page("verify_student_verify_now", course.id)
+        self.assertContains(response, "verification deadline")
+        self.assertContains(response, "Jan 02, 1999 at 00:00 UTC")
+
+    @ddt.data(datetime(2999, 1, 2, tzinfo=pytz.UTC), None)
+    def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
+        course = self._create_course("verified")
+
+        # Set the upgrade deadline in the past, but the verification
+        # deadline in the future.
+        self._set_deadlines(
+            course.id,
+            upgrade_deadline=datetime(1999, 1, 2, tzinfo=pytz.UTC),
+            verification_deadline=verification_deadline,
+        )
+
+        # Try to pay or upgrade.
+        # We should get an error message since the deadline has passed.
+        for page_name in ["verify_student_start_flow", "verify_student_upgrade_and_verify"]:
+            response = self._get_page(page_name, course.id)
+            self.assertContains(response, "Upgrade Deadline Has Passed")
+
+        # Simulate paying for the course and enrolling
+        self._enroll(course.id, "verified")
+
+        # Enter the verification part of the flow
+        # Expect that we are able to verify
+        response = self._get_page("verify_student_verify_now", course.id)
+        self.assertNotContains(response, "Verification is no longer available")
+
+        data = self._get_page_data(response)
+        self.assertEqual(data['message_key'], PayAndVerifyView.VERIFY_NOW_MSG)
+
+        # Check that the verification deadline (rather than the upgrade deadline) is displayed
+        if verification_deadline is not None:
+            self.assertEqual(data["verification_deadline"], "Jan 02, 2999 at 00:00 UTC")
+        else:
+            self.assertEqual(data["verification_deadline"], "")
+
+    def test_course_mode_not_expired_verification_deadline_passed(self):
+        course = self._create_course("verified")
+
+        # Set the upgrade deadline in the future
+        # and the verification deadline in the past
+        # We try not to discourage this with validation rules,
+        # since it's a bad user experience
+        # to purchase a verified track and then not be able to verify,
+        # but if it happens we need to handle it gracefully.
+        self._set_deadlines(
+            course.id,
+            upgrade_deadline=datetime(2999, 1, 2, tzinfo=pytz.UTC),
+            verification_deadline=datetime(1999, 1, 2, tzinfo=pytz.UTC),
+        )
+
+        # Enroll as verified (simulate purchasing the verified enrollment)
+        self._enroll(course.id, "verified")
+
+        # Even though the upgrade deadline is in the future,
+        # the verification deadline has passed, so we should see an error
+        # message when we go to verify.
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
         self.assertContains(response, "Jan 02, 1999 at 00:00 UTC")
@@ -718,6 +776,30 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
             attempt.save()
 
+    def _set_deadlines(self, course_key, upgrade_deadline=None, verification_deadline=None):
+        """
+        Set the upgrade and verification deadlines.
+
+        Arguments:
+            course_key (CourseKey): Identifier for the course.
+
+        Keyword Arguments:
+
+            upgrade_deadline (datetime): Datetime after which a user cannot
+                upgrade to a verified mode.
+
+            verification_deadline (datetime): Datetime after which a user cannot
+                submit an initial verification attempt.
+
+        """
+        # Set the course mode expiration (same as the "upgrade" deadline)
+        mode = CourseMode.objects.get(course_id=course_key, mode_slug="verified")
+        mode.expiration_datetime = upgrade_deadline
+        mode.save()
+
+        # Set the verification deadline
+        VerificationDeadline.set_deadline(course_key, verification_deadline)
+
     def _set_contribution(self, amount, course_id):
         """Set the contribution amount pre-filled in a session var. """
         session = self.client.session
@@ -787,6 +869,15 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         """Retrieve the data attributes rendered on the page. """
         soup = BeautifulSoup(response.content)
         pay_and_verify_div = soup.find(id="pay-and-verify-container")
+
+        self.assertIsNot(
+            pay_and_verify_div, None,
+            msg=(
+                "Could not load pay and verify flow data.  "
+                "Maybe this isn't the pay and verify page?"
+            )
+        )
+
         return {
             'full_name': pay_and_verify_div['data-full-name'],
             'course_key': pay_and_verify_div['data-course-key'],

@@ -24,14 +24,17 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from django.dispatch import receiver
 from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+from simple_history.models import HistoricalRecords
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
-from model_utils.models import StatusModel
+from model_utils.models import StatusModel, TimeStampedModel
 from model_utils import Choices
 from verify_student.ssencrypt import (
     random_aes_key, encrypt_and_encode,
@@ -884,6 +887,119 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return 'ID Verified'
 
 
+class VerificationDeadline(TimeStampedModel):
+    """
+    Represent a verification deadline for a particular course.
+
+    The verification deadline is the datetime after which
+    users are no longer allowed to submit photos for initial verification
+    in a course.
+
+    Note that this is NOT the same as the "upgrade" deadline, after
+    which a user is no longer allowed to upgrade to a verified enrollment.
+
+    If no verification deadline record exists for a course,
+    then that course does not have a deadline.  This means that users
+    can submit photos at any time.
+    """
+
+    course_key = CourseKeyField(
+        max_length=255,
+        db_index=True,
+        unique=True,
+        help_text=ugettext_lazy(u"The course for which this deadline applies"),
+    )
+
+    deadline = models.DateTimeField(
+        help_text=ugettext_lazy(
+            u"The datetime after which users are no longer allowed "
+            u"to submit photos for verification."
+        )
+    )
+
+    # Maintain a history of changes to deadlines for auditing purposes
+    history = HistoricalRecords()
+
+    ALL_DEADLINES_CACHE_KEY = "verify_student.all_verification_deadlines"
+
+    @classmethod
+    def set_deadline(cls, course_key, deadline):
+        """
+        Configure the verification deadline for a course.
+
+        If `deadline` is `None`, then the course will have no verification
+        deadline.  In this case, users will be able to verify for the course
+        at any time.
+
+        Arguments:
+            course_key (CourseKey): Identifier for the course.
+            deadline (datetime or None): The verification deadline.
+
+        """
+        if deadline is None:
+            VerificationDeadline.objects.filter(course_key=course_key).delete()
+        else:
+            record, created = VerificationDeadline.objects.get_or_create(
+                course_key=course_key,
+                defaults={"deadline": deadline}
+            )
+
+            if not created:
+                record.deadline = deadline
+                record.save()
+
+    @classmethod
+    def deadlines_for_courses(cls, course_keys):
+        """
+        Retrieve verification deadlines for particular courses.
+
+        Arguments:
+            course_keys (list): List of `CourseKey`s.
+
+        Returns:
+            dict: Map of course keys to datetimes (verification deadlines)
+
+        """
+        all_deadlines = cache.get(cls.ALL_DEADLINES_CACHE_KEY)
+        if all_deadlines is None:
+            all_deadlines = {
+                deadline.course_key: deadline.deadline
+                for deadline in VerificationDeadline.objects.all()
+            }
+            cache.set(cls.ALL_DEADLINES_CACHE_KEY, all_deadlines)
+
+        return {
+            course_key: all_deadlines[course_key]
+            for course_key in course_keys
+            if course_key in all_deadlines
+        }
+
+    @classmethod
+    def deadline_for_course(cls, course_key):
+        """
+        Retrieve the verification deadline for a particular course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            datetime or None
+
+        """
+        try:
+            deadline = cls.objects.get(course_key=course_key)
+            return deadline.deadline
+        except cls.DoesNotExist:
+            return None
+
+
+@receiver(models.signals.post_save, sender=VerificationDeadline)
+@receiver(models.signals.post_delete, sender=VerificationDeadline)
+def invalidate_deadline_caches(sender, **kwargs):  # pylint: disable=unused-argument
+    """Invalidate the cached verification deadline information. """
+    cache.delete(VerificationDeadline.ALL_DEADLINES_CACHE_KEY)
+
+
 class VerificationCheckpoint(models.Model):
     """Represents a point at which a user is asked to re-verify his/her
     identity.
@@ -895,7 +1011,7 @@ class VerificationCheckpoint(models.Model):
     checkpoint_location = models.CharField(max_length=255)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
-    class Meta:  # pylint: disable=missing-docstring, old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('course_id', 'checkpoint_location')
 
     def __unicode__(self):
@@ -1089,7 +1205,7 @@ class SkippedReverification(models.Model):
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:  # pylint: disable=missing-docstring, old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
 
     @classmethod

@@ -4,7 +4,6 @@ Student dashboard page.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise
 from . import BASE_URL
 
 
@@ -160,14 +159,14 @@ class DashboardPage(PageObject):
         """
         return self.q(css='.dropdown-menu li a').text
 
-    def click_account_settings_link(self):
-        """
-        Click on `Account Settings` link.
-        """
-        self.q(css='.dropdown-menu li a').first.click()
-
     def click_my_profile_link(self):
         """
-        Click on `My Profile` link.
+        Click on `Profile` link.
         """
         self.q(css='.dropdown-menu li a').nth(1).click()
+
+    def click_account_settings_link(self):
+        """
+        Click on `Account` link.
+        """
+        self.q(css='.dropdown-menu li a').nth(2).click()

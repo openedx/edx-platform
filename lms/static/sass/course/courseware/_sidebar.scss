@@ -137,10 +137,11 @@
             line-height: 1.3;
 
             &.subtitle {
-              color: #666;
-              font-size: 13px;
-              font-weight: normal;
-              display: block;
+              @extend %t-copy-sub2;
+              @extend %t-weight2;
+              display: inline-block;
+              width: 90%;
+              color: $gray-d1;
               margin: 0;
 
               &:empty {
@@ -153,7 +154,7 @@
             background: $shadow-l1;
 
             > a p {
-              color: #333;
+              color: $gray-d3;
             }
           }
 
@@ -168,7 +169,7 @@
         }
 
         &.active {
-          font-weight: bold;
+          @extend %t-weight5;
 
           &:after {
             content: '›';
@@ -199,19 +200,15 @@
           }
 
           span.subtitle {
-            font-weight: normal;
+            @extend %t-weight2;
           }
         }
 
         &.graded {
-         > a {
-           > img {
-             position: absolute;
-             top: 0;
-             bottom: 0;
-             @include right(7px);
-             margin: auto;
-           }
+          > a {
+            .icon {
+              vertical-align: middle;
+            }
           }
 
           &.active > a {

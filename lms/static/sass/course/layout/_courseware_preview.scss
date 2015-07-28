@@ -22,6 +22,24 @@
         margin-bottom: 0;
         vertical-align: middle;
       }
+
+      .action-preview-select {
+        margin-right: $baseline;
+      }
+
+      .action-preview-username-container {
+        display: none;
+
+        .action-preview-username {
+          vertical-align: middle;
+          height: 25px;
+        }
+      }
     }
+  }
+
+  .preview-specific-student-notice {
+    margin-top: ($baseline/2);
+    font-size: 90%;
   }
 }

@@ -298,7 +298,7 @@ class OpenEndedChild(object):
 
     def _allow_reset(self):
         """Can the module be reset?"""
-        return (self.child_state == self.DONE and self.child_attempts < self.max_attempts)
+        return self.child_state == self.DONE and self.child_attempts < self.max_attempts
 
     def max_score(self):
         """
@@ -396,7 +396,7 @@ class OpenEndedChild(object):
         @return: Boolean correct.
         """
         correct = False
-        if (isinstance(score, (int, long, float, complex))):
+        if isinstance(score, (int, long, float, complex)):
             score_ratio = int(score) / float(self.max_score())
             correct = (score_ratio >= 0.66)
         return correct

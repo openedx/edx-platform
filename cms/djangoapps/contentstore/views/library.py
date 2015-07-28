@@ -31,7 +31,6 @@ from student.auth import (
     STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
 )
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from student import auth
 from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
 
 __all__ = ['library_handler', 'manage_library_users']

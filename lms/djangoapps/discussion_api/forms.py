@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.forms import (
     BooleanField,
     CharField,
-    ChoiceField,
     Field,
     Form,
     IntegerField,

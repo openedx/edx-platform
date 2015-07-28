@@ -1,11 +1,15 @@
 """Defines serializers used by the Team API."""
 
 from django.contrib.auth.models import User
+from django.db.models import Count
+
 from rest_framework import serializers
-from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
+
+from openedx.core.lib.api.serializers import CollapsedReferenceSerializer, PaginationSerializer
 from openedx.core.lib.api.fields import ExpandableField
-from .models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.user_api.serializers import UserSerializer
+
+from .models import CourseTeam, CourseTeamMembership
 
 
 class UserMembershipSerializer(serializers.ModelSerializer):
@@ -108,8 +112,43 @@ class MembershipSerializer(serializers.ModelSerializer):
         read_only_fields = ("date_joined",)
 
 
-class TopicSerializer(serializers.Serializer):
-    """Serializes a topic."""
+class BaseTopicSerializer(serializers.Serializer):
+    """Serializes a topic without team_count."""
     description = serializers.CharField()
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
+
+
+class TopicSerializer(BaseTopicSerializer):
+    """
+    Adds team_count to the basic topic serializer.  Use only when
+    serializing a single topic.  When serializing many topics, use
+    `PaginatedTopicSerializer` to avoid O(N) SQL queries.
+    """
+    team_count = serializers.SerializerMethodField('get_team_count')
+
+    def get_team_count(self, topic):
+        """Get the number of teams associated with this topic"""
+        return CourseTeam.objects.filter(topic_id=topic['id']).count()
+
+
+class PaginatedTopicSerializer(PaginationSerializer):
+    """Serializes a set of topics.  Adds team_count field to each topic."""
+    class Meta(object):
+        """Defines meta information for the PaginatedTopicSerializer."""
+        object_serializer_class = BaseTopicSerializer
+
+    def __init__(self, *args, **kwargs):
+        """Adds team_count to each topic."""
+        super(PaginatedTopicSerializer, self).__init__(*args, **kwargs)
+
+        # The following query gets all the team_counts for each topic
+        # and outputs the result as a list of dicts (one per topic).
+        topic_ids = [topic['id'] for topic in self.data['results']]
+        teams_per_topic = CourseTeam.objects.filter(
+            topic_id__in=topic_ids
+        ).values('topic_id').annotate(team_count=Count('topic_id'))
+
+        topics_to_team_count = {d['topic_id']: d['team_count'] for d in teams_per_topic}
+        for topic in self.data['results']:
+            topic['team_count'] = topics_to_team_count.get(topic['id'], 0)

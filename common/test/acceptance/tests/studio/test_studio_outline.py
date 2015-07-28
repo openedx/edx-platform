@@ -141,13 +141,16 @@ class WarningMessagesTest(CourseOutlineTest):
     FUTURE_UNPUBLISHED_WARNING = 'Unpublished changes to content that will release in the future'
     NEVER_PUBLISHED_WARNING = 'Unpublished units will not be released'
 
-    class PublishState:
+    class PublishState(object):
+        """
+        Default values for representing the published state of a unit
+        """
         NEVER_PUBLISHED = 1
         UNPUBLISHED_CHANGES = 2
         PUBLISHED = 3
         VALUES = [NEVER_PUBLISHED, UNPUBLISHED_CHANGES, PUBLISHED]
 
-    class UnitState:
+    class UnitState(object):
         """ Represents the state of a unit """
 
         def __init__(self, is_released, publish_state, is_locked):

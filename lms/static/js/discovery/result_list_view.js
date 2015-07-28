@@ -11,7 +11,7 @@ define([
 
     return Backbone.View.extend({
 
-        el: 'section.courses',
+        el: 'div.courses',
         $window: $(window),
         $document: $(document),
 

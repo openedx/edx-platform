@@ -125,7 +125,7 @@ class VideoStudentViewHandlers(object):
 
             try:
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
-            except (NotFoundError):
+            except NotFoundError:
                 log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
                 generate_sjson_for_all_speeds(
                     self,

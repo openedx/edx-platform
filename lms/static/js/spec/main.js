@@ -3,7 +3,6 @@
     requirejs.config({
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
-            'mustache': 'xmodule_js/common_static/js/vendor/mustache',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
             'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
@@ -61,7 +60,6 @@
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
-            'js/mustache': 'js/mustache',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
 
@@ -69,18 +67,6 @@
             'js/models/notification': 'js/models/notification',
             'js/views/file_uploader': 'js/views/file_uploader',
             'js/views/notification': 'js/views/notification',
-            'js/groups/models/cohort': 'js/groups/models/cohort',
-            'js/groups/models/content_group': 'js/groups/models/content_group',
-            'js/groups/models/course_cohort_settings': 'js/groups/models/course_cohort_settings',
-            'js/groups/models/cohort_discussions': 'js/groups/models/cohort_discussions',
-            'js/groups/views/cohort_discussions': 'js/groups/views/cohort_discussions',
-            'js/groups/views/cohort_discussions_course_wide': 'js/groups/views/cohort_discussions_course_wide',
-            'js/groups/views/cohort_discussions_inline': 'js/groups/views/cohort_discussions_inline',
-            'js/groups/views/course_cohort_settings_notification': 'js/groups/views/course_cohort_settings_notification',
-            'js/groups/collections/cohort': 'js/groups/collections/cohort',
-            'js/groups/views/cohort_editor': 'js/groups/views/cohort_editor',
-            'js/groups/views/cohort_form': 'js/groups/views/cohort_form',
-            'js/groups/views/cohorts': 'js/groups/views/cohorts',
             'js/student_account/account': 'js/student_account/account',
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
@@ -98,9 +84,7 @@
             'js/ccx/schedule': 'js/ccx/schedule',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
-
-            'course_discovery_meanings': 'js/spec/discovery/course_discovery_meanings'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
@@ -303,63 +287,6 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
-            'js/groups/models/cohort': {
-                exports: 'edx.groups.CohortModel',
-                deps: ['backbone']
-            },
-            'js/groups/models/content_group': {
-                exports: 'edx.groups.ContentGroupModel',
-                deps: ['backbone']
-            },
-            'js/groups/models/course_cohort_settings': {
-                exports: 'edx.groups.CourseCohortSettingsModel',
-                deps: ['backbone']
-            },
-            'js/groups/models/cohort_discussions': {
-                exports: 'edx.groups.DiscussionTopicsSettingsModel',
-                deps: ['backbone']
-            },
-            'js/groups/views/cohort_discussions': {
-                exports: 'edx.groups.CohortDiscussionConfigurationView',
-                deps: ['backbone']
-            },
-            'js/groups/views/cohort_discussions_course_wide': {
-                exports: 'edx.groups.CourseWideDiscussionsView',
-                deps: ['backbone', 'js/groups/views/cohort_discussions']
-            },
-            'js/groups/views/cohort_discussions_inline': {
-                exports: 'edx.groups.InlineDiscussionsView',
-                deps: ['backbone', 'js/groups/views/cohort_discussions', 'js/vendor/jquery.qubit']
-            },
-            'js/groups/views/course_cohort_settings_notification': {
-                exports: 'edx.groups.CourseCohortSettingsNotificationView',
-                deps: ['backbone']
-            },
-            'js/groups/collections/cohort': {
-                exports: 'edx.groups.CohortCollection',
-                deps: ['backbone', 'js/groups/models/cohort']
-            },
-            'js/groups/views/cohort_form': {
-                exports: 'edx.groups.CohortFormView',
-                deps: [
-                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
-                    'string_utils'
-                ]
-            },
-            'js/groups/views/cohort_editor': {
-                exports: 'edx.groups.CohortEditorView',
-                deps: [
-                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
-                    'string_utils', 'js/groups/views/cohort_form'
-                ]
-            },
-            'js/groups/views/cohorts': {
-                exports: 'edx.groups.CohortsView',
-                deps: [
-                    'jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/groups/views/cohort_editor',
-                    'js/views/notification', 'js/models/notification', 'js/views/file_uploader'
-                ]
-            },
             'js/models/notification': {
                 exports: 'NotificationModel',
                 deps: ['backbone']
@@ -374,18 +301,6 @@
                     'backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
                     'js/models/notification', 'jquery.fileupload'
                 ]
-            },
-            'js/student_account/enrollment': {
-                exports: 'edx.student.account.EnrollmentInterface',
-                deps: ['jquery', 'jquery.cookie']
-            },
-            'js/student_account/emailoptin': {
-                exports: 'edx.student.account.EmailOptInInterface',
-                deps: ['jquery', 'jquery.cookie']
-            },
-            'js/student_account/shoppingcart': {
-                exports: 'edx.student.account.ShoppingCartInterface',
-                deps: ['jquery', 'jquery.cookie', 'underscore']
             },
             // Student account registration/login
             // Loaded explicitly until these are converted to RequireJS
@@ -616,6 +531,8 @@
         'lms/include/teams/js/spec/topic_card_spec.js',
         'lms/include/teams/js/spec/topic_collection_spec.js',
         'lms/include/teams/js/spec/topics_spec.js',
+        'lms/include/teams/js/spec/teams_spec.js',
+        'lms/include/teams/js/spec/teams_tab_spec.js',
         'lms/include/js/spec/components/header/header_spec.js',
         'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
@@ -665,7 +582,7 @@
         'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs/tags_spec.js',
         'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
-        'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_visibility_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
         'lms/include/js/spec/edxnotes/models/note_spec.js',
         'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',

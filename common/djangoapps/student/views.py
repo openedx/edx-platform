@@ -6,7 +6,6 @@ import logging
 import uuid
 import json
 import warnings
-from datetime import timedelta
 from collections import defaultdict
 from pytz import UTC
 from requests import HTTPError
@@ -26,9 +25,8 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
-from django.utils import timezone
 from django.utils.translation import ungettext
-from django.utils.http import cookie_date, base36_to_int
+from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -49,7 +47,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
-    Registration, UserProfile, PendingNameChange,
+    Registration, UserProfile,
     PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
@@ -60,13 +58,12 @@ from verify_student.models import SoftwareSecurePhotoVerification  # pylint: dis
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
-    get_active_web_certificate,
     has_html_certificates_enabled,
 )
-from dark_lang.models import DarkLangConfig
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
@@ -86,7 +83,6 @@ from external_auth.login_and_register import (
 )
 
 from bulk_email.models import Optout, CourseAuthorization
-import shoppingcart
 from lang_pref import LANGUAGE_KEY
 
 import track.views
@@ -537,7 +533,7 @@ def dashboard(request):
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
-    all_course_modes, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
+    __, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
     course_modes_by_course = {
         course_id: {
             mode.slug: mode
@@ -600,11 +596,7 @@ def dashboard(request):
     #
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
-    verify_status_by_course = check_verify_status_by_course(
-        user,
-        course_enrollments,
-        all_course_modes
-    )
+    verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
     cert_statuses = {
         enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
         for enrollment in course_enrollments
@@ -873,7 +865,7 @@ def _credit_statuses(user, course_enrollments):
 
     statuses = {}
     for eligibility in credit_api.get_eligibilities_for_user(user.username):
-        course_key = eligibility["course_key"]
+        course_key = CourseKey.from_string(unicode(eligibility["course_key"]))
         status = {
             "course_key": unicode(course_key),
             "eligible": True,
@@ -1049,7 +1041,7 @@ def accounts_login(request):
 
 # Need different levels of logging
 @ensure_csrf_cookie
-def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,unused-argument
+def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
     """AJAX request to log in the user."""
 
     backend_name = None
@@ -1091,9 +1083,9 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                       platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
-                _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
+                _("If you don't have an {platform_name} account yet, "
+                  "click <strong>Register</strong> at the top of the page.").format(
+                      platform_name=settings.PLATFORM_NAME),
                 content_type="text/plain",
                 status=403
             )

@@ -1495,7 +1495,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)
             new_def_data = partitioned_fields.get(Scope.content, {})
             # persist the definition if persisted != passed
-            if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
+            if definition_locator is None or isinstance(definition_locator.definition_id, LocalId):
                 definition_locator = self.create_definition_from_data(course_key, new_def_data, block_type, user_id)
             elif new_def_data:
                 definition_locator, _ = self.update_definition_from_data(course_key, definition_locator, new_def_data, user_id)
@@ -2443,6 +2443,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
 
+        self._emit_course_deleted_signal(course_key)
+
     @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)
     def inherit_settings(
         self, block_map, block_key, inherited_settings_map, inheriting_settings=None, inherited_from=None
@@ -2770,7 +2772,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 course_key.version_guid is None or
                 index_entry['versions'][course_key.branch] == course_key.version_guid
             )
-            if (is_head or force):
+            if is_head or force:
                 return index_entry
             else:
                 raise VersionConflictError(

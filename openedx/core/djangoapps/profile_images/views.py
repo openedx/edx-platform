@@ -29,7 +29,7 @@ LOG_MESSAGE_DELETE = 'Deleted images %(image_names)s for user %(user_id)s'
 
 def _make_upload_dt():
     """
-    Generate a server-side timestamp for the upload.  This is in a separate
+    Generate a server-side timestamp for the upload. This is in a separate
     function so its behavior can be overridden in tests.
     """
     return datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -37,35 +37,36 @@ def _make_upload_dt():
 
 class ProfileImageUploadView(APIView):
     """
-    **Use Cases**
+    **Use Case**
 
-        Upload an image to be used for the user's profile.
+        * Upload an image for the user's profile.
 
-        The requesting user must be signed in. The signed in user can only
-        upload his or her own profile image.
+          The requesting user must be signed in. The signed in user can only
+          upload his or her own profile image.
 
-    **Example Requests**
+    **Example Request**
 
         POST /api/profile_images/v1/{username}/upload
 
-    **Response for POST**
+    **Example Responses**
 
-        If the requesting user tries to upload the image for a different user:
+        When the requesting user tries to upload the image for a different user, the
+        request returns one of the following responses.
 
-        * If the requesting user has staff access, the request returns a 403
-          error.
+        * If the requesting user has staff access, the request returns an HTTP 403
+          "Forbidden" response.
 
         * If the requesting user does not have staff access, the request returns
-          a 404 error.
+          an HTTP 404 "Not Found" response.
 
-        If no user matches the "username" parameter, the request returns a 404
-        error.
+        * If no user matches the "username" parameter, the request returns an HTTP
+          404 "Not Found" response.
 
-        If the upload could not be performed, the request returns a 400 error is
-        with details.
+        * If the upload could not be performed, the request returns an HTTP 400 "Bad
+          Request" response with more information.
 
-        If the upload is successful, the request returns a 204 status with no
-        additional content.
+        * If the upload is successful, the request returns an HTTP 204 "No Content"
+          response with no additional content.
 
     """
     parser_classes = (MultiPartParser, FormParser,)
@@ -123,34 +124,38 @@ class ProfileImageUploadView(APIView):
 
 class ProfileImageRemoveView(APIView):
     """
-    **Use Cases**
+    **Use Case**
 
-        Remove all of the profile images associated with the user's account.
+        * Remove all of the profile images associated with the user's account.
 
-        The requesting user must be signed in.
+          The requesting user must be signed in.
 
-        Users with staff access can remove profile images for other user
-        accounts.
+          Users with staff access can remove profile images for other user
+          accounts.
 
-        Users without staff access can only remove their own profile images.
+          Users without staff access can only remove their own profile images.
 
-    **Example Requests**
+    **Example Request**
 
         POST /api/profile_images/v1/{username}/remove
 
-    **Response for POST**
+    **Example Responses**
 
-        Requesting users who do not have staff access and try to remove another
-        user's profile image receive a 404 error.
+        When the requesting user tries to remove the profile image for a
+        different user, the request returns one of the following responses.
 
-        If no user matches the "username" parameter, the request returns a 404
-        error.
+        * If the user does not have staff access, the request returns an HTTP
+          404 "Not Found" response.
 
-        If the request could not remove the image, the request returns a 400
-        error with details.
+        * If no user matches the "username" parameter, the request returns an
+          HTTP 404 "Not Found" response.
 
-        If the request successfully removes the image, the request returns a 204
-        status with no additional content.
+        * If the image could not be removed, the request returns an HTTP 400
+          "Bad Request" response with more information.
+
+        * If the request successfully removes the image, the request returns
+          an HTTP 204 "No Content" response with no additional content.
+
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)

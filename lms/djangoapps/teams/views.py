@@ -42,7 +42,14 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from .models import CourseTeam, CourseTeamMembership
-from .serializers import CourseTeamSerializer, CourseTeamCreationSerializer, TopicSerializer, MembershipSerializer
+from .serializers import (
+    CourseTeamSerializer,
+    CourseTeamCreationSerializer,
+    BaseTopicSerializer,
+    TopicSerializer,
+    PaginatedTopicSerializer,
+    MembershipSerializer
+)
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 
@@ -75,9 +82,15 @@ class TeamsDashboardView(View):
         sort_order = 'name'
         topics = get_ordered_topics(course, sort_order)
         topics_page = Paginator(topics, TOPICS_PER_PAGE).page(1)
-        topics_serializer = PaginationSerializer(instance=topics_page, context={'sort_order': sort_order})
+        topics_serializer = PaginatedTopicSerializer(instance=topics_page, context={'sort_order': sort_order})
         context = {
-            "course": course, "topics": topics_serializer.data, "topics_url": reverse('topics_list', request=request)
+            "course": course,
+            "topics": topics_serializer.data,
+            "topic_url": reverse(
+                'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
+            ),
+            "topics_url": reverse('topics_list', request=request),
+            "teams_url": reverse('teams_list', request=request)
         }
         return render_to_response("teams/teams.html", context)
 
@@ -248,7 +261,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             try:
                 course_key = CourseKey.from_string(course_id_string)
                 # Ensure the course exists
-                if not modulestore().has_course(course_key):
+                course_module = modulestore().get_course(course_key)
+                if course_module is None:
                     return Response(status=status.HTTP_404_NOT_FOUND)
                 result_filter.update({'course_id': course_key})
             except InvalidKeyError:
@@ -267,6 +281,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             )
 
         if 'topic_id' in request.QUERY_PARAMS:
+            topic_id = request.QUERY_PARAMS['topic_id']
+            if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
+                error = build_api_error(
+                    ugettext_noop('The supplied topic id {topic_id} is not valid'),
+                    topic_id=topic_id
+                )
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
             result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
         if 'include_inactive' in request.QUERY_PARAMS and request.QUERY_PARAMS['include_inactive'].lower() == 'true':
             del result_filter['is_active']
@@ -290,14 +311,17 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 build_api_error(ugettext_noop("last_activity is not yet supported")),
                 status=status.HTTP_400_BAD_REQUEST
             )
+        else:
+            return Response({
+                'developer_message': "unsupported order_by value {}".format(order_by_input),
+                'user_message': _(u"The ordering {} is not supported").format(order_by_input),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         queryset = queryset.order_by(order_by_field)
 
-        if not queryset:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         page = self.paginate_queryset(queryset)
         serializer = self.get_pagination_serializer(page)
+        serializer.context.update({'sort_order': order_by_input})  # pylint: disable=maybe-no-member
         return Response(serializer.data)  # pylint: disable=maybe-no-member
 
     def post(self, request):
@@ -492,8 +516,8 @@ class TopicListView(GenericAPIView):
 
     paginate_by = TOPICS_PER_PAGE
     paginate_by_param = 'page_size'
-    pagination_serializer_class = PaginationSerializer
-    serializer_class = TopicSerializer
+    pagination_serializer_class = PaginatedTopicSerializer
+    serializer_class = BaseTopicSerializer
 
     def get(self, request):
         """GET /api/team/v0/topics/?course_id={course_id}"""
@@ -531,8 +555,7 @@ class TopicListView(GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         page = self.paginate_queryset(topics)
-        serializer = self.get_pagination_serializer(page)
-        serializer.context = {'sort_order': ordering}
+        serializer = self.pagination_serializer_class(page, context={'sort_order': ordering})
         return Response(serializer.data)  # pylint: disable=maybe-no-member
 
 

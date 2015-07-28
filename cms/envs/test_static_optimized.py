@@ -33,3 +33,4 @@ STATIC_ROOT = (TEST_ROOT / "staticfiles" / "cms").abspath()
 # 1. Uglify is by far the slowest part of the build process
 # 2. Having full source code makes debugging tests easier for developers
 os.environ['REQUIRE_BUILD_PROFILE_OPTIMIZE'] = 'none'
+PIPELINE_JS_COMPRESSOR = None

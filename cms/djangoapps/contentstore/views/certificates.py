@@ -33,7 +33,9 @@ from django.views.decorators.http import require_http_methods
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey, AssetKey
+from eventtracking import tracker
 from student.auth import has_studio_write_access
+from student.roles import GlobalStaff
 from util.db import generate_int_id, MYSQL_MAX_INT
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
@@ -247,6 +249,20 @@ class CertificateManager(object):
                         store.update_item(course, request.user.id)
                         break
 
+    @staticmethod
+    def track_event(event_name, event_data):
+        """Track certificate configuration event.
+
+        Arguments:
+            event_name (str):  Name of the event to be logged.
+            event_data (dict): A Dictionary containing event data
+        Returns:
+            None
+
+        """
+        event_name = '.'.join(['edx', 'certificate', 'configuration', event_name])
+        tracker.emit(event_name, event_data)
+
 
 class Certificate(object):
     """
@@ -278,6 +294,9 @@ def certificate_activation_handler(request, course_key_string):
     POST
         json: is_active. update the activation state of certificate
     """
+    # Only global staff (PMs) are able to activate/deactivate certificate configuration
+    if not GlobalStaff().has_user(request.user):
+        raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     try:
@@ -296,6 +315,10 @@ def certificate_activation_handler(request, course_key_string):
         break
 
     store.update_item(course, request.user.id)
+    cert_event_type = 'activated' if is_active else 'deactivated'
+    CertificateManager.track_event(cert_event_type, {
+        'course_id': unicode(course.id),
+    })
     return HttpResponse(status=200)
 
 
@@ -375,6 +398,10 @@ def certificates_list_handler(request, course_key_string):
                     kwargs={'certificate_id': new_certificate.id}  # pylint: disable=no-member
                 )
                 store.update_item(course, request.user.id)
+                CertificateManager.track_event('created', {
+                    'course_id': unicode(course.id),
+                    'configuration_id': new_certificate.id
+                })
                 course = _get_course_and_check_access(course_key, request.user)
                 return response
         else:
@@ -414,15 +441,25 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             return JsonResponse({"error": err.message}, status=400)
 
         serialized_certificate = CertificateManager.serialize_certificate(new_certificate)
+        cert_event_type = 'created'
         if match_cert:
+            cert_event_type = 'modified'
             certificates_list[match_index] = serialized_certificate
         else:
             certificates_list.append(serialized_certificate)
 
         store.update_item(course, request.user.id)
+        CertificateManager.track_event(cert_event_type, {
+            'course_id': unicode(course.id),
+            'configuration_id': serialized_certificate["id"]
+        })
         return JsonResponse(serialized_certificate, status=201)
 
     elif request.method == "DELETE":
+        # Only global staff (PMs) are able to activate/deactivate certificate configuration
+        if not GlobalStaff().has_user(request.user):
+            raise PermissionDenied()
+
         if not match_cert:
             return JsonResponse(status=404)
         CertificateManager.remove_certificate(
@@ -431,6 +468,10 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             course=course,
             certificate_id=certificate_id
         )
+        CertificateManager.track_event('deleted', {
+            'course_id': unicode(course.id),
+            'configuration_id': certificate_id
+        })
         return JsonResponse(status=204)
 
 

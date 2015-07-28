@@ -1,12 +1,12 @@
 <article class="course" role="region" aria-label="<%= content.display_name %>">
-    <a href="/courses/<%- course %>/info">
+    <a href="/courses/<%- course %>/about">
         <header class="course-image">
             <div class="cover-image">
                 <img src="<%- image_url %>" alt="<%= content.display_name %> <%= content.number %>" />
                 <div class="learn-more" aria-hidden=true><%= gettext("LEARN MORE") %></div>
             </div>
         </header>
-        <section class="course-info" aria-hidden=true>
+        <section class="course-info" aria-hidden="true">
             <h2 class="course-name">
                 <span class="course-organization"><%= org %></span>
                 <span class="course-code"><%= content.number %></span>

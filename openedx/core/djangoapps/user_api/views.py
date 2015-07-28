@@ -196,7 +196,7 @@ class RegistrationView(APIView):
 
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
-        for field_name in (self.DEFAULT_FIELDS + self.EXTRA_FIELDS):
+        for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
 

@@ -1,0 +1,80 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+
+<table class="cn-container">
+  <tbody>
+  <tr>
+    <td class="cn-body">
+      <table>
+        <tr>
+          <td class="cn-img-wrapper">
+            <a target="_blank" title="" href="#">
+              <img class="cn-img" src="cid:${branded_logo}">
+            </a>
+          </td>
+        </tr>
+
+        <tr><td class="cn-content-clear"></td></tr>
+
+        <tr>
+          <td class="cn-content">
+            <p>
+              ${_("Hi {name},").format(name=full_name)}
+            </p>
+
+            <p>
+              ${_("Congratulations! You are eligible to receive university credit from edX partners! Click {link} to get your credit now.").format(
+                    link=u'<a href="{dashboard_url}">here</a>'.format(
+                        dashboard_url=dashboard_link
+                    ))
+              }
+            </p>
+
+            <p>
+              ${_("Credit from can help you get a jump start on your university degree, finish a degree already started, or fulfill requirements at a different academic institution.")}
+            </p>
+
+            <p>
+              ${_('To get university credit for {course_name}, simply go to your {link} and click the yellow "Get Credit" button. No application, transcript, or grade report is required.').format(
+              course_name=course_name,
+              link=u'<a href="{dashboard_url}">edX dashboard</a>'.format(
+                        dashboard_url=dashboard_link
+                  )
+              )}
+            </p>
+
+            <p>
+              ${_("We hope you enjoyed the course, and we hope to see you in future edX courses!")}<br/>
+              ${_("The edX team")}
+            </p>
+          </td>
+        </tr>
+
+        <tr><td class="cn-content-clear cn-footer"></td></tr>
+
+        <tr>
+          <td class="cn-footer-content">
+            <p>
+              <a href="${credit_course_link}"> ${_("Find more edX courses you can take for university credit.")} </a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+
+  </tbody>
+</table>
+<img src="${tracking_pixel}"/>
+
+
+</body>
+</html>

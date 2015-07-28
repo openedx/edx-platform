@@ -7,17 +7,21 @@ import pytz
 
 from django.conf import settings
 from django.db.utils import IntegrityError
+from django.test import TestCase
 from mock import patch
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from opaque_keys.edx.keys import CourseKey
+
 from verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint, VerificationStatus,
-    SkippedReverification
+    SoftwareSecurePhotoVerification,
+    VerificationException, VerificationCheckpoint,
+    VerificationStatus, SkippedReverification,
+    VerificationDeadline
 )
 
 FAKE_SETTINGS = {
@@ -764,3 +768,45 @@ class SkippedReverificationTest(ModuleStoreTestCase):
         self.assertFalse(
             SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=user2)
         )
+
+
+class VerificationDeadlineTest(TestCase):
+    """
+    Tests for the VerificationDeadline model.
+    """
+
+    def test_caching(self):
+        deadlines = {
+            CourseKey.from_string("edX/DemoX/Fall"): datetime.now(pytz.UTC),
+            CourseKey.from_string("edX/DemoX/Spring"): datetime.now(pytz.UTC) + timedelta(days=1)
+        }
+        course_keys = deadlines.keys()
+
+        # Initially, no deadlines are set
+        with self.assertNumQueries(1):
+            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
+            self.assertEqual(all_deadlines, {})
+
+        # Create the deadlines
+        for course_key, deadline in deadlines.iteritems():
+            VerificationDeadline.objects.create(
+                course_key=course_key,
+                deadline=deadline,
+            )
+
+        # Warm the cache
+        with self.assertNumQueries(1):
+            VerificationDeadline.deadlines_for_courses(course_keys)
+
+        # Load the deadlines from the cache
+        with self.assertNumQueries(0):
+            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
+            self.assertEqual(all_deadlines, deadlines)
+
+        # Delete the deadlines
+        VerificationDeadline.objects.all().delete()
+
+        # Verify that the deadlines are updated correctly
+        with self.assertNumQueries(1):
+            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
+            self.assertEqual(all_deadlines, {})

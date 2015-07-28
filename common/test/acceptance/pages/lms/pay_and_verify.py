@@ -1,10 +1,9 @@
 """Payment and verification pages"""
 
 import re
-from urllib import urlencode
 
-from bok_choy.page_object import PageObject, unguarded
-from bok_choy.promise import Promise, EmptyPromise
+from bok_choy.page_object import PageObject
+from bok_choy.promise import Promise
 from . import BASE_URL
 from .dashboard import DashboardPage
 

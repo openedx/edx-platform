@@ -3,17 +3,13 @@
 from mock import patch, sentinel
 
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from eventtracking import tracker
 from track import views
 from track.middleware import TrackMiddleware
 from track.tests import EventTrackingTestCase, FROZEN_TIME
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-
-from datetime import datetime
 
 
 class TestTrackViews(EventTrackingTestCase):

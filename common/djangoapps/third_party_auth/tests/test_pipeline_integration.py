@@ -13,7 +13,7 @@ from social.apps.django_app.default import models as social_models
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
-User = social_models.DjangoStorage.user.user_model()  # pylint: disable-msg=invalid-name
+User = social_models.DjangoStorage.user.user_model()  # pylint: disable=invalid-name
 
 
 class TestCase(testutil.TestCase, test.TestCase):

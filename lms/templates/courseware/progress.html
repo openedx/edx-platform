@@ -105,13 +105,13 @@ from django.utils.http import urlquote_plus
                     <h2>${_("Requirements for Course Credit")}</h2>
                 </div>
                 %if credit_course_requirements['eligibility_status'] == 'not_eligible':
-                    <span class="eligibility_msg">${student.get_full_name()}, ${_("You are no longer eligible for this course.")}</span>
+                    <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name)}</span>
                 %elif credit_course_requirements['eligibility_status'] == 'eligible':
-                    <span class="eligibility_msg">${student.get_full_name()}, ${_("You have met the requirements for credit in this course.")}
+                    <span class="eligibility_msg">${_("{student_name}, you have met the requirements for credit in this course.").format(student_name=student.profile.name)}
                         ${_("{link} to purchase course credit.").format(link="<a href={url}>{url_name}</a>".format(url = reverse('dashboard'), url_name = _('Go to your dashboard')))}
                     </span>
                 %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
-                    <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.get_full_name())}</span>
+                    <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name)}</span>
                 %endif
                 <a href="${settings.CREDIT_HELP_LINK_URL}" class="credit-help"><i class="fa fa-question"></i><span class="sr">${_("Information about course credit requirements")}</span></a><br>
                 <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
@@ -127,7 +127,13 @@ from django.utils.http import urlquote_plus
                                     <span>${_("Verification Failed" )}</span>
                                 %elif requirement['status'] == 'satisfied':
                                     <i class="fa fa-check"></i>
+                                    % if requirement['namespace'] == 'reverification':
                                     <span>Verified on ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
+                                    % elif requirement['namespace'] == 'grade' and 'final_grade' in requirement['reason']:
+                                    <span>${int(requirement['reason']['final_grade'] * 100)}%</span>
+                                    % else:
+                                    <span>Completed</span>
+                                    % endif
                                 %endif
                             %else:
                                 <span class="not-achieve">${_("Upcoming")}</span>

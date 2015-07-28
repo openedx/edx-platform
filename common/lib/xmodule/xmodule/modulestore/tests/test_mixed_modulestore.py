@@ -8,7 +8,6 @@ import logging
 import ddt
 import itertools
 import mimetypes
-from unittest import skip
 from uuid import uuid4
 from contextlib import contextmanager
 from mock import patch
@@ -1408,7 +1407,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             course_id.make_usage_key('course_info', 'updates'),
         ]
 
-        for location in (orphan_locations + detached_locations):
+        for location in orphan_locations + detached_locations:
             self.store.create_item(
                 self.user_id,
                 location.course_key,
@@ -2414,6 +2413,34 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                         self.store.update_item(unit, self.user_id)
                         self.assertEqual(receiver.call_count, 0)
                     self.assertEqual(receiver.call_count, 0)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_deleted_signal(self, default):
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+
+            with self.store.default_store(default):
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
+
+                with mock_signal_receiver(SignalHandler.course_deleted) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
+
+                    # Create a course
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+                    course_key = course.id
+
+                    # Delete the course
+                    course = self.store.delete_course(course_key, self.user_id)
+
+                    # Verify that the signal was emitted
+                    self.assertEqual(receiver.call_count, 1)
 
 
 @ddt.ddt

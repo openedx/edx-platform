@@ -18,7 +18,7 @@
                 it('can render itself as a list card', function () {
                     var view = new CardView({ configuration: 'list_card' });
                     expect(view.$el).toHaveClass('list-card');
-                    expect(view.$el.find('.wrapper-card-meta .action').length).toBe(1);
+                    expect(view.$el.find('.wrapper-card-core .action').length).toBe(1);
                 });
 
                 it('renders a pennant only if the pennant value is truthy', function () {

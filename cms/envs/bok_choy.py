@@ -1,9 +1,9 @@
 """
-Settings for Bok Choy tests that are used for running CMS and LMS.
+Settings for Bok Choy tests that are used when running Studio.
 
 Bok Choy uses two different settings files:
 1. test_static_optimized is used when invoking collectstatic
-2. bok_choy is used when running CMS and LMS
+2. bok_choy is used when running the tests
 
 Note: it isn't possible to have a single settings file, because Django doesn't
 support both generating static assets to a directory and also serving static
@@ -103,8 +103,8 @@ FEATURES['ENTRANCE_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
-YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
-YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
+YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
 
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True

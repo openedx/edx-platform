@@ -27,8 +27,8 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids,
-    get_discussion_id_map,
+    discussion_category_id_access,
+    get_cached_discussion_id_map,
 )
 from django_comment_client.permissions import check_permissions_by_view, has_permission
 from eventtracking import tracker
@@ -78,10 +78,11 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     """
     user = request.user
     data['id'] = obj.id
-    if id_map is None:
-        id_map = get_discussion_id_map(course, user)
-
     commentable_id = data['commentable_id']
+
+    if id_map is None:
+        id_map = get_cached_discussion_id_map(course, [commentable_id], user)
+
     if commentable_id in id_map:
         data['category_name'] = id_map[commentable_id]["title"]
         data['category_id'] = commentable_id
@@ -207,14 +208,9 @@ def create_thread(request, course_id, commentable_id):
     event_data = get_thread_created_event_data(thread, follow)
     data = thread.to_dict()
 
-    # Calls to id map are expensive, but we need this more than once.
-    # Prefetch it.
-    id_map = get_discussion_id_map(course, request.user)
+    add_courseware_context([data], course, request.user)
 
-    add_courseware_context([data], course, request.user, id_map=id_map)
-
-    track_forum_event(request, THREAD_CREATED_EVENT_NAME,
-                      course, thread, event_data, id_map=id_map)
+    track_forum_event(request, THREAD_CREATED_EVENT_NAME, course, thread, event_data)
 
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
@@ -244,8 +240,7 @@ def update_thread(request, course_id, thread_id):
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        commentable_ids = get_discussion_categories_ids(course, request.user)
-        if request.POST.get("commentable_id") in commentable_ids:
+        if discussion_category_id_access(course, request.user, request.POST.get("commentable_id")):
             thread.commentable_id = request.POST["commentable_id"]
         else:
             return JsonError(_("Topic doesn't exist"))
@@ -489,7 +484,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    remove_all = (
+    remove_all = bool(
         has_permission(request.user, 'openclose_thread', course_key) or
         has_access(request.user, 'staff', course)
     )
@@ -524,7 +519,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key)
-    remove_all = (
+    remove_all = bool(
         has_permission(request.user, 'openclose_thread', course_key) or
         has_access(request.user, 'staff', course)
     )

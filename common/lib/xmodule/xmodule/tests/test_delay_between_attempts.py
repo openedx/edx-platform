@@ -58,7 +58,7 @@ class CapaFactoryWithDelay(object):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + cls.answer_key(input_num))
+        return "input_" + cls.answer_key(input_num)
 
     @classmethod
     def answer_key(cls, input_num=2):

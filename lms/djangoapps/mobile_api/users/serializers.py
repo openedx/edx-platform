@@ -4,9 +4,12 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from courseware.courses import course_image_url
+from django.template import defaultfilters
+
+from courseware.access import has_access
 from student.models import CourseEnrollment, User
 from certificates.models import certificate_status_for_student, CertificateStatuses
+from xmodule.course_module import DEFAULT_START_DATE
 
 
 class CourseOverviewField(serializers.RelatedField):
@@ -36,12 +39,24 @@ class CourseOverviewField(serializers.RelatedField):
             course_updates_url = None
             course_handouts_url = None
 
+        if course_overview.advertised_start is not None:
+            start_type = "string"
+            start_display = course_overview.advertised_start
+        elif course_overview.start != DEFAULT_START_DATE:
+            start_type = "timestamp"
+            start_display = defaultfilters.date(course_overview.start, "DATE_FORMAT")
+        else:
+            start_type = "empty"
+            start_display = None
+
         return {
             "id": course_id,
             "name": course_overview.display_name,
             "number": course_overview.display_number_with_default,
             "org": course_overview.display_org_with_default,
             "start": course_overview.start,
+            "start_display": start_display,
+            "start_type": start_type,
             "end": course_overview.end,
             "course_image": course_overview.course_image_url,
             "social_urls": {
@@ -54,6 +69,7 @@ class CourseOverviewField(serializers.RelatedField):
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
             "subscription_id": course_overview.clean_id(padding_char='_'),
+            "courseware_access": has_access(request.user, 'load_mobile', course_overview).to_json() if request else None
         }
 
 

@@ -101,6 +101,8 @@ class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
 
     filename_extension = "xml"
 
+    show_in_read_only_mode = True
+
     def definition_to_xml(self, resource_fs):
 
         xml_object = etree.Element('randomize')

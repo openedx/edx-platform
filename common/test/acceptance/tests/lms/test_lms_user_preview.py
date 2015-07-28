@@ -7,7 +7,6 @@ from ..helpers import UniqueCourseTest, create_user_partition_json
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.staff_view import StaffPage
-from ...pages.lms.course_nav import CourseNavPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from xmodule.partitions.partitions import Group
 from textwrap import dedent

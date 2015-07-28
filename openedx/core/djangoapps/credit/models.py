@@ -111,34 +111,71 @@ class CreditProvider(TimeStampedModel):
         )
     )
 
+    eligibility_email_message = models.TextField(
+        default="",
+        help_text=ugettext_lazy(
+            "Plain text or html content for displaying custom message inside "
+            "credit eligibility email content which is sent when user has met "
+            "all credit eligibility requirements."
+        )
+    )
+
+    receipt_email_message = models.TextField(
+        default="",
+        help_text=ugettext_lazy(
+            "Plain text or html content for displaying custom message inside "
+            "credit receipt email content which is sent *after* paying to get "
+            "credit for a credit course."
+        )
+    )
+
     CREDIT_PROVIDERS_CACHE_KEY = "credit.providers.list"
 
     @classmethod
-    def get_credit_providers(cls):
+    def get_credit_providers(cls, providers_list=None):
         """
-        Retrieve a list of all credit providers, represented
+        Retrieve a list of all credit providers or filter on providers_list, represented
         as dictionaries.
+
+        Arguments:
+            provider_list (list of strings or None): contains list of ids if required results
+            to be filtered, None for all providers.
+
+        Returns:
+            list of providers represented as dictionaries.
+
         """
-        # Attempt to retrieve the credit provider list from the cache
+        # Attempt to retrieve the credit provider list from the cache if provider_list is None
         # The cache key is invalidated when the provider list is updated
         # (a post-save signal handler on the CreditProvider model)
         # This doesn't happen very often, so we would expect a *very* high
         # cache hit rate.
-        providers = cache.get(cls.CREDIT_PROVIDERS_CACHE_KEY)
 
-        # Cache miss: construct the provider list and save it in the cache
-        if providers is None:
-            providers = [
+        credit_providers = cache.get(cls.CREDIT_PROVIDERS_CACHE_KEY)
+        if credit_providers is None:
+            # Cache miss: construct the provider list and save it in the cache
+
+            credit_providers = CreditProvider.objects.filter(active=True)
+
+            credit_providers = [
                 {
                     "id": provider.provider_id,
                     "display_name": provider.display_name,
+                    "url": provider.provider_url,
                     "status_url": provider.provider_status_url,
+                    "description": provider.provider_description,
+                    "enable_integration": provider.enable_integration,
+                    "fulfillment_instructions": provider.fulfillment_instructions,
                 }
-                for provider in CreditProvider.objects.filter(active=True)
+                for provider in credit_providers
             ]
-            cache.set(cls.CREDIT_PROVIDERS_CACHE_KEY, providers)
 
-        return providers
+            cache.set(cls.CREDIT_PROVIDERS_CACHE_KEY, credit_providers)
+
+        if providers_list:
+            credit_providers = [provider for provider in credit_providers if provider['id'] in providers_list]
+
+        return credit_providers
 
     @classmethod
     def get_credit_provider(cls, provider_id):
@@ -460,6 +497,7 @@ class CreditEligibility(TimeStampedModel):
             username (str): Identifier of the user being updated.
             course_key (CourseKey): Identifier of the course.
 
+        Returns: tuple
         """
         # Check all requirements for the course to determine if the user
         # is eligible.  We need to check all the *requirements*
@@ -478,8 +516,11 @@ class CreditEligibility(TimeStampedModel):
                     username=username,
                     course=CreditCourse.objects.get(course_key=course_key),
                 )
+                return is_eligible, True
             except IntegrityError:
-                pass
+                return is_eligible, False
+        else:
+            return is_eligible, False
 
     @classmethod
     def get_user_eligibilities(cls, username):

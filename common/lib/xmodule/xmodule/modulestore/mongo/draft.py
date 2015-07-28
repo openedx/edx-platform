@@ -167,6 +167,8 @@ class DraftModuleStore(MongoModuleStore):
         self.collection.remove(course_query, multi=True)
         self.delete_all_asset_metadata(course_key, user_id)
 
+        self._emit_course_deleted_signal(course_key)
+
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
         Only called if cloning within this store or if env doesn't set up mixed.

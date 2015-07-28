@@ -20,10 +20,12 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
+from util.testing import EventTestMixin
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -194,7 +196,7 @@ class CertificatesBaseTestCase(object):
 
 # pylint: disable=no-member
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
     Test cases for certificates_list_handler.
     """
@@ -202,7 +204,7 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
         """
         Set up CertificatesListHandlerTestCase.
         """
-        super(CertificatesListHandlerTestCase, self).setUp()
+        super(CertificatesListHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
 
     def _url(self):
         """
@@ -229,8 +231,13 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
         content = json.loads(response.content)
-        self._remove_ids(content)  # pylint: disable=unused-variable
+        certificate_id = self._remove_ids(content)  # pylint: disable=unused-variable
         self.assertEqual(content, expected)
+        self.assert_event_emitted(
+            'edx.certificate.configuration.created',
+            course_id=unicode(self.course.id),
+            configuration_id=certificate_id,
+        )
 
     def test_cannot_create_certificate_if_user_has_no_write_permissions(self):
         """
@@ -347,12 +354,18 @@ class CertificatesListHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, 
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
 
     _id = 0
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        """
+        Set up CertificatesDetailHandlerTestCase.
+        """
+        super(CertificatesDetailHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
 
     def _url(self, cid=-1):
         """
@@ -388,6 +401,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         )
         content = json.loads(response.content)
         self.assertEqual(content, expected)
+        self.assert_event_emitted(
+            'edx.certificate.configuration.created',
+            course_id=unicode(self.course.id),
+            configuration_id=666,
+        )
 
     def test_can_edit_certificate(self):
         """
@@ -415,6 +433,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         )
         content = json.loads(response.content)
         self.assertEqual(content, expected)
+        self.assert_event_emitted(
+            'edx.certificate.configuration.modified',
+            course_id=unicode(self.course.id),
+            configuration_id=1,
+        )
         self.reload_course()
 
         # Verify that certificate is properly updated in the course.
@@ -440,6 +463,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 204)
+        self.assert_event_emitted(
+            'edx.certificate.configuration.deleted',
+            course_id=unicode(self.course.id),
+            configuration_id='1',
+        )
         self.reload_course()
         # Verify that certificates are properly updated in the course.
         certificates = self.course.certificates['certificates']
@@ -455,6 +483,23 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         """
         self._add_course_certificates(count=2, signatory_count=1)
         user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.delete(
+            self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_certificate_without_global_staff_permissions(self):
+        """
+        Tests certificate deletion without global staff permission on course.
+        """
+        self._add_course_certificates(count=2, signatory_count=1)
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
         self.client.login(username=user.username, password='test')
         response = self.client.delete(
             self._url(cid=1),
@@ -553,6 +598,11 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
             course = self.store.get_course(self.course.id)
             certificates = course.certificates['certificates']
             self.assertEqual(certificates[0].get('is_active'), is_active)
+            cert_event_type = 'activated' if is_active else 'deactivated'
+            self.assert_event_emitted(
+                '.'.join(['edx.certificate.configuration', cert_event_type]),
+                course_id=unicode(self.course.id),
+            )
 
     @ddt.data(True, False)
     def test_certificate_activation_without_write_permissions(self, activate):
@@ -563,6 +613,27 @@ class CertificatesDetailHandlerTestCase(CourseTestCase, CertificatesBaseTestCase
         test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
         self._add_course_certificates(count=1, signatory_count=2)
         user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.post(
+            test_url,
+            data=json.dumps({"is_active": activate}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEquals(response.status_code, 403)
+
+    @ddt.data(True, False)
+    def test_certificate_activation_without_global_staff_permissions(self, activate):
+        """
+        Tests certificate Activate and Deactivate should not be allowed if user
+        does not have global staff permissions on course.
+        """
+        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        self._add_course_certificates(count=1, signatory_count=2)
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
         self.client.login(username=user.username, password='test')
         response = self.client.post(
             test_url,

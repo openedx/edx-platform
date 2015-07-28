@@ -54,11 +54,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
 
-    def get_dashboard_demographic_message(self):
+    def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
-        return 'Demographic data is now available in <a href="http://example.com/courses/{}" ' \
+        return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
 
     def test_instructor_tab(self):
@@ -157,38 +157,28 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         expected_message = self.get_dashboard_enrollment_message()
         self.assertTrue(expected_message in response.content)
 
-    @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_DEMOGRAPHICS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
-    def test_show_dashboard_demographic_data(self):
+    def test_dashboard_analytics_tab_not_shown(self):
         """
-        Test enrollment demographic data is shown.
+        Test dashboard analytics tab isn't shown if insights isn't configured.
         """
         response = self.client.get(self.url)
-        # demographic information displayed
-        self.assertTrue('data-feature="year_of_birth"' in response.content)
-        self.assertTrue('data-feature="gender"' in response.content)
-        self.assertTrue('data-feature="level_of_education"' in response.content)
+        analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
+        self.assertFalse(analytics_section in response.content)
 
-        # dashboard link hidden
-        self.assertFalse(self.get_dashboard_demographic_message() in response.content)
-
-    @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_DEMOGRAPHICS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
-    def test_show_dashboard_demographic_message(self):
+    def test_dashboard_analytics_points_at_insights(self):
         """
-        Test enrollment demographic dashboard message is shown and data is hidden.
+        Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-
-        # demographics are hidden
-        self.assertFalse('data-feature="year_of_birth"' in response.content)
-        self.assertFalse('data-feature="gender"' in response.content)
-        self.assertFalse('data-feature="level_of_education"' in response.content)
+        analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
+        self.assertTrue(analytics_section in response.content)
 
         # link to dashboard shown
-        expected_message = self.get_dashboard_demographic_message()
+        expected_message = self.get_dashboard_analytics_message()
         self.assertTrue(expected_message in response.content)
 
     def add_course_to_user_cart(self, cart, course_key):

@@ -21,7 +21,7 @@ class CourseActionState(models.Model):
     For example: course copying (reruns), import, export, and validation.
     """
 
-    class Meta:
+    class Meta(object):
         """
         For performance reasons, we disable "concrete inheritance", by making the Model base class abstract.
         With the "abstract base class" inheritance model, tables are only created for derived models, not for
@@ -77,7 +77,7 @@ class CourseActionUIState(CourseActionState):
     """
     An abstract django model that is a sub-class of CourseActionState with additional fields related to UI.
     """
-    class Meta:
+    class Meta(object):
         """
         See comment in CourseActionState on disabling "concrete inheritance".
         """
@@ -101,7 +101,7 @@ class CourseRerunState(CourseActionUIState):
     """
     A concrete django model for maintaining state specifically for the Action Course Reruns.
     """
-    class Meta:
+    class Meta(object):
         """
         Set the (destination) course_key field to be unique for the rerun action
         Although multiple reruns can be in progress simultaneously for a particular source course_key,

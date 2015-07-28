@@ -1151,7 +1151,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         # pylint: disable=fixme
         # TODO (vshnayder): post-launch, make errors properties of items
         # self.get_item(location)
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         return self._course_errors[course_key].errors
 
     def get_errored_courses(self):
@@ -1169,7 +1169,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
 
         Default impl--linear search through course list
         """
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         for course in self.get_courses(**kwargs):
             if course.id == course_id:
                 return course
@@ -1184,7 +1184,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
                 to search for whether a potentially conflicting course exists in that case.
         """
         # linear search through list
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         if ignore_case:
             return next(
                 (
@@ -1353,7 +1353,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         otherwise a publish will be signalled at the end of the bulk operation
 
         Arguments:
-            library_updated - library_updated to which the signal applies
+            library_key - library_key to which the signal applies
         """
         signal_handler = getattr(self, 'signal_handler', None)
         if signal_handler:
@@ -1362,6 +1362,14 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
                 bulk_record.has_library_updated_item = True
             else:
                 signal_handler.send("library_updated", library_key=library_key)
+
+    def _emit_course_deleted_signal(self, course_key):
+        """
+        Helper method used to emit the course_deleted signal.
+        """
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler:
+            signal_handler.send("course_deleted", course_key=course_key)
 
 
 def only_xmodules(identifier, entry_points):

@@ -119,6 +119,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     module_class = CapaModule
 
     has_score = True
+    show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
@@ -143,7 +144,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Show them only if use_latex_compiler is set to True in
         course settings.
         """
-        return ('latex' not in template['template_id'] or course.use_latex_compiler)
+        return 'latex' not in template['template_id'] or course.use_latex_compiler
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

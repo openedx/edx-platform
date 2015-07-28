@@ -79,6 +79,12 @@ def should_show_debug_toolbar(_):
 
 ########################### PIPELINE #################################
 
+# # Skip RequireJS optimizer in development
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = DEBUG
+
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 ########################### VERIFIED CERTIFICATES #################################
@@ -180,6 +186,16 @@ FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
     AUTHENTICATION_BACKENDS = ['third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
+
+############## ECOMMERCE API CONFIGURATION SETTINGS ###############
+ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
+
+###################### Cross-domain requests ######################
+FEATURES['ENABLE_CORS_HEADERS'] = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = ()
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 #####################################################################
 # See if the developer has any local overrides.

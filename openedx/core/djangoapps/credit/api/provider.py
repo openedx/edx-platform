@@ -8,6 +8,7 @@ import pytz
 import uuid
 
 from django.db import transaction
+from lms.djangoapps.django_comment_client.utils import JsonResponse
 
 from openedx.core.djangoapps.credit.exceptions import (
     UserIsNotEligible,
@@ -30,26 +31,39 @@ from util.date_utils import to_timestamp
 log = logging.getLogger(__name__)
 
 
-def get_credit_providers():
+def get_credit_providers(providers_list=None):
+    """Retrieve all available credit providers or filter on given providers_list.
+
+    Arguments:
+        providers_list (list of strings or None): contains list of ids of credit providers
+        or None.
+
+    Returns:
+        list of credit providers represented as dictionaries
+    Response Values:
+        >>> get_credit_providers(['hogwarts'])
+        [
+            {
+                "id": "hogwarts",
+                "name": "Hogwarts School of Witchcraft and Wizardry",
+                "url": "https://credit.example.com/",
+                "status_url": "https://credit.example.com/status/",
+                "description: "A new model for the Witchcraft and Wizardry School System.",
+                "enable_integration": false,
+                "fulfillment_instructions": "
+                <p>In order to fulfill credit, Hogwarts School of Witchcraft and Wizardry requires learners to:</p>
+                <ul>
+                <li>Sample instruction abc</li>
+                <li>Sample instruction xyz</li>
+                </ul>",
+            },
+            ...
+        ]
     """
-    Retrieve all available credit providers.
-
-    Example:
-    >>> get_credit_providers()
-    [
-        {
-            "id": "hogwarts",
-            "display_name": "Hogwarts School of Witchcraft and Wizardry"
-        },
-        ...
-    ]
-
-    Returns: list
-    """
-    return CreditProvider.get_credit_providers()
+    return CreditProvider.get_credit_providers(providers_list=providers_list)
 
 
-def get_credit_provider_info(provider_id):
+def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-argument
     """Retrieve the 'CreditProvider' model data against provided
      credit provider.
 
@@ -89,7 +103,7 @@ def get_credit_provider_info(provider_id):
             "fulfillment_instructions": credit_provider.fulfillment_instructions
         }
 
-    return credit_provider_data
+    return JsonResponse(credit_provider_data)
 
 
 @transaction.commit_on_success

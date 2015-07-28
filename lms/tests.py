@@ -10,7 +10,6 @@ from edxmako import add_lookup, LOOKUP
 from lms import startup
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from util import keyword_substitution
 
 
 class LmsModuleTests(TestCase):

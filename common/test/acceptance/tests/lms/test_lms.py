@@ -9,7 +9,6 @@ from unittest import skip
 from nose.plugins.attrib import attr
 
 from bok_choy.promise import EmptyPromise
-from bok_choy.web_app_test import WebAppTest
 from ..helpers import (
     UniqueCourseTest,
     EventsTestMixin,

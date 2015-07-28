@@ -2,8 +2,6 @@
 """
 E2E tests for the LMS.
 """
-import time
-
 from unittest import skip
 
 from .helpers import UniqueCourseTest
@@ -11,7 +9,6 @@ from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.annotation_component import AnnotationComponentPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.xqueue import XQueueResponseFixture
 from textwrap import dedent
 
 

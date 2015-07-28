@@ -13,7 +13,7 @@ var edx = edx || {};
 
         initialize: function () {
             this.useEcommerceApi = !!($.url('?basket_id'));
-            _.bindAll(this, 'renderReceipt', 'renderError');
+            _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider');
 
             /* Mix non-conflicting functions from underscore.string (all but include, contains, and reverse) into
              * the Underscore namespace.
@@ -28,17 +28,31 @@ var edx = edx || {};
                 context = {
                     platformName: this.$el.data('platform-name'),
                     verified: this.$el.data('verified').toLowerCase() === 'true'
-                };
+                },
+                providerId;
 
             // Add the receipt info to the template context
+            this.course_key = this.getOrderCourseKey(data)
+            this.username = this.$el.data('username');
             _.extend(context, {
                 receipt: this.receiptContext(data),
-                courseKey: this.getOrderCourseKey(data)
+                courseKey: this.course_key
             });
 
             this.$el.html(_.template(templateHtml, context));
 
             this.trackLinks();
+            providerId = this.getCreditProviderId(data);
+            if (providerId) {
+                this.getProviderData(providerId).then(this.renderProvider, this.renderError)
+            }
+        },
+        renderProvider: function (context) {
+            var templateHtml = $("#provider-tpl").html(),
+                providerDiv = this.$el.find("#receipt-provider");
+            context.course_key = this.course_key;
+            context.username = this.username;
+            providerDiv.html(_.template(templateHtml, context)).removeClass('hidden');
         },
 
         renderError: function () {
@@ -80,7 +94,7 @@ var edx = edx || {};
         /**
          * Retrieve receipt data from Oscar (via LMS).
          * @param  {int} basketId The basket that was purchased.
-         * @return {object}                 JQuery Promise.
+         * @return {object} JQuery Promise.
          */
         getReceiptData: function (basketId) {
             var urlFormat = this.useEcommerceApi ? '/api/commerce/v0/baskets/%s/order/' : '/shoppingcart/receipt/%s/';
@@ -91,13 +105,27 @@ var edx = edx || {};
                 dataType: 'json'
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});
         },
+        /**
+         * Retrieve credit provider data from LMS.
+         * @param  {string} provider_id The provider_id of the credit provider.
+         * @return {object} JQuery Promise.
+         */
+        getProviderData: function (providerId) {
+            var providerUrl = '/api/credit/v1/providers/%s/';
+
+            return $.ajax({
+                url: _.sprintf(providerUrl, providerId),
+                type: 'GET',
+                dataType: 'json'
+            }).retry({times: 5, timeout: 2000, statusCodes: [404]});
+        },
 
         /**
          * Construct the template context from data received
          * from the E-Commerce API.
          *
          * @param  {object} order Receipt data received from the server
-         * @return {object}      Receipt template context.
+         * @return {object} Receipt template context.
          */
         receiptContext: function (order) {
             var self = this,
@@ -172,13 +200,13 @@ var edx = edx || {};
                 length = order.lines.length;
                 for (var i = 0; i < length; i++) {
                     var line = order.lines[i],
-                        attribute_values = _.filter(line.product.attribute_values, function (attribute) {
+                        attributeValues = _.find(line.product.attribute_values, function (attribute) {
                             return attribute.name === 'course_key'
                         });
 
                     // This method assumes that all items in the order are related to a single course.
-                    if (attribute_values.length > 0) {
-                        return attribute_values[0]['value'];
+                    if (attributeValues != undefined) {
+                        return attributeValues['value'];
                     }
                 }
             } else {
@@ -196,7 +224,30 @@ var edx = edx || {};
 
         formatMoney: function (moneyStr) {
             return Number(moneyStr).toFixed(2);
-        }
+        },
+
+        /**
+         * Check whether the payment is for the credit course or not.
+         *
+         * @param  {object} order Receipt data received from the server
+         * @return {string} String of the provider_id or null.
+         */
+        getCreditProviderId: function (order) {
+            var attributeValues,
+                line = order.lines[0];
+            if (this.useEcommerceApi) {
+                attributeValues = _.find(line.product.attribute_values, function (attribute) {
+                        return attribute.name === 'credit_provider'
+                    });
+
+                // This method assumes that all items in the order are related to a single course.
+                if (attributeValues != undefined) {
+                    return attributeValues['value'];
+                }
+            }
+
+            return null;
+        },
     });
 
     new edx.commerce.ReceiptView({
@@ -204,3 +255,54 @@ var edx = edx || {};
     });
 
 })(jQuery, _, _.str, Backbone);
+
+
+function completeOrder (event) {
+    var courseKey = $(event).data("course-key"),
+        username = $(event).data("username"),
+        providerId = $(event).data("provider"),
+        postData = {
+            'course_key': courseKey,
+            'username': username
+        },
+        errorContainer = $("#error-container");
+
+    analytics.track(
+        "edx.bi.credit.clicked_complete_credit",
+        {
+            category: "credit",
+            label: courseKey
+        }
+    );
+
+    $.ajax({
+        url: '/api/credit/v1/provider/' + providerId + '/request/',
+        type: 'POST',
+        headers: {
+            'X-CSRFToken': $.cookie('csrftoken')
+        },
+        data: JSON.stringify(postData) ,
+        context: this,
+        success: function(requestData){
+            var form = $('#complete-order-form');
+
+            $('input', form).remove();
+
+            form.attr( 'action', requestData.url );
+            form.attr( 'method', 'POST' );
+
+            _.each( requestData.parameters, function( value, key ) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: key,
+                    value: value
+                }).appendTo(form);
+            });
+            form.submit();
+        },
+        error: function(xhr){
+            errorContainer.removeClass("is-hidden");
+            errorContainer.removeClass("hidden");
+        }
+    });
+}

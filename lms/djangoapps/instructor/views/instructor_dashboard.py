@@ -62,7 +62,7 @@ class InstructorDashboardTab(CourseTab):
         """
         Returns true if the specified user has staff access.
         """
-        return user and has_access(user, 'staff', course, course.id)
+        return bool(user and has_access(user, 'staff', course, course.id))
 
 
 @ensure_csrf_cookie
@@ -79,10 +79,10 @@ def instructor_dashboard_2(request, course_id):
 
     access = {
         'admin': request.user.is_staff,
-        'instructor': has_access(request.user, 'instructor', course),
+        'instructor': bool(has_access(request.user, 'instructor', course)),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
-        'staff': has_access(request.user, 'staff', course),
+        'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
     }
 
@@ -97,10 +97,24 @@ def instructor_dashboard_2(request, course_id):
         _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
-        _section_analytics(course, access),
     ]
 
-    #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
+    analytics_dashboard_message = None
+    if settings.ANALYTICS_DASHBOARD_URL:
+        # Construct a URL to the external analytics dashboard
+        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+        analytics_dashboard_message = _(
+            "To gain insights into student enrollment and participation {link_start}"
+            "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
+        )
+        analytics_dashboard_message = analytics_dashboard_message.format(
+            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+
+        # Temporarily show the "Analytics" section until we have a better way of linking to Insights
+        sections.append(_section_analytics(course, access))
+
+    # Check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
     course_mode_has_price = False
     paid_modes = CourseMode.paid_modes_for_course(course_key)
     if len(paid_modes) == 1:
@@ -112,7 +126,7 @@ def instructor_dashboard_2(request, course_id):
             unicode(course_key), len(paid_modes)
         )
 
-    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
+    if settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']:
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
@@ -135,15 +149,6 @@ def instructor_dashboard_2(request, course_id):
         sections.append(_section_certificates(course))
 
     disable_buttons = not _is_small_course(course_key)
-
-    analytics_dashboard_message = None
-    if settings.ANALYTICS_DASHBOARD_URL:
-        # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
-        analytics_dashboard_message = _("To gain insights into student enrollment and participation {link_start}visit {analytics_dashboard_name}, our new course analytics product{link_end}.")
-        analytics_dashboard_message = analytics_dashboard_message.format(
-            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
 
     context = {
         'course': course,
@@ -231,20 +236,25 @@ def _section_certificates(course):
         dict
 
     """
-    example_cert_status = certs_api.example_certificates_status(course.id)
+    example_cert_status = None
+    html_cert_enabled = certs_api.has_html_certificates_enabled(course.id, course)
+    if html_cert_enabled:
+        can_enable_for_course = True
+    else:
+        example_cert_status = certs_api.example_certificates_status(course.id)
 
-    # Allow the user to enable self-generated certificates for students
-    # *only* once a set of example certificates has been successfully generated.
-    # If certificates have been misconfigured for the course (for example, if
-    # the PDF template hasn't been uploaded yet), then we don't want
-    # to turn on self-generated certificates for students!
-    can_enable_for_course = (
-        example_cert_status is not None and
-        all(
-            cert_status['status'] == 'success'
-            for cert_status in example_cert_status
+        # Allow the user to enable self-generated certificates for students
+        # *only* once a set of example certificates has been successfully generated.
+        # If certificates have been misconfigured for the course (for example, if
+        # the PDF template hasn't been uploaded yet), then we don't want
+        # to turn on self-generated certificates for students!
+        can_enable_for_course = (
+            example_cert_status is not None and
+            all(
+                cert_status['status'] == 'success'
+                for cert_status in example_cert_status
+            )
         )
-    )
     instructor_generation_enabled = settings.FEATURES.get('CERTIFICATES_INSTRUCTOR_GENERATION', False)
 
     return {
@@ -254,6 +264,7 @@ def _section_certificates(course):
         'can_enable_for_course': can_enable_for_course,
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
         'instructor_generation_enabled': instructor_generation_enabled,
+        'html_cert_enabled': html_cert_enabled,
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',
@@ -530,18 +541,19 @@ def _get_dashboard_link(course_key):
 def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+    link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+    insights_message = _("For analytics about your course, go to {analytics_dashboard_name}.")
+
+    insights_message = insights_message.format(
+        analytics_dashboard_name='{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
+    )
     section_data = {
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
-        'get_distribution_url': reverse('get_distribution', kwargs={'course_id': unicode(course_key)}),
-        'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': unicode(course_key)}),
+        'insights_message': insights_message,
     }
-
-    if settings.ANALYTICS_DASHBOARD_URL:
-        dashboard_link = _get_dashboard_link(course_key)
-        message = _("Demographic data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
-        section_data['demographic_message'] = message
 
     return section_data
 

@@ -1,12 +1,12 @@
 """
 Serializers for all Course Enrollment related return objects.
-
 """
 import logging
 
 from rest_framework import serializers
-from student.models import CourseEnrollment
+
 from course_modes.models import CourseMode
+from student.models import CourseEnrollment
 
 
 log = logging.getLogger(__name__)
@@ -39,19 +39,18 @@ class CourseField(serializers.RelatedField):
     """
 
     def to_native(self, course, **kwargs):
-        course_id = unicode(course.id)
         course_modes = ModeSerializer(
             CourseMode.modes_for_course(course.id, kwargs.get('include_expired', False), only_selectable=False)
         ).data  # pylint: disable=no-member
 
         return {
-            "course_id": course_id,
-            "enrollment_start": course.enrollment_start,
-            "enrollment_end": course.enrollment_end,
-            "course_start": course.start,
-            "course_end": course.end,
-            "invite_only": course.invitation_only,
-            "course_modes": course_modes,
+            'course_id': unicode(course.id),
+            'enrollment_start': course.enrollment_start,
+            'enrollment_end': course.enrollment_end,
+            'course_start': course.start,
+            'course_end': course.end,
+            'invite_only': course.invitation_only,
+            'course_modes': course_modes,
         }
 
 

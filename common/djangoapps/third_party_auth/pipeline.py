@@ -58,7 +58,7 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
 
 import random
-import string  # pylint: disable-msg=deprecated-module
+import string  # pylint: disable=deprecated-module
 from collections import OrderedDict
 import urllib
 import analytics
@@ -79,9 +79,6 @@ import student
 from logging import getLogger
 
 from . import provider
-
-# Note that this lives in openedx, so this dependency should be refactored.
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
 
 # These are the query string params you can pass
@@ -434,7 +431,7 @@ def running(request):
 # Pipeline functions.
 # Signatures are set by python-social-auth; prepending 'unused_' causes
 # TypeError on dispatch to the auth backend's authenticate().
-# pylint: disable-msg=unused-argument
+# pylint: disable=unused-argument
 
 
 def parse_query_params(strategy, response, *args, **kwargs):

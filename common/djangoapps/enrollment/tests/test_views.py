@@ -16,7 +16,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
@@ -26,8 +26,9 @@ from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
-from openedx.core.lib.django_test_client_utils import get_absolute_url
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.models import UserOrgTag
+from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
 from embargo.test_utils import restrict_course
@@ -47,6 +48,8 @@ class EnrollmentTestMixin(object):
             mode=CourseMode.HONOR,
             is_active=None,
             enrollment_attributes=None,
+            min_mongo_calls=0,
+            max_mongo_calls=0,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -77,31 +80,33 @@ class EnrollmentTestMixin(object):
         if as_server:
             extra['HTTP_X_EDX_API_KEY'] = self.API_KEY
 
-        with patch('enrollment.views.audit_log') as mock_audit_log:
-            url = reverse('courseenrollments')
-            response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
-            self.assertEqual(response.status_code, expected_status)
+        # Verify that the modulestore is queried as expected.
+        with check_mongo_calls_range(min_finds=min_mongo_calls, max_finds=max_mongo_calls):
+            with patch('enrollment.views.audit_log') as mock_audit_log:
+                url = reverse('courseenrollments')
+                response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
+                self.assertEqual(response.status_code, expected_status)
 
-            if expected_status == status.HTTP_200_OK:
-                data = json.loads(response.content)
-                self.assertEqual(course_id, data['course_details']['course_id'])
+                if expected_status == status.HTTP_200_OK:
+                    data = json.loads(response.content)
+                    self.assertEqual(course_id, data['course_details']['course_id'])
 
-                if mode is not None:
-                    self.assertEqual(mode, data['mode'])
+                    if mode is not None:
+                        self.assertEqual(mode, data['mode'])
 
-                if is_active is not None:
-                    self.assertEqual(is_active, data['is_active'])
-                else:
-                    self.assertTrue(data['is_active'])
+                    if is_active is not None:
+                        self.assertEqual(is_active, data['is_active'])
+                    else:
+                        self.assertTrue(data['is_active'])
 
-                if as_server:
-                    # Verify that an audit message was logged.
-                    self.assertTrue(mock_audit_log.called)
+                    if as_server:
+                        # Verify that an audit message was logged.
+                        self.assertTrue(mock_audit_log.called)
 
-                    # If multiple enrollment calls are made in the scope of a
-                    # single test, we want to validate that audit messages are
-                    # logged for each call.
-                    mock_audit_log.reset_mock()
+                        # If multiple enrollment calls are made in the scope of a
+                        # single test, we want to validate that audit messages are
+                        # logged for each call.
+                        mock_audit_log.reset_mock()
 
         return response
 
@@ -141,6 +146,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.rate_limit, rate_duration = throttle.parse_rate(throttle.rate)
 
         self.course = CourseFactory.create()
+        # Load a CourseOverview. This initial load should result in a cache
+        # miss; the modulestore is queried and course metadata is cached.
+        __ = CourseOverview.get_from_id(self.course.id)
+
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.other_user = UserFactory.create()
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
@@ -382,6 +391,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     @ddt.unpack
     def test_get_course_details_course_dates(self, start_datetime, end_datetime, expected_start, expected_end):
         course = CourseFactory.create(start=start_datetime, end=end_datetime)
+        # Load a CourseOverview. This initial load should result in a cache
+        # miss; the modulestore is queried and course metadata is cached.
+        __ = CourseOverview.get_from_id(course.id)
+
         self.assert_enrollment_status(course_id=unicode(course.id))
 
         # Check course details
@@ -411,7 +424,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertEqual(data[0]['course_details']['course_end'], expected_end)
 
     def test_with_invalid_course_id(self):
-        self.assert_enrollment_status(course_id='entirely/fake/course', expected_status=status.HTTP_400_BAD_REQUEST)
+        self.assert_enrollment_status(
+            course_id='entirely/fake/course',
+            expected_status=status.HTTP_400_BAD_REQUEST,
+            min_mongo_calls=3,
+            max_mongo_calls=4
+        )
 
     def test_get_enrollment_details_bad_course(self):
         resp = self.client.get(
@@ -797,7 +815,12 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentEmbargoTest, self).setUp('embargo')
+
         self.course = CourseFactory.create()
+        # Load a CourseOverview. This initial load should result in a cache
+        # miss; the modulestore is queried and course metadata is cached.
+        __ = CourseOverview.get_from_id(self.course.id)
+
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.url = reverse('courseenrollments')

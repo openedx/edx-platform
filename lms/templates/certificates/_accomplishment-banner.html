@@ -30,6 +30,9 @@ from django.core.urlresolvers import reverse
                   social_network: 'LinkedIn'
               };
               Logger.log('edx.certificate.shared', data);
+              % if linked_in_url:
+              window.open('${linked_in_url}');
+              % endif
           });
       });
 
@@ -73,7 +76,7 @@ from django.core.urlresolvers import reverse
                         </button>
                       %endif
                       % if share_settings.get('CERTIFICATE_TWITTER', False):
-                      <% twitter_url = 'https://twitter.com/intent/tweet?text=' + twitter_share_text + '&url='+ share_url%>
+                      <% twitter_url = 'https://twitter.com/intent/tweet?text=' + twitter_share_text + '&url='+ urllib.quote_plus(share_url)%>
                         <button data-tooltip="${_('Share on Twitter')}"
                           class="action action-share-twitter btn btn-overlay btn-small icon-only"
                           title="${_('Share on Twitter')}"
@@ -85,10 +88,10 @@ from django.core.urlresolvers import reverse
                     %endif
 
                     %if linked_in_url:
-                    <a class="action action-linkedin-profile btn btn-overlay btn-small icon-only" id="action-share-linkedin" target="_blank" href="${linked_in_url}" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
+                    <button class="action action-linkedin-profile btn btn-overlay btn-small icon-only" id="action-share-linkedin" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
                         <i class="icon fa fa-linkedin" aria-hidden="true"></i>
                         <span class="action-label">${_("Add to LinkedIn Profile")}</span>
-                    </a>
+                    </button>
                     %endif
 
                     %if badge:

@@ -299,6 +299,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
     js_module_name = "VerticalDescriptor"
 
+    show_in_read_only_mode = True
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(LibraryContentDescriptor, self).non_editable_metadata_fields

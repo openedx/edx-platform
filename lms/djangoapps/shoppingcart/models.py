@@ -1163,7 +1163,7 @@ class InvoiceHistory(models.Model):
         elif hasattr(instance, 'invoice'):
             InvoiceHistory.save_invoice_snapshot(instance.invoice)
 
-    class Meta:  # pylint: disable=missing-docstring,old-style-class
+    class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "timestamp"
 
 
