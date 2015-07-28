@@ -530,7 +530,10 @@ class CourseBlockData(object):
             *
         """
         if transformation.id in self._transformation_data:
-            return self._transformation_data[transformation.id][key]
+            if key in self._transformation_data[transformation.id]:
+                return self._transformation_data[transformation.id][key]
+            else:
+                return None
         else:
             raise KeyError(
                 "Data for transformation with ID {} not found.".format(

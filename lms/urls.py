@@ -122,6 +122,10 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
 
+urlpatterns += (
+    url(r'^api/course_structure_cache/', include('lms_course_cache.urls')),
+)
+
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
     # TODO Namespace these!
