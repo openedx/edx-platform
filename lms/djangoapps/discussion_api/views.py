@@ -141,6 +141,13 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             (including the bodies of comments in the thread) matches the search
             string will be returned.
 
+        * order_by: Must be "last_activity_at", "comment_count", or
+            "vote_count". The key to sort the threads by. The default is
+            "last_activity_at".
+
+        * order_direction: Must be "asc" or "desc". The direction in which to
+            sort the threads by. The default is "desc".
+
         * following: If true, retrieve only threads the requesting user is
             following
 
@@ -245,6 +252,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["text_search"],
                 form.cleaned_data["following"],
                 form.cleaned_data["view"],
+                form.cleaned_data["order_by"],
+                form.cleaned_data["order_direction"],
             )
         )
 

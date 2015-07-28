@@ -836,6 +836,74 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             query: ["true"],
         })
 
+    @ddt.data(
+        ("last_activity_at", "date"),
+        ("comment_count", "comments"),
+        ("vote_count", "votes")
+    )
+    @ddt.unpack
+    def test_order_by_query(self, http_query, cc_query):
+        """
+        Tests the order_by parameter
+
+        Arguments:
+            http_query (str): Query string sent in the http request
+            cc_query (str): Query string used for the comments client service
+        """
+        self.register_get_threads_response([], page=1, num_pages=1)
+        result = get_thread_list(
+            self.request,
+            self.course.id,
+            page=1,
+            page_size=11,
+            order_by=http_query,
+        )
+        self.assertEqual(
+            result,
+            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+        )
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/threads"
+        )
+        self.assert_last_query_params({
+            "user_id": [unicode(self.user.id)],
+            "course_id": [unicode(self.course.id)],
+            "sort_key": [cc_query],
+            "sort_order": ["desc"],
+            "page": ["1"],
+            "per_page": ["11"],
+            "recursive": ["False"],
+        })
+
+    @ddt.data("asc", "desc")
+    def test_order_direction_query(self, http_query):
+        self.register_get_threads_response([], page=1, num_pages=1)
+        result = get_thread_list(
+            self.request,
+            self.course.id,
+            page=1,
+            page_size=11,
+            order_direction=http_query,
+        )
+        self.assertEqual(
+            result,
+            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+        )
+        self.assertEqual(
+            urlparse(httpretty.last_request().path).path,
+            "/api/v1/threads"
+        )
+        self.assert_last_query_params({
+            "user_id": [unicode(self.user.id)],
+            "course_id": [unicode(self.course.id)],
+            "sort_key": ["date"],
+            "sort_order": [http_query],
+            "page": ["1"],
+            "per_page": ["11"],
+            "recursive": ["False"],
+        })
+
 
 @ddt.ddt
 class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
