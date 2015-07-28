@@ -7,12 +7,7 @@
 from collections import deque
 
 
-def _traverse_generic(
-        start_node,
-        get_parents,
-        get_children,
-        get_result=None,
-        predicate=None):
+def _traverse_generic(start_node, get_parents, get_children, get_result=None, predicate=None):
     """
     Helper function to avoid duplicating functionality between
     traverse_depth_first and traverse_topologically.
@@ -76,11 +71,7 @@ def _traverse_generic(
             yield get_result(curr_node)
 
 
-def traverse_depth_first(
-        start_node,
-        get_children,
-        get_result=None,
-        predicate=None):
+def traverse_depth_first(start_node, get_children, get_result=None, predicate=None):
     """
     ...
     """
@@ -94,12 +85,7 @@ def traverse_depth_first(
     )
 
 
-def traverse_topologically(
-        start_node,
-        get_children,
-        get_parents,
-        get_result=None,
-        predicate=None):
+def traverse_topologically(start_node, get_parents, get_children, get_result=None, predicate=None):
     """
     ...
     """

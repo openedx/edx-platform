@@ -20,8 +20,8 @@ def _get_cache_interface():
     if not _cache_interface:
         _cache_interface = CourseCacheInterface(
             get_cache('default'),  # TODO: For Django 1.7+, use django.core.caches[cache_name].
-            'lms.djangoapps.lms_course_cache.course.',
-            'lms.djangoapps.lms_course_cache.block.',
+            'lms.djangoapps.lms_course_cache.',
+            'lms.djangoapps.lms_course_cache.',
             LMS_COURSE_TRANSFORMATIONS,
         )
     return _cache_interface

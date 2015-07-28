@@ -765,6 +765,8 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     # for the student, since there may be field override data for the student
     # that affects xblock visibility.
     if getattr(user, 'known', True):
+
+        print '\n\nhas_access({})={}\nvisible_to_staff_only={}\nstart={}\n\n'.format(descriptor.display_name, bool(has_access(user, 'load', descriptor, course_id)), descriptor.visible_to_staff_only, descriptor.start)
         if not has_access(user, 'load', descriptor, course_id):
             return None
 

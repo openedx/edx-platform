@@ -85,7 +85,7 @@ class CourseCacheInterface(object):
         # (5) Load the necessary block data.
         else:
             full_block_structure, xblock_dict = self._create_block_structure(course_key)
-            block_data_dict = self._create_block_data_dict(full_block_structure, xblock_dict)
+            block_data_dict = self._create_block_data_dict(course_key, full_block_structure, xblock_dict)
             self._cache_block_structure(course_key, full_block_structure)
             self._cache_block_data_dict(block_data_dict)
             block_structure = (
@@ -167,12 +167,13 @@ class CourseCacheInterface(object):
 
         course = modulestore().get_course(course_key, depth=None)  # depth=None => load entire course
         build_block_structure(course)
-        block_structure = CourseBlockStructure(course.location, True, adj)
+        block_structure = CourseBlockStructure(course.location, True, dict(adj))
         return block_structure, xblock_dict
 
-    def _create_block_data_dict(self, block_structure, xblock_dict):
+    def _create_block_data_dict(self, course_key, block_structure, xblock_dict):
         """
         Arguments:
+            course_key (CourseKey)
             block_structure (CourseBlockStructure)
             xblock_dict (dict[UsageKey: XBlock])
             transformations (list[Transformation])
@@ -183,16 +184,6 @@ class CourseCacheInterface(object):
         if not block_structure.root_block_is_course_root:
             raise ValueError("block_structure must be entire course hierarchy.")
 
-        # Define functions for traversing course hierarchy.
-        get_children = lambda xblock: [
-            xblock_dict[child_key]
-            for child_key in block_structure.get_children(xblock.location)
-        ]
-        get_parents = lambda xblock: [
-            xblock_dict[child_key]
-            for child_key in block_structure.get_parents(xblock.location)
-        ]
-
         # For each transformation, extract required fields and collect specially
         # computed data.
         required_fields = set()
@@ -200,16 +191,14 @@ class CourseCacheInterface(object):
         for transformation in self._available_transformations:
             required_fields |= transformation.required_fields
             collected_data[transformation.id] = transformation.collect(
-                xblock_dict[block_structure.root_block_key],
-                get_children,
-                get_parents
+                course_key, block_structure, xblock_dict
             )
 
         # Build a dictionary mapping usage keys to block information.
         return {
             usage_key: CourseBlockData(
                 {
-                    required_field.name: getattr(xblock, required_field.name, None)
+                    required_field: getattr(xblock, required_field, None)
                     for required_field in required_fields
                 },
                 {
@@ -394,6 +383,20 @@ class CourseBlockStructure(object):
         }
         return CourseBlockStructure(root_block_key, False, adj)
 
+    def topological_traversal(self, start_block_key=None):
+        """
+        Arguments:
+            start_block (UsageKey)
+
+        Returns:
+            generator[UsageKey]
+        """
+        return traverse_topologically(
+            start_node=(start_block_key or self.root_block_key),
+            get_parents=self.get_parents,
+            get_children=self.get_children,
+        )
+
     def _remove_block(self, usage_key, remove_orphans):
         """
         Arguments:
@@ -444,7 +447,7 @@ class CourseBlockStructure(object):
         # Trivial case: If the root block satisfies the removal condition, then
         # just remove the entire structure.
         if removal_condition(self.root_block_key):
-            self._adj = []
+            self._adj = {}
             return
 
         traversal = traverse_topologically(
@@ -497,7 +500,7 @@ class CourseBlockData(object):
         return '{{"block_fields": {{{}}}, {}}}'.format(
             ", ".join([
                 '"{}": "{}"'.format(str(key), value)
-                for key, value in self._block_fields.iteritems()
+                for key, value in (self._block_fields).iteritems()
             ]),
             ", ".join([
                 '"{}": {{{}}}'.format(key, (
@@ -506,7 +509,7 @@ class CourseBlockData(object):
                         for k, v in value.iteritems()
                     ])
                 ))
-                for key, value in self._transformation_data.iteritems()
+                for key, value in (self._transformation_data).iteritems()
             ])
         )
 
@@ -530,7 +533,11 @@ class CourseBlockData(object):
             *
         """
         if transformation.id in self._transformation_data:
-            return self._transformation_data[transformation.id][key]
+            return (
+                self._transformation_data[transformation.id][key]
+                if self._transformation_data
+                else {}
+            )
         else:
             raise KeyError(
                 "Data for transformation with ID {} not found.".format(

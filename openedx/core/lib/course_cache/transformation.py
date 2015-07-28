@@ -21,7 +21,7 @@ class CourseStructureTransformation(object):
         apply method.
 
         Returns:
-            set[xblocks.fields.Field]
+            set[str]
         """
         return set()
 
