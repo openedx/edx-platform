@@ -159,10 +159,9 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         Verify age limit messages for a user.
         """
-        if birth_year:
-            self.set_birth_year(birth_year=birth_year)
-        else:
-            self.set_birth_year(birth_year="")
+        if birth_year is None:
+            birth_year = ""
+        self.set_birth_year(birth_year=birth_year)
         profile_page = self.visit_profile_page(username)
         self.assertTrue(profile_page.privacy_field_visible)
         if message:
