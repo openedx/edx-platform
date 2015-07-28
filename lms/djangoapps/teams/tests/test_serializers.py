@@ -54,7 +54,7 @@ class TopicSerializerTestCase(TopicTestCase):
         team count of 0, and that it only takes one SQL query.
         """
         with self.assertNumQueries(1):
-            serializer = TopicSerializer(self.course.teams_topics[0])
+            serializer = TopicSerializer(self.course.teams_topics[0], context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data,
                 {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 0}
@@ -67,7 +67,25 @@ class TopicSerializerTestCase(TopicTestCase):
         """
         CourseTeamFactory.create(course_id=self.course.id, topic_id=self.course.teams_topics[0]['id'])
         with self.assertNumQueries(1):
-            serializer = TopicSerializer(self.course.teams_topics[0])
+            serializer = TopicSerializer(self.course.teams_topics[0], context={'course_id': self.course.id})
+            self.assertEqual(
+                serializer.data,
+                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1}
+            )
+
+    def test_scoped_within_course(self):
+        """Verify that team count is scoped within a course."""
+        duplicate_topic = self.course.teams_topics[0]
+        second_course = CourseFactory.create(
+            teams_configuration={
+                "max_team_size": 10,
+                "topics": [duplicate_topic]
+            }
+        )
+        CourseTeamFactory.create(course_id=self.course.id, topic_id=duplicate_topic[u'id'])
+        CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
+        with self.assertNumQueries(1):
+            serializer = TopicSerializer(self.course.teams_topics[0], context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data,
                 {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1}
@@ -110,7 +128,7 @@ class PaginatedTopicSerializerTestCase(TopicTestCase):
         """
         with self.assertNumQueries(num_queries):
             page = Paginator(self.course.teams_topics, self.PAGE_SIZE).page(1)
-            serializer = PaginatedTopicSerializer(instance=page)
+            serializer = PaginatedTopicSerializer(instance=page, context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data['results'],
                 [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
@@ -149,3 +167,17 @@ class PaginatedTopicSerializerTestCase(TopicTestCase):
         teams_per_topic = 10
         topics = self.setup_topics(num_topics=self.PAGE_SIZE + 1, teams_per_topic=teams_per_topic)
         self.assert_serializer_output(topics[:self.PAGE_SIZE], num_teams_per_topic=teams_per_topic, num_queries=1)
+
+    def test_scoped_within_course(self):
+        """Verify that team counts are scoped within a course."""
+        teams_per_topic = 10
+        first_course_topics = self.setup_topics(num_topics=self.PAGE_SIZE, teams_per_topic=teams_per_topic)
+        duplicate_topic = first_course_topics[0]
+        second_course = CourseFactory.create(
+            teams_configuration={
+                "max_team_size": 10,
+                "topics": [duplicate_topic]
+            }
+        )
+        CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
+        self.assert_serializer_output(first_course_topics, num_teams_per_topic=teams_per_topic, num_queries=1)
