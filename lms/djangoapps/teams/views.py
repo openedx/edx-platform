@@ -82,7 +82,10 @@ class TeamsDashboardView(View):
         sort_order = 'name'
         topics = get_ordered_topics(course, sort_order)
         topics_page = Paginator(topics, TOPICS_PER_PAGE).page(1)
-        topics_serializer = PaginatedTopicSerializer(instance=topics_page, context={'sort_order': sort_order})
+        topics_serializer = PaginatedTopicSerializer(
+            instance=topics_page,
+            context={'course_id': course.id, 'sort_order': sort_order}
+        )
         context = {
             "course": course,
             "topics": topics_serializer.data,
@@ -570,7 +573,7 @@ class TopicListView(GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         page = self.paginate_queryset(topics)
-        serializer = self.pagination_serializer_class(page, context={'sort_order': ordering})
+        serializer = self.pagination_serializer_class(page, context={'course_id': course_id, 'sort_order': ordering})
         return Response(serializer.data)  # pylint: disable=maybe-no-member
 
 
@@ -649,7 +652,7 @@ class TopicDetailView(APIView):
         if len(topics) == 0:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TopicSerializer(topics[0])
+        serializer = TopicSerializer(topics[0], context={'course_id': course_id})
         return Response(serializer.data)
 
 
