@@ -137,7 +137,7 @@
                                             router: router,
                                             topic: topic,
                                             collection: collection,
-                                            maxTeamSize: this.maxTeamSize
+                                            maxTeamSize: self.maxTeamSize
                                         });
                                         deferred.resolve(self.createViewWithHeader(teamsView, topic));
                                     });
@@ -227,7 +227,7 @@
                     } else {
                         topic = new TopicModel({
                             id: topicID,
-                            url: self.topicUrl.replace('topic_id', this.id)
+                            url: self.topicUrl.replace('topic_id', topicID)
                         });
                         topic.fetch()
                             .done(function() {
