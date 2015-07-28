@@ -16,6 +16,9 @@ define([
             },
             expectError = function (text) {
                 expect(teamsTabView.$('.warning').text()).toContain(text);
+            },
+            expectFocus = function (element) {
+                expect(element.focus).toHaveBeenCalled();
             };
 
         beforeEach(function () {
@@ -40,6 +43,7 @@ define([
                 course_id: 'test/course/id'
             }).render();
             Backbone.history.start();
+            spyOn($.fn, 'focus');
         });
 
         afterEach(function () {
@@ -58,17 +62,19 @@ define([
             expectContent('This is the new Teams tab.');
         });
 
-        it('displays an error message when trying to navigate to a nonexistent route', function () {
+        it('displays and focuses an error message when trying to navigate to a nonexistent route', function () {
             teamsTabView.router.navigate('test', {trigger: true});
             expectError('The page "test" could not be found.');
+            expectFocus(teamsTabView.$('.warning'));
         });
 
-        it('displays an error message when trying to navigate to a nonexistent topic', function () {
+        it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
             var requests = AjaxHelpers.requests(this);
             teamsTabView.router.navigate('topics/test', {trigger: true});
             AjaxHelpers.expectRequest(requests, 'GET', 'api/topics/test,course_id', null);
             AjaxHelpers.respondWithError(requests, 404);
             expectError('The topic "test" could not be found.');
+            expectFocus(teamsTabView.$('.warning'));
         });
     });
 });
