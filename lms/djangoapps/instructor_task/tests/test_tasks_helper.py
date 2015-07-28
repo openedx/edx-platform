@@ -23,7 +23,6 @@ from courseware.tests.factories import StudentModuleFactory
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, xml_store_config
 
 from instructor_task.tasks_helper import (
@@ -44,7 +43,6 @@ TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 from instructor_task.models import ReportStore
 from student.models import CourseEnrollment
-from xmodule.partitions.partitions import Group, UserPartition
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
@@ -54,8 +52,6 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitio
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition

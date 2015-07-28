@@ -392,7 +392,6 @@ def submit_problem_grade_report(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
->>>>>>> release-2015-05-18
 def submit_calculate_students_features_csv(request, course_key, features):
     """
     Submits a task to generate a CSV containing student profile info.

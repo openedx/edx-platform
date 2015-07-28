@@ -1,4 +1,4 @@
-<%namespace file="../main.html" import="stanford_theme_enabled" />
+<%namespace file="../main.html" import="is_non_microsite_theme" />
 <%! from django.utils.translation import ugettext as _ %>
 % if status == "approved":
     ${_("Your verification for course {course_name} and assessment {assessment} "

@@ -35,9 +35,14 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
 -e git+https://github.com/edx/bok-choy.git@v0.3.4#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
--e git+https://github.com/Stanford-Online/edx-ora2.git@188914ed75d2fee87aef6ff40e9d7d6153782805#egg=edx-ora2
+
+#-e git+https://github.com/Stanford-Online/edx-ora2.git@188914ed75d2fee87aef6ff40e9d7d6153782805#egg=edx-ora2
+-e git+https://github.com/Stanford-Online/edx-ora2.git@ba471878b6506cae62302a7310daba08b5d1d0e1#egg=edx-ora2
+#-e /home/dcadams/DevProjects/edx-ora2
+
+
 # Forking Submissions repo for ORA2 score override function.
--e git+https://github.com/Stanford-Online/edx-submissions.git@b67737ef575ffd7366027c39823806c9937fce91#egg=edx-submissions
+-e git+https://github.com/Stanford-Online/edx-submissions.git@906c52584ff3f2d37ddb1d741a6313525f7547a2#egg=edx-submissions
 -e git+https://github.com/edx/edx-analytics-data-api-client.git@4d934a789e3a60a516e70b4bf6617522d6ed153d#egg=edx-analytics-data-api-client
 
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary
@@ -48,8 +53,8 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/mckinseyacademy/xblock-poll.git@09e8feda40fdf77bd19b830b497ff969891e11af#egg=xblock-poll
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2015-05-08T16.15#egg=edx-ora2
--e git+https://github.com/edx/edx-submissions.git@e2361932b9bce061a018a31bb3929e9cade80f49#egg=edx-submissions
+#-e git+https://github.com/edx/edx-ora2.git@release-2015-05-08T16.15#egg=edx-ora2
+#-e git+https://github.com/edx/edx-submissions.git@e2361932b9bce061a018a31bb3929e9cade80f49#egg=edx-submissions
 -e git+https://github.com/edx/opaque-keys.git@df0dd602869e498e512659bb4bd243309e30e19a#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@b67d2928a26fe497826b6ea359b9a3d0371548a7#egg=ease==0.1.3
 -e git+https://github.com/edx/i18n-tools.git@7b89d5e01c1a7cc5d69d813bd8c6b706a8f75119#egg=i18n-tools

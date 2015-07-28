@@ -19,8 +19,6 @@ from rest_framework.test import APITestCase
 
 from django.core.urlresolvers import reverse
 
-from rest_framework.test import APITestCase
-
 from opaque_keys.edx.keys import CourseKey
 
 from courseware.tests.factories import UserFactory

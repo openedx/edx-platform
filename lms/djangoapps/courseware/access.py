@@ -508,7 +508,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             if in_preview_mode() or now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
-                return UserProfile.has_registered(user) or _can_load_descriptor_nonregistered(descriptor)
+                return True
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor, course_key)
 

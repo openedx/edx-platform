@@ -2420,6 +2420,7 @@ def get_student_responses(request, course_id):
             "status": already_running_status
         })
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
