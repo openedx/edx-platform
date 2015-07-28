@@ -153,17 +153,14 @@ class UserPartitionTransformation(CourseStructureTransformation):
             # visited because we're iterating over the result of a topological
             # sort.
             group_ids = UserPartitionTransformation.get_group_ids(course_root_xblock, xblock)
-            print '--------- groups ids ------'
-            print group_ids
             parent_group_ids = []
             for parent in get_parents(xblock):
                 parent_group_ids.append(getattr(result_dict[parent.location], 'group_ids', None))
             result_dict[xblock.location] = {
-                'group_ids': group_ids or compose_parent_access(
-                    parent_group_ids
-                )
-            }
-            result_dict[xblock.location] = {
+                'group_ids': 
+                    group_ids or compose_parent_access(
+                        parent_group_ids
+                    ),
                 'user_partitions':
                     xblock.user_partitions or compose_parent_access(
                         result_dict[parent.location]['user_partitions']
@@ -191,17 +188,16 @@ class UserPartitionTransformation(CourseStructureTransformation):
             group_ids = block_data[root_block_key].get_transformation_data(
                 self, 'group_ids'
             )
-            print ' -group_ids'
-            print group_ids
             user_groups = UserPartitionTransformation.get_group_ids_for_user(course_key, user_partitions, user)
             if group_ids:
                 for group_id in group_ids:
                     if group_id in user_groups:
-                        return True
+                        return False
+                return True
             return False
 
-#        if not _has_access_to_course(user, 'staff', course_key):
-        block_structure.remove_block_if(remove_condition)
+        if not _has_access_to_course(user, 'staff', course_key):
+            block_structure.remove_block_if(remove_condition)
 
 LMS_COURSE_TRANSFORMATIONS = {
     VisibilityTransformation(), 
