@@ -129,6 +129,14 @@ class CreditProvider(TimeStampedModel):
         )
     )
 
+    thumbnail_url = models.URLField(
+        default="",
+        max_length=255,
+        help_text=ugettext_lazy(
+            "Thumbnail image url of the credit provider."
+        )
+    )
+
     CREDIT_PROVIDERS_CACHE_KEY = "credit.providers.list"
 
     @classmethod
@@ -166,6 +174,7 @@ class CreditProvider(TimeStampedModel):
                     "description": provider.provider_description,
                     "enable_integration": provider.enable_integration,
                     "fulfillment_instructions": provider.fulfillment_instructions,
+                    "thumbnail_url": provider.thumbnail_url,
                 }
                 for provider in credit_providers
             ]

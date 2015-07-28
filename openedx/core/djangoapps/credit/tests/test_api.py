@@ -70,6 +70,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         "mailing_address": "123 Fake Street, Cambridge MA",
         "country": "US",
     }
+    THUMBNAIL_URL = "https://credit.example.com/logo.png"
 
     def setUp(self, **kwargs):
         super(CreditApiTestBase, self).setUp()
@@ -86,7 +87,8 @@ class CreditApiTestBase(ModuleStoreTestCase):
             provider_status_url=self.PROVIDER_STATUS_URL,
             provider_description=self.PROVIDER_DESCRIPTION,
             enable_integration=self.ENABLE_INTEGRATION,
-            fulfillment_instructions=self.FULFILLMENT_INSTRUCTIONS
+            fulfillment_instructions=self.FULFILLMENT_INSTRUCTIONS,
+            thumbnail_url=self.THUMBNAIL_URL
         )
 
         return credit_course
@@ -516,7 +518,8 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
                 "status_url": self.PROVIDER_STATUS_URL,
                 "description": self.PROVIDER_DESCRIPTION,
                 "enable_integration": self.ENABLE_INTEGRATION,
-                "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS
+                "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS,
+                "thumbnail_url": self.THUMBNAIL_URL
             }
         ])
 
@@ -540,6 +543,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             "description": self.PROVIDER_DESCRIPTION,
             "enable_integration": self.ENABLE_INTEGRATION,
             "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS,
+            "thumbnail_url": self.THUMBNAIL_URL
         }]
         result = api.get_credit_providers([self.PROVIDER_ID])
         self.assertEqual(result, expected_result)
@@ -838,6 +842,7 @@ class CreditApiFeatureFlagEnabledTests(CreditApiFeatureFlagTest, CreditApiTestBa
             "provider_description": self.PROVIDER_DESCRIPTION,
             "enable_integration": self.ENABLE_INTEGRATION,
             "fulfillment_instructions": self.FULFILLMENT_INSTRUCTIONS,
+            "thumbnail_url": self.THUMBNAIL_URL
         }
         path = reverse('credit:get_provider_info', kwargs={'provider_id': self.PROVIDER_ID})
         result = self.client.get(path)
