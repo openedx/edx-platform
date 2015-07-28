@@ -3,6 +3,7 @@
 End-to-end tests for the LMS.
 """
 
+from datetime import datetime
 from flaky import flaky
 from textwrap import dedent
 from unittest import skip
@@ -17,6 +18,7 @@ from ..helpers import (
     select_option_by_value,
     element_has_text
 )
+from ...pages.lms import BASE_URL
 from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
@@ -1152,3 +1154,35 @@ class EntranceExamTest(UniqueCourseTest):
             css_selector=entrance_exam_link_selector,
             text='Entrance Exam'
         ))
+
+
+@attr('shard_5')
+class NotLiveRedirectTest(UniqueCourseTest):
+    """
+    Test that a banner is shown when the user is redirected to
+    the dashboard from a non-live course.
+    """
+
+    def setUp(self):
+        """Create a course that isn't live yet and enroll for it."""
+        super(NotLiveRedirectTest, self).setUp()
+        CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name'],
+            start_date=datetime(year=2099, month=1, day=1)
+        ).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_redirect_banner(self):
+        """
+        Navigate to the course info page, then check that we're on the
+        dashboard page with the appropriate message.
+        """
+        url = BASE_URL + "/courses/" + self.course_id + "/" + 'info'
+        self.browser.get(url)
+        page = DashboardPage(self.browser)
+        page.wait_for_page()
+        self.assertIn(
+            'The course you are looking for does not start until',
+            page.banner_text
+        )

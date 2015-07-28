@@ -129,6 +129,14 @@ class CreditProvider(TimeStampedModel):
         )
     )
 
+    thumbnail_url = models.URLField(
+        default="",
+        max_length=255,
+        help_text=ugettext_lazy(
+            "Thumbnail image url of the credit provider."
+        )
+    )
+
     CREDIT_PROVIDERS_CACHE_KEY = "credit.providers.list"
 
     @classmethod
@@ -166,6 +174,7 @@ class CreditProvider(TimeStampedModel):
                     "description": provider.provider_description,
                     "enable_integration": provider.enable_integration,
                     "fulfillment_instructions": provider.fulfillment_instructions,
+                    "thumbnail_url": provider.thumbnail_url,
                 }
                 for provider in credit_providers
             ]
@@ -286,6 +295,7 @@ class CreditRequirement(TimeStampedModel):
         Model metadata.
         """
         unique_together = ('namespace', 'name', 'course')
+        ordering = ["order"]
 
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement, order):
@@ -337,7 +347,7 @@ class CreditRequirement(TimeStampedModel):
 
         """
         # order credit requirements according to their appearance in courseware
-        requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True).order_by("-order")
+        requirements = CreditRequirement.objects.filter(course__course_key=course_key, active=True)
 
         if namespace is not None:
             requirements = requirements.filter(namespace=namespace)

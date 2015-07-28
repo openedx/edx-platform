@@ -61,7 +61,7 @@
 
             a {
               color: $lighter-base-font-color;
-              font: italic 800 0.6em/1em $sans-serif;
+              font: italic 700 0.6em/1em $sans-serif;
               letter-spacing: 0px;
               margin-left: ($baseline*0.75);
               text-shadow: 0 1px rgba(255,255,255, 0.6);
@@ -79,7 +79,7 @@
 
             a {
               color: $lighter-base-font-color;
-              font: italic 800 1em/1em $sans-serif;
+              font: italic 700 1em/1em $sans-serif;
               letter-spacing: 0px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-transform: none;
@@ -443,7 +443,7 @@
         color: $base-font-color;
         font-family: $sans-serif;
         font-style: italic;
-        font-weight: 800;
+        font-weight: 700;
         display: inline-block;
         letter-spacing: 0px;
         margin-right: ($baseline*0.75);

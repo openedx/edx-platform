@@ -9,10 +9,10 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
                 setFixtures('<section class="teams-content"></section>');
                 teamsTab = new TeamsTabFactory({
                     topics: {results: []},
-                    topics_url: '',
-                    teams_url: '',
-                    maxTeamSize: 9999
-                    course_id: 'edX/DemoX/Demo_Course'
+                    topicsUrl: '',
+                    teamsUrl: '',
+                    maxTeamSize: 9999,
+                    courseID: 'edX/DemoX/Demo_Course'
                 });
             });
 

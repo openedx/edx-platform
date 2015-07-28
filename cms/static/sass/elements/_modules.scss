@@ -249,7 +249,7 @@
         opacity: 1.0;
       }
 
-      // reset to remove jquery-ui float 
+      // reset to remove jquery-ui float
       a.link-tab {
         float: none;
       }
@@ -546,20 +546,24 @@ $outline-indent-width: $baseline;
       > .subsection-status .status-grading {
         opacity: 1.0;
       }
+
+      > .subsection-status .status-timed-proctored-exam {
+        opacity: 1.0;
+      }
     }
 
     // status - grading
-    .status-grading {
+    .status-grading, .status-timed-proctored-exam  {
       @include transition(opacity $tmg-f2 ease-in-out 0s);
       opacity: 0.65;
     }
 
-    .status-grading-value {
+    .status-grading-value, .status-proctored-exam-value {
       display: inline-block;
       vertical-align: middle;
     }
 
-    .status-grading-date {
+    .status-grading-date, .status-due-date {
       display: inline-block;
       vertical-align: middle;
       margin-left: ($baseline/4);

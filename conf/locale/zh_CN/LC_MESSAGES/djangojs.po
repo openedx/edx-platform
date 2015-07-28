@@ -28,6 +28,7 @@
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ranfish <ranfish@gmail.com>, 2015
+# ruiruillp <gaier1993@163.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # shuchuanchen <am15501@163.com>, 2014
 # skyclass443 <cyx19920829@gmail.com>, 2014
@@ -73,6 +74,7 @@
 # Na Liu <nanamadier@gmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # Rom, 2015
+# ruiruillp <gaier1993@163.com>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
@@ -123,8 +125,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-21 15:33+0000\n"
-"PO-Revision-Date: 2015-07-14 14:36+0000\n"
+"POT-Creation-Date: 2015-07-27 13:45+0000\n"
+"PO-Revision-Date: 2015-07-27 13:49+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -2328,14 +2330,31 @@ msgstr "标签："
 msgid "name"
 msgstr "名称"
 
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open_slots"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "%(member_count)s / %(max_member_count)s Member"
+msgid_plural "%(member_count)s / %(max_member_count)s Members"
+msgstr[0] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "View %(span_start)s %(team_name)s %(span_end)s"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Create new team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Course teams are organized into topics created by course instructors. Try to"
-" join others in an existing team before you decide to create a new team!"
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2348,6 +2367,14 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The page \"%(route)s\" could not be found."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The topic \"%(topic)s\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
@@ -2399,6 +2426,22 @@ msgstr "生成评分结果错误，请重试。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -3171,12 +3214,28 @@ msgstr "出错了，请尝试重新搜素。"
 msgid "Focus grabber"
 msgstr "焦点采集器"
 
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
 msgstr "出现了一个错误。请确保你已联网，然后刷新页面。"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Hide notes"
+msgstr "隐藏注释"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes visible"
+msgstr "注释可见"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Show notes"
+msgstr "显示注释"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes hidden"
+msgstr "注释已隐藏"
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -3186,22 +3245,6 @@ msgstr "请在 %(anchor_start)s 搜索字段%(anchor_end)s输入一个关键词�
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
 msgstr "当前选项"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hide notes"
-msgstr "隐藏注释"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes visible"
-msgstr "注释可见"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Show notes"
-msgstr "显示注释"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes hidden"
-msgstr "注释已隐藏"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
@@ -4887,6 +4930,11 @@ msgstr "无效的 URL 格式。"
 msgid "Actions"
 msgstr ""
 
+#: cms/templates/js/course-outline.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr "截止日期"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -4899,10 +4947,6 @@ msgstr "单元"
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "开始日期"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Due Date"
-msgstr "截止日期"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "remove all"
@@ -6164,6 +6208,14 @@ msgid "Due:"
 msgstr "截止时间："
 
 #: cms/templates/js/course-outline.underscore
+msgid "Proctored Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Timed and Proctored Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "您尚未向该课程添加任何内容。"
@@ -6685,6 +6737,36 @@ msgstr "删除{role}访问权限"
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
 msgstr "删除用户 {username}"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Timed Exam"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is timed"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Time Allotted (HH:MM):"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students see warnings when 20% and 5% of the allotted time remains. In "
+"certain cases, students can be granted allowances that give them extra time "
+"to complete the exam."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is proctored"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students can choose to take this exam with or without online proctoring, but"
+" only students who choose the proctored option are eligible for credit. "
+"Proctored exams must also be timed exams."
+msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

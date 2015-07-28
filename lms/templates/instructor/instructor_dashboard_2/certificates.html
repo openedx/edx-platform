@@ -58,7 +58,7 @@
         % endif
     </div>
 
-    % if section_data['instructor_generation_enabled']:
+    % if section_data['instructor_generation_enabled'] and not (section_data['enabled_for_course'] and section_data['html_cert_enabled']):
         <hr />
 
         <div class="start-certificate-generation">

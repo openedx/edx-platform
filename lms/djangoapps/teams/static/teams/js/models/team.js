@@ -16,6 +16,10 @@
                 country: '',
                 language: '',
                 membership: []
+            },
+
+            initialize: function(options) {
+                this.url = options.url;
             }
         });
         return Team;

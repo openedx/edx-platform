@@ -801,6 +801,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         child_info = None
 
+    release_date = _get_release_date(xblock, user)
+
     if xblock.category != 'course':
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
     else:
@@ -810,6 +812,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
     xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
     explanatory_message = None
+
     # is_entrance_exam is inherited metadata.
     if xblock.category == 'chapter' and getattr(xblock, "is_entrance_exam", None):
         # Entrance exam section should not be deletable, draggable and not have 'New Subsection' button.
@@ -835,7 +838,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
-        "release_date": _get_release_date(xblock, user),
+        "release_date": release_date,
         "visibility_state": visibility_state,
         "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
         "start": xblock.fields['start'].to_json(xblock.start),
@@ -846,8 +849,21 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
         "actions": xblock_actions,
-        "explanatory_message": explanatory_message
+        "explanatory_message": explanatory_message,
     }
+
+    # update xblock_info with proctored_exam information if the feature flag is enabled
+    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+        if xblock.category == 'course':
+            xblock_info.update({
+                "enable_proctored_exams": xblock.enable_proctored_exams
+            })
+        elif xblock.category == 'sequential':
+            xblock_info.update({
+                "is_proctored_enabled": xblock.is_proctored_enabled,
+                "is_time_limited": xblock.is_time_limited,
+                "default_time_limit_minutes": xblock.default_time_limit_minutes
+            })
 
     # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.
     if xblock.category == 'sequential' and getattr(xblock, "in_entrance_exam", False):
@@ -1036,7 +1052,15 @@ def _get_release_date(xblock, user=None):
     Returns the release date for the xblock, or None if the release date has never been set.
     """
     # If year of start date is less than 1900 then reset the start date to DEFAULT_START_DATE
-    if xblock.start.year < 1900 and user:
+    reset_to_default = False
+    try:
+        reset_to_default = xblock.start.year < 1900
+    except ValueError:
+        # For old mongo courses, accessing the start attribute calls `to_json()`,
+        # which raises a `ValueError` for years < 1900.
+        reset_to_default = True
+
+    if reset_to_default and user:
         xblock.start = DEFAULT_START_DATE
         xblock = _update_with_callback(xblock, user)
 

@@ -92,9 +92,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-21 15:33+0000\n"
-"PO-Revision-Date: 2015-07-20 21:04+0000\n"
-"Last-Translator: Patricia Colmenares <patrusca38@hotmail.com>\n"
+"POT-Creation-Date: 2015-07-27 13:45+0000\n"
+"PO-Revision-Date: 2015-07-27 13:49+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2392,18 +2392,33 @@ msgstr "Etiquetas:"
 msgid "name"
 msgstr "nombre"
 
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open_slots"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "%(member_count)s / %(max_member_count)s Member"
+msgid_plural "%(member_count)s / %(max_member_count)s Members"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "View %(span_start)s %(team_name)s %(span_end)s"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Create new team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Course teams are organized into topics created by course instructors. Try to"
-" join others in an existing team before you decide to create a new team!"
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
 msgstr ""
-"Los equipos de curso están organizados por temas creados por los "
-"instructores. Intente unirse un equipo existente antes de decidirse a crear "
-"un nuevo equipo."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Teams"
@@ -2416,6 +2431,14 @@ msgstr "Mis equipos"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse"
 msgstr "Explorar"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The page \"%(route)s\" could not be found."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The topic \"%(topic)s\" could not be found."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2473,6 +2496,22 @@ msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Error al generar el reporte de calificaciones. Por favor intente nuevamente."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3341,14 +3380,30 @@ msgstr "Hubo un error, intente buscar de nuevo."
 msgid "Focus grabber"
 msgstr "Captura del foco"
 
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
 msgstr ""
 "Ha ocurrido un error.  Asegúrese de que está conectado a Internet y luego "
 "recargue la página."
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Hide notes"
+msgstr "Ocultar notas"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes visible"
+msgstr "Notas visibles"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Show notes"
+msgstr "Mostrar notas"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes hidden"
+msgstr "Notas ocultas"
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -3359,22 +3414,6 @@ msgstr ""
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
 msgstr "Pestaña actual"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hide notes"
-msgstr "Ocultar notas"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes visible"
-msgstr "Notas visibles"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Show notes"
-msgstr "Mostrar notas"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes hidden"
-msgstr "Notas ocultas"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
@@ -5207,6 +5246,11 @@ msgstr "Formato incorrecto de URL."
 msgid "Actions"
 msgstr "Acciones"
 
+#: cms/templates/js/course-outline.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr "Fecha límite de entrega"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -5219,10 +5263,6 @@ msgstr "Unidad"
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Fecha inicial:"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Due Date"
-msgstr "Fecha límite de entrega"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "remove all"
@@ -6593,6 +6633,14 @@ msgid "Due:"
 msgstr "Fecha de entrega:"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Proctored Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Timed and Proctored Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Todavía no ha añadido ningún contenido a este curso."
@@ -7140,6 +7188,36 @@ msgstr "Eliminar permisos de {role}"
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
 msgstr "Borrar el usuario, {username}"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Timed Exam"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is timed"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Time Allotted (HH:MM):"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students see warnings when 20% and 5% of the allotted time remains. In "
+"certain cases, students can be granted allowances that give them extra time "
+"to complete the exam."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is proctored"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students can choose to take this exam with or without online proctoring, but"
+" only students who choose the proctored option are eligible for credit. "
+"Proctored exams must also be timed exams."
+msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

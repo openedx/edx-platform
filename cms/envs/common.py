@@ -44,7 +44,7 @@ from lms.envs.common import (
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
-    ENABLE_CREDIT_ELIGIBILITY
+    ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
 )
 from path import path
 from warnings import simplefilter
@@ -181,6 +181,9 @@ FEATURES = {
 
     # Can the visibility of the discussion tab be configured on a per-course basis?
     'ALLOW_HIDING_DISCUSSION_TAB': False,
+
+    # Timed or Proctored Exams
+    'ENABLE_PROCTORED_EXAMS': False,
 }
 
 ENABLE_JASMINE = False
@@ -654,10 +657,10 @@ CELERY_QUEUES = {
 
 YOUTUBE = {
     # YouTube JavaScript API
-    'API': 'www.youtube.com/iframe_api',
+    'API': 'https://www.youtube.com/iframe_api',
 
-    # URL to test YouTube availability
-    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+    # URL to get YouTube metadata
+    'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
     # Current youtube api for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
@@ -871,6 +874,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 
@@ -949,6 +955,9 @@ ADVANCED_COMPONENT_TYPES = [
     # embed public google drive documents and calendars within edX units
     'google-document',
     'google-calendar',
+
+    # In-course reverification checkpoint
+    'edx-reverification-block',
 ]
 
 # Adding components in this list will disable the creation of new problem for those
@@ -996,6 +1005,9 @@ ELASTIC_FIELD_MAPPINGS = {
 XBLOCK_SETTINGS = {
     "VideoDescriptor": {
         "licensing_enabled": FEATURES.get("LICENSING", False)
+    },
+    'VideoModule': {
+        'YOUTUBE_API_KEY': YOUTUBE_API_KEY
     }
 }
 
@@ -1018,3 +1030,12 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 ################################ Deprecated Blocks Info ################################
 
 DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+
+
+#### PROCTORING CONFIGURATION DEFAULTS
+
+PROCTORING_BACKEND_PROVIDER = {
+    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'options': {},
+}
+PROCTORING_SETTINGS = {}

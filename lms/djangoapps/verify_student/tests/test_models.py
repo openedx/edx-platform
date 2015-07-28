@@ -220,18 +220,6 @@ class TestPhotoVerification(ModuleStoreTestCase):
 
         return attempt
 
-    def test_fetch_photo_id_image(self):
-        user = UserFactory.create()
-        orig_attempt = SoftwareSecurePhotoVerification(user=user)
-        orig_attempt.save()
-
-        old_key = orig_attempt.photo_id_key
-
-        new_attempt = SoftwareSecurePhotoVerification(user=user)
-        new_attempt.save()
-        new_attempt.fetch_photo_id_image()
-        assert_equals(new_attempt.photo_id_key, old_key)
-
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""
         # Basic case, things go well.
@@ -501,7 +489,7 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
         )
 
     @ddt.data('midterm', 'final')
-    def test_get_verification_checkpoint(self, checkpoint):
+    def test_get_or_create_verification_checkpoint(self, checkpoint):
         """
         Test that a reverification checkpoint is created properly.
         """
@@ -514,25 +502,39 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
             checkpoint_location=checkpoint_location
         )
         self.assertEqual(
-            VerificationCheckpoint.get_verification_checkpoint(self.course.id, checkpoint_location),
+            VerificationCheckpoint.get_or_create_verification_checkpoint(self.course.id, checkpoint_location),
             verification_checkpoint
         )
 
-    def test_get_verification_checkpoint_for_not_existing_values(self):
-        """Test that 'get_verification_checkpoint' method returns None if user
-        tries to access a checkpoint with an invalid location.
-        """
-        # create the VerificationCheckpoint checkpoint
-        VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_location=self.checkpoint_midterm)
+    def test_get_or_create_verification_checkpoint_for_not_existing_values(self):
+        # Retrieving a checkpoint that doesn't yet exist will create it
+        location = u'i4x://edX/DemoX/edx-reverification-block/invalid_location'
+        checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(self.course.id, location)
 
-        # get verification for a non existing checkpoint
-        self.assertEqual(
-            VerificationCheckpoint.get_verification_checkpoint(
-                self.course.id,
-                u'i4x://edX/DemoX/edx-reverification-block/invalid_location'
-            ),
-            None
+        self.assertIsNot(checkpoint, None)
+        self.assertEqual(checkpoint.course_id, self.course.id)
+        self.assertEqual(checkpoint.checkpoint_location, location)
+
+    def test_get_or_create_integrity_error(self):
+        # Create the checkpoint
+        VerificationCheckpoint.objects.create(
+            course_id=self.course.id,
+            checkpoint_location=self.checkpoint_midterm,
         )
+
+        # Simulate that the get-or-create operation raises an IntegrityError
+        # This can happen when two processes both try to get-or-create at the same time
+        # when the database is set to REPEATABLE READ.
+        with patch.object(VerificationCheckpoint.objects, "get_or_create") as mock_get_or_create:
+            mock_get_or_create.side_effect = IntegrityError
+            checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(
+                self.course.id,
+                self.checkpoint_midterm
+            )
+
+        # The checkpoint should be retrieved without error
+        self.assertEqual(checkpoint.course_id, self.course.id)
+        self.assertEqual(checkpoint.checkpoint_location, self.checkpoint_midterm)
 
     def test_unique_together_constraint(self):
         """

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-21 15:41+0000\n"
-"PO-Revision-Date: 2015-07-21 15:42:35.786548\n"
+"POT-Creation-Date: 2015-07-27 13:54+0000\n"
+"PO-Revision-Date: 2015-07-27 13:56:06.383985\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2295,22 +2295,41 @@ msgstr "قثحمغ"
 msgid "Tags:"
 msgstr "فشلس:"
 
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "name"
 msgstr "رشوث"
 
+#: lms/djangoapps/teams/static/teams/js/collections/team.js
+msgid "open_slots"
+msgstr "خحثر_سمخفس"
+
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "فثشو ذخعرف"
 
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "%(member_count)s / %(max_member_count)s Member"
+msgid_plural "%(member_count)s / %(max_member_count)s Members"
+msgstr[0] "%(member_count)s / %(max_member_count)s وثوزثق"
+msgstr[1] "%(member_count)s / %(max_member_count)s وثوزثقس"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_card.js
+msgid "View %(span_start)s %(team_name)s %(span_end)s"
+msgstr "دهثص %(span_start)s %(team_name)s %(span_end)s"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Create new team"
+msgstr "ذقثشفث رثص فثشو"
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
-"Course teams are organized into topics created by course instructors. Try to"
-" join others in an existing team before you decide to create a new team!"
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
 msgstr ""
-"ذخعقسث فثشوس شقث خقلشرهظثي هرفخ فخحهذس ذقثشفثي زغ ذخعقسث هرسفقعذفخقس. فقغ فخ"
-" تخهر خفاثقس هر شر ثطهسفهرل فثشو زثبخقث غخع يثذهيث فخ ذقثشفث ش رثص فثشو!"
+"سثث شمم فثشوس هر غخعق ذخعقسث, خقلشرهظثي زغ فخحهذ. تخهر ش فثشو فخ ذخممشزخقشفث"
+" صهفا خفاثق مثشقرثقس صاخ شقث هرفثقثسفثي هر فاث سشوث فخحهذ شس غخع شقث."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Teams"
@@ -2323,6 +2342,14 @@ msgstr "وغ فثشوس"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Browse"
 msgstr "زقخصسث"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The page \"%(route)s\" could not be found."
+msgstr "فاث حشلث \"%(route)s\" ذخعمي رخف زث بخعري."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The topic \"%(topic)s\" could not be found."
+msgstr "فاث فخحهذ \"%(topic)s\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2375,6 +2402,22 @@ msgstr "ثققخق لثرثقشفهرل لقشيثس. حمثشسث فقغ شلش
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. حمثشسث فقغ شلشهر."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "عرشدشهمشزمث وثفقهذ يهسحمشغ."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "ثققخق بثفذاهرل لقشيث يهسفقهزعفهخرس."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "مشسف عحيشفثي: <%= timestamp %>"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> سفعيثرفس سذخقثي."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3211,14 +3254,30 @@ msgstr "فاثقث صشس شر ثققخق, فقغ سثشقذاهرل شلشهر.
 msgid "Focus grabber"
 msgstr "بخذعس لقشززثق"
 
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
 msgstr ""
 "شر ثققخق اشس خذذعققثي. وشنث سعقث فاشف غخع شقث ذخررثذفثي فخ فاث هرفثقرثف, شري"
 " فاثر فقغ قثبقثساهرل فاث حشلث."
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Hide notes"
+msgstr "اهيث رخفثس"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes visible"
+msgstr "رخفثس دهسهزمث"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Show notes"
+msgstr "ساخص رخفثس"
+
+#: lms/static/js/edxnotes/views/notes_visibility_factory.js
+msgid "Notes hidden"
+msgstr "رخفثس اهييثر"
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
@@ -3229,22 +3288,6 @@ msgstr ""
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
 msgstr "ذعققثرف فشز"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hide notes"
-msgstr "اهيث رخفثس"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes visible"
-msgstr "رخفثس دهسهزمث"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Show notes"
-msgstr "ساخص رخفثس"
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Notes hidden"
-msgstr "رخفثس اهييثر"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
@@ -5048,6 +5091,11 @@ msgstr "هرذخققثذف عقم بخقوشف."
 msgid "Actions"
 msgstr "شذفهخرس"
 
+#: cms/templates/js/course-outline.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr "يعث يشفث"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -5060,10 +5108,6 @@ msgstr "عرهف"
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "سفشقف يشفث"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Due Date"
-msgstr "يعث يشفث"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "remove all"
@@ -6415,6 +6459,14 @@ msgid "Due:"
 msgstr "يعث:"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Proctored Exam"
+msgstr "حقخذفخقثي ثطشو"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Timed and Proctored Exam"
+msgstr "فهوثي شري حقخذفخقثي ثطشو"
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "غخع اشدثر'ف شييثي شرغ ذخرفثرف فخ فاهس ذخعقسث غثف."
@@ -6962,6 +7014,42 @@ msgstr "قثوخدث {role} شذذثسس"
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
 msgstr "يثمثفث فاث عسثق, {username}"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Timed Exam"
+msgstr "فهوثي ثطشو"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is timed"
+msgstr "فاهس ثطشو هس فهوثي"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Time Allotted (HH:MM):"
+msgstr "فهوث شممخففثي (اا:وو):"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students see warnings when 20% and 5% of the allotted time remains. In "
+"certain cases, students can be granted allowances that give them extra time "
+"to complete the exam."
+msgstr ""
+"سفعيثرفس سثث صشقرهرلس صاثر 20% شري 5% خب فاث شممخففثي فهوث قثوشهرس. هر "
+"ذثقفشهر ذشسثس, سفعيثرفس ذشر زث لقشرفثي شممخصشرذثس فاشف لهدث فاثو ثطفقش فهوث "
+"فخ ذخوحمثفث فاث ثطشو."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is proctored"
+msgstr "فاهس ثطشو هس حقخذفخقثي"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students can choose to take this exam with or without online proctoring, but"
+" only students who choose the proctored option are eligible for credit. "
+"Proctored exams must also be timed exams."
+msgstr ""
+"سفعيثرفس ذشر ذاخخسث فخ فشنث فاهس ثطشو صهفا خق صهفاخعف خرمهرث حقخذفخقهرل, زعف"
+" خرمغ سفعيثرفس صاخ ذاخخسث فاث حقخذفخقثي خحفهخر شقث ثمهلهزمث بخق ذقثيهف. "
+"حقخذفخقثي ثطشوس وعسف شمسخ زث فهوثي ثطشوس."
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

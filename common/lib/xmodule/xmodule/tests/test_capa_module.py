@@ -1822,7 +1822,7 @@ class TestProblemCheckTracking(unittest.TestCase):
               </multiplechoiceresponse>
               <p>Which of the following are musical instruments?</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical" label="Which of the following are musical instruments?">
+                <checkboxgroup label="Which of the following are musical instruments?">
                   <choice correct="true">a piano</choice>
                   <choice correct="false">a tree</choice>
                   <choice correct="true">a guitar</choice>

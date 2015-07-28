@@ -786,6 +786,9 @@ def _rerun_course(request, org, number, run, fields):
     # Mark the action as initiated
     CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
 
+    # Clear the fields that must be reset for the rerun
+    fields['advertised_start'] = None
+
     # Rerun the course as a new celery task
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, json_fields)

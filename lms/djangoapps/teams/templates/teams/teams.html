@@ -7,8 +7,11 @@
 
 <%block name="bodyclass">view-teams is-in-course course</%block>
 <%block name="pagetitle">${_("Teams")}</%block>
+
 <%block name="headextra">
+<%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+<%include file="../discussion/_js_head_dependencies.html" />
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='teams'" />
@@ -21,14 +24,23 @@
 </div>
 
 <%block name="js_extra">
+
+<%include file="../discussion/_js_body_dependencies.html" />
+<%static:js group='discussion'/>
+<script type="text/javascript">
+    RequireJS.define('DiscussionModuleView', [], function() {return window['DiscussionModuleView'];});
+</script>
+
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
-    new TeamsTabFactory({
+    TeamsTabFactory({
         topics: ${ json.dumps(topics, cls=EscapedEdxJSONEncoder) },
-        topic_url: '${ topic_url }',
-        topics_url: '${ topics_url }',
-        teams_url: '${ teams_url }',
+        topicUrl: '${ topic_url }',
+        topicsUrl: '${ topics_url }',
+        teamsUrl: '${ teams_url }',
         maxTeamSize: ${ course.teams_max_size },
-        course_id: '${ unicode(course.id) }'
+        courseID: '${ unicode(course.id) }'
     });
 </%static:require_module>
 </%block>
+
+<%include file="../discussion/_underscore_templates.html" />

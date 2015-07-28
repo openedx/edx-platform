@@ -111,6 +111,23 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
         self.assertContains(response, 'enable-certificates-submit')
         self.assertNotContains(response, 'Generate Example Certificates')
 
+    @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_buttons_for_html_certs_in_self_paced_course(self):
+        """
+        Tests `Enable Student-Generated Certificates` button is enabled
+        and `Generate Certificates` button is not available if
+        course has Web/HTML certificates view enabled on a self paced course.
+        """
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.client.login(username=self.global_staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Enable Student-Generated Certificates')
+        self.assertContains(response, 'enable-certificates-submit')
+        self.assertNotContains(response, 'Generate Certificates')
+        self.assertNotContains(response, 'btn-start-generating-certificates')
+
     def _assert_certificates_visible(self, is_visible):
         """Check that the certificates section is visible on the instructor dash. """
         response = self.client.get(self.url)

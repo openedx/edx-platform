@@ -23,6 +23,7 @@
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
         defineDependency("Backbone", "backbone");
+
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency("isExternal", "utility", true);
     }
@@ -50,6 +51,7 @@
             "URI": "js/vendor/URI.min",
             "string_utils": "js/src/string_utils",
             "utility": "js/src/utility",
+            "moment": "js/vendor/moment.min",
 
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",

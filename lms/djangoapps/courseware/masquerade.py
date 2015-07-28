@@ -54,8 +54,8 @@ def handle_ajax(request, course_key_string):
     masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
     request_json = request.json
     role = request_json.get('role', 'student')
-    user_partition_id = request_json.get('user_partition_id', None)
     group_id = request_json.get('group_id', None)
+    user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
     user_name = request_json.get('user_name', None)
     if user_name:
         users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)

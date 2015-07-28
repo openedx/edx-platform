@@ -2,6 +2,7 @@
 metadata:
     display_name: Custom Javascript Display and Grading
     markdown: !!null
+    showanswer: never
 data: |
       <problem>
       <p>

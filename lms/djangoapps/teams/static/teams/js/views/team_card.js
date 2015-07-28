@@ -78,6 +78,11 @@
                     {span_start: '<span class="sr">', team_name: this.model.get('name'), span_end: '</span>'},
                     true
                 );
+            },
+            action: function (event) {
+                var url = 'teams/' + this.topic.get('id') + '/' + this.model.get('id');
+                event.preventDefault();
+                this.router.navigate(url, {trigger: true});
             }
         });
         return TeamCardView;

@@ -309,7 +309,7 @@ class MongoConnection(object):
         if self.database.connection.alive():
             return True
         else:
-            raise HeartbeatFailure("Can't connect to {}".format(self.database.name))
+            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
 
     def get_structure(self, key, course_context=None):
         """

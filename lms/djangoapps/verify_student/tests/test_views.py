@@ -11,9 +11,12 @@ from uuid import uuid4
 import ddt
 import httpretty
 import mock
+import boto
+import moto
 import pytz
 from bs4 import BeautifulSoup
 from mock import patch, Mock, ANY
+import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -44,8 +47,7 @@ from verify_student.views import (
 )
 from verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
-    VerificationCheckpoint, InCourseReverificationConfiguration,
-    VerificationStatus
+    VerificationCheckpoint, VerificationStatus
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -1307,6 +1309,82 @@ class TestSubmitPhotosForVerification(TestCase):
         # Check that the user's name was changed in the database
         self._assert_user_name(self.FULL_NAME)
 
+    def test_submit_photos_sends_confirmation_email(self):
+        self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA
+        )
+        self._assert_confirmation_email(True)
+
+    def test_submit_photos_error_does_not_send_email(self):
+        # Error because invalid parameters, so no confirmation email
+        # should be sent.
+        self._submit_photos(expected_status_code=400)
+        self._assert_confirmation_email(False)
+
+    # Disable auto-auth since we will be intercepting POST requests
+    # to the verification service ourselves in this test.
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False})
+    @override_settings(VERIFY_STUDENT={
+        "SOFTWARE_SECURE": {
+            "API_URL": "https://verify.example.com/submit/",
+            "API_ACCESS_KEY": "dcf291b5572942f99adaab4c2090c006",
+            "API_SECRET_KEY": "c392efdcc0354c5f922dc39844ec0dc7",
+            "FACE_IMAGE_AES_KEY": "f82400259e3b4f88821cd89838758292",
+            "RSA_PUBLIC_KEY": (
+                "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkgtz3fQdiXshy/RfOHkoHlhx/"
+                "SSPZ+nNyE9JZXtwhlzsXjnu+e9GOuJzgh4kUqo73ePIG5FxVU+mnacvufq2cu1SOx"
+                "lRYGyBK7qDf9Ym67I5gmmcNhbzdKcluAuDCPmQ4ecKpICQQldrDQ9HWDxwjbbcqpVB"
+                "PYWkE1KrtypGThmcehLmabf6SPq1CTAGlXsHgUtbWCwV6mqR8yScV0nRLln0djLDm9d"
+                "L8tIVFFVpAfBaYYh2Cm5EExQZjxyfjWd8P5H+8/l0pmK2jP7Hc0wuXJemIZbsdm+DSD"
+                "FhCGY3AILGkMwr068dGRxfBtBy/U9U5W+nStvkDdMrSgQezS5+V test@example.com"
+            ),
+            "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
+            "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
+            "S3_BUCKET": "test.example.com",
+        }
+    })
+    @httpretty.activate
+    @moto.mock_s3
+    def test_submit_photos_for_reverification(self):
+        # Create the S3 bucket for photo upload
+        conn = boto.connect_s3()
+        conn.create_bucket("test.example.com")
+
+        # Mock the POST to Software Secure
+        httpretty.register_uri(httpretty.POST, "https://verify.example.com/submit/")
+
+        # Submit an initial verification attempt
+        self._submit_photos(
+            face_image=self.IMAGE_DATA + "4567",
+            photo_id_image=self.IMAGE_DATA + "8910",
+        )
+        initial_data = self._get_post_data()
+
+        # Submit a face photo for re-verification
+        self._submit_photos(face_image=self.IMAGE_DATA + "1112")
+        reverification_data = self._get_post_data()
+
+        # Verify that the initial attempt sent the same ID photo as the reverification attempt
+        self.assertEqual(initial_data["PhotoIDKey"], reverification_data["PhotoIDKey"])
+
+        initial_photo_response = requests.get(initial_data["PhotoID"])
+        self.assertEqual(initial_photo_response.status_code, 200)
+
+        reverification_photo_response = requests.get(reverification_data["PhotoID"])
+        self.assertEqual(reverification_photo_response.status_code, 200)
+
+        self.assertEqual(initial_photo_response.content, reverification_photo_response.content)
+
+        # Verify that the second attempt sent the updated face photo
+        initial_photo_response = requests.get(initial_data["UserPhoto"])
+        self.assertEqual(initial_photo_response.status_code, 200)
+
+        reverification_photo_response = requests.get(reverification_data["UserPhoto"])
+        self.assertEqual(reverification_photo_response.status_code, 200)
+
+        self.assertNotEqual(initial_photo_response.content, reverification_photo_response.content)
+
     @ddt.data('face_image', 'photo_id_image')
     def test_invalid_image_data(self, invalid_param):
         params = {
@@ -1326,18 +1404,31 @@ class TestSubmitPhotosForVerification(TestCase):
         )
         self.assertEqual(response.content, "Name must be at least 2 characters long.")
 
-    @ddt.data('face_image', 'photo_id_image')
-    def test_missing_required_params(self, missing_param):
+    def test_missing_required_param(self):
+        # Missing face image parameter
         params = {
-            'face_image': self.IMAGE_DATA,
             'photo_id_image': self.IMAGE_DATA
         }
-        del params[missing_param]
         response = self._submit_photos(expected_status_code=400, **params)
+        self.assertEqual(response.content, "Missing required parameter face_image")
+
+    def test_no_photo_id_and_no_initial_verification(self):
+        # Submit face image data, but not photo ID data.
+        # Since the user doesn't have an initial verification attempt, this should fail
+        response = self._submit_photos(expected_status_code=400, face_image=self.IMAGE_DATA)
         self.assertEqual(
             response.content,
-            "Missing required parameters: {missing}".format(missing=missing_param)
+            "Photo ID image is required if the user does not have an initial verification attempt."
         )
+
+        # Create the initial verification attempt
+        self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+        )
+
+        # Now the request should succeed
+        self._submit_photos(face_image=self.IMAGE_DATA)
 
     def _submit_photos(self, face_image=None, photo_id_image=None, full_name=None, expected_status_code=200):
         """Submit photos for verification.
@@ -1367,15 +1458,19 @@ class TestSubmitPhotosForVerification(TestCase):
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, expected_status_code)
 
-        if expected_status_code == 200:
+        return response
+
+    def _assert_confirmation_email(self, expect_email):
+        """
+        Check that a confirmation email was or was not sent.
+        """
+        if expect_email:
             # Verify that photo submission confirmation email was sent
             self.assertEqual(len(mail.outbox), 1)
             self.assertEqual("Verification photos received", mail.outbox[0].subject)
         else:
             # Verify that photo submission confirmation email was not sent
             self.assertEqual(len(mail.outbox), 0)
-
-        return response
 
     def _assert_user_name(self, full_name):
         """Check the user's name.
@@ -1389,6 +1484,11 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         account_settings = get_account_settings(self.user)
         self.assertEqual(account_settings['name'], full_name)
+
+    def _get_post_data(self):
+        """Retrieve POST data from the last request. """
+        last_request = httpretty.last_request()
+        return json.loads(last_request.body)
 
 
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
@@ -1613,10 +1713,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         self.create_reverification_xblock()
 
-        incourse_reverify_enabled = InCourseReverificationConfiguration.current()
-        incourse_reverify_enabled.enabled = True
-        incourse_reverify_enabled.save()
-
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1821,8 +1917,6 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
 
         # Enroll the user in the default mode (honor) to emulate
         CourseEnrollment.enroll(self.user, self.course_key, mode="verified")
-        self.config = InCourseReverificationConfiguration(enabled=True)
-        self.config.save()
 
         # mocking and patching for bi events
         analytics_patcher = patch('verify_student.views.analytics')
@@ -1830,22 +1924,10 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         self.addCleanup(analytics_patcher.stop)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_feature_flag_get(self):
-        self.config.enabled = False
-        self.config.save()
-        response = self.client.get(self._get_url(self.course_key, self.reverification_location))
-        self.assertEquals(response.status_code, 404)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_invalid_course_get(self):
-        response = self.client.get(self._get_url("invalid/course/key", self.reverification_location))
-
-        self.assertEquals(response.status_code, 404)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_invalid_checkpoint_get(self):
+        # Retrieve a checkpoint that doesn't yet exist
         response = self.client.get(self._get_url(self.course_key, "invalid_checkpoint"))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_initial_redirect_get(self):
@@ -1853,6 +1935,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         response = self.client.get(self._get_url(self.course_key, self.reverification_location))
 
         url = reverse('verify_student_verify_now', kwargs={"course_id": unicode(self.course_key)})
+        url += u"?{params}".format(params=urllib.urlencode({"checkpoint": self.reverification_location}))
         self.assertRedirects(response, url)
 
     @override_settings(SEGMENT_IO_LMS_KEY="foobar")
@@ -1890,23 +1973,24 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         """Verify that POST requests including an invalid checkpoint location
         results in a 400 response.
         """
-        response = self.client.post(self._get_url(self.course_key, self.reverification_location))
+        response = self._submit_photos(self.course_key, self.reverification_location, self.IMAGE_DATA)
         self.assertEquals(response.status_code, 400)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_initial_redirect_post(self):
+    def test_incourse_reverify_id_required_if_no_initial_verification(self):
         self._create_checkpoint()
-        response = self.client.post(self._get_url(self.course_key, self.reverification_location))
 
-        url = reverse('verify_student_verify_now', kwargs={"course_id": unicode(self.course_key)})
-        self.assertRedirects(response, url)
+        # Since the user has no initial verification and we're not sending the ID photo,
+        # we should expect a 400 bad request
+        response = self._submit_photos(self.course_key, self.reverification_location, self.IMAGE_DATA)
+        self.assertEqual(response.status_code, 400)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_index_error_post(self):
         self._create_checkpoint()
         self._create_initial_verification()
 
-        response = self.client.post(self._get_url(self.course_key, self.reverification_location), {"face_image": ""})
+        response = self._submit_photos(self.course_key, self.reverification_location, "")
         self.assertEqual(response.status_code, 400)
 
     @override_settings(SEGMENT_IO_LMS_KEY="foobar")
@@ -1915,13 +1999,16 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         self._create_checkpoint()
         self._create_initial_verification()
 
-        response = self.client.post(
-            self._get_url(self.course_key, self.reverification_location),
-            {"face_image": self.IMAGE_DATA}
-        )
+        response = self._submit_photos(self.course_key, self.reverification_location, self.IMAGE_DATA)
         self.assertEqual(response.status_code, 200)
 
-        # test that Google Analytics event firs after successfully submitting
+        # Check that the checkpoint status has been updated
+        status = VerificationStatus.get_user_status_at_checkpoint(
+            self.user, self.course_key, self.reverification_location
+        )
+        self.assertEqual(status, "submitted")
+
+        # Test that Google Analytics event fires after successfully submitting
         # photo verification
         self.mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
             self.user.id,
@@ -1937,14 +2024,6 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
             }
         )
         self.mock_tracker.reset_mock()
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_feature_flag_post(self):
-        self.config.enabled = False
-        self.config.save()
-
-        response = self.client.post(self._get_url(self.course_key, self.reverification_location))
-        self.assertEquals(response.status_code, 404)
 
     def _create_checkpoint(self):
         """
@@ -1980,6 +2059,16 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
                 "usage_id": checkpoint_location
             }
         )
+
+    def _submit_photos(self, course_key, checkpoint_location, face_image_data):
+        """ Submit photos for verification. """
+        url = reverse("verify_student_submit_photos")
+        data = {
+            "course_key": unicode(course_key),
+            "checkpoint": checkpoint_location,
+            "face_image": face_image_data,
+        }
+        return self.client.post(url, data)
 
 
 class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
