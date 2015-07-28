@@ -337,7 +337,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self._test_dropdown_field(profile_page, 'country', 'Pakistan', 'Pakistan', 'display')
 
         profile_page.make_field_editable('country')
-        self.assertTrue(profile_page.mode_for_field('country'), 'edit')
+        self.assertEqual(profile_page.mode_for_field('country'), 'edit')
 
         self.assertTrue(profile_page.field_icon_present('country'))
 
