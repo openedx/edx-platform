@@ -1331,7 +1331,7 @@ incourse_reverify_js = [
     'js/verify_student/views/error_view.js',
     'js/verify_student/views/image_input_view.js',
     'js/verify_student/views/webcam_photo_view.js',
-    'js/verify_student/models/reverification_model.js',
+    'js/verify_student/models/verification_model.js',
     'js/verify_student/views/incourse_reverify_view.js',
     'js/verify_student/incourse_reverify.js',
 ]
