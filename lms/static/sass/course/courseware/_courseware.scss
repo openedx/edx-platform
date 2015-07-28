@@ -259,8 +259,9 @@ div.course-wrapper {
         margin-bottom: ($baseline/20);
         color: #797676;
       }
-      .padding-top{
+      .proctored-exam-instruction{
         padding: ($baseline/2) 0;
+        border-bottom: 2px solid rgb(207, 216, 220);
       }
     }
     .border-b-0 {
