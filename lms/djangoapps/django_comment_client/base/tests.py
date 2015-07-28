@@ -236,7 +236,7 @@ class ViewsTestCaseMixin(object):
             data["depth"] = 0
         self._set_mock_request_data(mock_request, data)
 
-    def create_thread_helper(self, mock_request):
+    def create_thread_helper(self, mock_request, extra_data=None):
         """
         Issues a request to create a thread and verifies the result.
         """
@@ -279,22 +279,27 @@ class ViewsTestCaseMixin(object):
             "anonymous": ["false"],
             "title": ["Hello"],
         }
+        if extra_data:
+            thread.update(extra_data)
         url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
                                                'course_id': self.course_id.to_deprecated_string()})
         response = self.client.post(url, data=thread)
         assert_true(mock_request.called)
+        expected_data = {
+            'thread_type': 'discussion',
+            'body': u'this is a post',
+            'anonymous_to_peers': False, 'user_id': 1,
+            'title': u'Hello',
+            'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
+            'anonymous': False,
+            'course_id': unicode(self.course_id),
+        }
+        if extra_data:
+            expected_data.update(extra_data)
         mock_request.assert_called_with(
             'post',
             '{prefix}/i4x-MITx-999-course-Robot_Super_Course/threads'.format(prefix=CS_PREFIX),
-            data={
-                'thread_type': 'discussion',
-                'body': u'this is a post',
-                'anonymous_to_peers': False, 'user_id': 1,
-                'title': u'Hello',
-                'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
-                'anonymous': False,
-                'course_id': unicode(self.course_id),
-            },
+            data=expected_data,
             params={'request_id': ANY},
             headers=ANY,
             timeout=5
@@ -377,6 +382,10 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, V
 
     def test_create_thread(self, mock_request):
         self.create_thread_helper(mock_request)
+
+    def test_create_thread_with_context(self, mock_request):
+        # create_thread_helper verifies that extra data are passed through to the comments service
+        self.create_thread_helper(mock_request, extra_data={'context': 'standalone'})
 
     def test_delete_comment(self, mock_request):
         self._set_mock_request_data(mock_request, {

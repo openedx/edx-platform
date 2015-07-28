@@ -104,7 +104,16 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
-def make_mock_thread_data(course, text, thread_id, num_children, group_id=None, group_name=None, commentable_id=None):
+def make_mock_thread_data(
+        course,
+        text,
+        thread_id,
+        num_children,
+        group_id=None,
+        group_name=None,
+        commentable_id=None,
+        context=None
+):
     thread_data = {
         "id": thread_id,
         "type": "thread",
@@ -116,7 +125,8 @@ def make_mock_thread_data(course, text, thread_id, num_children, group_id=None, 
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
-        "group_id": group_id
+        "group_id": group_id,
+        "context": context if context else "course"
     }
     if group_id is not None:
         thread_data['group_name'] = group_name
@@ -135,7 +145,8 @@ def make_mock_request_impl(
         thread_id="dummy_thread_id",
         group_id=None,
         commentable_id=None,
-        num_thread_responses=1
+        num_thread_responses=1,
+        context=None
 ):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
@@ -149,13 +160,19 @@ def make_mock_request_impl(
                         thread_id=thread_id,
                         num_children=None,
                         group_id=group_id,
-                        commentable_id=commentable_id
+                        commentable_id=commentable_id,
+                        context=context
                     )
                 ]
             }
         elif thread_id and url.endswith(thread_id):
             data = make_mock_thread_data(
-                course=course, text=text, thread_id=thread_id, num_children=num_thread_responses, group_id=group_id
+                course=course,
+                text=text,
+                thread_id=thread_id,
+                num_children=num_thread_responses,
+                group_id=group_id,
+                context=context
             )
         elif "/users/" in url:
             data = {
@@ -650,6 +667,33 @@ class SingleThreadContentGroupTestCase(ContentGroupTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
+class InlineDiscussionContextTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        super(InlineDiscussionContextTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def test_context_can_be_standalone(self, mock_request):
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course,
+            text="dummy text",
+            context="standalone"
+        )
+
+        request = RequestFactory().get("dummy_url")
+        request.user = self.user
+
+        response = views.inline_discussion(
+            request,
+            unicode(self.course.id),
+            "dummy_topic",
+        )
+
+        json_response = json.loads(response.content)
+        self.assertEqual(json_response['discussion_data'][0]['context'], 'standalone')
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionGroupIdTestCase(
         CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
@@ -953,6 +997,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
+@patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
@@ -969,23 +1014,36 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
             discussion_target="Discussion1"
         )
 
-    @patch('lms.lib.comment_client.utils.requests.request')
-    def test_courseware_data(self, mock_request):
-        request = RequestFactory().get("dummy_url")
+    def send_request(self, mock_request, params=None):
+        """
+        Creates and returns a request with params set, and configures
+        mock_request to return appropriate values.
+        """
+        request = RequestFactory().get("dummy_url", params if params else {})
         request.user = self.student
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id
         )
-
-        response = views.inline_discussion(
+        return views.inline_discussion(
             request, self.course.id.to_deprecated_string(), self.discussion1.discussion_id
         )
+
+    def verify_response(self, response):
+        """Verifies that the response contains the appropriate courseware_url and courseware_title"""
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
         expected_courseware_title = 'Chapter / Discussion1'
         self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
+
+    def test_courseware_data(self, mock_request):
+        self.verify_response(self.send_request(mock_request))
+
+    def test_context(self, mock_request):
+        response = self.send_request(mock_request, {'context': 'standalone'})
+        self.assertEqual(mock_request.call_args[1]['params']['context'], 'standalone')
+        self.verify_response(response)
 
 
 @patch('requests.request')
