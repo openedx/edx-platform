@@ -34,6 +34,7 @@ from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
+
 from django.utils.translation import ugettext as _
 from certificates.models import (
     CertificateWhitelist,
@@ -41,12 +42,20 @@ from certificates.models import (
     CertificateStatuses
 )
 from certificates.api import generate_user_certificates
-from courseware.courses import get_course_by_id, get_problems_in_section
+from courseware.courses import (
+    get_course,
+    get_course_by_id,
+    get_problems_in_section
+)
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor_analytics.basic import enrolled_students_features, list_may_enroll
+from instructor_analytics.basic import (
+    enrolled_students_features,
+    list_may_enroll,
+    student_response_rows,
+)
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
@@ -1389,3 +1398,28 @@ def students_require_certificate(course_id, enrolled_students):
         ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
         generatedcertificate__course_id=course_id)
     return list(set(enrolled_students) - set(students_already_have_certs))
+
+
+def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, _action_name):
+    """
+    For a given `course_id`, generate a responses CSV file for students that
+    have submitted problem responses, and store using a `ReportStore`. Once
+    created, the files can be accessed by instantiating another `ReportStore` (via
+    `ReportStore.from_config()`) and calling `link_for()` on it. Writes are
+    buffered, so we'll never write part of a CSV file to S3 -- i.e. any files
+    that are visible in ReportStore will be complete ones.
+    """
+    start_time = datetime.now(UTC)
+
+    try:
+        course = get_course(course_id)
+    except ValueError as exc:
+        TASK_LOG.error(exc.message)
+        return "failed"
+
+    rows = student_response_rows(course)
+
+    # Perform the actual upload
+    upload_csv_to_report_store(rows, 'responses_report', course_id, start_time)
+
+    return "succeeded"

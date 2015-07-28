@@ -4,10 +4,12 @@ Tests for instructor.basic
 
 import json
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
 from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory, CourseModeFactory
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
     Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
@@ -15,12 +17,13 @@ from shoppingcart.models import (
 from course_modes.models import CourseMode
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features,
-    course_registration_features, coupon_codes_features, list_may_enroll,
+    course_registration_features, coupon_codes_features, list_may_enroll, student_responses,
     AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from courseware.tests.factories import InstructorFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from courseware.courses import get_course_by_id
+from courseware.tests.factories import StudentModuleFactory, InstructorFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory
 
 import datetime
@@ -451,3 +454,60 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
                 active_coupon['course_id'],
                 [coupon.course_id.to_deprecated_string() for coupon in active_coupons]
             )
+
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
+TEST_DATA_MODULESTORE = mixed_store_config(
+    TEST_DATA_DIR,
+    {
+        'edX/graded/2012_Fall': 'xml',
+        'edX/simple/2012_Fall': 'xml',
+    },
+    include_xml=True,
+    xml_source_dirs=['graded', 'simple']
+)
+
+
+class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
+    """ Test basic student responses analytics function. """
+    # pylint: disable=attribute-defined-outside-init
+
+    MODULESTORE = TEST_DATA_MODULESTORE
+
+    def create_student(self):
+        """Creates a new user and enrolls it in self.course"""
+        self.student = UserFactory()
+        CourseEnrollment.enroll(self.student, self.course.id)
+
+    def test_empty_course(self):
+        self.course = CourseFactory.create()
+        self.create_student()
+
+        datarows = list(student_responses(self.course))
+        self.assertEqual(datarows, [])
+
+    def test_full_course_no_students(self):
+        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
+        self.course = get_course_by_id(course_key)
+
+        datarows = list(student_responses(self.course))
+        self.assertEqual(datarows, [])
+
+    def test_invalid_module_state(self):
+        course_key = SlashSeparatedCourseKey('edX', 'graded', '2012_Fall')
+        self.course = get_course_by_id(course_key)
+        self.problem_location = Location("edX", "graded", "2012_Fall", "problem", "H1P2")
+
+        self.create_student()
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=self.problem_location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answers":{"fake-problem":"No idea"}}}'
+        )
+
+        datarows = list(student_responses(self.course))
+        # Invalid module state response will be skipped, so datarows should be empty
+        self.assertEqual(len(datarows), 0)

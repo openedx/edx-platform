@@ -26,6 +26,7 @@ from instructor_task.tasks import (
     calculate_may_enroll_csv,
     exec_summary_report_csv,
     generate_certificates,
+    calculate_student_responses_csv,
 )
 
 from instructor_task.api_helper import (
@@ -430,6 +431,18 @@ def generate_certificates_for_all_students(request, course_key):   # pylint: dis
     """
     task_type = 'generate_certificates_all_student'
     task_class = generate_certificates
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_student_responses_csv(request, course_key):  # pylint: disable=invalid-name
+    """
+    AlreadyRunningError is raised if the student responses report is already being generated.
+    """
+    task_type = 'student_responses'
+    task_class = calculate_student_responses_csv
     task_input = {}
     task_key = ""
 

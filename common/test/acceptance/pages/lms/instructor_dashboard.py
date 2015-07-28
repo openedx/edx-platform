@@ -744,6 +744,13 @@ class DataDownloadPage(PageObject):
         """
         return self.q(css="#report-downloads-table .file-download-link>a")
 
+    @property
+    def student_response_report_button(self):
+        """
+        Returns the 'Generate Student Reponses Report' button
+        """
+        return self.q(css='.reports-download-container input[name="student-response-report"]')
+
     def wait_for_available_report(self):
         """
         Waits for a downloadable report to be available.
@@ -757,6 +764,15 @@ class DataDownloadPage(PageObject):
         Returns a list of all the available reports for download.
         """
         return self.report_download_links.map(lambda el: el.text)
+
+    def get_report_generation_msg(self):
+        """
+        Waits for and returns the message populated in the report request-response section
+        after a report generation task is kicked off.
+        """
+        self.wait_for_element_visibility('#report-request-response', 'Grade report task success message is shown')
+        text = self.q(css="#report-request-response").text[0]
+        return text
 
 
 class StudentAdminPage(PageObject):

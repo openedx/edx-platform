@@ -7,6 +7,7 @@ Tests that CSV grade report generation works with unicode emails.
 
 """
 import ddt
+from django.conf import settings
 from mock import Mock, patch
 import tempfile
 import unicodecsv
@@ -17,19 +18,22 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
-from courseware.tests.factories import InstructorFactory
+from courseware.courses import get_course_by_id
+from courseware.tests.factories import StudentModuleFactory, InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistrationCode, Invoice, \
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
-from student.tests.factories import UserFactory, CourseModeFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import (
     cohort_students_and_upload,
@@ -40,6 +44,8 @@ from instructor_task.tasks_helper import (
     upload_enrollment_report,
     upload_exec_summary_report,
     generate_students_certificates,
+    upload_students_csv,
+    push_student_responses_to_s3,
 )
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 
@@ -1353,3 +1359,44 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             },
             result
         )
+
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_MODULESTORE = mixed_store_config(
+    TEST_DATA_DIR,
+    {'edX/unicode_graded/2012_Fall': 'xml', },
+    include_xml=True,
+    xml_source_dirs=['unicode_graded']
+)
+
+
+class TestResponsesReport(TestReportMixin, ModuleStoreTestCase):
+    """
+    Tests that CSV student responses report generation works.
+    """
+    MODULESTORE = TEST_DATA_MODULESTORE
+
+    def test_nonexistant_course(self):
+        bad_course_key = SlashSeparatedCourseKey('totally', 'fake', 'course')
+        result = push_student_responses_to_s3(None, None, bad_course_key, None, 'generated')
+        self.assertEqual(result, "failed")
+
+    def test_unicode(self):
+        # pylint: disable=attribute-defined-outside-init
+        course_key = SlashSeparatedCourseKey('edX', 'unicode_graded', '2012_Fall')
+        self.course = get_course_by_id(course_key)
+        self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
+
+        self.student = UserFactory(username=u"🅂🅃🅄🄳🄴🄽🅃")
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=self.problem_location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answers":{"fake-problem":"ƒαкє"}}',
+        )
+
+        result = push_student_responses_to_s3(None, None, self.course.id, None, 'generated')
+        self.assertEqual(result, "succeeded")
