@@ -7,7 +7,6 @@ import json
 import urllib
 from datetime import timedelta, datetime
 from uuid import uuid4
-import contextlib
 
 import ddt
 import httpretty
@@ -1345,24 +1344,26 @@ class TestSubmitPhotosForVerification(TestCase):
             "S3_BUCKET": "test.example.com",
         }
     })
+    @httpretty.activate
     @moto.mock_s3
     def test_submit_photos_for_reverification(self):
         # Create the S3 bucket for photo upload
         conn = boto.connect_s3()
         conn.create_bucket("test.example.com")
 
+        # Mock the POST to Software Secure
+        httpretty.register_uri(httpretty.POST, "https://verify.example.com/submit/")
+
         # Submit an initial verification attempt
-        with self._intercept_post() as mock_post:
-            self._submit_photos(
-                face_image=self.IMAGE_DATA + "4567",
-                photo_id_image=self.IMAGE_DATA + "8910",
-            )
-            initial_data = self._get_post_data(mock_post)
+        self._submit_photos(
+            face_image=self.IMAGE_DATA + "4567",
+            photo_id_image=self.IMAGE_DATA + "8910",
+        )
+        initial_data = self._get_post_data()
 
         # Submit a face photo for re-verification
-        with self._intercept_post() as mock_post:
-            self._submit_photos(face_image=self.IMAGE_DATA + "1112")
-            reverification_data = self._get_post_data(mock_post)
+        self._submit_photos(face_image=self.IMAGE_DATA + "1112")
+        reverification_data = self._get_post_data()
 
         # Verify that the initial attempt sent the same ID photo as the reverification attempt
         self.assertEqual(initial_data["PhotoIDKey"], reverification_data["PhotoIDKey"])
@@ -1484,35 +1485,10 @@ class TestSubmitPhotosForVerification(TestCase):
         account_settings = get_account_settings(self.user)
         self.assertEqual(account_settings['name'], full_name)
 
-    @contextlib.contextmanager
-    def _intercept_post(self):
-        """
-        Mock `requests.post()` to always return a 200 status code.
-
-        Yields:
-            mock.Mock
-
-        """
-        with patch("verify_student.models.requests.post") as mock_post:
-            mock_post.return_value = mock.Mock(
-                status_code=200,
-                text="Fake response",
-            )
-            yield mock_post
-
-    def _get_post_data(self, mock_post):
-        """
-        Retrieve data sent with a mock POST request.
-
-        Arguments:
-            mock_post (mock.Mock): The mock for `requests.post()`.
-
-        Returns:
-            dict
-
-        """
-        __, kwargs = mock_post.call_args
-        return json.loads(kwargs["data"])
+    def _get_post_data(self):
+        """Retrieve POST data from the last request. """
+        last_request = httpretty.last_request()
+        return json.loads(last_request.body)
 
 
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
