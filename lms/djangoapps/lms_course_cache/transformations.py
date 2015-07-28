@@ -87,26 +87,26 @@ class UserPartitionTransformation(CourseStructureTransformation):
     block_data = None
 
     @staticmethod
-    def get_group_ids(course, item):
-        """
-
-        """
-        if hasattr(item, 'group_access') and item.group_access:
-            (__, group_ids), = item.group_access.items()
-            return group_ids
-        return None
-
-    @staticmethod
     def get_group_ids_for_user(course_key, user_partitions, user):
-        """ Collect user partition group ids for user for this course """
-        partition_groups = []
+        """
+        Collect group ID for each partition in this course for this user.
+
+        Arguments:
+            course_key (CourseKey)
+            user_partitions (list[UserPartition])
+            user (User)
+
+        Returns:
+            dict[int: int]: Mapping from partition IDs to the ID of the group
+                to which this user belongs within the partition.
+        """
+        partition_groups = {}
         for user_partition in user_partitions:
             if user_partition.scheme in INCLUDE_SCHEMES:
                 group = UserPartitionTransformation.get_group_for_user_partition(user_partition, course_key, user)
                 if group:
-                    partition_groups.append(group)
-        partition_group_ids = [unicode(partition_group.id) for partition_group in partition_groups]
-        return partition_group_ids if partition_group_ids else None
+                    partition_groups[user_partition.id] = group
+        return partition_groups
 
     @staticmethod
     def get_group_for_user_partition(user_partition, course_key, user):
@@ -125,6 +125,55 @@ class UserPartitionTransformation(CourseStructureTransformation):
                 user_partition,
             )
 
+    @staticmethod
+    def merge_group_ids(block_group_ids, parent_group_ids):
+        """
+        Merge together a block's own group IDs and its parents' group IDs
+        for a particular partition.
+
+        Arguments:
+            block_group_ids (set[int] or None): Set of group IDs for this block,
+                or None if this block has no group access restrictions.
+            parent_group_ids (list[set[int] or None]): For each of this block's
+                parents, a set group IDs or None if the parent has no group
+                access restrictions.
+
+        Note:
+            merge_group_ids must have already been called on the individual
+            sets in parent_group_ids.
+
+        Returns:
+            set[int] or None: Set of merged group IDs for this block or None if
+                there are no group access restrictions.
+        """
+        filtered_parent_group_ids = (
+            group_ids for group_ids in parent_group_ids
+            if group_ids is not None
+        )
+        if filtered_parent_group_ids:
+            first = next(filtered_parent_group_ids)
+            rest = filtered_parent_group_ids
+            merged_parent_group_ids = (
+                first.intersect(rest)
+                if ACCESS_TO_ALL_PARENTS_REQUIRED
+                else first.union(rest)
+            )
+        else:
+            merged_parent_group_ids = None
+
+        # If parents impose no group access restrictions, just use the block's
+        # own group IDs.
+        if merged_parent_group_ids is None:
+            return block_group_ids
+
+        # If the block has no access restrictions, just inherit its parents'.
+        elif block_group_ids is None:
+            return merged_parent_group_ids
+
+        # Else, take the intersection of the parents' and the block's group IDs.
+        else:
+            return block_group_ids & merged_parent_group_ids
+
     def collect(self, course_root_xblock, get_children, get_parents):
         """
         Computes any information for each XBlock that's necessary to execute
@@ -138,35 +187,48 @@ class UserPartitionTransformation(CourseStructureTransformation):
         Returns:
             dict[UsageKey: dict]
         """
+        result_dict = {}
+
+        # Because user partitions are coursewide, only store data for them on
+        # the root block.
+        partition_dict = {
+            partition.id: partition
+            for partition
+            in getattr(course_root_xblock, 'user_partitions', []) or []
+        }
+        result_dict[course_root_xblock.location]['user_partition_dict'] = partition_dict
+        if not partition_dict:
+            return result_dict  # Course has no partitions, so there is no data to collect.
+
+        # Create a topological traversal of this course, because we need to
+        # determine merged_group_ids for parents BEFORE children.
         xblock_gen = traverse_topologically(
             start_node=course_root_xblock,
             get_parents=get_parents,
             get_children=get_children,
         )
-        compose_parent_access = (
-            any if ACCESS_TO_ALL_PARENTS_REQUIRED
-            else all
-        )
-        result_dict = {}
+
         for xblock in xblock_gen:
-            # We know that all of the the block's parents have already been
-            # visited because we're iterating over the result of a topological
-            # sort.
-            group_ids = UserPartitionTransformation.get_group_ids(course_root_xblock, xblock)
-            parent_group_ids = []
-            for parent in get_parents(xblock):
-                parent_group_ids.append(getattr(result_dict[parent.location], 'group_ids', None))
-            result_dict[xblock.location] = {
-                'group_ids': 
-                    group_ids or compose_parent_access(
-                        parent_group_ids
-                    ),
-                'user_partitions':
-                    xblock.user_partitions or compose_parent_access(
-                        result_dict[parent.location]['user_partitions']
+
+            for partition_id in partition_dict:
+
+                block_group_ids = (
+                    set(xblock.group_access[partition_id]) if hasattr(xblock, 'group_access')
+                    else None
+                ) or None
+                parents_group_ids = (
+                    None
+                    if xblock is course_root_xblock
+                    else (
+                        result_dict[parent.location]['merged_group_access'][partition_id]
                         for parent in get_parents(xblock)
                     )
-            }
+                )
+                merged_group_ids = UserPartitionTransformation.merge_group_ids(
+                    block_group_ids, parents_group_ids
+                )
+                result_dict[xblock.location]['merged_group_access'][partition_id] = merged_group_ids
+
         return result_dict
 
     def apply(self, user, course_key, block_structure, block_data):
@@ -179,25 +241,34 @@ class UserPartitionTransformation(CourseStructureTransformation):
             block_structure (CourseBlockStructure)
             block_data (dict[UsageKey: CourseBlockData])
         """
+        user_partitions = block_data[block_structure.root_block_key].get_transformation_data(
+            self, 'user_partition_dict'
+        )
+        if not user_partitions:
+            return  # Course has no partitions, so there is nothing to apply.
+
+        user_groups = UserPartitionTransformation.get_group_ids_for_user(course_key, user_partitions, user)
+
         def remove_condition(root_block_key):
             """
             """
-            user_partitions = block_data[root_block_key].get_transformation_data(
-                self, 'user_partitions'
-            )
-            group_ids = block_data[root_block_key].get_transformation_data(
-                self, 'group_ids'
-            )
-            user_groups = UserPartitionTransformation.get_group_ids_for_user(course_key, user_partitions, user)
-            if group_ids:
-                for group_id in group_ids:
-                    if group_id in user_groups:
-                        return False
-                return True
-            return False
+            merged_group_access = block_data[root_block_key].get_transformation_data(self, 'merged_group_access')
+            for partition in user_partitions:
+                merged_group_ids = merged_group_access[partition.id]
+                if merged_group_access is None:
+                    continue  # No access restrictions; move on to next partition.
+                elif merged_group_access == set():
+                    return True  # No groups can access this block; remove it.
+                elif user_groups[partition.id] not in merged_group_ids:
+                    return True  # User is not in one of this block's allowed groups; remove it.
+                else:
+                    continue  # User is in one of the allowed groups; move on to next partition.
+            else:
+                return False  # User is in allowed groups for all partitions; don't remove block.
 
         if not _has_access_to_course(user, 'staff', course_key):
             block_structure.remove_block_if(remove_condition)
+
 
 LMS_COURSE_TRANSFORMATIONS = {
     VisibilityTransformation(), 
