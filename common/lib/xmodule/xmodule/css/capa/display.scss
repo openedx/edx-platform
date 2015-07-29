@@ -783,7 +783,7 @@ div.problem {
     .indicator-container {
       display: inline-block;
 
-      .status.correct:after, .status.incorrect:after {
+      .status.correct:after, .status.incorrect:after, .status.unanswered:after {
         @include margin-left(0);
       }
     }
