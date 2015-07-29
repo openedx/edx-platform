@@ -81,6 +81,9 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(str(self.not_started), "0/17")
         self.assertEqual(str(self.part_done), "2/6")
         self.assertEqual(str(self.done), "7/7")
+        self.assertEqual(str(Progress(2.1234, 7)), '2.12/7')
+        self.assertEqual(str(Progress(2.0034, 7)), '2/7')
+        self.assertEqual(str(Progress(0.999, 7)), '1/7')
 
     def test_ternary_str(self):
         self.assertEqual(self.not_started.ternary_str(), "none")

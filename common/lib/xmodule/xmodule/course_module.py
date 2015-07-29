@@ -907,6 +907,15 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    enable_proctored_exams = Boolean(
+        display_name=_("Enable Proctored Exams"),
+        help=_(
+            "Enter true or false. If this value is true, timed and proctored exams are enabled in your course."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
     minimum_grade_credit = Float(
         display_name=_("Minimum Grade for Credit"),
         help=_(

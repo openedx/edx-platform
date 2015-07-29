@@ -85,7 +85,7 @@ case "$TEST_SUITE" in
         PATH=$PATH:node_modules/.bin
         paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
         echo "Running code complexity report (python)."
-        paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+        paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
         cat > reports/quality.xml <<END

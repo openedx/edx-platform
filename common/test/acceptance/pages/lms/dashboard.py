@@ -48,6 +48,17 @@ class DashboardPage(PageObject):
 
         return self.q(css='h3.course-title > a').map(_get_course_name).results
 
+    @property
+    def banner_text(self):
+        """
+        Return the text of the banner on top of the page, or None if
+        the banner is not present.
+        """
+        message = self.q(css='div.wrapper-msg')
+        if message.present:
+            return message.text[0]
+        return None
+
     def get_enrollment_mode(self, course_name):
         """Get the enrollment mode for a given course on the dashboard.
 

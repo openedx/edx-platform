@@ -1,9 +1,10 @@
 """
 Acceptance tests for the Import and Export pages
 """
+from datetime import datetime
+
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
-from datetime import datetime
 
 from .base_studio_test import StudioLibraryTest, StudioCourseTest
 from ...fixtures.course import XBlockFixtureDesc
@@ -192,15 +193,33 @@ class ImportTestMixin(object):
             And if I refresh the page, the timestamp is still displayed
         """
         self.assertFalse(self.import_page.is_timestamp_visible())
+
+        # Get the time when the import has started.
+        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        upload_start_time = datetime.utcnow().replace(microsecond=0, second=0)
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
-        utc_now = datetime.utcnow()
-        import_date, import_time = self.import_page.timestamp
+        # Get the time when the import has finished.
+        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        upload_finish_time = datetime.utcnow().replace(microsecond=0, second=0)
 
+        import_timestamp = self.import_page.parsed_timestamp
         self.import_page.wait_for_timestamp_visible()
-        self.assertEqual(utc_now.strftime('%m/%d/%Y'), import_date)
-        self.assertEqual(utc_now.strftime('%H:%M'), import_time)
+
+        # Verify that 'import_timestamp' is between start and finish upload time
+        self.assertLessEqual(
+            upload_start_time,
+            import_timestamp,
+            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
+        )
+        self.assertGreaterEqual(
+            upload_finish_time,
+            import_timestamp,
+            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
+        )
 
         self.import_page.visit()
         self.import_page.wait_for_tasks(completed=True)

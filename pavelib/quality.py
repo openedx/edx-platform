@@ -229,13 +229,29 @@ def run_complexity():
     For additional details on radon, see http://radon.readthedocs.org/
     """
     system_string = 'cms/ lms/ common/ openedx/'
-    print "--> Calculating cyclomatic complexity of files..."
+    complexity_report_dir = (Env.REPORT_DIR / "complexity")
+    complexity_report = complexity_report_dir / "python_complexity.log"
+
+    # Ensure directory structure is in place: metrics dir, and an empty complexity report dir.
+    Env.METRICS_DIR.makedirs_p()
+    _prepare_report_dir(complexity_report_dir)
+
+    print "--> Calculating cyclomatic complexity of python files..."
     try:
         sh(
-            "radon cc {system_string} --total-average".format(
-                system_string=system_string
+            "radon cc {system_string} --total-average > {complexity_report}".format(
+                system_string=system_string,
+                complexity_report=complexity_report
             )
         )
+        complexity_metric = _get_count_from_last_line(complexity_report, "python_complexity")
+        _write_metric(
+            complexity_metric,
+            (Env.METRICS_DIR / "python_complexity")
+        )
+        print "--> Python cyclomatic complexity report complete."
+        print "radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric))
+
     except BuildFailure:
         print "ERROR: Unable to calculate python-only code-complexity."
 
@@ -264,13 +280,18 @@ def run_jshint(options):
         ),
         ignore_error=True
     )
-    num_violations = _get_count_from_last_line(jshint_report)
 
-    if not num_violations:
-        raise BuildFailure("Error in calculating total number of violations.")
+    try:
+        num_violations = int(_get_count_from_last_line(jshint_report, "jshint"))
+    except TypeError:
+        raise BuildFailure(
+            "Error. Number of jshint violations could not be found in {jshint_report}".format(
+                jshint_report=jshint_report
+            )
+        )
 
     # Record the metric
-    _write_metric(str(num_violations), (Env.METRICS_DIR / "jshint"))
+    _write_metric(num_violations, (Env.METRICS_DIR / "jshint"))
 
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
@@ -288,7 +309,7 @@ def _write_metric(metric, filename):
     jshint violations found
     """
     with open(filename, "w") as metric_file:
-        metric_file.write(metric)
+        metric_file.write(str(metric))
 
 
 def _prepare_report_dir(dir_name):
@@ -303,20 +324,34 @@ def _get_last_report_line(filename):
     """
     Returns the last line of a given file. Used for getting output from quality output files.
     """
-    with open(filename, 'r') as report_file:
-        lines = report_file.readlines()
-        return lines[len(lines) - 1]
+    file_not_found_message = "The following log file could not be found: {file}".format(file=filename)
+    if os.path.isfile(filename):
+        with open(filename, 'r') as report_file:
+            lines = report_file.readlines()
+            return lines[len(lines) - 1]
+    else:
+        # Raise a build error if the file is not found
+        raise BuildFailure(file_not_found_message)
 
 
-def _get_count_from_last_line(filename):
+def _get_count_from_last_line(filename, file_type):
     """
-    This will return the number in a line that looks something like "3000 errors found". It is returning
-    the digits only (as an integer).
+    This will return the number in the last line of a file.
+    It is returning only the value (as a floating number).
     """
     last_line = _get_last_report_line(filename)
+    if file_type is "python_complexity":
+        # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
+        regex = r'\d+.\d+'
+    else:
+        # Example of the last line of a jshint report (for example): "3482 errors"
+        regex = r'^\d+'
+
     try:
-        return int(re.search(r'^\d+', last_line).group(0))
-    except AttributeError:
+        return float(re.search(regex, last_line).group(0))
+    # An AttributeError will occur if the regex finds no matches.
+    # A ValueError will occur if the returned regex cannot be cast as a float.
+    except (AttributeError, ValueError):
         return None
 
 

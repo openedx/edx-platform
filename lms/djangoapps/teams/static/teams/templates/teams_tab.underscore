@@ -1,4 +1,4 @@
-<div class="wrapper-msg is-incontext urgency-low warning is-hidden">
+<div class="wrapper-msg is-incontext urgency-low warning is-hidden" tabindex="-1">
     <div class="msg">
         <div class="msg-content">
             <div class="copy">

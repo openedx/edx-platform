@@ -255,6 +255,7 @@
                        var warningEl = this.$('.warning');
                        warningEl.find('.copy').html('<p>' + message + '</p');
                        warningEl.toggleClass('is-hidden', false);
+                       warningEl.focus();
                    },
 
                    hideWarning: function () {

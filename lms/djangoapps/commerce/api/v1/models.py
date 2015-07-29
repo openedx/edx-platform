@@ -22,12 +22,29 @@ class Course(object):
         self.modes = list(modes)
         self._deleted_modes = []
 
+    def get_mode_display_name(self, mode):
+        """ Returns display name for the given mode. """
+        slug = mode.mode_slug.strip().lower()
+
+        if slug == 'credit':
+            return 'Credit'
+        if 'professional' in slug:
+            return 'Professional Education'
+        elif slug == 'verified':
+            return 'Verified Certificate'
+        elif slug == 'honor':
+            return 'Honor Certificate'
+        elif slug == 'audit':
+            return 'Audit'
+
+        return mode.mode_slug
+
     @transaction.commit_on_success
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
         for mode in self.modes:
             mode.course_id = self.id
-            mode.mode_display_name = mode.mode_slug
+            mode.mode_display_name = self.get_mode_display_name(mode)
             mode.save()
 
         deleted_mode_ids = [mode.id for mode in self._deleted_modes]
@@ -49,6 +66,7 @@ class Course(object):
             merged_mode.min_price = posted_mode.min_price
             merged_mode.currency = posted_mode.currency
             merged_mode.sku = posted_mode.sku
+            merged_mode.expiration_datetime = posted_mode.expiration_datetime
 
             merged_modes.add(merged_mode)
             merged_mode_keys.add(merged_mode.mode_slug)

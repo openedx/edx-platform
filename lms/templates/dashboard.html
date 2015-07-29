@@ -7,6 +7,7 @@ import third_party_auth
 from third_party_auth import pipeline
 from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
+import json
 %>
 
 <%
@@ -23,6 +24,9 @@ from django.core.urlresolvers import reverse
 % for template_name in ["donation"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="dashboard/${template_name}.underscore" />
+</script>
+<script type="text/template" id="message_banner-tpl">
+  <%static:include path="fields/message_banner.underscore" />
 </script>
 % endfor
 
@@ -47,6 +51,13 @@ from django.core.urlresolvers import reverse
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
+    </%static:require_module>
+  % endif
+  % if redirect_message:
+    <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${json.dumps(redirect_message)})
     </%static:require_module>
   % endif
 </%block>

@@ -87,6 +87,7 @@ def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-ar
                 <li>Sample instruction abc</li>
                 <li>Sample instruction xyz</li>
                 </ul>",
+            "thumbnail_url": "https://credit.example.com/logo.png"
         }
 
     """
@@ -100,7 +101,8 @@ def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-ar
             "provider_status_url": credit_provider.provider_status_url,
             "provider_description": credit_provider.provider_description,
             "enable_integration": credit_provider.enable_integration,
-            "fulfillment_instructions": credit_provider.fulfillment_instructions
+            "fulfillment_instructions": credit_provider.fulfillment_instructions,
+            "thumbnail_url": credit_provider.thumbnail_url
         }
 
     return JsonResponse(credit_provider_data)

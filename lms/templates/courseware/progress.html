@@ -117,7 +117,12 @@ from django.utils.http import urlquote_plus
                 <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
                 %for requirement in credit_course_requirements['requirements']:
                     <div class="requirement">
-                        <div class="requirement-name">${_(requirement['display_name'])}</div>
+                        <div class="requirement-name">
+                            ${_(requirement['display_name'])}
+                            %if requirement['namespace'] == 'grade':
+                                <span>${int(requirement['criteria']['min_grade'] * 100)}%</span>
+                            %endif
+                        </div>
                         <div class="requirement-status">
                             %if requirement['status']:
                                 %if requirement['status'] == 'submitted':

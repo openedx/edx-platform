@@ -17,7 +17,7 @@
   </multiplechoiceresponse>
   <p>Which of the following are musical instruments?</p>
   <choiceresponse>
-    <checkboxgroup direction="vertical">
+    <checkboxgroup>
       <choice correct="true">a piano</choice>
       <choice correct="false">a tree</choice>
       <choice correct="true">a guitar</choice>

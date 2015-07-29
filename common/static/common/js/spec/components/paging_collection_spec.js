@@ -239,7 +239,7 @@ define(['jquery',
                             }
                             expect(collection.getPage()).toBe(newPage);
                         }
-                    )
+                    );
                 });
             });
         });

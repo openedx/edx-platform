@@ -13,7 +13,7 @@ var edx = edx || {};
 
         initialize: function () {
             this.useEcommerceApi = !!($.url('?basket_id'));
-            _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider');
+            _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider', 'getCourseData');
 
             /* Mix non-conflicting functions from underscore.string (all but include, contains, and reverse) into
              * the Underscore namespace.
@@ -32,7 +32,7 @@ var edx = edx || {};
                 providerId;
 
             // Add the receipt info to the template context
-            this.course_key = this.getOrderCourseKey(data)
+            this.courseKey = this.getOrderCourseKey(data)
             this.username = this.$el.data('username');
             _.extend(context, {
                 receipt: this.receiptContext(data),
@@ -42,15 +42,21 @@ var edx = edx || {};
             this.$el.html(_.template(templateHtml, context));
 
             this.trackLinks();
+
+            this.getCourseData(this.courseKey).then(this.renderCourse, this.renderError)
+
             providerId = this.getCreditProviderId(data);
             if (providerId) {
                 this.getProviderData(providerId).then(this.renderProvider, this.renderError)
             }
         },
+        renderCourse: function(course) {
+            $(".course_name_placeholder").text(course.name);
+        },
         renderProvider: function (context) {
             var templateHtml = $("#provider-tpl").html(),
                 providerDiv = this.$el.find("#receipt-provider");
-            context.course_key = this.course_key;
+            context.course_key = this.courseKey;
             context.username = this.username;
             providerDiv.html(_.template(templateHtml, context)).removeClass('hidden');
         },
@@ -107,7 +113,7 @@ var edx = edx || {};
         },
         /**
          * Retrieve credit provider data from LMS.
-         * @param  {string} provider_id The provider_id of the credit provider.
+         * @param  {string} providerId The providerId of the credit provider.
          * @return {object} JQuery Promise.
          */
         getProviderData: function (providerId) {
@@ -115,6 +121,19 @@ var edx = edx || {};
 
             return $.ajax({
                 url: _.sprintf(providerUrl, providerId),
+                type: 'GET',
+                dataType: 'json'
+            }).retry({times: 5, timeout: 2000, statusCodes: [404]});
+        },
+        /**
+         * Retrieve course data from LMS.
+         * @param  {string} courseId The courseId of the course.
+         * @return {object} JQuery Promise.
+         */
+        getCourseData: function (courseId) {
+            var courseDetailUrl = '/api/course_structure/v0/courses/%s/';
+            return $.ajax({
+                url: _.sprintf(courseDetailUrl, courseId),
                 type: 'GET',
                 dataType: 'json'
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});

@@ -91,7 +91,7 @@ urlpatterns = patterns(
 
     url(
         r'^submit-photos/$',
-        views.submit_photos_for_verification,
+        views.SubmitPhotosView.as_view(),
         name="verify_student_submit_photos"
     ),
 
