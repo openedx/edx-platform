@@ -37,6 +37,7 @@ from certificates.tests.factories import (
     BadgeAssertionFactory,
 )
 from lms import urls
+from util import organizations_helpers as organizations_api
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -426,6 +427,38 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_rendering_course_organizations(self):
+        """
+        Test: Organizations should render on certificate web view if course has organizations.
+        """
+        test_organization_data = {
+            'name': 'test_organization',
+            'description': 'Test Organization Description',
+            'active': True,
+            'logo': '/t4x/orgX/testX/asset/org-logo.png'
+        }
+        test_org = organizations_api.add_organization(organization_data=test_organization_data)
+        organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn(
+            'a course of study offered by <span class="detail--xuniversity">test_organization</span>',
+            response.content
+        )
+        self.assertNotIn(
+            'a course of study offered by <span class="detail--xuniversity">testorg</span>',
+            response.content
+        )
+        self.assertIn(
+            '<title>test_organization {} Certificate |'.format(self.course.number, ),
+            response.content
+        )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):

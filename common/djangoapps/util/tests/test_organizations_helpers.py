@@ -41,3 +41,11 @@ class OrganizationsHelpersTestCase(ModuleStoreTestCase):
     def test_get_course_organizations_returns_none_when_app_disabled(self):
         response = organizations_helpers.get_course_organizations(unicode(self.course.id))
         self.assertEqual(len(response), 0)
+
+    def test_add_organization_returns_none_when_app_disabled(self):
+        response = organizations_helpers.add_organization(organization_data=self.organization)
+        self.assertIsNone(response)
+
+    def test_add_organization_course_returns_none_when_app_disabled(self):
+        response = organizations_helpers.add_organization_course(self.organization, self.course.id)
+        self.assertIsNone(response)
