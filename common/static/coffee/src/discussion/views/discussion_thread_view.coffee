@@ -50,7 +50,13 @@ if Backbone?
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
-      @template(@model.toJSON())
+      templateData = @model.toJSON()
+      container = $("#discussion-container")
+      if !container.length
+        # inline discussion
+        container = $(".discussion-module")
+      templateData.can_create_comment = container.data("user-create-comment")
+      @template(templateData)
 
     render: ->
       @$el.html(@renderTemplate())

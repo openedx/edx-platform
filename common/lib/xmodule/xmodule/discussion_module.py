@@ -1,5 +1,7 @@
 from pkg_resources import resource_string
 
+import json
+from xblock.core import XBlock
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
@@ -41,7 +43,20 @@ class DiscussionFields(object):
     sort_key = String(scope=Scope.settings)
 
 
+def has_permission(user, permission, course_id):
+    """
+    Copied from django_comment_client/permissions.py because I can't import
+    that file from here. It causes the xmodule_assets command to fail.
+    """
+    return any(role.has_permission(permission)
+               for role in user.roles.filter(course_id=course_id))
+
+
+@XBlock.wants('user')
 class DiscussionModule(DiscussionFields, XModule):
+    """
+    XModule for discussion forums.
+    """
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/discussion/display.coffee')
@@ -53,9 +68,26 @@ class DiscussionModule(DiscussionFields, XModule):
     js_module_name = "InlineDiscussion"
 
     def get_html(self):
+        course = self.get_course()
+        user = None
+        user_service = self.runtime.service(self, 'user')
+        if user_service:
+            user = user_service._django_user  # pylint: disable=protected-access
+        if user:
+            course_key = course.id  # pylint: disable=no-member
+            can_create_comment = has_permission(user, "create_comment", course_key)
+            can_create_subcomment = has_permission(user, "create_sub_comment", course_key)
+            can_create_thread = has_permission(user, "create_thread", course_key)
+        else:
+            can_create_comment = False
+            can_create_subcomment = False
+            can_create_thread = False
         context = {
             'discussion_id': self.discussion_id,
-            'course': self.get_course(),
+            'course': course,
+            'can_create_comment': json.dumps(can_create_comment),
+            'can_create_subcomment': json.dumps(can_create_subcomment),
+            'can_create_thread': can_create_thread,
         }
         if getattr(self.system, 'is_author_mode', False):
             template = 'discussion/_discussion_module_studio.html'

@@ -80,16 +80,16 @@ describe "DiscussionThreadView", ->
             expect(view.$('.display-vote').is(":visible")).toBe(not originallyClosed)
 
         _.each(["tab", "inline"], (mode) =>
-                it 'Test that in #{mode} mode when a closed thread is opened the comment form is displayed', ->
+                it "Test that in #{mode} mode when a closed thread is opened the comment form is displayed", ->
                         checkCommentForm(true, mode)
 
-                it 'Test that in #{mode} mode when a open thread is closed the comment form is hidden', ->
+                it "Test that in #{mode} mode when a open thread is closed the comment form is hidden", ->
                         checkCommentForm(false, mode)
 
-                it 'Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden', ->
+                it "Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden", ->
                         checkVoteDisplay(true, mode)
 
-                it 'Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed', ->
+                it "Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed", ->
                         checkVoteDisplay(false, mode)
         )
 
