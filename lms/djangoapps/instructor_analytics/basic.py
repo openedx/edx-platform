@@ -16,6 +16,7 @@ import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
 from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
+from edx_proctoring.api import get_all_exam_attempts
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -241,6 +242,27 @@ def list_may_enroll(course_key, features):
         return dict((feature, getattr(student, feature)) for feature in features)
 
     return [extract_student(student, features) for student in may_enroll_and_unenrolled]
+
+
+def get_proctored_exam_results(course_key, features):
+    """
+    Return info about proctored exam results in a course as a dict.
+    """
+    exam_attempts = get_all_exam_attempts(course_key)
+
+    def extract_student(exam_attempt, features):
+        """
+        Build dict containing information about a single student exam_attempt.
+        """
+        proctored_exam_dict = dict(
+            (feature, exam_attempt.get(feature)) for feature in features if feature in exam_attempt
+        )
+        proctored_exam_dict.update({'exam_name': exam_attempt.get('proctored_exam').get('exam_name')})
+        proctored_exam_dict.update({'user_email': exam_attempt.get('user').get('email')})
+
+        return proctored_exam_dict
+
+    return [extract_student(exam_attempt, features) for exam_attempt in exam_attempts]
 
 
 def coupon_codes_features(features, coupons_list, course_id):
