@@ -17,6 +17,8 @@ class ConvertExportFormat(TestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ConvertExportFormat, self).setUp()
+
         self.temp_dir = mkdtemp(dir=settings.DATA_DIR)
         self.data_dir = path(__file__).realpath().parent / 'data'
         self.version0 = self.data_dir / "Version0_drafts.tar.gz"
