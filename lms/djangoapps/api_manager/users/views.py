@@ -87,6 +87,7 @@ def _serialize_user(response_data, user):
     response_data['id'] = user.id
     response_data['is_active'] = user.is_active
     response_data['created'] = user.date_joined
+    response_data['is_staff'] = user.is_staff
     return response_data
 
 
@@ -329,6 +330,7 @@ class UsersList(SecureListAPIView):
         profile.gender = gender
         profile.title = title
         profile.avatar_url = avatar_url
+        profile.is_staff = is_staff
 
         try:
             profile.year_of_birth = int(year_of_birth)
