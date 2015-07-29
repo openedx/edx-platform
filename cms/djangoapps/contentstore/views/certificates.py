@@ -375,6 +375,7 @@ def certificates_list_handler(request, course_key_string):
                 'course_modes': course_modes,
                 'certificate_web_view_url': certificate_web_view_url,
                 'is_active': is_active,
+                'is_global_staff': GlobalStaff().has_user(request.user),
                 'certificate_activation_handler_url': activation_handler_url
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
