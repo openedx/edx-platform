@@ -49,7 +49,6 @@ from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import CourseLocationManager
-from xmodule.modulestore.django import NullSignalHandler
 from xmodule.services import SettingsService
 
 log = logging.getLogger(__name__)
@@ -544,7 +543,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  i18n_service=None,
                  fs_service=None,
                  user_service=None,
-                 signal_handler=NullSignalHandler(),
+                 signal_handler=None,
                  retry_wait_time=0.1,
                  **kwargs):
         """

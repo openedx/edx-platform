@@ -110,17 +110,6 @@ class SignalHandler(object):
             log.info('Sent %s signal to %s with kwargs %s. Response was: %s', signal_name, receiver, kwargs, response)
 
 
-class NullSignalHandler(object):
-    """
-    A null handler that does nothing
-    """
-    def send(self, *args, **kwargs):
-        """
-        No-op
-        """
-        pass
-
-
 def load_function(path):
     """
     Load a function by name.
