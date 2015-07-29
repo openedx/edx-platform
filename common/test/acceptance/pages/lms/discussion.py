@@ -143,6 +143,11 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
                 "Response edit started"
             ).fulfill()
 
+    def get_link_href(self):
+        """Extracts href attribute of the referenced link"""
+        link_href = self._find_within(".post-body p a").attrs('href')
+        return link_href[0] if link_href else None
+
     def get_response_vote_count(self, response_id):
         return self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
 
