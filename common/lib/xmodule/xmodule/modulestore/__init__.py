@@ -154,6 +154,17 @@ class ActiveBulkThread(threading.local):
         self.records = defaultdict(bulk_ops_record_type)
 
 
+class NullSignalHandler(object):
+    """
+    A null handler that does nothing
+    """
+    def send(self, *args, **kwargs):
+        """
+        No-op
+        """
+        pass
+
+
 class BulkOperationsMixin(object):
     """
     This implements the :meth:`bulk_operations` modulestore semantics which handles nested invocations
@@ -169,6 +180,23 @@ class BulkOperationsMixin(object):
     def __init__(self, *args, **kwargs):
         super(BulkOperationsMixin, self).__init__(*args, **kwargs)
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
+        self._signal_handler = None
+
+    @property
+    def signal_handler(self):
+        """
+        Return a signal handler, defaults to a null handler that does nothing.
+        """
+        if not self._signal_handler:
+            self._signal_handler = NullSignalHandler()
+        return self._signal_handler
+
+    @signal_handler.setter
+    def signal_handler(self, value):
+        """
+        Set the signal handler
+        """
+        self._signal_handler = value
 
     @contextmanager
     def bulk_operations(self, course_id, emit_signals=True):
@@ -296,18 +324,16 @@ class BulkOperationsMixin(object):
         """
         Sends out the signal that items have been published from within this course.
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler and bulk_ops_record.has_publish_item:
-            signal_handler.send("course_published", course_key=course_id)
+        if bulk_ops_record.has_publish_item:
+            self.signal_handler.send("course_published", course_key=course_id)
             bulk_ops_record.has_publish_item = False
 
     def send_bulk_library_updated_signal(self, bulk_ops_record, library_id):
         """
         Sends out the signal that library have been updated.
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler and bulk_ops_record.has_library_updated_item:
-            signal_handler.send("library_updated", library_key=library_id)
+        if bulk_ops_record.has_library_updated_item:
+            self.signal_handler.send("library_updated", library_key=library_id)
             bulk_ops_record.has_library_updated_item = False
 
 
@@ -1338,13 +1364,11 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Arguments:
             course_key - course_key to which the signal applies
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler:
-            bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
-            if bulk_record and bulk_record.active:
-                bulk_record.has_publish_item = True
-            else:
-                signal_handler.send("course_published", course_key=course_key)
+        bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
+        if bulk_record and bulk_record.active:
+            bulk_record.has_publish_item = True
+        else:
+            self.signal_handler.send("course_published", course_key=course_key)
 
     def _flag_library_updated_event(self, library_key):
         """
@@ -1355,21 +1379,17 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Arguments:
             library_key - library_key to which the signal applies
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler:
-            bulk_record = self._get_bulk_ops_record(library_key) if isinstance(self, BulkOperationsMixin) else None
-            if bulk_record and bulk_record.active:
-                bulk_record.has_library_updated_item = True
-            else:
-                signal_handler.send("library_updated", library_key=library_key)
+        bulk_record = self._get_bulk_ops_record(library_key) if isinstance(self, BulkOperationsMixin) else None
+        if bulk_record and bulk_record.active:
+            bulk_record.has_library_updated_item = True
+        else:
+            self.signal_handler.send("library_updated", library_key=library_key)
 
     def _emit_course_deleted_signal(self, course_key):
         """
         Helper method used to emit the course_deleted signal.
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler:
-            signal_handler.send("course_deleted", course_key=course_key)
+        self.signal_handler.send("course_deleted", course_key=course_key)
 
 
 def only_xmodules(identifier, entry_points):
