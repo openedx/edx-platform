@@ -16,6 +16,7 @@ from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys.edx.locator import LibraryLocator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.assetstore import AssetMetadata
+from xmodule.util.null_handler import NullHandler
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
@@ -108,7 +109,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             fs_service=None,
             user_service=None,
             create_modulestore_instance=None,
-            signal_handler=None,
+            signal_handler=NullHandler(),
             **kwargs
     ):
         """

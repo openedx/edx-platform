@@ -6,6 +6,7 @@ from opaque_keys.edx.keys import UsageKey
 from unittest import TestCase
 from xblock.fields import XBlockMixin
 from xmodule.x_module import XModuleMixin
+from xmodule.util.null_handler import NullHandler
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -36,7 +37,7 @@ def create_modulestore_instance(
         i18n_service=None,
         fs_service=None,
         user_service=None,
-        signal_handler=None,
+        signal_handler=NullHandler(),
 ):
     """
     This will return a new instance of a modulestore given an engine and options
