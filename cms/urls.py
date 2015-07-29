@@ -190,6 +190,11 @@ if settings.DEBUG:
     except ImportError:
         pass
 
+    import debug_toolbar
+    urlpatterns += (
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )
+
 # Custom error pages
 # pylint: disable=invalid-name
 handler404 = 'contentstore.views.render_404'
