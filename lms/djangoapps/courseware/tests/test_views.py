@@ -897,7 +897,6 @@ class ProgressPageTests(ModuleStoreTestCase):
                 'name': 'Name 1',
                 'description': 'Description 1',
                 'course_title': 'course_title_1',
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-1.png',
                 'signatories': [],
                 'version': 1,
                 'is_active': True
