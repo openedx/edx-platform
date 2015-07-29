@@ -28,22 +28,42 @@ class SAMLMetadataTest(SAMLTestCase):
 
     @ddt.data('saml_key', 'saml_key_alt')  # Test two slightly different key pair export formats
     def test_metadata(self, key_name):
-        self.enable_saml(
-            private_key=self._get_private_key(key_name),
-            public_key=self._get_public_key(key_name),
-            entity_id="https://saml.example.none",
-        )
+        self.enable_saml()
         doc = self._fetch_metadata()
         # Check the ACS URL:
         acs_node = doc.find(".//{}".format(etree.QName(SAML_XML_NS, 'AssertionConsumerService')))
         self.assertIsNotNone(acs_node)
         self.assertEqual(acs_node.attrib['Location'], 'http://example.none/auth/complete/tpa-saml/')
 
+    def test_default_contact_info(self):
+        self.enable_saml()
+        self.check_metadata_contacts(
+            xml=self._fetch_metadata(),
+            tech_name="edX Support",
+            tech_email="technical@example.com",
+            support_name="edX Support",
+            support_email="technical@example.com"
+        )
+
+    def test_custom_contact_info(self):
+        self.enable_saml(
+            other_config_str=(
+                '{'
+                '"TECHNICAL_CONTACT": {"givenName": "Jane Tech", "emailAddress": "jane@example.com"},'
+                '"SUPPORT_CONTACT": {"givenName": "Joe Support", "emailAddress": "joe@example.com"}'
+                '}'
+            )
+        )
+        self.check_metadata_contacts(
+            xml=self._fetch_metadata(),
+            tech_name="Jane Tech",
+            tech_email="jane@example.com",
+            support_name="Joe Support",
+            support_email="joe@example.com"
+        )
+
     def test_signed_metadata(self):
         self.enable_saml(
-            private_key=self._get_private_key(),
-            public_key=self._get_public_key(),
-            entity_id="https://saml.example.none",
             other_config_str='{"SECURITY_CONFIG": {"signMetadata": true} }',
         )
         doc = self._fetch_metadata()
@@ -62,3 +82,19 @@ class SAMLMetadataTest(SAMLTestCase):
             self.fail('SAML metadata must be valid XML')
         self.assertEqual(metadata_doc.tag, etree.QName(SAML_XML_NS, 'EntityDescriptor'))
         return metadata_doc
+
+    def check_metadata_contacts(self, xml, tech_name, tech_email, support_name, support_email):
+        """ Validate that the contact info in the metadata has the expected values """
+        technical_node = xml.find(".//{}[@contactType='technical']".format(etree.QName(SAML_XML_NS, 'ContactPerson')))
+        self.assertIsNotNone(technical_node)
+        tech_name_node = technical_node.find(etree.QName(SAML_XML_NS, 'GivenName'))
+        self.assertEqual(tech_name_node.text, tech_name)
+        tech_email_node = technical_node.find(etree.QName(SAML_XML_NS, 'EmailAddress'))
+        self.assertEqual(tech_email_node.text, tech_email)
+
+        support_node = xml.find(".//{}[@contactType='support']".format(etree.QName(SAML_XML_NS, 'ContactPerson')))
+        self.assertIsNotNone(support_node)
+        support_name_node = support_node.find(etree.QName(SAML_XML_NS, 'GivenName'))
+        self.assertEqual(support_name_node.text, support_name)
+        support_email_node = support_node.find(etree.QName(SAML_XML_NS, 'EmailAddress'))
+        self.assertEqual(support_email_node.text, support_email)
