@@ -42,6 +42,18 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
 
+    def test_inactive_enrollment(self):
+        """
+        Makes sure that get_credit_state returns None if the user's enrollment is
+        inactive
+        """
+
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        enrollment.is_active = False
+        enrollment.save()
+
+        self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
+
     def test_not_credit_course(self):
         """
         Makes sure that get_credit_state returns None if the test course is not

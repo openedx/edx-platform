@@ -55,7 +55,7 @@ class CreditService(object):
             return None
 
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
-        if not enrollment:
+        if not enrollment or not enrollment.is_active:
             # not enrolled
             return None
 
