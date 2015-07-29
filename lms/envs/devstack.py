@@ -168,9 +168,9 @@ SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 
 ########################## Shopping cart ##########################
-FEATURES['ENABLE_SHOPPING_CART'] = True
+FEATURES['ENABLE_SHOPPING_CART'] = False
 FEATURES['STORE_BILLING_INFO'] = True
-FEATURES['ENABLE_PAID_COURSE_REGISTRATION'] = True
+FEATURES['ENABLE_PAID_COURSE_REGISTRATION'] = False
 FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 
 ########################## Third Party Auth #######################
