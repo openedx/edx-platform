@@ -26,7 +26,6 @@ from xmodule.x_module import (
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
-from xmodule.util.null_handler import NullHandler
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
@@ -336,7 +335,7 @@ class XMLModuleStore(ModuleStoreReadBase):
     def __init__(
             self, data_dir, default_class=None, source_dirs=None, course_ids=None,
             load_error_modules=True, i18n_service=None, fs_service=None, user_service=None,
-            signal_handler=NullHandler(), target_course_id=None, **kwargs   # pylint: disable=unused-argument
+            signal_handler=None, target_course_id=None, **kwargs   # pylint: disable=unused-argument
     ):
         """
         Initialize an XMLModuleStore from data_dir

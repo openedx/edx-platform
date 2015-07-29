@@ -26,7 +26,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
-from xmodule.util.null_handler import NullHandler
 import xblock.reference.plugins
 
 
@@ -130,7 +129,7 @@ def create_modulestore_instance(
         i18n_service=None,
         fs_service=None,
         user_service=None,
-        signal_handler=NullHandler(),
+        signal_handler=None,
 ):
     """
     This will return a new instance of a modulestore given an engine and options
