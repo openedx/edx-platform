@@ -90,8 +90,9 @@ Test Locations
       ``common/djangoapps/terrain``
    -  Lettuce Tests: located in ``features`` subpackage within a Django
       app. For example: ``lms/djangoapps/courseware/features``
-   -  Bok Choy Tests: Artifacts are located under
-      ``common/test/acceptance``
+   -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
+   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/accessibility``
+   -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
 
 Factories
 ---------
@@ -366,6 +367,44 @@ and 'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore). For
 example::
 
     paver test_bokchoy --default_store='draft'
+
+Running Bok Choy Accessibility Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use Bok
+Choy for `automated accessibility testing
+<http://bok-choy.readthedocs.org/en/latest/accessibility.html>`__.
+Bok Choy, a UI-level acceptance test framework for writing robust
+`Selenium <http://docs.seleniumhq.org/>`__
+tests in `Python <https://www.python.org/>`__, includes the ability to perform
+accessibility audits on web pages using `Google Accessibility Developer Tools
+<https://github.com/GoogleChrome/accessibility-developer-tools/>`__.  For more
+details about how to write accessibility tests, please read the `Bok
+Choy documentation <http://bok-choy.readthedocs.org/en/latest/accessibility.html>`__
+and the Automated Accessibility Tests `openedx Confluence page
+<https://openedx.atlassian.net/wiki/display/TE/Automated+Accessibility+Tests>`__.
+
+**Prerequisites**:
+
+These prerequisites are all automatically installed and available in `Devstack
+<https://github.com/edx/configuration/wiki/edX-Developer-Stack>`__ (since the Cypress release), the supported development enviornment for the edX Platform.
+
+* PhantomJS
+
+* Mongo
+
+* Memcache
+
+* mySQL
+
+To run all the bok choy accessibility tests::
+
+    SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility
+
+To run specific tests, use the ``-t`` flag to specify a nose-style test spec
+relative to the ``common/test/acceptance/accessibility`` directory::
+
+    SELENIUM_BROWSER=phantomjs paver test_bokchoy -d accessibility -t test_lms_dashboard_axs.py:LmsDashboardAxsTest.test_dashboard_course_listings_axs
 
 Running Lettuce Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
