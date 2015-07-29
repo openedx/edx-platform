@@ -431,7 +431,7 @@ div.problem {
     // Hides equation previews in symbolic response problems when printing
     [id^='display'].equation {
       @media print {
-        display:none;
+        display: none;
       }
     }
 
@@ -857,6 +857,9 @@ div.problem .action {
     vertical-align: middle;
     text-transform: uppercase;
     font-weight: 600;
+    @media print {
+      display: none;
+    }
   }
 
   .save {
