@@ -23,6 +23,7 @@ from xblock.plugin import default_select
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
 from xmodule.assetstore import AssetMetadata
+from xmodule.modulestore.django import NullSignalHandler
 from opaque_keys.edx.keys import CourseKey, UsageKey, AssetKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
 from xblock.runtime import Mixologist
@@ -154,17 +155,6 @@ class ActiveBulkThread(threading.local):
         self.records = defaultdict(bulk_ops_record_type)
 
 
-class NullSignalHandler(object):
-    """
-    A null handler that does nothing
-    """
-    def send(self, *args, **kwargs):
-        """
-        No-op
-        """
-        pass
-
-
 class BulkOperationsMixin(object):
     """
     This implements the :meth:`bulk_operations` modulestore semantics which handles nested invocations
@@ -180,23 +170,7 @@ class BulkOperationsMixin(object):
     def __init__(self, *args, **kwargs):
         super(BulkOperationsMixin, self).__init__(*args, **kwargs)
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
-        self._signal_handler = None
-
-    @property
-    def signal_handler(self):
-        """
-        Return a signal handler, defaults to a null handler that does nothing.
-        """
-        if not self._signal_handler:
-            self._signal_handler = NullSignalHandler()
-        return self._signal_handler
-
-    @signal_handler.setter
-    def signal_handler(self, value):
-        """
-        Set the signal handler
-        """
-        self._signal_handler = value
+        self.signal_handler = NullSignalHandler()
 
     @contextmanager
     def bulk_operations(self, course_id, emit_signals=True):

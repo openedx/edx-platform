@@ -85,6 +85,7 @@ from xmodule.error_module import ErrorDescriptor
 from collections import defaultdict
 from types import NoneType
 from xmodule.assetstore import AssetMetadata
+from xmodule.modulestore.django import NullSignalHandler
 
 
 log = logging.getLogger(__name__)
@@ -640,7 +641,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None, fs_service=None, user_service=None,
-                 services=None, signal_handler=None, **kwargs):
+                 services=None, signal_handler=NullSignalHandler(),
+                 **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
