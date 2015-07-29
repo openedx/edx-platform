@@ -184,7 +184,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     content_id=content_id,
                     context={
                         'display_name': self.display_name,
-                        'default_time_limit_mins': self.default_time_limit_minutes
+                        'default_time_limit_mins': (
+                            self.default_time_limit_minutes if
+                            self.default_time_limit_minutes else 0
+                        )
                     },
                     user_role=user_role_in_course
                 )
