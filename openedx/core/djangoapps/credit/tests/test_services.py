@@ -96,8 +96,6 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertIsNotNone(credit_state)
         self.assertEqual(credit_state['enrollment_mode'], 'honor')
-        self.assertEqual(len(credit_state['credit_requirements']), 1)
-        self.assertEqual(credit_state['credit_requirements'][0]['name'], 'grade')
-
         self.assertEqual(len(credit_state['credit_requirement_status']), 1)
+        self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
         self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')

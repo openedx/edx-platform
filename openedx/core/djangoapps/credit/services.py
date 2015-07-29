@@ -42,7 +42,6 @@ class CreditService(object):
         # circular references when starting up the app
         from openedx.core.djangoapps.credit.api.eligibility import (
             is_credit_course,
-            get_credit_requirements,
             get_credit_requirement_status,
         )
 
@@ -64,6 +63,5 @@ class CreditService(object):
 
         return {
             'enrollment_mode': enrollment.mode,
-            'credit_requirements': get_credit_requirements(course_key),
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
