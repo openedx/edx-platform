@@ -634,6 +634,27 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         vertical = self.store.get_item(vertical.location)
         self.assertTrue(self._has_changes(vertical.location))
 
+    @ddt.data('draft', 'split')
+    def test_publish_automatically_after_delete_unit(self, default_ms):
+        """
+        Check that sequential publishes automatically after deleting a unit
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        # create sequential and vertical to test against
+        sequential = self.store.create_item(self.user_id, test_course.id, 'sequential', 'test_sequential')
+        vertical = self.store.create_child(self.user_id, sequential.location, 'vertical', 'test_vertical')
+
+        # publish sequential changes
+        self.store.publish(sequential.location, self.user_id)
+        self.assertFalse(self._has_changes(sequential.location))
+
+        # delete vertical and check sequential has no changes
+        self.store.delete_item(vertical.location, self.user_id)
+        self.assertFalse(self._has_changes(sequential.location))
+
     def setup_has_changes(self, default_ms):
         """
         Common set up for has_changes tests below.
@@ -854,7 +875,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # Split:
     #    queries: active_versions, draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 9, 2), ('split', 2, 2))
+    @ddt.data(('draft', 9, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
