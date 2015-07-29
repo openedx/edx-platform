@@ -185,6 +185,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * id: The team's unique identifier.
 
+                * discussion_topic_id: The unique id of the comments service
+                  discussion topic associated with this team.
+
                 * name: The name of the team.
 
                 * is_active: True if the team is currently active. If false, the
@@ -396,6 +399,9 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in, the response contains the following fields:
 
                 * id: The team's unique identifier.
+
+                * discussion_topic_id: The unique id of the comments service
+                  discussion topic associated with this team.
 
                 * name: The name of the team.
 
