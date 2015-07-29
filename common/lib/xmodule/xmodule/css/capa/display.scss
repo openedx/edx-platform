@@ -137,6 +137,10 @@ div.problem {
 
   .inline {
     display: inline;
+
+    + p {
+      margin-top: $baseline;
+    }
   }
 }
 
