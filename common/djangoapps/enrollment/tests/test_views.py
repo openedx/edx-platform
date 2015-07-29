@@ -18,6 +18,7 @@ from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 from django.test.utils import override_settings
+import pytz
 
 from course_modes.models import CourseMode
 from embargo.models import CountryAccessRule, Country, RestrictedCourse
@@ -715,6 +716,26 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             is_active=False,
             expected_status=expected_status,
         )
+
+    def test_deactivate_enrollment_expired_mode(self):
+        """Verify that an enrollment in an expired mode can be deactivated."""
+        for mode in (CourseMode.HONOR, CourseMode.VERIFIED):
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode,
+                mode_display_name=mode,
+            )
+
+        # Create verified enrollment.
+        self.assert_enrollment_status(as_server=True, mode=CourseMode.VERIFIED)
+
+        # Change verified mode expiration.
+        mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        mode.expiration_datetime = datetime.datetime(year=1970, month=1, day=1, tzinfo=pytz.utc)
+        mode.save()
+
+        # Deactivate enrollment.
+        self.assert_enrollment_activation(False, CourseMode.VERIFIED)
 
     def test_change_mode_from_user(self):
         """Users should not be able to alter the enrollment mode on an enrollment. """
