@@ -191,6 +191,37 @@ class UsersApiTests(ModuleStoreTestCase):
         user_id = response.data['id']
         return user_id
 
+    def test_user_is_staff(self):
+        """
+        Test if a user is a staff member
+        """
+        test_uri = self.users_base_uri
+        for i in xrange(1, 7):
+            data = {
+                    'email': 'test{}@example.com'.format(i),
+                    'username': 'test_user{}'.format(i),
+                    'password': 'PassWord1',
+                    'first_name': 'John',
+                    'last_name': 'Doe',
+                    'city': 'Boston',
+            }
+            data['is_staff'] = True if i % 2 == 0 else False
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # Test for Robot user with ID 1
+        response = self.do_get('{}?ids={}'.format(test_uri, '1,2,3,4,5,6,7'))
+        self.assertEqual(response.status_code, 200)
+
+        # ID 1 is a Robot Test (results[0]) so the users list starts with ID 2 (results[1])
+        self.assertEqual(response.data['results'][1]['is_staff'], False)        
+        self.assertEqual(response.data['results'][3]['is_staff'], False)        
+        self.assertEqual(response.data['results'][5]['is_staff'], False)        
+        self.assertTrue(response.data['results'][2]['is_staff'])
+        self.assertTrue(response.data['results'][4]['is_staff'])
+        self.assertTrue(response.data['results'][6]['is_staff'])
+
     def test_user_list_get(self):
         test_uri = self.users_base_uri
         users = []
