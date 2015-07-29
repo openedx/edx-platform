@@ -320,10 +320,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
     user_info = cc_user.to_dict()
     is_moderator = has_permission(request.user, "see_all_cohorts", course_key)
 
-    # Verify that the student has access to this thread if belongs to a discussion module
-    if discussion_id not in utils.get_discussion_categories_ids(course, request.user):
-        raise Http404
-
     # Currently, the front end always loads responses via AJAX, even for this
     # page; it would be a nice optimization to avoid that extra round trip to
     # the comments service.
@@ -338,6 +334,10 @@ def single_thread(request, course_key, discussion_id, thread_id):
         if e.status_code == 404:
             raise Http404
         raise
+
+    # Verify that the student has access to this thread if belongs to a course discussion module
+    if thread.context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
+        raise Http404
 
     # verify that the thread belongs to the requesting student's cohort
     if is_commentable_cohorted(course_key, discussion_id) and not is_moderator:
