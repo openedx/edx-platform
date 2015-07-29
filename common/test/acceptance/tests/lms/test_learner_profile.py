@@ -159,10 +159,15 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         Verify age limit messages for a user.
         """
-        self.set_birth_year(birth_year=birth_year if birth_year is not None else "")
+        if birth_year is None:
+            birth_year = ""
+        self.set_birth_year(birth_year=birth_year)
         profile_page = self.visit_profile_page(username)
         self.assertTrue(profile_page.privacy_field_visible)
-        self.assertEqual(profile_page.age_limit_message_present, message is not None)
+        if message:
+            self.assertTrue(profile_page.age_limit_message_present)
+        else:
+            self.assertFalse(profile_page.age_limit_message_present)
         self.assertIn(message, profile_page.profile_forced_private_message)
 
     def test_profile_defaults_to_public(self):
@@ -245,7 +250,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
-        self.assertTrue('Profile' in dashboard_page.username_dropdown_link_text)
+        self.assertIn('Profile', dashboard_page.username_dropdown_link_text)
         dashboard_page.click_my_profile_link()
         my_profile_page = LearnerProfilePage(self.browser, username)
         my_profile_page.wait_for_page()
@@ -331,7 +336,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self._test_dropdown_field(profile_page, 'country', 'Pakistan', 'Pakistan', 'display')
 
         profile_page.make_field_editable('country')
-        self.assertTrue(profile_page.mode_for_field('country'), 'edit')
+        self.assertEqual(profile_page.mode_for_field('country'), 'edit')
 
         self.assertTrue(profile_page.field_icon_present('country'))
 
