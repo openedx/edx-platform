@@ -215,7 +215,6 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
                 'name': 'Test Certificate Name',
                 'description': 'Test Certificate Description',
                 'course_title': 'tes_course_title',
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo.png',
                 'signatories': [],
                 'version': 1,
                 'is_active': True

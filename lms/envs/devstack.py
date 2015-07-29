@@ -121,6 +121,8 @@ PASSWORD_COMPLEXITY = {}
 ########################### Milestones #################################
 FEATURES['MILESTONES_APP'] = True
 
+########################### Milestones #################################
+FEATURES['ORGANIZATIONS_APP'] = True
 
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True

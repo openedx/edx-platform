@@ -93,13 +93,11 @@ class HelperMethods(object):
                 'id': i,
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
-                'org_logo_path': '/c4x/test/CSS101/asset/org_logo{}.png'.format(i),
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
                 'is_active': False
             } for i in xrange(0, count)
         ]
-        self._create_fake_images([certificate['org_logo_path'] for certificate in certificates])
         self.course.certificates = {'certificates': certificates}
         self.save_course()
 
@@ -220,7 +218,6 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
-            u'org_logo_path': '',
             u'signatories': []
         }
         response = self.client.ajax_post(
@@ -388,7 +385,6 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'name': u'Test certificate',
             u'description': u'Test description',
             u'course_title': u'Course Title Override',
-            u'org_logo_path': '',
             u'signatories': []
         }
 
@@ -419,7 +415,6 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'name': u'New test certificate',
             u'description': u'New test description',
             u'course_title': u'Course Title Override',
-            u'org_logo_path': '',
             u'signatories': []
 
         }
@@ -451,11 +446,6 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         Delete certificate
         """
         self._add_course_certificates(count=2, signatory_count=1)
-        certificates = self.course.certificates['certificates']
-        org_logo_url = certificates[1]['org_logo_path']
-        image_asset_location = AssetLocation.from_deprecated_string(org_logo_url)
-        content = contentstore().find(image_asset_location)
-        self.assertIsNotNone(content)
         response = self.client.delete(
             self._url(cid=1),
             content_type="application/json",
@@ -472,8 +462,6 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         # Verify that certificates are properly updated in the course.
         certificates = self.course.certificates['certificates']
         self.assertEqual(len(certificates), 1)
-        # make sure certificate org logo is deleted too
-        self.assertRaises(NotFoundError, contentstore().find, image_asset_location)
         self.assertEqual(certificates[0].get('name'), 'Name 0')
         self.assertEqual(certificates[0].get('description'), 'Description 0')
 
