@@ -21,6 +21,7 @@
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
+            'jquery.timeago': 'xmodule_js/common_static/js/vendor/jquery.timeago',
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
@@ -32,7 +33,6 @@
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
             'backbone-super': 'js/vendor/backbone-super',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
-            'mustache': 'xmodule_js/common_static/js/vendor/mustache',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
             'xmodule': 'xmodule_js/src/xmodule',
@@ -58,6 +58,12 @@
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
             'logger': 'xmodule_js/common_static/js/src/logger',
+            'Markdown.Converter': 'js/Markdown.Converter',
+            'Markdown.Editor': 'js/Markdown.Editor',
+            'Markdown.Sanitizer': 'js/Markdown.Sanitizer',
+            '_split': 'js/split',
+            'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
+            'MathJaxProcessor': 'coffee/src/customwmd',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -86,6 +92,9 @@
 
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
+            'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper': 'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper',
+            'xmodule_js/common_static/coffee/src/discussion/constant': 'xmodule_js/common_static/coffee/src/discussion/constant',
+            'xmodule_js/common_static/coffee/src/discussion/discussion': 'xmodule_js/common_static/coffee/src/discussion/discussion',
             'xmodule_js/common_static/coffee/src/discussion/utils': 'xmodule_js/common_static/coffee/src/discussion/utils',
             'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings': 'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
             'xmodule_js/common_static/coffee/src/discussion/models/discussion_user': 'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',
@@ -167,6 +176,10 @@
                 deps: ['jquery'],
                 exports: 'jQuery.fn.simulate'
             },
+            'jquery.timeago': {
+                deps: ['jquery'],
+                exports: 'jQuery.timeago'
+            },
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
                 exports: 'jQuery.fn.tinymce'
@@ -214,6 +227,27 @@
             },
             'youtube': {
                 exports: 'YT'
+            },
+            'Markdown.Converter': {
+                deps: ['mathjax'],
+                exports: 'Markdown.Converter'
+            },
+            'Markdown.Editor': {
+                deps: ['Markdown.Converter'],
+                exports: 'Markdown.Editor'
+            },
+            'Markdown.Sanitizer': {
+                deps: ['Markdown.Converter'],
+                exports: 'Markdown.Sanitizer'
+            },
+            '_split': {
+                exports: '_split'
+            },
+            'MathJaxProcessor': {
+                deps: [
+                    'Markdown.Converter', 'Markdown.Sanitizer', 'Markdown.Editor', '_split', 'mathjax_delay_renderer'
+                ],
+                exports: 'MathJaxProcessor'
             },
             'codemirror': {
                 exports: 'CodeMirror'
@@ -543,17 +577,18 @@
             'xmodule_js/common_static/coffee/src/discussion/utils': {
                 deps: [
                     'jquery',
+                    'jquery.timeago',
                     'underscore',
                     'backbone',
-                    'mustache',
                     'gettext',
+                    'MathJaxProcessor',
                     'URI'
                 ],
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
                     window.Backbone = require('backbone');
-                    window.Mustache = require('mustache');
+                    window.URI = require('URI');
                 }
             },
             'xmodule_js/common_static/coffee/src/discussion/content': {
@@ -564,7 +599,8 @@
             },
             'xmodule_js/common_static/coffee/src/discussion/discussion': {
                 deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/content'
                 ],
                 exports: 'Discussion'
             },
@@ -622,6 +658,30 @@
                 ],
                 exports: 'DiscussionUserProfileView'
             },
+            'xmodule_js/common_static/coffee/src/discussion/views/new_post_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'NewPostView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/thread_response_edit_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'ThreadResponseEditView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'ThreadResponseShowView'
+            },
+            'xmodule_js/common_static/coffee/src/discussion/views/thread_response_view': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'ThreadResponseView'
+            },
             'DiscussionModuleView': {
                 deps: [
                     'jquery',
@@ -629,9 +689,9 @@
                     'backbone',
                     'gettext',
                     'URI',
-                    'xmodule_js/common_static/coffee/src/discussion/utils',
                     'xmodule_js/common_static/coffee/src/discussion/content',
                     'xmodule_js/common_static/coffee/src/discussion/discussion',
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
                     'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
                     'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',
                     'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view',
@@ -646,13 +706,15 @@
                     'xmodule_js/common_static/coffee/src/discussion/views/thread_response_show_view',
                     'xmodule_js/common_static/coffee/src/discussion/views/thread_response_view'
                 ],
-                exports: 'DiscussionModuleView',
-                init: function() {
-                    // Force window.URI to be set as DiscussionModuleView expects to find it
-                    // TODO: find a more general way to do this
-                    window.URI = require('URI');
-                }
+                exports: 'DiscussionModuleView'
+            },
+            'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper': {
+                deps: [
+                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                ],
+                exports: 'DiscussionSpecHelper'
             }
+
         }
     });
 
