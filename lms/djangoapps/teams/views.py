@@ -331,14 +331,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
         queryset = queryset.order_by(order_by_field)
 
-        # TODO: Remove this on update to Django 1.8
-        # Use the cached length of the queryset in order to avoid
-        # making an extra database call to get the number of items in
-        # the collection
-        paginator = self.paginator_class(queryset, self.get_paginate_by())
-        paginator._count = len(queryset)  # pylint: disable=protected-access
-        page = paginator.page(int(request.QUERY_PARAMS.get('page', 1)))
-        # end TODO
+        page = self.paginate_queryset(queryset)
         serializer = self.get_pagination_serializer(page)
         serializer.context.update({'sort_order': order_by_input})  # pylint: disable=maybe-no-member
         return Response(serializer.data)  # pylint: disable=maybe-no-member
