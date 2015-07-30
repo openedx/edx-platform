@@ -6,6 +6,7 @@ from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.views.generic.base import View
+import newrelic.agent
 
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -256,6 +257,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     pagination_serializer_class = PaginationSerializer
     serializer_class = CourseTeamSerializer
 
+    @newrelic.agent.function_trace()
     def get(self, request):
         """GET /api/team/v0/teams/"""
         result_filter = {
