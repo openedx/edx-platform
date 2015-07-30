@@ -23,7 +23,6 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    is_commentable_cohorted
 )
 from courseware.tabs import EnrolledTab
 from courseware.access import has_access
@@ -36,7 +35,8 @@ from django_comment_client.utils import (
     extract,
     strip_none,
     add_courseware_context,
-    get_group_id_for_comments_service
+    get_group_id_for_comments_service,
+    is_commentable_cohorted
 )
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc

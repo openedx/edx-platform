@@ -16,12 +16,16 @@ import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.locator import CourseLocator
 
 
 @attr('shard_1')
@@ -1100,3 +1104,108 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             self.assertFalse(self.discussion_tab_present(self.enrolled_user))
+
+
+class IsCommentableCohortedTestCase(ModuleStoreTestCase):
+    """
+    Test the is_commentable_cohorted function.
+    """
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
+    def setUp(self):
+        """
+        Make sure that course is reloaded every time--clear out the modulestore.
+        """
+        super(IsCommentableCohortedTestCase, self).setUp()
+        self.toy_course_key = CourseLocator("edX", "toy", "2012_Fall", deprecated=True)
+
+    def test_is_commentable_cohorted(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        def to_id(name):
+            """Helper for topic_name_to_id that uses course."""
+            return topic_name_to_id(course, name)
+
+        # no topics
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course doesn't even have a 'General' topic"
+        )
+
+        # not cohorted
+        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
+
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course isn't cohorted"
+        )
+
+        # cohorted, but top level topics aren't
+        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
+
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course is cohorted, but 'General' isn't."
+        )
+
+        # cohorted, including "Feedback" top-level topics aren't
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback"]
+        )
+
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course is cohorted, but 'General' isn't."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            "Feedback was listed as cohorted.  Should be."
+        )
+
+    def test_is_commentable_cohorted_inline_discussion(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        def to_id(name):  # pylint: disable=missing-docstring
+            return topic_name_to_id(course, name)
+
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback", "random_inline"]
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("random")),
+            "By default, Non-top-level discussion is always cohorted in cohorted courses."
+        )
+
+        # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
+        # non cohorted unless they are explicitly set in cohorted_discussions
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback", "random_inline"],
+            always_cohort_inline_discussions=False
+        )
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("random")),
+            "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("random_inline")),
+            "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
+            "cohorted if explicitly set in cohorted_discussions."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
+        )

@@ -31,11 +31,11 @@ from django_comment_client.base.views import (
     get_thread_created_event_data,
     track_forum_event,
 )
-from django_comment_client.utils import get_accessible_discussion_modules
+from django_comment_client.utils import get_accessible_discussion_modules, is_commentable_cohorted
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, is_commentable_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 
 
 def _get_course_or_404(course_key, user):
