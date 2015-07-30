@@ -30,7 +30,8 @@ from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 from ccx.overrides import get_current_ccx
 
-from django_comment_client.permissions import has_permission
+from django_comment_common.utils import ThreadContext
+from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
     merge_dict,
     extract,
@@ -111,6 +112,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         'text': '',
         'course_id': unicode(course.id),
         'user_id': request.user.id,
+        'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
     }
 
@@ -118,6 +120,9 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     # comments_service.
     if discussion_id is not None:
         default_query_params['commentable_id'] = discussion_id
+        # Use the discussion id/commentable id to determine the context we are going to pass through to the backend.
+        if get_team(discussion_id) is not None:
+            default_query_params['context'] = ThreadContext.STANDALONE
 
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
@@ -149,7 +154,6 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
                     'flagged',
                     'unread',
                     'unanswered',
-                    'context',
                 ]
             )
         )

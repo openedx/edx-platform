@@ -19,7 +19,7 @@ from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, 
 from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
-from django_comment_common.utils import seed_permissions_roles
+from django_comment_common.utils import seed_permissions_roles, ThreadContext
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -240,7 +240,7 @@ class ViewsTestCaseMixin(object):
             data["depth"] = 0
         self._set_mock_request_data(mock_request, data)
 
-    def create_thread_helper(self, mock_request, extra_data=None):
+    def create_thread_helper(self, mock_request, extra_request_data=None, extra_response_data=None):
         """
         Issues a request to create a thread and verifies the result.
         """
@@ -283,8 +283,8 @@ class ViewsTestCaseMixin(object):
             "anonymous": ["false"],
             "title": ["Hello"],
         }
-        if extra_data:
-            thread.update(extra_data)
+        if extra_request_data:
+            thread.update(extra_request_data)
         url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
                                                'course_id': self.course_id.to_deprecated_string()})
         response = self.client.post(url, data=thread)
@@ -292,14 +292,15 @@ class ViewsTestCaseMixin(object):
         expected_data = {
             'thread_type': 'discussion',
             'body': u'this is a post',
+            'context': ThreadContext.COURSE,
             'anonymous_to_peers': False, 'user_id': 1,
             'title': u'Hello',
             'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
             'anonymous': False,
             'course_id': unicode(self.course_id),
         }
-        if extra_data:
-            expected_data.update(extra_data)
+        if extra_response_data:
+            expected_data.update(extra_response_data)
         mock_request.assert_called_with(
             'post',
             '{prefix}/i4x-MITx-999-course-Robot_Super_Course/threads'.format(prefix=CS_PREFIX),
@@ -387,9 +388,19 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, V
     def test_create_thread(self, mock_request):
         self.create_thread_helper(mock_request)
 
-    def test_create_thread_with_context(self, mock_request):
+    def test_create_thread_standalone(self, mock_request):
+        team = CourseTeamFactory.create(
+            name="A Team",
+            course_id=self.course_id,
+            topic_id='topic_id',
+            discussion_topic_id="i4x-MITx-999-course-Robot_Super_Course"
+        )
+
+        # Add the student to the team so they can post to the commentable.
+        team.add_user(self.student)
+
         # create_thread_helper verifies that extra data are passed through to the comments service
-        self.create_thread_helper(mock_request, extra_data={'context': 'standalone'})
+        self.create_thread_helper(mock_request, extra_response_data={'context': ThreadContext.STANDALONE})
 
     def test_delete_comment(self, mock_request):
         self._set_mock_request_data(mock_request, {

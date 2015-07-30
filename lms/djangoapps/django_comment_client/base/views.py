@@ -18,6 +18,7 @@ from courseware.access import has_access
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
+from django_comment_common.utils import ThreadContext
 from django_comment_client.utils import (
     add_courseware_context,
     get_annotated_content_info,
@@ -30,7 +31,7 @@ from django_comment_client.utils import (
     discussion_category_id_access,
     get_cached_discussion_id_map,
 )
-from django_comment_client.permissions import check_permissions_by_view, has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from eventtracking import tracker
 import lms.lib.comment_client as cc
 
@@ -187,8 +188,11 @@ def create_thread(request, course_id, commentable_id):
         'title': post["title"],
     }
 
-    if 'context' in post:
-        params['context'] = post['context']
+    # Check for whether this commentable belongs to a team, and add the right context
+    if get_team(commentable_id) is not None:
+        params['context'] = ThreadContext.STANDALONE
+    else:
+        params['context'] = ThreadContext.COURSE
 
     thread = cc.Thread(**params)
 
