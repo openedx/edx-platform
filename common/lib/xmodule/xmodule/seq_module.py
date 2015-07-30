@@ -186,7 +186,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     'default_time_limit_mins': (
                         self.default_time_limit_minutes if
                         self.default_time_limit_minutes else 0
-                    )
+                    ),
+                    'is_practice_exam': self.is_practice_exam
                 }
 
                 # inject the user's credit requirements and fulfillments
