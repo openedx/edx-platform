@@ -389,7 +389,7 @@ class InlineDiscussionPage(PageObject):
     def __init__(self, browser, discussion_id):
         super(InlineDiscussionPage, self).__init__(browser)
         self._discussion_selector = (
-            "body.courseware .discussion-module[data-discussion-id='{discussion_id}'] ".format(
+            ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
                 discussion_id=discussion_id
             )
         )
