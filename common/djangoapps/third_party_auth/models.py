@@ -363,11 +363,14 @@ class SAMLConfiguration(ConfigurationModel):
             return self.public_key
         if name == "SP_PRIVATE_KEY":
             return self.private_key
-        if name == "TECHNICAL_CONTACT":
-            return {"givenName": "Technical Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
-        if name == "SUPPORT_CONTACT":
-            return {"givenName": "SAML Support", "emailAddress": settings.TECH_SUPPORT_EMAIL}
         other_config = json.loads(self.other_config_str)
+        if name in ("TECHNICAL_CONTACT", "SUPPORT_CONTACT"):
+            contact = {
+                "givenName": "{} Support".format(settings.PLATFORM_NAME),
+                "emailAddress": settings.TECH_SUPPORT_EMAIL
+            }
+            contact.update(other_config.get(name, {}))
+            return contact
         return other_config[name]  # SECURITY_CONFIG, SP_EXTRA, or similar extra settings
 
 
