@@ -1,10 +1,16 @@
 # Custom requirements to be customized by individual OpenEdX instances
 
--e git+https://github.com/edx-solutions/xblock-mentoring.git@cc2026a4da325937a2e9a7ba8678b75ce4ef5b68#egg=xblock-mentoring
--e git+https://github.com/edx-solutions/xblock-image-explorer.git@9b01df4bca8aca89d300850a357fb1647cbd3173#egg=xblock-image-explorer
--e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@eaa8dd4d934a374738fd7385fc636cbb99575c40#egg=xblock-drag-and-drop
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@1e99a60c7f44c0c51f40b90069d911c61a35103b#egg=xblock-drag-and-drop-v2
--e git+https://github.com/edx-solutions/xblock-ooyala.git@10ededa58aab3f8893d98de36e2e5279890064bd#egg=xblock-ooyala
--e git+https://github.com/edx-solutions/xblock-group-project.git@2b932de36e293bd08f6a59112daa9d6794a05c46#egg=xblock-group-project
--e git+https://github.com/edx-solutions/xblock-discussion.git@5b14678ca85856b4db2bb612b69047ec82c11efb#egg=xblock-discussion
--e git+https://github.com/edx-solutions/xblock-adventure.git@7b0b4fae3d1aeab665001a16f42782b9ef9f8ccd#egg=xblock-adventure
+-e git+https://github.com/edx/xblock-utils.git@25f15734ec8d29fde0e114bbd199fd48638865ae#egg=xblock-utils
+-e git+https://github.com/edx-solutions/xblock-mentoring.git@bd0b3f413ae7e8274985555adfd7de7af3eca84c#egg=xblock-mentoring
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@21b9bcc4f2c7917463ab18a596161ac6c58c9c4a#egg=xblock-image-explorer
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@5736ed8774b92c8b8396b5bd455f8a8fb80295fb#egg=xblock-drag-and-drop-v2
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@ac49b30452aff0cc34cace6a34b788e100490f24#egg=xblock-ooyala
+-e git+https://github.com/edx-solutions/xblock-group-project.git@6b3393a1a5eb76224ecd3311e870ab8adf4badbf#egg=xblock-group-project
+-e git+https://github.com/edx-solutions/xblock-adventure.git@effa22006bb6528bc6d3788787466eb4e74e1161#egg=xblock-adventure
+-e git+https://github.com/mckinseyacademy/xblock-poll.git@ca0e6eb4ef10c128d573c3cec015dcfee7984730#egg=xblock-poll
+-e git+https://github.com/OfficeDev/xblock-officemix/@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock_officemix-master
+-e git+https://github.com/edx/edx-notifications.git@4e3323da6775a101da5d8beab80c231278df69d2#egg=edx-notifications
+-e git+https://github.com/open-craft/problem-builder.git@f42c7c572c7c9e5155062f3f1874714abf63e92a#egg=problem-builder
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@8bfe329e74b77c4b66399b3c605dcb5600edb1b2#egg=xblock-group-project-v2
+-e git+https://github.com/edx-solutions/xblock.git@07cfdf2e611375bccd481b4b388f70c6dbf6d6ab#egg=xblock
