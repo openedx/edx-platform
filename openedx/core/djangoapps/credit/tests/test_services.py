@@ -90,7 +90,12 @@ class CreditServiceTests(ModuleStoreTestCase):
         )
 
         # mark the grade as satisfied
-        set_credit_requirement_status(self.user.username, self.course.id, 'grade', 'grade')
+        self.service.set_credit_requirement_status(
+            self.user.id,
+            self.course.id,
+            'grade',
+            'grade'
+        )
 
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
 

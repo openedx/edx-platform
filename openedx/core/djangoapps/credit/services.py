@@ -33,7 +33,6 @@ class CreditService(object):
             - or -
             {
                 'enrollment_mode': the mode that the user is enrolled in the course
-                'credit_requirements': the requirements (dict) in order to eligible for credit
                 'credit_requirement_status': the user's status in fulfilling those requirements
             }
         """
@@ -65,3 +64,30 @@ class CreditService(object):
             'enrollment_mode': enrollment.mode,
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
+
+    def set_credit_requirement_status(self, user_id, course_key, req_namespace,
+                                      req_name, status="satisfied", reason=None):
+        """
+        A simple wrapper around the method of the same name in api.eligibility.py. The only difference is
+        that a user_id is passed in.
+
+        For more information, see documentation on this method name in api.eligibility.py
+        """
+
+        # need to get user_name
+        user = User.objects.get(id=user_id)
+
+        # This seems to need to be here otherwise we get
+        # circular references when starting up the app
+        from openedx.core.djangoapps.credit.api.eligibility import (
+            set_credit_requirement_status as api_set_credit_requirement_status
+        )
+
+        api_set_credit_requirement_status(
+            user.username,
+            course_key,
+            req_namespace,
+            req_name,
+            status,
+            reason
+        )
