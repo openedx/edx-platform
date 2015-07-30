@@ -33,6 +33,7 @@ from xmodule.tests.xml import XModuleXmlImportTest
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
+
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
 

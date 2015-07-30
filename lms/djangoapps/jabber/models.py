@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class JabberUser(models.Model):
     # The default length of the Jabber passwords we create. We set a
     # really long default since we're storing these passwords in

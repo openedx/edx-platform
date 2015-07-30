@@ -95,7 +95,7 @@ class Command(BaseCommand):
             info = dump_module_by_position(course_id, course)
         else:
             info = dump_module(course, inherited=options['inherited'], defaults=options['inherited_defaults'])
-            
+
         if options['csv']:
             csvout = StringIO.StringIO()
             writer = csv.writer(csvout, dialect='excel')
@@ -148,7 +148,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
     return destination
 
 
-def dump_module_by_position(course_id, module, level=0, 
+def dump_module_by_position(course_id, module, level=0,
                             destination=None, prefix=None, parent=None):
     """
     Add a module and all of its children to the end of the list.
@@ -165,30 +165,39 @@ def dump_module_by_position(course_id, module, level=0,
     else:
         display_name_long = prefix + "," + module.display_name
 
-    if destination == None:
-        destination = [ ('course_id',
-                         'position',
-                         'level',
-                         'module_id',
-                         'type',
-                         'displayname',
-                         'path',
-                         'parent') ]
+    if destination is None:
+        destination = [
+            (
+                'course_id',
+                'position',
+                'level',
+                'module_id',
+                'type',
+                'displayname',
+                'path',
+                'parent',
+            ),
+        ]
 
-    destination.append( (course_id,
-                         pos, 
-                         level, 
-                         module.id, 
-                         module.location.category,
-                         module.display_name, 
-                         display_name_long,
-                         parent) )
+    destination.append(
+        (
+            course_id,
+            pos,
+            level,
+            module.id,
+            module.location.category,
+            module.display_name,
+            display_name_long,
+            parent,
+        )
+    )
     for child in module.get_children():
-        dump_module_by_position(course_id, 
-                                child, 
-                                level=level+1, 
-                                destination=destination, 
-                                prefix=display_name_long, 
-                                parent=module.id)
+        dump_module_by_position(
+            course_id,
+            child,
+            level=level + 1,
+            destination=destination,
+            prefix=display_name_long,
+            parent=module.id,
+        )
     return destination
-

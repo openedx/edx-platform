@@ -1675,19 +1675,18 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(minutes_allowed=5, attempts=3)
         module.start_problem()
 
-        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct, \
-             patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-
-            mock_is_correct.return_value = False
-            mock_grade.return_value = CorrectMap(
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                mock_is_correct.return_value = False
+                mock_grade.return_value = CorrectMap(
                     answer_id='1_2_1',
                     correctness="correct",
                     npoints=0.9,
-            )
-            get_request_dict = {CapaFactory.answer_key(): '3'}
-            results = module.check_problem(get_request_dict)
-            self.assertFalse(module.should_show_reset_button())
-            self.assertFalse(module.should_show_check_button())
+                )
+                get_request_dict = {CapaFactory.answer_key(): '3'}
+                results = module.check_problem(get_request_dict)
+                self.assertFalse(module.should_show_reset_button())
+                self.assertFalse(module.should_show_check_button())
 
     def test_timed_save(self):
         """

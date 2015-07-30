@@ -691,6 +691,7 @@ class TestNonRegisteredUser(TestCase):
             req.user = self.user
             views.progress(req, self.course_id)
 
+
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student

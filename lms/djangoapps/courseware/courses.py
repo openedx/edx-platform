@@ -200,8 +200,8 @@ def get_course_about_section(course, section_key):
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
                        'number', 'instructors', 'overview', 'about_sidebar_html',
-                       'effort', 'end_date', 'prerequisites', 'ocw_links', 
-                       'pre_enrollment_email', 'post_enrollment_email', 
+                       'effort', 'end_date', 'prerequisites', 'ocw_links',
+                       'pre_enrollment_email', 'post_enrollment_email',
                        'pre_enrollment_email_subject', 'post_enrollment_email_subject']:
 
         try:
@@ -397,16 +397,18 @@ def sort_by_announcement(courses):
 
     return courses
 
+
 def registered_for_course(course, user):
     """
     Return CourseEnrollment if user is registered for course, else False
     """
     if user is None:
-      return False
+        return False
     if user.is_authenticated():
-      return CourseEnrollment.is_enrolled(user, course.id)
+        return CourseEnrollment.is_enrolled(user, course.id)
     else:
-      return False
+        return False
+
 
 def sort_by_start_date(courses):
     """

@@ -25,7 +25,7 @@ class JabberRouter(object):
         """
         if obj1._meta.app_label == 'jabber' or \
            obj2._meta.app_label == 'jabber':
-           return True
+            return True
         return None
 
     def allow_syncdb(self, db, model):

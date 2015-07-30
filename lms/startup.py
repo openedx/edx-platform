@@ -142,4 +142,3 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
-

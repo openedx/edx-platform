@@ -45,7 +45,7 @@ MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 # Remove sneakpeek during tests to prevent unwanted redirect
 MIDDLEWARE_CLASSES = tuple([
     mwc for mwc in MIDDLEWARE_CLASSES
-        if mwc != 'sneakpeek.middleware.SneakPeekLogoutMiddleware'
+    if mwc != 'sneakpeek.middleware.SneakPeekLogoutMiddleware'
 ])
 
 THIS_UUID = uuid4().hex[:5]

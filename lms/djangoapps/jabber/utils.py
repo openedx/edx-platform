@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .models import JabberUser
 
+
 def get_bosh_url():
     """
     Build a "Bidirectional-streams Over Synchronous HTTP" (BOSH) URL
@@ -127,4 +128,3 @@ def __validate_settings():
     host = settings.JABBER.get("HOST")
     if host is None or host == "":
         raise ImproperlyConfigured("Missing Jabber HOST in settings")
-

@@ -308,6 +308,7 @@ def get_transcripts_presence(videos, item):
     })
     return transcripts_presence
 
+
 def _transcripts_logic(transcripts_presence, videos):
     """
     By `transcripts_presence` content, figure what show to user:

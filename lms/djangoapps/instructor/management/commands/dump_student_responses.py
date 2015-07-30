@@ -20,10 +20,13 @@ class Command(BaseCommand):
     args = '<course_id>'
     help = __doc__
     option_list = BaseCommand.option_list + (
-        make_option('-o', '--output-file',
-                    dest='filename',
-                    help='Write CSV to FILENAME, defaults to stdout'),
-        )
+        make_option(
+            '-o',
+            '--output-file',
+            dest='filename',
+            help='Write CSV to FILENAME, defaults to stdout',
+        ),
+    )
 
     def handle(self, *args, **options):
         if not args:

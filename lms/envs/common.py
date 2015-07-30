@@ -1593,10 +1593,10 @@ EMAIL_OPTIN_MINIMUM_AGE = PARENTAL_CONSENT_AGE_LIMIT
 
 YOUTUBE = {
     # YouTube JavaScript API
-    'API': 'www.youtube.com/iframe_api',
+    'API': 'https://www.youtube.com/iframe_api',
 
-    # URL to test YouTube availability
-    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+    # URL to get YouTube metadata
+    'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
 
     # Current youtube api for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
@@ -1608,6 +1608,7 @@ YOUTUBE = {
         },
     },
 }
+YOUTUBE_API_KEY = None
 
 ################################### APPS ######################################
 INSTALLED_APPS = (
@@ -2304,9 +2305,9 @@ FORUM_MONGO_PARAMS = {
 INSTALLED_APPS += ('branding_stanford',)
 DISPLAY_COURSE_TILES = True
 
- # Set to True for systems where students are auto-registered on login
+# Set to True for systems where students are auto-registered on login
 DISABLE_REGISTER_BUTTON = False
-#date format the api will be formatting the datetime values
+# date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
 # Enrollment API Cache Timeout
