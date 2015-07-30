@@ -102,12 +102,16 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertEqual(0, len(field_dictionary['course']))
 
     def test_excludes_microsite(self):
-        """ By default there is the test microsite to exclude """
+        """
+        By default there is the test microsite and the microsite with logistration
+        to exclude
+        """
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertIn('org', exclude_dictionary)
         exclude_orgs = exclude_dictionary['org']
-        self.assertEqual(1, len(exclude_orgs))
-        self.assertEqual('TestMicrositeX', exclude_orgs[0])
+        self.assertEqual(2, len(exclude_orgs))
+        self.assertEqual('LogistrationX', exclude_orgs[0])
+        self.assertEqual('TestMicrositeX', exclude_orgs[1])
 
     @patch('microsite_configuration.microsite.get_all_orgs', Mock(return_value=[]))
     def test_excludes_no_microsite(self):

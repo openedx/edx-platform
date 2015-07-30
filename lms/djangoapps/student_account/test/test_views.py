@@ -459,3 +459,60 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase):
 
         for attribute in self.FIELDS:
             self.assertIn(attribute, response.content)
+
+
+@override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
+class MicrositeLogistrationTests(TestCase):
+    """
+    Test to validate that microsites can display the logistration page
+    """
+
+    def test_login_page(self):
+        """
+        Make sure that we get the expected logistration page on our specialized
+        microsite
+        """
+
+        resp = self.client.get(
+            reverse('account_login'),
+            HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertIn('<div id="login-and-registration-container"', resp.content)
+
+    def test_registration_page(self):
+        """
+        Make sure that we get the expected logistration page on our specialized
+        microsite
+        """
+
+        resp = self.client.get(
+            reverse('account_register'),
+            HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertIn('<div id="login-and-registration-container"', resp.content)
+
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_no_override(self):
+        """
+        Make sure we get the old style login/registration if we don't override
+        """
+
+        resp = self.client.get(
+            reverse('account_login'),
+            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertNotIn('<div id="login-and-registration-container"', resp.content)
+
+        resp = self.client.get(
+            reverse('account_register'),
+            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertNotIn('<div id="login-and-registration-container"', resp.content)
