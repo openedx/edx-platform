@@ -1119,8 +1119,8 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         ('student_not_in_team', 'team_commentable_id', 401),
         # Non-team commentables can be edited by any student.
         ('student_not_in_team', 'course_commentable_id', 200),
-        # Moderators most be a member of the team for doing "student actions".
-        ('moderator', 'team_commentable_id', 401)
+        # Moderators can always operator on threads within a team, regardless of team membership.
+        ('moderator', 'team_commentable_id', 200)
     ]
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1200,7 +1200,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
     @ddt.unpack
     def test_create_comment(self, user, commentable_id, status_code, mock_request):
         """
-        Verify that create_comment is limited to members of the team.
+        Verify that create_comment is limited to members of the team or users with 'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(user, mock_request, {"closed": False, "commentable_id": commentable_id})
@@ -1221,7 +1221,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
     @ddt.unpack
     def test_create_sub_comment(self, user, commentable_id, status_code, mock_request):
         """
-        Verify that create_subcomment is limited to members of the team.
+        Verify that create_subcomment is limited to members of the team or users with 'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
@@ -1244,7 +1244,8 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
     @ddt.unpack
     def test_comment_actions(self, user, commentable_id, status_code, mock_request):
         """
-        Verify that voting and flagging of comments is limited to members of the team.
+        Verify that voting and flagging of comments is limited to members of the team or users with
+        'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
@@ -1264,7 +1265,8 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
     @ddt.unpack
     def test_threads_actions(self, user, commentable_id, status_code, mock_request):
         """
-        Verify that voting, flagging, and following of threads is limited to members of the team.
+        Verify that voting, flagging, and following of threads is limited to members of the team or users with
+        'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
@@ -1285,7 +1287,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
     @ddt.unpack
     def test_create_thread(self, user, commentable_id, status_code, __):
         """
-        Verify that creation of threads is limited to members of the team.
+        Verify that creation of threads is limited to members of the team or users with 'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         # mock_request is not used because Commentables don't exist in comment service.
@@ -1303,7 +1305,8 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
     @ddt.unpack
     def test_commentable_actions(self, user, commentable_id, status_code, __):
         """
-        Verify that following of commentables is limited to members of the team.
+        Verify that following of commentables is limited to members of the team or users with
+        'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         # mock_request is not used because Commentables don't exist in comment service.

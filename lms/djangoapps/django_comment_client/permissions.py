@@ -114,30 +114,32 @@ def _check_conditions_permissions(user, permissions, course_id, content):
     return test(user, permissions, operator="or")
 
 
+# Note: 'edit_content' is being used as a generic way of telling if someone is a privileged user
+# (forum Moderator/Admin/TA), because there is a desire that team membership does not impact privileged users.
 VIEW_PERMISSIONS = {
     'update_thread': ['edit_content', ['update_thread', 'is_open', 'is_author']],
-    'create_comment': [["create_comment", "is_open", "is_team_member_if_applicable"]],
+    'create_comment': ['edit_content', ["create_comment", "is_open", "is_team_member_if_applicable"]],
     'delete_thread': ['delete_thread', ['update_thread', 'is_author']],
     'update_comment': ['edit_content', ['update_comment', 'is_open', 'is_author']],
     'endorse_comment': ['endorse_comment', 'is_question_author'],
     'openclose_thread': ['openclose_thread'],
-    'create_sub_comment': [['create_sub_comment', 'is_open', 'is_team_member_if_applicable']],
+    'create_sub_comment': ['edit_content', ['create_sub_comment', 'is_open', 'is_team_member_if_applicable']],
     'delete_comment': ['delete_comment', ['update_comment', 'is_open', 'is_author']],
-    'vote_for_comment': [['vote', 'is_open', 'is_team_member_if_applicable']],
-    'undo_vote_for_comment': [['unvote', 'is_open', 'is_team_member_if_applicable']],
-    'vote_for_thread': [['vote', 'is_open', 'is_team_member_if_applicable']],
-    'flag_abuse_for_thread': [['vote', 'is_team_member_if_applicable']],
-    'un_flag_abuse_for_thread': [['vote', 'is_team_member_if_applicable']],
-    'flag_abuse_for_comment': [['vote', 'is_team_member_if_applicable']],
-    'un_flag_abuse_for_comment': [['vote', 'is_team_member_if_applicable']],
-    'undo_vote_for_thread': [['unvote', 'is_open', 'is_team_member_if_applicable']],
+    'vote_for_comment': ['edit_content', ['vote', 'is_open', 'is_team_member_if_applicable']],
+    'undo_vote_for_comment': ['edit_content', ['unvote', 'is_open', 'is_team_member_if_applicable']],
+    'vote_for_thread': ['edit_content', ['vote', 'is_open', 'is_team_member_if_applicable']],
+    'flag_abuse_for_thread': ['edit_content', ['vote', 'is_team_member_if_applicable']],
+    'un_flag_abuse_for_thread': ['edit_content', ['vote', 'is_team_member_if_applicable']],
+    'flag_abuse_for_comment': ['edit_content', ['vote', 'is_team_member_if_applicable']],
+    'un_flag_abuse_for_comment': ['edit_content', ['vote', 'is_team_member_if_applicable']],
+    'undo_vote_for_thread': ['edit_content', ['unvote', 'is_open', 'is_team_member_if_applicable']],
     'pin_thread': ['openclose_thread'],
     'un_pin_thread': ['openclose_thread'],
-    'follow_thread': [['follow_thread', 'is_team_member_if_applicable']],
-    'follow_commentable': [['follow_commentable', 'is_team_member_if_applicable']],
-    'unfollow_thread': [['unfollow_thread', 'is_team_member_if_applicable']],
-    'unfollow_commentable': [['unfollow_commentable', 'is_team_member_if_applicable']],
-    'create_thread': [['create_thread', 'is_team_member_if_applicable']],
+    'follow_thread': ['edit_content', ['follow_thread', 'is_team_member_if_applicable']],
+    'follow_commentable': ['edit_content', ['follow_commentable', 'is_team_member_if_applicable']],
+    'unfollow_thread': ['edit_content', ['unfollow_thread', 'is_team_member_if_applicable']],
+    'unfollow_commentable': ['edit_content', ['unfollow_commentable', 'is_team_member_if_applicable']],
+    'create_thread': ['edit_content', ['create_thread', 'is_team_member_if_applicable']],
 }
 
 
