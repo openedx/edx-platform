@@ -340,23 +340,6 @@ class UserProfile(models.Model):
         return date.year - year_of_birth <= age_limit    # pylint: disable=maybe-no-member
 
 
-def get_profile_dict_for_user(user_id):
-    """
-    Returns a dict of the user profile. This is useful for cases where we have to provide
-    profile services to other code bases as part of a Dependency Injection approach
-    """
-
-    profile = {}
-
-    # this should always exist, but just in case...
-    if UserProfile.objects.filter(id=user_id).exists():
-        profile_obj = UserProfile.objects.get(id=user_id)
-
-        profile = model_to_dict(profile_obj)
-
-    return profile
-
-
 @receiver(pre_save, sender=UserProfile)
 def user_profile_pre_save_callback(sender, **kwargs):
     """
