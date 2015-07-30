@@ -44,6 +44,7 @@ class @DiscussionSpecHelper
             'thread-list-item', 'discussion-home', 'search-alert',
             'new-post', 'thread-type', 'new-post-menu-entry',
             'new-post-menu-category', 'topic', 'post-user-display',
+            'inline-discussion', 'pagination', 'user-profile', 'profile-thread'
         ]
         templateNamesNoTrailingTemplate = [
             'forum-action-endorse', 'forum-action-answer', 'forum-action-follow',

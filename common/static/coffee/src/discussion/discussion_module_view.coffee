@@ -9,7 +9,6 @@ if Backbone?
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
       "click .discussion-paginator a": "navigateToPage"
 
-    paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
     page_re: /\?discussion_page=(\d+)/
     initialize: ->
       @toggleDiscussionBtn = @$(".discussion-show")
@@ -91,7 +90,10 @@ if Backbone?
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
 
-      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId})
+      $discussion = _.template($("#inline-discussion-template").html())(
+        'threads': response.discussion_data,
+        'discussionId': discussionId
+      )
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else
@@ -149,8 +151,8 @@ if Backbone?
       pageUrl = (number) ->
         "?discussion_page=#{number}"
       params = DiscussionUtil.getPaginationParams(@page, numPages, pageUrl)
-      thing = Mustache.render @paginationTemplate(), params
-      @$('section.pagination').html(thing)
+      pagination = _.template($("#pagination-template").html())(params)
+      @$('section.pagination').html(pagination)
 
     navigateToPage: (event) =>
       event.preventDefault()
