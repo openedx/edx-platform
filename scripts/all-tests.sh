@@ -120,7 +120,11 @@ END
         ;;
 
     "js-unit")
-        paver test_js --coverage
+        # Runs  js tests under coverage. If the tests fail or error, then this
+        # will exit the script without running coverage. If the tests pass,
+        # then it will proceed and generate the diff-coverage reports for js.
+        paver test_js --coverage || exit 1
+        paver diff_coverage
         ;;
 
     "commonlib-js-unit")
