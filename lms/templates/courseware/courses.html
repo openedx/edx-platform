@@ -10,7 +10,7 @@
 
 % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
 <%block name="header_extras">
-  % for template_name in ["result_item", "filter_bar", "filter", "search_facets_list", "search_facets_section", "search_facet", "more_less_links"]:
+  % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
@@ -68,7 +68,7 @@
       </form>
     </div>
 
-    <div id="filter-bar" class="filters hide-phone">
+    <div id="filter-bar" class="filters hide-phone is-collapsed">
     </div>
     % endif
 
@@ -84,7 +84,10 @@
 
 
     % if course_discovery_enabled:
-    <aside aria-label="${_('Refine your search')}" class="search-facets phone-menu">
+    <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
+      <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
+      <section class="search-facets-lists">
+      </section>
     </aside>
     % endif
 

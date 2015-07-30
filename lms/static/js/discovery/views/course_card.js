@@ -28,7 +28,7 @@ define([
     return Backbone.View.extend({
 
         tagName: 'li',
-        templateId: '#result_item-tpl',
+        templateId: '#course_card-tpl',
         className: 'courses-listing-item',
 
         initialize: function () {
