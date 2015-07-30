@@ -1664,6 +1664,38 @@ class TestXBlockInfo(ItemTest):
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
 
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+    def test_proctored_exam_xblock_info(self):
+        self.course.enable_proctored_exams = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        course = modulestore().get_item(self.course.location)
+        xblock_info = create_xblock_info(
+            course,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        # exam proctoring should be enabled and time limited.
+        self.assertEqual(xblock_info['enable_proctored_exams'], True)
+
+        sequential = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential',
+            display_name="Test Lesson 1", user_id=self.user.id,
+            is_proctored_enabled=True, is_time_limited=True,
+            default_time_limit_minutes=100
+        )
+        sequential = modulestore().get_item(sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        # exam proctoring should be enabled and time limited.
+        self.assertEqual(xblock_info['is_proctored_enabled'], True)
+        self.assertEqual(xblock_info['is_time_limited'], True)
+        self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
+
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """

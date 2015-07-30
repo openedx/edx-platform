@@ -17,6 +17,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     id: 'mock-course',
                     display_name: 'Mock Course',
                     category: 'course',
+                    enable_proctored_exams: true,
                     studio_url: '/course/slashes:MockCourse',
                     is_container: true,
                     has_changes: false,
@@ -214,7 +215,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     'course-outline', 'xblock-string-field-editor', 'modal-button',
                     'basic-modal', 'course-outline-modal', 'release-date-editor',
                     'due-date-editor', 'grading-editor', 'publish-editor',
-                    'staff-lock-editor'
+                    'staff-lock-editor', 'timed-examination-preference-editor'
                 ]);
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON({}, [
@@ -582,7 +583,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
             });
 
             describe("Subsection", function() {
-                var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson;
+                var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson, setModalTimedExaminationPreferenceValues;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
@@ -593,6 +594,16 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     $("#due_date").val(due_date);
                     $("#grading_type").val(grading_type);
                     $("#staff_lock").prop('checked', is_locked);
+                };
+
+                setModalTimedExaminationPreferenceValues = function(
+                    is_timed_examination,
+                    time_limit,
+                    is_exam_proctoring_enabled
+                ){
+                    $("#id_time_limit").val(time_limit);
+                    $("#id_exam_proctoring").prop('checked', is_exam_proctoring_enabled);
+                    $("#id_timed_examination").prop('checked', is_timed_examination);
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
@@ -607,7 +618,10 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                             format: "Lab",
                             due: "2014-07-10T00:00:00Z",
                             has_explicit_staff_lock: true,
-                            staff_only_message: true
+                            staff_only_message: true,
+                            "is_time_limited": true,
+                            "is_proctored_enabled": true,
+                            "default_time_limit_minutes": 150
                         }, [
                             createMockVerticalJSON({
                                 has_changes: true,
@@ -682,6 +696,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setModalTimedExaminationPreferenceValues(true, "02:30", true);
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
@@ -689,7 +704,10 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                         "metadata":{
                             "visible_to_staff_only": true,
                             "start":"2014-07-09T00:00:00.000Z",
-                            "due":"2014-07-10T00:00:00.000Z"
+                            "due":"2014-07-10T00:00:00.000Z",
+                            "is_time_limited": true,
+                            "is_proctored_enabled": true,
+                            "default_time_limit_minutes": 150
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -720,6 +738,27 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
                     expect($("#staff_lock").is(":checked")).toBe(true);
+                    expect($("#id_timed_examination").is(":checked")).toBe(true);
+                    expect($("#id_exam_proctoring").is(":checked")).toBe(true);
+                    expect($("#id_time_limit").val()).toBe("02:30");
+                });
+
+                it('can be edited and enable/disable proctoring fields, when time_limit checkbox value changes', function() {
+                    createCourseOutlinePage(this, mockCourseJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    setModalTimedExaminationPreferenceValues(true, "02:30", true);
+                    var target = $('#id_timed_examination');
+                    target.attr("checked","checked");
+                    target.click();
+                    expect($('#id_exam_proctoring')).toHaveAttr('disabled','disabled');
+                    expect($('#id_time_limit')).toHaveAttr('disabled','disabled');
+                    target.removeAttr("checked");
+                    target.click();
+                    expect($('#id_exam_proctoring')).not.toHaveAttr('disabled','disabled');
+                    expect($('#id_time_limit')).not.toHaveAttr('disabled','disabled');
+                    expect($('#id_time_limit').val()).toBe('00:30');
+                    expect($('#id_exam_proctoring')).not.toHaveAttr('checked');
                 });
 
                 it('release date, due date, grading type, and staff lock can be cleared.', function() {

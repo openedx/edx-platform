@@ -519,9 +519,14 @@
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-
+    .exam-time-list-fields {
+      margin-bottom: ($baseline/2);
+    }
     .list-fields {
-
+      .field-message {
+        color: $gray;
+        font-size: ($baseline/2);
+      }
       .field {
         display: inline-block;
         vertical-align: top;
@@ -625,7 +630,42 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock {
+    .edit-staff-lock, .edit-settings-timed-examination {
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: block;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: none;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
+      }
+    }
+
+    // UI: timed and proctored exam section
+    .edit-settings-timed-examination {
+
+      // give a little space between the sections
+      padding-bottom: 10px;
+
+      // indent this group a bit to make it seem like
+      // it is one group, under a header
+      .modal-section-content {
+        margin-left: 25px;
+      }
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;

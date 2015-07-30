@@ -2385,6 +2385,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # edX Proctoring
+    'edx_proctoring',
 )
 
 for app_name in OPTIONAL_APPS:

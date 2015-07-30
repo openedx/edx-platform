@@ -1,4 +1,6 @@
 """ Commerce API v1 view tests. """
+from datetime import datetime
+import itertools
 import json
 
 import ddt
@@ -6,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from rest_framework.utils.encoders import JSONEncoder
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -31,12 +34,17 @@ class CourseApiViewTestMixin(object):
     @staticmethod
     def _serialize_course_mode(course_mode):
         """ Serialize a CourseMode to a dict. """
+        # encode the datetime (if nonempty) using DRF's encoder, simplifying
+        # equality assertions.
+        expires = course_mode.expiration_datetime
+        if expires is not None:
+            expires = JSONEncoder().default(expires)
         return {
             u'name': course_mode.mode_slug,
             u'currency': course_mode.currency.lower(),
             u'price': course_mode.min_price,
             u'sku': course_mode.sku,
-            u'expires': course_mode.expiration_datetime,
+            u'expires': expires,
         }
 
 
@@ -112,7 +120,14 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         """ Verify the view supports updating a course. """
         permission = Permission.objects.get(name='Can change course mode')
         self.user.user_permissions.add(permission)
-        expected_course_mode = CourseMode(mode_slug=u'verified', min_price=200, currency=u'USD', sku=u'ABC123')
+        expiration_datetime = datetime.now()
+        expected_course_mode = CourseMode(
+            mode_slug=u'verified',
+            min_price=200,
+            currency=u'USD',
+            sku=u'ABC123',
+            expiration_datetime=expiration_datetime
+        )
         expected = {
             u'id': unicode(self.course.id),
             u'modes': [self._serialize_course_mode(expected_course_mode)]
@@ -144,6 +159,34 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         # The existing CourseMode should have been removed.
         self.assertFalse(CourseMode.objects.filter(id=self.course_mode.id).exists())
 
+    @ddt.data(*itertools.product(
+        ('honor', 'audit', 'verified', 'professional', 'no-id-professional'),
+        (datetime.now(), None),
+    ))
+    @ddt.unpack
+    def test_update_professional_expiration(self, mode_slug, expiration_datetime):
+        """ Verify that pushing a mode with a professional certificate and an expiration datetime
+        will be rejected (this is not allowed). """
+        permission = Permission.objects.get(name='Can change course mode')
+        self.user.user_permissions.add(permission)
+
+        mode = self._serialize_course_mode(
+            CourseMode(
+                mode_slug=mode_slug,
+                min_price=500,
+                currency=u'USD',
+                sku=u'ABC123',
+                expiration_datetime=expiration_datetime
+            )
+        )
+        course_id = unicode(self.course.id)
+        payload = {u'id': course_id, u'modes': [mode]}
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
+
+        expected_status = 400 if CourseMode.is_professional_slug(mode_slug) and expiration_datetime is not None else 200
+        response = self.client.put(path, json.dumps(payload), content_type=JSON_CONTENT_TYPE)
+        self.assertEqual(response.status_code, expected_status)
+
     def assert_can_create_course(self, **request_kwargs):
         """ Verify a course can be created by the view. """
         course = CourseFactory.create()
@@ -162,6 +205,11 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 201)
         actual = json.loads(response.content)
         self.assertEqual(actual, expected)
+
+        # Verify the display names are correct
+        course_modes = CourseMode.objects.filter(course_id=course.id)
+        actual = [course_mode.mode_display_name for course_mode in course_modes]
+        self.assertListEqual(actual, ['Verified Certificate', 'Honor Certificate'])
 
     def test_create_with_permissions(self):
         """ Verify the view supports creating a course as a user with the appropriate permissions. """
