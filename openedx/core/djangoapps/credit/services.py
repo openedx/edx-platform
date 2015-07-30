@@ -67,11 +67,6 @@ class CreditService(object):
             else course_key_or_id
         )
 
-        #if isinstance(course_key_or_id, basestring):
-        #    course_key = CourseKey.from_string(course_key_or_id)
-        #else:
-        #    course_key = course_key_or_id
-
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         if not enrollment or not enrollment.is_active:
             # not enrolled
