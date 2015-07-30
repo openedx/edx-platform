@@ -336,7 +336,8 @@ def single_thread(request, course_key, discussion_id, thread_id):
         raise
 
     # Verify that the student has access to this thread if belongs to a course discussion module
-    if thread.context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
+    thread_context = getattr(thread, "context", "course")
+    if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
         raise Http404
 
     # verify that the thread belongs to the requesting student's cohort

@@ -389,7 +389,7 @@ class InlineDiscussionPage(PageObject):
     def __init__(self, browser, discussion_id):
         super(InlineDiscussionPage, self).__init__(browser)
         self._discussion_selector = (
-            "body.courseware .discussion-module[data-discussion-id='{discussion_id}'] ".format(
+            ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
                 discussion_id=discussion_id
             )
         )
@@ -417,6 +417,9 @@ class InlineDiscussionPage(PageObject):
 
     def get_num_displayed_threads(self):
         return len(self._find_within(".discussion-thread"))
+
+    def has_thread(self, thread_id):
+        return self._find_within('.discussion-thread#thread_{}'.format(thread_id)).present
 
     def element_exists(self, selector):
         return self.q(css=self._discussion_selector + " " + selector).present
