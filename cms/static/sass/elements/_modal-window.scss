@@ -629,8 +629,12 @@
       }
     }
 
+    .edit-staff-lock {
+      margin-bottom: $baseline;
+    }
+
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination {
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;

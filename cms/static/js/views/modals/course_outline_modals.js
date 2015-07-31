@@ -13,7 +13,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor, TimedExaminationPreferenceEditor;
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor,
+        VerificationAccessEditor, TimedExaminationPreferenceEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events : {
@@ -427,7 +428,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         hasChanges: function() {
-            return this.isModelLocked() != this.isLocked();
+            return this.isModelLocked() !== this.isLocked();
         },
 
         getRequestData: function() {
@@ -443,7 +444,94 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return {
                 hasExplicitStaffLock: this.isModelLocked(),
                 ancestorLocked: this.isAncestorLocked()
-            }
+            };
+        }
+    });
+
+    VerificationAccessEditor = AbstractEditor.extend({
+        templateName: 'verification-access-editor',
+        className: 'edit-verification-access',
+
+        // This constant MUST match the group ID
+        // defined by VerificationPartitionScheme on the backend!
+        ALLOW_GROUP_ID: 1,
+
+        isPartitionSelected: function(id) {
+            return $("#partition-" + id).is(':checked');
+        },
+
+        getGroupAccess: function() {
+            var groupAccess = _.clone(this.model.get('group_access')) || [],
+                userPartitions = this.model.get('user_partitions') || [],
+                that = this;
+
+            // We display a simplified UI to course authors.
+            // On the backend, each verification checkpoint is associated
+            // with a user partition that has two groups.  For example,
+            // if two checkpoints were defined, they might look like:
+            //
+            // Midterm A: |-- ALLOW --|-- DENY --|
+            // Midterm B: |-- ALLOW --|-- DENY --|
+            //
+            // To make life easier for course authors, we display
+            // *one* checkbox for each checkpoint, like this:
+            //
+            // * Require verification for Midterm A
+            // * Require verification for Midterm B
+            //
+            // This is where we map the simplified checkbox to
+            // the underlying user partition.  If the user checked
+            // the box, that means there *is* a restriction,
+            // so only the "ALLOW" group has access.
+            // Otherwise, all groups in the partition have access.
+            //
+            _.each(userPartitions, function(partition) {
+                if (partition.scheme === "verification") {
+                    if (that.isPartitionSelected(partition.id)) {
+                        groupAccess[partition.id] = [that.ALLOW_GROUP_ID];
+                    } else {
+                        delete groupAccess[partition.id];
+                    }
+                }
+            });
+
+            return groupAccess;
+        },
+
+        getRequestData: function() {
+            var groupAccess = this.getGroupAccess(),
+                hasChanges = !_.isEqual(groupAccess, this.model.get('group_access'));
+
+            return hasChanges ? {
+                publish: 'republish',
+                metadata: {
+                    group_access: this.getGroupAccess()
+                }
+            } : {};
+        },
+
+        getContext: function() {
+            var partitions = this.model.get("user_partitions"),
+                accessInfo = [];
+
+            // Display a simplified version of verified partition schemes.
+            // Although there are two groups defined (ALLOW and DENY),
+            // we show only the ALLOW group.
+            // To avoid searching all the groups, we're assuming that the editor
+            // either sets the ALLOW group or doesn't set any groups (implicitly allow all).
+            _.each(partitions, function(item) {
+                if (item.scheme === "verification") {
+                    accessInfo.push({
+                        "id": item.id,
+                        "name": item.name,
+                        "selected": _.any(_.pluck(item.groups, "selected"))
+                    });
+                }
+            });
+
+            return {
+                "access_info": accessInfo
+            };
         }
     });
 
@@ -472,8 +560,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 }
 
                 editors.push(StaffLockEditor);
+
+                if (xblockInfo.hasVerifiedCheckpoints()) {
+                    editors.push(VerificationAccessEditor);
+                }
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
+
+                if (xblockInfo.hasVerifiedCheckpoints()) {
+                    editors.push(VerificationAccessEditor);
+                }
             }
             return new SettingsXBlockModal($.extend({
                 editors: editors,

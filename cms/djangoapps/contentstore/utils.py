@@ -10,6 +10,7 @@ from pytz import UTC
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
@@ -213,12 +214,11 @@ def is_visible_to_specific_content_groups(xblock):
     """
     if not xblock.group_access:
         return False
-    for __, value in xblock.group_access.iteritems():
-        # value should be a list of group IDs. If it is an empty list or None, the xblock is visible
-        # to all groups in that particular partition. So if value is a truthy value, the xblock is
-        # restricted in some way.
-        if value:
+
+    for partition in get_user_partition_info(xblock):
+        if any(g["selected"] for g in partition["groups"]):
             return True
+
     return False
 
 
@@ -331,3 +331,117 @@ def has_active_web_certificate(course):
                 cert_config = True
                 break
     return cert_config
+
+
+def get_user_partition_info(xblock, schemes=None, course=None):
+    """
+    Retrieve user partition information for an XBlock for display in editors.
+
+    * If a partition has been disabled, it will be excluded from the results.
+
+    * If a group within a partition is referenced by the XBlock, but the group has been deleted,
+      the group will be marked as deleted in the results.
+
+    Arguments:
+        xblock (XBlock): The courseware component being edited.
+
+    Keyword Arguments:
+        schemes (iterable of str): If provided, filter partitions to include only
+            schemes with the provided names.
+
+        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+            instead of loading the course.  This is useful if we're calling this function multiple
+            times for the same course want to minimize queries to the modulestore.
+
+    Returns: list
+
+    Example Usage:
+    >>> get_user_partition_info(block, schemes=["cohort", "verification"])
+    [
+        {
+            "id": 12345,
+            "name": "Cohorts"
+            "scheme": "cohort",
+            "groups": [
+                {
+                    "id": 7890,
+                    "name": "Foo",
+                    "selected": True,
+                    "deleted": False,
+                }
+            ]
+        },
+        {
+            "id": 7292,
+            "name": "Midterm A",
+            "scheme": "verification",
+            "groups": [
+                {
+                    "id": 1,
+                    "name": "Completed verification at Midterm A",
+                    "selected": False,
+                    "deleted": False
+                },
+                {
+                    "id": 0,
+                    "name": "Did not complete verification at Midterm A",
+                    "selected": False,
+                    "deleted": False,
+                }
+            ]
+        }
+    ]
+
+    """
+    if course is None:
+        course = modulestore().get_course(xblock.location.course_key)
+
+    if course is None:
+        log.warning(
+            "Could not find course %s to retrieve user partition information",
+            xblock.location.course_key
+        )
+        return []
+
+    if schemes is not None:
+        schemes = set(schemes)
+
+    partitions = [
+        {
+            "id": p.id,
+            "name": p.name,
+            "scheme": p.scheme.name,
+            "groups": [
+                {
+                    "id": g.id,
+                    "name": g.name,
+                    "selected": g.id in xblock.group_access.get(p.id, []),
+                    "deleted": False,
+                }
+                for g in p.groups
+            ]
+        }
+        for p in sorted(course.user_partitions, key=lambda p: p.name)
+        if (
+            p.active and  # Exclude disabled partitions
+            p.groups and  # Exclude partitions with no groups defined
+            (schemes is None or p.scheme.name in schemes)  # Filter partitions by scheme
+        )
+    ]
+
+    # Add in groups for partitions that are stored in the XBlock
+    # but not in the course, but mark them as "deleted".
+    for p in partitions:
+        xblock_group_ids = set(xblock.group_access.get(p["id"], []))
+        defined_group_ids = set(g["id"] for g in p["groups"])
+        missing_group_ids = xblock_group_ids - defined_group_ids
+
+        for gid in missing_group_ids:
+            p["groups"].append({
+                "id": gid,
+                "name": _("Deleted group"),
+                "selected": True,
+                "deleted": True,
+            })
+
+    return partitions

@@ -2,18 +2,21 @@
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
-from contentstore.utils import ancestor_has_staff_lock
+from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
+from contentstore.utils import ancestor_has_staff_lock, get_user_partition_info
 
-cohorted_user_partition = get_cohorted_user_partition(xblock.location.course_key)
-unsorted_groups = cohorted_user_partition.groups if cohorted_user_partition else []
-groups = sorted(unsorted_groups, key=lambda group: group.name)
-selected_group_ids = xblock.group_access.get(cohorted_user_partition.id, []) if cohorted_user_partition else []
-has_selected_groups = len(selected_group_ids) > 0
+user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
+
+has_selected_groups = any(
+    any(g["selected"] for g in p["groups"])
+    for p in user_partitions
+)
+
 is_staff_locked = ancestor_has_staff_lock(xblock)
 %>
 
 <div class="modal-section visibility-summary">
-    % if len(groups) == 0:
+    % if len(user_partitions) == 0:
         <div class="is-not-configured has-actions">
             <h4 class="title">${_('No content groups exist')}</h4>
 
@@ -42,7 +45,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
     % endif
 </div>
 
-% if len(groups) > 0:
+% if len(user_partitions) > 0:
     <form class="visibility-controls-form" method="post" action="">
 
         <div class="modal-section visibility-controls">
@@ -64,35 +67,41 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                     </ul>
                 </section>
 
-                <div class="wrapper-visibility-specific" data-user-partition-id="${cohorted_user_partition.id}">
+                <div class="wrapper-visibility-specific">
                     <section class="visibility-controls-secondary">
                         <div class="visibility-controls-group">
                             <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
                             <ul class="list-fields list-checkbox">
-                                <%
-                                missing_group_ids = set(selected_group_ids)
-                                %>
-                                % for group in groups:
-                                    <%
-                                    is_group_selected = group.id in selected_group_ids
-                                    if is_group_selected:
-                                        missing_group_ids.remove(group.id)
-                                    %>
-                                    <li class="field field-checkbox field-visibility-content-group">
-                                        <input type="checkbox" id="visibility-content-group-${group.id}" name="visibility-content-group" value="${group.id}" class="input input-checkbox"  ${'checked="checked"' if group.id in selected_group_ids else ''}/>
-                                        <label for="visibility-content-group-${group.id}" class="label">${group.name | h}</label>
-                                    </li>
-                                % endfor
+                            % for partition in user_partitions:
+                                % for group in partition["groups"]:
 
-                                % for group_id in missing_group_ids:
-                                    <li class="field field-checkbox field-visibility-content-group was-removed">
-                                        <input type="checkbox" id="visibility-content-group-${group_id}" name="visibility-content-group" value="${group_id}" class="input input-checkbox" checked="checked" />
-                                        <label for="visibility-content-group-${group_id}" class="label">
-                                            ${_('Deleted Content Group')}
-                                            <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
-                                        </label>
+                                    ## In general, we show *all* groups for each partition.
+                                    ## For a verified partition scheme, we show only the "allow" group, since that's
+                                    ## the one course authors care about.
+                                    % if partition["scheme"] != "verification" or group["id"] == VerificationPartitionScheme.ALLOW:
+                                    <li class="field field-checkbox field-visibility-content-group">
+                                        <input type="checkbox"
+                                            id="visibility-content-group-${partition["id"]}-${group["id"]}"
+                                            name="visibility-content-group"
+                                            value="${partition["id"]}-${group["id"]}"
+                                            class="input input-checkbox"
+                                            ${'checked="checked"' if group["selected"] else ''}
+                                        />
+
+                                        ## For cohorts, we show deleted groups so the user can remove them.
+                                        ## For verification, we don't bother, since the user can't delete groups (allow/deny).
+                                        % if partition["scheme"] == "cohort" and group["deleted"]:
+                                            <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">
+                                                ${_('Deleted Content Group')}
+                                                <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
+                                            </label>
+                                        % else:
+                                            <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">${group["name"] | h}</label>
+                                        % endif
                                     </li>
+                                    % endif
                                 % endfor
+                            % endfor
                             </ul>
                         </div>
                     </section>

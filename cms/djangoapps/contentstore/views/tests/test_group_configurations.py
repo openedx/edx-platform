@@ -262,6 +262,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
                 {u'name': u'Group A', u'version': 1},
                 {u'name': u'Group B', u'version': 1},
             ],
+            u'parameters': {}
         }
         response = self.client.ajax_post(
             self._url(),
@@ -283,6 +284,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'Group A')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partititons[0].parameters, {})
 
     def test_lazily_creates_cohort_configuration(self):
         """
@@ -327,6 +329,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 0, u'name': u'Group A', u'version': 1, u'usage': []},
                 {u'id': 1, u'name': u'Group B', u'version': 1, u'usage': []},
             ],
+            u'parameters': {}
         }
         response = self.client.put(
             self._url(cid=666),
@@ -346,6 +349,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partitions[0].groups), 2)
         self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
         self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_content_group(self):
         """
@@ -364,6 +368,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 0, u'name': u'New Group Name', u'version': 1, u'usage': []},
                 {u'id': 2, u'name': u'Group C', u'version': 1, u'usage': []},
             ],
+            u'parameters': {}
         }
 
         response = self.client.put(
@@ -385,6 +390,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_content_group(self):
         """
@@ -466,6 +472,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 1, u'name': u'Group B', u'version': 1},
             ],
             u'usage': [],
+            u'parameters': {}
         }
 
         response = self.client.put(
@@ -485,6 +492,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partitions[0].groups), 2)
         self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
         self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_group_configuration(self):
         """
@@ -504,6 +512,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
                 {u'id': 2, u'name': u'Group C', u'version': 1},
             ],
             u'usage': [],
+            u'parameters': {}
         }
 
         response = self.client.put(
@@ -525,6 +534,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_group_configuration(self):
         """
@@ -609,6 +619,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 1, 'name': 'Group B', 'version': 1, 'usage': usage_for_group},
                 {'id': 2, 'name': 'Group C', 'version': 1, 'usage': []},
             ],
+            u'parameters': {}
         }
 
     def test_content_group_not_used(self):
@@ -701,6 +712,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [],
+            u'parameters': {}
         }]
         self.assertEqual(actual, expected)
 
@@ -730,6 +742,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }],
+            u'parameters': {}
         }, {
             'id': 1,
             'name': 'Name 1',
@@ -742,6 +755,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [],
+            u'parameters': {}
         }]
 
         self.assertEqual(actual, expected)
@@ -772,6 +786,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 'label': u"Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
                 'validation': None,
             }],
+            u'parameters': {}
         }]
 
         self.assertEqual(actual, expected)
@@ -807,6 +822,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 'label': 'Test Unit 1 / Test Content Experiment 1',
                 'validation': None,
             }],
+            u'parameters': {}
         }]
         self.assertEqual(actual, expected)
 

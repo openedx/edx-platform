@@ -6,17 +6,26 @@
 
     function VisibilityEditorView(runtime, element) {
         this.getGroupAccess = function() {
-            var groupAccess, userPartitionId, selectedGroupIds;
+            var groupAccess = {},
+                checkboxValues,
+                partitionId,
+                groupId;
+
             if (element.find('.visibility-level-all').prop('checked')) {
                 return {};
             }
-            userPartitionId = element.find('.wrapper-visibility-specific').data('user-partition-id').toString();
-            selectedGroupIds = [];
+
             element.find('.field-visibility-content-group input:checked').each(function(index, input) {
-                selectedGroupIds.push(parseInt($(input).val()));
+                checkboxValues = $(input).val().split("-");
+                partitionId = parseInt(checkboxValues[0], 10);
+                groupId = parseInt(checkboxValues[1], 10);
+
+                if (groupAccess.hasOwnProperty(partitionId)) {
+                    groupAccess[partitionId].push(groupId);
+                } else {
+                    groupAccess[partitionId] = [groupId];
+                }
             });
-            groupAccess = {};
-            groupAccess[userPartitionId] = selectedGroupIds;
             return groupAccess;
         };
 
@@ -25,6 +34,7 @@
                 element.find('.field-visibility-content-group input').prop('checked', false);
             }
         });
+
         element.find('.field-visibility-content-group input').change(function(event) {
             element.find('.visibility-level-all').prop('checked', false);
             element.find('.visibility-level-specific').prop('checked', true);
