@@ -101,10 +101,7 @@ if Backbone?
       @showView.convertMath()
       @$el.find(".forum-thread-expand").hide()
       @$el.find(".forum-thread-collapse").show()
-      if @readOnly
-        @$el.find(".post-extended-content").filter(':not(.post-header-actions)').show()
-      else
-        @$el.find(".post-extended-content").show()
+      @$el.find(".post-extended-content").show()
       if not @loadedResponses
         @loadInitialResponses()
 
