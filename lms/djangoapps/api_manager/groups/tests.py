@@ -43,6 +43,7 @@ class GroupsApiTests(ModuleStoreTestCase):
     """ Test suite for Groups API views """
 
     def setUp(self):
+        super(GroupsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())

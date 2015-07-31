@@ -93,6 +93,7 @@ class UsersApiTests(ModuleStoreTestCase):
         return module
 
     def setUp(self):
+        super(UsersApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.test_username = str(uuid.uuid4())
         self.test_password = 'Test.Me64!'
