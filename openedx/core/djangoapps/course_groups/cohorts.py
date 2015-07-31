@@ -554,3 +554,23 @@ def get_course_cohort_settings(course_key):
         course = courses.get_course_by_id(course_key)
         course_cohort_settings = migrate_cohort_settings(course)
     return course_cohort_settings
+
+def get_course_cohort_names(course_key):
+    """
+    Return a list of the cohort names in a course.
+    """
+    course = courses.get_course_by_id(course_key)
+    return [c.name for c in get_course_cohorts(course)]
+
+
+def delete_empty_cohort(course_key, name):
+    """
+    Remove an empty cohort.  Raise ValueError if cohort is not empty.
+    """
+    cohort = get_cohort_by_name(course_key, name)
+    if cohort.users.exists():
+        raise ValueError(
+            "Can't delete non-empty cohort {0} in course {1}".format(
+                name, course_key))
+
+    cohort.delete()
