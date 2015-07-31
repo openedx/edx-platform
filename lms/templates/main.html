@@ -63,9 +63,6 @@ from branding import api as branding_api
 
   <%static:css group='style-vendor'/>
   <%static:css group='style-main'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -136,9 +133,6 @@ from branding import api as branding_api
   <div class="window-wrap" dir="${static.dir_rtl()}">
 % endif
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
-
-    <%include file="mathjax_include.html" />
-    <%include file="mathjax_accessible.html" />
 
     <div class="content-wrapper" id="content">
         ${self.body()}
