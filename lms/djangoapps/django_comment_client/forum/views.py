@@ -370,7 +370,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_key, thread, request.user, user_info=user_info)
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
-        content = utils.safe_content(thread.to_dict(), course_key, is_staff)
         add_thread_group_name(content, course_key)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course, request.user)
