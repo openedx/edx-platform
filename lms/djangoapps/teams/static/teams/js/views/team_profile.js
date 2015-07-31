@@ -10,15 +10,14 @@
                 initialize: function (options) {
                     this.courseID = options.courseID;
                     this.discussionTopicID = this.model.get('discussion_topic_id');
+                    this.readOnly = options.readOnly;
                 },
 
                 render: function () {
-                    var canPostToTeam = true;  // TODO: determine this permission correctly!
                     this.$el.html(_.template(teamTemplate, {
                         courseID: this.courseID,
                         discussionTopicID: this.discussionTopicID,
-                        canCreateComment: canPostToTeam,
-                        canCreateSubComment: canPostToTeam
+                        readOnly: this.readOnly
                     }));
                     this.discussionView = new TeamDiscussionView({
                         el: this.$('.discussion-module')

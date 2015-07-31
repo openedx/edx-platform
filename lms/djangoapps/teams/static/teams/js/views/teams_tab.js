@@ -210,10 +210,12 @@
                         courseID = this.courseID;
                     self.getTopic(topicID).done(function(topic) {
                         self.getTeam(teamID).done(function(team) {
-                            var view = new TeamProfileView({
-                                courseID: courseID,
-                                model: team
-                            });
+                            var readOnly = self.readOnlyDiscussion(team),
+                                view = new TeamProfileView({
+                                    courseID: courseID,
+                                    model: team,
+                                    readOnly: readOnly
+                                });
                             deferred.resolve(self.createViewWithHeader(view, team, topic));
                         });
                     });
@@ -378,6 +380,23 @@
 
                 hideWarning: function () {
                     this.$('.warning').toggleClass('is-hidden', true);
+                },
+
+                /**
+                 * Returns true if the discussion thread belonging to
+                 * `team` is accessible to the user. This is the case
+                 * if the user is privileged (i.e., a community TA,
+                 * moderator, or administrator), or if the user
+                 * belongs to the team.
+                 */
+                readOnlyDiscussion: function (team) {
+                    var self = this;
+                    return !(
+                        this.$el.data('privileged') ||
+                        _.any(team.attributes.membership, function (membership) {
+                            return membership.user.username === self.$el.data('username');
+                        })
+                    );
                 }
             });
 

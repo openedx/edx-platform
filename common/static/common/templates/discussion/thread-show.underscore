@@ -40,19 +40,22 @@
                 <span class="post-label-closed"><i class="icon fa fa-lock"></i><%- gettext("Closed") %></span>
             </div>
         </div>
-        <div class="post-header-actions post-extended-content">
-            <%=
-            _.template(
-                $('#forum-actions').html(),
-                {
-                    contentId: cid,
-                    contentType: 'post',
-                    primaryActions: ['vote', 'follow'],
-                    secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
-                }
-            )
-            %>
-        </div>
+        <% if (!readOnly) { %>
+            <div class="post-header-actions post-extended-content">
+                <%=
+                _.template(
+                    $('#forum-actions').html(),
+                    {
+                        contentId: cid,
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
+                        readOnly: readOnly
+                    }
+                )
+                %>
+            </div>
+        <% } %>
     </header>
 
     <div class="post-body"><%- body %></div>

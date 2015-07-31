@@ -49,7 +49,8 @@
                     contentId: cid,
                     contentType: 'response',
                     primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
-                    secondaryActions: ['edit', 'delete', 'report']
+                    secondaryActions: ['edit', 'delete', 'report'],
+                    readOnly: readOnly
                 }
             )
         %>

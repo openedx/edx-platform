@@ -18,7 +18,7 @@
 
 <div class="container">
     <div class="teams-wrapper">
-        <section class="teams-content">
+        <section class="teams-content" data-username=${json.dumps(username, cls=EscapedEdxJSONEncoder)} data-privileged="${json.dumps(privileged)}">
         </section>
     </div>
 </div>

@@ -22,6 +22,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.django import modulestore
@@ -80,6 +81,8 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.community_ta_role.users.add(self.community_ta1)
         self.community_ta2 = UserFactory(username='community_ta2', email='community_ta2@edx.org')
         self.community_ta_role.users.add(self.community_ta2)
+        self.course_staff = UserFactory(username='course_staff', email='course_staff@edx.org')
+        CourseStaffRole(self.course_id).add_users(self.course_staff)
 
     def test_get_role_ids(self):
         ret = utils.get_role_ids(self.course_id)
@@ -89,6 +92,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     def test_has_discussion_privileges(self):
         self.assertFalse(utils.has_discussion_privileges(self.student1, self.course_id))
         self.assertFalse(utils.has_discussion_privileges(self.student2, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.course_staff, self.course_id))
         self.assertTrue(utils.has_discussion_privileges(self.moderator, self.course_id))
         self.assertTrue(utils.has_discussion_privileges(self.community_ta1, self.course_id))
         self.assertTrue(utils.has_discussion_privileges(self.community_ta2, self.course_id))

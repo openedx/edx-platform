@@ -467,7 +467,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
         # Verify that the creating user gets added to the team.
         self.assertEqual(len(team_membership), 1)
         member = team_membership[0]['user']
-        self.assertEqual(member['id'], creator)
+        self.assertEqual(member['username'], creator)
 
         self.assertEqual(team, {
             'name': 'Fully specified team',
@@ -688,7 +688,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         membership = self.get_membership_list(status, {'team_id': self.test_team_1.team_id}, user=user)
         if status == 200:
             self.assertEqual(membership['count'], 1)
-            self.assertEqual(membership['results'][0]['user']['id'], self.users['student_enrolled'].username)
+            self.assertEqual(membership['results'][0]['user']['username'], self.users['student_enrolled'].username)
 
     @ddt.data(
         (None, 401, False),
@@ -705,7 +705,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         if status == 200:
             if has_content:
                 self.assertEqual(membership['count'], 1)
-                self.assertEqual(membership['results'][0]['team']['id'], self.test_team_1.team_id)
+                self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_1.team_id)
             else:
                 self.assertEqual(membership['count'], 0)
 
@@ -754,8 +754,8 @@ class TestCreateMembershipAPI(TeamAPITestCase):
             user=user
         )
         if status == 200:
-            self.assertEqual(membership['user']['id'], self.users['student_enrolled_not_on_team'].username)
-            self.assertEqual(membership['team']['id'], self.test_team_1.team_id)
+            self.assertEqual(membership['user']['username'], self.users['student_enrolled_not_on_team'].username)
+            self.assertEqual(membership['team']['team_id'], self.test_team_1.team_id)
             memberships = self.get_membership_list(200, {'team_id': self.test_team_1.team_id})
             self.assertEqual(memberships['count'], 2)
 
