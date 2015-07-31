@@ -346,6 +346,97 @@
     }
   }
 
+  .team-profile {
+
+    .page-content-main {
+      display: inline-block;
+      width: flex-grid(7, 12);
+      vertical-align: top;
+    }
+
+    .page-content-secondary {
+      display: inline-block;
+      width: flex-grid(4,12);
+      @include margin($baseline, 0, $baseline, $baseline);
+
+      @extend %t-copy-sub1;
+      color: $gray-l1;
+
+      div, .team-detail-header {
+        margin-bottom: ($baseline/4);
+      }
+
+      .image-url {
+        border: 2px solid $outer-border-color;
+        border-radius: ($baseline/4);
+        margin-bottom: ($baseline/4);
+      }
+
+      .leave-team, .invites-header, .invite-text {
+        margin-bottom: ($baseline/2);
+      }
+
+      .invite-team {
+        margin-top: ($baseline/2);
+        margin-bottom: ($baseline/2);
+      }
+      .invite-link-input {
+        width: 100%;
+      }
+
+      .member-profile {
+        position: relative;
+        display: inline-block;
+
+        p {
+          @extend %ui-depth2;
+          background: $dark-gray;
+          border-radius: ($baseline/5);
+          color: $white;
+          font-family: $sans-serif;
+          line-height: lh();
+          opacity: 0.0;
+          padding: 6px;
+          position: absolute;
+          text-shadow: 0 -1px 0 $black;
+          @include transition(all .1s $ease-in-out-quart 0s);
+          white-space: pre;
+          visibility: hidden;
+          pointer-events: none;
+
+          &:empty {
+            background: none;
+
+            &::after {
+              display: none;
+            }
+          }
+
+          &::after {
+            background: $dark-gray;
+            content: " ";
+            display: block;
+            height: ($baseline/2);
+            right: 18px;
+            position: absolute;
+            top: ($baseline + ($baseline/4));
+            @include transform(rotate(45deg));
+            width: ($baseline/2);
+          }
+        }
+
+        &:hover, &:focus {
+          p {
+            display: block;
+            margin-top: -($baseline*2);
+            opacity: 1.0;
+            visibility: visible;
+          }
+        }
+      }
+    }
+  }
+
   .create-team {
 
     legend {

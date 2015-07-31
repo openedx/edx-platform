@@ -45,6 +45,7 @@
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
+                    this.requestUsername = options.requestUsername;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
@@ -213,7 +214,11 @@
                                 view = new TeamProfileView({
                                     courseID: courseID,
                                     model: team,
-                                    readOnly: readOnly
+                                    readOnly: readOnly,
+                                    maxTeamSize: self.maxTeamSize,
+                                    requestUsername: self.requestUsername,
+                                    countries: self.countries,
+                                    languages: self.languages
                                 });
                             deferred.resolve(self.createViewWithHeader(view, team, topic));
                         });
