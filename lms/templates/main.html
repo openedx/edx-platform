@@ -137,6 +137,12 @@ from branding import api as branding_api
 % endif
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
 
+    <%include file="mathjax_include.html" />
+    <%include file="mathjax_accessible.html" />
+
+    <div class="content-wrapper" id="content">
+        ${self.body()}
+    </div>
     % if not disable_header:
         <%include file="${header_file}" />
     % endif
@@ -158,21 +164,6 @@ from branding import api as branding_api
           % endif
         </%block>
     % endif
-
-% if not disable_window_wrap:
-<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
-
-  <%include file="mathjax_include.html" />
-  <%include file="mathjax_accessible.html" />
-
-  <%include file="${header_file}" />
-
-  <div class="content-wrapper" id="content">
-    ${self.body()}
-    <%block name="bodyextra"/>
-  </div>
-% endif
 
   % if not disable_courseware_js:
     <%static:js group='application'/>
