@@ -3,6 +3,7 @@ Acceptance tests for the teams feature.
 """
 import json
 
+import ddt
 from nose.plugins.attrib import attr
 from uuid import uuid4
 
@@ -652,6 +653,7 @@ class CreateTeamTest(TeamsTabBase):
 
 
 @attr('shard_5')
+@ddt.ddt
 class TeamPageTest(TeamsTabBase):
     """Tests for viewing a specific team"""
     def setUp(self):
@@ -659,12 +661,11 @@ class TeamPageTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.team = self.create_teams(self.topic, 1)[0]
-        self.create_membership(self.user_info['username'], self.team['id'])
         self.team_page = TeamPage(self.browser, self.course_id, self.team)
 
     def setup_thread(self):
         """
-        Set up the discussion thread for the team.
+        Create and return a thread for this test's discussion topic.
         """
         thread = Thread(
             id="test_thread_{}".format(uuid4().hex),
@@ -675,15 +676,25 @@ class TeamPageTest(TeamsTabBase):
         thread_fixture.push()
         return thread
 
-    def test_discussion_on_team_page(self):
+    def setup_discussion_user(self, role=None, staff=False):
+        """Set this test's user to have the given role in its
+        discussions. Role is one of 'Community TA', 'Moderator',
+        'Administrator', or 'Student'.
         """
-        Scenario: Team Page renders a team discussion.
-        Given I am enrolled in a course with a team configuration, a topic,
-            and a team belonging to that topic
-        When a thread exists in the team's discussion
-        And I visit the Team page for that team
-        Then I should see a discussion with the correct discussion_id
-        And I should see the existing thread
+        kwargs = {
+            'course_id': self.course_id,
+            'staff': staff
+        }
+        if role is not None:
+            kwargs['roles'] = role
+        #pylint: disable=attribute-defined-outside-init
+        self.user_info = AutoAuthPage(self.browser, **kwargs).visit().user_info
+
+    def verify_teams_discussion_permissions(self, should_have_permission):
+        """Verify that the teams discussion component is in the correct state
+        for the test user. If `should_have_permission` is True, assert that
+        the user can see controls for posting replies, voting, editing, and
+        deleting. Otherwise, assert that those controls are hidden.
         """
         thread = self.setup_thread()
         self.team_page.visit()
@@ -693,3 +704,42 @@ class TeamPageTest(TeamsTabBase):
         self.assertTrue(discussion.is_discussion_expanded())
         self.assertEqual(discussion.get_num_displayed_threads(), 1)
         self.assertTrue(discussion.has_thread(thread['id']))
+        assertion = self.assertTrue if should_have_permission else self.assertFalse
+        assertion(discussion.q(css='.post-header-actions').present)
+        assertion(discussion.q(css='.add-response').present)
+        assertion(discussion.q(css='.new-post-btn').present)
+
+    def test_discussion_on_my_team_page(self):
+        """
+        Scenario: Team Page renders a discussion for a team to which I belong.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When the team has a discussion with a thread
+        And I visit the Team page for that team
+        Then I should see a discussion with the correct discussion_id
+        And I should see the existing thread
+        And I should see controls to change the state of the discussion
+        """
+        self.create_membership(self.user_info['username'], self.team['id'])
+        self.verify_teams_discussion_permissions(True)
+
+    @ddt.data(True, False)
+    def test_discussion_on_other_team_page(self, is_staff):
+        """
+        Scenario: Team Page renders a team discussion for a team to which I do
+            not belong.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am not a member
+        When the team has a discussion with a thread
+        And I visit the Team page for that team
+        Then I should see a discussion with the correct discussion_id
+        And I should see the team's thread
+        And I should not see controls to change the state of the discussion
+        """
+        self.setup_discussion_user(staff=is_staff)
+        self.verify_teams_discussion_permissions(False)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator')
+    def test_discussion_privileged(self, role):
+        self.setup_discussion_user(role=role)
+        self.verify_teams_discussion_permissions(True)

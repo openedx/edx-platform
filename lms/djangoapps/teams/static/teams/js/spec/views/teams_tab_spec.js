@@ -88,5 +88,35 @@ define([
                 expectFocus(teamsTabView.$('.warning'));
             });
         });
+
+        describe('Discussion privileges', function () {
+            it('allows privileged access to any team', function () {
+                teamsTabView.$el.data('privileged', true);
+                // Note: using `undefined` here to ensure that we
+                // don't even look at the team when the user is
+                // privileged
+                expect(teamsTabView.readOnlyDiscussion(undefined)).toBe(false);
+            });
+
+            it('allows access to a team which an unprivileged user is a member of', function () {
+                teamsTabView.$el.data('privileged', false).data('username', 'test-user');
+                expect(teamsTabView.readOnlyDiscussion({
+                    attributes: {
+                        membership: [{
+                            user: {
+                                username: 'test-user'
+                            }
+                        }]
+                    }
+                })).toBe(false);
+            });
+
+            it('does not allow access if the user is neither privileged nor a team member', function () {
+                teamsTabView.$el.data('privileged', false).data('username', 'test-user');
+                expect(teamsTabView.readOnlyDiscussion({
+                    attributes: { membership: [] }
+                })).toBe(true);
+            });
+        });
     });
 });
