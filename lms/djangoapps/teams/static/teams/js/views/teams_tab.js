@@ -166,10 +166,17 @@
                         courseID = this.courseID;
                     self.getTopic(topicID).done(function(topic) {
                         self.getTeam(teamID).done(function(team) {
-                            var view = new TeamProfileView({
-                                courseID: courseID,
-                                model: team
-                            });
+                            var readOnly = !(
+                                self.$el.data('privileged') ||
+                                    _.any(team.attributes.membership, function (membership) {
+                                        return membership.user.id === self.$el.data('username');
+                                    })
+                                ),
+                                view = new TeamProfileView({
+                                    courseID: courseID,
+                                    model: team,
+                                    readOnly: readOnly
+                                });
                             deferred.resolve(self.createViewWithHeader(view, team, topic));
                         });
                     });

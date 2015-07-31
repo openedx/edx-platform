@@ -10,16 +10,14 @@
                 initialize: function (options) {
                     this.courseID = options.courseID;
                     this.discussionTopicID = this.model.get('discussion_topic_id');
-                    // TODO: remove this once the discussion ID works from the server!
-                    if (!this.discussionTopicID) {
-                        this.discussionTopicID = '7065c53dcac4fe469fb66997da075f9af7e760a9';
-                    }
+                    this.readOnly = options.readOnly;
                 },
 
                 render: function () {
                     this.$el.html(_.template(team_template, {
                         courseID: this.courseID,
-                        discussionTopicID: this.discussionTopicID
+                        discussionTopicID: this.discussionTopicID,
+                        readOnly: this.readOnly
                     }));
                     this.discussionView = new TeamDiscussionView({
                         el: this.$('.discussion-module')
