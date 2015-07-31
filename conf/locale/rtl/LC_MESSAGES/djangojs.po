@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-27 13:54+0000\n"
-"PO-Revision-Date: 2015-07-27 13:56:06.383985\n"
+"POT-Creation-Date: 2015-07-31 12:18+0000\n"
+"PO-Revision-Date: 2015-07-31 12:19:55.479818\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2223,6 +2223,7 @@ msgstr "يشفث حخسفثي"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
 msgstr "وخقث"
@@ -3219,6 +3220,7 @@ msgid "Enter Start Date"
 msgstr "ثرفثق سفشقف يشفث"
 
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
 msgstr "مثسس"
@@ -3235,17 +3237,17 @@ msgstr "غخعق يخرشفهخر ذخعمي رخف زث سعزوهففثي."
 msgid "An error occurred. Please try again later."
 msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "دهثصهرل %س ذخعقسث"
 msgstr[1] "دهثصهرل %س ذخعقسثس"
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "We couldn't find any results for \"%s\"."
 msgstr "صث ذخعمير'ف بهري شرغ قثسعمفس بخق \"%س\"."
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "فاثقث صشس شر ثققخق, فقغ سثشقذاهرل شلشهر."
@@ -5118,7 +5120,8 @@ msgid "remove"
 msgstr "قثوخدث"
 
 #: lms/templates/commerce/provider.underscore
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "gettext("
 msgstr "لثففثطف("
 
@@ -5133,10 +5136,6 @@ msgid ""
 msgstr ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%س</button>"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Thank you! We have received your payment."
-msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5215,29 +5214,17 @@ msgstr "دثقهبغ رخص"
 msgid "Donate"
 msgstr "يخرشفث"
 
-#: lms/templates/discovery/filter_bar.underscore
-msgid "CLEAR ALL"
-msgstr "ذمثشق شمم"
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "MORE..."
-msgstr "وخقث..."
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "LESS..."
-msgstr "مثسس..."
-
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
 
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr "سفشقفس"
 
-#: lms/templates/discovery/search_facets_list.underscore
-msgid "Refine your search"
-msgstr "قثبهرث غخعق سثشقذا"
+#: lms/templates/discovery/filter_bar.underscore
+msgid "Clear All"
+msgstr "ذمثشق شمم"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"

@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-27 13:45+0000\n"
+"POT-Creation-Date: 2015-07-31 12:10+0000\n"
 "PO-Revision-Date: 2015-07-27 13:49+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -2255,6 +2255,7 @@ msgstr "发表日期"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
 msgstr "更多"
@@ -3181,6 +3182,7 @@ msgid "Enter Start Date"
 msgstr "输入开始日期"
 
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
 msgstr ""
@@ -3197,12 +3199,12 @@ msgstr "您的捐款无法提交。"
 msgid "An error occurred. Please try again later."
 msgstr "出现了未知错误，请稍后重试。"
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] ""
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "We couldn't find any results for \"%s\"."
 msgstr ""
 
@@ -4957,7 +4959,8 @@ msgid "remove"
 msgstr "移除"
 
 #: lms/templates/commerce/provider.underscore
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "gettext("
 msgstr ""
 
@@ -4969,10 +4972,6 @@ msgstr ""
 msgid ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
-msgstr ""
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Thank you! We have received your payment."
 msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
@@ -5047,28 +5046,16 @@ msgstr ""
 msgid "Donate"
 msgstr "捐助"
 
-#: lms/templates/discovery/filter_bar.underscore
-msgid "CLEAR ALL"
-msgstr ""
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "MORE..."
-msgstr ""
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "LESS..."
-msgstr ""
-
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr ""
 
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr ""
 
-#: lms/templates/discovery/search_facets_list.underscore
-msgid "Refine your search"
+#: lms/templates/discovery/filter_bar.underscore
+msgid "Clear All"
 msgstr ""
 
 #: lms/templates/edxnotes/note-item.underscore

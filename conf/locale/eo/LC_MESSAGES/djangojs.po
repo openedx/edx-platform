@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-27 13:54+0000\n"
-"PO-Revision-Date: 2015-07-27 13:56:06.383985\n"
+"POT-Creation-Date: 2015-07-31 12:18+0000\n"
+"PO-Revision-Date: 2015-07-31 12:19:55.479818\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2320,6 +2320,7 @@ msgstr "Däté pöstéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
 msgstr "Möré Ⱡ'σяєм ι#"
@@ -3493,6 +3494,7 @@ msgid "Enter Start Date"
 msgstr "Éntér Stärt Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
 msgstr "Léss Ⱡ'σяєм ι#"
@@ -3515,19 +3517,19 @@ msgstr ""
 "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "Vïéwïng %s çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 msgstr[1] "Vïéwïng %s çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "We couldn't find any results for \"%s\"."
 msgstr ""
 "Wé çöüldn't fïnd äný résülts för \"%s\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr ""
@@ -5696,7 +5698,8 @@ msgid "remove"
 msgstr "rémövé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/commerce/provider.underscore
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "gettext("
 msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -5712,12 +5715,6 @@ msgstr ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button> Ⱡ'σяєм "
 "ιρѕυм ∂#"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Thank you! We have received your payment."
-msgstr ""
-"Thänk ýöü! Wé hävé réçéïvéd ýöür päýmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5806,29 +5803,17 @@ msgstr "Vérïfý Nöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Donate"
 msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
-#: lms/templates/discovery/filter_bar.underscore
-msgid "CLEAR ALL"
-msgstr "ÇLÉÀR ÀLL Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "MORE..."
-msgstr "MÖRÉ... Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "LESS..."
-msgstr "LÉSS... Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr "Stärts Ⱡ'σяєм ιρѕυ#"
 
-#: lms/templates/discovery/search_facets_list.underscore
-msgid "Refine your search"
-msgstr "Réfïné ýöür séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+#: lms/templates/discovery/filter_bar.underscore
+msgid "Clear All"
+msgstr "Çléär Àll Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
