@@ -56,7 +56,7 @@
                     this.languages = options.languages;
                     this.countries = options.countries;
                     this.userInfo = options.userInfo;
-
+                    this.teamsBaseUrl = options.teamsBaseUrl;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
@@ -267,12 +267,17 @@
                         deferred = $.Deferred(),
                         courseID = this.courseID;
                     self.getTopic(topicID).done(function(topic) {
-                        self.getTeam(teamID).done(function(team) {
+                        self.getTeam(teamID, true).done(function(team) {
                             var readOnly = self.readOnlyDiscussion(team),
                                 view = new TeamProfileView({
                                     courseID: courseID,
                                     model: team,
-                                    readOnly: readOnly
+                                    readOnly: readOnly,
+                                    maxTeamSize: self.maxTeamSize,
+                                    requestUsername: self.userInfo.username,
+                                    countries: self.countries,
+                                    languages: self.languages,
+                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true'
                                 });
                             deferred.resolve(self.createViewWithHeader(view, team, topic));
                         });
@@ -350,18 +355,21 @@
                  * promise, since the team may need to be fetched from the
                  * server.
                  * @param teamID the string identifier for the requested team
+                 * @param expandUser bool to add the users info.
                  * @returns {promise} a jQuery deferred promise for the team.
                  */
-                getTeam: function (teamID) {
+                getTeam: function (teamID, expandUser) {
                     var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                         self = this,
-                        deferred = $.Deferred();
+                        deferred = $.Deferred(),
+                        teamUrl;
                     if (team) {
                         deferred.resolve(team);
                     } else {
+                        teamUrl = this.teamsUrl + teamID + (expandUser ? '?expand=user': '');
                         team = new TeamModel({
                             id: teamID,
-                            url: this.teamsUrl + teamID
+                            url: teamUrl
                         });
                         team.fetch()
                             .done(function() {

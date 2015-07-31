@@ -92,7 +92,7 @@ define([
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('teams/test_topic/no_such_team', {trigger: true});
-                AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team', null);
+                AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team?expand=user', null);
                 AjaxHelpers.respondWithError(requests, 404);
                 expectError(teamsTabView, 'The team "no_such_team" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));

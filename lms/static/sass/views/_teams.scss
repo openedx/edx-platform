@@ -346,6 +346,64 @@
     }
   }
 
+  .team-profile {
+
+    .page-content-main {
+      display: inline-block;
+      width: flex-grid(8, 12);
+      vertical-align: top;
+
+      .forum-new-post-form,
+      .edit-post-form {
+        min-width: 700px;
+      }
+    }
+
+    .page-content-secondary {
+      display: inline-block;
+      width: flex-grid(4,12);
+      @include margin-left($baseline * 0.75);
+      margin-bottom: $baseline;
+
+      @extend %t-copy-sub1;
+      color: $gray-l1;
+
+      div, .team-detail-header {
+        margin-bottom: ($baseline/4);
+      }
+
+      .image-url {
+        border: 2px solid $outer-border-color;
+        border-radius: ($baseline/4);
+        margin-bottom: ($baseline/4);
+      }
+
+      .leave-team {
+        margin-bottom: $baseline;
+        margin-top: ($baseline/2);
+      }
+
+      .invite-header, .invite-text {
+        margin-bottom: ($baseline/2);
+      }
+
+      .invite-team {
+        margin-top: ($baseline);
+        margin-bottom: ($baseline/2);
+      }
+      .invite-link-input {
+        width: 100%;
+      }
+
+      .member-profile {
+        position: relative;
+        display: inline-block;
+
+        @include tooltip-hover-style(-($baseline*2));
+      }
+    }
+  }
+
   .create-team {
 
     legend {

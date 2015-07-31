@@ -8,6 +8,7 @@
 
                     this.course_id = options.course_id;
                     this.server_api['topic_id'] = this.topic_id = options.topic_id;
+                    this.server_api['expand'] = 'user';
                     this.perPage = options.per_page;
                     this.server_api['course_id'] = function () { return encodeURIComponent(this.course_id); };
                     this.server_api['order_by'] = function () { return 'name'; }; // TODO surface sort order in UI
