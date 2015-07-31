@@ -22,6 +22,8 @@ if Backbone?
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
+      @readOnly = $(".discussion-module").data('read-only')
+
       # Quick fix to have an actual model when we're receiving new models from
       # the server.
       @model.collection.on "reset", (collection) =>
@@ -50,12 +52,15 @@ if Backbone?
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
-      templateData = @model.toJSON()
       container = $("#discussion-container")
       if !container.length
         # inline discussion
         container = $(".discussion-module")
-      templateData.can_create_comment = container.data("user-create-comment")
+      templateData = _.extend(
+        @model.toJSON(),
+        readOnly: @readOnly,
+        can_create_comment: container.data("user-create-comment")
+      )
       @template(templateData)
 
     render: ->
@@ -96,7 +101,10 @@ if Backbone?
       @showView.convertMath()
       @$el.find(".forum-thread-expand").hide()
       @$el.find(".forum-thread-collapse").show()
-      @$el.find(".post-extended-content").show()
+      if @readOnly
+        @$el.find(".post-extended-content").filter(':not(.post-header-actions)').show()
+      else
+        @$el.find(".post-extended-content").show()
       if not @loadedResponses
         @loadInitialResponses()
 

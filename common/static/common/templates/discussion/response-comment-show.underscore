@@ -7,7 +7,8 @@
               contentId: cid,
               contentType: 'comment',
               primaryActions: [],
-              secondaryActions: ['edit', 'delete', 'report']
+              secondaryActions: ['edit', 'delete', 'report'],
+              readOnly: readOnly
           }
       )
   %>

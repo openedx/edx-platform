@@ -1,6 +1,7 @@
 <%include file="_underscore_templates.html" />
 <%!
 from django.utils.translation import ugettext as _
+import json
 %>
 
 <div class="discussion-module" data-discussion-id="${discussion_id | h}" data-user-create-comment="${can_create_comment}" data-user-create-subcomment="${can_create_subcomment}">
