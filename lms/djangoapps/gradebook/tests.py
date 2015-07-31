@@ -51,6 +51,7 @@ class GradebookTests(ModuleStoreTestCase):
         )._xmodule
 
     def setUp(self):
+        super(GradebookTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.user = UserFactory()
         self.score = 0.75

@@ -24,7 +24,7 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-
+        super(MigrateCourseIdsTests, self).setUp()
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
             end=datetime(2015, 1, 16)

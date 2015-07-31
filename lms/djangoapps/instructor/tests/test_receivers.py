@@ -25,6 +25,7 @@ class InstructorReceiversTests(ModuleStoreTestCase):
     """ Test suite for signal receivers """
 
     def setUp(self):
+        super(InstructorReceiversTests, self).setUp()
         # Create a course to work with
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
