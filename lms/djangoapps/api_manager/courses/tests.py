@@ -95,6 +95,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         return module
 
     def setUp(self):
+        super(CoursesApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.base_courses_uri = '/api/server/courses'
         self.base_groups_uri = '/api/server/groups'
