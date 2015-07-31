@@ -101,6 +101,9 @@ class ModuleStoreEnum(object):
         # user ID to use for tests that do not have a django user available
         test = -3
 
+        # user ID for automatic update by the system
+        system = -4
+
     class SortOrder(object):
         """
         Values for sorting asset metadata.
@@ -264,6 +267,12 @@ class BulkOperationsMixin(object):
         if not bulk_ops_record.active:
             return
 
+        # Send the pre-publish signal within the context of the bulk operation.
+        # Writes performed by signal handlers will be persisted when the bulk
+        # operation ends.
+        if emit_signals and bulk_ops_record.is_root:
+            self.send_pre_publish_signal(bulk_ops_record, structure_key)
+
         bulk_ops_record.unnest()
 
         # If this wasn't the outermost context, then don't close out the
@@ -292,6 +301,14 @@ class BulkOperationsMixin(object):
         Return whether a bulk operation is active on `course_key`.
         """
         return self._get_bulk_ops_record(course_key, ignore_case).active
+
+    def send_pre_publish_signal(self, bulk_ops_record, course_id):
+        """
+        Send a signal just before items are published in the course.
+        """
+        signal_handler = getattr(self, "signal_handler", None)
+        if signal_handler and bulk_ops_record.has_publish_item:
+            signal_handler.send("pre_publish", course_key=course_id)
 
     def send_bulk_published_signal(self, bulk_ops_record, course_id):
         """

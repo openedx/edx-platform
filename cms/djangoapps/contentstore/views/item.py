@@ -40,8 +40,11 @@ from util.date_utils import get_default_time_display
 from util.json_request import expect_json, JsonResponse
 
 from student.auth import has_studio_write_access, has_studio_read_access
-from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
-    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups
+from contentstore.utils import (
+    find_release_date_source, find_staff_lock_source, is_currently_visible_to_students,
+    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups,
+    get_user_partition_info,
+)
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
 from contentstore.views.preview import get_preview_fragment
@@ -756,7 +759,7 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
-                       user=None):
+                       user=None, course=None):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -788,6 +791,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Filter the graders data as needed
     graders = _filter_entrance_exam_grader(graders)
 
+    # We need to load the course in order to retrieve user partition information.
+    # For this reason, we load the course once and re-use it when recursively loading children.
+    if course is None:
+        course = modulestore().get_course(xblock.location.course_key)
+
     # Compute the child info first so it can be included in aggregate information for the parent
     should_visit_children = include_child_info and (course_outline and not is_xblock_unit or not course_outline)
     if should_visit_children and xblock.has_children:
@@ -796,7 +804,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             course_outline,
             graders,
             include_children_predicate=include_children_predicate,
-            user=user
+            user=user,
+            course=course
         )
     else:
         child_info = None
@@ -850,6 +859,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "has_changes": has_changes,
         "actions": xblock_actions,
         "explanatory_message": explanatory_message,
+        "group_access": xblock.group_access,
+        "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
     # update xblock_info with proctored_exam information if the feature flag is enabled
@@ -1023,7 +1034,7 @@ def _create_xblock_ancestor_info(xblock, course_outline):
     }
 
 
-def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None):
+def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None, course=None):  # pylint: disable=line-too-long
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1042,7 +1053,8 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
                 include_children_predicate=include_children_predicate,
                 parent_xblock=xblock,
                 graders=graders,
-                user=user
+                user=user,
+                course=course,
             ) for child in xblock.get_children()
         ]
     return child_info

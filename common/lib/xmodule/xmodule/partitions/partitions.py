@@ -84,18 +84,23 @@ class Group(namedtuple("Group", "id name")):
 USER_PARTITION_SCHEME_NAMESPACE = 'openedx.user_partition_scheme'
 
 
-class UserPartition(namedtuple("UserPartition", "id name description groups scheme")):
-    """
-    A named way to partition users into groups, primarily intended for running
-    experiments.  It is expected that each user will be in at most one group in a
-    partition.
+class UserPartition(namedtuple("UserPartition", "id name description groups scheme parameters active")):
+    """A named way to partition users into groups, primarily intended for
+    running experiments. It is expected that each user will be in at most one
+    group in a partition.
 
-    A Partition has an id, name, scheme, description, and a list of groups.
-    The id is intended to be unique within the context where these are used. (e.g. for
-    partitions of users within a course, the ids should be unique per-course).
-    The scheme is used to assign users into groups.
+    A Partition has an id, name, scheme, description, parameters, and a list
+    of groups. The id is intended to be unique within the context where these
+    are used. (e.g., for partitions of users within a course, the ids should
+    be unique per-course). The scheme is used to assign users into groups.
+    The parameters field is used to save extra parameters e.g., location of
+    the block in case of VerificationPartitionScheme.
+
+    Partitions can be marked as inactive by setting the "active" flag to False.
+    Any group access rule referencing inactive partitions will be ignored
+    when performing access checks.
     """
-    VERSION = 2
+    VERSION = 3
 
     # The collection of user partition scheme extensions.
     scheme_extensions = None
@@ -103,11 +108,14 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
     # The default scheme to be used when upgrading version 1 partitions.
     VERSION_1_SCHEME = "random"
 
-    def __new__(cls, id, name, description, groups, scheme=None, scheme_id=VERSION_1_SCHEME):
+    def __new__(cls, id, name, description, groups, scheme=None, parameters=None, active=True, scheme_id=VERSION_1_SCHEME):  # pylint: disable=line-too-long
         # pylint: disable=super-on-old-class
         if not scheme:
             scheme = UserPartition.get_scheme(scheme_id)
-        return super(UserPartition, cls).__new__(cls, int(id), name, description, groups, scheme)
+        if parameters is None:
+            parameters = {}
+
+        return super(UserPartition, cls).__new__(cls, int(id), name, description, groups, scheme, parameters, active)
 
     @staticmethod
     def get_scheme(name):
@@ -137,7 +145,9 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             "name": self.name,
             "scheme": self.scheme.name,
             "description": self.description,
+            "parameters": self.parameters,
             "groups": [g.to_json() for g in self.groups],
+            "active": bool(self.active),
             "version": UserPartition.VERSION
         }
 
@@ -165,13 +175,16 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         # Version changes should be backwards compatible in case the code
         # gets rolled back.  If we see a version number greater than the current
         # version, we should try to read it rather than raising an exception.
-        elif value["version"] >= UserPartition.VERSION:
+        elif value["version"] >= 2:
             if "scheme" not in value:
                 raise TypeError("UserPartition dict {0} missing value key 'scheme'".format(value))
+
             scheme_id = value["scheme"]
         else:
             raise TypeError("UserPartition dict {0} has unexpected version".format(value))
 
+        parameters = value.get("parameters", {})
+        active = value.get("active", True)
         groups = [Group.from_json(g) for g in value["groups"]]
         scheme = UserPartition.get_scheme(scheme_id)
         if not scheme:
@@ -183,12 +196,22 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             value["description"],
             groups,
             scheme,
+            parameters,
+            active,
         )
 
     def get_group(self, group_id):
         """
-        Returns the group with the specified id.  Raises NoSuchUserPartitionGroupError if not found.
+        Returns the group with the specified id.
+
+        Arguments:
+            group_id (int): ID of the partition group.
+
+        Raises:
+            NoSuchUserPartitionGroupError: The specified group could not be found.
+
         """
+        # pylint: disable=no-member
         for group in self.groups:
             if group.id == group_id:
                 return group

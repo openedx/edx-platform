@@ -93,7 +93,7 @@ class RenderXBlockTestMixin(object):
         return response
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 8),
+        (ModuleStoreEnum.Type.mongo, 7),
         (ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
