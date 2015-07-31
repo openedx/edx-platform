@@ -121,42 +121,6 @@ def get_cohort_id(user, course_key, use_cached=False):
     return None if cohort is None else cohort.id
 
 
-def is_commentable_cohorted(course_key, commentable_id):
-    """
-    Args:
-        course_key: CourseKey
-        commentable_id: string
-
-    Returns:
-        Bool: is this commentable cohorted?
-
-    Raises:
-        Http404 if the course doesn't exist.
-    """
-    course = courses.get_course_by_id(course_key)
-    course_cohort_settings = get_course_cohort_settings(course_key)
-
-    if not course_cohort_settings.is_cohorted:
-        # this is the easy case :)
-        ans = False
-    elif (
-            commentable_id in course.top_level_discussion_topic_ids or
-            course_cohort_settings.always_cohort_inline_discussions is False
-    ):
-        # top level discussions have to be manually configured as cohorted
-        # (default is not).
-        # Same thing for inline discussions if the default is explicitly set to False in settings
-        ans = commentable_id in course_cohort_settings.cohorted_discussions
-    else:
-        # inline discussions are cohorted by default
-        ans = True
-
-    log.debug(u"is_commentable_cohorted({0}, {1}) = {2}".format(
-        course_key, commentable_id, ans
-    ))
-    return ans
-
-
 def get_cohorted_commentables(course_key):
     """
     Given a course_key return a set of strings representing cohorted commentables.
