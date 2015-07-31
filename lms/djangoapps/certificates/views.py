@@ -303,8 +303,10 @@ def _update_certificate_context(context, course, user, user_certificate):
     partner_name = course.org
     organizations = organization_api.get_course_organizations(course_id=course.id)
     if organizations:
-        partner_name = ",".join(organization['name'] for organization in organizations)
-        #TODO Need to add organization_logos list here
+        #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
+        organization = next(iter(organizations))
+        partner_name = organization.get('name', course.org)
+        context['organization_logo'] = organization.get('logo', None)
 
     context['username'] = user.username
     context['course_mode'] = user_certificate.mode
