@@ -26,6 +26,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
+from teams.tests.factories import CourseTeamFactory
 
 
 @attr('shard_1')
@@ -1209,3 +1210,14 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
             utils.is_commentable_cohorted(course.id, to_id("Feedback")),
             "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
         )
+
+    def test_is_commentable_cohorted_team(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        config_course_cohorts(course, is_cohorted=True)
+        team = CourseTeamFactory(course_id=course.id)
+
+        # Verify that team discussions are not cohorted, but other discussions are
+        self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
+        self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))
