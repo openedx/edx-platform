@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import datetime
 import json
 import ddt
 import mock
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 import ddt
-from datetime import datetime
 from pytz import UTC
 from django.utils.timezone import UTC as django_utc
 
