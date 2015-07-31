@@ -1,5 +1,12 @@
 from django_comment_common.models import Role
 
+
+class ThreadContext(object):
+    """ An enumeration that represents the context of a thread. Used primarily by the comments service. """
+    STANDALONE = 'standalone'
+    COURSE = 'course'
+
+
 _STUDENT_ROLE_PERMISSIONS = ["vote", "update_thread", "follow_thread", "unfollow_thread",
                              "update_comment", "create_sub_comment", "unvote", "create_thread",
                              "follow_commentable", "unfollow_commentable", "create_comment", ]

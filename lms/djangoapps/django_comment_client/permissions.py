@@ -31,20 +31,40 @@ def has_permission(user, permission, course_id=None):
 CONDITIONS = ['is_open', 'is_author', 'is_question_author', 'is_team_member_if_applicable']
 
 
+def get_team(commentable_id):
+    """ Returns the team that the commentable_id belongs to if it exists. Returns None otherwise. """
+    request_cache_dict = RequestCache.get_request_cache().data
+    cache_key = "django_comment_client.team_commentable.{}".format(commentable_id)
+    if cache_key in request_cache_dict:
+        return request_cache_dict[cache_key]
+
+    try:
+        team = CourseTeam.objects.get(discussion_topic_id=commentable_id)
+    except CourseTeam.DoesNotExist:
+        team = None
+
+    request_cache_dict[cache_key] = team
+    return team
+
+
 def _check_condition(user, condition, content):
-    def check_open(user, content):
+    """ Check whether or not the given condition applies for the given user and content. """
+    def check_open(_user, content):
+        """ Check whether the content is open. """
         try:
             return content and not content['closed']
         except KeyError:
             return False
 
     def check_author(user, content):
+        """ Check if the given user is the author of the content. """
         try:
             return content and content['user_id'] == str(user.id)
         except KeyError:
             return False
 
     def check_question_author(user, content):
+        """ Check if the given user is the author of the original question for both threads and comments. """
         if not content:
             return False
         try:
@@ -69,17 +89,16 @@ def _check_condition(user, condition, content):
             cache_key = "django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]
-            team = CourseTeam.objects.get(discussion_topic_id=commentable_id)
-            passes_condition = team.users.filter(id=user.id).count() > 0
+            team = get_team(commentable_id)
+            if team is None:
+                passes_condition = True
+            else:
+                passes_condition = team.users.filter(id=user.id).exists()
             request_cache_dict[cache_key] = passes_condition
         except KeyError:
             # We do not expect KeyError in production-- it usually indicates an improper test mock.
             logging.warning("Did not find key commentable_id in content.")
             passes_condition = False
-        except CourseTeam.DoesNotExist:
-            passes_condition = True
-            request_cache_dict[cache_key] = passes_condition
-
         return passes_condition
 
     handlers = {
