@@ -55,10 +55,12 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             course_modes: ['honor', 'test'],
             certificate_web_view_url: '/users/1/courses/orgX/009/2016'
         });
+        window.CMS.User = {isGlobalStaff: true};
     });
 
     afterEach(function() {
         delete window.course;
+        delete window.CMS.User;
     });
 
     describe('Certificate Details Spec:', function() {
@@ -139,6 +141,12 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
             it('should present a Delete action', function () {
                 expect(this.view.$('.action-delete .delete')).toExist();
+            });
+
+            it('should not present a Delete action if user is not global staff', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                appendSetFixtures(this.view.render().el);
+                expect(this.view.$('.action-delete .delete')).not.toExist();
             });
 
             it('should prompt the user when when clicking the Delete button', function(){

@@ -22,7 +22,9 @@ from django.utils.translation import ugettext as _
 <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
+CMS.User = CMS.User || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
 </script>
 </%block>
 
