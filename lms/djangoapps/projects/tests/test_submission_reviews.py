@@ -40,6 +40,7 @@ class SubmissionReviewsApiTests(ModuleStoreTestCase):
     """ Test suite for Users API views """
 
     def setUp(self):
+        super(SubmissionReviewsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.test_users_uri = '/api/server/users/'
         self.test_workgroups_uri = '/api/server/workgroups/'

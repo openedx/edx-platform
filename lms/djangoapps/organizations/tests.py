@@ -45,6 +45,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
     """ Test suite for Users API views """
 
     def setUp(self):
+        super(OrganizationsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.base_organizations_uri = '/api/server/organizations/'
         self.base_users_uri = '/api/server/users'

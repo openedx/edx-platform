@@ -56,6 +56,7 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
         )._xmodule
 
     def setUp(self):
+        super(CourseModuleCompletionTests, self).setUp()
         self.user = UserFactory()
         self._create_course()
 
