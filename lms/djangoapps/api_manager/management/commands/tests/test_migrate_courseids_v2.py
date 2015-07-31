@@ -20,7 +20,7 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-
+        super(MigrateCourseIdsTests, self).setUp()
         self.bad_style_course_id = "slashes:old+style+id"
         self.good_style_course_id = "old/style/id"
         self.bad_style_content_id = "location:old+style+id+chapter+1234567890"
