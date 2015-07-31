@@ -33,7 +33,7 @@
                   <%- gettext('This exam is for practice only') %>
                 </label>
             </li>
-            <p class='field-message'> <%- gettext('Students will take this exam as a practice exam.') %> </p>
+            <p class='field-message'> <%- gettext('Learners can experience the proctoring software setup process and try some example problems. Make sure this practice exam is set up as an ungraded exam.') %> </p>
         </ul>
         <ul class="list-fields list-input">
             <li class="field field-checkbox checkbox-cosmetic">
