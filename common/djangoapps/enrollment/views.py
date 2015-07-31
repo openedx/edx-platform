@@ -598,7 +598,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 data={
                     "message": (
                         u"The course mode '{mode}' is not available for course '{course_id}'."
-                    ).format(mode="honor", course_id=course_id),
+                    ).format(mode=mode, course_id=course_id),
                     "course_details": error.data
                 })
         except CourseNotFoundError:

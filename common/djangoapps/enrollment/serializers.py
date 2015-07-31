@@ -40,7 +40,11 @@ class CourseField(serializers.RelatedField):
 
     def to_native(self, course, **kwargs):
         course_modes = ModeSerializer(
-            CourseMode.modes_for_course(course.id, kwargs.get('include_expired', False), only_selectable=False)
+            CourseMode.modes_for_course(
+                course.id,
+                include_expired=kwargs.get('include_expired', False),
+                only_selectable=False
+            )
         ).data  # pylint: disable=no-member
 
         return {
