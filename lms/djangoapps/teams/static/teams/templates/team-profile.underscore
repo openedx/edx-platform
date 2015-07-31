@@ -1,10 +1,73 @@
 <div class="team-profile">
-    <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
-            data-read-only="<%= readOnly %>"
-            data-user-create-comment="<%= !readOnly %>"
-            data-user-create-subcomment="<%= !readOnly %>">
-        <% if ( !readOnly) { %>
-            <a href="#" class="new-post-btn" role="button"><span class="icon fa fa-edit new-post-icon"></span><%= gettext("New Post") %></a>
-        <% } %>
+    <div class="page-content-main">
+        <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
+                data-read-only="<%= readOnly %>"
+                data-user-create-comment="<%= !readOnly %>"
+                data-user-create-subcomment="<%= !readOnly %>">
+            <% if ( !readOnly) { %>
+                <a href="#" class="new-post-btn" role="button"><span class="icon fa fa-edit new-post-icon"></span><%= gettext("New Post") %></a>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="page-content-secondary">
+        <div class="team-detail">
+            <h4 class="team-detail-header"><%- gettext("Team Details") %></h4>
+            <% if (isMember) { %>
+                <div class="team-member">
+                    <p><%- gettext("You are a member of this team.") %></p>
+                </div>
+            <% } %>
+            <div class="team-members">
+                <span class="sr"><%- gettext("Team member profiles") %></span>
+                <div class="members-info"></div>
+            </div>
+
+            <div class="team-capacity">
+                <span class="sr"><%- gettext("Team capacity") %></span>
+                <span><%- membershipText %></span>
+            </div>
+
+            <% if (country) { %>
+                <div class="team-country">
+                    <span class="sr"><%- gettext("The country that team members primarily identify with.") %></span>
+                    <i class="u-field-icon icon fa fa-globe fa-fw" aria-hidden="true"></i>
+                    <span>
+                        <%- gettext(country) %>
+                    </span>
+                </div>
+            <% } %>
+            <% if (language) { %>
+                <div class="team-language">
+                    <span class="sr"><%- gettext("The language that team members primarily use to communicate with each other.") %></span>
+                    <i class="icon fa fa-comment-o fa-fw" aria-hidden="true"></i>
+                    <span>
+                        <%- gettext(language) %>
+                    </span>
+                </div>
+            <% } %>
+
+            <% if (isMember) { %>
+                <div class="leave-team">
+                    <a href="#" class="leave-team-link"><%- gettext("Leave Team") %></a>
+                </div>
+
+                <div class="divider-lv1"></div>
+
+                <div class="invite-team">
+                    <h4 class="invites-header"><%- gettext("Invite Others") %></h4>
+                    <% if (hasCapacity) { %>
+                        <input type="text" class="invite-link-input" value="<%= inviteLink %>" aria-describedby="invite-text" readonly >
+                        <span class="invite-text" id="invite-text">
+                            <%- gettext("Send this link to friends so that they can join too.") %>
+                        </span>
+                    <% } else {  %>
+                        <span class="invite-text">
+                            <%- gettext("No invitations are available. This team is full.") %>
+                        </span>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
     </div>
 </div>
