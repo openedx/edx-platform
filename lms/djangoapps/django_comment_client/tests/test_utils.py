@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 import json
 
 import mock
@@ -9,7 +8,6 @@ from django.utils.timezone import UTC as django_utc
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 import ddt
-from datetime import datetime
 from pytz import UTC
 
 import django_comment_client.utils as utils
