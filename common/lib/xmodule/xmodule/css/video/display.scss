@@ -839,12 +839,28 @@ div.video {
       background-size: 15%;
     }
 
-    .btn-play {
-      text-indent: -999px;
-      overflow: hidden;
+    .btn-play.btn-pre-roll {
+      padding: $baseline;
       border: none;
+      border-radius: $baseline;
+      background: $black-t2;
       box-shadow: none;
-      line-height: 0;
+
+      &:after {
+        // the button class, ties to functionality, also uses an icon font
+        // we're overriding it here so we can use our image instead
+        display: none;
+      }
+
+      img {
+        height: ($baseline * 4);
+        width: ($baseline * 4);
+      }
+
+      &:hover,
+      &:focus {
+        background: $blue;
+      }
     }
   }
 }
