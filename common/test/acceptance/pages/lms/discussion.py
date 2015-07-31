@@ -419,6 +419,7 @@ class InlineDiscussionPage(PageObject):
         return len(self._find_within(".discussion-thread"))
 
     def has_thread(self, thread_id):
+        """Returns true if this page is showing the thread with the specified id."""
         return self._find_within('.discussion-thread#thread_{}'.format(thread_id)).present
 
     def element_exists(self, selector):
