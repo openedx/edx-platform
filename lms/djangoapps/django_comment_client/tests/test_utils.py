@@ -86,6 +86,13 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         expected = {u'Moderator': [3], u'Community TA': [4, 5]}
         self.assertEqual(ret, expected)
 
+    def test_has_discussion_privileges(self):
+        self.assertFalse(utils.has_discussion_privileges(self.student1, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.student2, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.moderator, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta1, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta2, self.course_id))
+
     def test_has_forum_access(self):
         ret = utils.has_forum_access('student', self.course_id, 'Student')
         self.assertTrue(ret)
