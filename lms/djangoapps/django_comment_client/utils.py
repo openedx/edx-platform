@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 import pystache_custom as pystache
+from courseware.access import has_access
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission
@@ -64,11 +65,12 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def get_accessible_discussion_modules(course):
-    discussion_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
-    discussion_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion-forum'})
-
-    all_discussions = discussion_modules + discussion_xblocks
+def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
+    """
+    Return a list of all valid discussion modules in this course that
+    are accessible to the given user.
+    """
+    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -77,7 +79,10 @@ def get_accessible_discussion_modules(course):
                 return False
         return True
 
-    return filter(has_required_keys, all_discussions)
+    return [
+        module for module in all_modules
+        if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
+    ]
 
 
 def get_discussion_id_map(course, user):
@@ -290,23 +295,6 @@ def get_discussion_categories_ids(course, user, include_all=False):
         module.discussion_id for module in get_accessible_discussion_modules(course, user, include_all=include_all)
     ]
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
-
-
-def get_discussion_categories_ids(course):
-    """
-    Returns a list of available ids of categories for the course.
-    """
-    ids = []
-    queue = [get_discussion_category_map(course)]
-    while queue:
-        category_map = queue.pop()
-        for child in category_map["children"]:
-            if child in category_map["entries"]:
-                ids.append(category_map["entries"][child]["id"])
-            else:
-                queue.append(category_map["subcategories"][child])
-
-    return ids
 
 
 class JsonResponse(HttpResponse):
