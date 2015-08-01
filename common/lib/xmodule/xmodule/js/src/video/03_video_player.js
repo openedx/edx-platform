@@ -334,7 +334,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.currentTime = time || this.videoPlayer.player.getCurrentTime();
 
         if (isFinite(this.videoPlayer.currentTime)) {
-            this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
+            this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime, this.videoPlayer.endTime);
 
             // We need to pause the video if current time is smaller (or equal)
             // than end-time. Also, we must make sure that this is only done
@@ -402,7 +402,7 @@ function (HTML5Video, Resizer) {
             // Why? This is how the YouTube API is implemented.
             // sjson.search() only works if time is defined.
             if (!_.isUndefined(time)) {
-                this.videoPlayer.updatePlayTime(time);
+                this.videoPlayer.updatePlayTime(time, duration);
             }
             if (time > 0 && this.isFlashMode()) {
                 this.videoPlayer.seekTo(time);
@@ -508,7 +508,7 @@ function (HTML5Video, Resizer) {
             }
         }
 
-        this.videoPlayer.updatePlayTime(time, true);
+        this.videoPlayer.updatePlayTime(time, duration);
         this.el.trigger('seek', arguments);
 
         // the timer is stopped above; restart it.
@@ -548,7 +548,7 @@ function (HTML5Video, Resizer) {
         // Sometimes `onEnded` events fires when `currentTime` not equal
         // `duration`. In this case, slider doesn't reach the end point of
         // timeline.
-        this.videoPlayer.updatePlayTime(time);
+        this.videoPlayer.updatePlayTime(time, time);
 
         this.el.trigger('ended', arguments);
     }
@@ -765,10 +765,10 @@ function (HTML5Video, Resizer) {
             videoPlayer.startTime /= Number(this.speed);
         }
 
-        videoPlayer.endTime = this.config.endTime;
+        videoPlayer.endTime = this.config.endTime || duration;
         if (
             videoPlayer.endTime <= videoPlayer.startTime ||
-            videoPlayer.endTime >= duration
+            videoPlayer.endTime > duration
         ) {
             videoPlayer.endTime = null;
         } else if (this.isFlashMode()) {
@@ -820,9 +820,8 @@ function (HTML5Video, Resizer) {
         return time;
     }
 
-    function updatePlayTime(time, skip_seek) {
+    function updatePlayTime(time, endTime) {
         var videoPlayer = this.videoPlayer,
-            endTime = this.videoPlayer.duration(),
             youTubeId;
 
 // TODO:FUNK <<<<<<< HEAD
