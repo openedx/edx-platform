@@ -14,6 +14,7 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
 
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -104,16 +105,8 @@ def view_course_access(depth=0, access_action='load', check_for_milestones=False
                         depth=depth,
                         check_if_enrolled=True,
                     )
-                except Http404:
-                    # any_unfulfilled_milestones called a second time since has_access returns a bool
-                    if check_for_milestones and any_unfulfilled_milestones(course_id, request.user.id):
-                        message = {
-                            "developer_message": "Cannot access content with unfulfilled "
-                                                 "pre-requisites or unpassed entrance exam."
-                        }
-                        return response.Response(data=message, status=status.HTTP_204_NO_CONTENT)
-                    else:
-                        raise
+                except CoursewareAccessException as error:
+                    return response.Response(data=error.to_json(), status=status.HTTP_404_NOT_FOUND)
                 return func(self, request, course=course, *args, **kwargs)
         return _wrapper
     return _decorator

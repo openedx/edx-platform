@@ -60,7 +60,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
 
 @ddt.ddt
-class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
     """
