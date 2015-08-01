@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
-from django_comment_client.permissions import check_permissions_by_view, has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
@@ -678,7 +678,7 @@ def is_commentable_cohorted(course_key, commentable_id):
     course = courses.get_course_by_id(course_key)
     course_cohort_settings = get_course_cohort_settings(course_key)
 
-    if not course_cohort_settings.is_cohorted:
+    if not course_cohort_settings.is_cohorted or get_team(commentable_id):
         # this is the easy case :)
         ans = False
     elif (
