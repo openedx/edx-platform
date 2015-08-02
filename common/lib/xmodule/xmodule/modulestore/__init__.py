@@ -1442,6 +1442,8 @@ class EdxJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (CourseKey, UsageKey)):
             return unicode(obj)
+        elif isinstance(obj, Location):
+            return obj.dict()
         elif isinstance(obj, datetime.datetime):
             if obj.tzinfo is not None:
                 if obj.utcoffset() is None:

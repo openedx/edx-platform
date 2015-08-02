@@ -13,15 +13,19 @@ from model_utils.models import TimeStampedModel
 from student.models import CourseEnrollment
 from xmodule_django.models import CourseKeyField
 
+
 class StudentGradebook(TimeStampedModel):
     """
-    StudentGradebook is essentiall a container used to cache calculated
+    StudentGradebook is essentially a container used to cache calculated
     grades (see courseware.grades.grade), which can be an expensive operation.
     """
     user = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
     grade = models.FloatField()
     proforma_grade = models.FloatField()
+    progress_summary = models.TextField(blank=True)
+    grade_summary = models.TextField(blank=True)
+    grading_policy = models.TextField(blank=True)
 
     class Meta:
         """
@@ -147,6 +151,7 @@ class StudentGradebook(TimeStampedModel):
 
         return data
 
+
 class StudentGradebookHistory(TimeStampedModel):
     """
     A running audit trail for the StudentGradebook model.  Listens for
@@ -156,6 +161,9 @@ class StudentGradebookHistory(TimeStampedModel):
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
     grade = models.FloatField()
     proforma_grade = models.FloatField()
+    progress_summary = models.TextField(blank=True)
+    grade_summary = models.TextField(blank=True)
+    grading_policy = models.TextField(blank=True)
 
     @receiver(post_save, sender=StudentGradebook)
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
@@ -169,7 +177,13 @@ class StudentGradebookHistory(TimeStampedModel):
 
         create_history_entry = False
         if latest_history_entry is not None:
-            if (latest_history_entry.grade != instance.grade) or (latest_history_entry.proforma_grade != instance.proforma_grade):
+            if (
+                latest_history_entry.grade != instance.grade or
+                latest_history_entry.proforma_grade != instance.proforma_grade or
+                latest_history_entry.progress_summary != instance.progress_summary or
+                latest_history_entry.grade_summary != instance.grade_summary or
+                latest_history_entry.grading_policy != instance.grading_policy
+            ):
                 create_history_entry = True
         else:
             create_history_entry = True
@@ -179,6 +193,9 @@ class StudentGradebookHistory(TimeStampedModel):
                 user=instance.user,
                 course_id=instance.course_id,
                 grade=instance.grade,
-                proforma_grade=instance.proforma_grade
+                proforma_grade=instance.proforma_grade,
+                progress_summary=instance.progress_summary,
+                grade_summary=instance.grade_summary,
+                grading_policy=instance.grading_policy
             )
             new_history_entry.save()

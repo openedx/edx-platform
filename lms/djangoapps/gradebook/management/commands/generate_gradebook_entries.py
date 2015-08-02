@@ -1,6 +1,7 @@
 """
-One-time data migration script -- shoulen't need to run it again
+One-time data migration script -- shouldn't need to run it again
 """
+import json
 import logging
 from optparse import make_option
 
@@ -10,6 +11,7 @@ from courseware import grades
 from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import EdxJSONEncoder
 from util.request import RequestMockWithoutMiddleware
 
 log = logging.getLogger(__name__)
@@ -21,7 +23,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        help = "Command to creaete or update gradebook entries"
+        help = "Command to create or update gradebook entries"
         option_list = BaseCommand.option_list + (
             make_option(
                 "-c",
@@ -69,15 +71,28 @@ class Command(BaseCommand):
                 request.user = user
                 grade_data = grades.grade(user, request, course)
                 grade = grade_data['percent']
-                proforma_grade = grades.calculate_proforma_grade(grade_data, course.grading_policy)
+                grading_policy = course.grading_policy
+                proforma_grade = grades.calculate_proforma_grade(grade_data, grading_policy)
+                progress_summary = grades.progress_summary(user, request, course)
                 try:
                     gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
                     if gradebook_entry.grade != grade or gradebook_entry.proforma_grade != proforma_grade:
                         gradebook_entry.grade = grade
                         gradebook_entry.proforma_grade = proforma_grade
+                        gradebook_entry.progress_summary = json.dumps(progress_summary, cls=EdxJSONEncoder)
+                        gradebook_entry.grade_summary = json.dumps(grade_data, cls=EdxJSONEncoder)
+                        gradebook_entry.grading_policy = json.dumps(grading_policy, cls=EdxJSONEncoder)
                         gradebook_entry.save()
                 except StudentGradebook.DoesNotExist:
-                    StudentGradebook.objects.create(user=user, course_id=course.id, grade=grade, proforma_grade=proforma_grade)
+                    StudentGradebook.objects.create(
+                        user=user,
+                        course_id=course.id,
+                        grade=grade,
+                        proforma_grade=proforma_grade,
+                        progress_summary=json.dumps(progress_summary, cls=EdxJSONEncoder),
+                        grade_summary=json.dumps(grade_data, cls=EdxJSONEncoder),
+                        grading_policy=json.dumps(grading_policy, cls=EdxJSONEncoder)
+                    )
                 log_msg = 'Gradebook entry created -- Course: {}, User: {}  (grade: {}, proforma_grade: {})'.format(course.id, user.id, grade, proforma_grade)
                 print log_msg
                 log.info(log_msg)
