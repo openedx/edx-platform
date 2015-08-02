@@ -6,7 +6,16 @@ window.PLATFORM_NAME = ${json.dumps(settings.PLATFORM_NAME)};
 window.ENABLE_DISCUSSION_HOME_PANEL = ${json.dumps(settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL', False))};
 </script>
 
-% for template_name in ['thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show', 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item', 'discussion-home', 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-menu-category', 'topic', 'post-user-display']:
+<%
+template_names = [
+    'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show', 'thread-response-edit',
+    'response-comment-show', 'response-comment-edit', 'thread-list-item', 'discussion-home', 'search-alert',
+    'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-menu-category', 'topic', 'post-user-display',
+    'inline-discussion', 'pagination', 'user-profile', 'profile-thread'
+]
+%>
+
+% for template_name in template_names:
 <script aria-hidden="true" type="text/template" id="${template_name}-template">
     <%static:include path="common/templates/discussion/${template_name}.underscore" />
 </script>
