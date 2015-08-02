@@ -1444,6 +1444,12 @@ class UsersApiTests(ModuleStoreTestCase):
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
             due=self.course_end_date.replace(tzinfo=timezone.utc)
         )
+        points_scored = 5
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item5)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
 
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
 
@@ -1471,16 +1477,16 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
-        self.assertEqual(response.data['current_grade'], 0.73)
-        self.assertEqual(response.data['proforma_grade'], 0.9375)
+        self.assertEqual(response.data['current_grade'], 0.74)
+        self.assertEqual(response.data['proforma_grade'], 0.9174999999999999)
 
         test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['course_id'], unicode(course.id))
-        self.assertEqual(response.data[0]['current_grade'], 0.73)
-        self.assertEqual(response.data[0]['proforma_grade'], 0.9375)
+        self.assertEqual(response.data[0]['current_grade'], 0.74)
+        self.assertEqual(response.data[0]['proforma_grade'], 0.9174999999999999)
         self.assertEqual(response.data[0]['complete_status'], False)
 
     def is_user_profile_created_updated(self, response, data):
