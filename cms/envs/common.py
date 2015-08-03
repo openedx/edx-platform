@@ -37,7 +37,7 @@ import lms.envs.common
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
     update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
-    YOUTUBE_API_KEY,
+    DATA_DIR, YOUTUBE_API_KEY,
 )
 from path import path
 from warnings import simplefilter
