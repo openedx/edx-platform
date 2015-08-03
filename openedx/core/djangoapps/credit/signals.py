@@ -8,11 +8,15 @@ from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
-from xmodule.modulestore.django import SignalHandler
+from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
+from openedx.core.djangoapps.credit.utils import get_course_xblocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 
 
 log = logging.getLogger(__name__)
+# XBlocks that are used as course credit requirements and are required for
+# access control of specific gated course contents
+GATED_CREDIT_XBLOCK_CATEGORIES = ['edx-reverification-block']
 
 
 def on_course_publish(course_key):  # pylint: disable=unused-argument
@@ -27,6 +31,7 @@ def on_course_publish(course_key):  # pylint: disable=unused-argument
     # Import here, because signal is registered at startup, but items in tasks
     # are not yet able to be loaded
     from openedx.core.djangoapps.credit import api, tasks
+    tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
 
     if api.is_credit_course(course_key):
         tasks.update_credit_course_requirements.delay(unicode(course_key))
@@ -70,3 +75,46 @@ def listen_for_grade_calculation(sender, username, grade_summary, course_key, de
                     api.set_credit_requirement_status(
                         username, course_id, 'grade', 'grade', status="failed", reason={}
                     )
+
+
+def tag_course_content_with_partition_scheme(course_key, partition_scheme):
+    """ Create user partitions with provided partition scheme and tag credit
+    blocks for the given course with those user partitions.
+
+    Args:
+        course_key (CourseKey): Identifier for the course.
+        partition_scheme (str): Name of the user partition scheme
+
+    """
+    partition = None
+    # create partition with provided partition scheme
+    if partition_scheme == 'verification':
+        partition = VerificationPartitionScheme()
+
+    if partition is None:
+        log.error(u'No user partition found with scheme "%s".', partition_scheme)
+        # TODO: maybe raise a 'NoSuchUserPartitionError' exception if not user partition is present with provide 'partition_scheme'.
+        return
+
+    access_control_credit_xblocks = _get_credit_xblocks_for_access_control(course_key)
+    for xblock in access_control_credit_xblocks:
+        # TODO: Implement ICRV access control by assigning partitions with different groups (remove old access groups with same partition scheme), to the credit xblocks and save them.
+        pass
+
+
+def _get_credit_xblocks_for_access_control(course_key):
+    """ Retrieve all credit requirements XBlocks in the course for categories
+     in list 'GATED_CREDIT_XBLOCK_CATEGORIES'.
+
+    Args:
+        course_key (CourseKey): Identifier for the course.
+
+    Returns:
+        List of XBlocks that are published and haven't been deleted.
+    """
+    credit_blocks = []
+    for category in GATED_CREDIT_XBLOCK_CATEGORIES:
+        xblocks = get_course_xblocks(course_key, category)
+        credit_blocks.append(xblocks)
+
+    return credit_blocks
