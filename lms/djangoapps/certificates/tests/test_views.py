@@ -19,6 +19,7 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.testing import UrlResetMixin
 
 from certificates.api import get_certificate_url
 from certificates.models import (
@@ -36,7 +37,6 @@ from certificates.tests.factories import (
     LinkedInAddToProfileConfigurationFactory,
     BadgeAssertionFactory,
 )
-from lms import urls
 from util import organizations_helpers as organizations_api
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -725,12 +725,14 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
 
-class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
+class TrackShareRedirectTest(UrlResetMixin, ModuleStoreTestCase, EventTrackingTestCase):
     """
     Verifies the badge image share event is sent out.
     """
+
+    @patch.dict(settings.FEATURES, {"ENABLE_OPENBADGES": True})
     def setUp(self):
-        super(TrackShareRedirectTest, self).setUp()
+        super(TrackShareRedirectTest, self).setUp('certificates.urls')
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='trackable course'
@@ -742,13 +744,6 @@ class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
                 'issuer': 'http://www.example.com/issuer.json',
             },
         )
-        # Enabling the feature flag isn't enough to change the URLs-- they're already loaded by this point.
-        self.old_patterns = urls.urlpatterns
-        urls.urlpatterns += (urls.BADGE_SHARE_TRACKER_URL,)
-
-    def tearDown(self):
-        super(TrackShareRedirectTest, self).tearDown()
-        urls.urlpatterns = self.old_patterns
 
     def test_social_event_sent(self):
         test_url = '/certificates/badge_share_tracker/{}/social_network/{}/'.format(

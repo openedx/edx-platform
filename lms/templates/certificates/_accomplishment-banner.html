@@ -57,7 +57,7 @@ from django.core.urlresolvers import reverse
                       <%
                        facebook_share_text = _("I completed the {course_title} course on {platform_name}.").format(course_title=accomplishment_course_title, platform_name=platform_name)
                        twitter_share_text = _("I completed a course on {platform_name}. Take a look at my certificate.").format(platform_name=platform_name)
-                       share_url = request.build_absolute_uri(reverse('cert_html_view', kwargs=dict(user_id=str(user.id),course_id=unicode(course_id))))
+                       share_url = request.build_absolute_uri(reverse('certificates:html_view', kwargs=dict(user_id=str(user.id),course_id=unicode(course_id))))
                        if share_settings.get('CERTIFICATE_FACEBOOK_TEXT', None):
                             facebook_share_text = share_settings.get('CERTIFICATE_FACEBOOK_TEXT')
                        if share_settings.get('CERTIFICATE_TWITTER_TEXT', None):

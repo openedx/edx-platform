@@ -799,6 +799,7 @@
         'lms/include/teams/js/spec/views/teams_tab_spec.js',
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
+        'lms/include/support/js/spec/certificates_spec.js'
     ]);
 
 }).call(this, requirejs, define);
