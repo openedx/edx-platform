@@ -30,7 +30,6 @@ class CourseCacheInterface(object):
     """
     ...
     """
-    # TODO me: Make sure cache keys will not cause conflicts.
 
     def __init__(self, cache, course_cache_key_prefix, block_cache_key_prefix, available_transformations):
         """
@@ -46,7 +45,7 @@ class CourseCacheInterface(object):
         self._len_block_cache_key_prefix = len(self._block_cache_key_prefix)
         self._available_transformations = available_transformations
 
-    def get_course_blocks(self, user, course_key, transformations, root_block_key=None):
+    def get_course_blocks(self, user, course_key, transformations, root_block_key=None, remove_orphans=False):
         """
         Arguments:
             user (User)
@@ -56,6 +55,7 @@ class CourseCacheInterface(object):
                 for which block information will be returned. Passing in the usage
                 key of a course will return the entire user-specific course
                 hierarchy.
+            remove_orphans (bool)
 
         Returns:
             (CourseBlockStructure, dict[UsageKey: CourseBlockData])
@@ -96,7 +96,7 @@ class CourseCacheInterface(object):
 
         # Apply transformations to course structure and data.
         for transformation in transformations:
-            transformation.apply(user, course_key, block_structure, block_data_dict)
+            transformation.apply(user, course_key, block_structure, block_data_dict, remove_orphans)
 
         # Filter out blocks that were removed during transformation application.
         return block_structure, _filter_block_data_dict(block_data_dict, block_structure)
@@ -437,37 +437,32 @@ class CourseBlockStructure(object):
                 orphans. Does not incur a significant performance hit.
 
         """
-        # Trivial case: If the root block satisfies the removal condition, then
-        # just remove the entire structure.
-        if removal_condition(self.root_block_key):
-            self._adj = {}
-            return
-
-        traversal = traverse_topologically(
-            start_node=self.root_block_key,
-            get_parents=self.get_parents,
-            get_children=self.get_children
-        )
-
-        # Skip the first (root) block because
-        # (a) We already checked it against the removal condition, and
-        # (b) It would be wrongly flagged as is_orphan in the next for loop.
-        __ = next(traversal)
-
-        for usage_key in traversal:
-            is_orphan = not self._adj[usage_key].parents
-            if (remove_orphans and is_orphan) or removal_condition(usage_key):
+        for usage_key in self.topological_traversal():
+            remove_as_orphan = (
+                remove_orphans
+                and not self._adj[usage_key].parents
+                and usage_key != self.root_block_key
+            )
+            if remove_as_orphan or removal_condition(usage_key):
                 # Because we're doing a topological sort, removing blocks can
                 # only create orphans *later* in the traversal. So, we save time
                 # by passing remove_orphans=False and handling orphan removal
                 # ourselves.
-                self._remove_block(usage_key, False)
+                self.remove_block(usage_key, False)
 
 
 class CourseBlockData(object):
     """
     ...
     """
+
+    class _NoDefault(object):
+        """
+        ...
+        """
+        pass
+
+    _NO_DEFAULT = _NoDefault()
 
     def __init__(self, block_fields, transformation_data):
         """
@@ -506,34 +501,67 @@ class CourseBlockData(object):
             ])
         )
 
-    def get_block_field(self, field_name):
+    def get_xblock_field(self, field_name, default=_NO_DEFAULT):
         """
         Arguments:
-            field_name: str
+            field_name (str)
+            default (T)
 
         Returns:
-            *
-        """
-        return self._block_fields[field_name]
+            T, where T is any type.
 
-    def get_transformation_data(self, transformation, key):
+        Raises:
+            KeyError if field_name is not defined and default is not provided.
+        """
+        if field_name in self._block_fields:
+            return self._block_fields[field_name]
+        elif default != CourseBlockData._NO_DEFAULT:
+            return default
+        else:
+            raise KeyError("Field {} undefined.".format(field_name))
+
+    def has_xblock_field(self, field_name):
         """
         Arguments:
-            transformation_id: str
-            key: str
+            field_name (str)
 
         Returns:
-            *
+            bool
         """
-        if transformation.id in self._transformation_data:
-            return (
-                self._transformation_data[transformation.id][key]
-                if self._transformation_data
-                else {}
-            )
+        return field_name in self._block_fields
+
+    def get_transformation_data(self, transformation, key, default=_NO_DEFAULT):
+        """
+        Arguments:
+            transformation (CourseStructureTransformation)
+            key (str)
+            default (T)
+
+        Returns:
+            T, where T is any type.
+
+        Raises:
+            KeyError if key is not defined for transformation and default is
+            not provided.
+        """
+        if key in self._transformation_data.get(transformation.id, {}):
+            self._transformation_data[transformation.id][key]
+        elif default != CourseBlockData._NO_DEFAULT:
+            return default
         else:
             raise KeyError(
-                "No collected data for transformation of type {}.".format(
-                    transformation.id
+                "Key {} not defined for transformation of type {}.".format(
+                    key, transformation.id
                 )
             )
+
+    def has_transformation_date(self, transformation, key):
+        """
+        Arguments:
+            transformation (CourseStructureTransformation)
+            key (str)
+
+        Returns:
+            bool
+        """
+        return key in self._transformation_data[transformation.id]

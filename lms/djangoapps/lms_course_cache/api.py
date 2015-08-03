@@ -27,7 +27,12 @@ def _get_cache_interface():
     return _cache_interface
 
 
-def get_course_blocks(user, course_key, transformations=LMS_COURSE_TRANSFORMATIONS, root_block_key=None):
+def get_course_blocks(
+        user,
+        course_key,
+        transformations=LMS_COURSE_TRANSFORMATIONS,
+        root_block_key=None,
+        remove_orphans=False):
     """
     Arguments:
         user (User)
@@ -37,12 +42,13 @@ def get_course_blocks(user, course_key, transformations=LMS_COURSE_TRANSFORMATIO
             for which block information will be returned. Passing in the usage
             key of a course will return the entire user-specific course
             hierarchy.
+        remove_orphans (bool)
 
     Returns:
         (CourseBlockStructure, dict[UsageKey: CourseBlockData])
     """
     return _get_cache_interface().get_course_blocks(
-        user, course_key, transformations, root_block_key,
+        user, course_key, transformations, root_block_key, remove_orphans
     )
 
 

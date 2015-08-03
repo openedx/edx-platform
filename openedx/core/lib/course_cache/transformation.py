@@ -40,7 +40,7 @@ class CourseStructureTransformation(object):
         """
         return None
 
-    def apply(self, user, course_key, block_structure, block_data):
+    def apply(self, user, course_key, block_structure, block_data, remove_orphans):
         """
         Mutates block_structure and block_data based on the given user_info.
 
@@ -49,5 +49,6 @@ class CourseStructureTransformation(object):
             course_key (CourseKey)
             block_structure (CourseBlockStructure)
             block_data (dict[UsageKey: CourseBlockData])
+            remove_orphans (bool)
         """
         pass

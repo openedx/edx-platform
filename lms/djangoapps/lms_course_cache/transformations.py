@@ -8,50 +8,23 @@ from courseware.access import _has_access_to_course
 from xmodule.course_module import DEFAULT_START_DATE
 
 
-# TODO me: Figure out what the value of this should be, and then hard code it in.
-ACCESS_TO_ALL_PARENTS_REQUIRED = False
-
-
 class VisibilityTransformation(CourseStructureTransformation):
     """
     ...
     """
-    def collect(self, course_key, block_structure, xblock_dict):
-        """
-        Computes any information for each XBlock that's necessary to execute
-        this transformation's apply method.
 
-        Arguments:
-            course_key (CourseKey)
-            block_structure (CourseBlockStructure)
-            xblock_dict (dict[UsageKey: XBlock])
+    @property
+    def required_fields(self):
+        """
+        Specifies XBlock fields that are required by this transformation's
+        apply method.
 
         Returns:
-            dict[UsageKey: dict]
+            set[str]
         """
-        result_dict = {}
-        for block_key in block_structure.topological_traversal():
-            # We know that all of the the block's parents have already been
-            # visited because we're iterating over the result of a topological
-            # sort.
-            parent_visibilities = [
-                result_dict[parent_key]['merged_student_visibility']
-                for parent_key in block_structure.get_parents(block_key)
-            ]
-            merged_parent_visibility = (
-                True if not parent_visibilities
-                else all(parent_visibilities) if ACCESS_TO_ALL_PARENTS_REQUIRED
-                else any(parent_visibilities)
-            )
-            result_dict[block_key] = {
-                'merged_student_visibility': (
-                    not xblock_dict[block_key].visible_to_staff_only
-                    and merged_parent_visibility
-                )
-            }
-        return result_dict
+        return {'visible_to_staff_only'}
 
-    def apply(self, user, course_key, block_structure, block_data):
+    def apply(self, user, course_key, block_structure, block_data, remove_orphans):
         """
         Mutates block_structure and block_data based on the given user_info.
 
@@ -60,110 +33,41 @@ class VisibilityTransformation(CourseStructureTransformation):
             course_key (CourseKey)
             block_structure (CourseBlockStructure)
             block_data (dict[UsageKey: CourseBlockData])
+            remove_orphans (bool)
         """
         if _has_access_to_course(user, 'staff', course_key):
             return
         block_structure.remove_block_if(
-            lambda block_key: not (
-                block_data[block_key].get_transformation_data(self, 'merged_student_visibility')
-            ),
-            True
+            lambda block_key: block_data[block_key].get_xblock_field('visible_to_staff_only'),
+            remove_orphans,
         )
-
 
 class StartDateTransformation(CourseStructureTransformation):
     """
     ...
     """
 
-    @staticmethod
-    def merge_start_dates(start, merged_parent_starts):
+    @property
+    def required_fields(self):
         """
-        Merge together the start date for a block and the start dates of its
-        parent blocks.
-
-        None implies that there is no start date restriction.
-
-        Arguments:
-            start (datetime or None): Start date of the block, or None if there
-                is no start date restriction.
-            merged_parent_starts (list[datetime]): Merged start dates of
-                this block's parents, or an empty list if none of them have
-                start date restrictions.
+        Specifies XBlock fields that are required by this transformation's
+        apply method.
 
         Returns:
-            datetime or None: The merged start date for the block, or None if
-                there is no start date restriction.
+            set[str]
         """
-        return (
-            max(
-                start,
-                max(merged_parent_starts) if ACCESS_TO_ALL_PARENTS_REQUIRED
-                else min(merged_parent_starts)
-            )
-            if start and merged_parent_starts
-            else start or merged_parent_starts
-        )
+        return {'start', 'days_early_for_beta'}
 
-    def collect(self, course_key, block_structure, xblock_dict):
-        """
-        Computes any information for each XBlock that's necessary to execute
-        this transformation's apply method.
-
-        Arguments:
-            course_key (CourseKey)
-            block_structure (CourseBlockStructure)
-            xblock_dict (dict[UsageKey: XBlock])
-
-        Returns:
-            dict[UsageKey: dict]
-        """
-        result_dict = {}
-
-        for block_key in block_structure.topological_traversal():
-            # We know that all of the the block's parents have already been
-            # visited because we're iterating over the result of a topological
-            # sort.
-            result_dict[block_key] = {}
-
-            xblock = xblock_dict[block_key]
-            parent_keys = block_structure.get_parents(block_key)
-
-            start = (
-                xblock.start if xblock.start != DEFAULT_START_DATE
-                else None
-            )
-            merged_parent_starts = [
-                result_dict[parent_key]['merged_start'] for parent_key in parent_keys
-                if 'merged_start' in result_dict[parent_key]
-            ]
-            merged_start = StartDateTransformation.merge_start_dates(start, merged_parent_starts)
-
-            if merged_start:
-                result_dict[block_key]['merged_start'] = merged_start
-                beta_start = (
-                    start - timedelta(days=xblock.days_early_for_beta) if start and xblock.days_early_for_beta
-                    else start
-                )
-                merged_parent_beta_starts = [
-                    result_dict[parent_key]['merged_beta_start'] for parent_key in parent_keys
-                    if 'merged_beta_start' in result_dict[parent_key]
-                ]
-                merged_beta_start = StartDateTransformation.merge_start_dates(beta_start, merged_parent_beta_starts)
-                if merged_beta_start and merged_beta_start != merged_start:
-                    result_dict[block_key]['merged_beta_start'] = merged_beta_start
-
-        return result_dict
-
-    def apply(self, user, course_key, block_structure, block_data):
+    def apply(self, user, course_key, block_structure, block_data, remove_orphans):
         """
         Mutates block_structure and block_data based on the given user_info.
 
         Arguments:
-            user (UserCourseInfo)
+            user (User)
             course_key (CourseKey)
             block_structure (CourseBlockStructure)
             block_data (dict[UsageKey: CourseBlockData])
+            remove_orphans (bool)
         """
         pass  # TODO
 
@@ -181,6 +85,7 @@ class CoursesApiTransformation(CourseStructureTransformation):
         Returns:
             set[str]
         """
+        # TODO: finish
         return {
             'id',
             'type',
@@ -194,6 +99,6 @@ class CoursesApiTransformation(CourseStructureTransformation):
 
 LMS_COURSE_TRANSFORMATIONS = {
     VisibilityTransformation(),
-    # StartDateTransformation(),  TODO
+    StartDateTransformation(),
     # CoursesApiTransformation(), TODO
 }
