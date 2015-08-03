@@ -16,7 +16,9 @@ from ..helpers import (
     load_data_str,
     generate_course_key,
     select_option_by_value,
-    element_has_text
+    element_has_text,
+    _link_dummy_account,
+    _unlink_dummy_account
 )
 from ...pages.lms import BASE_URL
 from ...pages.lms.account_settings import AccountSettingsPage
@@ -165,13 +167,15 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
         self.dashboard_page.wait_for_page()
 
-        self._unlink_dummy_account()
+        account_settings = AccountSettingsPage(self.browser)
+        _unlink_dummy_account(account_settings)
 
     def test_hinted_login(self):
         """ Test the login page when coming from course URL that specified which third party provider to use """
         # Create a user account and link it to third party auth with the dummy provider:
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
-        self._link_dummy_account()
+        account_settings = AccountSettingsPage(self.browser)
+        _link_dummy_account(account_settings)
         LogoutPage(self.browser).visit()
 
         # When not logged in, try to load a course URL that includes the provider hint ?tpa_hint=...
@@ -186,26 +190,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # We should now be redirected to the course page
         course_page.wait_for_page()
 
-        self._unlink_dummy_account()
-
-    def _link_dummy_account(self):
-        """ Go to Account Settings page and link the user's account to the Dummy provider """
-        account_settings = AccountSettingsPage(self.browser).visit()
-        field_id = "auth-oa2-dummy"
-        account_settings.wait_for_field(field_id)
-        self.assertEqual("Link", account_settings.link_title_for_link_field(field_id))
-        account_settings.click_on_link_in_link_field(field_id)
-        account_settings.wait_for_link_title_for_link_field(field_id, "Unlink")
-
-    def _unlink_dummy_account(self):
-        """ Verify that the 'Dummy' third party auth provider is linked, then unlink it """
-        # This must be done after linking the account, or we'll get cross-test side effects
-        account_settings = AccountSettingsPage(self.browser).visit()
-        field_id = "auth-oa2-dummy"
-        account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
-        account_settings.click_on_link_in_link_field(field_id)
-        account_settings.wait_for_message(field_id, "Successfully unlinked")
+        _unlink_dummy_account(account_settings)
 
     def _create_unique_user(self):
         """
@@ -333,12 +318,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.dashboard_page.wait_for_page()
 
         # Now unlink the account (To test the account settings view and also to prevent cross-test side effects)
-        account_settings = AccountSettingsPage(self.browser).visit()
-        field_id = "auth-oa2-dummy"
-        account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink", account_settings.link_title_for_link_field(field_id))
-        account_settings.click_on_link_in_link_field(field_id)
-        account_settings.wait_for_message(field_id, "Successfully unlinked")
+        account_settings = AccountSettingsPage(self.browser)
+        _unlink_dummy_account(account_settings)
 
 
 @attr('shard_4')

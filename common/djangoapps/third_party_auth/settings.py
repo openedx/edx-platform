@@ -43,6 +43,7 @@ def apply_settings(django_settings):
 
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
+    # Sometimes an extra pipeline step will be added on startup for django-sudo, if enabled.
     django_settings.SOCIAL_AUTH_PIPELINE = (
         'third_party_auth.pipeline.parse_query_params',
         'social.pipeline.social_auth.social_details',

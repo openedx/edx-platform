@@ -1,7 +1,8 @@
 {% block body %}
-    {% load i18n %}
+    {% load i18n third_party_auth_links %}
     {% load compressed %}
     {% compressed_css 'style-main' %}
+    {% compressed_css 'style-vendor' %}
 
 <a href="#sudo-modal" id="sudo-modal-trig" style="display: none;"></a>
 <section aria-hidden="true" class="modal sudo-modal" id="sudo-modal" style="overflow:auto; display: none;" >
@@ -14,9 +15,12 @@
         <form class="sudo-form" method="post" action="">{% csrf_token %}
             {{ form.as_p }}
             <p>
-                <input type="submit" id="sudo-button" class="sudo-button" value="{% trans 'Submit' %}">
+                {# Translators: this is a button to submit password. #}
+                <button type="submit" id="sudo-button" class="sudo-button">{% trans 'Submit' %}</button>
             </p>
         </form>
+
+    {% third_party_auth_links %}
     </div>
   </div>
 </section>

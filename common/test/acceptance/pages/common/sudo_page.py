@@ -38,7 +38,15 @@ class SudoPage(PageObject):
         """
         Returns submit button.
         """
-        return self.q(css='{} input[type=submit]'.format(self.SUDO_FORM))
+        return self.q(css='{} button[type=submit]'.format(self.SUDO_FORM))
+
+    @property
+    def is_dummy_auth_button_enabled(self):
+        """
+        Returns the status for dummy auth button, enabled or disabled.
+        """
+        disabled = self.q(css="button.button-oa2-dummy").attrs('disabled')
+        return disabled[0] != 'true'
 
     @wait_for_js
     def submit_sudo_password_and_get_access(self, password):
@@ -55,3 +63,10 @@ class SudoPage(PageObject):
         Click on submit button.
         """
         return self.submit_button.click()
+
+    def click_third_party_dummy_provider_button(self):
+        """
+        Click dummy third party auth button on sudo page.
+        """
+        self.q(css="button.button-oa2-dummy").click()
+        self.redirect_page.wait_for_page()

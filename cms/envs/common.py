@@ -223,6 +223,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+    COMMON_ROOT / 'djangoapps' / 'django_sudo_helpers' / 'templates',
 ]
 
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
@@ -803,6 +804,7 @@ INSTALLED_APPS = (
 
     # Allows sudo-mode
     'sudo',
+    'django_sudo_helpers'
 )
 
 

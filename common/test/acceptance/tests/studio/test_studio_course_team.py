@@ -5,11 +5,13 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioCourseTest
-from ..helpers import get_sudo_access
+from ..helpers import get_sudo_access, _link_dummy_account
+from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.studio.auto_auth import AutoAuthPage
-
+from ...pages.common.logout import LogoutPage
 from ...pages.studio.users import CourseTeamPage
 from ...pages.studio.index import DashboardPage
+from ...pages.common.sudo_page import SudoPage
 
 
 @flaky  # TODO fix this, see TNL-2667
@@ -293,7 +295,9 @@ class CourseTeamPageTest(StudioCourseTest):
         current = self.page.get_user(self.user.get('email'))
         self.assertTrue(current.can_demote)
         self.assertTrue(current.can_delete)
-        current.click_delete()
+        # Don't wait for ajax to complete on deleting logged in user from course
+        # team because response will be 403.
+        current.click_delete(wait_for_ajax=False)
 
         self.log_in(self.user)
         self._assert_current_course(visible=False)
@@ -352,3 +356,39 @@ class CourseTeamPageTest(StudioCourseTest):
 
         self.log_in(self.user)
         self._assert_current_course(visible=False)
+
+    def test_third_party_auth_on_sudo_page_with_unlinked_account(self):
+        """
+        Test that dummy auth button is disabled on sudo page when no account is linked.
+        """
+        # Logout and log back in to remove sudo access.
+        LogoutPage(self.browser).visit()
+        self.log_in(user=self.user)
+
+        sudo_password_page = SudoPage(self.browser, self.page)
+        sudo_password_page.visit()
+        self.assertFalse(sudo_password_page.is_dummy_auth_button_enabled)
+
+    def test_third_party_auth_on_sudo_page_with_linked_account(self):
+        """
+        Test that user can authenticate on sudo page with dummy third party auth.
+        """
+        dummy_user = self._make_user(username='dummy_user')
+
+        # Add user to course team.
+        self.page.visit()
+        self.page.add_user_to_course(dummy_user['email'])
+        self.assertIn(dummy_user.get('username'), self.page.usernames)
+
+        # Logout and log back in with new user.
+        LogoutPage(self.browser).visit()
+        self.log_in(user=dummy_user)
+
+        account_settings = AccountSettingsPage(self.browser)
+        _link_dummy_account(account_settings)
+
+        # Visit sudo page and click on dummy auth button to get sudo access.
+        sudo_password_page = SudoPage(self.browser, self.page)
+        sudo_password_page.visit()
+        sudo_password_page.click_third_party_dummy_provider_button()
+        self.assertTrue(self.page.is_browser_on_page())

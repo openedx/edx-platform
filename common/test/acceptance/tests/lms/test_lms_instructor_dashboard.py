@@ -9,7 +9,7 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
-from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin, get_sudo_access
+from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin, get_sudo_access, _link_dummy_account
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -21,6 +21,9 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.account_settings import AccountSettingsPage
+from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from ...pages.common.sudo_page import SudoPage
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -604,3 +607,42 @@ class CertificatesTest(BaseInstructorDashboardTest):
             Then I see 'Pending Instructor Tasks' section
         """
         self.assertTrue(self.certificates_section.pending_tasks_section.visible)
+
+
+class DjangoSudoThirdPartyAuthTest(BaseInstructorDashboardTest):
+    """
+    Tests for third party auth on django sudo page.
+    """
+
+    def setUp(self):
+        """
+        Install a course with no content using a fixture.
+        """
+        super(DjangoSudoThirdPartyAuthTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.login_page = CombinedLoginAndRegisterPage(
+            self.browser,
+            start_page="login",
+            course_id=self.course_id
+        )
+        self.log_in_as_instructor()
+        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+
+    def test_third_party_auth_on_sudo_page_with_unlinked(self):
+        """
+        Test that dummy auth button is disabled on sudo page when no account is linked.
+        """
+        sudo_password_page = SudoPage(self.browser, self.instructor_dashboard_page)
+        sudo_password_page.visit()
+        self.assertFalse(sudo_password_page.is_dummy_auth_button_enabled)
+
+    def test_third_party_auth_on_sudo_page_with_linked(self):
+        """
+        Test that user can authenticate on sudo page with dummy third party auth.
+        """
+        account_settings = AccountSettingsPage(self.browser)
+        _link_dummy_account(account_settings)
+        sudo_password_page = SudoPage(self.browser, self.instructor_dashboard_page)
+        sudo_password_page.visit()
+        sudo_password_page.click_third_party_dummy_provider_button()
+        self.assertTrue(self.instructor_dashboard_page.is_browser_on_page())

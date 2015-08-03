@@ -259,5 +259,5 @@ def i_get_sudo_access(_step, password):
         css_selector = 'input[id=id_password]'
         world.retry_on_exception(lambda: world.css_find(css_selector)[0].fill(password))
         world.wait_for(lambda _: not world.css_has_value(css_selector, '', index=0))
-        world.css_click('input[type=submit]')
+        world.css_click('button[type=submit]')
     return True

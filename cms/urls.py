@@ -209,3 +209,9 @@ urlpatterns += (
     url(r'404', handler404),
     url(r'500', handler500),
 )
+
+# Third-party auth.
+if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    urlpatterns += (
+        url(r'', include('third_party_auth.urls')),
+    )
