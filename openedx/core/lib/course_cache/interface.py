@@ -452,7 +452,7 @@ class CourseBlockStructure(object):
         # Trivial case: If the root block satisfies the removal condition, then
         # just remove the entire structure.
         if removal_condition(self.root_block_key):
-            self._adj = []
+            self._adj = {}
             return
 
         traversal = traverse_topologically(
