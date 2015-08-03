@@ -10,7 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
-from .prompt import query_yes_no
+from util.prompt import query_yes_no
 
 from xmodule.modulestore.django import modulestore
 
