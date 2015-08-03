@@ -435,7 +435,6 @@ class CourseBlockStructure(object):
             removal_condition (UsageKey -> bool)
             remove_orphans (bool): If True, remove all blocks that become
                 orphans. Does not incur a significant performance hit.
-
         """
         for usage_key in self.topological_traversal():
             remove_as_orphan = (
