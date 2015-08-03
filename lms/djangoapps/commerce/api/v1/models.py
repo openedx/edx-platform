@@ -1,11 +1,11 @@
 """ API v1 models. """
 from itertools import groupby
-import logging
 
+import logging
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from course_modes.models import CourseMode
 
 log = logging.getLogger(__name__)
@@ -21,6 +21,12 @@ class Course(object):
         self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
         self._deleted_modes = []
+
+    @property
+    def name(self):
+        """ Return course name. """
+        course_id = CourseKey.from_string(unicode(self.id))  # pylint: disable=invalid-name
+        return CourseOverview.get_from_id(course_id).display_name
 
     def get_mode_display_name(self, mode):
         """ Returns display name for the given mode. """

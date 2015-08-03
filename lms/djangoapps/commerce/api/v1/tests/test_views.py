@@ -54,6 +54,20 @@ class CourseApiViewTestMixin(object):
             u'verification_deadline': verification_deadline,
         }
 
+    @classmethod
+    def _serialize_course(cls, course, modes=None, verification_deadline=None):
+        """ Serializes a course to a Python dict. """
+        data = {
+            u'id': unicode(course.id),
+            u'name': unicode(course.display_name),
+            u'modes': []
+        }
+
+        modes = modes or []
+        data[u'modes'] = [cls._serialize_course_mode(mode, verification_deadline) for mode in modes]
+
+        return data
+
 
 class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseListView. """
@@ -73,12 +87,7 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         actual = json.loads(response.content)
-        expected = [
-            {
-                u'id': unicode(self.course.id),
-                u'modes': [self._serialize_course_mode(self.course_mode)]
-            }
-        ]
+        expected = [self._serialize_course(self.course, [self.course_mode])]
         self.assertListEqual(actual, expected)
 
 
@@ -111,10 +120,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 200)
 
         actual = json.loads(response.content)
-        expected = {
-            u'id': unicode(self.course.id),
-            u'modes': [self._serialize_course_mode(self.course_mode)]
-        }
+        expected = self._serialize_course(self.course, [self.course_mode])
         self.assertEqual(actual, expected)
 
     def test_retrieve_invalid_course(self):
@@ -136,10 +142,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             expiration_datetime=expiration_datetime
         )
 
-        expected = {
-            u'id': unicode(self.course.id),
-            u'modes': [self._serialize_course_mode(expected_course_mode, verification_deadline)]
-        }
+        expected = self._serialize_course(self.course, [expected_course_mode], verification_deadline)
 
         response = self.client.put(self.path, json.dumps(expected), content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 200)
@@ -160,11 +163,8 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.user.user_permissions.add(permission)
 
         course_id = unicode(self.course.id)
-        expected = {
-            u'id': course_id,
-            u'modes': [self._serialize_course_mode(
-                CourseMode(mode_slug=u'credit', min_price=500, currency=u'USD', sku=u'ABC123')), ]
-        }
+        expected_course_mode = CourseMode(mode_slug=u'credit', min_price=500, currency=u'USD', sku=u'ABC123')
+        expected = self._serialize_course(self.course, [expected_course_mode])
         path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 200)
@@ -205,19 +205,15 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
     def assert_can_create_course(self, **request_kwargs):
         """ Verify a course can be created by the view. """
         course = CourseFactory.create()
-        course_id = unicode(course.id)
-        expected = {
-            u'id': course_id,
-            u'modes': [
-                self._serialize_course_mode(
-                    CourseMode(mode_slug=u'verified', min_price=150, currency=u'USD', sku=u'ABC123')),
-                self._serialize_course_mode(
-                    CourseMode(mode_slug=u'honor', min_price=0, currency=u'USD', sku=u'DEADBEEF')),
-            ]
-        }
-        path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
+        expected_modes = [CourseMode(mode_slug=u'verified', min_price=150, currency=u'USD', sku=u'ABC123'),
+                          CourseMode(mode_slug=u'honor', min_price=0, currency=u'USD', sku=u'DEADBEEF')]
+        expected = self._serialize_course(course, expected_modes)
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(course.id)])
+
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE, **request_kwargs)
+
         self.assertEqual(response.status_code, 201)
+
         actual = json.loads(response.content)
         self.assertEqual(actual, expected)
 

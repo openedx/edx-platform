@@ -42,6 +42,7 @@ class CourseSerializer(serializers.Serializer):
     verification_deadline = None
 
     id = serializers.CharField()  # pylint: disable=invalid-name
+    name = serializers.CharField(read_only=True)
     modes = CourseModeSerializer(many=True, allow_add_remove=True)
 
     def __init__(self, *args, **kwargs):
