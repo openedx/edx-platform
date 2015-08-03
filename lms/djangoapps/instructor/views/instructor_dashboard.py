@@ -410,6 +410,8 @@ def _section_student_admin(course, access):
         ),
         'list_entrace_exam_instructor_tasks_url': reverse('list_entrance_exam_instructor_tasks',
                                                           kwargs={'course_id': unicode(course_key)}),
+        'get_blank_lti_url': reverse('get_blank_lti', kwargs={'course_id': unicode(course_key)}),
+        'upload_lti_url': reverse('upload_lti', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 

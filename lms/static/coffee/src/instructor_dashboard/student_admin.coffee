@@ -56,6 +56,7 @@ class @StudentAdmin
     @$btn_rescore_problem_all     = @$section.find "input[name='rescore-problem-all']"
     @$btn_task_history_all        = @$section.find "input[name='task-history-all']"
     @$table_task_history_all      = @$section.find ".task-history-all-table"
+    @$btn_download_blank_lti      = @$section.find "input[name='lti-blank-grades']"
     @instructor_tasks             = new (PendingInstructorTasks()) @$section
 
     # response areas
@@ -82,6 +83,10 @@ class @StudentAdmin
         success: @clear_errors_then (data) ->
           window.location = data.progress_url
         error: std_ajax_err => @$request_response_error_progress.text full_error_message
+
+    @$btn_download_blank_lti.click (e) =>
+      url = @$btn_download_blank_lti.data 'endpoint'
+      location.href = url
 
     # reset attempts for student on problem
     @$btn_reset_attempts_single.click =>
