@@ -17,13 +17,13 @@ def _get_cache_interface():
         django.core.cache.BaseCache
     """
     global _cache_interface
-#    if not _cache_interface:
-    _cache_interface = CourseCacheInterface(
-        get_cache('default'),  # TODO: For Django 1.7+, use django.core.caches[cache_name].
-        'lms.djangoapps.lms_course_cache.course.',
-        'lms.djangoapps.lms_course_cache.block.',
-        LMS_COURSE_TRANSFORMATIONS,
-    )
+    if not _cache_interface:
+        _cache_interface = CourseCacheInterface(
+            get_cache('default'),  # TODO: For Django 1.7+, use django.core.caches[cache_name].
+            'lms.djangoapps.lms_course_cache.course.',
+            'lms.djangoapps.lms_course_cache.block.',
+            LMS_COURSE_TRANSFORMATIONS,
+        )
     return _cache_interface
 
 
@@ -41,7 +41,6 @@ def get_course_blocks(user, course_key, transformations=LMS_COURSE_TRANSFORMATIO
     Returns:
         (CourseBlockStructure, dict[UsageKey: CourseBlockData])
     """
-    clear_course_from_cache(course_key)
     return _get_cache_interface().get_course_blocks(
         user, course_key, transformations, root_block_key,
     )

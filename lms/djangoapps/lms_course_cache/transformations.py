@@ -1,8 +1,6 @@
 """
 ...
 """
-from django.utils.translation import ugettext as _
-
 from openedx.core.lib.course_cache.graph_traversals import traverse_topologically
 from openedx.core.lib.course_cache.transformation import CourseStructureTransformation
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -10,11 +8,10 @@ from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartiti
 from courseware.access import _has_access_to_course
 
 
-INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
-SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
+INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme,]
+SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme,]
 # TODO me: Figure out what the value of this should be, and then hard code it in.
 ACCESS_TO_ALL_PARENTS_REQUIRED = True
-
 
 class VisibilityTransformation(CourseStructureTransformation):
     """
@@ -79,8 +76,6 @@ class UserPartitionTransformation(CourseStructureTransformation):
     """
     ...
     """
-
-    block_data = None
 
     @staticmethod
     def get_group_ids_for_user(course_key, user_partitions, user):
@@ -285,6 +280,6 @@ class UserPartitionTransformation(CourseStructureTransformation):
 
 LMS_COURSE_TRANSFORMATIONS = {
     VisibilityTransformation(), 
-    UserPartitionTransformation()
+    UserPartitionTransformation(),
 }
 
