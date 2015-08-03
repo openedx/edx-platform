@@ -40,6 +40,7 @@ import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from simple_history.models import HistoricalRecords
 from south.modelsinspector import add_introspection_rules
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
@@ -841,6 +842,9 @@ class CourseEnrollment(models.Model):
     mode = models.CharField(default="honor", max_length=100)
 
     objects = CourseEnrollmentManager()
+
+    # Maintain a history of requirement status updates for auditing purposes
+    history = HistoricalRecords()
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
