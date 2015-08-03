@@ -194,7 +194,6 @@ class CertificatesBaseTestCase(object):
         self.assertTrue('must have name of the certificate' in context.exception)
 
 
-# pylint: disable=no-member
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """

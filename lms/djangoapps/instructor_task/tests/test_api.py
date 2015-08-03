@@ -188,7 +188,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         `AlreadyRunningError`.
         """
         instructor_task = api_call()
-        instructor_task = InstructorTask.objects.get(id=instructor_task.id)  # pylint: disable=no-member
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         instructor_task.task_state = PROGRESS
         instructor_task.save()
         with self.assertRaises(AlreadyRunningError):

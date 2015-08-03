@@ -37,7 +37,7 @@ def get_course_enrollments(user_id):
     qset = CourseEnrollment.objects.filter(
         user__username=user_id, is_active=True
     ).order_by('created')
-    return CourseEnrollmentSerializer(qset).data  # pylint: disable=no-member
+    return CourseEnrollmentSerializer(qset).data
 
 
 def get_course_enrollment(username, course_id):
@@ -58,7 +58,7 @@ def get_course_enrollment(username, course_id):
         enrollment = CourseEnrollment.objects.get(
             user__username=username, course_id=course_key
         )
-        return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
+        return CourseEnrollmentSerializer(enrollment).data
     except CourseEnrollment.DoesNotExist:
         return None
 
@@ -211,7 +211,7 @@ def _get_user(user_id):
 def _update_enrollment(enrollment, is_active=None, mode=None):
     enrollment.update_enrollment(is_active=is_active, mode=mode)
     enrollment.save()
-    return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
+    return CourseEnrollmentSerializer(enrollment).data
 
 
 def _invalid_attribute(attributes):

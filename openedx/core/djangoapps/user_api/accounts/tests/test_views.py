@@ -609,7 +609,6 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
-        # pylint: disable=no-member
         self.assertEqual(
             response.data["profile_image"],
             {

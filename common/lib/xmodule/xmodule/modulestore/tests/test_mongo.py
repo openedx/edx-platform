@@ -1,7 +1,6 @@
 """
 Unit tests for the Mongo modulestore
 """
-# pylint: disable=no-member
 # pylint: disable=protected-access
 # pylint: disable=no-name-in-module
 # pylint: disable=bad-continuation

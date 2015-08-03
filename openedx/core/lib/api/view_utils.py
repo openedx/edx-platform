@@ -134,8 +134,8 @@ def view_auth_classes(is_user=False):
 
 def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
-    if not serializer.is_valid():  # pylint: disable=maybe-no-member
-        errors = serializer.errors  # pylint: disable=maybe-no-member
+    if not serializer.is_valid():
+        errors = serializer.errors
         for key, error in errors.iteritems():
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(

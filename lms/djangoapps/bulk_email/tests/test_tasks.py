@@ -134,7 +134,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
         with self.assertRaises(ValueError):
             with patch('bulk_email.tasks.update_subtask_status', dummy_update_subtask_status):
-                send_bulk_course_email(task_entry.id, {})  # pylint: disable=no-member
+                send_bulk_course_email(task_entry.id, {})
 
     def _create_students(self, num_students):
         """Create students for testing"""

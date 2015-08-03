@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
-# pylint: disable=maybe-no-member
 import json
 
 import ddt

@@ -2282,8 +2282,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         Returns the new set of BlockKeys that are the new descendants of the block with key 'block_key'
         """
-        # pylint: disable=no-member
-        # ^-- Until pylint gets namedtuple support, it will give warnings about BlockKey attributes
         new_blocks = set()
 
         new_children = list()  # ordered list of the new children of new_parent_block_key

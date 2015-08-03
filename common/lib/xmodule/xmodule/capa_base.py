@@ -1049,8 +1049,6 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-            # pylint: disable=maybe-no-member
-            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(

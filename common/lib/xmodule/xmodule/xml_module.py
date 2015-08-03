@@ -184,7 +184,7 @@ class XmlParserMixin(object):
 
         Returns an lxml Element
         """
-        return etree.parse(file_object, parser=EDX_XML_PARSER).getroot()  # pylint: disable=no-member
+        return etree.parse(file_object, parser=EDX_XML_PARSER).getroot()
 
     @classmethod
     def load_file(cls, filepath, fs, def_id):  # pylint: disable=invalid-name
@@ -499,7 +499,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    a) define from_xml themselves
         #    b) call super(..).from_xml(..)
         return super(XmlDescriptor, cls).parse_xml(
-            etree.fromstring(xml_data),  # pylint: disable=no-member
+            etree.fromstring(xml_data),
             system,
             None,  # This is ignored by XmlParserMixin
             id_generator,

@@ -1,4 +1,3 @@
-# pylint: disable=no-member
 """
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
@@ -283,7 +282,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         # and then to the root UsageKey
         self.course_locations = {
             course_id: course_key.make_usage_key('course', course_key.run)
-            for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
+            for course_id, course_key in self.course_locations.iteritems()
         }
 
         mongo_course_key = self.course_locations[self.MONGO_COURSEID].course_key

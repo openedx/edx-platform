@@ -45,7 +45,7 @@ class CourseField(serializers.RelatedField):
                 include_expired=kwargs.get('include_expired', False),
                 only_selectable=False
             )
-        ).data  # pylint: disable=no-member
+        ).data
 
         return {
             'course_id': unicode(course.id),

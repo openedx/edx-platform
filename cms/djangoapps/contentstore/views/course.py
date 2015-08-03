@@ -1459,7 +1459,7 @@ def group_configurations_list_handler(request, course_key_string):
                 response["Location"] = reverse_course_url(
                     'group_configurations_detail_handler',
                     course.id,
-                    kwargs={'group_configuration_id': new_configuration.id}  # pylint: disable=no-member
+                    kwargs={'group_configuration_id': new_configuration.id}
                 )
                 store.update_item(course, request.user.id)
                 return response

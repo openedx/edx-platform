@@ -575,7 +575,7 @@ class TopicListView(GenericAPIView):
 
         page = self.paginate_queryset(topics)
         serializer = self.pagination_serializer_class(page, context={'course_id': course_id, 'sort_order': ordering})
-        return Response(serializer.data)  # pylint: disable=maybe-no-member
+        return Response(serializer.data)
 
 
 def get_ordered_topics(course_module, ordering):

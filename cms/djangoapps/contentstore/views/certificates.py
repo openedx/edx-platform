@@ -396,7 +396,7 @@ def certificates_list_handler(request, course_key_string):
                 response["Location"] = reverse_course_url(
                     'certificates.certificates_detail_handler',
                     course.id,
-                    kwargs={'certificate_id': new_certificate.id}  # pylint: disable=no-member
+                    kwargs={'certificate_id': new_certificate.id}
                 )
                 store.update_item(course, request.user.id)
                 CertificateManager.track_event('created', {

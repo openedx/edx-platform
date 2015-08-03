@@ -1447,8 +1447,8 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
 
     """
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-        event_name = 'edx.bi.user.certificate.generate'  # pylint: disable=no-member
-        tracking_context = tracker.get_tracker().resolve_context()  # pylint: disable=no-member
+        event_name = 'edx.bi.user.certificate.generate'
+        tracking_context = tracker.get_tracker().resolve_context()
 
         analytics.track(
             user_id,

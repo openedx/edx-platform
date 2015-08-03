@@ -1016,7 +1016,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         )
 
     def test_register_form_year_of_birth(self):
-        this_year = datetime.datetime.now(UTC).year  # pylint: disable=maybe-no-member
+        this_year = datetime.datetime.now(UTC).year
         year_options = (
             [{"value": "", "name": "--", "default": True}] + [
                 {"value": unicode(year), "name": unicode(year)}

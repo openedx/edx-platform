@@ -1,7 +1,6 @@
 """
 Common utility functions useful throughout the contentstore
 """
-# pylint: disable=no-member
 
 import logging
 from opaque_keys import InvalidKeyError

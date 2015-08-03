@@ -14,7 +14,6 @@ from ...pages.studio.container import ContainerPage
 from ...pages.studio.overview import CourseOutlinePage
 
 
-# pylint: disable=no-member
 class ExportTestMixin(object):
     """
     Tests to run both for course and library export pages.
@@ -76,7 +75,6 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
         self.assertEqual(self.export_page.header_text, 'Library Export')
 
 
-# pylint: disable=no-member
 class BadExportMixin(object):
     """
     Test mixin for bad exports.
@@ -157,7 +155,6 @@ class TestCourseBadExport(BadExportMixin, StudioCourseTest):
         )
 
 
-# pylint: disable=no-member
 class ImportTestMixin(object):
     """
     Tests to run for both course and library import pages.

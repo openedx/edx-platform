@@ -509,7 +509,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         item = self.cart.orderitem_set.all().select_subclasses()[1]
         self.assertEquals(item.unit_cost, self.get_discount(self.testing_cost))
 
-    def test_soft_delete_coupon(self):  # pylint: disable=no-member
+    def test_soft_delete_coupon(self):
         self.add_coupon(self.course_key, True, self.coupon_code)
         coupon = Coupon(code='TestCode', description='testing', course_id=self.course_key,
                         percentage_discount=12, created_by=self.user, is_active=True)
@@ -520,25 +520,25 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         get_coupon = Coupon.objects.get(id=1)
         request = HttpRequest()
         request.user = admin
-        setattr(request, 'session', 'session')  # pylint: disable=no-member
-        messages = FallbackStorage(request)  # pylint: disable=no-member
-        setattr(request, '_messages', messages)  # pylint: disable=no-member
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
         test_query_set = coupon_admin.queryset(request)
         test_actions = coupon_admin.get_actions(request)
         self.assertIn('really_delete_selected', test_actions['really_delete_selected'])
         self.assertEqual(get_coupon.is_active, True)
-        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
+        coupon_admin.really_delete_selected(request, test_query_set)
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
-        coupon_admin.delete_model(request, get_coupon)  # pylint: disable=no-member
+        coupon_admin.delete_model(request, get_coupon)
         self.assertEqual(get_coupon.is_active, False)
 
         coupon = Coupon(code='TestCode123', description='testing123', course_id=self.course_key,
                         percentage_discount=22, created_by=self.user, is_active=True)
         coupon.save()
         test_query_set = coupon_admin.queryset(request)
-        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
+        coupon_admin.really_delete_selected(request, test_query_set)
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
 

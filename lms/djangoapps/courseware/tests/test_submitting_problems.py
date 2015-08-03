@@ -1254,7 +1254,7 @@ class TestConditionalContent(TestSubmittingProblems):
         UserCourseTagFactory(
             user=self.student_user,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
             value=str(user_partition_group)
         )
 

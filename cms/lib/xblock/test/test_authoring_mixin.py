@@ -68,7 +68,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         ids within the content partition.
         """
         item = self.store.get_item(item_location)
-        item.group_access[self.content_partition.id] = group_ids  # pylint: disable=no-member
+        item.group_access[self.content_partition.id] = group_ids
         self.store.update_item(item, self.user.id)
 
     def verify_visibility_view_contains(self, item_location, substrings):
