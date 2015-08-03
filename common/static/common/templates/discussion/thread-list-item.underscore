@@ -64,7 +64,7 @@
       );
       %>
       <span class="forum-nav-thread-votes-count">
-      +<%- interpolate(fmt, {
+      +<%= interpolate(fmt, {
                votes_count: votes['up_count'],
                span_start: '<span class="sr">',
                span_end: '</span>'
