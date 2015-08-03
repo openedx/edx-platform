@@ -5,6 +5,7 @@ Unit tests for namespace_resolver.py
 from django.test import TestCase
 
 from datetime import datetime
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.namespace_resolver import CourseNamespaceResolver
@@ -12,7 +13,7 @@ from util.namespace_resolver import CourseNamespaceResolver
 from student.scope_resolver import NamespaceEnrollmentsScopeResolver
 
 
-class NamespaceResolverTests(TestCase):
+class NamespaceResolverTests(ModuleStoreTestCase):
     """
     Tests for the CourseNamespaceResolver
     """
@@ -21,6 +22,7 @@ class NamespaceResolverTests(TestCase):
         """
         Test initialization
         """
+        super(NamespaceResolverTests, self).setUp()
 
         self.course = CourseFactory(
             org='foo',
