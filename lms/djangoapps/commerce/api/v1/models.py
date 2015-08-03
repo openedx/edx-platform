@@ -1,11 +1,11 @@
 """ API v1 models. """
 from itertools import groupby
-import logging
 
+import logging
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from course_modes.models import CourseMode
 
 log = logging.getLogger(__name__)
@@ -21,6 +21,19 @@ class Course(object):
         self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
         self._deleted_modes = []
+
+    @property
+    def name(self):
+        """ Return course name. """
+        course_id = CourseKey.from_string(unicode(self.id))  # pylint: disable=invalid-name
+
+        try:
+            return CourseOverview.get_from_id(course_id).display_name
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning('Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
 
     def get_mode_display_name(self, mode):
         """ Returns display name for the given mode. """

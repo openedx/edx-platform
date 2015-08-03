@@ -25,6 +25,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.Serializer):
     """ Course serializer. """
     id = serializers.CharField()  # pylint: disable=invalid-name
+    name = serializers.CharField(read_only=True)
     modes = CourseModeSerializer(many=True, allow_add_remove=True)
 
     def restore_object(self, attrs, instance=None):
