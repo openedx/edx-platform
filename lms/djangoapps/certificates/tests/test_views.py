@@ -260,7 +260,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
