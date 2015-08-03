@@ -469,7 +469,6 @@ class TeamPageTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.team = self.create_teams(self.topic, 1)[0]
-        self.create_membership(self.user_info['username'], self.team['id'])
         self.team_page = TeamPage(self.browser, self.course_id, self.team)
 
     def setup_thread(self):
@@ -485,15 +484,42 @@ class TeamPageTest(TeamsTabBase):
         thread_fixture.push()
         return thread
 
-    def test_discussion_on_team_page(self):
+    def test_discussion_on_my_team_page(self):
         """
-        Scenario: Team Page renders a team discussion.
+        Scenario: Team Page renders a discussion for a team to which I belong.
         Given I am enrolled in a course with a team configuration, a topic,
-            and a team belonging to that topic
-        When I post a thread in the team's discussion
+            and a team belonging to that topic of which I am a member
+        When the team has a discussion with a thread
         And I visit the Team page for that team
         Then I should see a discussion with the correct discussion_id
         And I should see the thread which I had posted
+        And I should see controls to change the state of the discussion
+        """
+        thread = self.setup_thread()
+        self.create_membership(self.user_info['username'], self.team['id'])
+        self.team_page.visit()
+        self.assertEqual(self.team_page.discussion_id, self.team['discussion_topic_id'])
+        discussion = self.team_page.discussion_page
+        self.assertTrue(discussion.is_browser_on_page())
+        self.assertTrue(discussion.is_discussion_expanded())
+        self.assertEqual(discussion.get_num_displayed_threads(), 1)
+        self.assertTrue(discussion.has_thread(thread['id']))
+        self.assertTrue(discussion.q(css='.post-header-actions').present)
+        self.assertTrue(discussion.q(css='.add-response').present)
+        self.assertTrue(discussion.q(css='.new-post-btn').present)
+
+    def test_discussion_on_other_team_page(self):
+        """
+        Scenario: Team Page renders a team discussion for a team to which I do
+            not belong.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am not a member
+        When the team has a discussion with a thread
+        And I visit the Team page for that team
+        Then I should see a discussion with the correct discussion_id
+        And I should see the thread which had been posted
+        And I should not see the thread which I had posted
+        And I should not see controls to change the state of the discussion
         """
         thread = self.setup_thread()
         self.team_page.visit()
@@ -503,3 +529,6 @@ class TeamPageTest(TeamsTabBase):
         self.assertTrue(discussion.is_discussion_expanded())
         self.assertEqual(discussion.get_num_displayed_threads(), 1)
         self.assertTrue(discussion.has_thread(thread['id']))
+        self.assertFalse(discussion.q(css='.post-header-actions').present)
+        self.assertFalse(discussion.q(css='.add-response').present)
+        self.assertFalse(discussion.q(css='.new-post-btn').present)
