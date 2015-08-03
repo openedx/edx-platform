@@ -23,7 +23,7 @@ DATABASES = {
 ######################### Static file overrides ####################################
 
 # Redirect to the test_root folder within the repo
-TEST_ROOT = REPO_ROOT / "test_root"  # pylint: disable=no-value-for-parameter
+TEST_ROOT = REPO_ROOT / "test_root"
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
 # Store the static files under test root so that they don't overwrite existing static assets
