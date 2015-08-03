@@ -668,6 +668,30 @@ class SingleThreadContentGroupTestCase(ContentGroupTestCase):
 
         self.assert_can_access(self.non_cohorted_user, self.beta_module.discussion_id, thread_id, False)
 
+    def test_course_context_respected(self, mock_request):
+        """
+        Verify that course threads go through discussion_category_id_access method.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id, context="course"
+        )
+
+        # Beta user does not have access to alpha_module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+
+    def test_standalone_context_respected(self, mock_request):
+        """
+        Verify that standalone threads don't go through discussion_category_id_access method.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id, context="standalone"
+        )
+
+        # If a thread returns context other than "course", the access check is not done.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
+
 
 @patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionContextTestCase(ModuleStoreTestCase):

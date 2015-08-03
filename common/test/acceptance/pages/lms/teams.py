@@ -4,6 +4,7 @@ Teams pages.
 """
 
 from .course_page import CoursePage
+from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
 
 
@@ -102,3 +103,42 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
     def team_cards(self):
         """Get all the team cards on the page."""
         return self.q(css='.team-card')
+
+
+class TeamPage(CoursePage, PaginatedUIMixin):
+    """
+    The page for a specific Team within the Teams tab
+    """
+    def __init__(self, browser, course_id, team):
+        """
+        Set up `self.url_path` on instantiation, since it dynamically
+        reflects the current topic.  Note that `topic` is a dict
+        representation of a topic following the same convention as a
+        course module's topic.
+        """
+        super(TeamPage, self).__init__(browser, course_id)
+        self.team = team
+        self.url_path = "teams/#teams/{topic_id}/{team_id}".format(
+            topic_id=self.team['topic_id'], team_id=self.team['id']
+        )
+
+    def is_browser_on_page(self):
+        """Check if we're on the teams list page for a particular team."""
+        has_correct_url = self.url.endswith(self.url_path)
+        # The "teams-main" class is not unique to this view, but currently there is nothing else on the
+        # page except for the discussion module.
+        team_view_present = self.q(css='.teams-main').present
+        return has_correct_url and team_view_present
+
+    @property
+    def discussion_id(self):
+        """Get the id of the discussion module on the page"""
+        return self.q(css='div.discussion-module').attrs('data-discussion-id')[0]
+
+    @property
+    def discussion_page(self):
+        """Get the discussion as a bok_choy page object"""
+        if not hasattr(self, '_discussion_page'):
+            # pylint: disable=attribute-defined-outside-init
+            self._discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+        return self._discussion_page

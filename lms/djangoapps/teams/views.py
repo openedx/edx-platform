@@ -87,6 +87,7 @@ class TeamsDashboardView(View):
             instance=topics_page,
             context={'course_id': course.id, 'sort_order': sort_order}
         )
+        user = request.user
         context = {
             "course": course,
             "topics": topics_serializer.data,
@@ -94,7 +95,9 @@ class TeamsDashboardView(View):
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
             "topics_url": reverse('topics_list', request=request),
-            "teams_url": reverse('teams_list', request=request)
+            "teams_url": reverse('teams_list', request=request),
+            "username": user.username,
+            "privileged": user.is_staff or CourseStaffRole(course_key).has_user(user)
         }
         return render_to_response("teams/teams.html", context)
 
