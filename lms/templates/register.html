@@ -244,6 +244,22 @@
         <h2 class="sr">${_("Additional Personal Information")}</h2>
 
         <ol class="list-input">
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['market'] != 'hidden':
+          <li class="field group">
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['market']} select" id="field-market">
+              <label for="market">${_('Market')}</label>
+              <select id="market" name="market" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['market'] == 'required' else ''}>
+                <option value="">--</option>
+                %for code, market_name in UserProfile.MARKET_CHOICES:
+                <option value="${code}">${_(market_name)}</option>
+                %endfor
+            </div>
+          </li>
+
+          % endif
+
+
           % if settings.REGISTRATION_EXTRA_FIELDS['city'] != 'hidden':
           <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['city']} text" id="field-city">
             <label for="city">${_('City')}</label>
