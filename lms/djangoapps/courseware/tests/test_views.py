@@ -8,6 +8,7 @@ import ddt
 import json
 import unittest
 from datetime import datetime
+from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
 
 from django.conf import settings
@@ -30,8 +31,10 @@ from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from courseware.model_data import set_score
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
+from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
@@ -523,6 +526,51 @@ class ViewsTestCase(ModuleStoreTestCase):
         })
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
+
+    def test_submission_history_contents(self):
+        # log into a staff account
+        admin = AdminFactory.create()
+
+        self.client.login(username=admin.username, password='test')
+
+        usage_key = self.course_key.make_usage_key('problem', 'test-history')
+        state_client = DjangoXBlockUserStateClient(admin)
+
+        # store state via the UserStateClient
+        state_client.set(
+            username=admin.username,
+            block_key=usage_key,
+            state={'field_a': 'x', 'field_b': 'y'}
+        )
+
+        set_score(admin.id, usage_key, 0, 3)
+
+        state_client.set(
+            username=admin.username,
+            block_key=usage_key,
+            state={'field_a': 'a', 'field_b': 'b'}
+        )
+        set_score(admin.id, usage_key, 3, 3)
+
+        url = reverse('submission_history', kwargs={
+            'course_id': unicode(self.course_key),
+            'student_username': admin.username,
+            'location': unicode(usage_key),
+        })
+        response = self.client.get(url)
+        response_content = HTMLParser().unescape(response.content)
+
+        # We have update the state 4 times: twice to change content, and twice
+        # to set the scores. We'll check that the identifying content from each is
+        # displayed (but not the order), and also the indexes assigned in the output
+        # #1 - #4
+
+        self.assertIn('#1', response_content)
+        self.assertIn(json.dumps({'field_a': 'a', 'field_b': 'b'}, sort_keys=True, indent=2), response_content)
+        self.assertIn("Score: 0.0 / 3.0", response_content)
+        self.assertIn(json.dumps({'field_a': 'x', 'field_b': 'y'}, sort_keys=True, indent=2), response_content)
+        self.assertIn("Score: 3.0 / 3.0", response_content)
+        self.assertIn('#4', response_content)
 
     def _load_mktg_about(self, language=None, org=None):
         """Retrieve the marketing about button (iframed into the marketing site)

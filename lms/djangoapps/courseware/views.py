@@ -44,6 +44,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
+from courseware.models import StudentModuleHistory
 from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 from .entrance_exams import (
@@ -1201,15 +1202,40 @@ def submission_history(request, course_id, student_username, location):
 
     user_state_client = DjangoXBlockUserStateClient()
     try:
-        history_entries = user_state_client.get_history(student_username, usage_key)
+        history_entries = list(user_state_client.get_history(student_username, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location
         )))
 
+    # This is ugly, but until we have a proper submissions API that we can use to provide
+    # the scores instead, it will have to do.
+    scores = list(StudentModuleHistory.objects.filter(
+        student_module__module_state_key=usage_key
+    ).order_by('-id'))
+
+    if len(scores) != len(history_entries):
+        log.warning(
+            "Mismatch when fetching scores for student "
+            "history for course %s, user %s, xblock %s. "
+            "Matching scores by date for display.",
+            course_id,
+            student_username,
+            location
+        )
+        scores_by_date = {
+            score.modified: score
+            for score in scores
+        }
+        scores = [
+            scores_by_date[history.updated]
+            for history in history_entries
+        ]
+
     context = {
         'history_entries': history_entries,
+        'scores': scores,
         'username': student_username,
         'location': location,
         'course_id': course_key.to_deprecated_string()
