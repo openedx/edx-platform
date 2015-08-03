@@ -249,7 +249,7 @@
           <li class="field group">
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['market']} select" id="field-market">
               <label for="market">${_('Market')}</label>
-              <selecti id="market" name="market" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['market'] == 'required' else ''}>
+              <select id="market" name="market" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['market'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, market_name in UserProfile.MARKET_CHOICES:
                 <option value="${code}">${_(market_name)}</option>
