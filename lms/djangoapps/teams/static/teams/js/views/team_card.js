@@ -93,10 +93,8 @@
                     true
                 );
             },
-            action: function (event) {
-                var url = 'teams/' + this.teamModel().get('topic_id') + '/' + this.teamModel().get('id');
-                event.preventDefault();
-                this.router.navigate(url, {trigger: true});
+            actionUrl: function () {
+                return '#teams/' + this.teamModel().get('topic_id') + '/' + this.teamModel().get('id');
             }
         });
         return TeamCardView;

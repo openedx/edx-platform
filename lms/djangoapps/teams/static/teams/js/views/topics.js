@@ -7,8 +7,16 @@
         var TopicsView = PaginatedView.extend({
             type: 'topics',
 
+            srInfo: {
+                id: "heading-browse-topics",
+                text: gettext("All topics")
+            },
+
             initialize: function (options) {
-                this.itemViewClass = TopicCardView.extend({router: options.router});
+                this.itemViewClass = TopicCardView.extend({
+                    router: options.router,
+                    srInfo: this.srInfo
+                });
                 PaginatedView.prototype.initialize.call(this);
             }
         });

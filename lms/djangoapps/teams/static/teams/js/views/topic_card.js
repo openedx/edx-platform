@@ -30,9 +30,8 @@
                     CardView.prototype.initialize.apply(this, arguments);
                 },
 
-                action: function (event) {
-                    event.preventDefault();
-                    this.router.navigate('topics/' + this.model.get('id'), {trigger: true});
+                actionUrl: function () {
+                    return '#topics/' + this.model.get('id');
                 },
 
                 configuration: 'square_card',

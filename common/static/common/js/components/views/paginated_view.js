@@ -1,3 +1,19 @@
+/**
+ * A base class for a view which renders and paginates a collection,
+ * along with a header and footer displaying controls for
+ * pagination.
+ *
+ * Subclasses should define a `type` property which will be used to
+ * create class names for the different subcomponents, as well as an
+ * `itemViewClass` which will be used to display each individual
+ * element of the collection.
+ *
+ * If provided, the `srInfo` property will be used to provide
+ * information for screen readers on each item. The `srInfo.text`
+ * property will be shown in the header, and the `srInfo.id` property
+ * will be used to connect each card's title with the header text via
+ * the ARIA describedby attribute.
+ */
 ;(function(define) {
     'use strict';
     define([
@@ -24,7 +40,7 @@
             },
 
             createHeaderView: function() {
-                return new PagingHeader({collection: this.options.collection});
+                return new PagingHeader({collection: this.options.collection, srInfo: this.srInfo});
             },
 
             createFooterView: function() {
