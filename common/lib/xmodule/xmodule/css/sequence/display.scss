@@ -1,5 +1,6 @@
 $sequence--border-color: #C8C8C8;
-
+$prev-icon: url('../images/sequence-nav/previous-icon.png');
+$next-icon: url('../images/sequence-nav/next-icon.png');
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   border-left: 1px solid lighten($sequence--border-color, 10%);
@@ -345,9 +346,6 @@ nav.sequence-bottom {
             */
           }
         }
-
-        $prev-icon: url('../images/sequence-nav/previous-icon.png');
-        $next-icon: url('../images/sequence-nav/next-icon.png');
 
         &.prev {
           @include border-radius(35px 0 0 35px);
