@@ -210,7 +210,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 )
 
                 if view_html:
-                    # Are we blocking content for any reason
+                    # Are we blocking sequence content for any reason
                     fragment.add_content(view_html)
                     return fragment
 
