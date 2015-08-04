@@ -56,6 +56,26 @@ def get_role_ids(course_id):
     return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
 
 
+def has_discussion_privileges(user, course_id):
+    """Returns True if the user is privileged in teams discussions for
+    this course. The user must be one of Discussion Admin, Moderator,
+    or Community TA.
+
+    Args:
+      user (User): The user to check privileges for.
+      course_id (CourseKey): A key for the course to check privileges for.
+
+    Returns:
+      bool
+    """
+    # get_role_ids returns a dictionary of only admin, moderator and community TAs.
+    roles = get_role_ids(course_id)
+    for role in roles:
+        if user.id in roles[role]:
+            return True
+    return False
+
+
 def has_forum_access(uname, course_id, rolename):
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)

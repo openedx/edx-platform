@@ -16,6 +16,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
+from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
+from django_comment_common.utils import seed_permissions_roles
+
 
 @attr('shard_1')
 class TestDashboard(SharedModuleStoreTestCase):
@@ -129,17 +132,26 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         super(TeamAPITestCase, self).setUp()
         self.topics_count = 4
         self.users = {
-            'student_unenrolled': UserFactory.create(password=self.test_password),
-            'student_enrolled': UserFactory.create(password=self.test_password),
-            'student_enrolled_not_on_team': UserFactory.create(password=self.test_password),
-
-            # This student is enrolled in both test courses and is a member of a team in each course, but is not on the
-            # same team as student_enrolled.
-            'student_enrolled_both_courses_other_team': UserFactory.create(password=self.test_password),
-
             'staff': AdminFactory.create(password=self.test_password),
             'course_staff': StaffFactory.create(course_key=self.test_course_1.id, password=self.test_password)
         }
+        self.create_and_enroll_student(username='student_enrolled')
+        self.create_and_enroll_student(username='student_enrolled_not_on_team')
+        self.create_and_enroll_student(username='student_unenrolled', courses=[])
+
+        # Make this student a community TA.
+        self.create_and_enroll_student(username='community_ta')
+        seed_permissions_roles(self.test_course_1.id)
+        community_ta_role = Role.objects.get(name=FORUM_ROLE_COMMUNITY_TA, course_id=self.test_course_1.id)
+        community_ta_role.users.add(self.users['community_ta'])
+
+        # This student is enrolled in both test courses and is a member of a team in each course, but is not on the
+        # same team as student_enrolled.
+        self.create_and_enroll_student(
+            courses=[self.test_course_1, self.test_course_2],
+            username='student_enrolled_both_courses_other_team'
+        )
+
         # 'solar team' is intentionally lower case to test case insensitivity in name ordering
         self.test_team_1 = CourseTeamFactory.create(
             name=u'sólar team',
@@ -152,10 +164,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.test_team_5 = CourseTeamFactory.create(name='Another Team', course_id=self.test_course_2.id)
 
         for user, course in [
-                ('student_enrolled', self.test_course_1),
-                ('student_enrolled_not_on_team', self.test_course_1),
-                ('student_enrolled_both_courses_other_team', self.test_course_1),
-                ('student_enrolled_both_courses_other_team', self.test_course_2)
+                ('staff', self.test_course_1),
+                ('course_staff', self.test_course_1),
         ]:
             CourseEnrollment.enroll(
                 self.users[user], course.id, check_access=True
@@ -164,6 +174,24 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.test_team_1.add_user(self.users['student_enrolled'])
         self.test_team_3.add_user(self.users['student_enrolled_both_courses_other_team'])
         self.test_team_5.add_user(self.users['student_enrolled_both_courses_other_team'])
+
+    def create_and_enroll_student(self, courses=None, username=None):
+        """ Creates a new student and enrolls that student in the course.
+
+        Adds the new user to the self.users dictionary with the username as the key.
+
+        Returns the username once the user has been created.
+        """
+        if username is not None:
+            user = UserFactory.create(password=self.test_password, username=username)
+        else:
+            user = UserFactory.create(password=self.test_password)
+        courses = courses if courses is not None else [self.test_course_1]
+        for course in courses:
+            CourseEnrollment.enroll(user, course.id, check_access=True)
+        self.users[user.username] = user
+
+        return user.username
 
     def login(self, user):
         """Given a user string, logs the given user in.
@@ -185,7 +213,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
         If a user is specified in kwargs, that user is first logged in.
         """
-        user = kwargs.pop('user', 'student_enrolled')
+        user = kwargs.pop('user', 'student_enrolled_not_on_team')
         if user:
             self.login(user)
         func = getattr(self.client, method)
@@ -371,7 +399,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
         (None, 401),
         ('student_inactive', 401),
         ('student_unenrolled', 403),
-        ('student_enrolled', 200),
+        ('student_enrolled_not_on_team', 200),
         ('staff', 200),
         ('course_staff', 200)
     )
@@ -386,7 +414,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
 
     def test_naming(self):
         new_teams = [
-            self.post_create_team(data=self.build_team_data(name=name))
+            self.post_create_team(data=self.build_team_data(name=name), user=self.create_and_enroll_student())
             for name in ["The Best Team", "The Best Team", "The Best Team", "The Best Team 2"]
         ]
         self.assertEquals(
@@ -417,7 +445,8 @@ class TestCreateTeamAPI(TeamAPITestCase):
     def test_bad_fields(self, kwargs):
         self.post_create_team(400, self.build_team_data(**kwargs))
 
-    def test_full(self):
+    def test_full_student_creator(self):
+        creator = self.create_and_enroll_student()
         team = self.post_create_team(data=self.build_team_data(
             name="Fully specified team",
             course=self.test_course_1,
@@ -425,22 +454,43 @@ class TestCreateTeamAPI(TeamAPITestCase):
             topic_id='great-topic',
             country='CA',
             language='fr'
-        ))
+        ), user=creator)
 
         # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
         del team['discussion_topic_id']
-        self.assertEquals(team, {
+
+        # Since membership is its own list, we want to examine this separately.
+        team_membership = team['membership']
+        del team['membership']
+
+        # Verify that the creating user gets added to the team.
+        self.assertEqual(len(team_membership), 1)
+        member = team_membership[0]['user']
+        self.assertEqual(member['id'], creator)
+
+        self.assertEqual(team, {
             'name': 'Fully specified team',
             'language': 'fr',
             'country': 'CA',
             'is_active': True,
-            'membership': [],
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
             'id': 'fully-specified-team',
             'description': 'Another fantastic team'
         })
+
+    @ddt.data('staff', 'course_staff', 'community_ta')
+    def test_membership_staff_creator(self, user):
+        # Verify that staff do not automatically get added to a team
+        # when they create one.
+        team = self.post_create_team(data=self.build_team_data(
+            name="New team",
+            course=self.test_course_1,
+            description="Another fantastic team",
+        ), user=user)
+
+        self.assertEqual(team['membership'], [])
 
 
 @ddt.ddt

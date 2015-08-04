@@ -42,6 +42,8 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from django_comment_client.utils import has_discussion_privileges
+
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
@@ -368,6 +370,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
+            if not (has_access(request.user, 'staff', course_key)
+                    or has_discussion_privileges(request.user, course_key)):
+                # Add the creating user to the team.
+                team.add_user(request.user)
             return Response(CourseTeamSerializer(team).data)
 
 
