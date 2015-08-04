@@ -4,4 +4,4 @@
         <article class="discussion-thread" id="thread_<%= thread.id %>"/>
     <% }); %>
 </section>
-<section class="pagination"/>
+<section class="discussion-pagination"/>

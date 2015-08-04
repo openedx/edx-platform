@@ -152,7 +152,7 @@ if Backbone?
         "?discussion_page=#{number}"
       params = DiscussionUtil.getPaginationParams(@page, numPages, pageUrl)
       pagination = _.template($("#pagination-template").html())(params)
-      @$('section.pagination').html(pagination)
+      @$('section.discussion-pagination').html(pagination)
 
     navigateToPage: (event) =>
       event.preventDefault()
