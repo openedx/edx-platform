@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from xblock.fields import Scope
+from openedx.core.djangoapps.course_groups.models import CourseCohort
 from xblock.runtime import KeyValueStore
 
 
@@ -118,13 +119,16 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         """
         Create a new workgroup and its cohort.
         """
+        assignment_type = request.DATA.get('assignment_type', CourseCohort.RANDOM)
+        if assignment_type not in dict(CourseCohort.ASSIGNMENT_TYPE_CHOICES).keys():
+            message = "Not a valid assignment type, '{}'".format(assignment_type)
+            return Response({'details': message}, status.HTTP_400_BAD_REQUEST)
         response = super(WorkgroupsViewSet, self).create(request)
-
         if response.status_code == status.HTTP_201_CREATED:
             # create the workgroup cohort
             workgroup = self.object
             course_descriptor, course_key, course_content = _get_course(self.request, self.request.user, workgroup.project.course_id)  # pylint: disable=W0612
-            add_cohort(course_key, workgroup.cohort_name)
+            add_cohort(course_key, workgroup.cohort_name, assignment_type)
 
         return response
 
@@ -198,7 +202,11 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             except ObjectDoesNotExist:
                 # This use case handles cases where a workgroup might have been created before
                 # the notion of a cohorted discussion. So we need to backfill in the data
-                cohort = add_cohort(course_key, workgroup.cohort_name)
+                assignment_type = request.DATA.get('assignment_type', CourseCohort.RANDOM)
+                if assignment_type not in dict(CourseCohort.ASSIGNMENT_TYPE_CHOICES).keys():
+                    message = "Not a valid assignment type, '{}'".format(assignment_type)
+                    return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+                cohort = add_cohort(course_key, workgroup.cohort_name, assignment_type)
                 for workgroup_user in workgroup.users.all():
                     add_user_to_cohort(cohort, workgroup_user.username)
             return Response({}, status=status.HTTP_201_CREATED)
