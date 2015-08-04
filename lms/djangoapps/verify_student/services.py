@@ -60,10 +60,9 @@ class ReverificationService(object):
             Re-verification link
         """
         course_key = CourseKey.from_string(course_id)
-        VerificationCheckpoint.objects.get_or_create(
-            course_id=course_key,
-            checkpoint_location=related_assessment_location
-        )
+
+        # Get-or-create the verification checkpoint
+        VerificationCheckpoint.get_or_create_verification_checkpoint(course_key, related_assessment_location)
 
         re_verification_link = reverse(
             'verify_student_incourse_reverify',

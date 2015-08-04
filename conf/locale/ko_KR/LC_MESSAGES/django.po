@@ -5,6 +5,7 @@
 # 
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
+# Hongseob Lee <shevious@gmail.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
@@ -19,6 +20,7 @@
 # Translators:
 # bossnm11 <bossnm11@gmail.com>, 2014
 # mariana1201 <gogo3135@naver.com>, 2014
+# Hongseob Lee <shevious@gmail.com>, 2015
 # Hongseob Lee <shevreg@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
@@ -33,6 +35,7 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # Chul Park <parkchul@nate.com>, 2015
 # mariana1201 <gogo3135@naver.com>, 2014
+# Hongseob Lee <shevious@gmail.com>, 2015
 # Hongseob Lee <shevreg@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
@@ -50,6 +53,7 @@
 # Pope, 2014
 # bossnm11 <bossnm11@gmail.com>, 2014
 # KimKyudong <choemh@nate.com>, 2014
+# Hongseob Lee <shevious@gmail.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
@@ -73,6 +77,7 @@
 # bossnm11 <bossnm11@gmail.com>, 2014
 # David10000 <gameness@naver.com>, 2014
 # Gil <gedwarp@gmail.com>, 2014
+# Hongseob Lee <shevious@gmail.com>, 2015
 # Chanseok <kcsgoodboy@gmail.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
@@ -81,9 +86,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-22 17:45+0000\n"
-"PO-Revision-Date: 2015-05-28 20:00+0000\n"
-"Last-Translator: Kevin Min <gr326887@graded.br>\n"
+"POT-Creation-Date: 2015-07-31 12:11+0000\n"
+"PO-Revision-Date: 2015-07-31 05:52+0000\n"
+"Last-Translator: Hongseob Lee <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -92,15 +97,11 @@ msgstr ""
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: This is a forum post type
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Discussion"
 msgstr ""
 
@@ -114,10 +115,9 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/entrance_exam.py
-#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "Entrance Exam"
-msgstr ""
+msgstr "사전 평가"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -270,6 +270,12 @@ msgid "Honor Code Certificate"
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
+msgid ""
+"Professional education modes are not allowed to have expiration_datetime "
+"set."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
 msgid "Your verification is pending"
 msgstr ""
 
@@ -346,7 +352,6 @@ msgid "Moderator"
 msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Community TA"
 msgstr ""
 
@@ -587,6 +592,10 @@ msgid "Value of the enrollment attribute"
 msgstr ""
 
 #: common/djangoapps/student/views.py
+msgid "The course you are looking for does not start until {date}."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Course id not specified"
 msgstr ""
 
@@ -670,7 +679,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "User with username {} does not exist"
-msgstr ""
+msgstr "{} 란 사용자 이름은 존재하지 않습니다. "
 
 #: common/djangoapps/student/views.py
 msgid "Successfully disabled {}'s account"
@@ -2876,6 +2885,16 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Proctored Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed and proctored exams are "
+"enabled in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
 msgstr ""
 
@@ -3397,6 +3416,44 @@ msgid ""
 "Exams for this course setting to take effect."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Time Limited"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether students have a limited time to view or "
+"interact with this courseware component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Time Limit in Minutes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"The number of minutes available to students for viewing or interacting with "
+"this courseware component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Proctoring Enabled"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "This setting indicates whether this exam is a proctored exam."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Practice Exam"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether this exam is for testing purposes only. "
+"Practice exams are not verified."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
 msgstr ""
@@ -3558,7 +3615,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Student answer."
-msgstr ""
+msgstr "학습자 답변"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "All possible words from all students."
@@ -5221,7 +5278,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr ""
@@ -5261,7 +5317,7 @@ msgstr ""
 #: lms/djangoapps/instructor/tests/test_api.py
 #: lms/djangoapps/instructor/views/api.py
 msgid "This student (%s) is already allowed to skip the entrance exam."
-msgstr ""
+msgstr "(%s)  학습자는 이미 입학 시험 면제가 허락되었습니다. "
 
 #: lms/djangoapps/instructor/tests/test_registration_codes.py
 #: lms/djangoapps/instructor/views/registration_codes.py
@@ -5333,7 +5389,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{num}' does not exist."
-msgstr ""
+msgstr "청구서 번호 '{num}' 가 존재하지 않습니다. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The sale associated with this invoice has already been invalidated."
@@ -5376,7 +5432,7 @@ msgstr ""
 
 #: lms/templates/register.html lms/templates/signup_modal.html
 msgid "Gender"
-msgstr "성(생물학적)"
+msgstr "성별"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
@@ -5446,10 +5502,8 @@ msgid "Description"
 msgstr "설명"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Expiration Date"
-msgstr ""
+msgstr "만기일"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Is Active"
@@ -5499,20 +5553,20 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Unable to generate redeem codes because of course misconfiguration."
-msgstr ""
+msgstr "강좌의 설정이 잘못되어 교환 코드를 생성할 수 없습니다. "
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/models.py
 msgid "pdf download unavailable right now, please contact support."
-msgstr ""
+msgstr "pdf 다운로드가 안됩니다. 지원팀에게 연락하십시오. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
-msgstr ""
+msgstr "모듈이 존재하지 않습니다. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "An error occurred while deleting the score."
-msgstr ""
+msgstr "점수를 삭제하는 동안 오류가 발생했습니다. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course has no entrance exam section."
@@ -5965,8 +6019,7 @@ msgstr ""
 msgid "Company Name"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
 msgid "Title"
 msgstr ""
 
@@ -7292,8 +7345,12 @@ msgstr ""
 msgid "last_activity is not yet supported"
 msgstr ""
 
+#. Translators: 'ordering' is a string describing a way
+#. of ordering a list. For example, {ordering} may be
+#. 'name', indicating that the user wants to sort the
+#. list by lower case name.
 #: lms/djangoapps/teams/views.py
-msgid "The ordering {} is not supported"
+msgid "The ordering {ordering} is not supported"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -7401,11 +7458,21 @@ msgid "No selected price or selected price is below minimum."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Missing required parameters: {missing}"
+msgid ""
+"Photo ID image is required if the user does not have an initial verification"
+" attempt."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-msgid "You already have a valid or pending verification."
+msgid "Missing required parameter face_image"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid course key"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid checkpoint location"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
@@ -7422,22 +7489,6 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid course location."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid checkpoint location."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid image data during photo verification."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Could not submit photos"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -7526,10 +7577,10 @@ msgstr ""
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr ""
 
-#: lms/envs/devstack.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html cms/templates/settings.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
 msgid "Organization"
-msgstr ""
+msgstr "기관명"
 
 #: lms/envs/devstack.py
 msgid "Course Type"
@@ -7771,7 +7822,6 @@ msgstr ""
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Delete"
 msgstr ""
 
@@ -7805,7 +7855,6 @@ msgstr ""
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
@@ -7825,7 +7874,6 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/signup_modal.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -8213,6 +8261,10 @@ msgid ""
 "Plain text or html content for displaying custom message inside credit "
 "receipt email content which is sent *after* paying to get credit for a "
 "credit course."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Thumbnail image url of the credit provider."
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
@@ -8821,7 +8873,6 @@ msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/modal/accessible_confirm.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
@@ -8891,7 +8942,7 @@ msgstr ""
 #: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html
 msgid "example: JaneDoe"
-msgstr "예: JaneDoe"
+msgstr "예: 홍길동"
 
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -9105,7 +9156,7 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
 msgid "Dashboard"
-msgstr "상황판"
+msgstr "대시보드"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
@@ -9186,7 +9237,7 @@ msgstr "이메일 변경 성공"
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
-msgstr " {link_start}상황판{link_end}에서 새로운 이메일을 볼 수 있습니다."
+msgstr " {link_start}대시보드{link_end}에서 새로운 이메일을 볼 수 있습니다."
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
@@ -9364,7 +9415,6 @@ msgstr "오류메세지, 문제 발생으로 가는 단계 등을 포함하세�
 #: lms/templates/register-shib.html
 #: lms/templates/combinedopenended/openended/open_ended.html
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -9513,7 +9563,7 @@ msgstr "도움되는 정보"
 
 #: lms/templates/login-sidebar.html
 msgid "Login via OpenID"
-msgstr "오픈아이디로 로그인"
+msgstr "OpenID로 로그인"
 
 #: lms/templates/login-sidebar.html
 msgid ""
@@ -9700,7 +9750,7 @@ msgstr ""
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
-msgstr "가공되지 않은 데이터:"
+msgstr "Raw data:"
 
 #: lms/templates/navigation-edx.html
 msgid "Home Page"
@@ -9708,7 +9758,7 @@ msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
-msgstr "어떻게 동작하는지"
+msgstr "동작 원리"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Find Courses"
@@ -9720,7 +9770,7 @@ msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
-msgstr "상황판:"
+msgstr "대시보드:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
@@ -10028,15 +10078,15 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "e.g. yourname@domain.com"
-msgstr "예) yourname@domain.com"
+msgstr "예: yourname@domain.com"
 
 #: lms/templates/signup_modal.html
 msgid "e.g. yourname (shown on forums)"
-msgstr "예) 당신의 이름(포럼에 표시된)"
+msgstr "예: 당신의 이름(포럼에 표시된)"
 
 #: lms/templates/signup_modal.html
 msgid "e.g. Your Name (for certificates)"
-msgstr "예: 당신의 이름(이수증용)"
+msgstr "예: 당신의 이름(수료증용)"
 
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
@@ -11225,7 +11275,7 @@ msgid "List of Courses"
 msgstr ""
 
 #: lms/templates/courseware/courses.html
-msgid "Refine your search"
+msgid "Refine Your Search"
 msgstr ""
 
 #: lms/templates/courseware/courseware-chromeless.html
@@ -11731,22 +11781,21 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive university credit from edX "
-"partners! Click {link} to get your credit now."
+"Congratulations! You are eligible to receive course credit for successfully "
+"completing your edX course! Click {link} to get your credit now."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Credit from can help you get a jump start on your university degree, finish "
-"a degree already started, or fulfill requirements at a different academic "
-"institution."
+"Course credit can help you get a jump start on your university degree, "
+"finish a degree already started, or fulfill requirements at a different "
+"academic institution."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get university credit for {course_name}, simply go to your {link} and "
-"click the yellow \"Get Credit\" button. No application, transcript, or grade"
-" report is required."
+"To get course credit, simply go to your {link} and click the <b>Get "
+"Credit</b> button. No application, transcript, or grade report is required."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -11760,7 +11809,7 @@ msgid "The edX team"
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid "Find more edX courses you can take for university credit."
+msgid "For more information on credit at edX, click {link}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -12004,42 +12053,37 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"The opportunity to purchase credit for this course expires on {deadline}. "
-"You've worked hard - don't miss out!"
+msgid "You are now eligible for credit. {congrats}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Get credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Congratulations - you have met the requirements for credit in this course!"
+"Thank you. Your credit is processing. Please see {link} for more "
+"information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Purchase Course Credit"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Thanks for your payment! We are currently processing your course credit. "
-"You'll see a message here when the transaction is complete. For more "
-"information, see {provider_link}."
+msgid "Learn more"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you for your payment! To receive your course credit, go to the "
-"{provider_link} website. You may have to complete some additional steps "
-"depending on the institution"
+"Thank you for your purchase. Please proceed to {link} to finalize your "
+"credit."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Complete Credit"
+msgid "Finalize credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Congratulations - you have received credit for this course! For more "
-"information, see {provider_link}."
+"Your credit has been processed and approved. {congrats}. Please see {link} "
+"for more information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -12048,12 +12092,12 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"{provider_name} has declined your request for course credit. For more "
-"information, contact {provider_link}."
+"Your credit has been processed but denied. Please contact {link} for more "
+"information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Contact {provider_link}"
+msgid "Contact {provider}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -12157,7 +12201,6 @@ msgid "Posts I'm Following"
 msgstr "구독하는 게시글"
 
 #: lms/templates/discussion/_recent_active_posts.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Following"
 msgstr "구독"
 
@@ -12170,7 +12213,6 @@ msgid "Hide"
 msgstr "감추기"
 
 #: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Discussion topics; current selection is: "
 msgstr "토론 토픽: 현재 선택:"
 
@@ -12228,314 +12270,6 @@ msgstr ""
 msgid "by most votes"
 msgstr ""
 
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add A Response"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "This thread is closed."
-msgstr "이 글타래는 종료되었습니다."
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post a response:"
-msgstr "응답 게시:"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Expand discussion"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Collapse discussion"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing post"
-msgstr "게시글 편집"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Edit post title"
-msgstr "게시 제목 편집"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update post"
-msgstr "게시글 업데이트"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Show Comments (%(num_comments)s)"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a comment"
-msgstr "코멘트 추가"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "marked as answer %(time_ago)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "endorsed %(time_ago)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing response"
-msgstr "응답 편집"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update response"
-msgstr "응답 업데이트"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing comment"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update comment"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "discussion"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "answered question"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "unanswered question"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "By: Staff"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "By: Community TA"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "DISCUSSION HOME:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "How to use {platform_name} discussions"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Find discussions"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Focus in on specific topics"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Search for specific posts "
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Sort by date, vote, or comments"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Engage with posts"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Upvote posts and good responses"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report Forum Misuse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow posts for updates"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Receive updates"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Toggle Notifications Setting"
-msgstr "통지 설정 전환"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Check this box to receive an email digest once a day notifying you about "
-"new, unread activity from posts you are following."
-msgstr ""
-
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Visible To:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "All Groups"
-msgstr "모든 모둠"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single cohort."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Title:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Enter your question or comment"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "follow this post"
-msgstr "게시글 구독"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "post anonymously"
-msgstr "익명으로 게시"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "post anonymously to classmates"
-msgstr "수강동료들에게 익명으로 게시"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add Post"
-msgstr ""
-
-#. Translators: This is the label for a control to
-#. select a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post type:"
-msgstr ""
-
-#. Translators: This is a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Question"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Topic Area:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Filter topics"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add your post to a relevant topic to help others find it."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Endorse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unendorse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Mark as Answer"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unmark as Answer"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unfollow"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Vote for this post,"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report abuse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unreport"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pin"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unpin"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Open"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr ""
-
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
 msgstr ""
@@ -12580,6 +12314,14 @@ msgstr "사용자 정보"
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
 msgstr ""
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "anonymous"
+msgstr ""
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "This thread is closed."
+msgstr "이 글타래는 종료되었습니다."
 
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"
@@ -14169,7 +13911,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
-msgstr "강사 상황판"
+msgstr "교수자 상황판"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -14581,19 +14323,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
-msgstr "학생 별 점수 검사"
+msgstr "학습자 별 성적 사정"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
-msgstr "학생들의 진도 페이지를 보기위해서 이 링크를 클릭하세요."
+msgstr "학습자의 진도 페이지를 보기 위해서 이 링크를 클릭하세요:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Progress Page"
-msgstr "학생 진도 페이지"
+msgstr "학습자 진도 페이지"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade adjustment"
-msgstr "학생별 성적 조정"
+msgstr "학습자별 성적 조정"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Specify a problem in the course here with its complete location:"
@@ -14680,11 +14422,11 @@ msgstr "액션을 선택하세요"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset ALL students' attempts"
-msgstr "모든 학생들의 시도를 초기화"
+msgstr "모든 학습자의 재시도 초기화"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore ALL students' problem submissions"
-msgstr "모든 학생들의 문제 제출 재채점"
+msgstr "모든 학습자의 문제 제출 재채점"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -14821,7 +14563,7 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_closed.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Peer Grading"
-msgstr "동료 채점"
+msgstr "상호 채점"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -15090,7 +14832,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/error.html
 msgid "Payment Error"
-msgstr "지불 오류"
+msgstr "결제 오류"
 
 #: lms/templates/shoppingcart/error.html
 msgid "There was an error processing your order!"
@@ -15220,7 +14962,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Students"
-msgstr "학생"
+msgstr "학습자"
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
@@ -16099,7 +15841,7 @@ msgstr ""
 #. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
-msgstr ""
+msgstr "예. KoreaX  혹은 PusanX"
 
 #: cms/templates/course-create-rerun.html
 msgid ""
@@ -16128,7 +15870,7 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
 msgid "Course Run"
-msgstr ""
+msgstr "강좌 운영 번호"
 
 #. Translators: This is an example for the "run" used to identify different
 #. instances of a course, seen when filling out the form to create a new
@@ -17297,7 +17039,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Course Run:"
-msgstr ""
+msgstr "강좌 운영 번호:"
 
 #: cms/templates/index.html
 msgid "This course run is currently being created."
@@ -17803,11 +17545,11 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Schedule & Details"
-msgstr ""
+msgstr "강좌 일정 및 기본 정보 설정"
 
 #: cms/templates/settings.html
 msgid "Basic Information"
-msgstr ""
+msgstr "강좌 기본 정보"
 
 #: cms/templates/settings.html
 msgid "The nuts and bolts of your course"
@@ -17977,7 +17719,7 @@ msgstr ""
 msgid ""
 "Appears on the course catalog page when students roll over the course name. "
 "Limit to ~150 characters"
-msgstr ""
+msgstr " 학생이 강좌명을 훓어볼 때 강좌 카달로그 페이지에 나타납니다. 150자 이내"
 
 #: cms/templates/settings.html
 msgid "Course Overview"
@@ -18018,15 +17760,15 @@ msgstr ""
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
-msgstr ""
+msgstr "강좌 이미지에 대한 유효한 경로와 이름을 입력하세요 ( JPEG 혹은 PNG 형식만 지원됨)"
 
 #: cms/templates/settings.html
 msgid "Upload Course Image"
-msgstr ""
+msgstr "강좌 이미지 업로드"
 
 #: cms/templates/settings.html
 msgid "Course Introduction Video"
-msgstr ""
+msgstr "강좌 소개 비디오"
 
 #: cms/templates/settings.html
 msgid "Delete Current Video"
@@ -18036,15 +17778,15 @@ msgstr ""
 #. YouTube video ID for a course video
 #: cms/templates/settings.html
 msgid "your YouTube video's ID"
-msgstr ""
+msgstr "Youtube URL의 뒷 부분 코드만 복사해서 붙여넣습니다. "
 
 #: cms/templates/settings.html
 msgid "Enter your YouTube video's ID (along with any restriction parameters)"
-msgstr ""
+msgstr "Youtube 영상의 ID를 입력하세요. (URL의 뒷 부분 코드)"
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
-msgstr ""
+msgstr "본 강좌를 수강하는 학습자에게 요구하는 사항"
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
@@ -18060,7 +17802,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course that students must complete before beginning this course"
-msgstr ""
+msgstr "본 강좌를 수강하기 전에 반드시 들어야 하는 과정"
 
 #: cms/templates/settings.html
 msgid "set pre-requisite course"
@@ -18207,7 +17949,7 @@ msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Grace Period on Deadline:"
-msgstr ""
+msgstr "마감 유예 시간"
 
 #: cms/templates/settings_graders.html
 msgid "Leeway on due dates"
@@ -18215,7 +17957,7 @@ msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Assignment Types"
-msgstr ""
+msgstr "과제명"
 
 #: cms/templates/settings_graders.html
 msgid "Categories and labels for any exercises that are gradable"

@@ -44,6 +44,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
         model = CourseTeam
         fields = (
             "id",
+            "discussion_topic_id",
             "name",
             "is_active",
             "course_id",
@@ -54,7 +55,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
             "language",
             "membership",
         )
-        read_only_fields = ("course_id", "date_created")
+        read_only_fields = ("course_id", "date_created", "discussion_topic_id")
 
 
 class CourseTeamCreationSerializer(serializers.ModelSerializer):
@@ -123,17 +124,23 @@ class TopicSerializer(BaseTopicSerializer):
     """
     Adds team_count to the basic topic serializer.  Use only when
     serializing a single topic.  When serializing many topics, use
-    `PaginatedTopicSerializer` to avoid O(N) SQL queries.
+    `PaginatedTopicSerializer` to avoid O(N) SQL queries.  Requires
+    that `context` is provided with a valid course_id in order to
+    filter teams within the course.
     """
     team_count = serializers.SerializerMethodField('get_team_count')
 
     def get_team_count(self, topic):
         """Get the number of teams associated with this topic"""
-        return CourseTeam.objects.filter(topic_id=topic['id']).count()
+        return CourseTeam.objects.filter(course_id=self.context['course_id'], topic_id=topic['id']).count()
 
 
 class PaginatedTopicSerializer(PaginationSerializer):
-    """Serializes a set of topics.  Adds team_count field to each topic."""
+    """
+    Serializes a set of topics, adding team_count field to each topic.
+    Requires that `context` is provided with a valid course_id in
+    order to filter teams within the course.
+    """
     class Meta(object):
         """Defines meta information for the PaginatedTopicSerializer."""
         object_serializer_class = BaseTopicSerializer
@@ -146,6 +153,7 @@ class PaginatedTopicSerializer(PaginationSerializer):
         # and outputs the result as a list of dicts (one per topic).
         topic_ids = [topic['id'] for topic in self.data['results']]
         teams_per_topic = CourseTeam.objects.filter(
+            course_id=self.context['course_id'],
             topic_id__in=topic_ids
         ).values('topic_id').annotate(team_count=Count('topic_id'))
 

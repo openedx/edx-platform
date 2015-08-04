@@ -23,7 +23,6 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    is_commentable_cohorted
 )
 from courseware.tabs import EnrolledTab
 from courseware.access import has_access
@@ -36,7 +35,8 @@ from django_comment_client.utils import (
     extract,
     strip_none,
     add_courseware_context,
-    get_group_id_for_comments_service
+    get_group_id_for_comments_service,
+    is_commentable_cohorted
 )
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
@@ -149,6 +149,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
                     'flagged',
                     'unread',
                     'unanswered',
+                    'context',
                 ]
             )
         )
@@ -276,6 +277,11 @@ def forum_form_discussion(request, course_key):
             'threads': _attr_safe_json(threads),
             'thread_pages': query_params['num_pages'],
             'user_info': _attr_safe_json(user_info),
+            'can_create_comment': _attr_safe_json(
+                has_permission(request.user, "create_comment", course.id)),
+            'can_create_subcomment': _attr_safe_json(
+                has_permission(request.user, "create_sub_comment", course.id)),
+            'can_create_thread': has_permission(request.user, "create_thread", course.id),
             'flag_moderator': bool(
                 has_permission(request.user, 'openclose_thread', course.id) or
                 has_access(request.user, 'staff', course)
@@ -375,6 +381,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'csrf': csrf(request)['csrf_token'],
             'init': '',   # TODO: What is this?
             'user_info': _attr_safe_json(user_info),
+            'can_create_comment': _attr_safe_json(
+                has_permission(request.user, "create_comment", course.id)),
+            'can_create_subcomment': _attr_safe_json(
+                has_permission(request.user, "create_sub_comment", course.id)),
+            'can_create_thread': has_permission(request.user, "create_thread", course.id),
             'annotated_content_info': _attr_safe_json(annotated_content_info),
             'course': course,
             #'recent_active_threads': recent_active_threads,

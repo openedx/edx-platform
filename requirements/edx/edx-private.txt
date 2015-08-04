@@ -2,7 +2,7 @@
 
 # For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
--e git+https://github.com/open-craft/problem-builder.git@86d0611bd6384a69b416a8b4b43dbe422a2de7cb#egg=xblock-problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@859df4155c0031b5a70e7f7e9744b67b3ed331d7#egg=xblock-problem-builder
 
 # Prototype XBlocks from edX learning sciences limited roll-outs and user testing.
 # Concept XBlock, in particular, is nowhere near finished and an early prototype.

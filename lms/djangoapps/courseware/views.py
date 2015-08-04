@@ -31,8 +31,9 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access, in_preview_mode, _adjust_start_date_for_beta_testers
+from courseware.access_response import StartDateError
 from courseware.courses import (
-    get_courses, get_course,
+    get_courses, get_course, get_course_by_id,
     get_studio_url, get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
@@ -60,6 +61,7 @@ from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedG
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
+from util.date_utils import strftime_localized
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -550,7 +552,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # Save where we are in the chapter.
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render(STUDENT_VIEW)
+            section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
+            context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
@@ -674,9 +677,23 @@ def course_info(request, course_id):
     Assumes the course_id is in a valid format.
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
     with modulestore().bulk_operations(course_key):
-        course = get_course_with_access(request.user, 'load', course_key)
+        course = get_course_by_id(course_key, depth=2)
+        access_response = has_access(request.user, 'load', course, course_key)
+
+        if not access_response:
+
+            # The user doesn't have access to the course. If they're
+            # denied permission due to the course not being live yet,
+            # redirect to the dashboard page.
+            if isinstance(access_response, StartDateError):
+                start_date = strftime_localized(course.start, 'SHORT_DATE')
+                params = urllib.urlencode({'notlive': start_date})
+                return redirect('{0}?{1}'.format(reverse('dashboard'), params))
+            # Otherwise, give a 404 to avoid leaking info about access
+            # control.
+            raise Http404("Course not found.")
+
         staff_access = has_access(request.user, 'staff', course)
         masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 

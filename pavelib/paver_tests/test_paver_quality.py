@@ -57,13 +57,13 @@ class TestPaverQualityViolations(unittest.TestCase):
         self.assertEqual(num, 2)
 
 
-class TestPaverJsHintViolationsCounts(unittest.TestCase):
+class TestPaverReportViolationsCounts(unittest.TestCase):
     """
-    For testing run_jshint
+    For testing run_jshint and run_complexity utils
     """
 
     def setUp(self):
-        super(TestPaverJsHintViolationsCounts, self).setUp()
+        super(TestPaverReportViolationsCounts, self).setUp()
 
         # Mock the paver @needs decorator
         self._mock_paver_needs = patch.object(pavelib.quality.run_quality, 'needs').start()
@@ -77,16 +77,16 @@ class TestPaverJsHintViolationsCounts(unittest.TestCase):
         self.addCleanup(self._mock_paver_needs.stop)
         self.addCleanup(os.remove, self.f.name)
 
-    def test_get_violations_count(self):
+    def test_get_jshint_violations_count(self):
         with open(self.f.name, 'w') as f:
             f.write("3000 violations found")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name)  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, 3000)
 
     def test_get_violations_no_number_found(self):
         with open(self.f.name, 'w') as f:
             f.write("Not expected string regex")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name)  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
     def test_get_violations_count_truncated_report(self):
@@ -95,7 +95,41 @@ class TestPaverJsHintViolationsCounts(unittest.TestCase):
         """
         with open(self.f.name, 'w') as f:
             f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name)  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_complexity_value(self):
+        with open(self.f.name, 'w') as f:
+            f.write("Average complexity: A (1.93953443446)")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 1.93953443446)
+
+    def test_truncated_complexity_report(self):
+        with open(self.f.name, 'w') as f:
+            f.write("M 110:4 FooBar.default - A")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_no_complexity_report(self):
+        with self.assertRaises(BuildFailure):
+            pavelib.quality._get_count_from_last_line("non-existent-file", "python_complexity")  # pylint: disable=protected-access
+
+    def test_generic_value(self):
+        """
+        Default behavior is to look for an integer appearing at head of line
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("5.777 good to see you")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 5)
+
+    def test_generic_value_none_found(self):
+        """
+        Default behavior is to look for an integer appearing at head of line
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("hello 5.777 good to see you")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
 

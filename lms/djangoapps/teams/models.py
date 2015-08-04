@@ -1,5 +1,7 @@
 """Django models related to teams functionality."""
 
+from uuid import uuid4
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy
@@ -15,7 +17,8 @@ class CourseTeam(models.Model):
     """This model represents team related info."""
 
     team_id = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
+    discussion_topic_id = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, db_index=True)
     is_active = models.BooleanField(default=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
@@ -48,9 +51,11 @@ class CourseTeam(models.Model):
         """
 
         team_id = generate_unique_readable_id(name, cls.objects.all(), 'team_id')
+        discussion_topic_id = uuid4().hex
 
         course_team = cls(
             team_id=team_id,
+            discussion_topic_id=discussion_topic_id,
             name=name,
             course_id=course_id,
             topic_id=topic_id if topic_id else '',

@@ -138,6 +138,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "course_id": unicode(self.course.id),
             "user_id": str(self.author.id),
             "username": self.author.username,
+            "read": True,
+            "endorsed": True
         }
         merged_overrides.update(overrides)
         return make_minimal_cs_thread(merged_overrides)
@@ -171,6 +173,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "votes": {"up_count": 4},
             "comments_count": 5,
             "unread_comments_count": 3,
+            "read": False,
+            "endorsed": False
         }
         expected = {
             "id": "test_thread",
@@ -198,6 +202,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "voted"],
+            "read": False,
+            "has_endorsed": False
         }
         self.assertEqual(self.serialize(thread), expected)
 
@@ -424,6 +430,8 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
             "title": "Original Title",
             "body": "Original body",
             "user_id": str(self.user.id),
+            "read": "False",
+            "endorsed": "False"
         }))
 
     def save_and_reserialize(self, data, instance=None):

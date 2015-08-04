@@ -95,6 +95,9 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "topic_id": [],
                 "text_search": "",
                 "following": None,
+                "view": "",
+                "order_by": "last_activity_at",
+                "order_direction": "desc",
             }
         )
 
@@ -140,6 +143,24 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.assert_error(
             "__all__",
             "The following query parameters are mutually exclusive: topic_id, text_search, following"
+        )
+
+    def test_invalid_view_choice(self):
+        self.form_data["view"] = "not_a_valid_choice"
+        self.assert_error("view", "Select a valid choice. not_a_valid_choice is not one of the available choices.")
+
+    def test_invalid_sort_by_choice(self):
+        self.form_data["order_by"] = "not_a_valid_choice"
+        self.assert_error(
+            "order_by",
+            "Select a valid choice. not_a_valid_choice is not one of the available choices."
+        )
+
+    def test_invalid_sort_direction_choice(self):
+        self.form_data["order_direction"] = "not_a_valid_choice"
+        self.assert_error(
+            "order_direction",
+            "Select a valid choice. not_a_valid_choice is not one of the available choices."
         )
 
 

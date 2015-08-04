@@ -6,6 +6,7 @@ from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.views.generic.base import View
+import newrelic.agent
 
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -82,7 +83,10 @@ class TeamsDashboardView(View):
         sort_order = 'name'
         topics = get_ordered_topics(course, sort_order)
         topics_page = Paginator(topics, TOPICS_PER_PAGE).page(1)
-        topics_serializer = PaginatedTopicSerializer(instance=topics_page, context={'sort_order': sort_order})
+        topics_serializer = PaginatedTopicSerializer(
+            instance=topics_page,
+            context={'course_id': course.id, 'sort_order': sort_order}
+        )
         context = {
             "course": course,
             "topics": topics_serializer.data,
@@ -182,6 +186,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * id: The team's unique identifier.
 
+                * discussion_topic_id: The unique id of the comments service
+                  discussion topic associated with this team.
+
                 * name: The name of the team.
 
                 * is_active: True if the team is currently active. If false, the
@@ -250,6 +257,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     pagination_serializer_class = PaginationSerializer
     serializer_class = CourseTeamSerializer
 
+    @newrelic.agent.function_trace()
     def get(self, request):
         """GET /api/team/v0/teams/"""
         result_filter = {
@@ -313,8 +321,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             )
         else:
             return Response({
-                'developer_message': "unsupported order_by value {}".format(order_by_input),
-                'user_message': _(u"The ordering {} is not supported").format(order_by_input),
+                'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
+                # Translators: 'ordering' is a string describing a way
+                # of ordering a list. For example, {ordering} may be
+                # 'name', indicating that the user wants to sort the
+                # list by lower case name.
+                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         queryset = queryset.order_by(order_by_field)
@@ -382,6 +394,9 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in, the response contains the following fields:
 
                 * id: The team's unique identifier.
+
+                * discussion_topic_id: The unique id of the comments service
+                  discussion topic associated with this team.
 
                 * name: The name of the team.
 
@@ -550,12 +565,16 @@ class TopicListView(GenericAPIView):
             topics = get_ordered_topics(course_module, ordering)
         else:
             return Response({
-                'developer_message': "unsupported order_by value {}".format(ordering),
-                'user_message': _(u"The ordering {} is not supported").format(ordering),
+                'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
+                # Translators: 'ordering' is a string describing a way
+                # of ordering a list. For example, {ordering} may be
+                # 'name', indicating that the user wants to sort the
+                # list by lower case name.
+                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=ordering),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         page = self.paginate_queryset(topics)
-        serializer = self.pagination_serializer_class(page, context={'sort_order': ordering})
+        serializer = self.pagination_serializer_class(page, context={'course_id': course_id, 'sort_order': ordering})
         return Response(serializer.data)  # pylint: disable=maybe-no-member
 
 
@@ -634,7 +653,7 @@ class TopicDetailView(APIView):
         if len(topics) == 0:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TopicSerializer(topics[0])
+        serializer = TopicSerializer(topics[0], context={'course_id': course_id})
         return Response(serializer.data)
 
 

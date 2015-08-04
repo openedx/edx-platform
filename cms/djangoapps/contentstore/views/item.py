@@ -801,6 +801,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         child_info = None
 
+    release_date = _get_release_date(xblock, user)
+
     if xblock.category != 'course':
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
     else:
@@ -836,7 +838,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
-        "release_date": _get_release_date(xblock, user),
+        "release_date": release_date,
         "visibility_state": visibility_state,
         "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
         "start": xblock.fields['start'].to_json(xblock.start),
@@ -1050,7 +1052,15 @@ def _get_release_date(xblock, user=None):
     Returns the release date for the xblock, or None if the release date has never been set.
     """
     # If year of start date is less than 1900 then reset the start date to DEFAULT_START_DATE
-    if xblock.start.year < 1900 and user:
+    reset_to_default = False
+    try:
+        reset_to_default = xblock.start.year < 1900
+    except ValueError:
+        # For old mongo courses, accessing the start attribute calls `to_json()`,
+        # which raises a `ValueError` for years < 1900.
+        reset_to_default = True
+
+    if reset_to_default and user:
         xblock.start = DEFAULT_START_DATE
         xblock = _update_with_callback(xblock, user)
 

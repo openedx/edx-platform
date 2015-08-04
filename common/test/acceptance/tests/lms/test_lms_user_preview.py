@@ -64,7 +64,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
             <problem markdown="Simple Problem" max_attempts="" weight="">
               <p>Choose Yes.</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical">
+                <checkboxgroup>
                   <choice correct="true">Yes</choice>
                 </checkboxgroup>
               </choiceresponse>
@@ -260,7 +260,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
             <problem markdown="Simple Problem" max_attempts="" weight="">
               <p>Choose Yes.</p>
               <choiceresponse>
-                <checkboxgroup direction="vertical">
+                <checkboxgroup>
                   <choice correct="true">Yes</choice>
                 </checkboxgroup>
               </choiceresponse>

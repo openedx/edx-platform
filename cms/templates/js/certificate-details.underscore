@@ -33,8 +33,10 @@
         <li class="action action-edit">
             <button class="edit"><i class="icon fa fa-pencil" aria-hidden="true"></i> <%= gettext("Edit") %></button>
         </li>
+        <% if (CMS.User.isGlobalStaff) { %>
         <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Delete') %>">
             <button class="delete action-icon"><i class="icon fa fa-trash-o" aria-hidden="true"></i><span><%= gettext("Delete") %></span></button>
         </li>
+        <% } %>
     </ul>
 </div>

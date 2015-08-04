@@ -4,9 +4,9 @@ Declaration of CourseOverview model
 
 import json
 
-import django.db.models
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.utils.translation import ugettext
+from model_utils.models import TimeStampedModel
 
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
@@ -16,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
 
-class CourseOverview(django.db.models.Model):
+class CourseOverview(TimeStampedModel):
     """
     Model for storing and caching basic information about a course.
 
@@ -24,6 +24,12 @@ class CourseOverview(django.db.models.Model):
     image URL, and any other information that would be necessary to display
     a course as part of a user dashboard or enrollment API.
     """
+
+    # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
+    VERSION = 1
+
+    # Cache entry versioning.
+    version = IntegerField()
 
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)  # pylint: disable=invalid-name
@@ -67,8 +73,8 @@ class CourseOverview(django.db.models.Model):
     invitation_only = BooleanField(default=False)
     max_student_enrollments_allowed = IntegerField(null=True)
 
-    @staticmethod
-    def _create_from_course(course):
+    @classmethod
+    def _create_from_course(cls, course):
         """
         Creates a CourseOverview object from a CourseDescriptor.
 
@@ -94,7 +100,9 @@ class CourseOverview(django.db.models.Model):
         except ValueError:
             lowest_passing_grade = None
 
-        return CourseOverview(
+        return cls(
+            version=cls.VERSION,
+
             id=course.id,
             _location=course.location,
             display_name=course.display_name,
@@ -130,8 +138,42 @@ class CourseOverview(django.db.models.Model):
             max_student_enrollments_allowed=course.max_student_enrollments_allowed,
         )
 
-    @staticmethod
-    def get_from_id(course_id):
+    @classmethod
+    def _load_from_module_store(cls, course_id):
+        """
+        Load a CourseDescriptor, create a new CourseOverview from it, cache the
+        overview, and return it.
+
+        Arguments:
+            course_id (CourseKey): the ID of the course overview to be loaded.
+
+        Returns:
+            CourseOverview: overview of the requested course.
+
+        Raises:
+            - CourseOverview.DoesNotExist if the course specified by course_id
+                was not found.
+            - IOError if some other error occurs while trying to load the
+                course from the module store.
+        """
+        store = modulestore()
+        with store.bulk_operations(course_id):
+            course = store.get_course(course_id)
+            if isinstance(course, CourseDescriptor):
+                course_overview = cls._create_from_course(course)
+                course_overview.save()
+                return course_overview
+            elif course is not None:
+                raise IOError(
+                    "Error while loading course {} from the module store: {}",
+                    unicode(course_id),
+                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                )
+            else:
+                raise cls.DoesNotExist()
+
+    @classmethod
+    def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
 
@@ -144,8 +186,7 @@ class CourseOverview(django.db.models.Model):
             course_id (CourseKey): the ID of the course overview to be loaded.
 
         Returns:
-            CourseOverview: overview of the requested course. If loading course
-            from the module store failed, returns None.
+            CourseOverview: overview of the requested course.
 
         Raises:
             - CourseOverview.DoesNotExist if the course specified by course_id
@@ -153,25 +194,15 @@ class CourseOverview(django.db.models.Model):
             - IOError if some other error occurs while trying to load the
                 course from the module store.
         """
-        course_overview = None
         try:
-            course_overview = CourseOverview.objects.get(id=course_id)
-        except CourseOverview.DoesNotExist:
-            store = modulestore()
-            with store.bulk_operations(course_id):
-                course = store.get_course(course_id)
-                if isinstance(course, CourseDescriptor):
-                    course_overview = CourseOverview._create_from_course(course)
-                    course_overview.save()
-                elif course is not None:
-                    raise IOError(
-                        "Error while loading course {} from the module store: {}",
-                        unicode(course_id),
-                        course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
-                    )
-                else:
-                    raise CourseOverview.DoesNotExist()
-        return course_overview
+            course_overview = cls.objects.get(id=course_id)
+            if course_overview.version != cls.VERSION:
+                # Throw away old versions of CourseOverview, as they might contain stale data.
+                course_overview.delete()
+                course_overview = None
+        except cls.DoesNotExist:
+            course_overview = None
+        return course_overview or cls._load_from_module_store(course_id)
 
     def clean_id(self, padding_char='='):
         """

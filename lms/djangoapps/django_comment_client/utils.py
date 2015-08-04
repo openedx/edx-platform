@@ -19,10 +19,11 @@ from django_comment_client.permissions import check_permissions_by_view, has_per
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
+from courseware import courses
 from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import (
-    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
@@ -561,7 +562,7 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
         'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'endorsement',
+        'endorsement', 'context'
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
@@ -660,3 +661,37 @@ def is_comment_too_deep(parent):
             (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
         )
     )
+
+
+def is_commentable_cohorted(course_key, commentable_id):
+    """
+    Args:
+        course_key: CourseKey
+        commentable_id: string
+
+    Returns:
+        Bool: is this commentable cohorted?
+
+    Raises:
+        Http404 if the course doesn't exist.
+    """
+    course = courses.get_course_by_id(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
+
+    if not course_cohort_settings.is_cohorted:
+        # this is the easy case :)
+        ans = False
+    elif (
+            commentable_id in course.top_level_discussion_topic_ids or
+            course_cohort_settings.always_cohort_inline_discussions is False
+    ):
+        # top level discussions have to be manually configured as cohorted
+        # (default is not).
+        # Same thing for inline discussions if the default is explicitly set to False in settings
+        ans = commentable_id in course_cohort_settings.cohorted_discussions
+    else:
+        # inline discussions are cohorted by default
+        ans = True
+
+    log.debug(u"is_commentable_cohorted(%s, %s) = {%s}", course_key, commentable_id, ans)
+    return ans

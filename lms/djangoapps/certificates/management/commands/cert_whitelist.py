@@ -12,6 +12,18 @@ from certificates.models import CertificateWhitelist
 from django.contrib.auth.models import User
 
 
+def get_user_from_identifier(identifier):
+    """
+     This function takes the string identifier and fetch relevant user object from database
+    """
+    identifier = identifier.strip()
+    if '@' in identifier:
+        user = User.objects.get(email=identifier)
+    else:
+        user = User.objects.get(username=identifier)
+    return user
+
+
 class Command(BaseCommand):
 
     help = """
@@ -57,6 +69,17 @@ class Command(BaseCommand):
         if not course_id:
             raise CommandError("You must specify a course-id")
 
+        def update_user_whitelist(username, add=True):
+            """
+            Update the status of whitelist user(s)
+            """
+            user = get_user_from_identifier(username)
+            cert_whitelist, _created = CertificateWhitelist.objects.get_or_create(
+                user=user, course_id=course
+            )
+            cert_whitelist.whitelist = add
+            cert_whitelist.save()
+
         # try to parse the serialized course key into a CourseKey
         try:
             course = CourseKey.from_string(course_id)
@@ -69,19 +92,11 @@ class Command(BaseCommand):
 
         if options['add'] or options['del']:
             user_str = options['add'] or options['del']
-            if '@' in user_str:
-                user = User.objects.get(email=user_str)
-            else:
-                user = User.objects.get(username=user_str)
-
-            cert_whitelist, _created = \
-                CertificateWhitelist.objects.get_or_create(
-                    user=user, course_id=course)
-            if options['add']:
-                cert_whitelist.whitelist = True
-            elif options['del']:
-                cert_whitelist.whitelist = False
-            cert_whitelist.save()
+            add_to_whitelist = True if options['add'] else False
+            users_list = user_str.split(",")
+            for username in users_list:
+                if username.strip():
+                    update_user_whitelist(username, add=add_to_whitelist)
 
         whitelist = CertificateWhitelist.objects.filter(course_id=course)
         wl_users = '\n'.join(

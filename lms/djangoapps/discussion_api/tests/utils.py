@@ -330,6 +330,8 @@ def make_minimal_cs_thread(overrides=None):
         "unread_comments_count": 0,
         "children": [],
         "resp_total": 0,
+        "read": False,
+        "endorsed": False,
     }
     ret.update(overrides or {})
     return ret

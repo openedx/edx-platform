@@ -1,8 +1,0 @@
-<div class="toggle ">
-    <button class="show-more discovery-button">
-        <%= gettext("MORE...") %>
-    </button>
-    <button class="show-less hidden discovery-button">
-        <%= gettext("LESS...") %>
-    </button>
-</div>

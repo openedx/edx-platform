@@ -31,6 +31,7 @@
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Michael Cao <ming.cao.ming@gmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# ruiruillp <gaier1993@163.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # shuchuanchen <am15501@163.com>, 2014-2015
 # riceball <snowyu.lee@gmail.com>, 2014
@@ -130,6 +131,7 @@
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Lucas H. Xu <xuh@bu.edu>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# ruiruillp <gaier1993@163.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # SherryQin <1449791494@qq.com>, 2015
 # shuchuanchen <am15501@163.com>, 2014
@@ -197,6 +199,7 @@
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# ruiruillp <gaier1993@163.com>, 2015
 # Scott Huang <sc.h@aol.com>, 2014
 # shuchuanchen <am15501@163.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
@@ -246,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-22 17:45+0000\n"
+"POT-Creation-Date: 2015-07-31 12:11+0000\n"
 "PO-Revision-Date: 2015-06-18 03:04+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -420,6 +423,12 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
 msgstr "诚信准则证书"
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"Professional education modes are not allowed to have expiration_datetime "
+"set."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Your verification is pending"
@@ -734,6 +743,10 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Value of the enrollment attribute"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The course you are looking for does not start until {date}."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -3034,6 +3047,16 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Proctored Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed and proctored exams are "
+"enabled in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
 msgstr ""
 
@@ -3550,6 +3573,44 @@ msgstr ""
 msgid ""
 "Tag this course module as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Time Limited"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether students have a limited time to view or "
+"interact with this courseware component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Time Limit in Minutes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"The number of minutes available to students for viewing or interacting with "
+"this courseware component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Proctoring Enabled"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "This setting indicates whether this exam is a proctored exam."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Practice Exam"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether this exam is for testing purposes only. "
+"Practice exams are not verified."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -5384,7 +5445,6 @@ msgid "Course Staff"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "教员"
@@ -6147,7 +6207,7 @@ msgstr ""
 msgid "Company Name"
 msgstr ""
 
-#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+#: wiki/forms.py
 msgid "Title"
 msgstr "标题"
 
@@ -7521,8 +7581,12 @@ msgstr ""
 msgid "last_activity is not yet supported"
 msgstr ""
 
+#. Translators: 'ordering' is a string describing a way
+#. of ordering a list. For example, {ordering} may be
+#. 'name', indicating that the user wants to sort the
+#. list by lower case name.
 #: lms/djangoapps/teams/views.py
-msgid "The ordering {} is not supported"
+msgid "The ordering {ordering} is not supported"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -7630,11 +7694,21 @@ msgid "No selected price or selected price is below minimum."
 msgstr "未选择价格或选择的价格低于最低价。"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Missing required parameters: {missing}"
+msgid ""
+"Photo ID image is required if the user does not have an initial verification"
+" attempt."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-msgid "You already have a valid or pending verification."
+msgid "Missing required parameter face_image"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid course key"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid checkpoint location"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
@@ -7651,22 +7725,6 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid course location."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid checkpoint location."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid image data during photo verification."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Could not submit photos"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -8014,8 +8072,6 @@ msgstr "删除文章"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Delete"
 msgstr "删除"
 
@@ -8049,7 +8105,6 @@ msgstr "您正试图删除文章。请确认！"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
@@ -8071,7 +8126,6 @@ msgstr "预览"
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -8464,6 +8518,10 @@ msgid ""
 "Plain text or html content for displaying custom message inside credit "
 "receipt email content which is sent *after* paying to get credit for a "
 "credit course."
+msgstr ""
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Thumbnail image url of the credit provider."
 msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
@@ -9078,7 +9136,6 @@ msgstr "设置"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/modal/accessible_confirm.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
@@ -9620,7 +9677,6 @@ msgstr "附上错误消息以及导致错误的步骤等"
 #: lms/templates/register-shib.html
 #: lms/templates/combinedopenended/openended/open_ended.html
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -11481,7 +11537,7 @@ msgid "List of Courses"
 msgstr ""
 
 #: lms/templates/courseware/courses.html
-msgid "Refine your search"
+msgid "Refine Your Search"
 msgstr ""
 
 #: lms/templates/courseware/courseware-chromeless.html
@@ -11989,22 +12045,21 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive university credit from edX "
-"partners! Click {link} to get your credit now."
+"Congratulations! You are eligible to receive course credit for successfully "
+"completing your edX course! Click {link} to get your credit now."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Credit from can help you get a jump start on your university degree, finish "
-"a degree already started, or fulfill requirements at a different academic "
-"institution."
+"Course credit can help you get a jump start on your university degree, "
+"finish a degree already started, or fulfill requirements at a different "
+"academic institution."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get university credit for {course_name}, simply go to your {link} and "
-"click the yellow \"Get Credit\" button. No application, transcript, or grade"
-" report is required."
+"To get course credit, simply go to your {link} and click the <b>Get "
+"Credit</b> button. No application, transcript, or grade report is required."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -12018,7 +12073,7 @@ msgid "The edX team"
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid "Find more edX courses you can take for university credit."
+msgid "For more information on credit at edX, click {link}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -12268,42 +12323,37 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"The opportunity to purchase credit for this course expires on {deadline}. "
-"You've worked hard - don't miss out!"
+msgid "You are now eligible for credit. {congrats}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Get credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Congratulations - you have met the requirements for credit in this course!"
+"Thank you. Your credit is processing. Please see {link} for more "
+"information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Purchase Course Credit"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Thanks for your payment! We are currently processing your course credit. "
-"You'll see a message here when the transaction is complete. For more "
-"information, see {provider_link}."
+msgid "Learn more"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you for your payment! To receive your course credit, go to the "
-"{provider_link} website. You may have to complete some additional steps "
-"depending on the institution"
+"Thank you for your purchase. Please proceed to {link} to finalize your "
+"credit."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Complete Credit"
+msgid "Finalize credit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Congratulations - you have received credit for this course! For more "
-"information, see {provider_link}."
+"Your credit has been processed and approved. {congrats}. Please see {link} "
+"for more information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -12312,12 +12362,12 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"{provider_name} has declined your request for course credit. For more "
-"information, contact {provider_link}."
+"Your credit has been processed but denied. Please contact {link} for more "
+"information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Contact {provider_link}"
+msgid "Contact {provider}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -12421,7 +12471,6 @@ msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
 
 #: lms/templates/discussion/_recent_active_posts.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Following"
 msgstr "关注"
 
@@ -12434,7 +12483,6 @@ msgid "Hide"
 msgstr "隐藏"
 
 #: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Discussion topics; current selection is: "
 msgstr "讨论主题；当前选中的是:"
 
@@ -12492,316 +12540,6 @@ msgstr ""
 msgid "by most votes"
 msgstr ""
 
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add A Response"
-msgstr "添加回复"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "This thread is closed."
-msgstr "这个帖子已经关闭。"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post a response:"
-msgstr "回复："
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Expand discussion"
-msgstr "展开讨论"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Collapse discussion"
-msgstr "折叠讨论"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing post"
-msgstr "编辑讨论帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Edit post title"
-msgstr "编辑帖子标题"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update post"
-msgstr "更新讨论帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Show Comments (%(num_comments)s)"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a comment"
-msgstr "添加评论"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "marked as answer %(time_ago)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "endorsed %(time_ago)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing response"
-msgstr "编辑回复"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update response"
-msgstr "更新回复"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing comment"
-msgstr "编辑注释"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update comment"
-msgstr "更新注释"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "discussion"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "answered question"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "unanswered question"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr "置顶"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "By: Staff"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "By: Community TA"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
-msgstr "%(votes_up_count)s%(span_sr_open)s 投票 %(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-"%(comments_count)s %(span_sr_open)s评论 (%(unread_comments_count)s "
-"未读评论)%(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr "%(comments_count)s %(span_sr_open)s评论 %(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "DISCUSSION HOME:"
-msgstr "讨论区："
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "How to use {platform_name} discussions"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Find discussions"
-msgstr "搜索讨论帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Focus in on specific topics"
-msgstr "关注特定话题"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Search for specific posts "
-msgstr "搜索特定讨论帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Sort by date, vote, or comments"
-msgstr "按照日期，投票或评论排序"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Engage with posts"
-msgstr "参与讨论"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Upvote posts and good responses"
-msgstr "投票支持优秀讨论帖及回复贴"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report Forum Misuse"
-msgstr "举报不恰当论坛讨论帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow posts for updates"
-msgstr "关注讨论帖更新"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Receive updates"
-msgstr "接收更新"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Toggle Notifications Setting"
-msgstr "切换通知设置"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Check this box to receive an email digest once a day notifying you about "
-"new, unread activity from posts you are following."
-msgstr "勾选此选项，每天接收一封提醒邮件，以摘要方式通知你所关注的讨论帖的更新情况。"
-
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Visible To:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "All Groups"
-msgstr "所有分组"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single cohort."
-msgstr "讨论区管理员、版主以及助教可以将它们的帖子设置为对所有学生可见或者仅对某个群组可见。"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Title:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Enter your question or comment"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "follow this post"
-msgstr "关注这个帖子"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "post anonymously"
-msgstr "匿名发帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "post anonymously to classmates"
-msgstr "向同学匿名发帖"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add Post"
-msgstr ""
-
-#. Translators: This is the label for a control to
-#. select a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post type:"
-msgstr ""
-
-#. Translators: This is a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Question"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Topic Area:"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Filter topics"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add your post to a relevant topic to help others find it."
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Endorse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unendorse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Mark as Answer"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unmark as Answer"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unfollow"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Vote for this post,"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report abuse"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unreport"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pin"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unpin"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Open"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr "匿名"
-
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
 msgstr "，"
@@ -12846,6 +12584,14 @@ msgstr "用户资料"
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
 msgstr "…"
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "anonymous"
+msgstr "匿名"
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "This thread is closed."
+msgstr "这个帖子已经关闭。"
 
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-22 18:11+0000\n"
-"PO-Revision-Date: 2015-07-22 18:12:54.993319\n"
+"POT-Creation-Date: 2015-07-31 12:18+0000\n"
+"PO-Revision-Date: 2015-07-31 12:19:55.479818\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2223,6 +2223,7 @@ msgstr "يشفث حخسفثي"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
 msgstr "وخقث"
@@ -2402,6 +2403,22 @@ msgstr "ثققخق لثرثقشفهرل لقشيثس. حمثشسث فقغ شلش
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. حمثشسث فقغ شلشهر."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "عرشدشهمشزمث وثفقهذ يهسحمشغ."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "ثققخق بثفذاهرل لقشيث يهسفقهزعفهخرس."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "مشسف عحيشفثي: <%= timestamp %>"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> سفعيثرفس سذخقثي."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3203,6 +3220,7 @@ msgid "Enter Start Date"
 msgstr "ثرفثق سفشقف يشفث"
 
 #: lms/static/js/courseware/credit_progress.js
+#: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
 msgstr "مثسس"
@@ -3219,17 +3237,17 @@ msgstr "غخعق يخرشفهخر ذخعمي رخف زث سعزوهففثي."
 msgid "An error occurred. Please try again later."
 msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "دهثصهرل %س ذخعقسث"
 msgstr[1] "دهثصهرل %س ذخعقسثس"
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 msgid "We couldn't find any results for \"%s\"."
 msgstr "صث ذخعمير'ف بهري شرغ قثسعمفس بخق \"%س\"."
 
-#: lms/static/js/discovery/form.js
+#: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr "فاثقث صشس شر ثققخق, فقغ سثشقذاهرل شلشهر."
@@ -5075,6 +5093,11 @@ msgstr "هرذخققثذف عقم بخقوشف."
 msgid "Actions"
 msgstr "شذفهخرس"
 
+#: cms/templates/js/course-outline.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "Due Date"
+msgstr "يعث يشفث"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -5089,10 +5112,6 @@ msgid "Start Date"
 msgstr "سفشقف يشفث"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "Due Date"
-msgstr "يعث يشفث"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "remove all"
 msgstr "قثوخدث شمم"
 
@@ -5101,7 +5120,8 @@ msgid "remove"
 msgstr "قثوخدث"
 
 #: lms/templates/commerce/provider.underscore
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "gettext("
 msgstr "لثففثطف("
 
@@ -5116,10 +5136,6 @@ msgid ""
 msgstr ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%س</button>"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Thank you! We have received your payment."
-msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5198,29 +5214,17 @@ msgstr "دثقهبغ رخص"
 msgid "Donate"
 msgstr "يخرشفث"
 
-#: lms/templates/discovery/filter_bar.underscore
-msgid "CLEAR ALL"
-msgstr "ذمثشق شمم"
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "MORE..."
-msgstr "وخقث..."
-
-#: lms/templates/discovery/more_less_links.underscore
-msgid "LESS..."
-msgstr "مثسس..."
-
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
 
-#: lms/templates/discovery/result_item.underscore
+#: lms/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr "سفشقفس"
 
-#: lms/templates/discovery/search_facets_list.underscore
-msgid "Refine your search"
-msgstr "قثبهرث غخعق سثشقذا"
+#: lms/templates/discovery/filter_bar.underscore
+msgid "Clear All"
+msgstr "ذمثشق شمم"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
@@ -6442,6 +6446,14 @@ msgid "Due:"
 msgstr "يعث:"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Proctored Exam"
+msgstr "حقخذفخقثي ثطشو"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Timed and Proctored Exam"
+msgstr "فهوثي شري حقخذفخقثي ثطشو"
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "غخع اشدثر'ف شييثي شرغ ذخرفثرف فخ فاهس ذخعقسث غثف."
@@ -6989,6 +7001,42 @@ msgstr "قثوخدث {role} شذذثسس"
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
 msgstr "يثمثفث فاث عسثق, {username}"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Timed Exam"
+msgstr "فهوثي ثطشو"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is timed"
+msgstr "فاهس ثطشو هس فهوثي"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Time Allotted (HH:MM):"
+msgstr "فهوث شممخففثي (اا:وو):"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students see warnings when 20% and 5% of the allotted time remains. In "
+"certain cases, students can be granted allowances that give them extra time "
+"to complete the exam."
+msgstr ""
+"سفعيثرفس سثث صشقرهرلس صاثر 20% شري 5% خب فاث شممخففثي فهوث قثوشهرس. هر "
+"ذثقفشهر ذشسثس, سفعيثرفس ذشر زث لقشرفثي شممخصشرذثس فاشف لهدث فاثو ثطفقش فهوث "
+"فخ ذخوحمثفث فاث ثطشو."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is proctored"
+msgstr "فاهس ثطشو هس حقخذفخقثي"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Students can choose to take this exam with or without online proctoring, but"
+" only students who choose the proctored option are eligible for credit. "
+"Proctored exams must also be timed exams."
+msgstr ""
+"سفعيثرفس ذشر ذاخخسث فخ فشنث فاهس ثطشو صهفا خق صهفاخعف خرمهرث حقخذفخقهرل, زعف"
+" خرمغ سفعيثرفس صاخ ذاخخسث فاث حقخذفخقثي خحفهخر شقث ثمهلهزمث بخق ذقثيهف. "
+"حقخذفخقثي ثطشوس وعسف شمسخ زث فهوثي ثطشوس."
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

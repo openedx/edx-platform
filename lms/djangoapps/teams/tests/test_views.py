@@ -15,22 +15,26 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @attr('shard_1')
-class TestDashboard(ModuleStoreTestCase):
+class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
     test_password = "test"
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestDashboard, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            teams_configuration={"max_team_size": 10, "topics": [{"name": "foo", "id": 0, "description": "test topic"}]}
+        )
 
     def setUp(self):
         """
         Set up tests
         """
         super(TestDashboard, self).setUp()
-        self.course = CourseFactory.create(
-            teams_configuration={"max_team_size": 10, "topics": [{"name": "foo", "id": 0, "description": "test topic"}]}
-        )
         # will be assigned to self.client by default
         self.user = UserFactory.create(password=self.test_password)
         self.teams_url = reverse('teams_dashboard', args=[self.course.id])
@@ -96,14 +100,14 @@ class TestDashboard(ModuleStoreTestCase):
         self.assertEqual(404, response.status_code)
 
 
-class TeamAPITestCase(APITestCase, ModuleStoreTestCase):
+class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     """Base class for Team API test cases."""
 
     test_password = 'password'
 
-    def setUp(self):
-        super(TeamAPITestCase, self).setUp()
-
+    @classmethod
+    def setUpClass(cls):
+        super(TeamAPITestCase, cls).setUpClass()
         teams_configuration = {
             'topics':
             [
@@ -114,16 +118,17 @@ class TeamAPITestCase(APITestCase, ModuleStoreTestCase):
                 } for i, name in enumerate([u'sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
             ]
         }
-        self.topics_count = 4
-
-        self.test_course_1 = CourseFactory.create(
+        cls.test_course_1 = CourseFactory.create(
             org='TestX',
             course='TS101',
             display_name='Test Course',
             teams_configuration=teams_configuration
         )
-        self.test_course_2 = CourseFactory.create(org='MIT', course='6.002x', display_name='Circuits')
+        cls.test_course_2 = CourseFactory.create(org='MIT', course='6.002x', display_name='Circuits')
 
+    def setUp(self):
+        super(TeamAPITestCase, self).setUp()
+        self.topics_count = 4
         self.users = {
             'student_unenrolled': UserFactory.create(password=self.test_password),
             'student_enrolled': UserFactory.create(password=self.test_password),
@@ -376,6 +381,7 @@ class TestCreateTeamAPI(TeamAPITestCase):
         team = self.post_create_team(status, self.build_team_data(name="New Team"), user=user)
         if status == 200:
             self.assertEqual(team['id'], 'new-team')
+            self.assertIn('discussion_topic_id', team)
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
 
@@ -422,8 +428,9 @@ class TestCreateTeamAPI(TeamAPITestCase):
             language='fr'
         ))
 
-        # Remove date_created because it changes between test runs
+        # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
+        del team['discussion_topic_id']
         self.assertEquals(team, {
             'name': 'Fully specified team',
             'language': 'fr',
@@ -453,7 +460,8 @@ class TestDetailTeamAPI(TeamAPITestCase):
     def test_access(self, user, status):
         team = self.get_team_detail(self.test_team_1.team_id, status, user=user)
         if status == 200:
-            self.assertEquals(team['description'], self.test_team_1.description)
+            self.assertEqual(team['description'], self.test_team_1.description)
+            self.assertEqual(team['discussion_topic_id'], self.test_team_1.discussion_topic_id)
 
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)

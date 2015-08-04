@@ -170,3 +170,34 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         # even though we would have been blocked by country
         # access rules.
         self.assertEqual(response.status_code, 200)
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def test_always_allow_course_detail_access(self):
+        """ Access to the Course Structure API's course detail endpoint should always be granted. """
+        # Make the user staff so that it has permissions to access the views.
+        self.user.is_staff = True
+        self.user.save()  # pylint: disable=no-member
+
+        # Blacklist an IP address
+        ip_address = "192.168.10.20"
+        IPFilter.objects.create(
+            blacklist=ip_address,
+            enabled=True
+        )
+
+        url = reverse('course_structure_api:v0:detail', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(
+            url,
+            HTTP_X_FORWARDED_FOR=ip_address,
+            REMOTE_ADDR=ip_address
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # Test with a fully-restricted course
+        with restrict_course(self.course.id):
+            response = self.client.get(
+                url,
+                HTTP_X_FORWARDED_FOR=ip_address,
+                REMOTE_ADDR=ip_address
+            )
+            self.assertEqual(response.status_code, 200)

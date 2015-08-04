@@ -331,3 +331,21 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             __ = course.lowest_passing_grade
         course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
+
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 1), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.unpack
+    def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
+        """
+        Test that CourseOverviews with old version numbers are thrown out.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create()
+            course_overview = CourseOverview.get_from_id(course.id)
+            course_overview.version = CourseOverview.VERSION - 1
+            course_overview.save()
+
+            # Because the course overview now has an old version number, it should
+            # be thrown out after being loaded from the cache, which results in
+            # a call to get_course.
+            with check_mongo_calls_range(max_finds=max_mongo_calls, min_finds=min_mongo_calls):
+                _course_overview_2 = CourseOverview.get_from_id(course.id)

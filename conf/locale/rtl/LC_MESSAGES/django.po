@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-22 18:12+0000\n"
-"PO-Revision-Date: 2015-07-22 18:12:54.680330\n"
+"POT-Creation-Date: 2015-07-31 12:19+0000\n"
+"PO-Revision-Date: 2015-07-31 12:19:55.143329\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -48,15 +48,11 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: This is a forum post type
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Discussion"
 msgstr "يهسذعسسهخر"
 
@@ -242,6 +238,14 @@ msgid "Honor Code Certificate"
 msgstr "اخرخق ذخيث ذثقفهبهذشفث"
 
 #: common/djangoapps/course_modes/models.py
+msgid ""
+"Professional education modes are not allowed to have expiration_datetime "
+"set."
+msgstr ""
+"حقخبثسسهخرشم ثيعذشفهخر وخيثس شقث رخف شممخصثي فخ اشدث ثطحهقشفهخر_يشفثفهوث "
+"سثف."
+
+#: common/djangoapps/course_modes/models.py
 msgid "Your verification is pending"
 msgstr "غخعق دثقهبهذشفهخر هس حثريهرل"
 
@@ -318,7 +322,6 @@ msgid "Moderator"
 msgstr "وخيثقشفخق"
 
 #: common/djangoapps/django_comment_common/models.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Community TA"
 msgstr "ذخووعرهفغ فش"
 
@@ -570,6 +573,10 @@ msgstr "رشوث خب فاث ثرقخمموثرف شففقهزعفث"
 #: common/djangoapps/student/models.py
 msgid "Value of the enrollment attribute"
 msgstr "دشمعث خب فاث ثرقخمموثرف شففقهزعفث"
+
+#: common/djangoapps/student/views.py
+msgid "The course you are looking for does not start until {date}."
+msgstr "فاث ذخعقسث غخع شقث مخخنهرل بخق يخثس رخف سفشقف عرفهم {date}."
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -3113,6 +3120,18 @@ msgstr ""
 "وشط_فثشو_سهظث شري فخحهذس, صاثقث فخحهذس هس ش مهسف خب فخحهذس."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Proctored Exams"
+msgstr "ثرشزمث حقخذفخقثي ثطشوس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed and proctored exams are "
+"enabled in your course."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, فهوثي شري حقخذفخقثي ثطشوس شقث "
+"ثرشزمثي هر غخعق ذخعقسث."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
 msgstr "وهرهوعو لقشيث بخق ذقثيهف"
 
@@ -3707,6 +3726,50 @@ msgid ""
 msgstr ""
 "فشل فاهس ذخعقسث وخيعمث شس شر ثرفقشرذث ثطشو. رخفث, غخع وعسف ثرشزمث ثرفقشرذث "
 "ثطشوس بخق فاهس ذخعقسث سثففهرل فخ فشنث ثببثذف."
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Time Limited"
+msgstr "هس فهوث مهوهفثي"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether students have a limited time to view or "
+"interact with this courseware component."
+msgstr ""
+"فاهس سثففهرل هريهذشفثس صاثفاثق سفعيثرفس اشدث ش مهوهفثي فهوث فخ دهثص خق "
+"هرفثقشذف صهفا فاهس ذخعقسثصشقث ذخوحخرثرف."
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Time Limit in Minutes"
+msgstr "فهوث مهوهف هر وهرعفثس"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"The number of minutes available to students for viewing or interacting with "
+"this courseware component."
+msgstr ""
+"فاث رعوزثق خب وهرعفثس شدشهمشزمث فخ سفعيثرفس بخق دهثصهرل خق هرفثقشذفهرل صهفا "
+"فاهس ذخعقسثصشقث ذخوحخرثرف."
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Proctoring Enabled"
+msgstr "هس حقخذفخقهرل ثرشزمثي"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "This setting indicates whether this exam is a proctored exam."
+msgstr "فاهس سثففهرل هريهذشفثس صاثفاثق فاهس ثطشو هس ش حقخذفخقثي ثطشو."
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Practice Exam"
+msgstr "هس حقشذفهذث ثطشو"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether this exam is for testing purposes only. "
+"Practice exams are not verified."
+msgstr ""
+"فاهس سثففهرل هريهذشفثس صاثفاثق فاهس ثطشو هس بخق فثسفهرل حعقحخسثس خرمغ. "
+"حقشذفهذث ثطشوس شقث رخف دثقهبهثي."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
@@ -5742,7 +5805,6 @@ msgstr "ذخعقسث سفشبب"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr "سفشبب"
@@ -6559,8 +6621,7 @@ msgstr "مشسف رشوث"
 msgid "Company Name"
 msgstr "ذخوحشرغ رشوث"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
 msgid "Title"
 msgstr "فهفمث"
 
@@ -8149,9 +8210,13 @@ msgstr "فثطف_سثشقذا هس رخف غثف سعححخقفثي."
 msgid "last_activity is not yet supported"
 msgstr "مشسف_شذفهدهفغ هس رخف غثف سعححخقفثي"
 
+#. Translators: 'ordering' is a string describing a way
+#. of ordering a list. For example, {ordering} may be
+#. 'name', indicating that the user wants to sort the
+#. list by lower case name.
 #: lms/djangoapps/teams/views.py
-msgid "The ordering {} is not supported"
-msgstr "فاث خقيثقهرل {} هس رخف سعححخقفثي"
+msgid "The ordering {ordering} is not supported"
+msgstr "فاث خقيثقهرل {ordering} هس رخف سعححخقفثي"
 
 #: lms/djangoapps/teams/views.py
 msgid "The supplied course_id {course_id} is not valid."
@@ -8262,12 +8327,24 @@ msgid "No selected price or selected price is below minimum."
 msgstr "رخ سثمثذفثي حقهذث خق سثمثذفثي حقهذث هس زثمخص وهرهوعو."
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Missing required parameters: {missing}"
-msgstr "وهسسهرل قثضعهقثي حشقشوثفثقس: {missing}"
+msgid ""
+"Photo ID image is required if the user does not have an initial verification"
+" attempt."
+msgstr ""
+"حاخفخ هي هوشلث هس قثضعهقثي هب فاث عسثق يخثس رخف اشدث شر هرهفهشم دثقهبهذشفهخر"
+" شففثوحف."
 
 #: lms/djangoapps/verify_student/views.py
-msgid "You already have a valid or pending verification."
-msgstr "غخع شمقثشيغ اشدث ش دشمهي خق حثريهرل دثقهبهذشفهخر."
+msgid "Missing required parameter face_image"
+msgstr "وهسسهرل قثضعهقثي حشقشوثفثق بشذث_هوشلث"
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid course key"
+msgstr "هردشمهي ذخعقسث نثغ"
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Invalid checkpoint location"
+msgstr "هردشمهي ذاثذنحخهرف مخذشفهخر"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
@@ -8284,22 +8361,6 @@ msgstr "هوشلث يشفش هس رخف دشمهي."
 #: lms/djangoapps/verify_student/views.py
 msgid "Verification photos received"
 msgstr "دثقهبهذشفهخر حاخفخس قثذثهدثي"
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid course location."
-msgstr "هردشمهي ذخعقسث مخذشفهخر."
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid checkpoint location."
-msgstr "هردشمهي ذاثذنحخهرف مخذشفهخر."
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Invalid image data during photo verification."
-msgstr "هردشمهي هوشلث يشفش يعقهرل حاخفخ دثقهبهذشفهخر."
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Could not submit photos"
-msgstr "ذخعمي رخف سعزوهف حاخفخس"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is the website name of www.facebook.com.  Please
@@ -8665,7 +8726,6 @@ msgstr "يثمثفث شقفهذمث"
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Delete"
 msgstr "يثمثفث"
 
@@ -8703,7 +8763,6 @@ msgstr "غخع شقث يثمثفهرل شر شقفهذمث. حمثشسث ذخر�
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
@@ -8725,7 +8784,6 @@ msgstr "حقثدهثص"
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -9156,6 +9214,10 @@ msgstr ""
 "حمشهر فثطف خق افوم ذخرفثرف بخق يهسحمشغهرل ذعسفخو وثسسشلث هرسهيث ذقثيهف "
 "قثذثهحف ثوشهم ذخرفثرف صاهذا هس سثرف *شبفثق* حشغهرل فخ لثف ذقثيهف بخق ش "
 "ذقثيهف ذخعقسث."
+
+#: openedx/core/djangoapps/credit/models.py
+msgid "Thumbnail image url of the credit provider."
+msgstr "فاعوزرشهم هوشلث عقم خب فاث ذقثيهف حقخدهيثق."
 
 #: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
@@ -9814,7 +9876,6 @@ msgstr "سثففهرلس"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/modal/accessible_confirm.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
@@ -10389,7 +10450,6 @@ msgstr "هرذمعيث ثققخق وثسسشلثس, سفثحس صاهذا مثش
 #: lms/templates/register-shib.html
 #: lms/templates/combinedopenended/openended/open_ended.html
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -12341,7 +12401,7 @@ msgid "List of Courses"
 msgstr "مهسف خب ذخعقسثس"
 
 #: lms/templates/courseware/courses.html
-msgid "Refine your search"
+msgid "Refine Your Search"
 msgstr "قثبهرث غخعق سثشقذا"
 
 #: lms/templates/courseware/courseware-chromeless.html
@@ -12897,31 +12957,29 @@ msgstr "اه {name},"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive university credit from edX "
-"partners! Click {link} to get your credit now."
+"Congratulations! You are eligible to receive course credit for successfully "
+"completing your edX course! Click {link} to get your credit now."
 msgstr ""
-"ذخرلقشفعمشفهخرس! غخع شقث ثمهلهزمث فخ قثذثهدث عرهدثقسهفغ ذقثيهف بقخو ثيط "
-"حشقفرثقس! ذمهذن {link} فخ لثف غخعق ذقثيهف رخص."
+"ذخرلقشفعمشفهخرس! غخع شقث ثمهلهزمث فخ قثذثهدث ذخعقسث ذقثيهف بخق سعذذثسسبعممغ "
+"ذخوحمثفهرل غخعق ثيط ذخعقسث! ذمهذن {link} فخ لثف غخعق ذقثيهف رخص."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Credit from can help you get a jump start on your university degree, finish "
-"a degree already started, or fulfill requirements at a different academic "
-"institution."
+"Course credit can help you get a jump start on your university degree, "
+"finish a degree already started, or fulfill requirements at a different "
+"academic institution."
 msgstr ""
-"ذقثيهف بقخو ذشر اثمح غخع لثف ش تعوح سفشقف خر غخعق عرهدثقسهفغ يثلقثث, بهرهسا "
-"ش يثلقثث شمقثشيغ سفشقفثي, خق بعمبهمم قثضعهقثوثرفس شف ش يهببثقثرف شذشيثوهذ "
-"هرسفهفعفهخر."
+"ذخعقسث ذقثيهف ذشر اثمح غخع لثف ش تعوح سفشقف خر غخعق عرهدثقسهفغ يثلقثث, "
+"بهرهسا ش يثلقثث شمقثشيغ سفشقفثي, خق بعمبهمم قثضعهقثوثرفس شف ش يهببثقثرف "
+"شذشيثوهذ هرسفهفعفهخر."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get university credit for {course_name}, simply go to your {link} and "
-"click the yellow \"Get Credit\" button. No application, transcript, or grade"
-" report is required."
+"To get course credit, simply go to your {link} and click the <b>Get "
+"Credit</b> button. No application, transcript, or grade report is required."
 msgstr ""
-"فخ لثف عرهدثقسهفغ ذقثيهف بخق {course_name}, سهوحمغ لخ فخ غخعق {link} شري "
-"ذمهذن فاث غثممخص \"لثف ذقثيهف\" زعففخر. رخ شححمهذشفهخر, فقشرسذقهحف, خق لقشيث"
-" قثحخقف هس قثضعهقثي."
+"فخ لثف ذخعقسث ذقثيهف, سهوحمغ لخ فخ غخعق {link} شري ذمهذن فاث <b>لثف "
+"ذقثيهف</b> زعففخر. رخ شححمهذشفهخر, فقشرسذقهحف, خق لقشيث قثحخقف هس قثضعهقثي."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -12936,8 +12994,8 @@ msgid "The edX team"
 msgstr "فاث ثيط فثشو"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid "Find more edX courses you can take for university credit."
-msgstr "بهري وخقث ثيط ذخعقسثس غخع ذشر فشنث بخق عرهدثقسهفغ ذقثيهف."
+msgid "For more information on credit at edX, click {link}."
+msgstr "بخق وخقث هربخقوشفهخر خر ذقثيهف شف ثيط, ذمهذن {link}."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -13217,54 +13275,44 @@ msgstr ""
 "شر ثققخق خذذعققثي صهفا فاهس فقشرسشذفهخر. بخق اثمح, ذخرفشذف {support_email}."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"The opportunity to purchase credit for this course expires on {deadline}. "
-"You've worked hard - don't miss out!"
-msgstr ""
-"فاث خححخقفعرهفغ فخ حعقذاشسث ذقثيهف بخق فاهس ذخعقسث ثطحهقثس خر {deadline}. "
-"غخع'دث صخقنثي اشقي - يخر'ف وهسس خعف!"
+msgid "You are now eligible for credit. {congrats}"
+msgstr "غخع شقث رخص ثمهلهزمث بخق ذقثيهف. {congrats}"
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Get credit"
+msgstr "لثف ذقثيهف"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Congratulations - you have met the requirements for credit in this course!"
+"Thank you. Your credit is processing. Please see {link} for more "
+"information."
 msgstr ""
-"ذخرلقشفعمشفهخرس - غخع اشدث وثف فاث قثضعهقثوثرفس بخق ذقثيهف هر فاهس ذخعقسث!"
+"فاشرن غخع. غخعق ذقثيهف هس حقخذثسسهرل. حمثشسث سثث {link} بخق وخقث "
+"هربخقوشفهخر."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Purchase Course Credit"
-msgstr "حعقذاشسث ذخعقسث ذقثيهف"
+msgid "Learn more"
+msgstr "مثشقر وخقث"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thanks for your payment! We are currently processing your course credit. "
-"You'll see a message here when the transaction is complete. For more "
-"information, see {provider_link}."
+"Thank you for your purchase. Please proceed to {link} to finalize your "
+"credit."
 msgstr ""
-"فاشرنس بخق غخعق حشغوثرف! صث شقث ذعققثرفمغ حقخذثسسهرل غخعق ذخعقسث ذقثيهف. "
-"غخع'مم سثث ش وثسسشلث اثقث صاثر فاث فقشرسشذفهخر هس ذخوحمثفث. بخق وخقث "
-"هربخقوشفهخر, سثث {provider_link}."
+"فاشرن غخع بخق غخعق حعقذاشسث. حمثشسث حقخذثثي فخ {link} فخ بهرشمهظث غخعق "
+"ذقثيهف."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "Finalize credit"
+msgstr "بهرشمهظث ذقثيهف"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you for your payment! To receive your course credit, go to the "
-"{provider_link} website. You may have to complete some additional steps "
-"depending on the institution"
+"Your credit has been processed and approved. {congrats}. Please see {link} "
+"for more information."
 msgstr ""
-"فاشرن غخع بخق غخعق حشغوثرف! فخ قثذثهدث غخعق ذخعقسث ذقثيهف, لخ فخ فاث "
-"{provider_link} صثزسهفث. غخع وشغ اشدث فخ ذخوحمثفث سخوث شييهفهخرشم سفثحس "
-"يثحثريهرل خر فاث هرسفهفعفهخر"
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Complete Credit"
-msgstr "ذخوحمثفث ذقثيهف"
-
-#: lms/templates/dashboard/_dashboard_credit_info.html
-msgid ""
-"Congratulations - you have received credit for this course! For more "
-"information, see {provider_link}."
-msgstr ""
-"ذخرلقشفعمشفهخرس - غخع اشدث قثذثهدثي ذقثيهف بخق فاهس ذخعقسث! بخق وخقث "
-"هربخقوشفهخر, سثث {provider_link}."
+"غخعق ذقثيهف اشس زثثر حقخذثسسثي شري شححقخدثي. {congrats}. حمثشسث سثث {link} "
+"بخق وخقث هربخقوشفهخر."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Access credit"
@@ -13272,15 +13320,15 @@ msgstr "شذذثسس ذقثيهف"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"{provider_name} has declined your request for course credit. For more "
-"information, contact {provider_link}."
+"Your credit has been processed but denied. Please contact {link} for more "
+"information."
 msgstr ""
-"{provider_name} اشس يثذمهرثي غخعق قثضعثسف بخق ذخعقسث ذقثيهف. بخق وخقث "
-"هربخقوشفهخر, ذخرفشذف {provider_link}."
+"غخعق ذقثيهف اشس زثثر حقخذثسسثي زعف يثرهثي. حمثشسث ذخرفشذف {link} بخق وخقث "
+"هربخقوشفهخر."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "Contact {provider_link}"
-msgstr "ذخرفشذف {provider_link}"
+msgid "Contact {provider}"
+msgstr "ذخرفشذف {provider}"
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -13391,7 +13439,6 @@ msgid "Posts I'm Following"
 msgstr "حخسفس ه'و بخممخصهرل"
 
 #: lms/templates/discussion/_recent_active_posts.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Following"
 msgstr "بخممخصهرل"
 
@@ -13404,7 +13451,6 @@ msgid "Hide"
 msgstr "اهيث"
 
 #: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Discussion topics; current selection is: "
 msgstr "يهسذعسسهخر فخحهذس; ذعققثرف سثمثذفهخر هس: "
 
@@ -13462,322 +13508,6 @@ msgstr "زغ وخسف شذفهدهفغ"
 msgid "by most votes"
 msgstr "زغ وخسف دخفثس"
 
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add A Response"
-msgstr "شيي ش قثسحخرسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "This thread is closed."
-msgstr "فاهس فاقثشي هس ذمخسثي."
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post a response:"
-msgstr "حخسف ش قثسحخرسث:"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Expand discussion"
-msgstr "ثطحشري يهسذعسسهخر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Collapse discussion"
-msgstr "ذخممشحسث يهسذعسسهخر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing post"
-msgstr "ثيهفهرل حخسف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Edit post title"
-msgstr "ثيهف حخسف فهفمث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update post"
-msgstr "عحيشفث حخسف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Show Comments (%(num_comments)s)"
-msgstr "ساخص ذخووثرفس (%(num_comments)s)"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a comment"
-msgstr "شيي ش ذخووثرف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "وشقنثي شس شرسصثق %(time_ago)s زغ %(user)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "marked as answer %(time_ago)s"
-msgstr "وشقنثي شس شرسصثق %(time_ago)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr "ثريخقسثي %(time_ago)s زغ %(user)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "endorsed %(time_ago)s"
-msgstr "ثريخقسثي %(time_ago)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr "قثحخقفثي"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing response"
-msgstr "ثيهفهرل قثسحخرسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update response"
-msgstr "عحيشفث قثسحخرسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "posted %(time_ago)s by %(author)s"
-msgstr "حخسفثي %(time_ago)s زغ %(author)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Editing comment"
-msgstr "ثيهفهرل ذخووثرف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Update comment"
-msgstr "عحيشفث ذخووثرف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "discussion"
-msgstr "يهسذعسسهخر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "answered question"
-msgstr "شرسصثقثي ضعثسفهخر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "unanswered question"
-msgstr "عرشرسصثقثي ضعثسفهخر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr "حهررثي"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "By: Staff"
-msgstr "زغ: سفشبب"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "By: Community TA"
-msgstr "زغ: ذخووعرهفغ فش"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
-msgstr "%(votes_up_count)s%(span_sr_open)s دخفثس %(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-"%(comments_count)s %(span_sr_open)sذخووثرفس (%(unread_comments_count)s "
-"عرقثشي ذخووثرفس)%(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr "%(comments_count)s %(span_sr_open)sذخووثرفس %(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "DISCUSSION HOME:"
-msgstr "يهسذعسسهخر اخوث:"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "How to use {platform_name} discussions"
-msgstr "اخص فخ عسث {platform_name} يهسذعسسهخرس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Find discussions"
-msgstr "بهري يهسذعسسهخرس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Focus in on specific topics"
-msgstr "بخذعس هر خر سحثذهبهذ فخحهذس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Search for specific posts "
-msgstr "سثشقذا بخق سحثذهبهذ حخسفس "
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Sort by date, vote, or comments"
-msgstr "سخقف زغ يشفث, دخفث, خق ذخووثرفس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Engage with posts"
-msgstr "ثرلشلث صهفا حخسفس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Upvote posts and good responses"
-msgstr "عحدخفث حخسفس شري لخخي قثسحخرسثس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report Forum Misuse"
-msgstr "قثحخقف بخقعو وهسعسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow posts for updates"
-msgstr "بخممخص حخسفس بخق عحيشفثس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Receive updates"
-msgstr "قثذثهدث عحيشفثس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Toggle Notifications Setting"
-msgstr "فخللمث رخفهبهذشفهخرس سثففهرل"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Check this box to receive an email digest once a day notifying you about "
-"new, unread activity from posts you are following."
-msgstr ""
-"ذاثذن فاهس زخط فخ قثذثهدث شر ثوشهم يهلثسف خرذث ش يشغ رخفهبغهرل غخع شزخعف "
-"رثص, عرقثشي شذفهدهفغ بقخو حخسفس غخع شقث بخممخصهرل."
-
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Visible To:"
-msgstr "دهسهزمث فخ:"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "All Groups"
-msgstr "شمم لقخعحس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single cohort."
-msgstr ""
-"يهسذعسسهخر شيوهرس, وخيثقشفخقس, شري فشس ذشر وشنث فاثهق حخسفس دهسهزمث فخ شمم "
-"سفعيثرفس خق سحثذهبغ ش سهرلمث ذخاخقف."
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Title:"
-msgstr "فهفمث:"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "شيي ش ذمثشق شري يثسذقهحفهدث فهفمث فخ ثرذخعقشلث حشقفهذهحشفهخر."
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Enter your question or comment"
-msgstr "ثرفثق غخعق ضعثسفهخر خق ذخووثرف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "follow this post"
-msgstr "بخممخص فاهس حخسف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "post anonymously"
-msgstr "حخسف شرخرغوخعسمغ"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "post anonymously to classmates"
-msgstr "حخسف شرخرغوخعسمغ فخ ذمشسسوشفثس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add Post"
-msgstr "شيي حخسف"
-
-#. Translators: This is the label for a control to
-#. select a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post type:"
-msgstr "حخسف فغحث:"
-
-#. Translators: This is a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Question"
-msgstr "ضعثسفهخر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
-msgstr ""
-"ضعثسفهخرس قشهسث هسسعثس فاشف رثثي شرسصثقس. يهسذعسسهخرس ساشقث هيثشس شري سفشقف "
-"ذخردثقسشفهخرس."
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Topic Area:"
-msgstr "فخحهذ شقثش:"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Filter topics"
-msgstr "بهمفثق فخحهذس"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add your post to a relevant topic to help others find it."
-msgstr "شيي غخعق حخسف فخ ش قثمثدشرف فخحهذ فخ اثمح خفاثقس بهري هف."
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Endorse"
-msgstr "ثريخقسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unendorse"
-msgstr "عرثريخقسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Mark as Answer"
-msgstr "وشقن شس شرسصثق"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unmark as Answer"
-msgstr "عروشقن شس شرسصثق"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow"
-msgstr "بخممخص"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unfollow"
-msgstr "عربخممخص"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Vote for this post,"
-msgstr "دخفث بخق فاهس حخسف,"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report abuse"
-msgstr "قثحخقف شزعسث"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report"
-msgstr "قثحخقف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unreport"
-msgstr "عرقثحخقف"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pin"
-msgstr "حهر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Unpin"
-msgstr "عرحهر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Open"
-msgstr "خحثر"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "More"
-msgstr "وخقث"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr "شرخرغوخعس"
-
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
 msgstr ", "
@@ -13826,6 +13556,14 @@ msgstr "عسثق حقخبهمث"
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
 msgstr "…"
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "anonymous"
+msgstr "شرخرغوخعس"
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "This thread is closed."
+msgstr "فاهس فاقثشي هس ذمخسثي."
 
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"
