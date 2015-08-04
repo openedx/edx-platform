@@ -37,30 +37,30 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
             run='test_run',
             display_name='User Partition Transformation test course',
         )
-
+        self.course.save()
         self.chapter = ItemFactory.create(
-            parent_location=self.course.location,
+            parent=self.course,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
         )
-
+        self.chapter.save()
         self.sequential = ItemFactory.create(
-            parent_location=self.chapter.location,
+            parent=self.chapter,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
         )
-
+        self.sequential.save()
         self.vertical = ItemFactory.create(
-            parent_location=self.sequential.location,
+            parent=self.sequential,
             category='vertical',
             display_name='Subsection 1',
             publish_item=True,
         )
-
+        self.vertical.save()
         self.html = ItemFactory.create(
-            parent_location=self.vertical.location,
+            parent=self.vertical,
             category='html',
             display_name='Html Test 1',
             publish_item=True,          
@@ -102,13 +102,13 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
         self.user_partition.scheme.name = "cohort"
 
         self.html2 = ItemFactory.create(
-            parent_location=self.vertical.location,
+            parent=self.vertical,
             category='html',
             display_name="Html Test 2",
             publish_item=True,
             metadata={'group_access': {0: [1]}},
         )
-
+        self.html2.save()
         self.first_cohort, self.second_cohort = [
             CohortFactory(course_id=self.course.id) for _ in range(2)
         ]
@@ -159,5 +159,18 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
         self.transformation = UserPartitionTransformation()
         self.add_seq_with_content_groups()
         self.add_user_to_cohort_group()
-        course_blocks = get_course_blocks(self.user, self.course.id, transformations={self.transformation})
-        self.assertEquals(1, course_blocks)
+
+        __, raw_data_blocks = get_course_blocks(
+            self.user,
+            self.course.id,
+            transformations={}
+        )
+        self.assertEquals(len(raw_data_blocks), 6)
+
+        clear_course_from_cache(self.course.id)
+        __, trans_data_blocks = get_course_blocks(
+            self.user,
+            self.course.id,
+            transformations={self.transformation}
+        )
+        self.assertEquals(len(trans_data_blocks), 5)

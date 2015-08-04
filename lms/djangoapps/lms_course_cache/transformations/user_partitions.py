@@ -15,10 +15,10 @@ class MergedGroupAccess(object):
     ...
     """
 
-    def __init__(self, partition_ids, xblock, merged_parent_access_list):
+    def __init__(self, user_partitions, xblock, merged_parent_access_list):
         """
         Arguments:
-            partition_ids (list[int])
+            user_partitions (list[UserPartition])
             xblock (XBlock)
             merged_parent_access_list (list[MergedGroupAccess])
         """
@@ -32,26 +32,27 @@ class MergedGroupAccess(object):
         #       - group_access[partition_id] == [group1..groupN] => groups 1..N have access for this partition
         #
         # We internally represent the restrictions in a simplified way:
-        #   - self._partition_dict == {}                                 => No group access restrictions.
+        #   - self._access == {}                                 => No group access restrictions.
         #   - For each partition:
-        #       - partition.id not in _partition_access                  => All groups have access for this partition
-        #       - _partition_access[partition_id] == set()               => No groups have access for this partition
-        #       - _partition_access[partition_id] == set(group1..groupN) => groups 1..N have access for this partition
+        #       - partition.id not in _access                    => All groups have access for this partition
+        #       - _access[partition_id] == set()                 => No groups have access for this partition
+        #       - _access[partition_id] == set(group1..groupN)   => groups 1..N have access for this partition
         #
         # Note that a user must have access to all partitions in group_access
-        # or _partition_dict in order to access a block.
+        # or _access in order to access a block.
 
         block_group_access = getattr(xblock, 'group_access', {})
+        self._access = {}  # { partition.id: set(IDs of groups that can access partition }
 
-        for partition_id in partition_ids:
+        for partition in user_partitions:
 
             # Within this loop, None <=> Universe set <=> "No access restriction"
 
-            block_group_ids = set(block_group_access.get(partition_id, [])) or None
+            block_group_ids = set(block_group_access.get(partition.id, [])) or None
             parents_group_ids = [
-                merged_parent_access[partition_id]
+                merged_parent_access._access[partition.id]
                 for merged_parent_access in merged_parent_access_list
-                if partition_id in merged_parent_access_list
+                if partition.id in merged_parent_access._access
             ]
             merged_parent_group_ids = (
                 set().union(*parents_group_ids) if parents_group_ids != []
@@ -59,7 +60,7 @@ class MergedGroupAccess(object):
             )
             merged_group_ids = MergedGroupAccess._intersection(block_group_ids, merged_parent_group_ids)
             if merged_group_ids is not None:
-                self._partition_access[partition_id] = merged_group_ids
+                self._access[partition.id] = merged_group_ids
 
     @staticmethod
     def _intersection(*sets):
@@ -84,23 +85,29 @@ class MergedGroupAccess(object):
     def check_group_access(self, user_groups):
         """
         Arguments:
-            user_groups (dict[int: int]): Dictionary in the form: {
-                    partition1.id: group1.id,
-                    partition2.id: group2.id,
-                    ...
-                    partitionN.id: groupN.id
-                }
-                where groupX is the group of partitionY to which the user
-                belongs.
+            dict[int: Group]: Given a user, a mapping from user partition IDs
+                to the group to which the user belongs in each partition.
 
         Returns:
-            bool: Whether said user
+            bool: Whether said user has group access.
         """
-        # TODO me: is this the correct behavior for partitions in which user doesn't belong to a group?
-        for partition_id, allowed_group_ids in self._partition_dict.iteritems():
-            group_id = user_groups.get(partition_id, None)
-            if group_id not in allowed_group_ids:
+        for partition_id, allowed_group_ids in self._access.iteritems():
+
+            # If the user is not assigned to a group for this partition, deny access.
+            # TODO: is this ^ the correct behavior?
+            if partition_id not in user_groups:
                 return False
+
+            # If the user belongs to one of the allowed groups for this partition,
+            # then move and and check the next partition.
+            elif user_groups[partition_id] in allowed_group_ids:
+                continue
+
+            # Else, deny access.
+            else:
+                return False
+
+        # If the user has access for every partition, grant access.
         else:
             return True
 
@@ -111,60 +118,33 @@ class UserPartitionTransformation(CourseStructureTransformation):
     """
 
     @staticmethod
-    def _get_group_for_user_partition(course_key, user_partition, user):
-        """
-        Compute the user's group for the given user partition.
-
-        Arguments:
-            course_key(CourseKey)
-            user_partition (UserPartition)
-            user (User)
-
-        Returns:
-            Group or None
-        """
-        kwargs = (
-            {'assign': False} if user_partition.scheme in SCHEME_SUPPORTS_ASSIGNMENT
-            else {}
-        )
-        return user_partition.scheme.get_group_for_user(
-            course_key,
-            user,
-            user_partition,
-            **kwargs
-        )
-
-    @staticmethod
-    def _get_group_ids_for_user(course_key, user_partitions, user):
+    def _get_user_partition_groups(course_key, user_partitions, user):
         """
         Collect group ID for each partition in this course for this user.
 
         Arguments:
             course_key (CourseKey)
-            user_partitions (dict[int: UserPartition])
+            user_partitions (list[UserPartition])
             user (User)
 
         Returns:
-            dict[int: int]: Dictionary in the form: {
-                partition1.id: group1.id,
-                partition2.id: group2.id,
-                ...
-                partitionN.id: groupN.id
-            }
-            where groupX is the group of partitionY to which the user belongs.
-
-        Note:
-            (partitionA.id not in return_value) => user is not assigned a
-                group for partitionA.
+            dict[int: Group]: Mapping from user partitions to the group to which
+                the user belongs in each partition. If the user isn't in a group
+                for a particular partition, then that partition's ID will not be
+                in the dict.
         """
         partition_groups = {}
-        for partition_id, user_partition in user_partitions.iteritems():
-            if user_partition.scheme not in INCLUDE_SCHEMES:
+        for partition in user_partitions:
+            if partition.scheme not in INCLUDE_SCHEMES:
                 continue
-            group = UserPartitionTransformation._get_group_for_user_partition(course_key, user_partition, user)
-            if not group:
-                continue
-            partition_groups[partition_id] = group
+            group = partition.scheme.get_group_for_user(
+                course_key,
+                user,
+                partition,
+                **({'assign': False} if partition.scheme in SCHEME_SUPPORTS_ASSIGNMENT else {})
+            )
+            if group is not None:
+                partition_groups[partition.id] = group
         return partition_groups
 
     def collect(self, course_key, block_structure, xblock_dict):
@@ -184,16 +164,14 @@ class UserPartitionTransformation(CourseStructureTransformation):
 
         # Because user partitions are course-wide, only store data for them on
         # the root block.
-        partition_dict = {
-            partition.id: partition
-            for partition
-            in getattr(xblock_dict[block_structure.root_block_key], 'user_partitions', []) or []
-        }
-        result_dict[block_structure.root_block_key]['user_partition_dict'] = partition_dict
+        # TODO me: change the above
+        xblock = xblock_dict[block_structure.root_block_key]
+        user_partitions = getattr(xblock, 'user_partitions', []) or []
+        result_dict[block_structure.root_block_key]['user_partitions'] = user_partitions
 
         # If there are no user partitions, this transformation is a no-op,
         # so there is nothing to collect.
-        if not partition_dict:
+        if not user_partitions:
             return result_dict
 
         # For each block, compute merged group access. Because this is a
@@ -203,7 +181,7 @@ class UserPartitionTransformation(CourseStructureTransformation):
             xblock = xblock_dict[block_key]
             parent_keys = block_structure.get_parents(block_key)
             parent_access = [result_dict[parent_key]['merged_group_access'] for parent_key in parent_keys]
-            merged_group_access = MergedGroupAccess(partition_dict.keys(), xblock, parent_access)
+            merged_group_access = MergedGroupAccess(user_partitions, xblock, parent_access)
             result_dict[block_key]['merged_group_access'] = merged_group_access
 
         return result_dict
@@ -220,21 +198,22 @@ class UserPartitionTransformation(CourseStructureTransformation):
             remove_orphans (bool)
         """
         # TODO me: This will break if the block_structure.root_block_key is not the course
-        user_partition_dict = block_data[block_structure.root_block_key].get_transformation_data(
-            self, 'user_partition_dict'
+        user_partitions = block_data[block_structure.root_block_key].get_transformation_data(
+            self, 'user_partitions'
         )
 
         # If there are no user partitions, this transformation is a no-op,
         # so there is nothing to apply.
-        if not user_partition_dict:
+        if not user_partitions:
             return
 
-        user_groups = UserPartitionTransformation._get_group_ids_for_user(
-            course_key, user_partition_dict, user
+        user_groups = UserPartitionTransformation._get_user_partition_groups(
+            course_key, user_partitions, user
         )
         if not _has_access_to_course(user, 'staff', course_key):
             block_structure.remove_block_if(
-                lambda block_key: block_data[block_key].get_transformation_data(
+                lambda block_key: not block_data[block_key].get_transformation_data(
                     self, 'merged_group_access'
-                ).check_group_access(user_groups)
+                ).check_group_access(user_groups),
+                remove_orphans
             )

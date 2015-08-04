@@ -546,7 +546,7 @@ class CourseBlockData(object):
             not provided.
         """
         if key in self._transformation_data.get(transformation.id, {}):
-            self._transformation_data[transformation.id][key]
+            return self._transformation_data[transformation.id][key]
         elif default != CourseBlockData._NO_DEFAULT:
             return default
         else:
