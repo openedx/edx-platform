@@ -250,11 +250,13 @@ def update_thread(request, course_id, thread_id):
     if "thread_type" in request.POST:
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
+        commentable_id = request.POST["commentable_id"]
         course = get_course_with_access(request.user, 'load', course_key)
-        if discussion_category_id_access(course, request.user, request.POST.get("commentable_id")):
-            thread.commentable_id = request.POST["commentable_id"]
-        else:
+        thread_context = getattr(thread, "context", "course")
+        if thread_context == "course" and not discussion_category_id_access(course, request.user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
+        else:
+            thread.commentable_id = commentable_id
 
     thread.save()
     if request.is_ajax():
