@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from xblock.fields import Scope
+from courseware.models import StudentModule
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from xblock.runtime import KeyValueStore
 
@@ -303,17 +304,14 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
 
         users = User.objects.filter(workgroups=pk)
         for user in users:
-            key = KeyValueStore.Key(
-                scope=Scope.user_state,
-                user_id=user.id,
-                block_scope_id=content_key,
-                field_name='grade'
+            module, created = StudentModule.objects.get_or_create(
+                student_id=user.id,
+                module_state_key=content_key,
+                course_id=course_key,
             )
-            field_data_cache = FieldDataCache([course_descriptor], course_key, user)
-            student_module = field_data_cache.find_or_create(key)
-            student_module.grade = grade
-            student_module.max_grade = max_grade
-            student_module.save()
+            module.grade = grade
+            module.max_grade = max_grade
+            module.save()
         return Response({}, status=status.HTTP_201_CREATED)
 
 
