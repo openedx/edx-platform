@@ -41,8 +41,6 @@ class InstructorReceiversTests(ModuleStoreTestCase):
             display_name="Overview"
         )
 
-        self.user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
-
     def test_receiver_on_course_deleted(self):
         """
         Test the workflow
