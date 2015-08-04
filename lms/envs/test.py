@@ -540,3 +540,6 @@ FEATURES['ORGANIZATIONS_APP'] = True
 if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
     INSTALLED_APPS += ('organizations',)
 
+# Test mode. Used to let code that might otherwise affect global state know that it shouldn't
+# (such as management commands.)
+TEST_MODE = True

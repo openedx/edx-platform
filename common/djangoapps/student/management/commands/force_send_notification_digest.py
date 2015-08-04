@@ -6,28 +6,29 @@ import datetime
 import pytz
 import logging
 import logging.config
+from django.conf import settings
 
-# This is specifially placed at the top
-# to act as a loggic configuration override for the rest of the
+# This is specifically placed at the top
+# to act as a logic configuration override for the rest of the
 # code
 # Have all logging go to stdout with management commands
 # this must be up at the top otherwise the
 # configuration does not appear to take affect
-logging.config.dictConfig({
-    'version': 1,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
+if not getattr(settings, 'TEST_MODE', False):
+    logging.config.dictConfig({
+        'version': 1,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': sys.stdout,
+            }
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO'
         }
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO'
-    }
-})
+    })
 
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from edx_notifications import const

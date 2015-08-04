@@ -286,3 +286,7 @@ FEATURES['ENABLE_TEAMS'] = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# Test mode. Used to let code that might otherwise affect global state know that it shouldn't
+# (such as management commands.)
+TEST_MODE = True
