@@ -58,7 +58,7 @@ class Command(BaseCommand):
             courses = filtered_courses
 
         for course in courses:
-            users = CourseEnrollment.users_enrolled_in(course.id)
+            users = CourseEnrollment.objects.users_enrolled_in(course.id)
             # If one or more users were specified by the caller, just use those ones...
             if user_ids is not None:
                 filtered_users = []
