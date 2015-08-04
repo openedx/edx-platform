@@ -167,7 +167,11 @@ END
                 ;;
 
             "6")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False --with-flaky"
+                paver test_bokchoy --extra_args="-a 'shard_6' --with-flaky"
+                ;;
+
+            "7")
+                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False --with-flaky"
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
