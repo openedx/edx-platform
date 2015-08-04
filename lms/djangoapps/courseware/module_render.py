@@ -584,8 +584,8 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         # events.
         SCORE_CHANGED.send(
             sender=None,
-            points_possible=event['max_value'],
-            points_earned=event['value'],
+            points_possible=event.get('max_value'),
+            points_earned=event.get('value'),
             user_id=user_id,
             course_id=unicode(course_id),
             usage_id=unicode(descriptor.location)
