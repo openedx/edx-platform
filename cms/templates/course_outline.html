@@ -69,7 +69,13 @@ from microsite_configuration import microsite
                   <nav class="nav-related" aria-label="${_('Unsupported Components')}">
                     <ul>
                       % for component_parent_url, component_display_name in deprecated_blocks_info['blocks']:
-                        <li class="nav-item"><a href="${component_parent_url}">${_(component_display_name)}</a></li>
+                          <li class="nav-item">
+                                % if component_display_name:
+                                    <a href="${component_parent_url}">${_(component_display_name)}</a>
+                                % else:
+                                    <a href="${component_parent_url}">${_("Deprecated Component")}</a>
+                                % endif
+                          </li>
                       % endfor
                     </ul>
                   </nav>

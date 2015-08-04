@@ -1599,6 +1599,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
                                    'from the course advanced settings. To do this, go to the Advanced Settings '
                                    'page, locate the "Advanced Module List" setting, and then delete the following '
                                    'modules from the list.')
+    DEFAULT_DISPLAYNAME = "Deprecated Component"
 
     def _add_deprecated_advance_modules(self, block_types):
         """
@@ -1684,6 +1685,32 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
             components_present=True,
             components_display_name_list=['Open', 'Peer'],
             deprecated_modules_list=['peergrading', 'combinedopenended']
+        )
+
+    def test_deprecation_warning_with_no_displayname(self):
+        """
+        Scenario: Verify deprecation warning message if  ORA1 components are present.
+
+        Given I have created 1 ORA1 deprecated component
+        When I go to course outline
+        Then I see ORA1 deprecated warning
+        And I see correct ORA1 deprecated warning heading text
+        And I see list of ORA1 components with correct message
+        """
+        parent_vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+
+        # Create a deprecated ORA1 component with display_name to be empty and make sure
+        # the deprecation warning is displayed with
+        self.course_fixture.create_xblock(
+            parent_vertical.locator,
+            XBlockFixtureDesc(category='combinedopenended', display_name="", data=load_data_str('ora_peer_problem.xml'))
+        )
+        self.course_outline_page.visit()
+
+        self._verify_deprecation_warning_info(
+            deprecated_blocks_present=False,
+            components_present=True,
+            components_display_name_list=[self.DEFAULT_DISPLAYNAME],
         )
 
     def test_warning_with_ora1_advance_modules_only(self):
