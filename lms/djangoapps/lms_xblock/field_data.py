@@ -6,9 +6,6 @@ from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope, RemoteScope
 from xblock.runtime import KeyValueStore
 
-from courseware.model_data import FieldDataCache
-
-
 class LmsFieldData(SplitFieldData):
     """
     A :class:`~xblock.field_data.FieldData` that
@@ -39,28 +36,3 @@ class LmsFieldData(SplitFieldData):
 
     def __repr__(self):
         return "LmsFieldData{!r}".format((self._authored_data, self._student_data))
-
-    def _shared_field_data(self, remote_scope):
-        """Summary
-        
-        Args:
-            remote_scope (TYPE): Description
-        
-        Returns:
-            TYPE: Description
-        """
-        return self._find_scope_in_mapping(remote_scope)
-
-    def _find_scope_in_mapping(self, scope):
-        return self._scope_mappings[scope]
-
-    # def get(self, block, name):
-    #     queryable = block.fields[name].queryable
-    #     if queryable is None:
-    #         return self._field_data(block, name).get(block, name)
-    #     else:
-    #         field_data_cache = self._shared_field_data(queryable.remote_scope)
-    #         try:
-    #             return field_data_cache.get(block, name)
-    #         except TypeError:
-    #             raise TypeError

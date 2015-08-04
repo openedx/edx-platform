@@ -510,7 +510,24 @@ class UserStateCache(object):
             student_module.max_grade = max_score
             student_module.save()
 
+    @contract(
+        username="basestring", 
+        block_key=UsageKey, 
+        fields="seq(basestring)|set(basestring)"
+    )
     def remote_get(self, username, block_key, fields):
+        """
+        Call for accessing data directly via username, block_key and field names.
+        Necessry for shared field data
+
+        Arguments:
+            username (str): The username of a user
+            block_key (UsageKey): The UsageKey identifying which xblock state to load.
+            fields (list of str): Field names to cache.
+
+        Return:
+            A django orm object from the cache
+        """
         return self._client.get(username, block_key, Scope.user_state, fields)
 
     def __len__(self):
@@ -945,7 +962,7 @@ class FieldDataCache(object):
         Returns: bool
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous() and key.queryable is None:
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
