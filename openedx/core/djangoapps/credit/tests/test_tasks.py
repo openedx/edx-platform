@@ -125,7 +125,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         self.assertEqual(len(requirements), 1)
         self.assertEqual(requirements[0]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[0]['name'], 'proctored_exam_id:1')
+        self.assertEqual(requirements[0]['name'], 'foo')
         self.assertEqual(requirements[0]['display_name'], 'A Proctored Exam')
         self.assertEqual(requirements[0]['criteria'], {})
 
