@@ -129,7 +129,7 @@ class RenderXBlockTestMixin(object):
                     self.assertContains(response, chrome_element)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 5),
+        (ModuleStoreEnum.Type.mongo, 6),
         (ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
