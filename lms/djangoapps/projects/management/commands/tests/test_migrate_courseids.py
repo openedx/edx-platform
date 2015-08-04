@@ -66,7 +66,7 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         Test the data migration
         """
         # Set up the data to be migrated
-        user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
+        user = User.objects.create(email='testuser@edx.org', username='testuser1', password='testpassword', is_active=True)
         project = Project.objects.create(course_id=self.old_style_course_id, content_id=self.old_style_content_id)
         workgroup = Workgroup.objects.create(name='Test Workgroup', project=project)
         workgroup_review = WorkgroupReview.objects.create(workgroup=workgroup, content_id=self.old_style_content_id)

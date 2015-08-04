@@ -41,8 +41,6 @@ class ProjectsReceiversTests(ModuleStoreTestCase):
             display_name="Overview"
         )
 
-        self.user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
-
     def test_receiver_on_course_deleted(self):
         project = models.Project.objects.create(
             course_id=unicode(self.course.id),
