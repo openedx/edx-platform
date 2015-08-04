@@ -13,7 +13,8 @@
 
                 render: function () {
                     var discussionModuleView = new DiscussionModuleView({
-                        el: this.$el
+                        el: this.$el,
+                        context: 'standalone'
                     });
                     discussionModuleView.render();
                     discussionModuleView.loadPage(this.$el);

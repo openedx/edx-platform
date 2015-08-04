@@ -7,7 +7,8 @@ define([
     describe('TeamProfileView', function () {
         var discussionView, createTeamProfileView,
             testCourseID = 'course/1',
-            testTeamDiscussionID = '12345';
+            testTeamDiscussionID = '12345',
+            testTopicId = "999";
 
         beforeEach(function () {
             setFixtures('<div class="discussion-module""></div>');
@@ -18,7 +19,7 @@ define([
 
         createTeamProfileView = function(requests) {
             var model = new TeamModel(
-                { id: "test-team", name: "Test Team" },
+                { id: "test-team", name: "Test Team", discussion_topic_id: testTopicId },
                 { parse: true }
             );
             discussionView = new TeamProfileView({
@@ -30,7 +31,11 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                '/courses/course/1/discussion/forum/7065c53dcac4fe469fb66997da075f9af7e760a9/inline?page=1&ajax=1'
+                interpolate(
+                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline?page=1&ajax=1',
+                    { courseID: testCourseID, topicID: testTopicId},
+                    true
+                )
             );
             AjaxHelpers.respondWithJson(requests, TeamDiscussionSpecHelper.createMockDiscussionResponse());
             return discussionView;

@@ -10,10 +10,6 @@
                 initialize: function (options) {
                     this.courseID = options.courseID;
                     this.discussionTopicID = this.model.get('discussion_topic_id');
-                    // TODO: remove this once the discussion ID works from the server!
-                    if (!this.discussionTopicID) {
-                        this.discussionTopicID = '7065c53dcac4fe469fb66997da075f9af7e760a9';
-                    }
                 },
 
                 render: function () {

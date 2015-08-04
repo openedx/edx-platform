@@ -48,7 +48,7 @@ define([
                 "follower_ids": [],
                 "default_sort_key": "date",
                 "downvoted_ids": [],
-                "subscribed_thread_ids": ["55b91ef756c02c54a1000001", "55b91f2856c02c0d1d000003"],
+                "subscribed_thread_ids": [],
                 "upvoted_ids": [],
                 "external_id": "9",
                 "id": "9",
@@ -56,21 +56,6 @@ define([
                 "subscribed_commentable_ids": []
             },
             "annotated_content_info": {
-                "55b78e2956c02c6655000001": {
-                    "voted": "",
-                    "subscribed": false,
-                    "ability": {"can_reply": true, "editable": false, "can_openclose": false, "can_delete": false, "can_vote": true}
-                },
-                "55b91ef756c02c54a1000001": {
-                    "voted": "",
-                    "subscribed": true,
-                    "ability": {"can_reply": true, "editable": true, "can_openclose": false, "can_delete": true, "can_vote": true}
-                },
-                "55b91f2856c02c0d1d000003": {
-                    "voted": "",
-                    "subscribed": true,
-                    "ability": {"can_reply": true, "editable": true, "can_openclose": false, "can_delete": true, "can_vote": true}
-                }
             },
             "roles": {"Moderator": [], "Administrator": [], "Community TA": []},
             "course_settings": {

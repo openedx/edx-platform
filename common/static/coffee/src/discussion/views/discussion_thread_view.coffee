@@ -19,6 +19,7 @@ if Backbone?
     initialize: (options) ->
       super()
       @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
+      @context = options.context or "course"  # allowed values are "course" or "standalone"
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
@@ -300,6 +301,7 @@ if Backbone?
         container: @$('.thread-content-wrapper')
         model: @model
         mode: @mode
+        context: @context
         course_settings: @options.course_settings
       )
       @editView.bind "thread:updated thread:cancel_edit", @closeEditView

@@ -4,12 +4,12 @@ define([
     'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
 ], function (_, AjaxHelpers, TeamDiscussionView, TeamDiscussionSpecHelper, DiscussionSpecHelper) {
     'use strict';
-    describe('TeamDiscussionView', function () {
+    describe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView,
             testCourseID = 'course/1',
             testTeamDiscussionID = '12345';
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures('<div class="discussion-module""></div>');
             $('.discussion-module').data('course-id', testCourseID);
             $('.discussion-module').data('discussion-id', testTeamDiscussionID);
@@ -26,13 +26,13 @@ define([
             return discussionView;
         };
 
-        it('can render itself', function () {
+        it('can render itself', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests);
             expect(view.$('.discussion-thread').length).toEqual(3);
         });
 
-        it('can create a new post', function () {
+        it('can create a new post', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests),
                 testTitle = 'New Post',
@@ -58,6 +58,37 @@ define([
             newThreadElement = $(view.$('.discussion-thread')[0]);
             expect(newThreadElement.find('.post-header-content h1').text().trim()).toEqual(testTitle);
             expect(newThreadElement.find('.post-body').text().trim()).toEqual(testBody);
+        });
+
+        it('cannot move a thread to a different topic', function() {
+            var requests = AjaxHelpers.requests(this),
+                view = createDiscussionView(requests),
+                postTopicButton, updatedThreadElement,
+                updatedTitle = 'Updated title',
+                updatedBody = 'Updated body';
+            $(view.$('.forum-thread-expand')[0]).click();
+            $(view.$('.action-more .icon')[0]).click();
+            $(view.$('.action-edit')[0]).click();
+            postTopicButton = view.$('.post-topic');
+            expect(postTopicButton.length).toBe(0);
+            view.$('.js-post-post-title').val(updatedTitle);
+            view.$('.js-post-body textarea').val(updatedBody);
+            view.$('.submit').click();
+            AjaxHelpers.expectRequest(
+                requests, 'POST', '/courses/course/1/discussion/12345/threads/create?ajax=1',
+                'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'
+            );
+            AjaxHelpers.respondWithJson(requests, {
+                content: TeamDiscussionSpecHelper.createMockThreadResponse({
+                    id: "999", title: updatedTitle, body: updatedBody
+                }),
+                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+            });
+
+            // Expect the thread to have been updated
+            updatedThreadElement = $(view.$('.discussion-thread')[0]);
+            expect(updatedThreadElement.find('.post-header-content h1').text().trim()).toEqual(updatedTitle);
+            expect(updatedThreadElement.find('.post-body').text().trim()).toEqual(updatedBody);
         });
     });
 });
