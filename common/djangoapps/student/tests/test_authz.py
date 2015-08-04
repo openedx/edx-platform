@@ -11,6 +11,9 @@ from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRo
 from student.tests.factories import AdminFactory
 from student.auth import user_has_role, add_users, remove_users
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from student.admin import UserModelAdmin, UserCreateForm
+from django.contrib.admin.sites import AdminSite
+from django.http import HttpRequest
 
 
 class CreatorGroupTest(TestCase):
@@ -194,3 +197,69 @@ class CourseGroupTest(TestCase):
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator, self.staff, another_staff)
         with self.assertRaises(PermissionDenied):
             remove_users(self.staff, CourseStaffRole(self.course_key), another_staff)
+
+
+class UserCreationAdminAppTest(TestCase):
+    """
+    Tests for user creation in admin app.
+    """
+
+    def setUp(self):
+        """
+        User creation in admin app test-case setup
+        """
+        super(UserCreationAdminAppTest, self).setUp()
+        self.request = HttpRequest()
+        self.site = AdminSite()
+
+    def test_user_creation_adminapp(self):
+        """
+        Verify that user can be created in admin app
+        """
+        user_admin = UserModelAdmin(User, self.site)
+        form = user_admin.get_form(None)
+
+        # Verify form has email field
+        self.assertTrue('email' in form.base_fields)
+        expected_fieldset = [(
+            None, {'classes': ('wide',), 'fields': ('username', 'email', 'password1', 'password2', ), }
+        )]
+        self.assertEqual(list(user_admin.get_fieldsets(self.request)), expected_fieldset)
+
+        # Try to create user with empty email
+        form_data = {'username': 'test_user', 'email': '', 'password1': 'foo', 'password2': 'foo'}
+        form = UserCreateForm(form_data)
+
+        # Verify empty email raises error
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.errors)
+        self.assertEqual(form.errors.get('email'), [u'This field is required.'])
+
+        # Try to create user with invalid email
+        form_data = {'username': 'test_user', 'email': '1', 'password1': 'foo', 'password2': 'foo'}
+        form = UserCreateForm(form_data)
+
+        # Verify invalid email raises error
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.errors)
+        self.assertEqual(form.errors.get('email'), [u'Enter a valid e-mail address.'])
+
+        # Try to create user with duplicate email
+        User.objects.create_user('testuser', 'testuser@edx.org', 'foo')    # create a user first
+        form_data = {'username': 'test_user', 'email': 'testuser@edx.org', 'password1': 'foo', 'password2': 'foo'}
+        form = UserCreateForm(form_data)
+
+        # Verify duplicate email raises error
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.errors)
+        self.assertEqual(form.errors.get('email'), [u'A user with that email already exists.'])
+
+        # Try to create user successfully
+        form_data = {'username': 'test_user', 'email': 'test_user@edx.org', 'password1': 'foo', 'password2': 'foo'}
+        form = UserCreateForm(form_data)
+
+        # Verify user is created
+        self.assertTrue(form.is_valid())
+        self.assertFalse(form.errors)
+        test_user = form.save()
+        self.assertTrue(test_user)

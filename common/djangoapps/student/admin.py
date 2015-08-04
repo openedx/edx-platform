@@ -1,6 +1,8 @@
 '''
 django admin pages for courseware model
 '''
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib.auth.models import User
@@ -129,6 +131,46 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     # Exclude deprecated fields
     exclude = ('dashboard_tracking_code',)
 
+
+class UserCreateForm(UserCreationForm):
+    """
+    Form for adding new users in Django admin panel.
+    """
+
+    class Meta:  # pylint: disable=missing-docstring, old-style-class
+        model = User
+        fields = ('username', 'email', )
+
+    def clean_email(self):
+        """
+        Validate and clean email field.
+        """
+        email = self.cleaned_data['email']
+        user = None
+        if not email:
+            raise forms.ValidationError(u'This field is required.')
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return email
+        if user:
+            raise forms.ValidationError(u'A user with that email already exists.')
+
+
+class UserModelAdmin(UserAdmin):
+    """
+    Admin panel interface for User.
+    """
+    add_form = UserCreateForm
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', ),
+        }),
+    )
+
+
+admin.site.register(User, UserModelAdmin)
 
 admin.site.register(UserProfile)
 
