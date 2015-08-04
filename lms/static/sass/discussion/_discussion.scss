@@ -753,10 +753,10 @@ body.discussion {
   }
 
   section.discussion {
-    margin-top: ($baseline*1.5);
+    clear: both;
+    padding-top: $baseline;
 
     .threads {
-      margin-top: $baseline;
     }
 
     .discussion-thread {
@@ -936,7 +936,7 @@ body.discussion {
     color: $white;
   }
 
-  section.pagination {
+  section.discussion-pagination {
     margin-top: ($baseline*1.5);
 
     nav.discussion-paginator {
