@@ -29,7 +29,7 @@ class GenerateProgressEntriesTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-
+        super(GenerateProgressEntriesTests, self).setUp()
         # Create a couple courses to work with
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
