@@ -6,6 +6,9 @@ $seq-nav-icon-color-muted: rgb(90, 90, 90) !default;
 $seq-nav-tooltip-color: rgb(51, 51, 51) !default;
 $seq-nav-height: 44px;
 
+$prev-icon: url('../images/sequence-nav/previous-icon.png');
+$next-icon: url('../images/sequence-nav/next-icon.png');
+
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   @include border-left(1px solid $seq-nav-border-color);
@@ -325,9 +328,6 @@ nav.sequence-bottom {
             */
           }
         }
-
-        $prev-icon: url('../images/sequence-nav/previous-icon.png');
-        $next-icon: url('../images/sequence-nav/next-icon.png');
 
         &.prev {
           @include border-radius(35px 0 0 35px);
