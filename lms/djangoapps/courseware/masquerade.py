@@ -40,6 +40,16 @@ class CourseMasquerade(object):
         self.group_id = group_id
         self.user_name = user_name
 
+    def __setstate__(self, state):
+        """
+        Ensure that all attributes are initialised when unpickling CourseMasquerade objects.
+
+        Users might still have CourseMasquerade objects from older versions of the code in their
+        session.  These old objects might not have all attributes set, possibly resulting in
+        AttributeErrors.
+        """
+        self.__init__(**state)
+
 
 @require_POST
 @login_required
