@@ -75,6 +75,7 @@ from django.utils.http import urlquote_plus
               </div>
               %elif is_generating:
               <div class="msg-content">
+                # Translators: This message appears to users when the system is processessing course certificates, which can take a few hours.
                 <h2 class="title">${_("We're working on it...")}</h2>
                 <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
               </div>
@@ -108,7 +109,10 @@ from django.utils.http import urlquote_plus
                     <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name)}</span>
                 %elif credit_course_requirements['eligibility_status'] == 'eligible':
                     <span class="eligibility_msg">${_("{student_name}, you have met the requirements for credit in this course.").format(student_name=student.profile.name)}
-                        ${_("{link} to purchase course credit.").format(link="<a href={url}>{url_name}</a>".format(url = reverse('dashboard'), url_name = _('Go to your dashboard')))}
+                        ${_("{a_start}Go to your dashboard{a_end} to purchase course credit.").format(
+		             a_start=u"<a href={url}>".format(url=reverse('dashboard')),
+			     a_end="</a>"
+		      )}
                     </span>
                 %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
                     <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name)}</span>
@@ -173,7 +177,7 @@ from django.utils.http import urlquote_plus
                 ${ section['display_name'] }
                 %if total > 0 or earned > 0:
                   <span class="sr">
-                    ${_("{earned:.3n} of {total:.3n} possible points").format( earned = float(earned), total = float(total) )}
+                    ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
                   </span>
                 %endif
                 </a>
