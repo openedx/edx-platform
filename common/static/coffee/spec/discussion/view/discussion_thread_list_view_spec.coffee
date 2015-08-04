@@ -224,6 +224,13 @@ describe "DiscussionThreadListView", ->
             checkThreadsOrdering(view, sort_order, type)
             expect(view.$el.find(".forum-nav-thread-comments-count:visible").length).toEqual(if type == "votes" then 0 else 4)
             expect(view.$el.find(".forum-nav-thread-votes-count:visible").length).toEqual(if type == "votes" then 4 else 0)
+            if type == "votes"
+                expect(
+                    _.map(
+                        view.$el.find(".forum-nav-thread-votes-count"),
+                        (element) -> $(element).text().trim()
+                    )
+                ).toEqual(["+25 votes", "+20 votes", "+42 votes", "+12 votes"])
 
         it "with sort preference date", ->
             checkRender(@threads, "date", ["Thread1", "Thread4", "Thread2", "Thread3"])
