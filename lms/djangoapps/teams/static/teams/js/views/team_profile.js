@@ -13,9 +13,12 @@
                 },
 
                 render: function () {
+                    var canPostToTeam = true;  // TODO: determine this permission correctly!
                     this.$el.html(_.template(team_template, {
                         courseID: this.courseID,
-                        discussionTopicID: this.discussionTopicID
+                        discussionTopicID: this.discussionTopicID,
+                        canCreateComment: canPostToTeam,
+                        canCreateSubComment: canPostToTeam
                     }));
                     this.discussionView = new TeamDiscussionView({
                         el: this.$('.discussion-module')

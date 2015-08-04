@@ -2,23 +2,25 @@ define([
     'underscore', 'common/js/spec_helpers/ajax_helpers'
 ], function (_, AjaxHelpers) {
     'use strict';
-    var createMockThreadResponse, createMockDiscussionResponse, createAnnotatedContentInfo, loadDiscussionView,
+    var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         testCourseID = 'course/1',
-        testUser = 'testUser';
+        testUser = 'testUser',
+        testTeamDiscussionID = "12345";
 
-    createMockThreadResponse = function(options) {
+    createMockPostResponse = function(options) {
         return _.extend(_.extend({
+                username: testUser,
+                course_id: testCourseID,
+                commentable_id: testTeamDiscussionID,
                 type: 'thread',
-                body: "Test body",
+                body: "",
                 anonymous_to_peers: false,
                 unread_comments_count: 0,
                 updated_at: '2015-07-29T18:44:56Z',
                 group_name: 'Default Group',
-                course_id: testCourseID,
                 pinned: false,
                 votes: {count: 0, down_count: 0, point: 0, up_count: 0},
                 user_id: "9",
-                commentable_id: "67890",
                 abuse_flaggers: [],
                 closed: false,
                 at_position_list: [],
@@ -26,7 +28,6 @@ define([
                 anonymous: false,
                 created_at: "2015-07-29T18:44:56Z",
                 thread_type: 'discussion',
-                username: testUser,
                 comments_count: 0,
                 group_id: 1,
                 endorsed: false
@@ -39,9 +40,9 @@ define([
             "num_pages": 1,
             "page": 1,
             "discussion_data": [
-                createMockThreadResponse({ id: "1", title: "First Post"}),
-                createMockThreadResponse({ id: "2", title: "Second Post"}),
-                createMockThreadResponse({ id: "3", title: "Third Post"})
+                createMockPostResponse({ id: "1", title: "First Post"}),
+                createMockPostResponse({ id: "2", title: "Second Post"}),
+                createMockPostResponse({ id: "3", title: "Third Post"})
             ],
             "user_info": {
                 "username": testUser,
@@ -82,9 +83,44 @@ define([
         };
     };
 
+    createMockThreadResponse = function(options) {
+        return _.extend(_.extend({
+                username: testUser,
+                course_id: testCourseID,
+                commentable_id: testTeamDiscussionID,
+                children: [],
+                comments_count: 0,
+                anonymous_to_peers: false,
+                unread_comments_count: 0,
+                updated_at: "2015-08-04T21:44:28Z",
+                resp_skip: 0,
+                id: "55c1323c56c02ce921000001",
+                pinned: false,
+                votes: {"count": 0, "down_count": 0, "point": 0, "up_count": 0},
+                resp_limit: 25,
+                abuse_flaggers: [],
+                closed: false,
+                resp_total: 1,
+                at_position_list: [],
+                type: "thread",
+                read: true,
+                anonymous: false,
+                user_id: "5",
+                created_at: "2015-08-04T21:44:28Z",
+                thread_type: "discussion",
+                context: "standalone",
+                endorsed: false
+            }),
+            options);
+    };
+
     return {
-        createMockThreadResponse: createMockThreadResponse,
+        testCourseID: testCourseID,
+        testUser: testUser,
+        testTeamDiscussionID: testTeamDiscussionID,
+        createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
-        createAnnotatedContentInfo: createAnnotatedContentInfo
+        createAnnotatedContentInfo: createAnnotatedContentInfo,
+        createMockThreadResponse: createMockThreadResponse
     };
 });

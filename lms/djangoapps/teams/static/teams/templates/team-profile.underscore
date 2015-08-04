@@ -1,5 +1,7 @@
 <div>
-    <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>">
+    <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
+            data-user-create-comment="<%= canCreateComment %>"
+            data-user-create-subcomment="<%= canCreateSubComment %>">
         <a href="#" class="new-post-btn" role="button"><span class="icon fa fa-edit new-post-icon"></span><%= gettext("New Post") %></a>
     </div>
 </div>

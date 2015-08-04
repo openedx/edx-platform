@@ -5,26 +5,23 @@ define([
 ], function (_, AjaxHelpers, TeamModel, TeamProfileView, TeamDiscussionSpecHelper, DiscussionSpecHelper) {
     'use strict';
     describe('TeamProfileView', function () {
-        var discussionView, createTeamProfileView,
-            testCourseID = 'course/1',
-            testTeamDiscussionID = '12345',
-            testTopicId = "999";
+        var discussionView, createTeamProfileView;
 
         beforeEach(function () {
-            setFixtures('<div class="discussion-module""></div>');
-            $('.discussion-module').data('course-id', testCourseID);
-            $('.discussion-module').data('discussion-id', testTeamDiscussionID);
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
         createTeamProfileView = function(requests) {
             var model = new TeamModel(
-                { id: "test-team", name: "Test Team", discussion_topic_id: testTopicId },
+                {
+                    id: "test-team",
+                    name: "Test Team",
+                    discussion_topic_id: TeamDiscussionSpecHelper.testTeamDiscussionID
+                },
                 { parse: true }
             );
             discussionView = new TeamProfileView({
-                el: '.discussion-module',
-                courseID: testCourseID,
+                courseID: TeamDiscussionSpecHelper.testCourseID,
                 model: model
             });
             discussionView.render();
@@ -33,7 +30,10 @@ define([
                 'GET',
                 interpolate(
                     '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline?page=1&ajax=1',
-                    { courseID: testCourseID, topicID: testTopicId},
+                    {
+                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        topicID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                    },
                     true
                 )
             );
