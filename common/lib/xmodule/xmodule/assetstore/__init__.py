@@ -16,8 +16,8 @@ new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
 new_contract('basestring', basestring)
 new_contract('long', long)
-new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access, no-member
-new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access, no-member
+new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access
+new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access
 
 
 class AssetMetadata(object):

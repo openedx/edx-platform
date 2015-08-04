@@ -76,7 +76,7 @@ def see_a_problem_component(step, category):
     problem_css = 'li.studio-xblock-wrapper div.xblock-student_view'
     # This view presents the given problem component in uppercase. Assert that the text matches
     # the component selected (in uppercase)
-    assert_true(world.css_contains_text(problem_css, category.upper()))  # pylint: disable=no-value-for-parameter
+    assert_true(world.css_contains_text(problem_css, category.upper()))
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')

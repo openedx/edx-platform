@@ -285,7 +285,6 @@ class XmlHandlingTest(TestCase):
     @patch('uuid.uuid4', return_value='random_uuid')
     def test_replace_result_message_uuid(self, _uuid_mock):
         # Pylint doesn't recognize members in the LXML module
-        # pylint: disable=no-member
         xml = outcomes.generate_replace_result_xml(self.result_id, self.score)
         tree = etree.fromstring(xml)
         message_id = tree.xpath(
@@ -296,7 +295,6 @@ class XmlHandlingTest(TestCase):
         self.assertEqual(message_id[0].text, 'random_uuid')
 
     def test_replace_result_sourced_id(self):
-        # pylint: disable=no-member
         xml = outcomes.generate_replace_result_xml(self.result_id, self.score)
         tree = etree.fromstring(xml)
         sourced_id = tree.xpath(
@@ -308,7 +306,6 @@ class XmlHandlingTest(TestCase):
         self.assertEqual(sourced_id[0].text, 'result_id')
 
     def test_replace_result_score(self):
-        # pylint: disable=no-member
         xml = outcomes.generate_replace_result_xml(self.result_id, self.score)
         tree = etree.fromstring(xml)
         xml_score = tree.xpath(

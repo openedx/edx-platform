@@ -337,7 +337,7 @@ class UserProfile(models.Model):
             return default_requires_consent
         if date is None:
             date = datetime.now(UTC)
-        return date.year - year_of_birth <= age_limit    # pylint: disable=maybe-no-member
+        return date.year - year_of_birth <= age_limit
 
 
 @receiver(pre_save, sender=UserProfile)

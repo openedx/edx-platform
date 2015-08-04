@@ -29,8 +29,8 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
                 Group(1, 'beta')
             ]
         )
-        self.group1 = self.user_partition.groups[0]    # pylint: disable=no-member
-        self.group2 = self.user_partition.groups[1]    # pylint: disable=no-member
+        self.group1 = self.user_partition.groups[0]
+        self.group2 = self.user_partition.groups[1]
         self.course = CourseFactory.create(user_partitions=[self.user_partition])
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')

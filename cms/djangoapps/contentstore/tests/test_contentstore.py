@@ -1077,13 +1077,13 @@ class ContentStoreTest(ContentStoreTestCase):
 
         # test that a user gets his enrollment and its 'student' role as default on creating a course
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
-        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))
 
         delete_course_and_groups(course_id, self.user.id)
         # check that user's enrollment for this course is not deleted
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
         # check that user has form role "Student" for this course even after deleting it
-        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))
 
     def test_course_access_groups_on_delete(self):
         """

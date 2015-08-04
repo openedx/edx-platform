@@ -270,7 +270,7 @@ class ImportManager(object):
 
         all_assets = []
         try:
-            xml_data = etree.parse(asset_xml_file).getroot()  # pylint: disable=no-member
+            xml_data = etree.parse(asset_xml_file).getroot()
             assert xml_data.tag == AssetMetadata.ALL_ASSETS_XML_TAG
             for asset in xml_data.iterchildren():
                 if asset.tag == AssetMetadata.ASSET_XML_TAG:

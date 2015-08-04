@@ -33,7 +33,6 @@ class CourseSerializer(serializers.Serializer):
 
     def get_uri(self, course):
         """ Builds course detail uri """
-        # pylint: disable=no-member
         request = self.context['request']
         return request.build_absolute_uri(reverse('course_structure_api:v0:detail', kwargs={'course_id': course.id}))
 

@@ -12,7 +12,6 @@ class RegistryTest(testutil.TestCase):
 
     def test_configure_once_adds_gettable_providers(self):
         facebook_provider = self.configure_facebook_provider(enabled=True)
-        # pylint: disable=no-member
         self.assertEqual(facebook_provider.id, provider.Registry.get(facebook_provider.provider_id).id)
 
     def test_no_providers_by_default(self):
@@ -55,7 +54,6 @@ class RegistryTest(testutil.TestCase):
 
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)
-        # pylint: disable=no-member
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
 
     def test_get_returns_none_if_provider_not_enabled(self):

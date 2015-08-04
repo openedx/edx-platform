@@ -707,7 +707,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
-        self.assertIn(test_redemption.id, ids)  # pylint: disable=no-member
+        self.assertIn(test_redemption.id, ids)
 
     def test_add_with_default_mode(self):
         """

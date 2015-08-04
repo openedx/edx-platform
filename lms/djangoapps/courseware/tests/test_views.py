@@ -182,7 +182,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
         self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
@@ -632,12 +632,12 @@ class BaseDueDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory.create(**course_kwargs)
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         section = ItemFactory.create(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
         vertical = ItemFactory.create(category='vertical', parent_location=section.location)
         ItemFactory.create(category='problem', parent_location=vertical.location)
 
-        course = modulestore().get_course(course.id)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
         CourseEnrollmentFactory(user=self.user, course_id=course.id)
         return course
@@ -752,7 +752,7 @@ class StartDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory.create(start=datetime(2013, 9, 16, 7, 17, 28))
-        course = modulestore().get_course(course.id)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)
         return course
 
     def get_about_text(self, course_key):
@@ -806,10 +806,10 @@ class ProgressPageTests(ModuleStoreTestCase):
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
-        self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
+        self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 

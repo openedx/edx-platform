@@ -16,7 +16,7 @@ urlpatterns = patterns(
         r'^start-flow/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         # Pylint seems to dislike the as_view() method because as_view() is
         # decorated with `classonlymethod` instead of `classmethod`.
-        views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.PayAndVerifyView.as_view(),
         name="verify_student_start_flow",
         kwargs={
             'message': views.PayAndVerifyView.FIRST_TIME_VERIFY_MSG
@@ -28,7 +28,7 @@ urlpatterns = patterns(
     # except with slight messaging changes.
     url(
         r'^upgrade/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.PayAndVerifyView.as_view(),
         name="verify_student_upgrade_and_verify",
         kwargs={
             'message': views.PayAndVerifyView.UPGRADE_MSG
@@ -43,7 +43,7 @@ urlpatterns = patterns(
     # to the dashboard.
     url(
         r'^verify-now/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.PayAndVerifyView.as_view(),
         name="verify_student_verify_now",
         kwargs={
             'always_show_payment': True,
@@ -59,7 +59,7 @@ urlpatterns = patterns(
     # (since the user already paid).
     url(
         r'^verify-later/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.VerifyLaterView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.VerifyLaterView.as_view(),
         name="verify_student_verify_later"
     ),
 
@@ -68,7 +68,7 @@ urlpatterns = patterns(
     # once the order has been fulfilled.
     url(
         r'^payment-confirmation/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.PayAndVerifyView.as_view(),
         name="verify_student_payment_confirmation",
         kwargs={
             'always_show_payment': True,

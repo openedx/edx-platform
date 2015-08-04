@@ -49,7 +49,6 @@ class Group(namedtuple("Group", "id name")):
         Returns:
             a dictionary with keys for the properties of the group.
         """
-        # pylint: disable=no-member
         return {
             "id": self.id,
             "name": self.name,
@@ -133,7 +132,6 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         Returns:
             a dictionary with keys for the properties of the partition.
         """
-        # pylint: disable=no-member
         return {
             "id": self.id,
             "name": self.name,
@@ -187,8 +185,6 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         """
         Returns the group with the specified id.  Raises NoSuchUserPartitionGroupError if not found.
         """
-        # pylint: disable=no-member
-
         for group in self.groups:
             if group.id == group_id:
                 return group

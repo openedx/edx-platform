@@ -377,7 +377,6 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         # exactly the same children-- someone may be duplicating an out of date block, after all.
         user_id = self.get_user_id()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        # pylint: disable=no-member
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
         self.tools.update_children(self, user_id, user_perms, version=self.source_library_version)

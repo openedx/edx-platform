@@ -19,7 +19,7 @@ from tempfile import mkdtemp
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
+CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -47,7 +47,7 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=no-value-for-parameter
+        'fs_root': (TEST_ROOT / "data").abspath(),
     },
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
@@ -161,7 +161,7 @@ FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
 MOCK_SEARCH_BACKING_FILE = (
-    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
+    TEST_ROOT / "index_file.dat"
 ).abspath()
 
 # Generate a random UUID so that different runs of acceptance tests don't break each other
