@@ -18,7 +18,7 @@ if Backbone?
       baseUri = URI(window.location).removeSearch("page")
       pageUrlFunc = (page) -> baseUri.clone().addSearch("page", page)
       paginationParams = DiscussionUtil.getPaginationParams(@page, @numPages, pageUrlFunc)
-      @$el.find(".pagination").html(_.template($("#pagination-template").html())(paginationParams))
+      @$el.find(".discussion-pagination").html(_.template($("#pagination-template").html())(paginationParams))
 
     changePage: (event) ->
       event.preventDefault()
