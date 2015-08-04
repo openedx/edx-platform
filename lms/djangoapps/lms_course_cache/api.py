@@ -1,14 +1,22 @@
 """
 ...
 """
+from django.conf import settings
 from django.core.cache import get_cache
 
 from openedx.core.lib.course_cache.interface import CourseCacheInterface
 
-from .transformations import LMS_COURSE_TRANSFORMATIONS
+from transformations import start_date, user_partitions, visibility
 
 
 _cache_interface = None
+
+LMS_COURSE_TRANSFORMATIONS = {
+    visibility.VisibilityTransformation(),
+    start_date.StartDateTransformation(),
+    user_partitions.UserPartitionTransformation(),
+    # CoursesApiTransformation(), TODO
+}
 
 
 def _get_cache_interface():
@@ -47,6 +55,8 @@ def get_course_blocks(
     Returns:
         (CourseBlockStructure, dict[UsageKey: CourseBlockData])
     """
+    if transformations is None:
+        transformations = settings.LMS_COURSE_TRANSFORMATIONS
     return _get_cache_interface().get_course_blocks(
         user, course_key, transformations, root_block_key, remove_orphans
     )

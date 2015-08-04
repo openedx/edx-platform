@@ -1,11 +1,10 @@
 """
 ...
 """
+from courseware.access import _has_access_to_course
 from openedx.core.lib.course_cache.transformation import CourseStructureTransformation
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
-from courseware.access import _has_access_to_course
-
 
 INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme,]
 SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme,]
@@ -21,7 +20,7 @@ class MergedGroupAccess(object):
         Arguments:
             partition_ids (list[int])
             xblock (XBlock)
-            merged_parent_access_list (dict[UsageKey: MergedGroupAccess])
+            merged_parent_access_list (list[MergedGroupAccess])
         """
 
         # How group access restrictions are represented within an XBlock:
@@ -51,7 +50,7 @@ class MergedGroupAccess(object):
             block_group_ids = set(block_group_access.get(partition_id, [])) or None
             parents_group_ids = [
                 merged_parent_access[partition_id]
-                for merged_parent_access in merged_parent_access_list.values()
+                for merged_parent_access in merged_parent_access_list
                 if partition_id in merged_parent_access_list
             ]
             merged_parent_group_ids = (
@@ -181,7 +180,7 @@ class UserPartitionTransformation(CourseStructureTransformation):
         Returns:
             dict[UsageKey: dict]
         """
-        result_dict = {}
+        result_dict = {block_key: {} for block_key in block_structure.get_block_keys()}
 
         # Because user partitions are course-wide, only store data for them on
         # the root block.
@@ -200,14 +199,16 @@ class UserPartitionTransformation(CourseStructureTransformation):
         # For each block, compute merged group access. Because this is a
         # topological sort, we know a block's parents are guaranteed to
         # already have merged group access computed before the block itself.
-        for block_key in block_structure.topological_sort():
+        for block_key in block_structure.topological_traversal():
             xblock = xblock_dict[block_key]
             parent_keys = block_structure.get_parents(block_key)
             parent_access = [result_dict[parent_key]['merged_group_access'] for parent_key in parent_keys]
             merged_group_access = MergedGroupAccess(partition_dict.keys(), xblock, parent_access)
             result_dict[block_key]['merged_group_access'] = merged_group_access
 
-    def apply(self, user, course_key, block_structure, block_data):
+        return result_dict
+
+    def apply(self, user, course_key, block_structure, block_data, remove_orphans):
         """
         Mutates block_structure and block_data based on the given user_info.
 
@@ -215,7 +216,8 @@ class UserPartitionTransformation(CourseStructureTransformation):
             user (User)
             course_key (CourseKey)
             block_structure (CourseBlockStructure)
-            block_data (dict[UsageKey: CourseBlockData])
+            block_data (dict[UsageKey: CourseBlockData]).
+            remove_orphans (bool)
         """
         # TODO me: This will break if the block_structure.root_block_key is not the course
         user_partition_dict = block_data[block_structure.root_block_key].get_transformation_data(

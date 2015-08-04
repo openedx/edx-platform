@@ -158,6 +158,7 @@ class CourseCacheInterface(object):
             """
             visited_keys.add(xblock.location)
             xblock_dict[xblock.location] = xblock
+            __ = adj[xblock.location]  # Ensures a defaultdict entry for this block exists
 
             for child in xblock.get_children():
                 adj[xblock.location].children.add(child.location)
@@ -260,7 +261,8 @@ class CourseCacheInterface(object):
         cached = self._cache.get(self._encode_course_key(course_key), None)
         if not cached:
             return None
-        course_root_block_key, child_map = cached
+        course_root_block_key = cached[0].map_into_course(course_key)
+        child_map = cached[1]
 
         # We have a singly-linked DAG (child_map).
         # We want to create a doubly-linked DAG.

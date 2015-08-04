@@ -1,7 +1,6 @@
 """
-...
+Tests for UserPartitionTransformation.
 """
-
 from unittest import TestCase
 from mock import patch, Mock
 
@@ -20,8 +19,9 @@ from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from lms_course_cache.transformations import UserPartitionTransformation
+from lms_course_cache.transformations.user_partitions import UserPartitionTransformation
 from lms_course_cache.api import get_course_blocks, clear_course_from_cache
+
 
 class UserPartitionTransformationTestCase(ModuleStoreTestCase):
     """ Test case class to test search result processor """
@@ -31,7 +31,7 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
         Build up a course tree with multiple test courses
         """
 
-        self.course =CourseFactory.create(
+        self.course = CourseFactory.create(
             org='UserPartitionTransformation',
             course='UP101F',
             run='test_run',
@@ -82,7 +82,6 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
         self.course.save()
         modulestore().update_item(self.course, self.user.id)
 
-
     def add_seq_with_content_groups(self, groups=None):
         """
         Adds sequential and two content groups to first course in courses list.
@@ -107,7 +106,7 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
             category='html',
             display_name="Html Test 2",
             publish_item=True,
-            metadata= {'group_access': {0: [1]}},
+            metadata={'group_access': {0: [1]}},
         )
 
         self.first_cohort, self.second_cohort = [
@@ -141,7 +140,6 @@ class UserPartitionTransformationTestCase(ModuleStoreTestCase):
         modulestore().update_item(self.vertical, self.user.id)
         modulestore().update_item(self.html, self.user.id)
         modulestore().update_item(self.html2, self.user.id)
-
 
     # def test_course_structure_without_user_partition(self):
     #     clear_course_from_cache(self.course.id)
