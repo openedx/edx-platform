@@ -134,9 +134,6 @@ from branding import api as branding_api
 % endif
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
 
-    <div class="content-wrapper" id="content">
-        ${self.body()}
-    </div>
     % if not disable_header:
         <%include file="${header_file}" />
     % endif
