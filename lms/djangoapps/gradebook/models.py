@@ -62,7 +62,7 @@ class StudentGradebook(TimeStampedModel):
         data['course_count'] = 0
         data['queryset'] = []
 
-        enrolled_users_not_excluded = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        enrolled_users_not_excluded = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         total_user_count = enrolled_users_not_excluded.count()
 
         if total_user_count:
