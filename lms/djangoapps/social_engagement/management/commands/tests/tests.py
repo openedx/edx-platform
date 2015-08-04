@@ -35,6 +35,7 @@ class StudentEngagementTests(ModuleStoreTestCase):
     """ Test suite for CourseModuleCompletion """
 
     def setUp(self):
+        super(StudentEngagementTests, self).setUp()
         self.user = UserFactory()
         self.user2 = UserFactory()
 
