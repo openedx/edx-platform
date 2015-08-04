@@ -69,3 +69,6 @@ git+https://github.com/edx/ecommerce-api-client.git@0.4.3#egg=ecommerce-api-clie
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
+
+# OLI XBlocks
+-e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
