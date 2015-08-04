@@ -67,13 +67,13 @@
                             % for unit_settings in subsection_settings['children']:
                                 <tr class = "unit-header">
                                     <!-- TODO: dynamically allocate space ?-->
-                                    <td width = "92%" colspan="6"><strong><a href="${unit_settings['url']}">${unit_settings['name']}</a></strong></td>
+                                    <td width = "92%" colspan="6" class="unit-title"><strong><a href="${unit_settings['url']}">${unit_settings['name']}</a></strong></td>
                                     <td width = "8%">${unit_settings['ispublic']}</td> <!--hard coded right now-->
                                 </tr>
 
                                 % for problem_settings in unit_settings['children']:
                                     <tr class="problem-header">
-                                        <td width="52%"><strong><a href="${problem_settings['url']}">${problem_settings['name']}</a></strong></td>
+                                        <td width="52%" class="problem-title"><strong><a href="${problem_settings['url']}">${problem_settings['name']}</a></strong></td>
                                         % for setting_type in setting_type_list_map['problem_setting_types']:
                                             <td width="8%">${problem_settings[setting_type]}</td>
                                         % endfor
