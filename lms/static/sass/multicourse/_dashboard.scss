@@ -363,23 +363,23 @@
         @include margin-right(flex-gutter());
         width: flex-grid(3);
 
-      .cover {
-        @include box-sizing(border-box);
-        @include transition(all 0.15s linear 0s);
-        overflow: hidden;
-        position: relative;
-        @include float(left);
-        height: 100%;
-        max-height: 100%;
-        width: 200px;
-        height: 120px;
-        margin: 0;
-        border-radius: ($baseline/10);
-        border: 1px solid $dashboard-course-cover-border;
-        border-bottom: 4px solid $dashboard-course-cover-border;
-        padding: ($baseline/10);
+        .cover {
+          @include box-sizing(border-box);
+          @include transition(all 0.15s linear 0s);
+          overflow: hidden;
+          position: relative;
+          @include float(left);
+          height: 100%;
+          max-height: 100%;
+          width: 200px;
+          height: 120px;
+          margin: 0;
+          border-radius: ($baseline/10);
+          border: 1px solid $dashboard-course-cover-border;
+          border-bottom: 4px solid $dashboard-course-cover-border;
+          padding: ($baseline/10);
 
-        .course-image {
+          .course-image {
             width: 100%;
           }
         }
@@ -387,6 +387,9 @@
         // "enrolled as" status
         .sts-enrollment {
           @include float(left);
+        }
+      }
+
       .info {
         @include clearfix;
         @include padding(0, 10px, 0, 230px);
