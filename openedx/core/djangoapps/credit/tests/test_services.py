@@ -6,11 +6,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.credit.services import CreditService
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirementStatus, CreditRequirement
-from openedx.core.djangoapps.credit.api.eligibility import (
-    set_credit_requirements,
-    set_credit_requirement_status
-)
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
 
 from student.models import CourseEnrollment, UserProfile
 
