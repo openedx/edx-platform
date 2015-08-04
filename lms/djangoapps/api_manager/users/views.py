@@ -38,6 +38,7 @@ from notification_prefs.views import enable_notifications
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
@@ -343,7 +344,7 @@ class UsersList(SecureListAPIView):
 
         profile.save()
 
-        UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+        set_user_preference(user, LANGUAGE_KEY, get_language())
         if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
             enable_notifications(user)
 
