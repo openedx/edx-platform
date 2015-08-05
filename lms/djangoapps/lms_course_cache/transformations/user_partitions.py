@@ -100,7 +100,7 @@ class MergedGroupAccess(object):
 
             # If the user belongs to one of the allowed groups for this partition,
             # then move and and check the next partition.
-            elif user_groups[partition_id] in allowed_group_ids:
+            elif user_groups[partition_id].id in allowed_group_ids:
                 continue
 
             # Else, deny access.
