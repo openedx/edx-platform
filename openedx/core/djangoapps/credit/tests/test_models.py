@@ -5,7 +5,6 @@ Tests for credit course models.
 
 import ddt
 
-from django.core.cache import cache
 from django.test import TestCase
 
 from opaque_keys.edx.keys import CourseKey
@@ -32,15 +31,21 @@ class CreditEligibilityModelTests(TestCase):
             self.assertFalse(CreditCourse.is_credit_course(self.course_key))
 
     def test_cache_is_credit_course(self):
-        self.assertFalse(CreditCourse.is_credit_course(self.course_key))
-        CreditCourse(course_key=self.course_key, enabled=True).save()
-        cache.clear()
 
-        # Warm the cache
+        # Without any course in cache it will hit database
+        with self.assertNumQueries(1):
+            self.assertFalse(CreditCourse.is_credit_course(self.course_key))
+
+        CreditCourse(course_key=self.course_key, enabled=True).save()
+
+        # Test that for first time, checking whether a course is credit
+        # course or not requires querying the database
         with self.assertNumQueries(1):
             self.assertTrue(CreditCourse.is_credit_course(self.course_key))
 
-        # Load credit courses from cache
+        # Test that for the second time, checking whether a course is credit
+        # course or not don't require querying the database, instead credit
+        # course data is fetched from cache
         with self.assertNumQueries(0):
             self.assertTrue(CreditCourse.is_credit_course(self.course_key))
 
