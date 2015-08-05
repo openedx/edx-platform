@@ -319,6 +319,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('Microsite title', response.content)
 
     @patch("microsite_configuration.microsite.get_value", fakemicrosite)
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_microsite_configuration_missing(self):
         test_configuration_string = """{
             "default": {
