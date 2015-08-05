@@ -446,7 +446,8 @@ class TestCourseGrader(TestSubmittingProblems):
         # Now fetch the state entry for that problem.
         student_module = StudentModule.objects.filter(
             course_id=self.course.id,
-            student=self.student_user
+            student=self.student_user,
+            module_state_key=self.problem_location('p1')
         )
         # count how many state history entries there are
         baseline = BaseStudentModuleHistory.get_history(student_module)
@@ -1095,22 +1096,6 @@ class TestAnswerDistributions(TestSubmittingProblems):
                     },
                 }
             )
-        for student_module in student_modules:
-            if student_module.module_state_key.name == problem_name:
-                for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
-                    state = json.loads(student_module.state)
-                    state["student_answers"]['i4x-MITx-100-problem-p1_2_1'] = val
-                    student_module.state = json.dumps(state)
-                    student_module.save()
-
-                    self.assertEqual(
-                        grades.answer_distributions(self.course.id),
-                        {
-                            ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
-                                str(val): 1
-                            },
-                        }
-                    )
 
     def test_missing_content(self):
         # If there's a StudentModule entry for content that no longer exists,
