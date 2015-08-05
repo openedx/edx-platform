@@ -205,6 +205,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
         request = self.request_factory.get(reverse('about_course', args=[course.id.to_deprecated_string()]))
         request.user = AnonymousUser()
+        mako_middleware_process_request(request)
         response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
