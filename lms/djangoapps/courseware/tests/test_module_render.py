@@ -1770,7 +1770,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
                 break
             self.fail('Event type "problem_check" not found in call list.')
 
-        return call_data['context']['module']['display_name']
+        return call_data['context']['module']
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
