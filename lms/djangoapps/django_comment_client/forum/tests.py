@@ -1102,6 +1102,7 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
 @patch('requests.request')
 class SingleCohortedThreadTestCase(ModuleStoreTestCase):
     def setUp(self):
+        super(SingleCohortedThreadTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)

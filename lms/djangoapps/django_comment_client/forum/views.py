@@ -395,7 +395,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
             threads, query_params = get_threads(request, course)
         except ValueError:
             return HttpResponseBadRequest("Invalid group_id")
-        threads, query_params = get_threads(request, course_key)
         threads.append(thread.to_dict())
 
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):

@@ -347,7 +347,6 @@ def create_thread(request, course_id, commentable_id):
 
     data = thread.to_dict()
 
-    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:
