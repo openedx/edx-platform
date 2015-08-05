@@ -9,7 +9,7 @@ from django.conf import settings
 # Force settings to run so that the python path is modified
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-from instructor.services import CoursewareService
+from instructor.services import InstructorService
 
 from openedx.core.lib.django_startup import autostartup
 import edxmako
@@ -51,7 +51,7 @@ def run():
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
     if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
         set_runtime_service('credit', CreditService())
-        set_runtime_service('courseware', CoursewareService())
+        set_runtime_service('instructor', InstructorService())
 
 
 def add_mimetypes():
