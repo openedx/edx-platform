@@ -35,12 +35,15 @@
     TeamsTabFactory({
         courseID: '${ unicode(course.id) }',
         topics: ${ json.dumps(topics, cls=EscapedEdxJSONEncoder) },
+        teamMemberships: ${ json.dumps(team_memberships, cls=EscapedEdxJSONEncoder) },
         topicUrl: '${ topic_url }',
         topicsUrl: '${ topics_url }',
         teamsUrl: '${ teams_url }',
+        teamMembershipsUrl: '${ team_memberships_url }',
         maxTeamSize: ${ course.teams_max_size },
         languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
-        countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) }
+        countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) },
+        username: '${ username }'
     });
 </%static:require_module>
 </%block>

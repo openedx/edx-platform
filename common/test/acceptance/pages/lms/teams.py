@@ -11,6 +11,7 @@ from .fields import FieldsMixin
 
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
+TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
 TEAMS_LINK_CSS = '.action-view'
 TEAMS_HEADER_CSS = '.teams-header'
@@ -36,9 +37,33 @@ class TeamsPage(CoursePage):
         )
         return self.q(css=main_page_content_css).text[0]
 
+    def active_tab(self):
+        """ Get the active tab. """
+        return self.q(css='.is-active').attrs('data-url')[0]
+
     def browse_topics(self):
         """ View the Browse tab of the Teams page. """
         self.q(css=BROWSE_BUTTON_CSS).click()
+
+
+class MyTeamsPage(CoursePage, PaginatedUIMixin):
+    """
+    The 'My Teams' tab of the Teams page.
+    """
+
+    url_path = "teams/#my-teams"
+
+    def is_browser_on_page(self):
+        """Check if the "My Teams" tab is being viewed."""
+        button_classes = self.q(css=TEAMS_BUTTON_CSS).attrs('class')
+        if len(button_classes) == 0:
+            return False
+        return 'is-active' in button_classes[0]
+
+    @property
+    def team_cards(self):
+        """Get all the team cards on the page."""
+        return self.q(css='.team-card')
 
 
 class BrowseTopicsPage(CoursePage, PaginatedUIMixin):

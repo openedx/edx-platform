@@ -11,13 +11,14 @@
             'teams/js/collections/topic',
             'teams/js/models/team',
             'teams/js/collections/team',
+            'teams/js/collections/team_membership',
             'teams/js/views/topics',
             'teams/js/views/team_profile',
             'teams/js/views/teams',
             'teams/js/views/edit_team',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
-                  TopicModel, TopicCollection, TeamModel, TeamCollection,
+                  TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, TeamsView, TeamEditView,
                   teamsTemplate) {
             var ViewWithHeader = Backbone.View.extend({
@@ -37,14 +38,17 @@
 
             var TeamTabView = Backbone.View.extend({
                 initialize: function(options) {
-                    var TempTabView, router;
+                    var router;
                     this.courseID = options.courseID;
                     this.topics = options.topics;
+                    this.teamMemberships = options.teamMemberships;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
+                    this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
+                    this.username = options.username;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
@@ -56,27 +60,44 @@
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
-                        [new RegExp('^(teams)\/?$'), _.bind(this.goToTab, this)]
+                        [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
                     ], function (route) {
                         router.route.apply(router, route);
                     });
-                    // TODO replace this with actual views!
-                    TempTabView = Backbone.View.extend({
-                        initialize: function (options) {
-                            this.text = options.text;
-                        },
-                        render: function () {
-                            this.$el.html(this.text);
+
+                    this.teamMembershipsCollection = new TeamMembershipCollection(
+                        this.teamMemberships,
+                        {
+                            url: this.teamMembershipsUrl,
+                            course_id: this.courseID,
+                            username: this.username,
+                            parse: true,
+
+                        }
+                    ).bootstrap();
+
+                    this.myTeamsView = new TeamsView({
+                        router: this.router,
+                        collection: this.teamMembershipsCollection,
+                        maxTeamSize: this.maxTeamSize,
+                        teamParams: {
+                            courseId: this.courseID,
+                            teamsUrl: this.teamsUrl,
+                            languages: this.languages,
+                            countries: this.countries
                         }
                     });
+
                     this.topicsCollection = new TopicCollection(
                         this.topics,
                         {url: options.topicsUrl, course_id: this.courseID, parse: true}
                     ).bootstrap();
+
                     this.topicsView = new TopicsView({
                         collection: this.topicsCollection,
                         router: this.router
                     });
+
                     this.mainView = this.tabbedView = new ViewWithHeader({
                         header: new HeaderView({
                             model: new HeaderModel({
@@ -87,8 +108,8 @@
                         main: new TabbedView({
                             tabs: [{
                                 title: gettext('My Teams'),
-                                url: 'teams',
-                                view: new TempTabView({text: '<p class="temp-tab-view">This is the new Teams tab.</p>'})
+                                url: 'my-teams',
+                                view: this.myTeamsView
                             }, {
                                 title: gettext('Browse'),
                                 url: 'browse',
@@ -170,9 +191,9 @@
                                     .done(function() {
                                         var teamsView = new TeamsView({
                                             router: router,
-                                            topic: topic,
                                             collection: collection,
                                             maxTeamSize: self.maxTeamSize,
+                                            showActions: true,
                                             teamParams: {
                                                 courseId: self.courseID,
                                                 teamsUrl: self.teamsUrl,
@@ -366,7 +387,7 @@
                  * the main teams tab, and adds an error message.
                  */
                 notFoundError: function (message) {
-                    this.router.navigate('teams', {trigger: true});
+                    this.router.navigate('my-teams', {trigger: true});
                     this.showWarning(message);
                 },
 

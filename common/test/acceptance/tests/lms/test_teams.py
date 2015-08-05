@@ -17,7 +17,7 @@ from ...fixtures.discussion import (
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
+from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
 
 
 class TeamsTabBase(UniqueCourseTest):
@@ -84,9 +84,32 @@ class TeamsTabBase(UniqueCourseTest):
         if present:
             self.assertIn("Teams", self.tab_nav.tab_names)
             self.teams_page.visit()
-            self.assertEqual("This is the new Teams tab.", self.teams_page.get_body_text())
+            self.assertEqual(self.teams_page.active_tab(), 'my-teams')
+            self.assertEqual("Showing 0 out of 0 total", self.teams_page.get_body_text())
         else:
             self.assertNotIn("Teams", self.tab_nav.tab_names)
+
+    def verify_teams(self, page, expected_teams):
+        """Verify that the list of team cards on the current page match the expected teams in order."""
+
+        def assert_team_equal(expected_team, team_card_name, team_card_description):
+            """
+            Helper to assert that a single team card has the expected name and
+            description.
+            """
+            self.assertEqual(expected_team['name'], team_card_name)
+            self.assertEqual(expected_team['description'], team_card_description)
+
+        team_cards = page.team_cards
+        team_card_names = [
+            team_card.find_element_by_css_selector('.card-title').text
+            for team_card in team_cards.results
+        ]
+        team_card_descriptions = [
+            team_card.find_element_by_css_selector('.card-description').text
+            for team_card in team_cards.results
+        ]
+        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
 
 
 @ddt.ddt
@@ -159,7 +182,7 @@ class TeamsTabTest(TeamsTabBase):
 
     @ddt.data(
         ('browse', 'div.topics-list'),
-        ('teams', 'p.temp-tab-view'),
+        ('my-teams', 'div.teams-paging-header'),
         ('teams/{topic_id}/{team_id}', 'div.discussion-module'),
         ('topics/{topic_id}/create-team', 'div.create-team-instructions'),
         ('topics/{topic_id}', 'div.teams-list'),
@@ -189,6 +212,55 @@ class TeamsTabTest(TeamsTabBase):
         self.teams_page.wait_for_ajax()
         self.assertTrue(self.teams_page.q(css=selector).present)
         self.assertTrue(self.teams_page.q(css=selector).visible)
+
+
+@attr('shard_5')
+class MyTeamsTest(TeamsTabBase):
+    """
+    Tests for the "My Teams" tab of the Teams page.
+    """
+
+    def setUp(self):
+        super(MyTeamsTest, self).setUp()
+        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.my_teams_page = MyTeamsPage(self.browser, self.course_id)
+
+    def test_not_member_of_any_teams(self):
+        """
+        Scenario: Visiting the My Teams page when user is not a member of any team should not display any teams.
+        Given I am enrolled in a course with a team configuration and a topic but am not a member of a team
+        When I visit the My Teams page
+        Then I should see a pagination header showing no teams
+        And I should see no teams
+        And I should not see a pagination footer
+        """
+        self.my_teams_page.visit()
+        self.assertEqual(self.my_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
+        self.assertFalse(
+            self.my_teams_page.pagination_controls_visible(),
+            msg='Expected paging footer to be invisible'
+        )
+
+    def test_member_of_a_team(self):
+        """
+        Scenario: Visiting the My Teams page when user is a member of a team should display the teams.
+        Given I am enrolled in a course with a team configuration and a topic and am a member of a team
+        When I visit the My Teams page
+        Then I should see a pagination header showing the number of teams
+        And I should see all the expected team cards
+        And I should not see a pagination footer
+        """
+        teams = self.create_teams(self.topic, 1)
+        self.create_membership(self.user_info['username'], teams[0]['id'])
+        self.my_teams_page.visit()
+        self.assertEqual(self.my_teams_page.get_pagination_header_text(), 'Showing 1 out of 1 total')
+        self.verify_teams(self.my_teams_page, teams)
+        self.assertFalse(
+            self.my_teams_page.pagination_controls_visible(),
+            msg='Expected paging footer to be invisible'
+        )
 
 
 @attr('shard_5')
@@ -344,28 +416,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.assertEqual(self.browse_teams_page.header_topic_name, self.topic['name'])
         self.assertEqual(self.browse_teams_page.header_topic_description, self.topic['description'])
 
-    def verify_teams(self, expected_teams):
-        """Verify that the list of team cards on the current page match the expected teams in order."""
-
-        def assert_team_equal(expected_team, team_card_name, team_card_description):
-            """
-            Helper to assert that a single team card has the expected name and
-            description.
-            """
-            self.assertEqual(expected_team['name'], team_card_name)
-            self.assertEqual(expected_team['description'], team_card_description)
-
-        team_cards = self.browse_teams_page.team_cards
-        team_card_names = [
-            team_card.find_element_by_css_selector('.card-title').text
-            for team_card in team_cards.results
-        ]
-        team_card_descriptions = [
-            team_card.find_element_by_css_selector('.card-description').text
-            for team_card in team_cards.results
-        ]
-        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
-
     def verify_on_page(self, page_num, total_teams, pagination_header_text, footer_visible):
         """
         Verify that we are on the correct team list page.
@@ -381,7 +431,10 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         """
         alphabetized_teams = sorted(total_teams, key=lambda team: team['name'])
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), pagination_header_text)
-        self.verify_teams(alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE])
+        self.verify_teams(
+            self.browse_teams_page,
+            alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
+        )
         self.assertEqual(
             self.browse_teams_page.pagination_controls_visible(),
             footer_visible,
@@ -424,7 +477,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1-10 out of 10 total')
-        self.verify_teams(teams)
+        self.verify_teams(self.browse_teams_page, teams)
         self.assertFalse(
             self.browse_teams_page.pagination_controls_visible(),
             msg='Expected paging footer to be invisible'
@@ -488,7 +541,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         teams = self.create_teams(self.topic, 1)
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.verify_teams(teams)
+        self.verify_teams(self.browse_teams_page, teams)
         self.create_membership(self.user_info['username'], teams[0]['id'])
         self.browser.refresh()
         self.browse_teams_page.wait_for_ajax()

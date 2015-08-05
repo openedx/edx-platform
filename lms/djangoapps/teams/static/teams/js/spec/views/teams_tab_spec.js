@@ -38,6 +38,28 @@ define([
                         team_count: 0
                     }]
                 },
+                teamMemberships: {
+                    count: 1,
+                    currentPage: 1,
+                    numPages: 1,
+                    next: null,
+                    previous: null,
+                    results: [
+                    {
+                        user: {
+                            username: 'andya',
+                            url: 'https://openedx.example.com/api/user/v1/accounts/andya'
+                        },
+                        team: {
+                            description: '',
+                            name: 'Discrete Maths',
+                            id: 'dm',
+                            topic_id: 'algorithms'
+                          },
+                          date_joined: '2015-04-09T17:31:56Z'
+                    },
+                  ]
+                },
                 topicsUrl: 'api/topics/',
                 topicUrl: 'api/topics/topic_id,test/course/id',
                 teamsUrl: 'api/teams/',
@@ -51,17 +73,19 @@ define([
             Backbone.history.stop();
         });
 
-        it('shows the teams tab initially', function () {
+        it('shows the my teams tab initially', function () {
             expectHeader('See all teams in your course, organized by topic');
-            expectContent('This is the new Teams tab.');
+            expectContent('Showing 1 out of 1 total');
+            expectContent('Discrete Maths');
         });
 
         describe('Navigation', function () {
             it('can switch tabs', function () {
                 teamsTabView.$('a.nav-item[data-url="browse"]').click();
                 expectContent('test description');
-                teamsTabView.$('a.nav-item[data-url="teams"]').click();
-                expectContent('This is the new Teams tab.');
+                teamsTabView.$('a.nav-item[data-url="my-teams"]').click();
+                expectContent('Showing 1 out of 1 total');
+                expectContent('Discrete Maths');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
