@@ -33,19 +33,22 @@ define([
                 group_id: 1,
                 endorsed: false
             },
-            options
+            options || {}
         );
     };
 
-    createMockDiscussionResponse = function() {
-        return {
-            "num_pages": 1,
-            "page": 1,
-            "discussion_data": [
+    createMockDiscussionResponse = function(threads) {
+        if (_.isUndefined(threads)) {
+            threads = [
                 createMockPostResponse({ id: "1", title: "First Post"}),
                 createMockPostResponse({ id: "2", title: "Second Post"}),
                 createMockPostResponse({ id: "3", title: "Third Post"})
-            ],
+            ];
+        }
+        return {
+            "num_pages": 1,
+            "page": 1,
+            "discussion_data": threads,
             "user_info": {
                 "username": testUser,
                 "follower_ids": [],
@@ -114,7 +117,7 @@ define([
                 context: "standalone",
                 endorsed: false
             },
-            options
+            options || {}
         );
     };
 

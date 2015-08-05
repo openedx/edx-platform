@@ -5,7 +5,7 @@ define([
 ], function (_, AjaxHelpers, TeamDiscussionView, TeamDiscussionSpecHelper, DiscussionSpecHelper) {
     'use strict';
     describe('TeamDiscussionView', function() {
-        var discussionView, createDiscussionView;
+        var discussionView, createDiscussionView, createPost, expandReplies, postReply;
 
         beforeEach(function() {
             setFixtures('<div class="discussion-module""></div>');
@@ -16,14 +16,107 @@ define([
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
-        createDiscussionView = function(requests) {
+        createDiscussionView = function(requests, threads) {
             discussionView = new TeamDiscussionView({
                 el: '.discussion-module'
             });
             discussionView.render();
-            AjaxHelpers.expectRequest(requests, 'GET', '/courses/course/1/discussion/forum/12345/inline?page=1&ajax=1');
-            AjaxHelpers.respondWithJson(requests, TeamDiscussionSpecHelper.createMockDiscussionResponse());
+            AjaxHelpers.expectRequest(
+                requests, 'GET',
+                interpolate(
+                    '/courses/%(courseID)s/discussion/forum/%(discussionID)s/inline?page=1&ajax=1',
+                    {
+                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                    },
+                    true
+
+                )
+            );
+            AjaxHelpers.respondWithJson(requests, TeamDiscussionSpecHelper.createMockDiscussionResponse(threads));
             return discussionView;
+        };
+
+        createPost = function(requests, view, title, body, threadID) {
+            title = title || "Test title";
+            body = body || "Test body";
+            threadID = threadID || "999";
+            view.$('.new-post-button').click();
+            view.$('.js-post-title').val(title);
+            view.$('.js-post-body textarea').val(body);
+            view.$('.submit').click();
+            AjaxHelpers.expectRequest(
+                requests, 'POST',
+                interpolate(
+                    '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
+                    {
+                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                    },
+                    true
+                ),
+                interpolate(
+                    'thread_type=discussion&title=%(title)s&body=%(body)s&anonymous=false&anonymous_to_peers=false&auto_subscribe=true',
+                    {
+                        title: title.replace(/ /g, '+'),
+                        body: body.replace(/ /g, '+')
+                    },
+                    true
+                )
+            );
+            AjaxHelpers.respondWithJson(requests, {
+                content: TeamDiscussionSpecHelper.createMockPostResponse({
+                    id: threadID,
+                    title: title,
+                    body: body
+                }),
+                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+            });
+        };
+
+        expandReplies = function(requests, view, threadID) {
+            view.$('.forum-thread-expand').first().click();
+            AjaxHelpers.expectRequest(
+                requests, 'GET',
+                interpolate(
+                    '/courses/%(courseID)s/discussion/forum/%(discussionID)s/threads/%(threadID)s?ajax=1&resp_skip=0&resp_limit=25',
+                    {
+                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID,
+                        threadID: threadID || "999"
+                    },
+                    true
+                )
+            );
+            AjaxHelpers.respondWithJson(requests, {
+                content: TeamDiscussionSpecHelper.createMockThreadResponse(),
+                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+            });
+        };
+
+        postReply = function(requests, view, reply, threadID) {
+            var replyForm = view.$('.discussion-reply-new').first();
+            replyForm.find('.reply-body textarea').val(reply);
+            replyForm.find('.discussion-submit-post').click();
+            AjaxHelpers.expectRequest(
+                requests, 'POST',
+                interpolate(
+                    '/courses/%(courseID)s/discussion/threads/%(threadID)s/reply?ajax=1',
+                    {
+                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        threadID: threadID || "999"
+                    },
+                    true
+                ),
+                'body=' + reply.replace(/ /g, '+')
+            );
+            AjaxHelpers.respondWithJson(requests, {
+                content: TeamDiscussionSpecHelper.createMockThreadResponse({
+                    body: reply,
+                    comments_count: 1
+                }),
+                "annotated_content_info": TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+            });
         };
 
         it('can render itself', function() {
@@ -38,20 +131,7 @@ define([
                 testTitle = 'New Post',
                 testBody = 'New post body',
                 newThreadElement;
-            view.$('.new-post-button').click();
-            view.$('.js-post-post-title').val(testTitle);
-            view.$('.js-post-body textarea').val(testBody);
-            view.$('.submit').click();
-            AjaxHelpers.expectRequest(
-                requests, 'POST', '/courses/course/1/discussion/12345/threads/create?ajax=1',
-                'thread_type=discussion&title=&body=New+post+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'
-            );
-            AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockPostResponse({
-                    id: "999", title: testTitle, body: testBody
-                }),
-                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
-            });
+            createPost(requests, view, testTitle, testBody);
 
             // Expect the first thread to be the new post
             expect(view.$('.discussion-thread').length).toEqual(4);
@@ -63,46 +143,31 @@ define([
         it('can post a reply', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests),
-                replyForm,
-                testReply = "Test reply";
-
-            // Expand the replies
-            view.$('.forum-thread-expand').first().click();
-            AjaxHelpers.expectRequest(
-                requests, 'GET', '/courses/course/1/discussion/forum/12345/threads/1?ajax=1&resp_skip=0&resp_limit=25'
-            );
-            AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockThreadResponse({
-                    body: testReply
-                }),
-                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
-            });
-            replyForm = view.$('.discussion-reply-new').first();
-
-            // Post a new reply
-            replyForm.find('.reply-body textarea').val(testReply);
-            replyForm.find('.discussion-submit-post').click();
-            AjaxHelpers.expectRequest(
-                requests, 'POST', '/courses/course/1/discussion/threads/1/reply?ajax=1',
-                'body=Test+reply'
-            );
-            AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockThreadResponse({
-                    body: testReply,
-                    comments_count: 1
-                }),
-                "annotated_content_info": TeamDiscussionSpecHelper.createAnnotatedContentInfo()
-            });
+                testReply = "Test reply",
+                testThreadID = "1";
+            expandReplies(requests, view, testThreadID);
+            postReply(requests, view, testReply, testThreadID);
             expect(view.$('.discussion-response .response-body').text().trim()).toBe(testReply);
         });
 
-        it('cannot move a thread to a different topic', function() {
+        it('can post a reply to a new post', function() {
+            var requests = AjaxHelpers.requests(this),
+                view = createDiscussionView(requests, []),
+                testReply = "Test reply";
+            createPost(requests, view);
+            expandReplies(requests, view);
+            postReply(requests, view, testReply);
+            expect(view.$('.discussion-response .response-body').text().trim()).toBe(testReply);
+        });
+
+        it('cannot move an existing thread to a different topic', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests),
                 postTopicButton, updatedThreadElement,
                 updatedTitle = 'Updated title',
-                updatedBody = 'Updated body';
-            view.$('.forum-thread-expand').first().click();
+                updatedBody = 'Updated body',
+                testThreadID = "1";
+            expandReplies(requests, view, testThreadID);
             view.$('.action-more .icon').first().click();
             view.$('.action-edit').first().click();
             postTopicButton = view.$('.post-topic');
@@ -111,7 +176,15 @@ define([
             view.$('.js-post-body textarea').val(updatedBody);
             view.$('.submit').click();
             AjaxHelpers.expectRequest(
-                requests, 'POST', '/courses/course/1/discussion/12345/threads/create?ajax=1',
+                requests, 'POST',
+                interpolate(
+                    '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
+                    {
+                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                    },
+                    true
+                ),
                 'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'
             );
             AjaxHelpers.respondWithJson(requests, {
@@ -125,6 +198,17 @@ define([
             updatedThreadElement = view.$('.discussion-thread').first();
             expect(updatedThreadElement.find('.post-header-content h1').text().trim()).toEqual(updatedTitle);
             expect(updatedThreadElement.find('.post-body').text().trim()).toEqual(updatedBody);
+        });
+
+        it('cannot move a new thread to a different topic', function() {
+            var requests = AjaxHelpers.requests(this),
+                view = createDiscussionView(requests),
+                postTopicButton;
+            createPost(requests, view);
+            expandReplies(requests, view);
+            view.$('.action-more .icon').first().click();
+            view.$('.action-edit').first().click();
+            expect(view.$('.post-topic').length).toBe(0);
         });
     });
 });

@@ -143,6 +143,7 @@ if Backbone?
         el: article,
         model: thread,
         mode: "inline",
+        context: @context,
         course_settings: @course_settings,
         topicId: @$el.data("discussion-id")
       )
