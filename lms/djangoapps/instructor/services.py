@@ -1,5 +1,5 @@
 """
-Implementation of "courseware" service
+Implementation of "Instructor" service
 """
 
 import logging
@@ -14,9 +14,12 @@ import instructor.enrollment as enrollment
 log = logging.getLogger(__name__)
 
 
-class CoursewareService(object):
+class InstructorService(object):
     """
-    Courseware service for deleting student attempt
+    Instructor service for deleting the students attempt(s) of an exam. This service has been created
+    for the edx_proctoring's dependency injection to cater for a requirement where edx_proctoring
+    needs to call into edx-platform's functions to delete the students' existing answers, grades
+    and attempt counts if there had been an earlier attempt.
     """
 
     def delete_student_attempt(self, student_identifier, course_id, content_id):
