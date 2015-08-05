@@ -8,13 +8,17 @@ from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import get_course_xblocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
+from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition, NoSuchUserPartitionError
 
 
 log = logging.getLogger(__name__)
+# User partition scheme
+VERIFICATION_SCHEME = "verification"
+# Course modules categories on which an ICRV has access control
+GATED_COURSE_CATEGORIES = ['vertical', 'sequential']
 # XBlocks that are used as course credit requirements and are required for
 # access control of specific gated course contents
 GATED_CREDIT_XBLOCK_CATEGORIES = ['edx-reverification-block']
@@ -87,6 +91,9 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         partition_scheme (str): Name of the user partition scheme
 
     """
+    # TODO: Dynamically update user_id (actual course publisher)
+    user_id = 1
+
     # get user partition with provided partition scheme
     user_partition = UserPartition.get_scheme(partition_scheme)
     if user_partition is None:
@@ -99,9 +106,92 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         raise NoSuchUserPartitionError
 
     access_control_credit_xblocks = _get_credit_xblocks_for_access_control(course_key)
-    for xblock in access_control_credit_xblocks:
-        # TODO: Implement ICRV access control by assigning partitions with different groups (remove old access groups with same partition scheme), to the credit xblocks and save them.
-        pass
+    all_user_partitions = []
+    for block in access_control_credit_xblocks:
+        # for now we are only entertaining verification partition scheme
+        if partition_scheme == VERIFICATION_SCHEME:
+            # TODO: Break code in small reusable code
+            # create group configuration for VerificationPartitionScheme
+            group_configuration = _verification_partition_group_configuration(user_partition, block)
+            all_user_partitions.append(group_configuration)
+
+            # update 'group_access' field of gating xblock with groups
+            # 'verified_allow' and 'verified_deny' of newly created group
+            # configuration
+            access_dict = {
+                group_configuration.id: [
+                    group_configuration.get_group('verified_allow').id,
+                    group_configuration.get_group('verified_deny').id,
+                ]
+            }
+            block.group_access = access_dict
+            modulestore().update_item(block, user_id)
+
+            # now for course content access control, add groups
+            # 'non_verified' and 'verified_allow' in 'group_access' field of
+            # current ICRV's grand parent (if category of parent and grand
+            # parent are 'vertical' and 'sequential' respectively);
+            # otherwise add groups to current ICRV's parent only
+            access_dict = {
+                group_configuration.id: [
+                    group_configuration.get_group('non_verified').id,
+                    group_configuration.get_group('verified_allow').id,
+                ]
+            }
+            parent_block = block.get_parent()
+            grandparent_block = parent_block.get_parent()
+            ancestor_categories = [parent_block.location.category, grandparent_block.location.category]
+
+            # update 'group_access' field of parent only (immediate siblings
+            # will have access control)
+            ancestor_for_update = parent_block
+            if len(set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES))) == 0:
+                # category of parent and grand parent are 'vertical' and
+                # 'sequential' respectively so update 'group_access' field of
+                # grandparent
+                ancestor_for_update = grandparent_block
+
+            ancestor_for_update.group_access = access_dict
+            modulestore().update_item(ancestor_for_update, user_id)
+
+    # Now add all newly created partition in 'user_partitions' field of course
+    course = modulestore().get_course(course_key, depth=0)
+    # TODO: Consider deleting old user partition with same scheme for proper cleanup, preserve non matching partitions
+    course.user_partitions = all_user_partitions
+    modulestore().update_item(course, user_id)
+    # TODO: Check that course and modules are properly updated in database
+
+
+def _verification_partition_group_configuration(user_partition, block):
+    """ Create verification user partition for given block.
+
+    Args:
+        user_partition (UserPartition): UserPartition object
+        block (xblock): XBlock mixin
+
+    """
+    group_configuration_id = user_partition.key_for_partition(block.location)
+    group_configuration_name = u"Verification Checkpoint for {checkpoint_name}".format(
+        checkpoint_name=block.display_name
+    )
+    group_configuration_description = group_configuration_name
+    # TODO: Group requires id to be an int value. Properly handle using strings as id's
+    group_configuration_groups = [
+        Group('non_verified', 'Not enrolled in a verified track'),
+        Group('verified_allow', 'Enrolled in a verified track and has access'),
+        Group('verified_deny', 'Enrolled in a verified track and does not have access'),
+    ]
+    group_configuration_parameters = {'location': unicode(block.location)}
+
+    group_configuration = UserPartition(
+        id=group_configuration_id,
+        name=group_configuration_name,
+        description=group_configuration_description,
+        groups=group_configuration_groups,
+        scheme=VERIFICATION_SCHEME,
+        parameters=group_configuration_parameters,
+    )
+    return group_configuration
 
 
 def _get_credit_xblocks_for_access_control(course_key):
@@ -117,6 +207,6 @@ def _get_credit_xblocks_for_access_control(course_key):
     credit_blocks = []
     for category in GATED_CREDIT_XBLOCK_CATEGORIES:
         xblocks = get_course_xblocks(course_key, category)
-        credit_blocks.append(xblocks)
+        credit_blocks.extend(xblocks)
 
     return credit_blocks
