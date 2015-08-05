@@ -35,6 +35,7 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(DeleteCourseReferencesTests, self).setUp()
         # Create a course to work with
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
@@ -49,8 +50,6 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
             due=datetime(2014, 5, 16, 14, 30),
             display_name="Overview"
         )
-
-        self.user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
 
     if settings.FEATURES.get('API', False):
         def test_delete_course_references_api_manager(self):
