@@ -556,7 +556,7 @@ class CourseBlockData(object):
                 )
             )
 
-    def has_transformation_date(self, transformation, key):
+    def has_transformation_data(self, transformation, key):
         """
         Arguments:
             transformation (CourseStructureTransformation)
@@ -565,4 +565,4 @@ class CourseBlockData(object):
         Returns:
             bool
         """
-        return key in self._transformation_data[transformation.id]
+        return key in self._transformation_data.get(transformation.id, {})
