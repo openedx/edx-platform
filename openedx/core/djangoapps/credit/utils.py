@@ -1,9 +1,6 @@
 """
-Common utility methods useful for credit app
+Common utility methods useful for credit app.
 """
-
-import datetime
-from pytz import UTC
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
@@ -47,14 +44,5 @@ def get_course_xblocks(course_key, category):
         )
         if is_in_course_tree(block)
     ]
-
-    # Secondary sort on credit requirement name
-    xblocks = sorted(xblocks, key=lambda block: block.get_credit_requirement_display_name())
-
-    # Primary sort on start date
-    xblocks = sorted(xblocks, key=lambda block: (
-        block.start if block.start is not None
-        else datetime.datetime(datetime.MINYEAR, 1, 1).replace(tzinfo=UTC)
-    ))
 
     return xblocks

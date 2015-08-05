@@ -2,6 +2,9 @@
 This file contains celery tasks for credit course views.
 """
 
+import datetime
+from pytz import UTC
+
 from django.conf import settings
 
 from celery import task
@@ -130,11 +133,36 @@ def _get_credit_course_requirement_xblocks(course_key):  # pylint: disable=inval
                 "display_name": block.get_credit_requirement_display_name(),
                 "criteria": {},
             }
-            for block in get_course_xblocks(course_key, category)
+            for block in _get_sorted_xblocks(course_key, category)
             if _is_credit_requirement(block)
         ])
 
     return requirements
+
+
+def _get_sorted_xblocks(course_key, category):
+    """ Retrieve all XBlocks in the course for a particular category sorted
+    by their display name and start date.
+
+    Args:
+        course_key (CourseKey): Identifier for the course.
+        category (str): Category of XBlock.
+
+    Returns:
+        Sorted list of XBlocks that are published and haven't been deleted.
+    """
+    xblocks = get_course_xblocks(course_key, category)
+
+    # Secondary sort on credit requirement name
+    xblocks = sorted(xblocks, key=lambda block: block.get_credit_requirement_display_name())
+
+    # Primary sort on start date
+    xblocks = sorted(xblocks, key=lambda block: (
+        block.start if block.start is not None
+        else datetime.datetime(datetime.MINYEAR, 1, 1).replace(tzinfo=UTC)
+    ))
+
+    return xblocks
 
 
 def _is_credit_requirement(xblock):
