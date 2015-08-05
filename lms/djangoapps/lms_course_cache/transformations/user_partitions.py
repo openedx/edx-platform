@@ -16,6 +16,8 @@ class MergedGroupAccess(object):
     ...
     """
 
+    # TODO 8874: Make it so LmsBlockMixin.merged_group_access use MergedGroupAccess
+
     def __init__(self, user_partitions, xblock, merged_parent_access_list):
         """
         Arguments:
@@ -198,6 +200,7 @@ class UserPartitionTransformation(CourseStructureTransformation):
             block_data (dict[UsageKey: CourseBlockData]).
             remove_orphans (bool)
         """
+        # TODO 8874: Factor out functionality of UserPartitionTransformation.apply and access._has_group_access into a common utility function.
         # TODO 8874: Make it so user_partitions is stored with the entire course, not just the root block, because this will break if we request a subtree.
         user_partitions = block_data[block_structure.root_block_key].get_transformation_data(
             self, 'user_partitions'

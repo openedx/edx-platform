@@ -6,6 +6,8 @@ class CourseStructureTransformation(object):
     ...
     """
 
+    # TODO 8874: Add versioning system to transformations (MA-1121)
+
     @property
     def id(self):
         """
@@ -38,6 +40,7 @@ class CourseStructureTransformation(object):
         Returns:
             dict[UsageKey: dict]
         """
+        # TODO 8874: Instead of returning a dict of dicts, encapsulate data collection in a nice DataCollector class or something.
         return None
 
     def apply(self, user, course_key, block_structure, block_data, remove_orphans):

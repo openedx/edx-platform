@@ -261,6 +261,9 @@ class CourseCacheInterface(object):
         cached = self._cache.get(self._encode_course_key(course_key), None)
         if not cached:
             return None
+
+        # TODO 8874: Check (a) what transformations have been collected and (b) if they are up to date. If not, throw away the cache entry (MA-1121)
+
         course_root_block_key = cached[0].map_into_course(course_key)
         child_map = cached[1]
 
