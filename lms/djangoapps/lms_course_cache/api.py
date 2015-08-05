@@ -11,11 +11,11 @@ from transformations import start_date, user_partitions, visibility
 
 _cache_interface = None
 
+# TODO 8874: Populate this list using Stevadore.
 LMS_COURSE_TRANSFORMATIONS = {
     visibility.VisibilityTransformation(),
     start_date.StartDateTransformation(),
     user_partitions.UserPartitionTransformation(),
-    # CoursesApiTransformation(), TODO
 }
 
 

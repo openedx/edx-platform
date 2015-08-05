@@ -317,24 +317,6 @@ class CourseBlockStructure(object):
         self.root_block_is_course_root = root_block_is_course_root
         self._adj = adj
 
-    def __str__(self):
-        """
-        Returns:
-            str
-        """
-        # TODO me: This version is just for debugging; rewrite or remove this.
-        return '{{"root_block_key": "{}", "root_block_is_course_root": "{}", "adj": {{{}}}}}'.format(
-            self.root_block_key, self.root_block_is_course_root,
-            ", ".join([
-                '"{}": {{"parents": [{}], "children": [{}]}}'.format(
-                    u,
-                    ", ".join(['"{}"'.format(p) for p in parents]),
-                    ", ".join(['"{}"'.format(c) for c in children]),
-                )
-                for u, (parents, children) in self._adj.iteritems()
-            ])
-        )
-
     def get_block_keys(self):
         """
         Returns:
@@ -479,28 +461,6 @@ class CourseBlockData(object):
         """
         self._block_fields = block_fields
         self._transformation_data = transformation_data
-
-    def __str__(self):
-        """
-        Returns:
-            str
-        """
-        # TODO me: This version is just for debugging; rewrite or remove this.
-        return '{{"block_fields": {{{}}}, {}}}'.format(
-            ", ".join([
-                '"{}": "{}"'.format(str(key), value)
-                for key, value in self._block_fields.iteritems()
-            ]),
-            ", ".join([
-                '"{}": {{{}}}'.format(trans_id, (
-                    ", ".join([
-                        '"{}": "{}"'.format(k, v)
-                        for k, v in trans_data.iteritems()
-                    ])
-                ))
-                for trans_id, trans_data in self._transformation_data.iteritems()
-            ])
-        )
 
     def get_xblock_field(self, field_name, default=_NO_DEFAULT):
         """

@@ -32,4 +32,4 @@ class StartDateTransformation(CourseStructureTransformation):
             block_data (dict[UsageKey: CourseBlockData])
             remove_orphans (bool)
         """
-        pass  # TODO me
+        pass  # TODO 8874: Write StartDateTransformation.apply.

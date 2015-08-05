@@ -2,12 +2,12 @@
 ...
 """
 
-# TODO me: Finish docstrings and test more comprehensively
+# TODO 8874: Test graph_traversals more comprehensively.
 
 from collections import defaultdict
 from unittest import TestCase
 
-from openedx.core.lib.graph_traversals import (
+from ..graph_traversals import (
     traverse_depth_first, traverse_topologically
 )
 

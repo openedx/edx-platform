@@ -760,7 +760,7 @@ INSTALLED_APPS = (
     # Course data caching
     'openedx.core.djangoapps.content.course_structures',
     'openedx.core.djangoapps.content.course_overviews',
-    'lms.djangoapps.lms_course_cache',  # TODO me: Change this to whatever final name of app is.
+    'lms.djangoapps.lms_course_cache',
 
     # Credit courses
     'openedx.core.djangoapps.credit',

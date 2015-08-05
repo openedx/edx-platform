@@ -1,7 +1,6 @@
 """
 Tests for VisibilityTransformation.
 """
-# TODO me: Add more tests
 import ddt
 
 from courseware.access import has_access
@@ -12,11 +11,15 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from lms_course_cache.api import get_course_blocks
 
 
+# TODO 8874: More comprehensively test VisibilityTransformation.
+
 @ddt.ddt
 class VisibilityTransformationTestCase(ModuleStoreTestCase):
     """
     ...
     """
+    # TODO 8874: Change this VisibilityTransformationTestCase to use CourseStructureTestCase.
+
     # Tree formed by parent_map:
     #      0
     #     / \

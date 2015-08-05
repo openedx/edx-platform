@@ -1,9 +1,6 @@
 """
 ...
 """
-
-# TODO me: Finish docstrings.
-
 from collections import deque
 
 
@@ -66,7 +63,9 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
         stack.extend(unvisited_children)
 
         # Return the result it if it satisfies the predicate.
-        # TODO: Explain that we have to do this *after* calling get_children in order to make remove_block_if work.
+        # It's important that we do this *after* calling get_children, because the
+        # caller may want to modify the yielded value, so calling get_children
+        # after that might mess up the traversal.
         if predicate(curr_node):
             yield get_result(curr_node)
 
@@ -75,7 +74,6 @@ def traverse_depth_first(start_node, get_children, get_result=None, predicate=No
     """
     ...
     """
-    # TODO me: Remove this function if we don't end up using it anywhere.
     return _traverse_generic(
         start_node,
         get_parents=None,
