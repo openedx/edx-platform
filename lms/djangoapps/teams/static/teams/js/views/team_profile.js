@@ -14,10 +14,9 @@
                     'click .invite-link-input': 'selectText'
                 },
                 initialize: function (options) {
+                    this.listenTo(this.model, "change", this.render);
                     this.courseID = options.courseID;
-                    this.discussionTopicID = this.model.get('discussion_topic_id');
                     this.maxTeamSize = options.maxTeamSize;
-                    this.memberships = this.model.get('membership');
                     this.readOnly = options.readOnly;
                     this.requestUsername = options.requestUsername;
 
@@ -30,9 +29,11 @@
                 },
 
                 render: function () {
+                    var memberships = this.model.get('membership');
+                    var discussionTopicID = this.model.get('discussion_topic_id');
                     this.$el.html(_.template(teamTemplate, {
                         courseID: this.courseID,
-                        discussionTopicID: this.discussionTopicID,
+                        discussionTopicID: discussionTopicID,
                         readOnly: this.readOnly,
                         country: this.country,
                         language: this.language,
@@ -43,10 +44,10 @@
                                 '%(member_count)s / %(max_member_count)s Members',
                                 this.maxTeamSize
                             ),
-                            {member_count: this.memberships.length, max_member_count: this.maxTeamSize}, true
+                            {member_count: memberships.length, max_member_count: this.maxTeamSize}, true
                         ),
                         isMember: this.isUserMemberOfTeam(),
-                        hasCapacity: this.memberships.length < this.maxTeamSize,
+                        hasCapacity: memberships.length < this.maxTeamSize,
                         inviteLink: window.location +'?invite=true'
 
                     }));
@@ -61,7 +62,7 @@
 
                 renderTeamMembers: function() {
                     var view = this;
-                    _.each(this.memberships, function(membership) {
+                    _.each(this.model.get('membership'), function(membership) {
                         view.$('.members-info').append(_.template(teamMemberTemplate, {
                             imageUrl: 'https://dkxj5n08iyd6q.cloudfront.net/54.208.48.207/759220e8c562e167cab003f0023f839e_50.jpg?v=1438793481',
                             username: membership.user.username,
@@ -71,7 +72,7 @@
                 },
                 isUserMemberOfTeam: function() {
                     var view = this;
-                    var member = _.find(this.memberships, function (membership) {
+                    var member = _.find(this.model.get('membership'), function (membership) {
                         return membership.user.username === view.requestUsername
                     });
                     return member ? true : false;

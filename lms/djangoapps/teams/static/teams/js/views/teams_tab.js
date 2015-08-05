@@ -15,11 +15,12 @@
             'teams/js/views/team_profile',
             'teams/js/views/teams',
             'teams/js/views/edit_team',
+            'teams/js/views/team_join',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection,
                   TopicsView, TeamProfileView, TeamsView, TeamEditView,
-                  teamsTemplate) {
+                  TeamJoinView, teamsTemplate) {
             var ViewWithHeader = Backbone.View.extend({
                 initialize: function (options) {
                     this.header = options.header;
@@ -42,6 +43,7 @@
                     this.topics = options.topics;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
+                    this.teamsMembershipUrl = options.teamsMembershipUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
@@ -182,7 +184,14 @@
                                                 countries: self.countries
                                             }
                                         });
-                                        deferred.resolve(self.createViewWithHeader(teamsView, topic));
+                                        deferred.resolve(
+                                            self.createViewWithHeader(
+                                                {
+                                                    mainView: teamsView,
+                                                    subject: topic
+                                                }
+                                            )
+                                        );
                                     });
                             });
                     }
@@ -209,41 +218,61 @@
                         courseID = this.courseID;
                     self.getTopic(topicID).done(function(topic) {
                         self.getTeam(teamID).done(function(team) {
-                            var readOnly = self.readOnlyDiscussion(team),
+                            var username = self.$el.data('username'),
+                                readOnly = self.readOnlyDiscussion(team),
                                 view = new TeamProfileView({
-                                    courseID: courseID,
+                                courseID: courseID,
+                                model: team,
+                                readOnly: readOnly,
+                                maxTeamSize: self.maxTeamSize,
+                                requestUsername: username,
+                                countries: self.countries,
+                                languages: self.languages    
+                            });
+                            var teamJoinView = new TeamJoinView(
+                                {
                                     model: team,
-                                    readOnly: readOnly,
+                                    teamsUrl: self.teamsUrl,
                                     maxTeamSize: self.maxTeamSize,
-                                    requestUsername: self.$el.data('username'),
-                                    countries: self.countries,
-                                    languages: self.languages
-                                });
-                            deferred.resolve(self.createViewWithHeader(view, team, topic));
+                                    currentUsername: username,
+                                    teamsMembershipUrl: self.teamsMembershipUrl
+                                }
+                            );
+                            deferred.resolve(
+                                self.createViewWithHeader(
+                                    {
+                                        mainView: view,
+                                        subject: team,
+                                        parentTopic: topic,
+                                        headerActionView: teamJoinView
+                                    }
+                                )
+                            );
                         });
                     });
                     return deferred.promise();
                 },
 
-                createViewWithHeader: function (mainView, subject, parentTopic) {
+                createViewWithHeader: function (options) {
                     var router = this.router,
                         breadcrumbs, headerView;
                     breadcrumbs = [{
                         title: gettext('All Topics'),
                         url: '#browse'
                     }];
-                    if (parentTopic) {
+                    if (options.parentTopic) {
                         breadcrumbs.push({
-                            title: parentTopic.get('name'),
-                            url: '#topics/' + parentTopic.id
+                            title: options.parentTopic.get('name'),
+                            url: '#topics/' + options.parentTopic.id
                         });
                     }
                     headerView = new HeaderView({
                         model: new HeaderModel({
-                            description: subject.get('description'),
-                            title: subject.get('name'),
+                            description: options.subject.get('description'),
+                            title: options.subject.get('name'),
                             breadcrumbs: breadcrumbs
                         }),
+                        headerActionView: options.headerActionView,
                         events: {
                             'click nav.breadcrumbs a.nav-item': function (event) {
                                 var url = $(event.currentTarget).attr('href');
@@ -254,7 +283,7 @@
                     });
                     return new ViewWithHeader({
                         header: headerView,
-                        main: mainView
+                        main: options.mainView
                     });
                 },
 

@@ -693,9 +693,37 @@ class TeamPageTest(TeamsTabBase):
     def setUp(self):
         super(TeamPageTest, self).setUp()
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
-        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
-        self.team = self.create_teams(self.topic, 1)[0]
-        self.team_page = TeamPage(self.browser, self.course_id, self.team)
+
+    def _team_config(
+            self,
+            max_team_size=10,
+            membership_team_index=0,
+            visit_team_index=0,
+            create_membership=True,
+            another_user=False):
+        """
+        Set team configuration.
+
+        Arguments:
+            max_team_size (int): number of users a team can have
+            membership_team_index (int): index of team user will join
+            visit_team_index (int): index of team user will visit
+            create_membership (bool): whether to create membership or not
+            another_user (bool): another user to visit a team
+        """
+        #pylint: disable=attribute-defined-outside-init
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': max_team_size, 'topics': [self.topic]}
+        )
+        self.teams = self.create_teams(self.topic, 2)
+
+        if create_membership:
+            self.create_membership(self.user_info['username'], self.teams[membership_team_index]['id'])
+
+        if another_user:
+            AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.team_page = TeamPage(self.browser, self.course_id, self.teams[visit_team_index])
 
     def setup_thread(self):
         """
@@ -703,7 +731,7 @@ class TeamPageTest(TeamsTabBase):
         """
         thread = Thread(
             id="test_thread_{}".format(uuid4().hex),
-            commentable_id=self.team['discussion_topic_id'],
+            commentable_id=self.teams[0]['discussion_topic_id'],
             body="Dummy text body."
         )
         thread_fixture = MultipleThreadFixture([thread])
@@ -732,7 +760,7 @@ class TeamPageTest(TeamsTabBase):
         """
         thread = self.setup_thread()
         self.team_page.visit()
-        self.assertEqual(self.team_page.discussion_id, self.team['discussion_topic_id'])
+        self.assertEqual(self.team_page.discussion_id, self.teams[0]['discussion_topic_id'])
         discussion = self.team_page.discussion_page
         self.assertTrue(discussion.is_browser_on_page())
         self.assertTrue(discussion.is_discussion_expanded())
@@ -754,7 +782,7 @@ class TeamPageTest(TeamsTabBase):
         And I should see the existing thread
         And I should see controls to change the state of the discussion
         """
-        self.create_membership(self.user_info['username'], self.team['id'])
+        self._team_config()
         self.verify_teams_discussion_permissions(True)
 
     @ddt.data(True, False)
@@ -770,10 +798,88 @@ class TeamPageTest(TeamsTabBase):
         And I should see the team's thread
         And I should not see controls to change the state of the discussion
         """
+        self._team_config(create_membership=False)
         self.setup_discussion_user(staff=is_staff)
         self.verify_teams_discussion_permissions(False)
 
     @ddt.data('Moderator', 'Community TA', 'Administrator')
     def test_discussion_privileged(self, role):
+        self._team_config(create_membership=False)
         self.setup_discussion_user(role=role)
         self.verify_teams_discussion_permissions(True)
+
+    def test_join_team(self):
+        """
+        Scenario: User can join a Team if not a member already..
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I visit the Team page for that team
+        Then I should see Join Team button
+        When I click on Join Team button
+        Then there should be no Join Team button and no message
+        And I should see the updated information under Team Details
+        """
+        self._team_config(create_membership=False)
+        self.team_page.visit()
+        self.assertTrue(self.team_page.join_team_button_present)
+        self.team_page.click_join_team_button()
+        self.assertFalse(self.team_page.join_team_button_present)
+        self.assertFalse(self.team_page.join_team_message_present)
+        self.assertEqual(
+            self.team_page.team_details_info, {
+                'team_member_status': 'You are a member of this team.',
+                'team_members_present': True,
+                'team_capacity': '1 / 10 Members'
+            }
+        )
+
+    def test_already_member_message(self):
+        """
+        Scenario: User should see `You are already in a team` if user is a
+            member of other team.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I am already a member of a team
+        And I visit a team other than mine
+        Then I should see `You are already in a team` message
+        """
+        self._team_config(membership_team_index=0, visit_team_index=1)
+        self.team_page.visit()
+        self.assertEqual(self.team_page.join_team_message, 'You already belong to another team.')
+        self.assertEqual(
+            self.team_page.team_details_info, {
+                'team_member_status': '',
+                'team_members_present': False,
+                'team_capacity': '0 / 10 Members'
+            }
+        )
+
+    def test_team_full_message(self):
+        """
+        Scenario: User should see `Team is full` message when team is full.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And team has no space left
+        And I am not a member of any team
+        And I visit a team
+        Then I should see `Team is full` message
+        """
+        self._team_config(
+            create_membership=True,
+            max_team_size=1,
+            membership_team_index=0,
+            visit_team_index=0,
+            another_user=True
+        )
+        self.team_page.visit()
+        self.assertEqual(self.team_page.join_team_message, 'This team is full.')
+        self.assertEqual(
+            self.team_page.team_details_info, {
+                'team_member_status': '',
+                'team_members_present': True,
+                'team_capacity': '1 / 1 Member'
+            }
+        )

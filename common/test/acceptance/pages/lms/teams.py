@@ -227,3 +227,36 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def team_description(self):
         """Get the team's description as displayed in the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text
+
+    def click_join_team_button(self):
+        """ Click on Join Team button"""
+        self.q(css='.join-team .action-primary').first.click()
+        self.wait_for_ajax()
+
+    @property
+    def join_team_message(self):
+        """ Returns join team message """
+        self.wait_for_ajax()
+        return self.q(css='.join-team .join-team-message').text[0]
+
+    @property
+    def join_team_button_present(self):
+        """ Returns True if Join Team button is present else False """
+        self.wait_for_ajax()
+        return self.q(css='.join-team .action-primary').present
+
+    @property
+    def join_team_message_present(self):
+        """ Returns True if Join Team message is present else False """
+        return self.q(css='.join-team .join-team-message').present
+
+    @property
+    def team_details_info(self):
+        """ Returns Team Details """
+        info = {}
+        query = self.q(css='.team-member-status')
+        info['team_member_status'] = query.text[0] if query.present else ''
+        info['team_members_present'] = self.q(css='.team-members .members-info .team-member').present
+        info['team_capacity'] = self.q(css='.team-capacity :last-child').text[0]
+
+        return info
