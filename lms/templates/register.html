@@ -248,7 +248,7 @@
           % if settings.REGISTRATION_EXTRA_FIELDS['market'] != 'hidden':
           <li class="field group">
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['market']} select" id="field-market">
-              <label for="market">${_('Market')}</label>
+              <label for="market">${_('Select your nearest city')}</label>
               <select id="market" name="market" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['market'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, market_name in UserProfile.MARKET_CHOICES:
