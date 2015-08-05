@@ -33,12 +33,12 @@
 
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({
+        courseID: '${ unicode(course.id) }',
         topics: ${ json.dumps(topics, cls=EscapedEdxJSONEncoder) },
         topicUrl: '${ topic_url }',
         topicsUrl: '${ topics_url }',
         teamsUrl: '${ teams_url }',
         maxTeamSize: ${ course.teams_max_size },
-        course_id: '${ unicode(course.id) }',
         languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
         countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) }
     });

@@ -38,10 +38,10 @@
             var TeamTabView = Backbone.View.extend({
                 initialize: function(options) {
                     var TempTabView, router;
-                    this.course_id = options.course_id;
+                    this.courseID = options.courseID;
                     this.topics = options.topics;
-                    this.topic_url = options.topic_url;
-                    this.teams_url = options.teams_url;
+                    this.topicUrl = options.topicUrl;
+                    this.teamsUrl = options.teamsUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
@@ -54,6 +54,7 @@
                         [':default', _.bind(this.routeNotFound, this)],
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
+                        ['teams/:topic_id/:team_id', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(teams)\/?$'), _.bind(this.goToTab, this)]
                     ], function (route) {
@@ -170,7 +171,15 @@
                                             router: router,
                                             topic: topic,
                                             collection: collection,
-                                            maxTeamSize: self.maxTeamSize
+                                            maxTeamSize: self.maxTeamSize,
+                                            teamParams: {
+                                                courseId: self.courseID,
+                                                teamsUrl: self.teamsUrl,
+                                                topicId: topic.get('id'),
+                                                topicName: topic.get('name'),
+                                                languages: self.languages,
+                                                countries: self.countries
+                                            }
                                         });
                                         deferred.resolve(self.createViewWithHeader(teamsView, topic));
                                     });
@@ -187,51 +196,6 @@
                     this.getBrowseTeamView(topicID, teamID).done(function (browseTeamView) {
                         self.mainView = browseTeamView;
                         self.render();
-                    });
-                },
-
-                /**
-                 * Given a topic and the results of the team
-                 * collection's fetch(), return the team list view.
-                 */
-                constructTeamView: function (topic, collectionResults) {
-                    var self = this,
-                        headerView = new HeaderView({
-                            model: new HeaderModel({
-                                description: _.escape(topic.get('description')),
-                                title: _.escape(topic.get('name')),
-                                breadcrumbs: [{
-                                    title: 'All topics',
-                                    url: '#'
-                                }]
-                            }),
-                            events: {
-                                'click nav.breadcrumbs a.nav-item': function (event) {
-                                    event.preventDefault();
-                                    self.router.navigate('browse', {trigger: true});
-                                }
-                            }
-                        });
-                    return new ViewWithHeader({
-                        header: headerView,
-                        main: new TeamsView({
-                            collection: new TeamCollection(collectionResults[0], {
-                                course_id: this.course_id,
-                                url: this.teams_url,
-                                topic_id: topic.get('id'),
-                                per_page: 10,
-                                parse: true
-                            }),
-                            teamParams: {
-                                courseId: this.course_id,
-                                teamsUrl: this.teams_url,
-                                topicId: topic.get('id'),
-                                topicName: topic.get('name'),
-                                languages: self.languages,
-                                countries: self.countries
-                            },
-                            maxTeamSize: this.maxTeamSize
-                        })
                     });
                 },
 

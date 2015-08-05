@@ -462,7 +462,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             '1 / 10 Members'
         )
 
-<<<<<<< HEAD
     def test_navigation_links(self):
         """
         Scenario: User should be able to navigate to "browse all teams" and "search team description" links.
@@ -655,7 +654,7 @@ class CreateTeamTest(TeamsTabBase):
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
-=======
+
 
 @attr('shard_5')
 class TeamPageTest(TeamsTabBase):
@@ -699,4 +698,3 @@ class TeamPageTest(TeamsTabBase):
         self.assertTrue(discussion.is_discussion_expanded())
         self.assertEqual(discussion.get_num_displayed_threads(), 1)
         self.assertTrue(discussion.has_thread(thread['id']))
->>>>>>> Add Bok Choy test.
