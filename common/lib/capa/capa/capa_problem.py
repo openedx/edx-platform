@@ -575,11 +575,13 @@ class LoncapaProblem(object):
             return {}
 
     @property
-    def has_responsive_ui(self):
+    def has_multi_device_support(self):
         """
-        Returns whether this capa problem has support for responsive UI.
+        Returns whether this capa problem has multi-device support.
         """
-        return all(responder.has_responsive_ui for responder in self.responders.values())
+        return all(
+            responder.multi_device_support for responder in self.responders.values()
+        )
 
     # ======= Private Methods Below ========
 
