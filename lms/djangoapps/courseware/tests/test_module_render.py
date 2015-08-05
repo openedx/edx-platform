@@ -1781,7 +1781,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
                 break
             self.fail('Event type "problem_check" not found in call list.')
 
-        return call_data['context']['module']['display_name']
+        return call_data['context']['module']
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
@@ -1862,6 +1862,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
 
     @freeze_time(datetime.now().replace(tzinfo=pytz.UTC))
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
+    @patch.dict(settings.FEATURES, {'MARK_PROGRESS_ON_GRADING_EVENT': True})
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         self.set_module_grade_using_publish(self.grade_dict)
