@@ -80,8 +80,8 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             this.model = new CertificateModel({
                 name: 'Test Name',
                 description: 'Test Description',
-                course_title: 'Test Course Title Override'
-
+                course_title: 'Test Course Title Override',
+                is_active: true
             }, this.newModelOptions);
 
             this.collection = new CertificatesCollection([ this.model ], {
@@ -139,11 +139,17 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.model.get('editing')).toBe(true);
             });
 
+            it('should not present a Edit action if user is not global staff and certificate is active', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                appendSetFixtures(this.view.render().el);
+                expect(this.view.$('.action-edit .edit')).not.toExist();
+            });
+
             it('should present a Delete action', function () {
                 expect(this.view.$('.action-delete .delete')).toExist();
             });
 
-            it('should not present a Delete action if user is not global staff', function () {
+            it('should not present a Delete action if user is not global staff and certificate is active', function () {
                 window.CMS.User = {isGlobalStaff: false};
                 appendSetFixtures(this.view.render().el);
                 expect(this.view.$('.action-delete .delete')).not.toExist();
@@ -159,7 +165,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         describe('Signatory details', function(){
 
             beforeEach(function() {
-                this.view.render(true);
+                this.view.render();
             });
 
             it('displays certificate signatories details', function(){
@@ -169,6 +175,16 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(
                     this.view.$(SELECTORS.signatory_organization_value)
                 ).toContainText('Organization of the signatory');
+            });
+
+            it('should present Edit action on signaotry', function () {
+                expect(this.view.$(SELECTORS.edit_signatory)).toExist();
+            });
+
+            it('should not present Edit action on signaotry if user is not global staff and certificate is active', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                this.view.render();
+                expect(this.view.$(SELECTORS.edit_signatory)).not.toExist();
             });
 
             it('supports in-line editing of signatory information', function() {
