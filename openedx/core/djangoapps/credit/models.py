@@ -236,7 +236,8 @@ class CreditCourse(models.Model):
                 unicode(course.course_key)
                 for course in cls.objects.filter(enabled=True)
             )
-            cache.set(cls.CREDIT_COURSES_CACHE_KEY, credit_courses)
+            if credit_courses:
+                cache.set(cls.CREDIT_COURSES_CACHE_KEY, credit_courses)
 
         return unicode(course_key) in credit_courses
 
