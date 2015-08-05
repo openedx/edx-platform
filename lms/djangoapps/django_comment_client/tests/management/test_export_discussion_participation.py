@@ -255,7 +255,7 @@ class ExtractorTest(TestCase):
     @ddt.data(*_std_parameters_list)
     def test_extract_invokes_correct_data_extraction_methods(self, course_key, end_date, thread_type, thread_ids):
         """ Tests that correct underlying extractors are called with proper arguments """
-        with mock.patch(_target_module + '.CourseEnrollment.users_enrolled_in') as patched_users_enrolled_in, \
+        with mock.patch(_target_module + '.CourseEnrollment.objects.users_enrolled_in') as patched_users_enrolled_in, \
                 mock.patch(_target_module + ".User.all_social_stats") as patched_all_social_stats:
             self.extractor.extract(course_key, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids)
             patched_users_enrolled_in.return_value = []
@@ -306,7 +306,7 @@ class ExtractorTest(TestCase):
     )
     def test_extract_correctly_merges_data(self, user_data, social_stats, expected_result):
         """ Tests that extracted data is merged correctly """
-        with mock.patch(_target_module + '.CourseEnrollment.users_enrolled_in') as patched_users_enrolled_in, \
+        with mock.patch(_target_module + '.CourseEnrollment.objects.users_enrolled_in') as patched_users_enrolled_in, \
                 mock.patch(_target_module + ".User.all_social_stats") as patched_all_social_stats:
             patched_users_enrolled_in.return_value = user_data
             patched_all_social_stats.return_value = social_stats

@@ -33,14 +33,6 @@ class CohortedContentTestCase(ModuleStoreTestCase):
                 "cohorted_discussions": ["cohorted_topic"]
             }
         )
-        self.student_cohort = CohortFactory.create(
-            name="student_cohort",
-            course_id=self.course.id
-        )
-        self.moderator_cohort = CohortFactory.create(
-            name="moderator_cohort",
-            course_id=self.course.id
-        )
         self.course.discussion_topics["cohorted topic"] = {"id": "cohorted_topic"}
         self.course.discussion_topics["non-cohorted topic"] = {"id": "non_cohorted_topic"}
         self.store.update_item(self.course, self.user.id)

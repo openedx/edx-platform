@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import datetime
 import mock
 from nose.plugins.attrib import attr
 import ddt
@@ -722,7 +723,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_ids_empty(self):
-        self.assertEqual(utils.get_discussion_categories_ids(self.course), [])
+        self.assertEqual(utils.get_discussion_categories_ids(self.course, self.user), [])
 
     def test_ids_configured_topics(self):
         self.course.discussion_topics = {
@@ -731,7 +732,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic C": {"id": "Topic_C"}
         }
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course),
+            utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C"]
         )
 
@@ -743,7 +744,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course),
+            utils.get_discussion_categories_ids(self.course, self.user),
             ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
         )
 
@@ -757,7 +758,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course),
+            utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
         )
 
