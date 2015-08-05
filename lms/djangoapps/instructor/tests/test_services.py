@@ -1,12 +1,12 @@
 """
-Tests for the Courseware reset attempt service service
+Tests for the InstructorService
 """
 
 import json
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.models import StudentModule
-from instructor.services import CoursewareService
+from instructor.services import InstructorService
 from instructor.tests.test_tools import msk_from_problem_urlname
 from nose.plugins.attrib import attr
 
@@ -15,13 +15,13 @@ from student.tests.factories import UserFactory
 
 
 @attr('shard_1')
-class CoursewareServiceTests(ModuleStoreTestCase):
+class InstructorServiceTests(ModuleStoreTestCase):
     """
-    Tests for the Courseware service
+    Tests for the InstructorService
     """
 
     def setUp(self):
-        super(CoursewareServiceTests, self).setUp()
+        super(InstructorServiceTests, self).setUp()
 
         self.course = CourseFactory.create()
         self.student = UserFactory()
@@ -33,7 +33,7 @@ class CoursewareServiceTests(ModuleStoreTestCase):
         )
 
         self.problem_urlname = self.problem_location.to_deprecated_string()
-        self.service = CoursewareService()
+        self.service = InstructorService()
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
