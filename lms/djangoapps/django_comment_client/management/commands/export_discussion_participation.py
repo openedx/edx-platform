@@ -238,7 +238,7 @@ class Extractor(object):
 
     def _get_users(self, course_key):
         """ Returns users enrolled to a course as dictionary user_id => user """
-        users = CourseEnrollment.users_enrolled_in(course_key)
+        users = CourseEnrollment.objects.users_enrolled_in(course_key)
         return {user.id: user for user in users}
 
     def _get_social_stats(self, course_key, end_date=None, thread_type=None, thread_ids=None):
