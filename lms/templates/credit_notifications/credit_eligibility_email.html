@@ -30,7 +30,7 @@
             </p>
 
             <p>
-              ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your {platform_name} course! Click {link_start}here{link_end} to get your credit now.").format(
+              ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
                 link_start=u'<a href="{dashboard_url}">'.format(
                     dashboard_url=dashboard_link
                 ),
@@ -64,13 +64,11 @@
 
         <tr>
           <td class="cn-footer-content">
-            <p>
-              ${_(u"For more information on credit at {platform_name}, click {link_start}here{link_end}.").format(
-                link_start=u'<a href="https://www.edx.org/gfa">',
-                link_end=u'</a>',
-                platform_name=settings.PLATFORM_NAME
+            <p><a href="https://www.edx.org/gfa">
+              ${_(u"Get more information on credit at {platform_name}").format(
+                platform_name=settings.PLATFORM_NAME,
               )}
-            </p>
+            </a></p>
           </td>
         </tr>
       </table>
