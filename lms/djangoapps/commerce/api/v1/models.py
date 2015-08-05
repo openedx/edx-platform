@@ -1,12 +1,13 @@
 """ API v1 models. """
 from itertools import groupby
-import logging
 
+import logging
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from course_modes.models import CourseMode
+from verify_student.models import VerificationDeadline
 
 log = logging.getLogger(__name__)
 
@@ -17,10 +18,24 @@ class Course(object):
     modes = None
     _deleted_modes = None
 
-    def __init__(self, id, modes):  # pylint: disable=invalid-name,redefined-builtin
+    def __init__(self, id, modes, verification_deadline=None):  # pylint: disable=invalid-name,redefined-builtin
         self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
+        self.verification_deadline = verification_deadline
         self._deleted_modes = []
+
+    @property
+    def name(self):
+        """ Return course name. """
+        course_id = CourseKey.from_string(unicode(self.id))  # pylint: disable=invalid-name
+
+        try:
+            return CourseOverview.get_from_id(course_id).display_name
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning('Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
 
     def get_mode_display_name(self, mode):
         """ Returns display name for the given mode. """
@@ -42,6 +57,10 @@ class Course(object):
     @transaction.commit_on_success
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
+
+        # Update the verification deadline for the course (not the individual modes)
+        VerificationDeadline.set_deadline(self.id, self.verification_deadline)
+
         for mode in self.modes:
             mode.course_id = self.id
             mode.mode_display_name = self.get_mode_display_name(mode)
@@ -53,6 +72,8 @@ class Course(object):
 
     def update(self, attrs):
         """ Update the model with external data (usually passed via API call). """
+        self.verification_deadline = attrs.get('verification_deadline')
+
         existing_modes = {mode.mode_slug: mode for mode in self.modes}
         merged_modes = set()
         merged_mode_keys = set()
@@ -87,7 +108,8 @@ class Course(object):
         course_modes = CourseMode.objects.filter(course_id=course_id)
 
         if course_modes:
-            return cls(unicode(course_id), list(course_modes))
+            verification_deadline = VerificationDeadline.deadline_for_course(course_id)
+            return cls(course_id, list(course_modes), verification_deadline=verification_deadline)
 
         return None
 
