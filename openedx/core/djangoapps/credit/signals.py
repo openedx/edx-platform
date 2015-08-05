@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import get_course_xblocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
+from xmodule.partitions.partitions import Group, UserPartition, NoSuchUserPartitionError
 
 
 log = logging.getLogger(__name__)
@@ -86,15 +87,16 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         partition_scheme (str): Name of the user partition scheme
 
     """
-    partition = None
-    # create partition with provided partition scheme
-    if partition_scheme == 'verification':
-        partition = VerificationPartitionScheme()
-
-    if partition is None:
-        log.error(u'No user partition found with scheme "%s".', partition_scheme)
-        # TODO: maybe raise a 'NoSuchUserPartitionError' exception if not user partition is present with provide 'partition_scheme'.
-        return
+    # get user partition with provided partition scheme
+    user_partition = UserPartition.get_scheme(partition_scheme)
+    if user_partition is None:
+        # log and raise exception 'NoSuchUserPartitionError' if no matching
+        # user partition exists
+        log.error(
+            u'No user partition found with scheme "%s". Exiting tagging course content with user partition.',
+            partition_scheme
+        )
+        raise NoSuchUserPartitionError
 
     access_control_credit_xblocks = _get_credit_xblocks_for_access_control(course_key)
     for xblock in access_control_credit_xblocks:
