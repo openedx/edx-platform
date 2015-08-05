@@ -164,11 +164,9 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
             it('displays certificate signatories details', function(){
                 this.view.$('.show-details').click();
-                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText(/^[A-Za-z\s]{10,40}/);
-                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('Title of the signatory');
-                expect(
-                    this.view.$(SELECTORS.signatory_organization_value)
-                ).toContainText('Organization of the signatory');
+                expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('');
+                expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('');
+                expect(this.view.$(SELECTORS.signatory_organization_value)).toContainText('');
             });
 
             it('supports in-line editing of signatory information', function() {
