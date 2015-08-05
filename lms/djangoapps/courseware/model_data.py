@@ -37,6 +37,7 @@ from opaque_keys.edx.asides import AsideUsageKeyV1
 from contracts import contract, new_contract
 
 from django.db import DatabaseError
+from django.core.exceptions import ObjectDoesNotExist
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
@@ -211,7 +212,7 @@ class DjangoOrmFieldCache(object):
         self.set_many({kvs_key: value})
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
-    def set_many(self, kv_dict):
+    def set_many(self, kv_dict, remote_user=None):
         """
         Set the specified fields to the supplied values.
 
@@ -293,6 +294,12 @@ class DjangoOrmFieldCache(object):
             return None
         else:
             return field_object.modified
+
+    def remote_get(self, user, field_name, block_type):
+        try:
+            return json.loads(self._get_remote_object(user, field_name, block_type).value)
+        except ObjectDoesNotExist:
+            raise KeyError
 
     def __len__(self):
         return len(self._cache)
@@ -402,7 +409,7 @@ class UserStateCache(object):
         ).get(kvs_key.field_name)
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
-    def set_many(self, kv_dict, remote_username=None):
+    def set_many(self, kv_dict, remote_user=None):
         """
         Set the specified fields to the supplied values.
 
@@ -419,7 +426,7 @@ class UserStateCache(object):
         if remote_username is None:
             username = self.user.username
         else:
-            username = remote_username
+            username = remote_user.username
 
         try:
             self._client.set_many(
@@ -510,12 +517,12 @@ class UserStateCache(object):
             student_module.max_grade = max_score
             student_module.save()
 
-    @contract(
-        username="basestring", 
-        block_key=UsageKey, 
-        fields="seq(basestring)|set(basestring)"
-    )
-    def remote_get(self, username, block_key, fields):
+    # @contract(
+    #     username="basestring", 
+    #     block_key=UsageKey, 
+    #     fields="seq(basestring)|set(basestring)"
+    # )
+    def remote_get(self, user, field, block_key):
         """
         Call for accessing data directly via username, block_key and field names.
         Necessry for shared field data
@@ -528,7 +535,7 @@ class UserStateCache(object):
         Return:
             A django orm object from the cache
         """
-        return self._client.get(username, block_key, Scope.user_state, fields)
+        return self._client.get(user.username, block_key, Scope.user_state, [field])[field]
 
     def __len__(self):
         return len(self._cache)
@@ -583,6 +590,12 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
             'usage_id__in',
             _all_usage_keys(xblocks, aside_types),
             field_name__in=set(field.name for field in fields),
+        )
+
+    def _get_remote_object(self, user, field_name, block_key):
+        return XModuleUserStateSummaryField.objects.get(
+            usage_id=block_key,
+            field_name=field_name
         )
 
     def _cache_key_for_field_object(self, field_object):
@@ -648,6 +661,13 @@ class PreferencesCache(DjangoOrmFieldCache):
             field_name__in=set(field.name for field in fields),
         )
 
+    def _get_remote_object(self, user, field_name, block_key):
+        return XModuleStudentPrefsField.objects.filter(
+            module_type=block_key,
+            student=user.pk,
+            field_name=field_name
+        )
+
     def _cache_key_for_field_object(self, field_object):
         """
         Return the key used in this DjangoOrmFieldCache to store the specified field_object.
@@ -665,7 +685,6 @@ class PreferencesCache(DjangoOrmFieldCache):
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
         return (BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
-
 
 class UserInfoCache(DjangoOrmFieldCache):
     """
@@ -708,6 +727,13 @@ class UserInfoCache(DjangoOrmFieldCache):
             field_name__in=set(field.name for field in fields),
         )
 
+    def _get_remote_object(self, user, field_name, block_type):
+
+        return XModuleStudentInfoField.objects.get(
+            student=user.pk,
+            field_name=field_name
+        )
+
     def _cache_key_for_field_object(self, field_object):
         """
         Return the key used in this DjangoOrmFieldCache to store the specified field_object.
@@ -725,7 +751,6 @@ class UserInfoCache(DjangoOrmFieldCache):
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
         return key.field_name
-
 
 class FieldDataCache(object):
     """
@@ -874,9 +899,10 @@ class FieldDataCache(object):
         if key.queryable is not None:
             user = user_by_anonymous_id(key.user_id)
             return self.cache[key.scope].remote_get(
-                user.username, 
-                key.block_scope_id, 
-                [key.field_name])[key.field_name]
+                user, 
+                key.field_name,
+                key.block_scope_id
+                )
 
         return self.cache[key.scope].get(key)
 
