@@ -1126,11 +1126,16 @@ class VerificationStatus(models.Model):
     A verification status represents a user’s progress through the verification
     process for a particular checkpoint.
     """
+    SUBMITTED_STATUS = "submitted"
+    APPROVED_STATUS = "approved"
+    DENIED_STATUS = "denied"
+    ERROR_STATUS = "error"
+
     VERIFICATION_STATUS_CHOICES = (
-        ("submitted", "submitted"),
-        ("approved", "approved"),
-        ("denied", "denied"),
-        ("error", "error")
+        (SUBMITTED_STATUS, SUBMITTED_STATUS),
+        (APPROVED_STATUS, APPROVED_STATUS),
+        (DENIED_STATUS, DENIED_STATUS),
+        (ERROR_STATUS, ERROR_STATUS)
     )
 
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="checkpoint_status")
@@ -1217,7 +1222,7 @@ class VerificationStatus(models.Model):
             user_id=user_id,
             checkpoint__course_id=course_key,
             checkpoint__checkpoint_location=related_assessment_location,
-            status="submitted"
+            status=cls.SUBMITTED_STATUS
         ).count()
 
     @classmethod
@@ -1235,6 +1240,27 @@ class VerificationStatus(models.Model):
             return verification_status.checkpoint.checkpoint_location
         except cls.DoesNotExist:
             return ""
+
+    @classmethod
+    def check_user_has_completed_checkpoint(cls, user_id, course_key, related_assessment_location):
+        """
+        Get re-verification status against a user for a 'course_id' and checkpoint.
+        Only 'approved' and 'submitted' statuses are considered as completed.
+
+        Args:
+            user_id(str): User Id string
+            course_key(str): A CourseKey of a course
+            related_assessment_location(str): Verification checkpoint location
+
+        Returns:
+            Boolean
+        """
+        return cls.objects.filter(
+            user_id=user_id,
+            checkpoint__course_id=course_key,
+            checkpoint__checkpoint_location=related_assessment_location,
+            status__in=[cls.SUBMITTED_STATUS, cls.APPROVED_STATUS]
+        ).exists()
 
 
 # DEPRECATED: this feature has been permanently enabled.
