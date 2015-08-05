@@ -32,11 +32,12 @@ def on_course_publish(course_key):  # pylint: disable=unused-argument
     IMPORTANT: It is assumed that the edx-proctoring subsystem has been appropriate refreshed
     with any on_publish event workflow *BEFORE* this method is called.
     """
+    # synchronously tag course content with ICRV access control
+    tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
 
     # Import here, because signal is registered at startup, but items in tasks
     # are not yet able to be loaded
     from openedx.core.djangoapps.credit import api, tasks
-    tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
 
     if api.is_credit_course(course_key):
         tasks.update_credit_course_requirements.delay(unicode(course_key))
