@@ -99,12 +99,13 @@
             },
 
             saveValue: function () {
-                var attributes = {},
-                    value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
-                attributes[this.options.valueAttribute] = value;
-                this.saveAttributes(attributes);
+                if (this.persistChanges === true) {
+                    var attributes = {},
+                        value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
+                    attributes[this.options.valueAttribute] = value;
+                    this.saveAttributes(attributes);
+                }
             }
-
         });
 
         AccountSettingsFieldViews.AuthFieldView = FieldViews.LinkFieldView.extend({

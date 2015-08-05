@@ -1,6 +1,6 @@
 define([
-    'teams/js/collections/team', 'teams/js/views/teams'
-], function (TeamCollection, TeamsView) {
+    'backbone', 'teams/js/collections/team', 'teams/js/views/teams'
+], function (Backbone, TeamCollection, TeamsView) {
     'use strict';
     describe('TeamsView', function () {
         var teamsView, teamCollection, initialTeams,
@@ -32,7 +32,8 @@ define([
             );
             teamsView = new TeamsView({
                 el: '.teams-container',
-                collection: teamCollection
+                collection: teamCollection,
+                teamParams: {}
             }).render();
         });
 
