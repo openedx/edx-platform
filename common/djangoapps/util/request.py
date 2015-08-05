@@ -63,15 +63,13 @@ def course_id_from_url(url):
         return None
 
     try:
-        course_key = key_generator(course_id)
+        return CourseKey.from_string(course_id)
     except InvalidKeyError:
         log.warning(
             'unable to parse course_id "{}"'.format(course_id),
             exc_info=True
         )
         return None
-
-    return course_key
 
 
 class RequestMock(RequestFactory):
