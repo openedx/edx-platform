@@ -6,13 +6,14 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.4",
+    version="0.5",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
     # be reorganized to be a more conventional Python tree.
     packages=[
         "openedx.core.djangoapps.course_groups",
+        "openedx.core.djangoapps.credit",
         "openedx.core.djangoapps.user_api",
         "lms",
         "cms",

@@ -8,6 +8,7 @@ import unittest
 from mock import Mock
 
 from django.conf import settings
+from django.test import TestCase
 
 from lms.djangoapps.verify_student.models import (
     VerificationCheckpoint,
@@ -19,6 +20,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
 
 
 @ddt.ddt
@@ -154,3 +156,18 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
                 self.checkpoint_location
             )
         )
+
+
+class TestExtension(TestCase):
+    """ Ensure that the scheme extension is correctly plugged in (via entry
+    point in setup.py)
+    """
+
+    def test_get_scheme(self):
+        # test that 'VerificationPartitionScheme' is present
+        self.assertEqual(UserPartition.get_scheme('verification'), VerificationPartitionScheme)
+
+        # now test that exception is raised if we try to access a non existing
+        # user partition scheme
+        with self.assertRaisesRegexp(UserPartitionError, 'Unrecognized scheme'):
+            UserPartition.get_scheme('other')
