@@ -8,7 +8,8 @@ define([
         testTeamDiscussionID = "12345";
 
     createMockPostResponse = function(options) {
-        return _.extend(_.extend({
+        return _.extend(
+            {
                 username: testUser,
                 course_id: testCourseID,
                 commentable_id: testTeamDiscussionID,
@@ -31,8 +32,9 @@ define([
                 comments_count: 0,
                 group_id: 1,
                 endorsed: false
-            }),
-            options);
+            },
+            options
+        );
     };
 
     createMockDiscussionResponse = function() {
@@ -84,7 +86,8 @@ define([
     };
 
     createMockThreadResponse = function(options) {
-        return _.extend(_.extend({
+        return _.extend(
+            {
                 username: testUser,
                 course_id: testCourseID,
                 commentable_id: testTeamDiscussionID,
@@ -110,8 +113,9 @@ define([
                 thread_type: "discussion",
                 context: "standalone",
                 endorsed: false
-            }),
-            options);
+            },
+            options
+        );
     };
 
     return {

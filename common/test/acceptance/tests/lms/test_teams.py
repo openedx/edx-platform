@@ -670,7 +670,7 @@ class TeamPageTest(TeamsTabBase):
 
     def setup_thread(self):
         """
-        Set up multiple threads on the team page by passing 'thread_count'.
+        Set up the discussion thread for the team.
         """
         thread = Thread(
             id="test_thread_{}".format(uuid4().hex),
@@ -686,10 +686,10 @@ class TeamPageTest(TeamsTabBase):
         Scenario: Team Page renders a team discussion.
         Given I am enrolled in a course with a team configuration, a topic,
             and a team belonging to that topic
-        When I post a thread in the team's discussion
+        When a thread exists in the team's discussion
         And I visit the Team page for that team
         Then I should see a discussion with the correct discussion_id
-        And I should see the thread which I had posted
+        And I should see the existing thread
         """
         thread = self.setup_thread()
         self.team_page.visit()

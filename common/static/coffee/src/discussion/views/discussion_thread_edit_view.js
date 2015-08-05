@@ -61,7 +61,7 @@
                     postData = {
                         title: title,
                         thread_type: threadType,
-                        body: body,
+                        body: body
                     };
                 if (this.topicView) {
                     postData.commentable_id = this.topicView.getCurrentTopicId();

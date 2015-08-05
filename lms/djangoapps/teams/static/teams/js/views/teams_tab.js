@@ -180,7 +180,7 @@
                 },
 
                 /**
-                 * Render the list of teams for the given topic ID.
+                 * Browse to the team with the specified team ID belonging to the specified topic.
                  */
                 browseTeam: function (topicID, teamID) {
                     var self = this;
@@ -258,7 +258,7 @@
                     var router = this.router,
                         breadcrumbs, headerView;
                     breadcrumbs = [{
-                        title: 'All Topics',
+                        title: gettext('All Topics'),
                         url: '#browse'
                     }];
                     if (parentTopic) {

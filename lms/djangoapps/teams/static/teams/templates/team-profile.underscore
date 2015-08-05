@@ -1,4 +1,4 @@
-<div>
+<div class="team-profile">
     <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
             data-user-create-comment="<%= canCreateComment %>"
             data-user-create-subcomment="<%= canCreateSubComment %>">

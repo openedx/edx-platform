@@ -189,9 +189,7 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def __init__(self, browser, course_id, team):
         """
         Set up `self.url_path` on instantiation, since it dynamically
-        reflects the current topic.  Note that `topic` is a dict
-        representation of a topic following the same convention as a
-        course module's topic.
+        reflects the current team.
         """
         super(TeamPage, self).__init__(browser, course_id)
         self.team = team
@@ -202,9 +200,7 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def is_browser_on_page(self):
         """Check if we're on the teams list page for a particular team."""
         has_correct_url = self.url.endswith(self.url_path)
-        # The "teams-main" class is not unique to this view, but currently there is nothing else on the
-        # page except for the discussion module.
-        team_view_present = self.q(css='.teams-main').present
+        team_view_present = self.q(css='.team-profile').present
         return has_correct_url and team_view_present
 
     @property
