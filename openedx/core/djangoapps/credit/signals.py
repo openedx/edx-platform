@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.credit.utils import get_course_xblocks
+from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition, NoSuchUserPartitionError
@@ -107,14 +107,14 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         raise NoSuchUserPartitionError
 
     access_control_credit_xblocks = _get_credit_xblocks_for_access_control(course_key)
-    all_user_partitions = []
+    new_user_partitions = []
     for block in access_control_credit_xblocks:
         # for now we are only entertaining verification partition scheme
         if partition_scheme == VERIFICATION_SCHEME:
             # TODO: Break code in small reusable code
             # create group configuration for VerificationPartitionScheme
             group_configuration = _verification_partition_group_configuration(user_partition, block)
-            all_user_partitions.append(group_configuration)
+            new_user_partitions.append(group_configuration)
 
             # update 'group_access' field of gating xblock with groups
             # 'verified_allow' and 'verified_deny' of newly created group
@@ -156,11 +156,30 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
             modulestore().update_item(ancestor_for_update, user_id)
 
     # Now add all newly created partition in 'user_partitions' field of course
+    _update_course_user_partitions(course_key, user_id, new_user_partitions)
+
+
+def _update_course_user_partitions(course_key, user_id, new_user_partitions):
+    """ Add provided user partitions in 'new_user_partitions' in
+    'user_partitions' field of course.
+
+    Remove all user partitions of course with same partition schemes as in
+    provided list 'new_user_partitions'.
+
+    Args:
+        course_key (CourseKey): Identifier for the course
+        user_partitions (List): List of user partitions
+
+    """
     course = modulestore().get_course(course_key, depth=0)
-    # TODO: Consider deleting old user partition with same scheme for proper cleanup, preserve non matching partitions
-    course.user_partitions = all_user_partitions
+    # get unique set of partition schemes for update and filter course user
+    # partitions with any of the unique set of partition schemes
+    filter_partition_schemes = set([user_partition.scheme.name for user_partition in new_user_partitions])
+    course_user_partitions = filter_by_scheme(course.user_partitions, filter_partition_schemes)
+    # new add user partitions 'new_user_partitions' in filter course user partitions
+    course.user_partitions = course_user_partitions + new_user_partitions
+    # TODO: Check that course and modules are properly updated in database, preserve those user partition which scheme name not in 'new_user_partitions'.
     modulestore().update_item(course, user_id)
-    # TODO: Check that course and modules are properly updated in database
 
 
 def _verification_partition_group_configuration(user_partition, block):
@@ -176,7 +195,7 @@ def _verification_partition_group_configuration(user_partition, block):
         checkpoint_name=block.display_name
     )
     group_configuration_description = group_configuration_name
-    # TODO: Group requires id to be an int value. Properly handle using strings as id's
+    # TODO: Group requires id to be an int value. Properly handle using strings (without spaces, maybe convert spaces to '-' or '_') as id's. For now I have disabled int restriction on id's.
     group_configuration_groups = [
         Group('non_verified', 'Not enrolled in a verified track'),
         Group('verified_allow', 'Enrolled in a verified track and has access'),
@@ -189,7 +208,7 @@ def _verification_partition_group_configuration(user_partition, block):
         name=group_configuration_name,
         description=group_configuration_description,
         groups=group_configuration_groups,
-        scheme=VERIFICATION_SCHEME,
+        scheme=user_partition,
         parameters=group_configuration_parameters,
     )
     return group_configuration
