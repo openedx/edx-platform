@@ -1258,7 +1258,12 @@ base_application_js = [
 dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
-discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+discussion_js = (
+    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/customwmd.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_accessible.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_delay_renderer.js') +
+    sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+)
 
 discussion_vendor_js = [
     'js/Markdown.Converter.js',
