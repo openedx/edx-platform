@@ -299,6 +299,14 @@ class DjangoOrmFieldCache(object):
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def remote_get(self, kvs_key):
+        """
+        A method of getting a remote field
+        
+        Args:
+            kvs_key (DjangoKeyValueStore.Key): The key information of field
+        
+        Returns: query data
+        """
         user = user_by_anonymous_id(kvs_key.user_id)
         field_name = kvs_key.field_name
         block_type = kvs_key.block_scope_id
@@ -309,6 +317,13 @@ class DjangoOrmFieldCache(object):
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)", remote_user="User|None")
     def remote_set_many(self, kv_dict, remote_user):
+        """
+        A method of saving a remote field
+        
+        Args:
+            kv_dict (dict): Description
+            remote_user (User): Description
+        """
         self.set_many(kv_dict)
 
     def __len__(self):
@@ -544,15 +559,12 @@ class UserStateCache(object):
         """
         Call for accessing data directly via username, block_key and field names.
         Necessry for shared field data
-
-        Arguments:
-            username (str): The username of a user
-            block_key (UsageKey): The UsageKey identifying which xblock state to load.
-            fields (list of str): Field names to cache.
-
-        Return:
-            A django orm object from the cache
+        
+        Args:
+            kvs_key (DjangoKeyValueStore.Key): The information key of field
+        Returns: json str
         """
+        #
         user = user_by_anonymous_id(kvs_key.user_id)
         field_name = kvs_key.field_name
         block_key = kvs_key.block_scope_id
@@ -976,13 +988,11 @@ class FieldDataCache(object):
 
         for user_id, by_scope_data in by_user_scope.iteritems():
             user = user_by_anonymous_id(user_id)
-            print "set user id", user_id
-            print key.field_name
             for scope, set_many_data in by_scope_data.iteritems():
                 try:
                     self.cache[scope].remote_set_many(set_many_data, user)
                 except KeyValueMultiSaveError as exc:
-                    log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
+                    log.exception('Error saving remote fields %r', [key.field_name for key in set_many_data])
                     raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
 
     @contract(key=DjangoKeyValueStore.Key)
