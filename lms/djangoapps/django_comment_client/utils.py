@@ -351,6 +351,7 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
 def discussion_category_id_access(course, user, discussion_id):
     """
     Returns True iff the given discussion_id is accessible for user in course.
+    Assumes that the commentable identified by discussion_id has a null or 'course' context.
     Uses the discussion id cache if available, falling back to
     get_discussion_categories_ids if there is no cache.
     """

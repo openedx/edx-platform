@@ -67,5 +67,6 @@ class @DiscussionSpecHelper
                 data-course-name="Fake Course"
                 data-user-create-comment="true"
                 data-user-create-subcomment="true"
+                data-read-only="false"
             ></div>
         """)

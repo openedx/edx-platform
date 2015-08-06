@@ -1193,7 +1193,11 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         thread_author = getattr(self, thread_author)
         self._setup_mock(
             user, mock_request,  # user is the person making the request.
-            {"user_id": str(thread_author.id), "closed": False, "commentable_id": commentable_id}
+            {
+                "user_id": str(thread_author.id),
+                "closed": False, "commentable_id": commentable_id,
+                "context": "standalone"
+            }
         )
         response = self.client.post(
             reverse(
@@ -1203,7 +1207,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
                     "thread_id": "dummy"
                 }
             ),
-            data={"body": "foo", "title": "foo"}
+            data={"body": "foo", "title": "foo", "commentable_id": commentable_id}
         )
         self.assertEqual(response.status_code, status_code)
 

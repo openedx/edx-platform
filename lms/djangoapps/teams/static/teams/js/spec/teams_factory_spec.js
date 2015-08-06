@@ -2,17 +2,17 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
     function($, Backbone, TeamsTabFactory) {
         'use strict';
        
-        describe("Teams tab", function() {
+        describe("Teams Tab Factory", function() {
             var teamsTab;
 
             beforeEach(function() {
                 setFixtures('<section class="teams-content"></section>');
                 teamsTab = new TeamsTabFactory({
                     topics: {results: []},
-                    topics_url: '',
-                    teams_url: '',
+                    topicsUrl: '',
+                    teamsUrl: '',
                     maxTeamSize: 9999,
-                    course_id: 'edX/DemoX/Demo_Course'
+                    courseID: 'edX/DemoX/Demo_Course'
                 });
             });
 

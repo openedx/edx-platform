@@ -8,6 +8,6 @@
         <% }); %>
     </section>
 
-    <section class="pagination">
+    <section class="discussion-pagination">
     </section>
 </section>

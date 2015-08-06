@@ -205,7 +205,7 @@ describe "DiscussionUserProfileView", ->
                     )
                     {always: ->}
             )
-            @view.$(".pagination a").first().click()
+            @view.$(".discussion-pagination a").first().click()
             expect(@view.$(".current-page").text()).toEqual("42")
             expect(@view.$(".last-page").text()).toEqual("99")
 
@@ -216,5 +216,5 @@ describe "DiscussionUserProfileView", ->
                     params.error()
                     {always: ->}
             )
-            @view.$(".pagination a").first().click()
+            @view.$(".discussion-pagination a").first().click()
             expect(DiscussionUtil.discussionAlert).toHaveBeenCalled()

@@ -90,6 +90,7 @@ class TeamsDashboardView(View):
             instance=topics_page,
             context={'course_id': course.id, 'sort_order': sort_order}
         )
+        user = request.user
         context = {
             "course": course,
             "topics": topics_serializer.data,
@@ -100,6 +101,8 @@ class TeamsDashboardView(View):
             "teams_url": reverse('teams_list', request=request),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
+            "username": user.username,
+            "privileged": has_discussion_privileges(user, course_key)
         }
         return render_to_response("teams/teams.html", context)
 

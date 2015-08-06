@@ -176,6 +176,7 @@ def make_mock_request_impl(
                 thread_id=thread_id,
                 num_children=num_thread_responses,
                 group_id=group_id,
+                commentable_id=commentable_id
             )
         elif "/users/" in url:
             data = {
@@ -336,8 +337,8 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
     @ddt.data(
         # old mongo with cache
-        (ModuleStoreEnum.Type.mongo, 1, 7, 5, 14, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 7, 5, 14, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 14, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 14, 8),
         # split mongo: 3 queries, regardless of thread response size.
         (ModuleStoreEnum.Type.split, 1, 3, 3, 14, 8),
         (ModuleStoreEnum.Type.split, 50, 3, 3, 14, 8),
@@ -667,6 +668,40 @@ class SingleThreadContentGroupTestCase(ContentGroupTestCase):
         self.assert_can_access(self.non_cohorted_user, self.alpha_module.discussion_id, thread_id, False)
 
         self.assert_can_access(self.non_cohorted_user, self.beta_module.discussion_id, thread_id, False)
+
+    def test_course_context_respected(self, mock_request):
+        """
+        Verify that course threads go through discussion_category_id_access method.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id
+        )
+
+        # Beta user does not have access to alpha_module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+
+    def test_standalone_context_respected(self, mock_request):
+        """
+        Verify that standalone threads don't go through discussion_category_id_access method.
+        """
+        # For this rather pathological test, we are assigning the alpha module discussion_id (commentable_id)
+        # to a team so that we can verify that standalone threads don't go through discussion_category_id_access.
+        thread_id = "test_thread_id"
+        CourseTeamFactory(
+            name="A team",
+            course_id=self.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=self.alpha_module.discussion_id
+        )
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id,
+            commentable_id=self.alpha_module.discussion_id
+        )
+
+        # If a thread returns context other than "course", the access check is not done, and the beta user
+        # can see the alpha discussion module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
