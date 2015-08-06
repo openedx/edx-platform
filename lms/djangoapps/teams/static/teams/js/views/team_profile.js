@@ -64,8 +64,8 @@
                     _.each(this.memberships, function(membership) {
                         view.$('.members-info').append(_.template(teamMemberTemplate, {
                             imageUrl: 'https://dkxj5n08iyd6q.cloudfront.net/54.208.48.207/759220e8c562e167cab003f0023f839e_50.jpg?v=1438793481',
-                            username: membership.id,
-                            memberProfileUrl: '/u/' + membership.id
+                            username: membership.user.id,
+                            memberProfileUrl: '/u/' + membership.user.id
                         }));
                     });
                 },
