@@ -30,7 +30,7 @@ class TeamsTabBase(UniqueCourseTest):
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
-        return [{u"description": str(i), u"name": str(i), u"id": i} for i in xrange(num_topics)]
+        return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
 
     def create_teams(self, topic, num_teams):
         """Create `num_teams` teams belonging to `topic`."""
@@ -89,6 +89,7 @@ class TeamsTabBase(UniqueCourseTest):
             self.assertNotIn("Teams", self.tab_nav.tab_names)
 
 
+@ddt.ddt
 @attr('shard_5')
 class TeamsTabTest(TeamsTabBase):
     """
@@ -155,6 +156,39 @@ class TeamsTabTest(TeamsTabBase):
             global_staff=True
         )
         self.verify_teams_present(True)
+
+    @ddt.data(
+        ('browse', 'div.topics-list'),
+        ('teams', 'p.temp-tab-view'),
+        ('teams/{topic_id}/{team_id}', 'div.discussion-module'),
+        ('topics/{topic_id}/create-team', 'div.create-team-instructions'),
+        ('topics/{topic_id}', 'div.teams-list'),
+        ('not-a-real-route', 'div.warning')
+    )
+    @ddt.unpack
+    def test_url_routing(self, route, selector):
+        """Ensure that navigating to a URL route correctly updates the page
+        content.
+        """
+        topics = self.create_topics(1)
+        topic = topics[0]
+        self.set_team_configuration({
+            u'max_team_size': 10,
+            u'topics': topics
+        })
+        team = self.create_teams(topic, 1)[0]
+        self.teams_page.visit()
+        self.browser.get(
+            '{url}#{route}'.format(
+                url=self.browser.current_url,
+                route=route.format(
+                    topic_id=topic['id'],
+                    team_id=team['id']
+                ))
+        )
+        self.teams_page.wait_for_ajax()
+        self.assertTrue(self.teams_page.q(css=selector).present)
+        self.assertTrue(self.teams_page.q(css=selector).visible)
 
 
 @attr('shard_5')
