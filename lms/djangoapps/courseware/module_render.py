@@ -80,6 +80,8 @@ from verify_student.services import ReverificationService
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService
 
+from edx_proctoring.api import get_attempt_status_summary
+
 from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
@@ -180,29 +182,45 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                           section.url_name == active_section)
 
                 if not section.hide_from_toc:
-                    section_context = {'display_name': section.display_name_with_default,
+                    section_context = {
+                        'display_name': section.display_name_with_default,
                         'url_name': section.url_name,
                         'format': section.format if section.format is not None else '',
                         'due': section.due,
                         'active': active,
                         'graded': section.graded,
-                     }
+                    }
 
-                     # Add in rendering context for proctored exams
-                     # if applicable
+                    #
+                    # Add in rendering context for proctored exams
+                    # if applicable
+                    #
                     is_proctored_enabled = (
                         getattr(section, 'is_proctored_enabled', False) and
                         settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
                     if is_proctored_enabled:
+                        #
+                        # call into edx_proctoring subsystem
+                        # to get relevant proctoring information regarding this
+                        # level of the courseware
+                        #
+                        # This will return None, if (user, course_id, content_id)
+                        # is not applicable
+                        #
                         proctoring_attempt_context = get_attempt_status_summary(
                             user.id,
                             unicode(course.id),
-                            unicode(section.location.id)
+                            unicode(section.location)
                         )
-                        section_context.update({
-                            'proctoring_context': proctoring_attempt_context,
-                        })
+
+                        if proctoring_attempt_context:
+                            # yes, user has proctoring context about
+                            # this level of the courseware
+                            # so add to the accordion data context
+                            section_context.update({
+                                'proctoring': proctoring_attempt_context,
+                            })
 
                     sections.append(section_context)
             toc_chapters.append({
