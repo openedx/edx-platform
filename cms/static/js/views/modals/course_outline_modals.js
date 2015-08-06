@@ -282,7 +282,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 this.$('#id_practice_exam').attr('disabled','disabled');
             }
             else {
-                if (this.$('#id_time_limit').val()==='00:00') {
+                if (!this.isValidTimeLimit(this.$('#id_time_limit').val())) {
                     this.$('#id_time_limit').val('00:30');
                 }
                 this.$('#id_practice_exam').removeAttr('disabled');
