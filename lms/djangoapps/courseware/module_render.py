@@ -180,19 +180,31 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                           section.url_name == active_section)
 
                 if not section.hide_from_toc:
+                    section_context = {'display_name': section.display_name_with_default,
+                        'url_name': section.url_name,
+                        'format': section.format if section.format is not None else '',
+                        'due': section.due,
+                        'active': active,
+                        'graded': section.graded,
+                     }
+
+                     # Add in rendering context for proctored exams
+                     # if applicable
                     is_proctored_enabled = (
                         getattr(section, 'is_proctored_enabled', False) and
                         settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
+                    if is_proctored_enabled:
+                        proctoring_attempt_context = get_attempt_status_summary(
+                            user.id,
+                            unicode(course.id),
+                            unicode(section.location.id)
+                        )
+                        section_context.update({
+                            'proctoring_context': proctoring_attempt_context,
+                        })
 
-                    sections.append({'display_name': section.display_name_with_default,
-                                     'url_name': section.url_name,
-                                     'format': section.format if section.format is not None else '',
-                                     'due': section.due,
-                                     'active': active,
-                                     'graded': section.graded,
-                                     'is_proctored_enabled': is_proctored_enabled,
-                                     })
+                    sections.append(section_context)
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
                 'url_name': chapter.url_name,
