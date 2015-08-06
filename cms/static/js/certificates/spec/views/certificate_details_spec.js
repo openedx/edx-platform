@@ -41,6 +41,11 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         inputSignatoryTitle: '.signatory-title-input',
         inputSignatoryOrganization: '.signatory-organization-input'
     };
+    var verifyAndConfirmPrompt = function(promptSpy, promptText){
+        ViewHelpers.verifyPromptShowing(promptSpy, gettext(promptText));
+        ViewHelpers.confirmPrompt(promptSpy);
+        ViewHelpers.verifyPromptHidden(promptSpy);
+    };
 
     beforeEach(function() {
         window.course = new Course({
@@ -133,7 +138,16 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$('.edit')).toExist();
             });
 
-            it('should change to "edit" mode when clicking the Edit button', function(){
+            it('should change to "edit" mode when clicking the Edit button and confirming the prompt', function(){
+                expect(this.view.$('.action-edit .edit')).toExist();
+                var promptSpy = ViewHelpers.createPromptSpy();
+                this.view.$('.action-edit .edit').click();
+                verifyAndConfirmPrompt(promptSpy, gettext('Edit this certificate?'));
+                expect(this.model.get('editing')).toBe(true);
+            });
+
+            it('should not show confirmation prompt when clicked on "edit" in case of inactive certificate', function(){
+                this.model.set('is_active', false);
                 expect(this.view.$('.action-edit .edit')).toExist();
                 this.view.$('.action-edit .edit').click();
                 expect(this.model.get('editing')).toBe(true);
