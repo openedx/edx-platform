@@ -186,22 +186,24 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     """
     The page for a specific Team within the Teams tab
     """
-    def __init__(self, browser, course_id, team):
+    def __init__(self, browser, course_id, team=None):
         """
         Set up `self.url_path` on instantiation, since it dynamically
         reflects the current team.
         """
         super(TeamPage, self).__init__(browser, course_id)
         self.team = team
-        self.url_path = "teams/#teams/{topic_id}/{team_id}".format(
-            topic_id=self.team['topic_id'], team_id=self.team['id']
-        )
+        if self.team:
+            self.url_path = "teams/#teams/{topic_id}/{team_id}".format(
+                topic_id=self.team['topic_id'], team_id=self.team['id']
+            )
 
     def is_browser_on_page(self):
         """Check if we're on the teams list page for a particular team."""
-        has_correct_url = self.url.endswith(self.url_path)
-        team_view_present = self.q(css='.team-profile').present
-        return has_correct_url and team_view_present
+        if self.team:
+            if not self.url.endswith(self.url_path):
+                return False
+        return self.q(css='.team-profile').present
 
     @property
     def discussion_id(self):
@@ -215,3 +217,13 @@ class TeamPage(CoursePage, PaginatedUIMixin):
             # pylint: disable=attribute-defined-outside-init
             self._discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         return self._discussion_page
+
+    @property
+    def team_name(self):
+        """Get the team's name as displayed in the page header"""
+        return self.q(css='.page-header .page-title')[0].text
+
+    @property
+    def team_description(self):
+        """Get the team's description as displayed in the page header"""
+        return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text

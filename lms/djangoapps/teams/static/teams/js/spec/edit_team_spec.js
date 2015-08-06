@@ -102,10 +102,10 @@ define([
 
             teamEditView.$('.create-team.form-actions .action-primary').click();
             AjaxHelpers.expectJsonRequest(requests, 'POST', teamsUrl, teamsData);
-            AjaxHelpers.respondWithJson(requests, teamsData);
+            AjaxHelpers.respondWithJson(requests, _.extend(_.extend({}, teamsData), { id: '123'}));
 
             expect(teamEditView.$('.create-team.wrapper-msg .copy').text().trim().length).toBe(0);
-            expect(Backbone.history.navigate.calls[0].args).toContain('topics/awesomeness');
+            expect(Backbone.history.navigate.calls[0].args).toContain('teams/awesomeness/123');
         });
 
         it('shows validation error message when field is empty', function () {

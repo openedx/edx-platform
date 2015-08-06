@@ -137,6 +137,7 @@
                             }),
                             main: new TeamEditView({
                                 tagName: 'create-new-team',
+                                collection: this.teamsCollection,
                                 teamParams: teamsView.main.teamParams,
                                 primaryButtonTitle: 'Create'
                             })
@@ -154,7 +155,7 @@
                     var self = this,
                         router = this.router,
                         deferred = $.Deferred();
-                    if (this.teamsView && this.teamsView.main.collection.topic_id === topicID) {
+                    if (this.teamsCollection && this.teamsCollection.topic_id === topicID) {
                         deferred.resolve(this.teamsView);
                     } else {
                         this.getTopic(topicID)
@@ -165,6 +166,7 @@
                                     url: self.teamsUrl,
                                     per_page: 10
                                 });
+                                this.teamsCollection = collection;
                                 collection.goTo(1)
                                     .done(function() {
                                         var teamsView = new TeamsView({
@@ -291,7 +293,7 @@
                  * @returns {promise} a jQuery deferred promise for the team.
                  */
                 getTeam: function (teamID) {
-                    var team = this.teamsView ? this.teamsView.main.collection.get(teamID) : null,
+                    var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                         self = this,
                         deferred = $.Deferred();
                     if (team) {

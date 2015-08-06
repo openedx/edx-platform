@@ -620,23 +620,18 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see the Create Team header and form
         When I fill all the fields present with appropriate data
         And I click Create button
-        Then I should see teams list page with newly created team.
+        Then I should see the page for my team
         """
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
         self.verify_and_navigate_to_create_team_page()
 
         self.fill_create_form()
         self.create_team_page.submit_form()
 
-        self.assertTrue(self.browse_teams_page.is_browser_on_page())
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1 out of 1 total')
-        # Verify the newly created team content.
-        team_card = self.browse_teams_page.team_cards.results[0]
-        self.assertEqual(team_card.find_element_by_css_selector('.card-title').text, self.team_name)
-        self.assertEqual(
-            team_card.find_element_by_css_selector('.card-description').text,
-            'The Avengers are a fictional team of superheroes.'
-        )
+        # Verify that the page is shown for the new team
+        team_page = TeamPage(self.browser, self.course_id)
+        team_page.wait_for_page()
+        self.assertEqual(team_page.team_name, self.team_name)
+        self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
 
     def test_user_can_cancel_the_team_creation(self):
         """
