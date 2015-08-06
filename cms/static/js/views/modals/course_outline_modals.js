@@ -275,13 +275,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             event.preventDefault();
             if (!$(event.currentTarget).is(':checked')) {
                 this.$('#id_exam_proctoring').attr('checked', false);
-                this.$('#id_time_limit').val('00:30');
+                this.$('#id_time_limit').val('00:00');
                 this.$('#id_exam_proctoring').attr('disabled','disabled');
                 this.$('#id_time_limit').attr('disabled', 'disabled');
                 this.$('#id_practice_exam').attr('checked', false);
                 this.$('#id_practice_exam').attr('disabled','disabled');
             }
             else {
+                if (this.$('#id_time_limit').val()==='00:00') {
+                    this.$('#id_time_limit').val('00:30');
+                }
                 this.$('#id_practice_exam').removeAttr('disabled');
                 this.$('#id_exam_proctoring').removeAttr('disabled');
                 this.$('#id_time_limit').removeAttr('disabled');
