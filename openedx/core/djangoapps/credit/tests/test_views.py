@@ -1,22 +1,23 @@
 """
 Tests for credit app views.
 """
-import unittest
-import json
 import datetime
-import pytz
+import json
+import unittest
 
 import ddt
-from mock import patch
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
-from django.conf import settings
+from mock import patch
+from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from opaque_keys.edx.keys import CourseKey
+import pytz
 
 from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
 from util.date_utils import to_timestamp
-from opaque_keys.edx.keys import CourseKey
+from util.testing import UrlResetMixin
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.signature import signature
 from openedx.core.djangoapps.credit.models import (
@@ -28,7 +29,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequest,
 )
 
-
+JSON = 'application/json'
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 
 
@@ -167,7 +168,7 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
     )
     def test_create_credit_request_invalid_parameters(self, request_data):
         url = reverse("credit:create_request", args=[self.PROVIDER_ID])
-        response = self.client.post(url, data=request_data, content_type="application/json")
+        response = self.client.post(url, data=request_data, content_type=JSON)
         self.assertEqual(response.status_code, 400)
 
     def test_credit_provider_callback_validates_signature(self):
@@ -228,7 +229,7 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
     )
     def test_credit_provider_callback_invalid_parameters(self, request_data):
         url = reverse("credit:provider_callback", args=[self.PROVIDER_ID])
-        response = self.client.post(url, data=request_data, content_type="application/json")
+        response = self.client.post(url, data=request_data, content_type=JSON)
         self.assertEqual(response.status_code, 400)
 
     def test_credit_provider_invalid_status(self):
@@ -286,7 +287,7 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
                 "username": username,
                 "course_key": unicode(course_key),
             }),
-            content_type="application/json",
+            content_type=JSON,
         )
 
     def _create_credit_request_and_get_uuid(self, username, course_key):
@@ -326,7 +327,7 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         }
         parameters["signature"] = kwargs.get("sig", signature(parameters, secret_key))
 
-        return self.client.post(url, data=json.dumps(parameters), content_type="application/json")
+        return self.client.post(url, data=json.dumps(parameters), content_type=JSON)
 
     def _assert_request_status(self, uuid, expected_status):
         """
@@ -334,3 +335,126 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         """
         request = CreditRequest.objects.get(uuid=uuid)
         self.assertEqual(request.status, expected_status)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CreditCourseViewSetTests(TestCase):
+    """ Tests for the CreditCourse endpoints.
+
+     GET/POST /api/v1/credit/creditcourse/
+     GET/PUT  /api/v1/credit/creditcourse/:course_id/
+    """
+    password = 'password'
+
+    def setUp(self):
+        super(CreditCourseViewSetTests, self).setUp()
+
+        # This value must be set here, as setting it outside of a method results in issues with CMS/Studio tests.
+        self.path = reverse('credit:creditcourse-list')
+
+        # Create a user and login, so that we can use session auth for the
+        # tests that aren't specifically testing authentication or authorization.
+        user = UserFactory(password=self.password, is_staff=True)
+        self.client.login(username=user.username, password=self.password)
+
+    def _serialize_credit_course(self, credit_course):
+        """ Serializes a CreditCourse to a Python dict. """
+
+        return {
+            'course_key': unicode(credit_course.course_key),
+            'enabled': credit_course.enabled
+        }
+
+    def test_session_auth(self):
+        """ Verify the endpoint supports session authentication, and only allows authorization for staff users. """
+        user = UserFactory(password=self.password, is_staff=False)
+        self.client.login(username=user.username, password=self.password)
+
+        # Non-staff users should not have access to the API
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 403)
+
+        # Staff users should have access to the API
+        user.is_staff = True
+        user.save()  # pylint: disable=no-member
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+
+    def test_oauth(self):
+        """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
+        user = UserFactory(is_staff=False)
+        oauth_client = ClientFactory.create()
+        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+
+        # Non-staff users should not have access to the API
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, 403)
+
+        # Staff users should have access to the API
+        user.is_staff = True
+        user.save()  # pylint: disable=no-member
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_create(self):
+        """ Verify the endpoint supports creating new CreditCourse objects. """
+        course_key = CourseKey.from_string('a/b/c')
+        enabled = True
+        data = {
+            'course_key': unicode(course_key),
+            'enabled': enabled
+        }
+
+        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
+        self.assertEqual(response.status_code, 201)
+
+        # Verify the API returns the serialized CreditCourse
+        self.assertDictEqual(json.loads(response.content), data)
+
+        # Verify the CreditCourse was actually created
+        self.assertTrue(CreditCourse.objects.filter(course_key=course_key, enabled=enabled).exists())
+
+    def test_get(self):
+        """ Verify the endpoint supports retrieving CreditCourse objects. """
+        course_id = 'a/b/c'
+        cc1 = CreditCourse.objects.create(course_key=CourseKey.from_string(course_id))
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the API returns the serialized CreditCourse
+        self.assertDictEqual(json.loads(response.content), self._serialize_credit_course(cc1))
+
+    def test_list(self):
+        """ Verify the endpoint supports listing all CreditCourse objects. """
+        cc1 = CreditCourse.objects.create(course_key=CourseKey.from_string('a/b/c'))
+        cc2 = CreditCourse.objects.create(course_key=CourseKey.from_string('d/e/f'), enabled=True)
+        expected = [self._serialize_credit_course(cc1), self._serialize_credit_course(cc2)]
+
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the API returns a list of serialized CreditCourse objects
+        self.assertListEqual(json.loads(response.content), expected)
+
+    def test_update(self):
+        """ Verify the endpoint supports updating a CreditCourse object. """
+        course_id = 'course-v1:edX+BlendedX+1T2015'
+        credit_course = CreditCourse.objects.create(course_key=CourseKey.from_string(course_id), enabled=False)
+        self.assertFalse(credit_course.enabled)
+
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+        data = {'course_key': course_id, 'enabled': True}
+        response = self.client.put(path, json.dumps(data), content_type=JSON)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the serialized CreditCourse is returned
+        self.assertDictEqual(json.loads(response.content), data)
+
+        # Verify the data was persisted
+        credit_course = CreditCourse.objects.get(course_key=credit_course.course_key)
+        self.assertTrue(credit_course.enabled)

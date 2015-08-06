@@ -4,27 +4,28 @@ Views for the credit Django app.
 import json
 import datetime
 import logging
-import pytz
 
+from django.conf import settings
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
     Http404
 )
-from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-
-from opaque_keys.edx.keys import CourseKey
+from django.views.decorators.http import require_POST, require_GET
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+import pytz
+from rest_framework import viewsets, mixins, permissions, authentication
 
 from util.json_request import JsonResponse
 from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
-from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
 from openedx.core.djangoapps.credit.exceptions import CreditApiBadRequest, CreditRequestNotFound
-
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.serializers import CreditCourseSerializer
+from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ def create_credit_request(request, provider_id):
 
     This end-point will get-or-create a record in the database to track
     the request.  It will then calculate the parameters to send to
-    the credit provider and digitially sign the parameters, using a secret
+    the credit provider and digitally sign the parameters, using a secret
     key shared with the credit provider.
 
     The user's browser is responsible for POSTing these parameters
@@ -366,3 +367,23 @@ def _validate_timestamp(timestamp_value, provider_id):
             timestamp_value, elapsed_seconds, provider_id,
         )
         return HttpResponseForbidden(u"Timestamp is too far in the past.")
+
+
+class CreditCourseViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
+    """ CreditCourse endpoints. """
+
+    lookup_field = 'course_key'
+    lookup_value_regex = settings.COURSE_KEY_REGEX
+    queryset = CreditCourse.objects.all()
+    serializer_class = CreditCourseSerializer
+    authentication_classes = (authentication.OAuth2Authentication, authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+
+    def dispatch(self, request, *args, **kwargs):
+        # Convert the course ID/key from a string to an actual CourseKey object.
+        course_id = kwargs.get(self.lookup_field, None)
+
+        if course_id:
+            kwargs[self.lookup_field] = CourseKey.from_string(course_id)
+
+        return super(CreditCourseViewSet, self).dispatch(request, *args, **kwargs)
