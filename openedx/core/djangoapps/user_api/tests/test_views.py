@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 
 from social.apps.django_app.default.models import UserSocialAuth
 
@@ -1269,7 +1270,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
         user = User.objects.get(username=self.USERNAME)
-        account_settings = get_account_settings(user)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)
 
         self.assertEqual(self.USERNAME, account_settings["username"])
         self.assertEqual(self.EMAIL, account_settings["email"])
@@ -1307,7 +1310,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
 
         # Verify the user's account
         user = User.objects.get(username=self.USERNAME)
-        account_settings = get_account_settings(user)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)
+
         self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
         self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
         self.assertEqual(account_settings["year_of_birth"], int(self.YEAR_OF_BIRTH))

@@ -22,84 +22,67 @@ from ..helpers import intercept_errors
 from ..models import UserPreference
 
 from . import (
-    ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY,
+    ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
     EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
-from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer
+from .serializers import (
+    AccountLegacyProfileSerializer, AccountUserSerializer,
+    UserReadOnlySerializer
+)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def get_account_settings(requesting_user, username=None, configuration=None, view=None):
+def get_account_settings(request, username=None, configuration=None, view=None):
     """Returns account information for a user serialized as JSON.
 
     Note:
-        If `requesting_user.username` != `username`, this method will return differing amounts of information
-        based on who `requesting_user` is and the privacy settings of the user associated with `username`.
+        If `request.user.username` != `username`, this method will return differing amounts of information
+        based on who `request.user` is and the privacy settings of the user associated with `username`.
 
     Args:
-        requesting_user (User): The user requesting the account information. Only the user with username
-            `username` or users with "is_staff" privileges can get full account information.
-            Other users will get the account fields that the user has elected to share.
+        request (Request): The request object with account information about the requesting user.
+            Only the user with username `username` or users with "is_staff" privileges can get full
+            account information. Other users will get the account fields that the user has elected to share.
         username (str): Optional username for the desired account information. If not specified,
-            `requesting_user.username` is assumed.
+            `request.user.username` is assumed.
         configuration (dict): an optional configuration specifying which fields in the account
             can be shared, and the default visibility settings. If not present, the setting value with
             key ACCOUNT_VISIBILITY_CONFIGURATION is used.
         view (str): An optional string allowing "is_staff" users and users requesting their own
             account information to get just the fields that are shared with everyone. If view is
-            "shared", only shared account information will be returned, regardless of `requesting_user`.
+            "shared", only shared account information will be returned, regardless of `request.user`.
 
     Returns:
          A dict containing account fields.
 
     Raises:
-         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
+         UserNotFound: no user with username `username` exists (or `request.user.username` if
             `username` is not specified)
          UserAPIInternalError: the operation failed due to an unexpected error.
     """
+    requesting_user = request.user
+
     if username is None:
         username = requesting_user.username
 
+    try:
+        existing_user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        raise UserNotFound()
+
     has_full_access = requesting_user.username == username or requesting_user.is_staff
-    return_all_fields = has_full_access and view != 'shared'
-
-    existing_user, existing_user_profile = _get_user_and_profile(username)
-
-    user_serializer = AccountUserSerializer(existing_user)
-    legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile)
-
-    account_settings = dict(user_serializer.data, **legacy_profile_serializer.data)
-
-    if return_all_fields:
-        return account_settings
-
-    if not configuration:
-        configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
-
-    visible_settings = {}
-
-    profile_visibility = _get_profile_visibility(existing_user_profile, configuration)
-    if profile_visibility == ALL_USERS_VISIBILITY:
-        field_names = configuration.get('shareable_fields')
+    if has_full_access and view != 'shared':
+        admin_fields = settings.ACCOUNT_VISIBILITY_CONFIGURATION.get('admin_fields')
     else:
-        field_names = configuration.get('public_fields')
+        admin_fields = None
 
-    for field_name in field_names:
-        visible_settings[field_name] = account_settings.get(field_name, None)
-
-    return visible_settings
-
-
-def _get_profile_visibility(user_profile, configuration):
-    """Returns the visibility level for the specified user profile."""
-    if user_profile.requires_parental_consent():
-        return PRIVATE_VISIBILITY
-
-    # Calling UserPreference directly because the requesting user may be different from existing_user
-    # (and does not have to be is_staff).
-    profile_privacy = UserPreference.get_value(user_profile.user, ACCOUNT_VISIBILITY_PREF_KEY)
-    return profile_privacy if profile_privacy else configuration.get('default_visibility')
+    return UserReadOnlySerializer(
+        existing_user,
+        configuration=configuration,
+        custom_fields=admin_fields,
+        context={'request': request}
+    ).data
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])

@@ -146,11 +146,7 @@ class AccountView(APIView):
         GET /api/user/v1/accounts/{username}/
         """
         try:
-            account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
-            # Account for possibly relative URLs.
-            for key, value in account_settings['profile_image'].items():
-                if key.startswith(PROFILE_IMAGE_KEY_PREFIX):
-                    account_settings['profile_image'][key] = request.build_absolute_uri(value)
+            account_settings = get_account_settings(request, username, view=request.QUERY_PARAMS.get('view'))
         except UserNotFound:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
 
