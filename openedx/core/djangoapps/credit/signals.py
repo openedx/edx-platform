@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule.modulestore.django import modulestore
@@ -46,7 +47,7 @@ def on_course_publish(course_key):  # pylint: disable=unused-argument
 
 @receiver(GRADES_UPDATED)
 def listen_for_grade_calculation(sender, username, grade_summary, course_key, deadline, **kwargs):  # pylint: disable=unused-argument
-    """Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade
+    """ Receive 'MIN_GRADE_REQUIREMENT_STATUS' signal and update minimum grade
     requirement status.
 
     Args:
@@ -88,7 +89,7 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
     blocks for the given course with those user partitions.
 
     Args:
-        course_key (CourseKey): Identifier for the course.
+        course_key (CourseKey): Identifier for the course
         partition_scheme (str): Name of the user partition scheme
 
     """
@@ -109,66 +110,90 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
     access_control_credit_xblocks = _get_credit_xblocks_for_access_control(course_key)
     new_user_partitions = []
     for block in access_control_credit_xblocks:
-        # for now we are only entertaining verification partition scheme
+        # for now we are entertaining only verification partition scheme
         if partition_scheme == VERIFICATION_SCHEME:
-            # TODO: Break code in small reusable code
+            # TODO: Refactor code in small reusable pieces
             # create group configuration for VerificationPartitionScheme
             group_configuration = _verification_partition_group_configuration(user_partition, block)
             new_user_partitions.append(group_configuration)
 
-            # update 'group_access' field of gating xblock with groups
-            # 'verified_allow' and 'verified_deny' of newly created group
-            # configuration
-            access_dict = {
-                group_configuration.id: [
-                    group_configuration.get_group('verified_allow').id,
-                    group_configuration.get_group('verified_deny').id,
-                ]
-            }
-            block.group_access = access_dict
-            modulestore().update_item(block, user_id)
-
-            # now for course content access control, add groups
-            # 'non_verified' and 'verified_allow' in 'group_access' field of
-            # current ICRV's grand parent (if category of parent and grand
-            # parent are 'vertical' and 'sequential' respectively);
-            # otherwise add groups to current ICRV's parent only
-            access_dict = {
-                group_configuration.id: [
-                    group_configuration.get_group('non_verified').id,
-                    group_configuration.get_group('verified_allow').id,
-                ]
-            }
-            parent_block = block.get_parent()
-            grandparent_block = parent_block.get_parent()
-            ancestor_categories = [parent_block.location.category, grandparent_block.location.category]
-
-            # update 'group_access' field of parent only (immediate siblings
-            # will have access control)
-            ancestor_for_update = parent_block
-            if len(set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES))) == 0:
-                # category of parent and grand parent are 'vertical' and
-                # 'sequential' respectively so update 'group_access' field of
-                # grandparent
-                ancestor_for_update = grandparent_block
-
-            ancestor_for_update.group_access = access_dict
-            modulestore().update_item(ancestor_for_update, user_id)
+            # update the 'group_access' of provided xblock 'block' and its ancestor.
+            _update_content_group_access(user_id, block, group_configuration)
 
     # Now add all newly created partition in 'user_partitions' field of course
     _update_course_user_partitions(course_key, user_id, new_user_partitions)
 
 
+def _access_dict(group_configuration, access_groups_id_list):
+    """ Returns dict 'group_access' of provided user partition and its groups.
+
+    Args:
+        group_configuration  (UserPartition): UserPartition object
+        access_groups_id_list  (List): List of id's of partition groups
+
+    Returns:
+        Dict object.
+
+    """
+    access_dict = {
+        group_configuration.id: [
+            group_configuration.get_group(group_id).id for group_id in access_groups_id_list
+        ]
+    }
+    return access_dict
+
+
+def _update_content_group_access(user_id, block, group_configuration):
+    """ Update the 'group_access' of provided xblock 'block' and its ancestor.
+
+    Args:
+        user_id (Int): ID of user who has publish the course
+        block (xblock): XBlock mixin
+        group_configuration  (UserPartition): UserPartition object
+
+    """
+    # update 'group_access' field of gating xblock with groups
+    # 'verified_allow' and 'verified_deny' of provided user partition
+    # 'group_configuration'
+    access_groups_id_list = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
+    block.group_access = _access_dict(group_configuration, access_groups_id_list)
+    modulestore().update_item(block, user_id)
+
+    # now for course content access control, add groups
+    # 'non_verified' and 'verified_allow' in 'group_access' field of
+    # current ICRV's grand parent (if category of parent and grand
+    # parent are 'vertical' and 'sequential' respectively);
+    # otherwise add groups to current ICRV's parent only
+    access_groups_id_list = [VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW]
+    access_dict = _access_dict(group_configuration, access_groups_id_list)
+    parent_block = block.get_parent()
+    grandparent_block = parent_block.get_parent()
+    ancestor_categories = [parent_block.location.category, grandparent_block.location.category]
+
+    # update 'group_access' field of parent only (immediate siblings
+    # will have access control)
+    ancestor_for_update = parent_block
+    if len(set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES))) == 0:
+        # category of parent and grand parent are 'vertical' and
+        # 'sequential' respectively so update 'group_access' field of
+        # grandparent
+        ancestor_for_update = grandparent_block
+
+    ancestor_for_update.group_access = access_dict
+    modulestore().update_item(ancestor_for_update, user_id)
+
+
 def _update_course_user_partitions(course_key, user_id, new_user_partitions):
     """ Add provided user partitions in 'new_user_partitions' in
-    'user_partitions' field of course.
+    'user_partitions' field of provided course.
 
     Remove all user partitions of course with same partition schemes as in
     provided list 'new_user_partitions'.
 
     Args:
         course_key (CourseKey): Identifier for the course
-        user_partitions (List): List of user partitions
+        user_id (Int): ID of user who has publish the course
+        new_user_partitions (List): List of user partitions
 
     """
     course = modulestore().get_course(course_key, depth=0)
@@ -188,6 +213,9 @@ def _verification_partition_group_configuration(user_partition, block):
     Args:
         user_partition (UserPartition): UserPartition object
         block (xblock): XBlock mixin
+
+    Returns:
+        UserPartition object.
 
     """
     group_configuration_id = user_partition.key_for_partition(block.location)
@@ -219,10 +247,11 @@ def _get_credit_xblocks_for_access_control(course_key):
      in list 'GATED_CREDIT_XBLOCK_CATEGORIES'.
 
     Args:
-        course_key (CourseKey): Identifier for the course.
+        course_key (CourseKey): Identifier for the course
 
     Returns:
         List of XBlocks that are published and haven't been deleted.
+
     """
     credit_blocks = []
     for category in GATED_CREDIT_XBLOCK_CATEGORIES:

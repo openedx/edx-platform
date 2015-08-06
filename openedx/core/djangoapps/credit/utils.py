@@ -29,8 +29,8 @@ def get_course_xblocks(course_key, category):
     """ Retrieve all XBlocks in the course for a particular category.
 
     Args:
-        course_key (CourseKey): Identifier for the course.
-        category (str): Category of XBlock.
+        course_key (CourseKey): Identifier for the course
+        category (str): Category of XBlock
 
     Returns:
         List of XBlocks that are published and haven't been deleted.
@@ -50,7 +50,7 @@ def get_course_xblocks(course_key, category):
 
 def filter_by_scheme(course_user_partitions, filter_partition_schemes):
     """ Filter all user partitions for 'course_user_partitions' which have
-    scheme present in list 'filter_partition_schemes'
+    scheme present in list 'filter_partition_schemes'.
 
     Args:
         course_user_partitions (List): List of user partitions
