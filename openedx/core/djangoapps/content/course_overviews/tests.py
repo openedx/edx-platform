@@ -191,7 +191,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "display_name": "",                         # Empty display name
                 "start": LAST_MONTH,                        # Course already ended
                 "end": LAST_WEEK,
-                "advertised_start": None,                   # No advertised start
+                "advertised_start": '',                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "",                    # Empty asset path
                 "certificates_show_before_end": False,
@@ -200,7 +200,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 #                                           # Don't set display name
                 "start": DEFAULT_START_DATE,                # Default start and end dates
                 "end": None,
-                "advertised_start": None,                   # No advertised start
+                "advertised_start": '',                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": None,                  # No asset path
                 "certificates_show_before_end": False,
