@@ -34,11 +34,14 @@
                     due_date = '' if len(formatted_string)==0 else _('due {date}').format(date=formatted_string)
               %>
               <p class="subtitle">
-                % if section['is_proctored_enabled']:
-                  <i class="fa fa-lock"></i>&nbsp;
+                % if 'proctoring_context' in section:
+                  <i class="fa ${section['proctoring_context'].get('suggested_icon', 'fa-lock')}  ${section['proctoring_context'].get('status', 'eligible')}"></i>&nbsp;
+                  <span class="subtitle-name">${section['proctoring_context']['short_description']} ${due_date}
+                  </span>
+                % else
+                  <span class="subtitle-name">${section['format']} ${due_date}
+                  </span>
                 % endif
-                <span class="subtitle-name">${section['format']} ${due_date}
-                </span>
               </p>
 
               % if 'graded' in section and section['graded']:
