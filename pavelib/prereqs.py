@@ -11,6 +11,10 @@ from .utils.envs import Env
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "http://registry.npmjs.org/"
+
+# If you make any changes to this list you also need to make
+# a corresponding change to circle.yml, which is how the python
+# prerequisites are installed for builds on circleci.com
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
     'requirements/edx/github.txt',
