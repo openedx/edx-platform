@@ -171,7 +171,6 @@ class BulkOperationsMixin(object):
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
         self.signal_handler = None
 
-
     @contextmanager
     def bulk_operations(self, course_id, emit_signals=True):
         """
