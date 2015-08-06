@@ -231,10 +231,18 @@ class CreditCourse(models.Model):
 
         """
         credit_courses = cache.get(cls.CREDIT_COURSES_CACHE_KEY)
-        if credit_courses is None:
+        if not credit_courses:
+            credit_courses = cls.objects.filter(enabled=True)
+
+            # If queryset is empty return False.
+            if not credit_courses:
+                return False
+
+            # If there are courses then set the cache, and check whether given
+            # course key is exist in credit courses.
             credit_courses = set(
                 unicode(course.course_key)
-                for course in cls.objects.filter(enabled=True)
+                for course in credit_courses
             )
             cache.set(cls.CREDIT_COURSES_CACHE_KEY, credit_courses)
 
