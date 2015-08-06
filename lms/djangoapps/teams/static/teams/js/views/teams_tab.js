@@ -66,7 +66,7 @@
                             this.text = options.text;
                         },
                         render: function () {
-                            this.$el.text(this.text);
+                            this.$el.html(this.text);
                         }
                     });
                     this.topicsCollection = new TopicCollection(
@@ -88,7 +88,7 @@
                             tabs: [{
                                 title: gettext('My Teams'),
                                 url: 'teams',
-                                view: new TempTabView({text: 'This is the new Teams tab.'})
+                                view: new TempTabView({text: '<p class="temp-tab-view">This is the new Teams tab.</p>'})
                             }, {
                                 title: gettext('Browse'),
                                 url: 'browse',
