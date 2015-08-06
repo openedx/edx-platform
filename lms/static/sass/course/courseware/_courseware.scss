@@ -159,6 +159,14 @@ div.course-wrapper {
         border-left: 4px solid #22B557 !important;
         margin: 0 auto;
       }
+      &.success-top-bar {
+        border-top: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
+      &.message-top-bar {
+        border-top: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
       &.failure {
         border-left: 4px solid #C93B34 !important;
         margin: 0 auto;
