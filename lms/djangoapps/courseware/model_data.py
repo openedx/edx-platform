@@ -47,6 +47,7 @@ from xblock.core import XBlockAside
 from courseware.user_state_client import DjangoXBlockUserStateClient
 
 from student.models import user_by_anonymous_id
+from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
 
@@ -156,6 +157,7 @@ class DjangoKeyValueStore(KeyValueStore):
 
 new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
 new_contract("DjangoKeyValueStore_Key", DjangoKeyValueStore.Key)
+new_contract("User", User)
 
 
 class DjangoOrmFieldCache(object):
@@ -212,7 +214,7 @@ class DjangoOrmFieldCache(object):
         self.set_many({kvs_key: value})
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
-    def set_many(self, kv_dict, remote_user=None):
+    def set_many(self, kv_dict):
         """
         Set the specified fields to the supplied values.
 
@@ -295,11 +297,19 @@ class DjangoOrmFieldCache(object):
         else:
             return field_object.modified
 
-    def remote_get(self, user, field_name, block_type):
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def remote_get(self, kvs_key):
+        user = user_by_anonymous_id(kvs_key.user_id)
+        field_name = kvs_key.field_name
+        block_type = kvs_key.block_scope_id
         try:
             return json.loads(self._get_remote_object(user, field_name, block_type).value)
         except ObjectDoesNotExist:
             raise KeyError
+
+    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)", remote_user="User|None")
+    def remote_set_many(self, kv_dict, remote_user):
+        self.set_many(kv_dict)
 
     def __len__(self):
         return len(self._cache)
@@ -352,6 +362,16 @@ class DjangoOrmFieldCache(object):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    def _get_remote_object(self, user, field_name, block_key):
+        """Return a object specified by user, field_name and block_key
+        
+        Args:
+            user (User): a usr object
+            field_name (str): the name of a field 
+            block_key (str): the block_scope_id str
+        """
+        raise NotImplementedError()
 
 class UserStateCache(object):
     """
@@ -377,7 +397,6 @@ class UserStateCache(object):
             self.user.username,
             _all_usage_keys(xblocks, aside_types),
         )
-        print self.user.username
         for usage_key, field_state in block_field_state:
             self._cache[usage_key] = field_state
 
@@ -408,7 +427,10 @@ class UserStateCache(object):
             fields=[kvs_key.field_name],
         ).get(kvs_key.field_name)
 
-    @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
+    @contract(
+        kv_dict="dict(DjangoKeyValueStore_Key: *)",
+        remote_user="User|None"
+        )
     def set_many(self, kv_dict, remote_user=None):
         """
         Set the specified fields to the supplied values.
@@ -423,7 +445,7 @@ class UserStateCache(object):
 
             pending_updates[cache_key][kvs_key.field_name] = value
 
-        if remote_username is None:
+        if remote_user is None:
             username = self.user.username
         else:
             username = remote_user.username
@@ -437,7 +459,7 @@ class UserStateCache(object):
             log.exception("Saving user state failed for %s", username)
             raise KeyValueMultiSaveError([])
         finally:
-            if remote_username is None:
+            if remote_user is None:
                 self._cache.update(pending_updates)
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
@@ -517,12 +539,8 @@ class UserStateCache(object):
             student_module.max_grade = max_score
             student_module.save()
 
-    # @contract(
-    #     username="basestring", 
-    #     block_key=UsageKey, 
-    #     fields="seq(basestring)|set(basestring)"
-    # )
-    def remote_get(self, user, field, block_key):
+    @contract(kvs_key=DjangoKeyValueStore.Key)
+    def remote_get(self, kvs_key):
         """
         Call for accessing data directly via username, block_key and field names.
         Necessry for shared field data
@@ -535,7 +553,21 @@ class UserStateCache(object):
         Return:
             A django orm object from the cache
         """
-        return self._client.get(user.username, block_key, Scope.user_state, [field])[field]
+        user = user_by_anonymous_id(kvs_key.user_id)
+        field_name = kvs_key.field_name
+        block_key = kvs_key.block_scope_id
+        return self._client.get(
+            user.username, 
+            block_key, 
+            Scope.user_state, 
+            [field_name])[field_name]
+
+    @contract(
+        kv_dict="dict(DjangoKeyValueStore_Key: *)",
+        remote_user="User|None"
+        )
+    def remote_set_many(self, kv_dict, remote_user):
+        self.set_many(kv_dict, remote_user)
 
     def __len__(self):
         return len(self._cache)
@@ -897,12 +929,7 @@ class FieldDataCache(object):
             raise KeyError(key.field_name)
 
         if key.queryable is not None:
-            user = user_by_anonymous_id(key.user_id)
-            return self.cache[key.scope].remote_get(
-                user, 
-                key.field_name,
-                key.block_scope_id
-                )
+            return self.cache[key.scope].remote_get(key)
 
         return self.cache[key.scope].get(key)
 
@@ -949,9 +976,11 @@ class FieldDataCache(object):
 
         for user_id, by_scope_data in by_user_scope.iteritems():
             user = user_by_anonymous_id(user_id)
+            print "set user id", user_id
+            print key.field_name
             for scope, set_many_data in by_scope_data.iteritems():
                 try:
-                    self.cache[scope].set_many(set_many_data, user.username)
+                    self.cache[scope].remote_set_many(set_many_data, user)
                 except KeyValueMultiSaveError as exc:
                     log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
                     raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
