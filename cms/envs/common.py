@@ -36,13 +36,16 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     ACCOUNT_NAME,
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT,
+    DATA_DIR,
+    PARENTAL_CONSENT_AGE_LIMIT,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
+    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
+    YOUTUBE_API_KEY,
 )
 from path import path
 from warnings import simplefilter
@@ -547,7 +550,7 @@ PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
-    "*.pyc"
+    "*.pyc",
     # it would be nice if we could do, for example, "**/*.scss",
     # but these strings get passed down to the `fnmatch` module,
     # which doesn't support that. :(
@@ -656,10 +659,10 @@ CELERY_QUEUES = {
 
 YOUTUBE = {
     # YouTube JavaScript API
-    'API': 'www.youtube.com/iframe_api',
+    'API': 'https://www.youtube.com/iframe_api',
 
-    # URL to test YouTube availability
-    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+    # URL to get YouTube metadata
+    'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
     # Current youtube api for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
@@ -676,19 +679,30 @@ YOUTUBE = {
 
 # Todo: add aws entries for this
 COURSE_UTILITIES = [
-    {"short_description": "Bulk Operations",
-     "items": [
-         {"short_description": "Get all captions from YouTube",
-          "long_description": "This utility will attempt to get or update captions for all videos in the course from YouTube. Please allow it a couple of minutes to run.",
-          "action_url": "utility_captions_handler",
-          "action_text": "Check Captions",
-          "action_external": False},
-#         {"short_description": "Bulk view problem settings",
-#          "long_description": "This utility will allow you to view all section, subsection and problem settings in one page.",
-#          "action_url": "utility_bulksettings_handler",
-#          "action_text": "View Problem Settings",
-#          "action_external" : False}
-          ]
+    {
+        'short_description': 'Bulk Operations',
+        'items': [
+            {
+                'short_description': 'Get all captions from YouTube',
+                'long_description': (
+                    'This utility will attempt to get or update captions for all videos '
+                    'in the course from YouTube. Please allow it a couple of minutes to run.'
+                ),
+                'action_url': 'utility_captions_handler',
+                'action_text': 'Check Captions',
+                'action_external': False,
+            },
+            {
+                'short_description': 'Bulk view problem settings',
+                'long_description': (
+                    'This utility will allow you to view all section, subsection '
+                    'and problem settings in one page.'
+                ),
+                'action_url': 'utility_bulksettings_handler',
+                'action_text': 'View Problem Settings',
+                'action_external': False,
+            },
+        ],
     }
 ]
 ############################# VIDEO UPLOAD PIPELINE #############################
@@ -975,5 +989,11 @@ SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
+    }
+}
+
+XBLOCK_SETTINGS = {
+    'VideoModule': {
+        'YOUTUBE_API_KEY': YOUTUBE_API_KEY
     }
 }

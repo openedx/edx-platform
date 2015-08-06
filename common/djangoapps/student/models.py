@@ -215,8 +215,8 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    #VALID_YEARS = range(this_year, this_year - 120, -1) 
-    VALID_YEARS = range(this_year - 13, this_year - 100, -1) # changed valid years to be between 100 and 13 years ago.
+    #VALID_YEARS = range(this_year, this_year - 120, -1)
+    VALID_YEARS = range(this_year - 13, this_year - 100, -1)  # changed valid years to be between 100 and 13 years ago.
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
@@ -1019,7 +1019,7 @@ class CourseEnrollment(models.Model):
                until we have these mapped out.
 
         `should_send_email` is a boolean that specifies if a course enrollment
-        email should be sent to the given user. 
+        email should be sent to the given user.
 
         `check_access`: if True, we check that an accessible course actually
                 exists for the given course_key before we enroll the student.

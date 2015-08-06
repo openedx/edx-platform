@@ -9,6 +9,7 @@ import os
 import traceback
 import struct
 import sys
+import re
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
@@ -105,10 +106,11 @@ class CapaFields(object):
         scope=Scope.user_state)
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Defines the number of times a student can try to answer this problem. "
-               "If the value is not set, infinite attempts are allowed. "
-               "NOTE: If a problem is timed, we only allow a single attempt, and ignore "
-               "the value in this field."
+        help=_(
+            'Defines the number of times a student can try to answer this problem. '
+            'If the value is not set, infinite attempts are allowed. '
+            'NOTE: If a problem is timed, we only allow a single attempt, and ignore '
+            'the value in this field.'
         ),
         values={"min": 0}, scope=Scope.settings
     )
@@ -173,19 +175,27 @@ class CapaFields(object):
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
-    minutes_allowed = IntegerWithWarningField(display_name=("Minutes Allowed"),
-                              help=_("Number of minutes allowed to finish this assessment. Set 0 for no time-limit. "
-                                     "If there is a time-limit, the student will only be given one attempt."),
-                              warning=_("Setting minutes allowed means that this question can only have one attempt, "
-                                     "regardless of the value of the maximum attempts field."),
-                              default=0, scope=Scope.settings)
+    minutes_allowed = IntegerWithWarningField(
+        display_name=('Minutes Allowed'),
+        help=_(
+            'Number of minutes allowed to finish this assessment. Set 0 for no time-limit. '
+            'If there is a time-limit, the student will only be given one attempt.'
+        ),
+        warning=_(
+            'Setting minutes allowed means that this question can only have one attempt, '
+            'regardless of the value of the maximum attempts field.'
+        ),
+        default=0,
+        scope=Scope.settings,
+    )
     time_started = Date(help=_("time student started this assessment"), scope=Scope.user_state)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(
         display_name=_("Timer Between Attempts"),
         help=_("Seconds a student must wait between submissions for a problem with multiple attempts."),
         scope=Scope.settings,
-        default=0)
+        default=0,
+    )
     weight = Float(
         display_name=_("Problem Weight"),
         help=_("Defines the number of points each problem is worth. "
@@ -215,7 +225,7 @@ class CapaFields(object):
              "This key is granted for exclusive use by this course for the specified duration. "
              "Please do not share the API key with other courses and notify MathWorks immediately "
              "if you believe the key is exposed or compromised. To obtain a key for your course, "
-             "or to report and issue, please contact moocsupport@mathworks.com",
+             "or to report an issue, please contact moocsupport@mathworks.com",
         scope=Scope.settings
     )
 
@@ -224,7 +234,6 @@ class CapaMixin(CapaFields):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
-
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
 
@@ -345,6 +354,7 @@ class CapaMixin(CapaFields):
             state=state,
             seed=self.seed,
             capa_system=capa_system,
+            capa_module=self,  # njp
         )
 
     def get_state_for_lcp(self):
@@ -625,15 +635,54 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def get_problem_html(self, encapsulate=True):
+    def get_demand_hint(self, hint_index):
         """
         Return html for the problem.
         For timed problems, returns an interstitial view if
         the problem has not yet been started.
 
-        Adds check, reset, save buttons as necessary based on the problem config and state.
+        Adds check, reset, save, and hint buttons as necessary based on the problem config
+        and state.
+        encapsulate: if True (the default) embed the html in a problem <div>
+        hint_index: (None is the default) if not None, this is the index of the next demand
+        hint to show.
         """
+        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
+        hint_index = hint_index % len(demand_hints)
 
+        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
+        hint_element = demand_hints[hint_index]
+        hint_text = hint_element.text.strip()
+        if len(demand_hints) == 1:
+            prefix = _('Hint: ')
+        else:
+            # Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three hints.
+            prefix = _('Hint ({hint_num} of {hints_count}): ').format(hint_num=hint_index + 1,
+                                                                      hints_count=len(demand_hints))
+
+        # Log this demand-hint request
+        event_info = dict()
+        event_info['module_id'] = self.location.to_deprecated_string()
+        event_info['hint_index'] = hint_index
+        event_info['hint_len'] = len(demand_hints)
+        event_info['hint_text'] = hint_text
+        self.runtime.track_function('edx.problem.hint.demandhint_displayed', event_info)
+
+        # We report the index of this hint, the client works out what index to use to get the next hint
+        return {
+            'success': True,
+            'contents': prefix + hint_text,
+            'hint_index': hint_index
+        }
+
+    def get_problem_html(self, encapsulate=True):
+        """
+        Return html for the problem.
+
+        Adds check, reset, save, and hint buttons as necessary based on the problem config
+        and state.
+        encapsulate: if True (the default) embed the html in a problem <div>
+        """
         try:
             html = self.lcp.get_html()
 
@@ -641,6 +690,8 @@ class CapaMixin(CapaFields):
         # then generate an error message instead.
         except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
+
+        html = self.remove_tags_from_html(html)
 
         # The convention is to pass the name of the check button if we want
         # to show a check button, and False otherwise This works because
@@ -659,14 +710,11 @@ class CapaMixin(CapaFields):
         total_seconds_left = -1
         end_time_to_display = now + datetime.timedelta(minutes=self.minutes_allowed)
 
-
         if self.is_timed_problem() and self.time_started:
             end_time_to_display = self.time_started + datetime.timedelta(minutes=self.minutes_allowed)
             problem_has_finished = end_time_to_display >= now
             time_left = end_time_to_display - now
             total_seconds_left = (time_left).total_seconds()
-
-
 
         # because we use self.due and not self.close_date below, this is not the actual end_time, but the
         # end_time we want to display to the user
@@ -678,6 +726,10 @@ class CapaMixin(CapaFields):
             'html': html,
             'weight': self.weight,
         }
+
+        # If demand hints are available, emit hint button and div.
+        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
+        demand_hint_possible = len(demand_hints) > 0
 
         context = {
             'problem': content,
@@ -697,6 +749,7 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
+            'demand_hint_possible': demand_hint_possible
         }
 
         if self.is_timed_problem() and not self.time_started:
@@ -744,6 +797,28 @@ class CapaMixin(CapaFields):
         now = datetime.datetime.now(UTC())
         time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed))
         return now > time_limit_end
+
+    def remove_tags_from_html(self, html):
+        """
+        The capa xml includes many tags such as <additional_answer> or <demandhint> which are not
+        meant to be part of the client html. We strip them all and return the resulting html.
+        """
+        tags = ['demandhint', 'choicehint', 'optionhint', 'stringhint', 'numerichint', 'optionhint',
+                'correcthint', 'regexphint', 'additional_answer', 'stringequalhint', 'compoundhint',
+                'stringequalhint']
+        for tag in tags:
+            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag), '', html, flags=re.DOTALL)
+            # Some of these tags span multiple lines
+        # Note: could probably speed this up by calling sub() once with a big regex
+        # vs. simply calling sub() many times as we have here.
+        return html
+
+    def hint_button(self, data):
+        """
+        Hint button handler, returns new html using hint_index from the client.
+        """
+        hint_index = int(data['hint_index'])
+        return self.get_demand_hint(hint_index)
 
     def is_past_due(self):
         """

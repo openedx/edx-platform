@@ -264,6 +264,7 @@ class WarningFieldSingleValueMixin(object):
             "warning": warning,
         }
 
+
 class IntegerWithWarningField(WarningFieldSingleValueMixin, Integer):
     """
     Integer with a warning field built-in. The warning is triggered
@@ -271,4 +272,3 @@ class IntegerWithWarningField(WarningFieldSingleValueMixin, Integer):
     """
     def __init__(self, **kwargs):
         super(IntegerWithWarningField, self).__init__(**kwargs)
-

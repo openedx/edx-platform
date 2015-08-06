@@ -1076,7 +1076,6 @@ def _progress(request, course_key, student_id):
     studio_url = get_studio_url(course, 'settings/grading')
     grade_summary = grades.grade(student, request, course)
 
-
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 

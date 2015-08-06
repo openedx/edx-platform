@@ -32,7 +32,8 @@ class TestCourseAccess(ModuleStoreTestCase):
         self.course_key = self.store.make_course_key('myu', 'mydept.mycourse', 'myrun')
         course_url = reverse_url('course_handler')
         with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-            self.client.ajax_post(course_url,
+            self.client.ajax_post(
+                course_url,
                 {
                     'org': self.course_key.org,
                     'number': self.course_key.course,

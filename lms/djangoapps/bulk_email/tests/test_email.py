@@ -218,7 +218,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         students_left = StudentsForQuery.objects.all()
         queries_left = TemporaryQuery.objects.all()
         self.assertEquals(len(students_left), 0)
-        self.assertEquals(len(queries_left), 1) # should just have the one created from _setup_query
+        self.assertEquals(len(queries_left), 1)  # should just have the one created from _setup_query
 
     def test_send_to_query_no_results(self):
         """
@@ -236,7 +236,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEquals(len(mail.outbox), 0)
 
         queries_left = TemporaryQuery.objects.all()
-        self.assertEquals(len(queries_left), 1) # should just have the one created from _setup_query
+        self.assertEquals(len(queries_left), 1)  # should just have the one created from _setup_query
 
     def _make_query(self, query_type, joining="OR"):
         """

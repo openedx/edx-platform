@@ -96,6 +96,7 @@ import track.views
 
 import dogstats_wrapper as dog_stats_api
 
+from util.date_utils import get_default_time_display
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -997,6 +998,7 @@ def change_enrollment(request, check_access=True):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
+
 def notify_enrollment_by_email(course, user, request):
     """
     Updates the user about the course enrollment by email.
@@ -1023,16 +1025,23 @@ def notify_enrollment_by_email(course, user, request):
                 'name': user.profile.name,
                 'course_title': course.display_name,
                 'course_id': course.id,
-                'course_start_date': course.start,
-                'course_end_date': course.end,
+                'course_start_date': get_default_time_display(course.start),
+                'course_end_date': get_default_time_display(course.end),
             }
             message = substitute_keywords_with_data(message, context)
             user.email_user(subject, message, from_address)
 
         except Exception:
-            log.error('unable to send course enrollment verification email to user from "{from_address}"'.format(
-                        from_address=from_address), exc_info = True)
-            return JsonResponse({"is_success": False, "error": _("Could not send enrollment email to the user"),})
+            log.error(
+                "unable to send course enrollment verification email to user from '{from_address}'".format(
+                    from_address=from_address,
+                ),
+                exc_info=True,
+            )
+            return JsonResponse({
+                'is_success': False,
+                'error': _('Could not send enrollment email to the user'),
+            })
 
         return JsonResponse({"is_success": True, "subject": subject, "message": message})
 

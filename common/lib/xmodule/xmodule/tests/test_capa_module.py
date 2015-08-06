@@ -1266,6 +1266,54 @@ class CapaModuleTest(unittest.TestCase):
         # Assert that the encapsulated html contains the original html
         self.assertTrue(html in html_encapsulated)
 
+    demand_xml = """
+        <problem>
+        <p>That is the question</p>
+        <multiplechoiceresponse>
+          <choicegroup type="MultipleChoice">
+            <choice correct="false">Alpha <choicehint>A hint</choicehint>
+            </choice>
+            <choice correct="true">Beta</choice>
+          </choicegroup>
+        </multiplechoiceresponse>
+        <demandhint>
+          <hint>Demand 1</hint>
+          <hint>Demand 2</hint>
+        </demandhint>
+        </problem>"""
+
+    def test_demand_hint(self):
+        # HTML generation is mocked out to be meaningless here, so instead we check
+        # the context dict passed into HTML generation.
+        module = CapaFactory.create(xml=self.demand_xml)
+        module.get_problem_html()  # ignoring html result
+        context = module.system.render_template.call_args[0][1]
+        self.assertEqual(context['demand_hint_possible'], True)
+
+        # Check the AJAX call that gets the hint by index
+        result = module.get_demand_hint(0)
+        self.assertEqual(result['contents'], u'Hint (1 of 2): Demand 1')
+        self.assertEqual(result['hint_index'], 0)
+        result = module.get_demand_hint(1)
+        self.assertEqual(result['contents'], u'Hint (2 of 2): Demand 2')
+        self.assertEqual(result['hint_index'], 1)
+        result = module.get_demand_hint(2)  # here the server wraps around to index 0
+        self.assertEqual(result['contents'], u'Hint (1 of 2): Demand 1')
+        self.assertEqual(result['hint_index'], 0)
+
+    def test_demand_hint_logging(self):
+        module = CapaFactory.create(xml=self.demand_xml)
+        # Re-mock the module_id to a fixed string, so we can check the logging
+        module.location = Mock(module.location)
+        module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
+        module.get_problem_html()
+        module.get_demand_hint(0)
+        module.runtime.track_function.assert_called_with(
+            'edx.problem.hint.demandhint_displayed',
+            {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
+             'hint_text': 'Demand 1', 'hint_len': 2}
+        )
+
     def test_input_state_consistency(self):
         module1 = CapaFactory.create()
         module2 = CapaFactory.create()
@@ -1627,19 +1675,18 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(minutes_allowed=5, attempts=3)
         module.start_problem()
 
-        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct, \
-             patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-
-            mock_is_correct.return_value = False
-            mock_grade.return_value = CorrectMap(
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                mock_is_correct.return_value = False
+                mock_grade.return_value = CorrectMap(
                     answer_id='1_2_1',
                     correctness="correct",
                     npoints=0.9,
-            )
-            get_request_dict = {CapaFactory.answer_key(): '3'}
-            results = module.check_problem(get_request_dict)
-            self.assertFalse(module.should_show_reset_button())
-            self.assertFalse(module.should_show_check_button())
+                )
+                get_request_dict = {CapaFactory.answer_key(): '3'}
+                results = module.check_problem(get_request_dict)
+                self.assertFalse(module.should_show_reset_button())
+                self.assertFalse(module.should_show_check_button())
 
     def test_timed_save(self):
         """
@@ -1875,7 +1922,6 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.input_key(3): 'choice_0',
             factory.input_key(4): ['choice_0', 'choice_1'],
         }
-
         event = self.get_event_for_answers(module, answer_input_dict)
 
         self.assertEquals(event['submission'], {
@@ -1918,8 +1964,9 @@ class TestProblemCheckTracking(unittest.TestCase):
         with patch.object(module.runtime, 'track_function') as mock_track_function:
             module.check_problem(answer_input_dict)
 
-            self.assertEquals(len(mock_track_function.mock_calls), 1)
-            mock_call = mock_track_function.mock_calls[0]
+            self.assertGreaterEqual(len(mock_track_function.mock_calls), 1)
+            # There are potentially 2 track logs: answers and hint. [-1]=answers.
+            mock_call = mock_track_function.mock_calls[-1]
             event = mock_call[1][1]
 
             return event
@@ -1976,6 +2023,71 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.answer_key(2, 2): {
                 'question': '',
                 'answer': 'yellow',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': False,
+                'variant': '',
+            },
+        })
+
+    def test_optioninput_extended_xml(self):
+        """Test the new XML form of writing with <option> tag instead of options= attribute."""
+        factory = self.capa_factory_for_problem_xml("""\
+            <problem display_name="Woo Hoo">
+              <p>Are you the Gatekeeper?</p>
+                <optionresponse>
+                   <optioninput>
+                       <option correct="True" label="Good Job">
+                           apple
+                           <optionhint>
+                               banana
+                           </optionhint>
+                       </option>
+                       <option correct="False" label="blorp">
+                           cucumber
+                           <optionhint>
+                               donut
+                           </optionhint>
+                       </option>
+                   </optioninput>
+
+                   <optioninput>
+                       <option correct="True">
+                           apple
+                           <optionhint>
+                               banana
+                           </optionhint>
+                       </option>
+                       <option correct="False">
+                           cucumber
+                           <optionhint>
+                               donut
+                           </optionhint>
+                       </option>
+                   </optioninput>
+                 </optionresponse>
+            </problem>
+            """)
+        module = factory.create()
+
+        answer_input_dict = {
+            factory.input_key(2, 1): 'apple',
+            factory.input_key(2, 2): 'cucumber',
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2, 1): {
+                'question': '',
+                'answer': 'apple',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(2, 2): {
+                'question': '',
+                'answer': 'cucumber',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
                 'correct': False,

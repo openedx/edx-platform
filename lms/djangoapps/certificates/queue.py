@@ -333,7 +333,7 @@ class XQueueCertInterface(object):
                         'name': profile_name,
                         'grade': grade_contents,
                         'template_pdf': template_pdf,
-                        'designation':  profile_title,
+                        'designation': profile_title,
                     }
                     if template_file:
                         contents['template_pdf'] = template_file

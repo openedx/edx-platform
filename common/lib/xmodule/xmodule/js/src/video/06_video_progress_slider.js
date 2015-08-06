@@ -170,10 +170,6 @@ function () {
             endTime = Math.min(this.config.endTime, endTime);
         }
 
-        if (this.config.endTime !== null) {
-            duration = Math.min(this.config.endTime, duration);
-        }
-
         this.videoProgressSlider.frozen = true;
 
         // Remember the seek to value so that we don't repeat ourselves on the

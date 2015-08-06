@@ -280,7 +280,7 @@ def generate_course_forums_d3(url_handle):
     previous_date = -1
     previous = None
     rows = [['Date', 'New Threads', 'Responses', 'Comments']]
-    for date, comment_type, number, up_vote, down, net in reader: # pylint: disable=unused-variable
+    for date, comment_type, number, up_vote, down, net in reader:  # pylint: disable=unused-variable
         if date != previous_date:
             if previous:
                 rows.append([previous_date] + previous)

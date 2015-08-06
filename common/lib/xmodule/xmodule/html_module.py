@@ -10,6 +10,8 @@ from path import path
 from fs.errors import ResourceNotFoundError
 from pkg_resources import resource_string
 
+from util.date_utils import get_default_time_display
+
 import dogstats_wrapper as dog_stats_api
 from xmodule.annotator_mixin import html_to_text
 from xmodule.contentstore.content import StaticContent
@@ -83,8 +85,8 @@ class HtmlModuleMixin(HtmlFields, XModule):
                 'name': user.profile.name if user else '',
                 'course_title': course.display_name,
                 'course_id': self.course_id,
-                'course_start_date': course.start,
-                'course_end_date': course.end,
+                'course_start_date': get_default_time_display(course.start),
+                'course_end_date': get_default_time_display(course.end),
             }
             return self.system.substitute_keywords_with_data(self.data, context)
         return self.data

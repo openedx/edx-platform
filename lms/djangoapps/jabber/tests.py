@@ -127,4 +127,3 @@ class UtilsTests(TestCase):
         post_jabber_user_count = JabberUser.objects.count()
         jabber_user_delta = post_jabber_user_count - pre_jabber_user_count
         self.assertEquals(jabber_user_delta, 1)
-
