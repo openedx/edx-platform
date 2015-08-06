@@ -92,6 +92,7 @@ def learner_profile_context(logged_in_user, profile_username, user_is_staff, bui
             'country_options': list(countries),
             'language_options': settings.ALL_LANGUAGES,
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
-        }
+        },
+        'disable_courseware_js': True,
     }
     return context
