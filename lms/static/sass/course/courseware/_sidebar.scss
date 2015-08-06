@@ -147,6 +147,19 @@
               &:empty {
                 display: none;
               }
+
+              // definitions for proctored exam attempt status indicators
+              i.verified {
+                color: $success-color;
+              }
+
+              i.rejected {
+                color: $alert-color;
+              }
+
+              i.error {
+                color: $alert-color;
+              }
             }
           }
 
