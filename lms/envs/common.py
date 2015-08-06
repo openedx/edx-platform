@@ -1259,6 +1259,18 @@ dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+
+discussion_vendor_js = [
+    'js/Markdown.Converter.js',
+    'js/Markdown.Sanitizer.js',
+    'js/Markdown.Editor.js',
+    'js/vendor/jquery.timeago.js',
+    'js/src/jquery.timeago.locale.js',
+    'js/vendor/jquery.truncate.js',
+    'js/jquery.ajaxfileupload.js',
+    'js/split.js'
+]
+
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1511,6 +1523,10 @@ PIPELINE_JS = {
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
+    },
+    'discussion_vendor': {
+        'source_filenames': discussion_vendor_js,
+        'output_filename': 'js/discussion_vendor.js',
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
