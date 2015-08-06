@@ -90,6 +90,21 @@ class CreditService(object):
         For more information, see documentation on this method name in api.eligibility.py
         """
 
+        log_msg = (
+            'set_credit_requirement_status was called with '
+            'user_id={user_id}, course_key_or_id={course_key_or_id} '
+            'req_namespace={req_namespace}, req_name={req_name}, '
+            'status={status}, reason={reason}'.format(
+                user_id=user_id,
+                course_key_or_id=course_key_or_id,
+                req_namespace=req_namespace,
+                req_name=req_name,
+                status=status,
+                reason=reason
+            )
+        )
+        log.info(log_msg)
+
         # need to get user_name
         user = User.objects.get(id=user_id)
 
