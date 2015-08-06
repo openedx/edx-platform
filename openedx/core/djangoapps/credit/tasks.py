@@ -231,7 +231,7 @@ def _get_proctoring_requirements(course_key):
     requirements = [
         {
             'namespace': 'proctored_exam',
-            'name': 'proctored_exam_id:{id}'.format(id=exam['id']),
+            'name': exam['content_id'],
             'display_name': exam['exam_name'],
             'criteria': {},
         }

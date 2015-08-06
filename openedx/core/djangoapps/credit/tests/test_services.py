@@ -77,7 +77,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
 
-    def test_get_credit_state(self):
+    def test_get_and_set_credit_state(self):
         """
         Happy path through the service
         """
