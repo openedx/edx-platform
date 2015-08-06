@@ -9,6 +9,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms_course_cache.api import get_course_blocks
+from lms_course_cache.transformers.visibility import VisibilityTransformer
 
 
 # TODO 8874: More comprehensively test VisibilityTransformation.
@@ -53,10 +54,12 @@ class VisibilityTransformationTestCase(ModuleStoreTestCase):
 
         def check_against_has_access(user):
             self.client.login(username=user.username, password=password)
-            __, block_data_dict = get_course_blocks(user, course.id)
+            block_structure = get_course_blocks(
+                user, course.id, course.location, transformers=[VisibilityTransformer()]
+            )
             for xblock in xblocks:
                 self.assertEqual(
-                    xblock.location in block_data_dict,
+                    block_structure.has_block(xblock.location),
                     bool(has_access(user, 'load', xblock))
                 )
             self.client.logout()

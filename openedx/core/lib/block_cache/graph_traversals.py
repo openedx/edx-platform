@@ -16,16 +16,11 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
     as it needs to check whether each node's parents have been visited.
 
     Arguments:
-        start_node (AType)
-        get_parents (AType -> list[AType])
-        get_children (AType -> list[AType])
-        get_result (AType -> BType)
-        predicate (AType -> bool)
-    where AType is any hashable type,
-      and BType is any type.
-
-    Returns:
-        generator[BType]
+        start_node - the starting node for the traversal
+        get_parents - function that returns a list of parent nodes for the given node
+        get_children - function that returns a list of children nodes for the given node
+        get_result - function that computes and returns the resulting value to be yielded for the given node
+        predicate - function that returns whether or not to yield the given node
     """
     # If get_result or predicate aren't provided, just make them to no-ops.
     get_result = get_result or (lambda node_: node_)
@@ -62,7 +57,7 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
         unvisited_children.reverse()
         stack.extend(unvisited_children)
 
-        # Return the result it if it satisfies the predicate.
+        # Return the result if it satisfies the predicate.
         # It's important that we do this *after* calling get_children, because the
         # caller may want to modify the yielded value, so calling get_children
         # after that might mess up the traversal.
@@ -71,9 +66,6 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
 
 
 def traverse_depth_first(start_node, get_children, get_result=None, predicate=None):
-    """
-    ...
-    """
     return _traverse_generic(
         start_node,
         get_parents=None,
@@ -84,9 +76,6 @@ def traverse_depth_first(start_node, get_children, get_result=None, predicate=No
 
 
 def traverse_topologically(start_node, get_parents, get_children, get_result=None, predicate=None):
-    """
-    ...
-    """
     return _traverse_generic(
         start_node,
         get_parents=get_parents,

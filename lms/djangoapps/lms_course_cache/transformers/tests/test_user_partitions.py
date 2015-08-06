@@ -11,7 +11,7 @@ from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition
 
-from lms_course_cache.transformations.user_partitions import UserPartitionTransformation
+from lms_course_cache.transformers.user_partitions import UserPartitionTransformation
 from lms_course_cache.api import get_course_blocks, clear_course_from_cache
 from test_helpers import CourseStructureTestCase
 

@@ -4,67 +4,40 @@
 from django.conf import settings
 from django.core.cache import get_cache
 
-from openedx.core.lib.course_cache.interface import CourseCacheInterface
+from openedx.core.lib.block_cache.block_cache import get_blocks, clear_block_cache
+from xmodule.modulestore.django import modulestore
 
-from transformations import start_date, user_partitions, visibility
+from transformers import start_date, user_partitions, visibility
+from user_info import CourseUserInfo
 
 
-_cache_interface = None
-
-# TODO 8874: Populate this list using Stevadore.
-LMS_COURSE_TRANSFORMATIONS = {
-    visibility.VisibilityTransformation(),
-    start_date.StartDateTransformation(),
-    user_partitions.UserPartitionTransformation(),
+LMS_COURSE_TRANSFORMERS = {
+    visibility.VisibilityTransformer(),
+    start_date.StartDateTransformer(),
+    user_partitions.UserPartitionTransformer(),
 }
 
-
-def _get_cache_interface():
-    """
-    Returns:
-        django.core.cache.BaseCache
-    """
-    global _cache_interface
-    if not _cache_interface:
-        _cache_interface = CourseCacheInterface(
-            get_cache('default'),  # TODO: For Django 1.7+, use django.core.caches[cache_name].
-            'lms.djangoapps.lms_course_cache.',
-            'lms.djangoapps.lms_course_cache.',
-            LMS_COURSE_TRANSFORMATIONS,
-        )
-    return _cache_interface
+_cache = None
+def _get_cache():
+    global _cache
+    if not _cache:
+        _cache = get_cache('lms.course_blocks_cache')
+    return _cache
 
 
 def get_course_blocks(
         user,
         course_key,
-        transformations=LMS_COURSE_TRANSFORMATIONS,
-        root_block_key=None,
-        remove_orphans=False):
-    """
-    Arguments:
-        user (User)
-        course_key (CourseKey): Course to which desired blocks belong.
-        transformations (list[Transformation])
-        root_block_key (UsageKey): Usage key for root block in the subtree
-            for which block information will be returned. Passing in the usage
-            key of a course will return the entire user-specific course
-            hierarchy.
-        remove_orphans (bool)
+        root_usage_key,
+        transformers=LMS_COURSE_TRANSFORMERS,
+):
+    if transformers is None:
+        transformers = settings.LMS_COURSE_TRANSFORMERS
 
-    Returns:
-        (CourseBlockStructure, dict[UsageKey: CourseBlockData])
-    """
-    if transformations is None:
-        transformations = settings.LMS_COURSE_TRANSFORMATIONS
-    return _get_cache_interface().get_course_blocks(
-        user, course_key, transformations, root_block_key, remove_orphans
+    return get_blocks(
+        _get_cache(), modulestore(), CourseUserInfo(course_key, user), root_usage_key, transformers,
     )
 
 
 def clear_course_from_cache(course_key):
-    """
-    Arguments:
-        course_key (CourseKey)
-    """
-    return _get_cache_interface().clear_course(course_key)
+    return clear_block_cache(_get_cache(), course_key.location)

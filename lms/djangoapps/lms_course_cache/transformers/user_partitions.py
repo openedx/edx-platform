@@ -2,7 +2,7 @@
 ...
 """
 from courseware.access import _has_access_to_course
-from openedx.core.lib.course_cache.transformation import CourseStructureTransformation
+from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 
@@ -115,10 +115,11 @@ class MergedGroupAccess(object):
             return True
 
 
-class UserPartitionTransformation(CourseStructureTransformation):
+class UserPartitionTransformer(BlockStructureTransformer):
     """
     ...
     """
+    VERSION = 1
 
     @staticmethod
     def _get_user_partition_groups(course_key, user_partitions, user):
@@ -150,44 +151,46 @@ class UserPartitionTransformation(CourseStructureTransformation):
                 partition_groups[partition.id] = group
         return partition_groups
 
-    def collect(self, course_key, block_structure, xblock_dict):
+    @classmethod
+    def collect(self, block_structure):
         """
         Computes any information for each XBlock that's necessary to execute
         this transformation's apply method.
 
         Arguments:
             course_key (CourseKey)
-            block_structure (CourseBlockStructure)
+            block_structure (BlockStructure)
             xblock_dict (dict[UsageKey: XBlock])
 
         Returns:
             dict[UsageKey: dict]
         """
-        result_dict = {block_key: {} for block_key in block_structure.get_block_keys()}
-
-        # TODO 8874: Make it so user_partitions is stored with the entire course, not just the root block, because this will break if we request a subtree.
-        # Because user partitions are course-wide, only store data for them on
-        # the root block.
-        xblock = xblock_dict[block_structure.root_block_key]
-        user_partitions = getattr(xblock, 'user_partitions', []) or []
-        result_dict[block_structure.root_block_key]['user_partitions'] = user_partitions
-
-        # If there are no user partitions, this transformation is a no-op,
-        # so there is nothing to collect.
-        if not user_partitions:
-            return result_dict
-
-        # For each block, compute merged group access. Because this is a
-        # topological sort, we know a block's parents are guaranteed to
-        # already have merged group access computed before the block itself.
-        for block_key in block_structure.topological_traversal():
-            xblock = xblock_dict[block_key]
-            parent_keys = block_structure.get_parents(block_key)
-            parent_access = [result_dict[parent_key]['merged_group_access'] for parent_key in parent_keys]
-            merged_group_access = MergedGroupAccess(user_partitions, xblock, parent_access)
-            result_dict[block_key]['merged_group_access'] = merged_group_access
-
-        return result_dict
+        # result_dict = {block_key: {} for block_key in block_structure.get_block_keys()}
+        #
+        # # TODO 8874: Make it so user_partitions is stored with the entire course, not just the root block, because this will break if we request a subtree.
+        # # Because user partitions are course-wide, only store data for them on
+        # # the root block.
+        # xblock = xblock_dict[block_structure.root_block_key]
+        # user_partitions = getattr(xblock, 'user_partitions', []) or []
+        # result_dict[block_structure.root_block_key]['user_partitions'] = user_partitions
+        #
+        # # If there are no user partitions, this transformation is a no-op,
+        # # so there is nothing to collect.
+        # if not user_partitions:
+        #     return result_dict
+        #
+        # # For each block, compute merged group access. Because this is a
+        # # topological sort, we know a block's parents are guaranteed to
+        # # already have merged group access computed before the block itself.
+        # for block_key in block_structure.topological_traversal():
+        #     xblock = xblock_dict[block_key]
+        #     parent_keys = block_structure.get_parents(block_key)
+        #     parent_access = [result_dict[parent_key]['merged_group_access'] for parent_key in parent_keys]
+        #     merged_group_access = MergedGroupAccess(user_partitions, xblock, parent_access)
+        #     result_dict[block_key]['merged_group_access'] = merged_group_access
+        #
+        # return result_dict
+        pass
 
     def apply(self, user, course_key, block_structure, block_data, remove_orphans):
         """
@@ -196,8 +199,8 @@ class UserPartitionTransformation(CourseStructureTransformation):
         Arguments:
             user (User)
             course_key (CourseKey)
-            block_structure (CourseBlockStructure)
-            block_data (dict[UsageKey: CourseBlockData]).
+            block_structure (BlockStructure)
+            block_data (dict[UsageKey: BlockData]).
             remove_orphans (bool)
         """
         # TODO 8874: Factor out functionality of UserPartitionTransformation.apply and access._has_group_access into a common utility function.
