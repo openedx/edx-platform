@@ -70,9 +70,11 @@ class UserPartitionTransformationTestCase(CourseStructureTestCase):
                     '#ref': 'chapter1',
                     '#children': [
                         {
-                            'metadata': {'group_access': {0: [0, 1, 2]},
-                            '#type': 'sequential',
-                            '#ref': 'lesson1',
+                            'metadata': {
+                                'group_access': {0: [0, 1, 2]},
+                            },
+                                '#type': 'sequential',
+                                '#ref': 'lesson1',
                             '#children': [
                                 {
                                     '#type': 'vertical',
