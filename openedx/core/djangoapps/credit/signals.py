@@ -9,7 +9,7 @@ from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
-from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme
+from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme, get_group_access_blocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition, NoSuchUserPartitionError
@@ -93,9 +93,12 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         partition_scheme (str): Name of the user partition scheme
 
     """
+    # TODO: Refactor code (move code to proper files e.g., 'common/lib/xmodule/xmodule/partitions/partitions.py') in once ICRV access control functionality is complete
+
     # TODO: Dynamically update user_id (actual course publisher)
     user_id = 1
 
+    # TODO: Increase logging (add logging for errors and success)
     # get user partition with provided partition scheme
     user_partition = UserPartition.get_scheme(partition_scheme)
     if user_partition is None:
@@ -112,7 +115,6 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
     for block in access_control_credit_xblocks:
         # for now we are entertaining only verification partition scheme
         if partition_scheme == VERIFICATION_SCHEME:
-            # TODO: Refactor code in small reusable pieces
             # create group configuration for VerificationPartitionScheme
             group_configuration = _verification_partition_group_configuration(user_partition, block)
             new_user_partitions.append(group_configuration)
@@ -199,12 +201,39 @@ def _update_course_user_partitions(course_key, user_id, new_user_partitions):
     course = modulestore().get_course(course_key, depth=0)
     # get unique set of partition schemes for update and filter course user
     # partitions with any of the unique set of partition schemes
+    course_user_partitions_old = [user_partition.id for user_partition in course.user_partitions]
     filter_partition_schemes = set([user_partition.scheme.name for user_partition in new_user_partitions])
     course_user_partitions = filter_by_scheme(course.user_partitions, filter_partition_schemes)
     # new add user partitions 'new_user_partitions' in filter course user partitions
     course.user_partitions = course_user_partitions + new_user_partitions
     # TODO: Check that course and modules are properly updated in database, preserve those user partition which scheme name not in 'new_user_partitions'.
     modulestore().update_item(course, user_id)
+    course_user_partitions_new = [user_partition.id for user_partition in course.user_partitions]
+
+    # sync blocks with access roles according to new user partitions for course
+    deleted_partitions = list(set(course_user_partitions_old) - set(course_user_partitions_new))
+
+    # sync blocks with access roles according to new user partitions for the
+    # course so that user is not denied access for blocks with non-existing
+    # user partitions/groups
+    _sync_course_content_deleted_partitions(course_key, deleted_partitions)
+
+
+def _sync_course_content_deleted_partitions(course_key, deleted_partitions):
+    """ Sync blocks with access roles according to new user partitions for
+    the provided course.
+
+    Args:
+        course_key (CourseKey): Identifier for the course
+        deleted_partitions (List): List of id's of deleted user partitions
+
+    """
+    group_access_blocks = get_group_access_blocks(course_key)
+    # loop over all block with access groups and update them conditionally (
+    # remove access groups pointing to deleted user partitions), since we have
+    # updated user partitions for course so some partitions may have been
+    # deleted.
+    # TODO: Complete this methods functionality
 
 
 def _verification_partition_group_configuration(user_partition, block):

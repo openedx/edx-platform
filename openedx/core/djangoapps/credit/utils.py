@@ -66,3 +66,18 @@ def filter_by_scheme(course_user_partitions, filter_partition_schemes):
             filtered_user_partitions.append(user_partition)
 
     return filtered_user_partitions
+
+
+def get_group_access_blocks(course_key):
+    """ Returns list of course blocks which have group access.
+
+    Args:
+        course_key (CourseKey): Identifier for the course
+
+    Returns:
+        List of xblocks.
+
+    """
+    items = modulestore().get_items(course_key, settings={'group_access': {'$exists': True}})
+
+    return items
