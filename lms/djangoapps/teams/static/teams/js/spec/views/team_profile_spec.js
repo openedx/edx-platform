@@ -95,7 +95,7 @@ define([
                     var view = createTeamProfileView(requests, {
                         country: 'Pakistan',
                         language: 'English',
-                        membership: [{'user':{'id': 'bilbo'}}]
+                        membership: [{'user':{'username': 'bilbo'}}]
                     });
                     assertTeamDetails(view, 1);
                     expect(view.$('.team-member-status').text().trim()).toBe('You are a member of this team.');
@@ -117,7 +117,7 @@ define([
                     var view = createTeamProfileView(requests , {
                         country: 'Pakistan',
                         language: 'English',
-                        membership: [{'user':{'id': 'bilbo'}},{'user':{'id': 'bilbo1'}},{'user':{'id': 'bilbo2'}}]
+                        membership: [{'user':{'username': 'bilbo'}},{'user':{'username': 'bilbo1'}},{'user':{'username': 'bilbo2'}}]
                     });
 
                     assertTeamDetails(view, 3);
@@ -132,7 +132,7 @@ define([
                     var view = createTeamProfileView(requests, {
                         country: 'Pakistan',
                         language: 'English',
-                        membership: [{'user':{'id': 'bilbo'}}]
+                        membership: [{'user':{'username': 'bilbo'}}]
                     });
                     assertTeamDetails(view, 1);
 

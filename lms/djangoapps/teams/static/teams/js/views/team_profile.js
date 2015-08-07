@@ -64,15 +64,15 @@
                     _.each(this.memberships, function(membership) {
                         view.$('.members-info').append(_.template(teamMemberTemplate, {
                             imageUrl: 'https://dkxj5n08iyd6q.cloudfront.net/54.208.48.207/759220e8c562e167cab003f0023f839e_50.jpg?v=1438793481',
-                            username: membership.user.id,
-                            memberProfileUrl: '/u/' + membership.user.id
+                            username: membership.user.username,
+                            memberProfileUrl: '/u/' + membership.user.username
                         }));
                     });
                 },
                 isUserMemberOfTeam: function() {
                     var view = this;
                     var member = _.find(this.memberships, function (membership) {
-                        return membership.user.id === view.requestUsername
+                        return membership.user.username === view.requestUsername
                     });
                     return member ? true : false;
                 },
