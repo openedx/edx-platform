@@ -15,6 +15,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
 from course_modes.models import CourseMode
@@ -23,7 +24,7 @@ from student.models import CourseEnrollment
 
 
 @ddt.ddt
-class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """
     Tests for the instructor dashboard (not legacy).
     """
@@ -34,7 +35,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         super(TestInstructorDashboard, self).setUp()
         self.course = CourseFactory.create(
-            grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}}
+            grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
+            display_name='<script>alert("XSS")</script>'
         )
 
         self.course_mode = CourseMode(course_id=self.course.id,
@@ -86,6 +88,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
         self.assertTrue('${amount}'.format(amount=total_amount) in response.content)
+
+    def test_course_name_xss(self):
+        """Test that the instructor dashboard correctly escapes course names
+        with script tags.
+        """
+        response = self.client.get(self.url)
+        self.assert_xss(response, '<script>alert("XSS")</script>')
 
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
     def test_override_currency_settings_in_the_html_response(self):
