@@ -142,7 +142,7 @@ def correct_video_settings(_step):
     expected_entries = [
         # basic
         [DISPLAY_NAME, 'Video', False],
-        ['Default Video URL', 'http://youtu.be/3_yD_cEKoCk, , ', False],
+        ['Default Video URL', 'http://youtu.be/_Szu8hVDvgc, , ', False],
 
         # advanced
         [DISPLAY_NAME, 'Video', False],
@@ -157,7 +157,7 @@ def correct_video_settings(_step):
         ['Video File URLs', '', False],
         ['Video Start Time', '00:00:00', False],
         ['Video Stop Time', '00:00:00', False],
-        ['YouTube ID', '3_yD_cEKoCk', False],
+        ['YouTube ID', '_Szu8hVDvgc', False],
         ['YouTube ID for .75x speed', '', False],
         ['YouTube ID for 1.25x speed', '', False],
         ['YouTube ID for 1.5x speed', '', False]

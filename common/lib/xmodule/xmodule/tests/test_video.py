@@ -383,7 +383,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
-            'youtube_id_1_0': '3_yD_cEKoCk',
+            'youtube_id_1_0': '_Szu8hVDvgc',
             'youtube_id_1_25': '',
             'youtube_id_1_5': '',
             'show_captions': True,

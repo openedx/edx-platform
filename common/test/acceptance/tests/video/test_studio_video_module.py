@@ -150,7 +150,7 @@ class CMSVideoTest(CMSVideoBaseTest):
             YouTubeStubConfig.configure(youtube_stub_config)
 
         if subtitles:
-            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+            self.assets.append('subs__Szu8hVDvgc.srt.sjson')
 
         self.navigate_to_course_unit()
 

@@ -70,7 +70,7 @@ def is_youtube_available():
         'player': 'https://www.youtube.com/iframe_api',
         # For transcripts, you need to check an actual video, so we will
         # just specify our default video and see if that one is available.
-        'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
+        'transcript': 'http://video.google.com/timedtext?lang=en&v=_Szu8hVDvgc',
     }
 
     for url in youtube_api_urls.itervalues():

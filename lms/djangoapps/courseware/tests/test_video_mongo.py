@@ -127,7 +127,7 @@ class TestVideoNonYouTube(TestVideo):
             'metadata': json.dumps(OrderedDict({
                 "saveStateUrl": self.item_descriptor.xmodule_runtime.ajax_url + "/save_user_state",
                 "autoplay": False,
-                "streams": "1.00:3_yD_cEKoCk",
+                "streams": "1.00:_Szu8hVDvgc",
                 "sub": "a_sub_file.srt.sjson",
                 "sources": sources,
                 "captionDataDir": None,
@@ -181,7 +181,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         self.default_metadata_dict = OrderedDict({
             "saveStateUrl": "",
             "autoplay": settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            "streams": "1.00:3_yD_cEKoCk",
+            "streams": "1.00:_Szu8hVDvgc",
             "sub": "a_sub_file.srt.sjson",
             "sources": '[]',
             "captionDataDir": None,
@@ -811,7 +811,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     def test_source_not_in_html5sources(self):
         metadata = {
             'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
+            'html5_sources': ['http://youtu.be/_Szu8hVDvgc.mp4'],
         }
 
         self.initialize_module(metadata=metadata)
@@ -839,7 +839,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         metadata = {
             'track': u'http://some_track.srt',
             'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
+            'html5_sources': ['http://youtu.be/_Szu8hVDvgc.mp4'],
             'download_video': False,
         }
 
@@ -856,7 +856,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     def test_source_is_empty(self):
         metadata = {
             'source': '',
-            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
+            'html5_sources': ['http://youtu.be/_Szu8hVDvgc.mp4'],
         }
 
         self.initialize_module(metadata=metadata)

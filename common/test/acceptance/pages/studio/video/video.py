@@ -53,7 +53,7 @@ DISPLAY_NAME = "Component Display Name"
 DEFAULT_SETTINGS = [
     # basic
     [DISPLAY_NAME, 'Video', False],
-    ['Default Video URL', 'http://youtu.be/3_yD_cEKoCk, , ', False],
+    ['Default Video URL', 'http://youtu.be/_Szu8hVDvgc, , ', False],
 
     # advanced
     [DISPLAY_NAME, 'Video', False],
@@ -69,7 +69,7 @@ DEFAULT_SETTINGS = [
     ['Video ID', '', False],
     ['Video Start Time', '00:00:00', False],
     ['Video Stop Time', '00:00:00', False],
-    ['YouTube ID', '3_yD_cEKoCk', False],
+    ['YouTube ID', '_Szu8hVDvgc', False],
     ['YouTube ID for .75x speed', '', False],
     ['YouTube ID for 1.25x speed', '', False],
     ['YouTube ID for 1.5x speed', '', False]

@@ -29,7 +29,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
         expected_event = {
             'event': {
                 'id': video_locator.html_id(),
-                'code': '3_yD_cEKoCk'
+                'code': '_Szu8hVDvgc'
             }
         }
         self.assert_events_match([expected_event], [video_event])
