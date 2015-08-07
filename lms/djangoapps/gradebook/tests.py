@@ -47,7 +47,6 @@ class GradebookTests(ModuleStoreTestCase):
             mock_request,
             problem.location,
             field_data_cache,
-            course.id
         )._xmodule
 
     def setUp(self):
