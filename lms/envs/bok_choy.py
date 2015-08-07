@@ -129,6 +129,8 @@ FEATURES['LICENSING'] = True
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
 
+FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
 YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
