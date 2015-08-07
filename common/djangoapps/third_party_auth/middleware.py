@@ -16,6 +16,7 @@ from . import pipeline
 
 log = logging.getLogger(__file__)
 
+
 class ExceptionMiddleware(SocialAuthExceptionMiddleware):
     """Custom middleware that handles conditional redirection."""
 

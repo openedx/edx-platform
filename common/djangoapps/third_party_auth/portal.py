@@ -37,5 +37,7 @@ class PortalOAuth2(BaseOAuth2):
     def process_error(self, data):
         super(PortalOAuth2, self).process_error(data)
         if data.get('error_code'):
-            raise AuthCanceled(self, data.get('error_message') or
-                                     data.get('error_code'))
+            raise AuthCanceled(
+                self,
+                data.get('error_message') or data.get('error_code')
+            )
