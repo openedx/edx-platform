@@ -74,6 +74,7 @@
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # paul ochoa <palichis@solid-ec.org>, 2015
 # Thomas Alberto Castro Acosta <snaketh@gmail.com>, 2014
+# UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -89,14 +90,15 @@
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
+# UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:10+0000\n"
-"PO-Revision-Date: 2015-07-27 13:49+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
-"Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
+"POT-Creation-Date: 2015-08-07 13:41+0000\n"
+"PO-Revision-Date: 2015-07-31 19:03+0000\n"
+"Last-Translator: UAbierta Universidad de Chile <uabierta@u.uchile.cl>\n"
+"Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2403,6 +2405,87 @@ msgstr ""
 msgid "team count"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Name (Required) *"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "A name that identifies your team (maximum 255 characters)."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Description (Required) *"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"A short description of the team to help other learners understand the goals "
+"or direction of the team (maximum 300 characters)."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Optional Characteristics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"Help other learners decide whether to join your team by specifying some "
+"characteristics for your team. Choose carefully, because fewer people might "
+"be interested in joining your team if it seems too restrictive."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Language"
+msgstr "Idioma"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"The language that team members primarily use to communicate with each other."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Country"
+msgstr "País"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "The country that team members primarily identify with."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/views/fields.js
+msgid "An error occurred. Please try again."
+msgstr "Ocurrió un error. Por favor, intente nuevamente."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Check the highlighted fields below and try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team name."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team name cannot have more than 255 characters."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team description."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team description cannot have more than 300 characters."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_actions.js
+msgid ""
+"Try {browse_span_start}browsing all teams{span_end} or "
+"{search_span_start}searching team descriptions{span_end}. If you still can't"
+" find a team to join, {create_span_start}create a new team in this "
+"topic{span_end}."
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "%(member_count)s / %(max_member_count)s Member"
 msgid_plural "%(member_count)s / %(max_member_count)s Members"
@@ -2411,10 +2494,6 @@ msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams.js
-msgid "Create new team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2436,11 +2515,29 @@ msgid "Browse"
 msgstr "Explorar"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find existing teams to join, or if you would "
+"like to learn with friends you know."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Create a New Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "All Topics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"%(route)s\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"%(topic)s\" could not be found."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The team \"%(team)s\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
@@ -2780,7 +2877,6 @@ msgstr ""
 "curso."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Please enter a student email address or username."
 msgstr ""
 "Por favor ingrese una dirección de correo electrónico o nombre de usuario "
@@ -2868,14 +2964,12 @@ msgstr ""
 "estudiante estén identificados correctamente."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr ""
 "Intentos para exámen de ingreso esta siendo reiniciado para el estudiante "
 "'{student_id}'"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
@@ -2904,7 +2998,6 @@ msgstr ""
 " y el identificador del estudiante es correcto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Enter a student's username or email address."
 msgstr "Ingresar un nombre de usuario o email del estudiante."
 
@@ -2925,7 +3018,6 @@ msgstr ""
 "estudiante es correcto e intentar de nuevo."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr ""
 "El estado del examen de ingreso está siendo borrado para el estudiante "
@@ -3613,31 +3705,6 @@ msgid_plural "%s results"
 msgstr[0] "%s resultado"
 msgstr[1] "%s resultados"
 
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Started entrance exam rescore task for student '{student_id}'."
-msgstr ""
-"Iniciado recalificación para exámen de ingreso para estudiante "
-"'{student_id}'"
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid ""
-"Error starting a task to rescore entrance exam for student '{student_id}'."
-msgstr ""
-"Error iniciando recalificación de exámen de ingreso para el estudiante "
-"'{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error deleting entrance exam state for student '{student_id}'. "
-msgstr ""
-"Error borrando estado de exámen de ingreso para el estudiante "
-"'{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error getting entrance exam task history for student '{student_id}'. "
-msgstr ""
-"Error obteniendo historial de tarea para exámen de ingreso del estudiante "
-"'{student_id}'."
-
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
 msgstr "Los datos no pudieron ser guardados."
@@ -3743,10 +3810,6 @@ msgstr ""
 " para restablecer su contraseña."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Language"
-msgstr "Idioma"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages."
@@ -3833,10 +3896,6 @@ msgstr "Perfil limitado"
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Full Profile"
 msgstr "Perfil completo"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Country"
-msgstr "País"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Add Country"
@@ -4024,10 +4083,6 @@ msgid "Placeholder"
 msgstr "Marcador de posición"
 
 #: lms/static/js/views/fields.js
-msgid "An error occurred. Please try again."
-msgstr "Ocurrió un error. Por favor, intente nuevamente."
-
-#: lms/static/js/views/fields.js
 msgid "Upload an image"
 msgstr "Subir una imagen"
 
@@ -4190,6 +4245,20 @@ msgstr "El cargo del signatario no debe tener más de 40 caracteres por línea."
 #: cms/static/js/certificates/models/signatory.js
 msgid "Signatory organization should not be more than 40 characters long."
 msgstr "La Institución del signatario no debe tener más de 40 caracteres."
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Edit this certificate?"
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid ""
+"This certificate has already been activated and is live. Are you sure you "
+"want to continue editing?"
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Yes, allow edits to the active Certificate"
+msgstr ""
 
 #: cms/static/js/certificates/views/certificate_editor.js
 msgid "Upload organization logo."
@@ -4522,11 +4591,6 @@ msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 "No se puede configurar este valor en menos de %(minimum_grade_cutoff)s%."
 
-#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
-#: cms/templates/js/asset-library.underscore
-msgid "Type"
-msgstr "Escribir"
-
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "Confirmación de borrado de archivo"
@@ -4549,6 +4613,10 @@ msgstr "Su archivo ha sido borrado."
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr "Fecha añadida"
+
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+msgid "Type"
+msgstr "Escribir"
 
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"

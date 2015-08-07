@@ -6,7 +6,7 @@
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# Андрей Сандлер <andrei.sandler@phystech.edu>, 2013
+# Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # berseneva, 2013
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
@@ -43,7 +43,7 @@
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
 # YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
 # tonybond <zippo2021@gmail.com>, 2014
-# Андрей Сандлер <andrei.sandler@phystech.edu>, 2013
+# Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2015 EdX
@@ -51,7 +51,7 @@
 # 
 # Translators:
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# Андрей Сандлер <andrei.sandler@phystech.edu>, 2013
+# Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # berseneva, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
@@ -75,7 +75,7 @@
 # Andrey Bochkarev <abocha@ya.ru>, 2015
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# Андрей Сандлер <andrei.sandler@phystech.edu>, 2013
+# Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # berseneva, 2013
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # daznix <daznix@gmail.com>, 2014
@@ -121,7 +121,7 @@
 # YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
 # Pavel Zamyshliaev, 2014
 # tonybond <zippo2021@gmail.com>, 2014
-# Андрей Сандлер <andrei.sandler@phystech.edu>, 2013
+# Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -132,7 +132,7 @@
 # Alena Koneva <alenakoneva@ya.ru>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
-# Андрей Сандлер <andrei.sandler@phystech.edu>, 2013
+# Андрей Сандлер <inactive+asandler@transifex.com>, 2013
 # berseneva, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
@@ -180,10 +180,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:11+0000\n"
-"PO-Revision-Date: 2015-07-13 21:12+0000\n"
+"POT-Creation-Date: 2015-08-07 13:42+0000\n"
+"PO-Revision-Date: 2015-08-05 08:47+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
+"Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -210,9 +210,9 @@ msgid "Advanced"
 msgstr "Дополнительно"
 
 #: cms/djangoapps/contentstore/views/entrance_exam.py
-#: lms/djangoapps/courseware/tabs.py
+#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
-msgstr "Вступительный тест"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -2166,10 +2166,7 @@ msgstr ""
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: common/lib/xmodule/xmodule/tests/test_course_metadata_utils.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
 msgstr ""
@@ -4419,30 +4416,6 @@ msgstr ""
 msgid "Do not show bumper again"
 msgstr ""
 
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Navigation"
-msgstr "Навигация"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "About these documents"
-msgstr "Об этих документах"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Index"
-msgstr ""
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/courseware/courses.html
-#: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/edxnotes/edxnotes.html
-msgid "Search"
-msgstr "Поиск"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Copyright"
-msgstr "Авторское право"
-
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -4498,6 +4471,10 @@ msgstr "Политика конфиденциальности"
 msgid "Accessibility Policy"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "Условия предоставления услуг"
@@ -5058,10 +5035,6 @@ msgstr ""
 msgid "Certificate is being created."
 msgstr "Создание сертификата"
 
-#: lms/djangoapps/courseware/features/video.py
-msgid "ERROR: No playable video sources found!"
-msgstr "ОШИБКА: не найдено источников видео, доступных для воспроизведения!"
-
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
@@ -5251,7 +5224,6 @@ msgid "Delete User Results"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
 msgstr ""
 
@@ -5271,7 +5243,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -5443,47 +5414,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/instructor_task_helpers.py
-msgid "Complete"
-msgstr "Завершено"
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/api.py
-msgid "This student (%s) will skip the entrance exam."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/api.py
-msgid "This student (%s) is already allowed to skip the entrance exam."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid ""
-"The enrollment code ({code}) was not found for the {course_name} course."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been canceled. It can no longer be used."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been marked as unused."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The enrollment code has been restored."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The redemption does not exist against enrollment code ({code})."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5792,6 +5722,14 @@ msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) will skip the entrance exam."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) is already allowed to skip the entrance exam."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Certificate generation task for all students of this course has been "
 "started. You can view the status of the generation task in the \"Pending "
@@ -5941,6 +5879,10 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "Complete"
+msgstr "Завершено"
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "Не завершено"
 
@@ -6065,6 +6007,27 @@ msgid ""
 "\"{problem}\"."
 msgstr ""
 
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid ""
+"The enrollment code ({code}) was not found for the {course_name} course."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "This enrollment code has been canceled. It can no longer be used."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "This enrollment code has been marked as unused."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "The enrollment code has been restored."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "The redemption does not exist against enrollment code ({code})."
+msgstr ""
+
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Could not find student matching identifier: {student_identifier}"
 msgstr ""
@@ -6185,25 +6148,26 @@ msgstr ""
 msgid "Title"
 msgstr "Заголовок"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Year of Birth"
-msgstr ""
+msgstr "Год рождения"
 
-#: lms/templates/register.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "City"
 msgstr "Город"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Country"
-msgstr ""
+msgstr "Страна"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -8297,6 +8261,13 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html lms/templates/courseware/courses.html
+#: lms/templates/discussion/_thread_list_template.html
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Search"
+msgstr "Поиск"
+
+#: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -8462,10 +8433,15 @@ msgstr ""
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/register.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "Пароль"
 
@@ -8720,7 +8696,6 @@ msgid "Blank"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
-#: cms/djangoapps/contentstore/views/tests/test_course_index.py
 msgid "Course has been successfully reindexed."
 msgstr ""
 
@@ -10206,17 +10181,15 @@ msgstr "Подписка успешно возобновлена!"
 
 #: lms/templates/resubscribe.html
 msgid ""
-"You have re-enabled forum notification emails from {platform_name}. Click "
-"{dashboard_link_start}here{link_end} to return to your dashboard. "
+"You have re-enabled forum notification emails from {platform_name}. You may "
+"{dashboard_link_start}return to your dashboard{link_end}."
 msgstr ""
 
 #: lms/templates/seq_module.html
-#: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
 msgstr ""
 
 #: lms/templates/seq_module.html
-#: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Next"
 msgstr ""
 
@@ -10542,9 +10515,8 @@ msgstr ""
 #: lms/templates/unsubscribe.html
 msgid ""
 "You will no longer receive forum notification emails from {platform_name}. "
-"Click {dashboard_link_start}here{link_end} to return to your dashboard. If "
-"you did not mean to do this, click {undo_link_start}here{link_end} to re-"
-"subscribe."
+"You may {dashboard_link_start}return to your dashboard{link_end}. If you did"
+" not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
 msgstr ""
 
 #: lms/templates/using.html
@@ -10776,33 +10748,6 @@ msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Output"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "{course_number} {ccx_name} Cover Image"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "View Archived Custom Course"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "View Custom Course"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
@@ -11411,18 +11356,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/courses.html
-msgid "Explore free courses from {university_name}."
-msgstr ""
-
-#: lms/templates/courseware/courses.html
-msgid "Explore courses from {platform_name}."
-msgstr ""
-
-#: lms/templates/courseware/courses.html
-msgid "{platform_name} Logo"
-msgstr ""
-
-#: lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr ""
 
@@ -11494,12 +11427,12 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. Sign up for it "
-"{link_start}here{link_end}!"
+"You are not currently enrolled in this course. {link_start}Sign up "
+"now!{link_end}"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
+msgid "View Updates in {studio_name}"
 msgstr ""
 
 #: lms/templates/courseware/info.html
@@ -12065,6 +11998,18 @@ msgid "Enrolled as: "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr ""
 
@@ -12474,26 +12419,6 @@ msgstr ""
 
 #: lms/templates/discussion/user_profile.html
 msgid "User Profile"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_pagination.mustache
-msgid "…"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "This thread is closed."
-msgstr "Эта тема закрыта."
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_user_profile.mustache
-msgid "Active Threads"
 msgstr ""
 
 #: lms/templates/edxnotes/edxnotes.html
@@ -15322,6 +15247,10 @@ msgid ""
 "here for possible use by installations of Open edX."
 msgstr ""
 
+#: lms/templates/static_templates/copyright.html
+msgid "Copyright"
+msgstr ""
+
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
@@ -16143,6 +16072,10 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Unsupported Components"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Deprecated Component"
 msgstr ""
 
 #: cms/templates/course_outline.html

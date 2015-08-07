@@ -72,10 +72,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:11+0000\n"
+"POT-Creation-Date: 2015-08-07 13:42+0000\n"
 "PO-Revision-Date: 2015-06-28 20:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
-"Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
+"Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2059,10 +2059,7 @@ msgstr ""
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: common/lib/xmodule/xmodule/tests/test_course_metadata_utils.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
 msgstr "TBD"
@@ -4323,31 +4320,6 @@ msgstr ""
 msgid "Do not show bumper again"
 msgstr ""
 
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Navigation"
-msgstr "नेविगेशन"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "About these documents"
-msgstr "इन दस्तावेज़ों के बारे में"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Index"
-msgstr "सूची"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/courseware/courses.html
-#: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/edxnotes/edxnotes.html
-msgid "Search"
-msgstr "खोजें"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/static_templates/copyright.html
-msgid "Copyright"
-msgstr "सर्वाधिकार"
-
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -4961,10 +4933,6 @@ msgstr ""
 msgid "Certificate is being created."
 msgstr ""
 
-#: lms/djangoapps/courseware/features/video.py
-msgid "ERROR: No playable video sources found!"
-msgstr "त्रुटि: चलाने योग्य वीडियो स्रोत नहीं मिले!"
-
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
@@ -5158,7 +5126,6 @@ msgid "Delete User Results"
 msgstr "उपयोगकर्ता के परिणाम हटाएं"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
 msgstr ""
 "Git रेपो स्थान '.git' के साथ खत्म होना चाहिए, और एक मान्य URL होना चाहिए"
@@ -5183,7 +5150,6 @@ msgstr ""
 " वो भी तभी यदि यह एक डेवेलेपमैंट एनवाइरनमैंट नहीं है तो।"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -5358,47 +5324,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/instructor_task_helpers.py
-msgid "Complete"
-msgstr "पूरा हुआ"
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/api.py
-msgid "This student (%s) will skip the entrance exam."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/api.py
-msgid "This student (%s) is already allowed to skip the entrance exam."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid ""
-"The enrollment code ({code}) was not found for the {course_name} course."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been canceled. It can no longer be used."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been marked as unused."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The enrollment code has been restored."
-msgstr ""
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The redemption does not exist against enrollment code ({code})."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5714,6 +5639,14 @@ msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr "छात्र {0} के लिए नियत तारीख {1} से {2} सफ़लतापूर्वक रीसेट कर दी गई है"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) will skip the entrance exam."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) is already allowed to skip the entrance exam."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Certificate generation task for all students of this course has been "
 "started. You can view the status of the generation task in the \"Pending "
@@ -5857,6 +5790,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "Complete"
+msgstr "पूरा हुआ"
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "अधूरा"
 
@@ -5979,6 +5916,27 @@ msgstr ""
 msgid ""
 "Failed to find any background tasks for course \"{course}\" and module "
 "\"{problem}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid ""
+"The enrollment code ({code}) was not found for the {course_name} course."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "This enrollment code has been canceled. It can no longer be used."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "This enrollment code has been marked as unused."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "The enrollment code has been restored."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "The redemption does not exist against enrollment code ({code})."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
@@ -8342,6 +8300,13 @@ msgstr ""
 "अच्छी बात हो सकती है या नहीं भी।"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html lms/templates/courseware/courses.html
+#: lms/templates/discussion/_thread_list_template.html
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Search"
+msgstr "खोजें"
+
+#: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -8763,7 +8728,6 @@ msgid "Blank"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
-#: cms/djangoapps/contentstore/views/tests/test_course_index.py
 msgid "Course has been successfully reindexed."
 msgstr ""
 
@@ -10292,19 +10256,15 @@ msgstr "पुनः सदस्यता सफ़ल!"
 
 #: lms/templates/resubscribe.html
 msgid ""
-"You have re-enabled forum notification emails from {platform_name}. Click "
-"{dashboard_link_start}here{link_end} to return to your dashboard. "
+"You have re-enabled forum notification emails from {platform_name}. You may "
+"{dashboard_link_start}return to your dashboard{link_end}."
 msgstr ""
-"आपने {platform_name} से मंच सूचना ईमेलों को पुनः सक्षम किया है। अपने "
-"डैशबोर्ड पर लौटने के लिए {dashboard_link_start}यहां{link_end}दबाएं। "
 
 #: lms/templates/seq_module.html
-#: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
 msgstr "पिछला"
 
 #: lms/templates/seq_module.html
-#: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Next"
 msgstr "अगला"
 
@@ -10632,14 +10592,9 @@ msgstr "सदस्यता रद्द सफ़ल!"
 #: lms/templates/unsubscribe.html
 msgid ""
 "You will no longer receive forum notification emails from {platform_name}. "
-"Click {dashboard_link_start}here{link_end} to return to your dashboard. If "
-"you did not mean to do this, click {undo_link_start}here{link_end} to re-"
-"subscribe."
+"You may {dashboard_link_start}return to your dashboard{link_end}. If you did"
+" not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
 msgstr ""
-"अब से आपको {platform_name} से मंच सूचना ईमेलें मिलनी बंद हो जाएंगी। अपने "
-"डैशबोर्ड पर लौटने के लिए {dashboard_link_start}यहां{link_end}दबाएं। अगर आपका"
-" ये इरादा नहीं था तो फिर से सदस्य बनने के लिए "
-"{undo_link_start}यहां{link_end}पर क्लिक करें।"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -10879,33 +10834,6 @@ msgstr "गणना करें"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Output"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "{course_number} {ccx_name} Cover Image"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "View Archived Custom Course"
-msgstr ""
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "View Custom Course"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
@@ -11528,18 +11456,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/courses.html
-msgid "Explore free courses from {university_name}."
-msgstr "{university_name} में उपलब्ध नि:शुल्क पाठ्यक्रम खोजें।"
-
-#: lms/templates/courseware/courses.html
-msgid "Explore courses from {platform_name}."
-msgstr ""
-
-#: lms/templates/courseware/courses.html
-msgid "{platform_name} Logo"
-msgstr ""
-
-#: lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr ""
 
@@ -11611,12 +11527,12 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. Sign up for it "
-"{link_start}here{link_end}!"
+"You are not currently enrolled in this course. {link_start}Sign up "
+"now!{link_end}"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
+msgid "View Updates in {studio_name}"
 msgstr ""
 
 #: lms/templates/courseware/info.html
@@ -12203,6 +12119,18 @@ msgid "Enrolled as: "
 msgstr ": के रूप में नामांकन"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "संग्रहित कोर्स देखें "
 
@@ -12614,26 +12542,6 @@ msgstr ""
 #: lms/templates/discussion/user_profile.html
 msgid "User Profile"
 msgstr "उपयोगकर्ता की प्रोफ़ाइल"
-
-#: lms/templates/discussion/mustache/_pagination.mustache
-msgid "…"
-msgstr "…"
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr "गुमनाम"
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "This thread is closed."
-msgstr "यह कड़ी बंद हो चुकी है।"
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
-msgstr "चर्चा देखें"
-
-#: lms/templates/discussion/mustache/_user_profile.mustache
-msgid "Active Threads"
-msgstr "सक्रिय कड़ियां"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -15527,6 +15435,10 @@ msgstr ""
 " जाता लेकिन यहां इसलिए छोड़ा गया है ताकि अगर ज़रूरत पड़े तो Open edX इस पेज "
 "का उपयोग कर सकें।"
 
+#: lms/templates/static_templates/copyright.html
+msgid "Copyright"
+msgstr "सर्वाधिकार"
+
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
@@ -16348,6 +16260,10 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Unsupported Components"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Deprecated Component"
 msgstr ""
 
 #: cms/templates/course_outline.html
