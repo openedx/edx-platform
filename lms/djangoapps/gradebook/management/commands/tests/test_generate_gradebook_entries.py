@@ -31,9 +31,9 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-
+        super(GenerateGradebookEntriesTests, self).setUp()
         # Turn off the signalling mechanism temporarily
-        #settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
+        settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
 
         # Create a couple courses to work with
         self.course = CourseFactory.create(
@@ -95,7 +95,8 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
         )
 
         # Create some users and enroll them
-        self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(3)]
+        self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(2)]
+        self.users.insert(0, self.user)
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
@@ -136,7 +137,6 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
             mock_request,
             problem.location,
             field_data_cache,
-            course.id
         )._xmodule
 
     @patch.dict(settings.FEATURES, {
