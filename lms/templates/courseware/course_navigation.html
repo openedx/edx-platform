@@ -35,7 +35,7 @@ include_proctoring_widget = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', Fals
 %>
 % if include_proctoring_widget:
   <%static:js group='proctoring'/>
-  % for template_name in ["proctored-exam-status", "proctored-exam-controls"]:
+  % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="courseware/${template_name}.underscore" />
     </script>
