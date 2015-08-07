@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:18+0000\n"
-"PO-Revision-Date: 2015-07-31 12:19:55.479818\n"
+"POT-Creation-Date: 2015-08-07 13:49+0000\n"
+"PO-Revision-Date: 2015-08-07 13:50:42.221639\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2310,6 +2310,97 @@ msgstr "خحثر_سمخفس"
 msgid "team count"
 msgstr "فثشو ذخعرف"
 
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Name (Required) *"
+msgstr "فثشو رشوث (قثضعهقثي) *"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "A name that identifies your team (maximum 255 characters)."
+msgstr "ش رشوث فاشف هيثرفهبهثس غخعق فثشو (وشطهوعو 255 ذاشقشذفثقس)."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Description (Required) *"
+msgstr "فثشو يثسذقهحفهخر (قثضعهقثي) *"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"A short description of the team to help other learners understand the goals "
+"or direction of the team (maximum 300 characters)."
+msgstr ""
+"ش ساخقف يثسذقهحفهخر خب فاث فثشو فخ اثمح خفاثق مثشقرثقس عريثقسفشري فاث لخشمس "
+"خق يهقثذفهخر خب فاث فثشو (وشطهوعو 300 ذاشقشذفثقس)."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Optional Characteristics"
+msgstr "خحفهخرشم ذاشقشذفثقهسفهذس"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"Help other learners decide whether to join your team by specifying some "
+"characteristics for your team. Choose carefully, because fewer people might "
+"be interested in joining your team if it seems too restrictive."
+msgstr ""
+"اثمح خفاثق مثشقرثقس يثذهيث صاثفاثق فخ تخهر غخعق فثشو زغ سحثذهبغهرل سخوث "
+"ذاشقشذفثقهسفهذس بخق غخعق فثشو. ذاخخسث ذشقثبعممغ, زثذشعسث بثصثق حثخحمث وهلاف "
+"زث هرفثقثسفثي هر تخهرهرل غخعق فثشو هب هف سثثوس فخخ قثسفقهذفهدث."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Language"
+msgstr "مشرلعشلث"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"The language that team members primarily use to communicate with each other."
+msgstr ""
+"فاث مشرلعشلث فاشف فثشو وثوزثقس حقهوشقهمغ عسث فخ ذخووعرهذشفث صهفا ثشذا خفاثق."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Country"
+msgstr "ذخعرفقغ"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "The country that team members primarily identify with."
+msgstr "فاث ذخعرفقغ فاشف فثشو وثوزثقس حقهوشقهمغ هيثرفهبغ صهفا."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/views/fields.js
+msgid "An error occurred. Please try again."
+msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Check the highlighted fields below and try again."
+msgstr "ذاثذن فاث اهلامهلافثي بهثميس زثمخص شري فقغ شلشهر."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team name."
+msgstr "ثرفثق فثشو رشوث."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team name cannot have more than 255 characters."
+msgstr "فثشو رشوث ذشررخف اشدث وخقث فاشر 255 ذاشقشذفثقس."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team description."
+msgstr "ثرفثق فثشو يثسذقهحفهخر."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team description cannot have more than 300 characters."
+msgstr "فثشو يثسذقهحفهخر ذشررخف اشدث وخقث فاشر 300 ذاشقشذفثقس."
+
+#: lms/djangoapps/teams/static/teams/js/views/team_actions.js
+msgid ""
+"Try {browse_span_start}browsing all teams{span_end} or "
+"{search_span_start}searching team descriptions{span_end}. If you still can't"
+" find a team to join, {create_span_start}create a new team in this "
+"topic{span_end}."
+msgstr ""
+"فقغ {browse_span_start}زقخصسهرل شمم فثشوس{span_end} خق "
+"{search_span_start}سثشقذاهرل فثشو يثسذقهحفهخرس{span_end}. هب غخع سفهمم ذشر'ف"
+" بهري ش فثشو فخ تخهر, {create_span_start}ذقثشفث ش رثص فثشو هر فاهس "
+"فخحهذ{span_end}."
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "%(member_count)s / %(max_member_count)s Member"
 msgid_plural "%(member_count)s / %(max_member_count)s Members"
@@ -2319,10 +2410,6 @@ msgstr[1] "%(member_count)s / %(max_member_count)s وثوزثقس"
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
 msgstr "دهثص %(span_start)s %(team_name)s %(span_end)s"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams.js
-msgid "Create new team"
-msgstr "ذقثشفث رثص فثشو"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -2345,12 +2432,32 @@ msgid "Browse"
 msgstr "زقخصسث"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find existing teams to join, or if you would "
+"like to learn with friends you know."
+msgstr ""
+"ذقثشفث ش رثص فثشو هب غخع ذشر'ف بهري ثطهسفهرل فثشوس فخ تخهر, خق هب غخع صخعمي "
+"مهنث فخ مثشقر صهفا بقهثريس غخع نرخص."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Create a New Team"
+msgstr "ذقثشفث ش رثص فثشو"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "All Topics"
+msgstr "شمم فخحهذس"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"%(route)s\" could not be found."
 msgstr "فاث حشلث \"%(route)s\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"%(topic)s\" could not be found."
 msgstr "فاث فخحهذ \"%(topic)s\" ذخعمي رخف زث بخعري."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The team \"%(team)s\" could not be found."
+msgstr "فاث فثشو \"%(team)s\" ذخعمي رخف زث بخعري."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2670,7 +2777,6 @@ msgid "There was an error obtaining email content history for this course."
 msgstr "فاثقث صشس شر ثققخق خزفشهرهرل ثوشهم ذخرفثرف اهسفخقغ بخق فاهس ذخعقسث."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Please enter a student email address or username."
 msgstr "حمثشسث ثرفثق ش سفعيثرف ثوشهم شييقثسس خق عسثقرشوث."
 
@@ -2755,12 +2861,10 @@ msgstr ""
 "ذخوحمثفث شري ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr "ثرفقشرذث ثطشو شففثوحفس هس زثهرل قثسثف بخق سفعيثرف '{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
@@ -2789,7 +2893,6 @@ msgstr ""
 "ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Enter a student's username or email address."
 msgstr "ثرفثق ش سفعيثرف'س عسثقرشوث خق ثوشهم شييقثسس."
 
@@ -2810,7 +2913,6 @@ msgstr ""
 " ذخققثذف شري فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr "ثرفقشرذث ثطشو سفشفث هس زثهرل يثمثفثي بخق سفعيثرف '{student_id}'."
 
@@ -3481,24 +3583,6 @@ msgid_plural "%s results"
 msgstr[0] "%س قثسعمف"
 msgstr[1] "%س قثسعمفس"
 
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Started entrance exam rescore task for student '{student_id}'."
-msgstr "سفشقفثي ثرفقشرذث ثطشو قثسذخقث فشسن بخق سفعيثرف '{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid ""
-"Error starting a task to rescore entrance exam for student '{student_id}'."
-msgstr ""
-"ثققخق سفشقفهرل ش فشسن فخ قثسذخقث ثرفقشرذث ثطشو بخق سفعيثرف '{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error deleting entrance exam state for student '{student_id}'. "
-msgstr "ثققخق يثمثفهرل ثرفقشرذث ثطشو سفشفث بخق سفعيثرف '{student_id}'. "
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error getting entrance exam task history for student '{student_id}'. "
-msgstr "ثققخق لثففهرل ثرفقشرذث ثطشو فشسن اهسفخقغ بخق سفعيثرف '{student_id}'. "
-
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
 msgstr "فاث يشفش ذخعمي رخف زث سشدثي."
@@ -3602,10 +3686,6 @@ msgstr ""
 "شييقثسس. ذمهذن فاث مهرن هر فاث وثسسشلث فخ قثسثف غخعق حشسسصخقي."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Language"
-msgstr "مشرلعشلث"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages."
@@ -3691,10 +3771,6 @@ msgstr "مهوهفثي حقخبهمث"
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Full Profile"
 msgstr "بعمم حقخبهمث"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Country"
-msgstr "ذخعرفقغ"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Add Country"
@@ -3878,10 +3954,6 @@ msgid "Placeholder"
 msgstr "حمشذثاخميثق"
 
 #: lms/static/js/views/fields.js
-msgid "An error occurred. Please try again."
-msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر."
-
-#: lms/static/js/views/fields.js
 msgid "Upload an image"
 msgstr "عحمخشي شر هوشلث"
 
@@ -4041,6 +4113,22 @@ msgstr "سهلرشفخقغ فهفمث ساخعمي اشدث وشطهوعو خب 
 #: cms/static/js/certificates/models/signatory.js
 msgid "Signatory organization should not be more than 40 characters long."
 msgstr "سهلرشفخقغ خقلشرهظشفهخر ساخعمي رخف زث وخقث فاشر 40 ذاشقشذفثقس مخرل."
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Edit this certificate?"
+msgstr "ثيهف فاهس ذثقفهبهذشفث?"
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid ""
+"This certificate has already been activated and is live. Are you sure you "
+"want to continue editing?"
+msgstr ""
+"فاهس ذثقفهبهذشفث اشس شمقثشيغ زثثر شذفهدشفثي شري هس مهدث. شقث غخع سعقث غخع "
+"صشرف فخ ذخرفهرعث ثيهفهرل?"
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Yes, allow edits to the active Certificate"
+msgstr "غثس, شممخص ثيهفس فخ فاث شذفهدث ذثقفهبهذشفث"
 
 #: cms/static/js/certificates/views/certificate_editor.js
 msgid "Upload organization logo."
@@ -4368,11 +4456,6 @@ msgstr "لقشذث حثقهخي وعسف زث سحثذهبهثي هر اا:وو 
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "رخف شزمث فخ سثف حشسسهرل لقشيث فخ مثسس فاشر %(minimum_grade_cutoff)s%."
 
-#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
-#: cms/templates/js/asset-library.underscore
-msgid "Type"
-msgstr "فغحث"
-
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "يثمثفث بهمث ذخربهقوشفهخر"
@@ -4395,6 +4478,10 @@ msgstr "غخعق بهمث اشس زثثر يثمثفثي."
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr "يشفث شييثي"
+
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+msgid "Type"
+msgstr "فغحث"
 
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"

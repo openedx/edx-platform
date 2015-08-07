@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:19+0000\n"
-"PO-Revision-Date: 2015-07-31 12:19:55.143329\n"
+"POT-Creation-Date: 2015-08-07 13:50+0000\n"
+"PO-Revision-Date: 2015-08-07 13:50:41.691914\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2416,10 +2416,7 @@ msgstr ""
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: common/lib/xmodule/xmodule/tests/test_course_metadata_utils.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
 msgstr "TBD Ⱡ'σяєм#"
@@ -5476,31 +5473,6 @@ msgstr ""
 msgid "Do not show bumper again"
 msgstr "Dö nöt shöw ßümpér ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Navigation"
-msgstr "Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "About these documents"
-msgstr "Àßöüt thésé döçüménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-msgid "Index"
-msgstr "Ìndéx Ⱡ'σяєм ιρѕ#"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/courseware/courses.html
-#: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/edxnotes/edxnotes.html
-msgid "Search"
-msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
-
-#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/static_templates/copyright.html
-msgid "Copyright"
-msgstr "Çöpýrïght Ⱡ'σяєм ιρѕυм ∂σł#"
-
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -6318,12 +6290,6 @@ msgstr ""
 msgid "Certificate is being created."
 msgstr "Çértïfïçäté ïs ßéïng çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: lms/djangoapps/courseware/features/video.py
-msgid "ERROR: No playable video sources found!"
-msgstr ""
-"ÉRRÖR: Nö pläýäßlé vïdéö söürçés föünd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
@@ -6547,7 +6513,6 @@ msgid "Delete User Results"
 msgstr "Délété Ûsér Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
 msgstr ""
 "Thé gït répö löçätïön shöüld énd wïth '.gït', änd ßé ä välïd ürl Ⱡ'σяєм "
@@ -6576,7 +6541,6 @@ msgstr ""
 "ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -6772,61 +6736,6 @@ msgstr "Mänüällý Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
 msgstr "Dätä Ìntégrïtý Érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/instructor_task_helpers.py
-msgid "Complete"
-msgstr "Çömplété Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/api.py
-msgid "This student (%s) will skip the entrance exam."
-msgstr ""
-"Thïs stüdént (%s) wïll skïp thé éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/instructor/tests/test_api.py
-#: lms/djangoapps/instructor/views/api.py
-msgid "This student (%s) is already allowed to skip the entrance exam."
-msgstr ""
-"Thïs stüdént (%s) ïs älréädý ällöwéd tö skïp thé éntränçé éxäm. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid ""
-"The enrollment code ({code}) was not found for the {course_name} course."
-msgstr ""
-"Thé énröllmént çödé ({code}) wäs nöt föünd för thé {course_name} çöürsé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been canceled. It can no longer be used."
-msgstr ""
-"Thïs énröllmént çödé häs ßéén çänçéléd. Ìt çän nö löngér ßé üséd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been marked as unused."
-msgstr ""
-"Thïs énröllmént çödé häs ßéén märkéd äs ünüséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The enrollment code has been restored."
-msgstr ""
-"Thé énröllmént çödé häs ßéén réstöréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/instructor/tests/test_registration_codes.py
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The redemption does not exist against enrollment code ({code})."
-msgstr ""
-"Thé rédémptïön döés nöt éxïst ägäïnst énröllmént çödé ({code}). Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
@@ -7240,6 +7149,18 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) will skip the entrance exam."
+msgstr ""
+"Thïs stüdént (%s) wïll skïp thé éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "This student (%s) is already allowed to skip the entrance exam."
+msgstr ""
+"Thïs stüdént (%s) ïs älréädý ällöwéd tö skïp thé éntränçé éxäm. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Certificate generation task for all students of this course has been "
 "started. You can view the status of the generation task in the \"Pending "
@@ -7426,6 +7347,10 @@ msgstr[0] "{num_emails} fäïléd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgstr[1] "{num_emails} fäïléd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "Complete"
+msgstr "Çömplété Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "Ìnçömplété Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -7571,6 +7496,37 @@ msgid ""
 msgstr ""
 "Fäïléd tö fïnd äný ßäçkgröünd täsks för çöürsé \"{course}\" änd mödülé "
 "\"{problem}\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid ""
+"The enrollment code ({code}) was not found for the {course_name} course."
+msgstr ""
+"Thé énröllmént çödé ({code}) wäs nöt föünd för thé {course_name} çöürsé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "This enrollment code has been canceled. It can no longer be used."
+msgstr ""
+"Thïs énröllmént çödé häs ßéén çänçéléd. Ìt çän nö löngér ßé üséd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "This enrollment code has been marked as unused."
+msgstr ""
+"Thïs énröllmént çödé häs ßéén märkéd äs ünüséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "The enrollment code has been restored."
+msgstr ""
+"Thé énröllmént çödé häs ßéén réstöréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/instructor/views/registration_codes.py
+msgid "The redemption does not exist against enrollment code ({code})."
+msgstr ""
+"Thé rédémptïön döés nöt éxïst ägäïnst énröllmént çödé ({code}). Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Could not find student matching identifier: {student_identifier}"
@@ -10415,6 +10371,13 @@ msgstr ""
 "ön öthér ärtïçlés whïçh mäý ör mäý nöt ßé ä gööd thïng. Ⱡ#"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html lms/templates/courseware/courses.html
+#: lms/templates/discussion/_thread_list_template.html
+#: lms/templates/edxnotes/edxnotes.html
+msgid "Search"
+msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -10985,7 +10948,6 @@ msgid "Blank"
 msgstr "Blänk Ⱡ'σяєм ιρѕ#"
 
 #: cms/djangoapps/contentstore/views/course.py
-#: cms/djangoapps/contentstore/views/tests/test_course_index.py
 msgid "Course has been successfully reindexed."
 msgstr ""
 "Çöürsé häs ßéén süççéssfüllý réïndéxéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -12773,20 +12735,18 @@ msgstr "Ré-süßsçrïßé Süççéssfül! Ⱡ'σяєм ιρѕυм ∂σłσя
 
 #: lms/templates/resubscribe.html
 msgid ""
-"You have re-enabled forum notification emails from {platform_name}. Click "
-"{dashboard_link_start}here{link_end} to return to your dashboard. "
+"You have re-enabled forum notification emails from {platform_name}. You may "
+"{dashboard_link_start}return to your dashboard{link_end}."
 msgstr ""
-"Ýöü hävé ré-énäßléd förüm nötïfïçätïön émäïls fröm {platform_name}. Çlïçk "
-"{dashboard_link_start}héré{link_end} tö rétürn tö ýöür däshßöärd.  Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αм#"
+"Ýöü hävé ré-énäßléd förüm nötïfïçätïön émäïls fröm {platform_name}. Ýöü mäý "
+"{dashboard_link_start}rétürn tö ýöür däshßöärd{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢#"
 
 #: lms/templates/seq_module.html
-#: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
 msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/seq_module.html
-#: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Next"
 msgstr "Néxt Ⱡ'σяєм ι#"
 
@@ -13135,19 +13095,18 @@ msgstr "Ûnsüßsçrïßé Süççéssfül! Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: lms/templates/unsubscribe.html
 msgid ""
 "You will no longer receive forum notification emails from {platform_name}. "
-"Click {dashboard_link_start}here{link_end} to return to your dashboard. If "
-"you did not mean to do this, click {undo_link_start}here{link_end} to re-"
-"subscribe."
+"You may {dashboard_link_start}return to your dashboard{link_end}. If you did"
+" not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
 msgstr ""
 "Ýöü wïll nö löngér réçéïvé förüm nötïfïçätïön émäïls fröm {platform_name}. "
-"Çlïçk {dashboard_link_start}héré{link_end} tö rétürn tö ýöür däshßöärd. Ìf "
-"ýöü dïd nöt méän tö dö thïs, çlïçk {undo_link_start}héré{link_end} tö ré-"
-"süßsçrïßé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
-" єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα#"
+"Ýöü mäý {dashboard_link_start}rétürn tö ýöür däshßöärd{link_end}. Ìf ýöü dïd"
+" nöt méän tö dö thïs, {undo_link_start}ýöü çän ré-süßsçrïßé{link_end}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕ#"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -13416,33 +13375,6 @@ msgstr "Çälçüläté Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Output"
 msgstr "Çälçülätör Öütpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "{course_number} {ccx_name} Cover Image"
-msgstr "{course_number} {ccx_name} Çövér Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr "Éndéd - {end_date} Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr "Stärtéd - {start_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr "Stärts - {start_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "View Archived Custom Course"
-msgstr "Vïéw Àrçhïvéd Çüstöm Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: lms/templates/ccx/_dashboard_ccx_listing.html
-msgid "View Custom Course"
-msgstr "Vïéw Çüstöm Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -14146,21 +14078,6 @@ msgstr ""
 "réléäsé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/courseware/courses.html
-msgid "Explore free courses from {university_name}."
-msgstr ""
-"Éxplöré fréé çöürsés fröm {university_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
-
-#: lms/templates/courseware/courses.html
-msgid "Explore courses from {platform_name}."
-msgstr ""
-"Éxplöré çöürsés fröm {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/courseware/courses.html
-msgid "{platform_name} Logo"
-msgstr "{platform_name} Lögö Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr "Lïst öf Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -14257,15 +14174,15 @@ msgstr "Ýöü äré nöt énrölléd ýét Ⱡ'σяєм ιρѕυм ∂σłσя 
 
 #: lms/templates/courseware/info.html
 msgid ""
-"You are not currently enrolled in this course. Sign up for it "
-"{link_start}here{link_end}!"
+"You are not currently enrolled in this course. {link_start}Sign up "
+"now!{link_end}"
 msgstr ""
-"Ýöü äré nöt çürréntlý énrölléd ïn thïs çöürsé. Sïgn üp för ït "
-"{link_start}héré{link_end}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Ýöü äré nöt çürréntlý énrölléd ïn thïs çöürsé. {link_start}Sïgn üp "
+"nöw!{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
-msgstr "Vïéw Ûpdätés ïn Stüdïö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid "View Updates in {studio_name}"
+msgstr "Vïéw Ûpdätés ïn {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
@@ -14999,6 +14916,18 @@ msgid "Enrolled as: "
 msgstr "Énrölléd äs:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Ended - {end_date}"
+msgstr "Éndéd - {end_date} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr "Stärtéd - {start_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr "Stärts - {start_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -15491,26 +15420,6 @@ msgstr ""
 #: lms/templates/discussion/user_profile.html
 msgid "User Profile"
 msgstr "Ûsér Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/discussion/mustache/_pagination.mustache
-msgid "…"
-msgstr "… Ⱡ#"
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr "änönýmöüs Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "This thread is closed."
-msgstr "Thïs thréäd ïs çlöséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
-msgstr "Vïéw dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/discussion/mustache/_user_profile.mustache
-msgid "Active Threads"
-msgstr "Àçtïvé Thréäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -19197,6 +19106,10 @@ msgstr ""
 "Thïs pägé léft ïnténtïönällý ßlänk. Ìt ïs nöt üséd ßý édx.örg ßüt ïs léft "
 "héré för pössïßlé üsé ßý ïnställätïöns öf Öpén édX. Ⱡ'σяєм #"
 
+#: lms/templates/static_templates/copyright.html
+msgid "Copyright"
+msgstr "Çöpýrïght Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
@@ -20273,6 +20186,10 @@ msgstr ""
 #: cms/templates/course_outline.html
 msgid "Unsupported Components"
 msgstr "Ûnsüppörtéd Çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/course_outline.html
+msgid "Deprecated Component"
+msgstr "Dépréçätéd Çömpönént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/course_outline.html
 msgid ""

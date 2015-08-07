@@ -11,6 +11,7 @@
 # Abdullatif El Ali <abdullatifalali@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
+# Ahmed Jazzar <ajazzar@edraak.org>, 2015
 # ayshibly <ayshibly@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # br1ng <ibnalawam@gmail.com>, 2014
@@ -55,6 +56,7 @@
 # Translators:
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # qrfahasan <ahasan@qrf.org>, 2014
+# Ahmed Jazzar <ajazzar@edraak.org>, 2015
 # mohammad hamdi <babrica@hotmail.com>, 2014
 # may <may@qordoba.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
@@ -67,6 +69,7 @@
 # 
 # Translators:
 # Abdallah Nassif <abdoosh00@gmail.com>, 2014
+# Ahmed Jazzar <ajazzar@edraak.org>, 2015
 # may <may@qordoba.com>, 2014
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
@@ -76,10 +79,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:10+0000\n"
-"PO-Revision-Date: 2015-07-29 14:54+0000\n"
-"Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
-"Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
+"POT-Creation-Date: 2015-08-07 13:41+0000\n"
+"PO-Revision-Date: 2015-08-06 09:32+0000\n"
+"Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
+"Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2436,6 +2439,87 @@ msgstr "open_slots"
 msgid "team count"
 msgstr "عدد أعضاء الفريق"
 
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Name (Required) *"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "A name that identifies your team (maximum 255 characters)."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Description (Required) *"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"A short description of the team to help other learners understand the goals "
+"or direction of the team (maximum 300 characters)."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Optional Characteristics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"Help other learners decide whether to join your team by specifying some "
+"characteristics for your team. Choose carefully, because fewer people might "
+"be interested in joining your team if it seems too restrictive."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Language"
+msgstr "اللغة"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"The language that team members primarily use to communicate with each other."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Country"
+msgstr "البلد"
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "The country that team members primarily identify with."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/views/fields.js
+msgid "An error occurred. Please try again."
+msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Check the highlighted fields below and try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team name."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team name cannot have more than 255 characters."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team description."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team description cannot have more than 300 characters."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_actions.js
+msgid ""
+"Try {browse_span_start}browsing all teams{span_end} or "
+"{search_span_start}searching team descriptions{span_end}. If you still can't"
+" find a team to join, {create_span_start}create a new team in this "
+"topic{span_end}."
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "%(member_count)s / %(max_member_count)s Member"
 msgid_plural "%(member_count)s / %(max_member_count)s Members"
@@ -2449,10 +2533,6 @@ msgstr[5] "%(member_count)s / %(max_member_count)s عضو"
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
 msgstr "مشاهدة %(span_start)s %(team_name)s %(span_end)s"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams.js
-msgid "Create new team"
-msgstr "إنشاء فريق جديد"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -2475,12 +2555,30 @@ msgid "Browse"
 msgstr "تصفّح"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find existing teams to join, or if you would "
+"like to learn with friends you know."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Create a New Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "All Topics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"%(route)s\" could not be found."
 msgstr "نأسف لتعذّر إيجاد الصفحة \"%(route)s\"."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"%(topic)s\" could not be found."
 msgstr "نأسف لتعذّر إيجاد الموضوع \"%(topic)s\"."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The team \"%(team)s\" could not be found."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2818,7 +2916,6 @@ msgstr ""
 "لهذا المساق."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Please enter a student email address or username."
 msgstr "يُرجى إدخال اسم المستخدم الخاص بالطالب أو عنوان بريده الإلكتروني."
 
@@ -2902,12 +2999,10 @@ msgstr ""
 "إدخال هذين الرقمين. "
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr "جاري إعادة ضبط محاولات امتحان الدخول للطالب '{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
@@ -2934,7 +3029,6 @@ msgstr ""
 "يُرجى التأكّد من وجود مسائل في امتحان الدخول ومن صحّة رقم الطالب."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Enter a student's username or email address."
 msgstr "يُرجى إدخال اسم الطالب أو عنوان بريده الإلكتروني."
 
@@ -2953,7 +3047,6 @@ msgstr ""
 "الإلكتروني ثمّ المحاولة مجدّدًا."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr "جاري حذف حالة امتحان الدخول للطالب '{student_id}'."
 
@@ -3650,25 +3743,6 @@ msgstr[3] "%s نتائج"
 msgstr[4] "%s نتيجة"
 msgstr[5] "%s نتائج"
 
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Started entrance exam rescore task for student '{student_id}'."
-msgstr "بدء مهمّة إعادة تقييم امتحان الدخول للطالب '{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid ""
-"Error starting a task to rescore entrance exam for student '{student_id}'."
-msgstr ""
-"نأسف لحدوث خطأ في بدء مهمّة إعادة تقييم امتحان الدخول للطالب '{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error deleting entrance exam state for student '{student_id}'. "
-msgstr "نأسف لحدوث خطأ أثناء حذف حالة امتحان الدخول للطالب '{student_id}'."
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error getting entrance exam task history for student '{student_id}'. "
-msgstr ""
-"نأسف لتعذّر الحصول على تاريخ مهامّ امتحان الدخول للطالب '{student_id}'."
-
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
 msgstr "تعذّر حفظ البيانات."
@@ -3686,13 +3760,13 @@ msgid ""
 "Password reset email sent. Follow the link in the email to change your "
 "password."
 msgstr ""
-"بعثنا لك رسالة عبر البريد الإلكتروني لإعادة ضبط كلمة المرور. يُرجى اتّباع "
-"الرابط الوارد في الرسالة لتغيير كلمة مرورك. "
+"تم إرسال بريد إلكتروني لتغيير كلمة السر. يُرجى اتّباع الرابط الوارد في "
+"الرسالة لاستكمال العملية . "
 
 #: lms/static/js/student_account/account.js
 msgid "We weren't able to send you a password reset email."
 msgstr ""
-"عذرًا، لم نتمكّن من مراسلتك عبر البريد الإلكتروني لإعادة ضبط كلمة المرور. "
+"عذرًا، لم نتمكّن من مراسلتك عبر البريد الإلكتروني لإعادة ضبط كلمة السر. "
 
 #: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
@@ -3752,28 +3826,24 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
 msgid "Password"
-msgstr "كلمة المرور"
+msgstr "كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset your Password"
-msgstr "إعادة ضبط كلمة المرور"
+msgstr "إعادة ضبط كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
-msgstr "إعادة ضبط كلمة المرور"
+msgstr "إعادة ضبط كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "When you click \"Reset Password\", a message will be sent to your email "
 "address. Click the link in the message to reset your password."
 msgstr ""
-"عندما تنقر على \"إعادة ضبط كلمة المرور\"، ستصلك رسالة إلى بريدك الإلكتروني. "
-"يُرجى عندها النقر على الرابط الموجود في الرسالة لتغيّر كلمة المرور."
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Language"
-msgstr "اللغة"
+"عندما تنقر على \"إعادة ضبط كلمة السر\"، ستصل رسالة لبريدك الإلكتروني. يُرجى "
+"عندها النقر على الرابط الموجود في الرسالة لتغيّرها."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -3862,10 +3932,6 @@ msgstr "ملفّي الشخصي المحدود"
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Full Profile"
 msgstr "كامل ملفّي الشخصي"
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Country"
-msgstr "البلد"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Add Country"
@@ -4053,10 +4119,6 @@ msgid "Placeholder"
 msgstr "موضع الفلاش"
 
 #: lms/static/js/views/fields.js
-msgid "An error occurred. Please try again."
-msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
-
-#: lms/static/js/views/fields.js
 msgid "Upload an image"
 msgstr "تحميل صورة"
 
@@ -4229,6 +4291,20 @@ msgstr "لا يجب أن يزيد عدد أحرف لقب الموقّع عن 40 
 #: cms/static/js/certificates/models/signatory.js
 msgid "Signatory organization should not be more than 40 characters long."
 msgstr "لا يجب أن يزيد عدد أحرف اسم شركة الموقّع عن 40 حرفًا."
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Edit this certificate?"
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid ""
+"This certificate has already been activated and is live. Are you sure you "
+"want to continue editing?"
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Yes, allow edits to the active Certificate"
+msgstr ""
 
 #: cms/static/js/certificates/views/certificate_editor.js
 msgid "Upload organization logo."
@@ -4551,11 +4627,6 @@ msgstr "يجب تحديد فترة السماح بصيغة HH:MM."
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "لم يمكن تحديد درجة النجاح عند أقلّ من %(minimum_grade_cutoff)s%."
 
-#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
-#: cms/templates/js/asset-library.underscore
-msgid "Type"
-msgstr "النوع"
-
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "تأكيد حذف الملف"
@@ -4578,6 +4649,10 @@ msgstr "جرى حذف ملفّك."
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr "تاريخ الإضافة "
+
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+msgid "Type"
+msgstr "النوع"
 
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
@@ -5418,7 +5493,7 @@ msgstr "البداية"
 
 #: lms/templates/discovery/filter_bar.underscore
 msgid "Clear All"
-msgstr ""
+msgstr "امسح الحقول"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
@@ -5719,7 +5794,7 @@ msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة."
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
-msgstr "هل نسيت كلمة المرور؟"
+msgstr "هل نسيت كلمة السر؟"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -5772,7 +5847,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
-msgstr "أرسلنا رسالة بالبريد الإلكتروني لضبط كلمة المرور."
+msgstr "لقد أرسلنا بريداً إلكترونياً لك لتغيير كلمة السر."
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -5795,13 +5870,12 @@ msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
 msgstr ""
-"يُرجى منك تسجيل دخولك باستخدام عنوان بريدك الإلكتروني وكلمة المرور، أو "
-"استخدام أحد المزوِّدين المذكورين أدناه."
+"يُرجى تسجيل الدخول باستخدام عنوان بريدك الإلكتروني وكلمة السر، أو من خلال "
+"أحد المزوِّدين المذكورين أدناه."
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
-msgstr ""
-"يُرجى منك تسجيل دخولك هنا باستخدام عنوان بريدك الإلكتروني وكلمة المرور."
+msgstr "يُرجى تسجيل دخولك باستخدام عنوان بريدك الإلكتروني وكلمة السر."
 
 #: lms/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
@@ -5809,7 +5883,7 @@ msgstr "إذا لم تكن تملك حسابًا بعد، يُرجى استخد�
 
 #: lms/templates/student_account/login.underscore
 msgid "or sign in with"
-msgstr "أو تسجيل الدخول من خلال"
+msgstr "أو سجّل الدخول باستخدام"
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in with %(providerName)s"
@@ -5822,7 +5896,7 @@ msgstr "استخدام بياناتي لدى المؤسّسة/ الحرم الج
 
 #: lms/templates/student_account/login.underscore
 msgid "New to %(platformName)s?"
-msgstr "هل تستخدم %(platformName)s لأوّل مرّة؟"
+msgstr "هل أنت جديد على %(platformName)s؟ أنشئ حسابًا جديدًا اﻵن."
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an account"
@@ -5847,7 +5921,7 @@ msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
-msgstr "إعادة ضبط كلمة السر"
+msgstr "تغيير كلمة السر"
 
 #: lms/templates/student_account/register.underscore
 msgid "We couldn't create your account."
@@ -5875,11 +5949,11 @@ msgstr "إنشاء حساب باستخدام %(providerName)s."
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr "أو إنشاء حساب جديد هنا"
+msgstr "أو أنشئ حساباً جديداً باستخدام"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create a new account"
-msgstr "إنشاء حساب جديد"
+msgstr "أنشئ حسابًا جديدًا"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create your account"
@@ -5891,7 +5965,7 @@ msgstr "حقل مطلوب"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "هل لديك حساب من قبل؟"
+msgstr "لديك حساب على إدراك؟"
 
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "You are currently sharing a limited profile."
@@ -7220,6 +7294,8 @@ msgid ""
 "certain cases, students can be granted allowances that give them extra time "
 "to complete the exam."
 msgstr ""
+"يرى الطلّاب تحذيرًا عندما يتبقى 20% و 5% من الوقت المقرر. في بعض الحالات، "
+"يمكن للطلاب أن يحصلوا على وقت إضافي  لمساعدتهم في إنهاء الاختبار."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "This exam is proctored"

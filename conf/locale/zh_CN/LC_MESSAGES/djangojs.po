@@ -75,6 +75,7 @@
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # Rom, 2015
 # ruiruillp <gaier1993@163.com>, 2015
+# San <github@zhujunsan.net>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
@@ -118,6 +119,7 @@
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # peipeixiang <peipei0903@gmail.com>, 2015
 # Rom, 2015
+# San <github@zhujunsan.net>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # 竹轩 <fmyzjs@gmail.com>, 2014
@@ -125,10 +127,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-07-31 12:10+0000\n"
-"PO-Revision-Date: 2015-07-27 13:49+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
+"POT-Creation-Date: 2015-08-07 13:41+0000\n"
+"PO-Revision-Date: 2015-08-07 13:49+0000\n"
+"Last-Translator: San <github@zhujunsan.net>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2339,6 +2341,87 @@ msgstr ""
 msgid "team count"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Name (Required) *"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "A name that identifies your team (maximum 255 characters)."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team Description (Required) *"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"A short description of the team to help other learners understand the goals "
+"or direction of the team (maximum 300 characters)."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Optional Characteristics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"Help other learners decide whether to join your team by specifying some "
+"characteristics for your team. Choose carefully, because fewer people might "
+"be interested in joining your team if it seems too restrictive."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Language"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid ""
+"The language that team members primarily use to communicate with each other."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Country"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "The country that team members primarily identify with."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/static/js/views/fields.js
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Check the highlighted fields below and try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team name."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team name cannot have more than 255 characters."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Enter team description."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+msgid "Team description cannot have more than 300 characters."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_actions.js
+msgid ""
+"Try {browse_span_start}browsing all teams{span_end} or "
+"{search_span_start}searching team descriptions{span_end}. If you still can't"
+" find a team to join, {create_span_start}create a new team in this "
+"topic{span_end}."
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "%(member_count)s / %(max_member_count)s Member"
 msgid_plural "%(member_count)s / %(max_member_count)s Members"
@@ -2346,10 +2429,6 @@ msgstr[0] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams.js
-msgid "Create new team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2371,11 +2450,29 @@ msgid "Browse"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"Create a new team if you can't find existing teams to join, or if you would "
+"like to learn with friends you know."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Create a New Team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "All Topics"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"%(route)s\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"%(topic)s\" could not be found."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "The team \"%(team)s\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
@@ -2673,7 +2770,6 @@ msgid "There was an error obtaining email content history for this course."
 msgstr "存在能获取该课程邮件历史内容的错误"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Please enter a student email address or username."
 msgstr "请输入学生的邮件地址或用户名。"
 
@@ -2748,12 +2844,10 @@ msgstr ""
 "是完整且正确的。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr "正在重置学生“{student_id}”的入学考试尝试次数。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
@@ -2774,7 +2868,6 @@ msgid ""
 msgstr "为学生“{student_id}”开始运行重新计算入学考试分数的任务时出错了，请确认该入学考试中有题目并且学生编号无误。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Enter a student's username or email address."
 msgstr "输入学生的用户名或电子邮件地址。"
 
@@ -2791,7 +2884,6 @@ msgid ""
 msgstr "发生了一个错误，请确认学生用户名或电子邮件地址正确后再试一次。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr "学生“{student_id}”的入学考试的状态已被删除。"
 
@@ -3428,23 +3520,6 @@ msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s个结果"
 
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Started entrance exam rescore task for student '{student_id}'."
-msgstr "已启动为学生“{student_id}”重新计算入学考试分数的任务。"
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid ""
-"Error starting a task to rescore entrance exam for student '{student_id}'."
-msgstr "为学生“{student_id}”开始运行重新计算入学考试分数的任务时出错了。"
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error deleting entrance exam state for student '{student_id}'. "
-msgstr "删除学生“{student_id}”的入学考试状态时出错了。"
-
-#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
-msgid "Error getting entrance exam task history for student '{student_id}'. "
-msgstr "获取学生“{student_id}”的入学考试任务历史时出错了。"
-
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
 msgstr "该数据无法保存。"
@@ -3536,10 +3611,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Language"
-msgstr ""
-
-#: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages."
@@ -3621,10 +3692,6 @@ msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "Full Profile"
-msgstr ""
-
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Country"
 msgstr ""
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
@@ -3798,10 +3865,6 @@ msgid "Placeholder"
 msgstr ""
 
 #: lms/static/js/views/fields.js
-msgid "An error occurred. Please try again."
-msgstr ""
-
-#: lms/static/js/views/fields.js
 msgid "Upload an image"
 msgstr ""
 
@@ -3949,6 +4012,20 @@ msgstr ""
 
 #: cms/static/js/certificates/models/signatory.js
 msgid "Signatory organization should not be more than 40 characters long."
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Edit this certificate?"
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid ""
+"This certificate has already been activated and is live. Are you sure you "
+"want to continue editing?"
+msgstr ""
+
+#: cms/static/js/certificates/views/certificate_details.js
+msgid "Yes, allow edits to the active Certificate"
 msgstr ""
 
 #: cms/static/js/certificates/views/certificate_editor.js
@@ -4256,11 +4333,6 @@ msgstr "宽限时间必须以 HH:MM 格式设定。"
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 
-#: cms/static/js/spec/views/assets_spec.js cms/static/js/views/assets.js
-#: cms/templates/js/asset-library.underscore
-msgid "Type"
-msgstr "类型"
-
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "删除文件确认"
@@ -4284,6 +4356,10 @@ msgstr "您的文件已经被删除"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr "添加日期"
+
+#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+msgid "Type"
+msgstr "类型"
 
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
