@@ -16,6 +16,7 @@ from ...fixtures.discussion import (
 )
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
+from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
 
@@ -40,7 +41,9 @@ class TeamsTabBase(UniqueCourseTest):
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
                 'name': 'Team {}'.format(i),
-                'description': 'Description {}'.format(i)
+                'description': 'Description {}'.format(i),
+                'language': 'aa',
+                'country': 'AF'
             }
             response = self.course_fixture.session.post(
                 LMS_BASE_URL + '/api/team/v0/teams/',
@@ -656,6 +659,8 @@ class CreateTeamTest(TeamsTabBase):
         When I fill all the fields present with appropriate data
         And I click Create button
         Then I should see the page for my team
+        And I should see the message that says
+        "You are member of this team"
         """
         self.verify_and_navigate_to_create_team_page()
 
@@ -667,6 +672,7 @@ class CreateTeamTest(TeamsTabBase):
         team_page.wait_for_page()
         self.assertEqual(team_page.team_name, self.team_name)
         self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
+        self.assertEqual(team_page.team_membership_text, 'You are a member of this team.')
 
     def test_user_can_cancel_the_team_creation(self):
         """
@@ -693,9 +699,37 @@ class TeamPageTest(TeamsTabBase):
     def setUp(self):
         super(TeamPageTest, self).setUp()
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
-        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
-        self.team = self.create_teams(self.topic, 1)[0]
-        self.team_page = TeamPage(self.browser, self.course_id, self.team)
+
+    def _team_config(
+            self,
+            max_team_size=10,
+            membership_team_index=0,
+            visit_team_index=0,
+            create_membership=True,
+            another_user=False):
+        """
+        Set team configuration.
+
+        Arguments:
+            max_team_size (int): number of users a team can have
+            membership_team_index (int): index of team user will join
+            visit_team_index (int): index of team user will visit
+            create_membership (bool): whether to create membership or not
+            another_user (bool): another user to visit a team
+        """
+        #pylint: disable=attribute-defined-outside-init
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': max_team_size, 'topics': [self.topic]}
+        )
+        self.teams = self.create_teams(self.topic, 2)
+
+        if create_membership:
+            self.create_membership(self.user_info['username'], self.teams[membership_team_index]['id'])
+
+        if another_user:
+            AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.team_page = TeamPage(self.browser, self.course_id, self.teams[visit_team_index])
 
     def setup_thread(self):
         """
@@ -703,7 +737,7 @@ class TeamPageTest(TeamsTabBase):
         """
         thread = Thread(
             id="test_thread_{}".format(uuid4().hex),
-            commentable_id=self.team['discussion_topic_id'],
+            commentable_id=self.teams[0]['discussion_topic_id'],
             body="Dummy text body."
         )
         thread_fixture = MultipleThreadFixture([thread])
@@ -732,7 +766,7 @@ class TeamPageTest(TeamsTabBase):
         """
         thread = self.setup_thread()
         self.team_page.visit()
-        self.assertEqual(self.team_page.discussion_id, self.team['discussion_topic_id'])
+        self.assertEqual(self.team_page.discussion_id, self.teams[0]['discussion_topic_id'])
         discussion = self.team_page.discussion_page
         self.assertTrue(discussion.is_browser_on_page())
         self.assertTrue(discussion.is_discussion_expanded())
@@ -754,7 +788,7 @@ class TeamPageTest(TeamsTabBase):
         And I should see the existing thread
         And I should see controls to change the state of the discussion
         """
-        self.create_membership(self.user_info['username'], self.team['id'])
+        self._team_config()
         self.verify_teams_discussion_permissions(True)
 
     @ddt.data(True, False)
@@ -770,10 +804,156 @@ class TeamPageTest(TeamsTabBase):
         And I should see the team's thread
         And I should not see controls to change the state of the discussion
         """
+        self._team_config(create_membership=False)
         self.setup_discussion_user(staff=is_staff)
         self.verify_teams_discussion_permissions(False)
 
     @ddt.data('Moderator', 'Community TA', 'Administrator')
     def test_discussion_privileged(self, role):
+        self._team_config(create_membership=False)
         self.setup_discussion_user(role=role)
         self.verify_teams_discussion_permissions(True)
+
+    def assert_team_details_for_members(self, num_members, max_size=10, invite_text=''):
+        """
+        Verifies that team members can see all the info. present on detail page.
+
+        Arguments:
+            num_members (int): number of users in a team
+            max_size (int): number of users a team can have
+            invite_text (str): help text for invite link.
+        """
+        self.assertEqual(self.team_page.team_membership_text, 'You are a member of this team.')
+        # TODO change location and language when functionality implemented.
+        self.assertEqual(
+            self.team_page.team_details_info, {
+                'team_members_present': True if num_members else False,
+                'team_capacity': '{num_members} / {max_size} {members_text}'.format(
+                    num_members=num_members,
+                    max_size=max_size,
+                    members_text='Member' if num_members == max_size else 'Members'
+                ),
+                'team_location': 'AF',
+                'team_language': 'aa'
+            }
+        )
+        self.assertEqual(self.team_page.team_members, num_members)
+        self.assertTrue(self.team_page.team_leave_link_present)
+        self.assertTrue(self.team_page.team_invite_section_present)
+        self.assertEqual(self.team_page.team_invite_help_text, invite_text)
+
+    def assert_team_details_for_non_members(self, num_members, max_size=10):
+        """
+        Verifies that Non team members can see only limited info.
+
+        Arguments:
+            num_members (int): number of users in a team
+        """
+        self.assertEqual(self.team_page.team_membership_text, '')
+        # TODO change location and language when functionality implemented.
+        self.assertEqual(
+            self.team_page.team_details_info, {
+                'team_members_present': True if num_members else False,
+                'team_capacity': '{num_members} / 10 {members_text}'.format(
+                    num_members=num_members,
+                    members_text='Member' if num_members == max_size else 'Members'
+                ),
+                'team_location': 'AF',
+                'team_language': 'aa'
+            }
+        )
+        self.assertFalse(self.team_page.team_leave_link_present)
+        self.assertFalse(self.team_page.team_invite_section_present)
+
+    def test_team_member_can_see_full_team_details(self):
+        """
+        Scenario: Team member can see full info for team.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When I visit the Team page for that team
+        Then I should see a full team detail
+        And I should see the team members
+        And I should see the team membership text
+        And I should see the language & country
+        And I should see the Leave Team and Invite Team
+        """
+        self._team_config()
+        self.team_page.visit()
+
+        self.assert_team_details_for_members(
+            num_members=1,
+            invite_text='Send this link to friends so that they can join too.'
+        )
+
+    def test_other_users_can_see_limited_team_details(self):
+        """
+        Scenario: Users who are not member of this team can only see limited info for this team.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am not a member
+        When I visit the Team page for that team
+        Then I should not see full team detail
+        And I should see the team members
+        And I should not see the team membership text
+        And I should not see the Leave Team and Invite Team
+        """
+        self._team_config(create_membership=False)
+        self.team_page.visit()
+
+        self.assert_team_details_for_non_members(num_members=0)
+
+    def test_user_can_navigate_to_members_profile_page(self):
+        """
+        Scenario: User can navigate to profile page via team member profile image.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When I visit the Team page for that team
+        Then I should see a profile image for team member
+        When I click on profile image
+        Then I should be taken to the user's profile page
+        And I should see the username on profile page
+        """
+        self._team_config()
+        self.team_page.visit()
+
+        self.team_page.click_users_profile_image()
+
+        learner_profile_page = LearnerProfilePage(self.browser, self.team_page.username)
+        learner_profile_page.wait_for_page()
+        learner_profile_page.wait_for_field('username')
+        self.assertTrue(learner_profile_page.field_is_visible('username'))
+
+    def test_team_member_cannot_see_invite_link_if_team_full(self):
+        """
+        Scenario: Team members should not see the invite link if the team is full.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When I visit the Team page for that team
+        Then I should see the "team is full" message
+        And I should not see the invite link
+        """
+        self._team_config(max_team_size=1)
+        self.team_page.visit()
+
+        self.assert_team_details_for_members(
+            num_members=1,
+            max_size=1,
+            invite_text='No invitations are available. This team is full.'
+        )
+
+    def test_team_member_can_see_invite_link(self):
+        """
+        Scenario: Team members should see the invite link if the team has capacity.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When I visit the Team page for that team
+        Then I should see the invite link help message
+        And I should see the invite link that can be selected
+        """
+        self._team_config()
+        self.team_page.visit()
+
+        self.assert_team_details_for_members(
+            num_members=1,
+            invite_text='Send this link to friends so that they can join too.'
+        )
+        self.assertEqual(self.team_page.team_invite_url, '{0}?invite=true'.format(self.team_page.url))
