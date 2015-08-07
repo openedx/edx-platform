@@ -40,8 +40,7 @@
         teamsUrl: '${ teams_url }',
         maxTeamSize: ${ course.teams_max_size },
         languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
-        countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) },
-        requestUsername: '${ request_username }'
+        countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) }
     });
 </%static:require_module>
 </%block>

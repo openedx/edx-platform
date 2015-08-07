@@ -45,7 +45,6 @@
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
-                    this.requestUsername = options.requestUsername;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
@@ -216,7 +215,7 @@
                                     model: team,
                                     readOnly: readOnly,
                                     maxTeamSize: self.maxTeamSize,
-                                    requestUsername: self.requestUsername,
+                                    requestUsername: self.$el.data('username'),
                                     countries: self.countries,
                                     languages: self.languages
                                 });
