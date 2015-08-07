@@ -45,6 +45,8 @@ from lms.envs.common import (
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
+    # Default Course Image static path
+    DEFAULT_COURSE_ABOUT_IMAGE_URL,
 )
 from path import path
 from warnings import simplefilter
