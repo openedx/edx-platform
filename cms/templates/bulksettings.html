@@ -81,7 +81,14 @@
                                         %>
                                         <td width="52%" class="problem-title"><strong><a href="${problem_settings['url']}">${problem_title}</a></strong></td>
                                         % for setting_type in setting_type_list_map['problem_setting_types']:
-                                            <td width="8%">${problem_settings[setting_type]}</td>
+                                            <%
+                                            problem_setting_type = problem_settings[setting_type]
+                                            if setting_type == 'weight':
+                                                problem_setting_type = problem_settings[setting_type] or '1'
+                                            elif setting_type == 'max_attempts':
+                                                problem_setting_type = problem_settings[setting_type] or 'unlimited'
+                                            %>
+                                            <td width="8%">${problem_setting_type}</td>
                                         % endfor
                                         <td width="8%"></td> <!-- Padding-->
                                     </tr>
