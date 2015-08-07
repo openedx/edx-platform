@@ -76,7 +76,10 @@
 
                                 % for problem_settings in unit_settings['children']:
                                     <tr class="problem-header">
-                                        <td width="52%" class="problem-title"><strong><a href="${problem_settings['url']}">${problem_settings['name']}</a></strong></td>
+                                        <%
+                                        problem_title = problem_settings['name'] or 'Unnamed Problem'
+                                        %>
+                                        <td width="52%" class="problem-title"><strong><a href="${problem_settings['url']}">${problem_title}</a></strong></td>
                                         % for setting_type in setting_type_list_map['problem_setting_types']:
                                             <td width="8%">${problem_settings[setting_type]}</td>
                                         % endfor
