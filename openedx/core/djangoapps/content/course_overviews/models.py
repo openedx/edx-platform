@@ -15,8 +15,6 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
-from ccx_keys.locator import CCXLocator
-
 
 class CourseOverview(TimeStampedModel):
     """
@@ -102,26 +100,17 @@ class CourseOverview(TimeStampedModel):
         except ValueError:
             lowest_passing_grade = None
 
-        display_name = course.display_name
-        start = course.start
-        end = course.end
-        if isinstance(course.id, CCXLocator):
-            from ccx.utils import get_ccx_from_ccx_locator  # pylint: disable=import-error
-            ccx = get_ccx_from_ccx_locator(course.id)
-            display_name = ccx.display_name
-            start = ccx.start
-            end = ccx.due
-
         return cls(
             version=cls.VERSION,
+
             id=course.id,
             _location=course.location,
-            display_name=display_name,
+            display_name=course.display_name,
             display_number_with_default=course.display_number_with_default,
             display_org_with_default=course.display_org_with_default,
 
-            start=start,
-            end=end,
+            start=course.start,
+            end=course.end,
             advertised_start=course.advertised_start,
 
             course_image_url=course_image_url(course),
