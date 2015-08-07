@@ -88,17 +88,17 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
     """ Create user partitions with provided partition scheme and tag credit
     blocks for the given course with those user partitions.
 
+    Course and its all block will be updated with their respective last
+    editor's `edited_by`.
+
     Args:
         course_key (CourseKey): Identifier for the course
         partition_scheme (str): Name of the user partition scheme
 
     """
     # TODO: Refactor code (move code to proper files e.g., 'common/lib/xmodule/xmodule/partitions/partitions.py') in once ICRV access control functionality is complete
-
-    # TODO: Dynamically update user_id (actual course publisher)
-    user_id = 1
-
     # TODO: Increase logging (add logging for errors and success)
+
     # get user partition with provided partition scheme
     user_partition = UserPartition.get_scheme(partition_scheme)
     if user_partition is None:
@@ -120,10 +120,10 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
             new_user_partitions.append(group_configuration)
 
             # update the 'group_access' of provided xblock 'block' and its ancestor.
-            _update_content_group_access(user_id, block, group_configuration)
+            _update_content_group_access(block, group_configuration)
 
     # Now add all newly created partition in 'user_partitions' field of course
-    _update_course_user_partitions(course_key, user_id, new_user_partitions)
+    _update_course_user_partitions(course_key, new_user_partitions)
 
 
 def _access_dict(group_configuration, access_groups_id_list):
@@ -145,11 +145,10 @@ def _access_dict(group_configuration, access_groups_id_list):
     return access_dict
 
 
-def _update_content_group_access(user_id, block, group_configuration):
+def _update_content_group_access(block, group_configuration):
     """ Update the 'group_access' of provided xblock 'block' and its ancestor.
 
     Args:
-        user_id (Int): ID of user who has publish the course
         block (xblock): XBlock mixin
         group_configuration  (UserPartition): UserPartition object
 
@@ -159,7 +158,8 @@ def _update_content_group_access(user_id, block, group_configuration):
     # 'group_configuration'
     access_groups_id_list = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
     block.group_access = _access_dict(group_configuration, access_groups_id_list)
-    modulestore().update_item(block, user_id)
+    # save updated block with the last editor
+    modulestore().update_item(block, block.edited_by)
 
     # now for course content access control, add groups
     # 'non_verified' and 'verified_allow' in 'group_access' field of
@@ -182,10 +182,11 @@ def _update_content_group_access(user_id, block, group_configuration):
         ancestor_for_update = grandparent_block
 
     ancestor_for_update.group_access = access_dict
-    modulestore().update_item(ancestor_for_update, user_id)
+    # save updated block with the last editor
+    modulestore().update_item(ancestor_for_update, ancestor_for_update.edited_by)
 
 
-def _update_course_user_partitions(course_key, user_id, new_user_partitions):
+def _update_course_user_partitions(course_key, new_user_partitions):
     """ Add provided user partitions in 'new_user_partitions' in
     'user_partitions' field of provided course.
 
@@ -194,7 +195,6 @@ def _update_course_user_partitions(course_key, user_id, new_user_partitions):
 
     Args:
         course_key (CourseKey): Identifier for the course
-        user_id (Int): ID of user who has publish the course
         new_user_partitions (List): List of user partitions
 
     """
@@ -206,8 +206,9 @@ def _update_course_user_partitions(course_key, user_id, new_user_partitions):
     course_user_partitions = filter_by_scheme(course.user_partitions, filter_partition_schemes)
     # new add user partitions 'new_user_partitions' in filter course user partitions
     course.user_partitions = course_user_partitions + new_user_partitions
-    # TODO: Check that course and modules are properly updated in database, preserve those user partition which scheme name not in 'new_user_partitions'.
-    modulestore().update_item(course, user_id)
+
+    # save updated course with the last editor
+    modulestore().update_item(course, course.edited_by)
     course_user_partitions_new = [user_partition.id for user_partition in course.user_partitions]
 
     # sync blocks with access roles according to new user partitions for course
@@ -228,12 +229,25 @@ def _sync_course_content_deleted_partitions(course_key, deleted_partitions):
         deleted_partitions (List): List of id's of deleted user partitions
 
     """
+    # no action needed if there is no deleted user partitions
+    if not deleted_partitions:
+        return
+
+    # get all course blocks with `group_access` field set, this might include
+    # orphan blocks
     group_access_blocks = get_group_access_blocks(course_key)
     # loop over all block with access groups and update them conditionally (
     # remove access groups pointing to deleted user partitions), since we have
     # updated user partitions for course so some partitions may have been
     # deleted.
-    # TODO: Complete this methods functionality
+    for block in group_access_blocks:
+        deleted_group_access = set(block.group_access).intersection(set(deleted_partitions))
+        if deleted_group_access:
+            for group_id in deleted_group_access:
+                del block.group_access[group_id]
+
+            # save updated block with the last editor
+            modulestore().update_item(block, block.edited_by)
 
 
 def _verification_partition_group_configuration(user_partition, block):
@@ -254,9 +268,9 @@ def _verification_partition_group_configuration(user_partition, block):
     group_configuration_description = group_configuration_name
     # TODO: Group requires id to be an int value. Properly handle using strings (without spaces, maybe convert spaces to '-' or '_') as id's. For now I have disabled int restriction on id's.
     group_configuration_groups = [
-        Group('non_verified', 'Not enrolled in a verified track'),
-        Group('verified_allow', 'Enrolled in a verified track and has access'),
-        Group('verified_deny', 'Enrolled in a verified track and does not have access'),
+        Group(VerificationPartitionScheme.NON_VERIFIED, 'Not enrolled in a verified track'),
+        Group(VerificationPartitionScheme.VERIFIED_ALLOW, 'Enrolled in a verified track and has access'),
+        Group(VerificationPartitionScheme.VERIFIED_DENY, 'Enrolled in a verified track and does not have access'),
     ]
     group_configuration_parameters = {'location': unicode(block.location)}
 
