@@ -215,7 +215,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                                 unicode(course.id),
                                 unicode(section.location)
                             )
-                        except Exception, ex:
+                        except Exception, ex:  # pylint: disable=broad-except
                             # safety net in case something blows up in edx_proctoring
                             # as this is just informational descriptions, it is better
                             # to log and continue (which is safe) than to have it be an
