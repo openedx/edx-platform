@@ -25,6 +25,10 @@ set -e
 # piped command, or a zero if they all succeed.
 set -o pipefail
 
+# There is no need to install the prereqs, as this was already
+# just done via the dependencies override section of circle.yml.
+export NO_PREREQ_INSTALL='true'
+
 EXIT=0
 
 case $CIRCLE_NODE_INDEX in
