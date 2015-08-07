@@ -224,7 +224,7 @@ def _preview_module_system(request, descriptor, field_data):
         error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
-        descriptor_runtime=descriptor.runtime,
+        descriptor_runtime=descriptor._runtime,
         services=services,
     )
 
