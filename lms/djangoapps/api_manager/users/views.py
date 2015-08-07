@@ -18,7 +18,6 @@ from rest_framework.response import Response
 
 from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
-from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name,
@@ -30,8 +29,6 @@ from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
-from notification_prefs.views import enable_notifications
-from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
 from lms.lib.comment_client.user import get_user_social_stats
 from notification_prefs.views import enable_notifications
@@ -40,7 +37,6 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
-from openedx.core.djangoapps.user_api.models import UserPreference
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
 from openedx.core.djangoapps.user_api.models import UserPreference
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -49,7 +45,6 @@ from util.password_policy_validators import (
     validate_password_dictionary
 )
 from xmodule.modulestore import InvalidLocationError
-from xmodule.modulestore.django import modulestore
 
 from progress.serializers import CourseModuleCompletionSerializer
 from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists
