@@ -123,12 +123,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             beforeEach(function () {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
-                TemplateHelpers.installTemplate('templates/fields/field_readonly');
-                TemplateHelpers.installTemplate('templates/fields/field_dropdown');
-                TemplateHelpers.installTemplate('templates/fields/field_textarea');
-                TemplateHelpers.installTemplate('templates/fields/field_image');
-                TemplateHelpers.installTemplate('templates/fields/message_banner');
-                TemplateHelpers.installTemplate('templates/student_profile/learner_profile');
             });
 
             it("shows loading error correctly", function() {
