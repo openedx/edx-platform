@@ -32,7 +32,7 @@
             </li>
         <% } else { %>
             <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Cannot delete when in use by a unit') %>">
-                <button class="delete action-icon is-disabled" aria-disabled="true"><i class="icon fa fa-trash-o"></i><span><%= gettext("Delete") %></span></button>
+                <button class="delete action-icon is-disabled" aria-disabled="true" disabled="disabled"><i class="icon fa fa-trash-o"></i><span><%= gettext("Delete") %></span></button>
             </li>
         <% } %>
     </ul>
