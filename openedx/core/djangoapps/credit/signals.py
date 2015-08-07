@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from util.db import generate_int_id, MYSQL_MAX_INT
 
-from contentstore.course_group_config import GroupConfiguration, MINIMUM_GROUP_ID
+from cms.djangoapps.contentstore.course_group_config import GroupConfiguration, MINIMUM_GROUP_ID
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme, get_group_access_blocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
@@ -87,7 +87,7 @@ def listen_for_grade_calculation(sender, username, grade_summary, course_key, de
                     )
 
 
-def tag_course_content_with_partition_scheme(course_key, partition_scheme):
+def tag_course_content_with_partition_scheme(course_key, partition_scheme):  # pylint: disable=invalid-name
     """ Create user partitions with provided partition scheme and tag credit
     blocks for the given course with those user partitions.
 
@@ -99,7 +99,7 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         partition_scheme (str): Name of the user partition scheme
 
     """
-    # TODO: Refactor code (move code to proper files e.g., 'common/lib/xmodule/xmodule/partitions/partitions.py') in once ICRV access control functionality is complete
+    # TODO: Refactor code (move code to proper files e.g., 'common/lib/xmodule/xmodule/partitions/partitions.py')
     # TODO: Increase logging (add logging for errors and success)
 
     # get user partition with provided partition scheme
@@ -223,7 +223,7 @@ def _update_course_user_partitions(course_key, new_user_partitions):
     _sync_course_content_deleted_partitions(course_key, deleted_partitions)
 
 
-def _sync_course_content_deleted_partitions(course_key, deleted_partitions):
+def _sync_course_content_deleted_partitions(course_key, deleted_partitions):  # pylint: disable=invalid-name
     """ Sync blocks with access roles according to new user partitions for
     the provided course.
 
@@ -253,7 +253,7 @@ def _sync_course_content_deleted_partitions(course_key, deleted_partitions):
             modulestore().update_item(block, block.edited_by)
 
 
-def _verification_partition_group_configuration(course_key, user_partition, block):
+def _verification_partition_group_configuration(course_key, user_partition, block):  # pylint: disable=invalid-name
     """ Create verification user partition for given block.
 
     Group and UserPartition id's will be int.
@@ -298,7 +298,7 @@ def _verification_partition_group_configuration(course_key, user_partition, bloc
     return group_configuration
 
 
-def _get_credit_xblocks_for_access_control(course_key):
+def _get_credit_xblocks_for_access_control(course_key):  # pylint: disable=invalid-name
     """ Retrieve all credit requirements XBlocks in the course for categories
      in list 'GATED_CREDIT_XBLOCK_CATEGORIES'.
 
