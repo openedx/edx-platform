@@ -282,3 +282,9 @@ FEATURES['ENABLE_TEAMS'] = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# IONISx
+IONISX_AUTH = {
+    'ROOT_URL': 'http://example.com',
+    'LOGOUT_URL': 'http://example.com/logout'
+}

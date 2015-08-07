@@ -494,3 +494,9 @@ PROFILE_IMAGE_MIN_BYTES = 100
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
 AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
+
+# IONISx
+IONISX_AUTH = {
+    'ROOT_URL': 'http://example.com',
+    'LOGOUT_URL': 'http://example.com/logout'
+}
