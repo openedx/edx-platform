@@ -1211,6 +1211,38 @@ class TeamsPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSe
         )
         self.assertEqual(response.status_code, status_code)
 
+    @ddt.data(
+        # Students can delete their own posts
+        ('student_in_team', 'student_in_team', 'team_commentable_id', 200),
+        # Moderators can delete any post
+        ('moderator', 'student_in_team', 'team_commentable_id', 200),
+        # Others cannot delete posts
+        ('student_in_team', 'moderator', 'team_commentable_id', 401),
+        ('student_not_in_team', 'student_in_team', 'team_commentable_id', 401)
+    )
+    @ddt.unpack
+    def test_delete_comment(self, user, comment_author, commentable_id, status_code, mock_request):
+        commentable_id = getattr(self, commentable_id)
+        comment_author = getattr(self, comment_author)
+
+        self._setup_mock(user, mock_request, {
+            "closed": False,
+            "commentable_id": commentable_id,
+            "user_id": str(comment_author.id)
+        })
+
+        response = self.client.post(
+            reverse(
+                "delete_comment",
+                kwargs={
+                    "course_id": unicode(self.course.id),
+                    "comment_id": "dummy"
+                }
+            ),
+            data={"body": "foo", "title": "foo"}
+        )
+        self.assertEqual(response.status_code, status_code)
+
     @ddt.data(*ddt_permissions_args)
     @ddt.unpack
     def test_create_comment(self, user, commentable_id, status_code, mock_request):
