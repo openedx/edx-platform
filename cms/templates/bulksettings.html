@@ -59,7 +59,10 @@
                                 <td class = "subsection-header-cell" colspan = "7">
                           <strong><a href="${subsection_settings['url']}">${subsection_settings['name']}</a></strong> -
                           % for setting_type in setting_type_list_map['subsection_setting_types']:
-                              <span title=${setting_type} class="subsection-settings"><strong>${subsection_setting_map[setting_type]}:</strong> ${subsection_settings[setting_type]}</span>
+                              <%
+                              subsection_setting = subsection_settings[setting_type] or 'N/A'
+                              %>
+                              <span title=${setting_type} class="subsection-settings"><strong>${subsection_setting_map[setting_type]}:</strong> ${subsection_setting}</span>
                           % endfor
                         </td>
                             </tr>
