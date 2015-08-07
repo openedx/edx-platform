@@ -34,9 +34,9 @@ class VerificationPartitionScheme(object):
     all ICRV blocks will be hidden and the student will have access to all
     the gated exams content.
     """
-    NON_VERIFIED = 'non_verified'
-    VERIFIED_ALLOW = 'verified_allow'
-    VERIFIED_DENY = 'verified_deny'
+    NON_VERIFIED = 0
+    VERIFIED_ALLOW = 1
+    VERIFIED_DENY = 2
 
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition):

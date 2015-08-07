@@ -40,7 +40,7 @@ class Group(namedtuple("Group", "id name")):
 
     def __new__(cls, id, name):
         # pylint: disable=super-on-old-class
-        return super(Group, cls).__new__(cls, id, name)
+        return super(Group, cls).__new__(cls, int(id), name)
 
     def to_json(self):
         """
@@ -112,7 +112,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if parameters is None:
             parameters = {}
 
-        return super(UserPartition, cls).__new__(cls, id, name, description, groups, scheme, parameters)
+        return super(UserPartition, cls).__new__(cls, int(id), name, description, groups, scheme, parameters)
 
     @staticmethod
     def get_scheme(name):

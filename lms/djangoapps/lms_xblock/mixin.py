@@ -16,7 +16,7 @@ class GroupAccessDict(Dict):
     """Special Dict class for serializing the group_access field"""
     def from_json(self, access_dict):
         if access_dict is not None:
-            return {k: access_dict[k] for k in access_dict}
+            return {int(k): access_dict[k] for k in access_dict}
 
     def to_json(self, access_dict):
         if access_dict is not None:

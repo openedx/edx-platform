@@ -8,6 +8,9 @@ from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
+from util.db import generate_int_id, MYSQL_MAX_INT
+
+from contentstore.course_group_config import GroupConfiguration, MINIMUM_GROUP_ID
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme, get_group_access_blocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
@@ -116,7 +119,7 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):
         # for now we are entertaining only verification partition scheme
         if partition_scheme == VERIFICATION_SCHEME:
             # create group configuration for VerificationPartitionScheme
-            group_configuration = _verification_partition_group_configuration(user_partition, block)
+            group_configuration = _verification_partition_group_configuration(course_key, user_partition, block)
             new_user_partitions.append(group_configuration)
 
             # update the 'group_access' of provided xblock 'block' and its ancestor.
@@ -250,10 +253,13 @@ def _sync_course_content_deleted_partitions(course_key, deleted_partitions):
             modulestore().update_item(block, block.edited_by)
 
 
-def _verification_partition_group_configuration(user_partition, block):
+def _verification_partition_group_configuration(course_key, user_partition, block):
     """ Create verification user partition for given block.
 
+    Group and UserPartition id's will be int.
+
     Args:
+        course_key (CourseKey): Identifier for the course
         user_partition (UserPartition): UserPartition object
         block (xblock): XBlock mixin
 
@@ -261,12 +267,19 @@ def _verification_partition_group_configuration(user_partition, block):
         UserPartition object.
 
     """
-    group_configuration_id = user_partition.key_for_partition(block.location)
+    course = modulestore().get_course(course_key, depth=0)
+
+    # make int id for user partition scheme `VerificationPartitionScheme` which
+    # is unique in user partitions of the provided course
+    group_configuration_id = generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course))
     group_configuration_name = u"Verification Checkpoint for {checkpoint_name}".format(
         checkpoint_name=block.display_name
     )
     group_configuration_description = group_configuration_name
-    # TODO: Group requires id to be an int value. Properly handle using strings (without spaces, maybe convert spaces to '-' or '_') as id's. For now I have disabled int restriction on id's.
+    # Since Group requires id to be an int so map verification partition group names to int
+    # 0: VerificationPartitionScheme.NON_VERIFIED
+    # 1: VerificationPartitionScheme.VERIFIED_ALLOW
+    # 2: VerificationPartitionScheme.VERIFIED_DENY
     group_configuration_groups = [
         Group(VerificationPartitionScheme.NON_VERIFIED, 'Not enrolled in a verified track'),
         Group(VerificationPartitionScheme.VERIFIED_ALLOW, 'Enrolled in a verified track and has access'),
