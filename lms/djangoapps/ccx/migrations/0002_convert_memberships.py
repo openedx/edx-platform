@@ -3,6 +3,7 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+from opaque_keys import InvalidKeyError
 
 class Migration(DataMigration):
 
@@ -12,11 +13,14 @@ class Migration(DataMigration):
         memberships = orm['ccx.CcxMembership'].objects.select_related('ccx', 'student').all()
         for membership in memberships:
             ccx = membership.ccx
-            course_key = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
-            enrollment, created = orm['student.CourseEnrollment'].objects.get_or_create(
+            try:
+                course_key = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
+                enrollment, created = orm['student.CourseEnrollment'].objects.get_or_create(
                     user=membership.student,
                     course_id=course_key,
-            )
+                )
+            except InvalidKeyError:
+                membership.delete()
 
 
     def backwards(self, orm):
