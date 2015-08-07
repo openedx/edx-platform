@@ -208,11 +208,19 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                         # This will return None, if (user, course_id, content_id)
                         # is not applicable
                         #
-                        proctoring_attempt_context = get_attempt_status_summary(
-                            user.id,
-                            unicode(course.id),
-                            unicode(section.location)
-                        )
+                        proctoring_attempt_context = None
+                        try:
+                            proctoring_attempt_context = get_attempt_status_summary(
+                                user.id,
+                                unicode(course.id),
+                                unicode(section.location)
+                            )
+                        except Exception, ex:
+                            # safety net in case something blows up in edx_proctoring
+                            # as this is just informational descriptions, it is better
+                            # to log and continue (which is safe) than to have it be an
+                            # unhandled exception
+                            log.exception(ex)
 
                         if proctoring_attempt_context:
                             # yes, user has proctoring context about
