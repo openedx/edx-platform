@@ -297,7 +297,7 @@ from microsite_configuration import microsite
 
             <h3 class="course-title-info" id="course-title">
               <span class="course-registration-title">${_('Registration for:')}</span>
-              <span class="course-display-name">${ course.display_name }</span>
+              <span class="course-display-name">${ course.display_name | h }</span>
             </h3>
             <p class="course-meta-info" aria-describedby="course-title">
               <span class="course-dates-title">

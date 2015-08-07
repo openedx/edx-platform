@@ -53,7 +53,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
             });
             var msg = new FileUploadModel({
                 title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
-                    {name: course.escape('name')}),
+                    {name: course.get('name')}),
                 message: gettext("Please select a PDF file to upload."),
                 mimeTypes: ['application/pdf']
             });

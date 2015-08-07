@@ -87,7 +87,7 @@ import json
               require(['js/factories/course'], function(CourseFactory) {
                   CourseFactory({
                       id: "${context_course.id | escapejs}",
-                      name: "${context_course.display_name_with_default | h}",
+                      name: "${context_course.display_name_with_default}",
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
