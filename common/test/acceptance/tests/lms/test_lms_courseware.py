@@ -109,6 +109,115 @@ class CoursewareTest(UniqueCourseTest):
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
 
 
+class ProctoringExamTest(UniqueCourseTest):
+    """
+    Test courseware.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(ProctoringExamTest, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        self.course_outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        course_fix.add_advanced_settings({
+            "enable_proctored_exams": {"value": "true"}
+        })
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                )
+            )
+        ).install()
+
+        # Auto-auth register for the course.
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+    def _goto_problem_page(self):
+        """
+        Open problem page with assertion.
+        """
+        self.courseware_page.visit()
+        self.problem_page = ProblemPage(self.browser)
+        self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 1')
+
+    def _open_exam_settings_dialog(self):
+        """
+
+        """
+        self.course_outline.q(css=".subsection-header-actions .configure-button").first.click()
+
+    def _assert_proctoring_items_are_displayed(self):
+        """
+        """
+        # The Timed exam checkbox
+        self.assertTrue(self.course_outline.q(css="#id_timed_examination").present)
+
+        # The time limit field
+        self.assertTrue(self.course_outline.q(css="#id_time_limit").present)
+
+        # The Practice exam checkbox
+        self.assertTrue(self.course_outline.q(css="#id_practice_exam").present)
+
+        # The Proctored exam checkbox
+        self.assertTrue(self.course_outline.q(css="#id_exam_proctoring").present)
+
+
+    def _make_exam_proctored_in_studio(self):
+        self.course_outline.q(css="#id_timed_examination").first.click()
+        self.course_outline.q(css=".action-save").first.click()
+
+    def _auto_auth(self, username, email, staff):
+        """
+        Logout and login with given credentials.
+        """
+        AutoAuthPage(self.browser, username=username, email=email,
+                     course_id=self.course_id, staff=staff).visit()
+
+    def test_courseware(self):
+        """
+        Test courseware if recent visited subsection become unpublished.
+        """
+
+        # Logout and login as a staff user.
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+
+        # Visit course outline page in studio.
+        self.course_outline.visit()
+
+        # Open the subsection edit dialog
+        self._open_exam_settings_dialog()
+
+        # Assert all settings related to Proctored exams are displayed
+        self._assert_proctoring_items_are_displayed()
+
+        # Make the exam proctored.
+        self._make_exam_proctored_in_studio()
+
+        # Wait for 2 seconds to save new date.
+        time.sleep(2)
+
+        # Logout and login as a student.
+        LogoutPage(self.browser).visit()
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+
 class CoursewareMultipleVerticalsTest(UniqueCourseTest):
     """
     Test courseware with multiple verticals
