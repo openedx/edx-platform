@@ -179,7 +179,7 @@ CACHES = {
 INSTALLED_APPS += ('external_auth', )
 
 # Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager', 'edx_proctoring')
+INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
