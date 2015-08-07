@@ -102,6 +102,7 @@ function($, _, Backbone, gettext,
                 description: this.model.escape('description'),
                 course_title: this.model.escape('course_title'),
                 org_logo_path: this.model.escape('org_logo_path'),
+                is_active: this.model.escape('is_active'),
                 isNew: this.model.isNew()
             };
         },

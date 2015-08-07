@@ -1248,12 +1248,34 @@ main_vendor_js = base_vendor_js + [
 base_application_js = [
     'js/src/utility.js',
     'js/src/logger.js',
+    'js/my_courses_dropdown.js',
+    'js/src/string_utils.js',
+    'js/form.ext.js',
+    'js/src/ie_shim.js',
+    'js/src/accessibility_tools.js',
 ]
 
 dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
-discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+discussion_js = (
+    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/customwmd.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_accessible.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_delay_renderer.js') +
+    sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+)
+
+discussion_vendor_js = [
+    'js/Markdown.Converter.js',
+    'js/Markdown.Sanitizer.js',
+    'js/Markdown.Editor.js',
+    'js/vendor/jquery.timeago.js',
+    'js/src/jquery.timeago.locale.js',
+    'js/vendor/jquery.truncate.js',
+    'js/jquery.ajaxfileupload.js',
+    'js/split.js'
+]
+
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1267,14 +1289,9 @@ instructor_dash_js = (
 # JavaScript modules.
 student_account_js = [
     'js/utils/edx.utils.validate.js',
-    'js/form.ext.js',
-    'js/my_courses_dropdown.js',
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
-    'js/src/accessibility_tools.js',
-    'js/src/ie_shim.js',
-    'js/src/string_utils.js',
     'js/student_account/models/LoginModel.js',
     'js/student_account/models/RegisterModel.js',
     'js/student_account/models/PasswordResetModel.js',
@@ -1289,14 +1306,9 @@ student_account_js = [
 ]
 
 verify_student_js = [
-    'js/form.ext.js',
-    'js/my_courses_dropdown.js',
     'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
-    'js/src/accessibility_tools.js',
-    'js/src/ie_shim.js',
-    'js/src/string_utils.js',
     'js/verify_student/models/verification_model.js',
     'js/verify_student/views/error_view.js',
     'js/verify_student/views/image_input_view.js',
@@ -1487,14 +1499,9 @@ PIPELINE_JS = {
 
         # Application will contain all paths not in courseware_only_js
         'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
-            'js/form.ext.js',
-            'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
-            'js/src/accessibility_tools.js',
-            'js/src/ie_shim.js',
-            'js/src/string_utils.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
@@ -1521,6 +1528,10 @@ PIPELINE_JS = {
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
+    },
+    'discussion_vendor': {
+        'source_filenames': discussion_vendor_js,
+        'output_filename': 'js/discussion_vendor.js',
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,

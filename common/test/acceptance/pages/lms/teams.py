@@ -227,3 +227,55 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def team_description(self):
         """Get the team's description as displayed in the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text
+
+    @property
+    def team_details_info(self):
+        """ Returns Team Details """
+        info = dict()
+        info['team_members_present'] = self.q(css='.page-content-secondary .team-members .team-member').present
+        info['team_capacity'] = self.q(css='.page-content-secondary .team-capacity :last-child').text[0]
+        info['team_location'] = self.q(css='.page-content-secondary .team-country :last-child').text[0]
+        info['team_language'] = self.q(css='.page-content-secondary .team-language :last-child').text[0]
+
+        return info
+
+    @property
+    def team_membership_text(self):
+        """Returns the team membership text"""
+        query = self.q(css='.page-content-secondary > .team-member-status')
+        return query.text[0] if query.present else ''
+
+    @property
+    def team_leave_link_present(self):
+        """Verifies that team leave link is present"""
+        return self.q(css='.leave-team-link').present
+
+    @property
+    def team_invite_section_present(self):
+        """Verifies that invite section is present"""
+        return self.q(css='.page-content-secondary .invite-team').present
+
+    @property
+    def team_members(self):
+        """Returns the number of team members in this team"""
+        return len(self.q(css='.page-content-secondary .team-member'))
+
+    def click_users_profile_image(self):
+        """Clicks on team member's profile image"""
+        self.q(css='.page-content-secondary .members-info > .team-member').first.click()
+
+    @property
+    def username(self):
+        """Returns the username of team member"""
+        return self.q(css='.page-content-secondary .tooltip-custom').text[0]
+
+    @property
+    def team_invite_help_text(self):
+        """Returns the team invite help text"""
+        return self.q(css='.page-content-secondary .invite-text').text[0]
+
+    @property
+    def team_invite_url(self):
+        """Returns the url of invite line box"""
+        return self.q(css='.page-content-secondary .invite-link-input').attrs('value')[0]
+

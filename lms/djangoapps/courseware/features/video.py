@@ -8,7 +8,6 @@ import time
 import requests
 from nose.tools import assert_equal, assert_true, assert_false
 from common import i_am_registered_for_the_course, visit_scenario_item
-from django.utils.translation import ugettext as _
 from django.conf import settings
 from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
@@ -432,7 +431,7 @@ def error_message_is_shown(_step):
 @step('error message has correct text$')
 def error_message_has_correct_text(_step):
     selector = '.video .video-player h3'
-    text = _('ERROR: No playable video sources found!')
+    text = 'ERROR: No playable video sources found!'
     assert world.css_has_text(selector, text)
 
 

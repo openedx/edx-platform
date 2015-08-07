@@ -66,7 +66,7 @@
                             this.text = options.text;
                         },
                         render: function () {
-                            this.$el.text(this.text);
+                            this.$el.html(this.text);
                         }
                     });
                     this.topicsCollection = new TopicCollection(
@@ -88,7 +88,7 @@
                             tabs: [{
                                 title: gettext('My Teams'),
                                 url: 'teams',
-                                view: new TempTabView({text: 'This is the new Teams tab.'})
+                                view: new TempTabView({text: '<p class="temp-tab-view">This is the new Teams tab.</p>'})
                             }, {
                                 title: gettext('Browse'),
                                 url: 'browse',
@@ -213,7 +213,11 @@
                                 view = new TeamProfileView({
                                     courseID: courseID,
                                     model: team,
-                                    readOnly: readOnly
+                                    readOnly: readOnly,
+                                    maxTeamSize: self.maxTeamSize,
+                                    requestUsername: self.$el.data('username'),
+                                    countries: self.countries,
+                                    languages: self.languages
                                 });
                             deferred.resolve(self.createViewWithHeader(view, team, topic));
                         });
