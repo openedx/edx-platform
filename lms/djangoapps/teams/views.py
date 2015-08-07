@@ -102,7 +102,8 @@ class TeamsDashboardView(View):
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
             "username": user.username,
-            "privileged": has_discussion_privileges(user, course_key)
+            "privileged": has_discussion_privileges(user, course_key),
+            "disable_courseware_js": True,
         }
         return render_to_response("teams/teams.html", context)
 
