@@ -14,7 +14,9 @@
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
                     topic: options.topic,
-                    maxTeamSize: options.maxTeamSize
+                    maxTeamSize: options.maxTeamSize,
+                    countries: this.selectorOptionsArrayToHashWithBlank(options.teamParams.countries),
+                    languages: this.selectorOptionsArrayToHashWithBlank(options.teamParams.languages),
                 });
                 PaginatedView.prototype.initialize.call(this);
                 this.teamParams = options.teamParams;
@@ -29,6 +31,20 @@
                 this.$el.append(teamActionsView.$el);
                 teamActionsView.render();
                 return this;
+            },
+
+            /**
+             * Convert a 2d array to an object equivalent with an additional blank element
+             *
+             * @param {Array.<Array.<string>>} Two dimensional options array
+             * @returns {Object} Hash version of the input array
+             * @example selectorOptionsArrayToHashWithBlank([["a", "alpha"],["b","beta"]])
+             * // returns {"a":"alpha", "b":"beta", "":""}
+             */
+            selectorOptionsArrayToHashWithBlank: function (options) {
+                var map = _.object(options);
+                map[""] = "";
+                return map;
             }
         });
         return TeamsView;
