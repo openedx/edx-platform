@@ -684,6 +684,220 @@ class TestTOC(ModuleStoreTestCase):
 
 @attr('shard_1')
 @ddt.ddt
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+class TestProctoredTOC(ModuleStoreTestCase):
+    """Check the Table of Contents for a course"""
+    def setup_modulestore(self, default_ms, num_finds, num_sends):
+        self.course_key = self.create_toy_course()
+        self.chapter = 'Overview'
+        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
+        factory = RequestFactory()
+        self.request = factory.get(chapter_url)
+        self.request.user = UserFactory()
+        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
+        with self.modulestore.bulk_operations(self.course_key):
+            with check_mongo_calls(num_finds, num_sends):
+                self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+                self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                    self.toy_loc, self.request.user, self.toy_course, depth=2
+                )
+
+    #
+    # Test TOC rendering when there are proctored exams
+    #
+    @ddt.data(
+        ('honor', False, None, None),
+        (
+            'honor',
+            True,
+            'eligible',
+            {
+                'status': 'eligible',
+                'short_description': 'Ungraded Practice Exam',
+                'suggested_icon': 'fa-lock',
+                'in_completed_state': False
+            }
+        ),
+        (
+            'honor',
+            True,
+            'submitted',
+            {
+                'status': 'submitted',
+                'short_description': 'Practice Exam Completed',
+                'suggested_icon': 'fa-check',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'honor',
+            True,
+            'error',
+            {
+                'status': 'error',
+                'short_description': 'Practice Exam Failed',
+                'suggested_icon': 'fa-exclamation-triangle',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            None,
+            {
+                'status': 'eligible',
+                'short_description': 'Proctored Option Available',
+                'suggested_icon': 'fa-lock',
+                'in_completed_state': False
+            }
+        ),
+        (
+            'verified',
+            False,
+            'declined',
+            {
+                'status': 'declined',
+                'short_description': 'Taking As Open Exam',
+                'suggested_icon': 'fa-unlock',
+                'in_completed_state': False
+            }
+        ),
+        (
+            'verified',
+            False,
+            'submitted',
+            {
+                'status': 'submitted',
+                'short_description': 'Pending Session Review',
+                'suggested_icon': 'fa-spinner fa-spin',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            'verified',
+            {
+                'status': 'verified',
+                'short_description': 'Passed Proctoring',
+                'suggested_icon': 'fa-check',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            'rejected',
+            {
+                'status': 'rejected',
+                'short_description': 'Failed Proctoring',
+                'suggested_icon': 'fa-exclamation-triangle',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            'error',
+            {
+                'status': 'error',
+                'short_description': 'Failed Proctoring',
+                'suggested_icon': 'fa-exclamation-triangle',
+                'in_completed_state': True
+            }
+        ),
+    )
+    @ddt.unpack
+    def test_proctored_exam_toc(self, enrollment_mode, is_practice_exam,
+                                attempt_status, expected):
+        """
+        Generate TOC for a course with a single chapter/sequence which contains proctored exam
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            self.setup_modulestore(ModuleStoreEnum.Type.mongo, 3, 0)
+            usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
+            sequence = self.modulestore.get_item(usage_key)
+
+            sequence.is_time_limited = True
+            sequence.is_proctored_enabled = True
+            sequence.is_practice_exam = is_practice_exam
+
+            self.modulestore.update_item(sequence, self.user.id)
+
+            self.toy_course = self.modulestore.get_course(self.course_key)
+
+            # refresh cache after update
+            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                self.course_key, self.request.user, self.toy_course, depth=2
+            )
+
+            from edx_proctoring.api import (
+                create_exam,
+                create_exam_attempt,
+                update_attempt_status
+            )
+            from edx_proctoring.runtime import set_runtime_service
+            from edx_proctoring.tests.test_services import MockCreditService
+
+            set_runtime_service(
+                'credit',
+                MockCreditService(enrollment_mode=enrollment_mode)
+            )
+
+            exam_id = create_exam(
+                course_id=unicode(self.course_key),
+                content_id=unicode(sequence.location),
+                exam_name='foo',
+                time_limit_mins=10,
+                is_proctored=True,
+                is_practice_exam=is_practice_exam
+            )
+
+            if attempt_status:
+                create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
+                update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
+            actual = render.toc_for_course(
+                self.request.user,
+                self.request,
+                self.toy_course,
+                self.chapter,
+                'Toy_Videos',
+                self.field_data_cache
+            )
+            section_actual = self._find_section(actual, 'Overview', 'Toy_Videos')
+
+            if expected:
+                self.assertIn(expected, [section_actual['proctoring']])
+            else:
+                # we expect there not to be a 'proctoring' key in the dict
+                self.assertNotIn('proctoring', section_actual)
+
+    def _find_url_name(self, toc, url_name):
+        """
+        Helper to return the dict TOC section associated with a Chapter of url_name
+        """
+
+        for entry in toc:
+            if entry['url_name'] == url_name:
+                return entry
+
+        return None
+
+    def _find_section(self, toc, chapter_url_name, section_url_name):
+        """
+        Helper to return the dict TOC section associated with a section of url_name
+        """
+
+        chapter = self._find_url_name(toc, chapter_url_name)
+        if chapter:
+            return self._find_url_name(chapter['sections'], section_url_name)
+
+        return None
+
+
+@attr('shard_1')
+@ddt.ddt
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
     Tests to verify that standard modifications to the output of XModule/XBlock
