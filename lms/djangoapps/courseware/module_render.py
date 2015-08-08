@@ -77,10 +77,9 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService
+
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService
-
-from edx_proctoring.api import get_attempt_status_summary
 
 from .field_overrides import OverrideFieldData
 
@@ -200,6 +199,20 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                         settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
                     )
                     if is_proctored_enabled:
+                        # We need to import this here otherwise Lettuce test
+                        # harness fails. When running in 'harvest' mode, the
+                        # test service appears to get into trouble with
+                        # circular references (not sure which as edx_proctoring.api
+                        # doesn't import anything from edx-platform). Odd thing
+                        # is that running: manage.py lms runserver --settings=acceptance
+                        # works just fine, it's really a combination of Lettuce and the
+                        # 'harvest' management command
+                        #
+                        # One idea is that there is some coupling between
+                        # lettuce and the 'terrain' Djangoapps projects in /common
+                        # This would need more investigation
+                        from edx_proctoring.api import get_attempt_status_summary
+
                         #
                         # call into edx_proctoring subsystem
                         # to get relevant proctoring information regarding this
