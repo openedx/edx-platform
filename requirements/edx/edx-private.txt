@@ -18,3 +18,6 @@
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.
 -e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock
+
+# Peer instruction xblock
+ubcpi-xblock==0.4.4
