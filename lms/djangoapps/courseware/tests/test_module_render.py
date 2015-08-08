@@ -685,7 +685,7 @@ class TestTOC(ModuleStoreTestCase):
 @attr('shard_1')
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
-class TestProctoredTOC(ModuleStoreTestCase):
+class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setup_modulestore(self, default_ms, num_finds, num_sends):
         self.course_key = self.create_toy_course()
@@ -702,9 +702,6 @@ class TestProctoredTOC(ModuleStoreTestCase):
                     self.toy_loc, self.request.user, self.toy_course, depth=2
                 )
 
-    #
-    # Test TOC rendering when there are proctored exams
-    #
     @ddt.data(
         ('honor', False, None, None),
         (
@@ -872,6 +869,118 @@ class TestProctoredTOC(ModuleStoreTestCase):
             else:
                 # we expect there not to be a 'proctoring' key in the dict
                 self.assertNotIn('proctoring', section_actual)
+
+    @ddt.data(
+        (
+            'honor',
+            True,
+            None,
+            'Would you like to take "Toy Videos" as a practice proctored exam?'
+        ),
+        (
+            'honor',
+            True,
+            'submitted',
+            'You have submitted this practice proctored exam'
+        ),
+        (
+            'honor',
+            True,
+            'error',
+            'There was a problem with your practice proctoring session'
+        ),
+        (
+            'verified',
+            False,
+            None,
+            'Would you like to take "Toy Videos" as a proctored exam?'
+        ),
+        (
+            'verified',
+            False,
+            'submitted',
+            'You have submitted this proctored exam for review'
+        ),
+        (
+            'verified',
+            False,
+            'verified',
+            'Your proctoring session was reviewed and passed all requirements'
+        ),
+        (
+            'verified',
+            False,
+            'rejected',
+            'Your proctoring session was reviewed and did not pass requirements'
+        ),
+        (
+            'verified',
+            False,
+            'error',
+            'There was a problem with your proctoring session'
+        ),
+    )
+    @ddt.unpack
+    def test_render_proctored_exam(self, enrollment_mode, is_practice_exam,
+                                   attempt_status, expected):
+        """
+        Verifies gated content from the student view rendering of a sequence
+        this is labeled as a proctored exam
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            self.setup_modulestore(ModuleStoreEnum.Type.mongo, 3, 0)
+            usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
+            sequence = self.modulestore.get_item(usage_key)
+
+            sequence.is_time_limited = True
+            sequence.is_proctored_enabled = True
+            sequence.is_practice_exam = is_practice_exam
+
+            self.modulestore.update_item(sequence, self.user.id)
+
+            self.toy_course = self.modulestore.get_course(self.course_key)
+
+            # refresh cache after update
+            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                self.course_key, self.request.user, self.toy_course, depth=2
+            )
+
+            from edx_proctoring.api import (
+                create_exam,
+                create_exam_attempt,
+                update_attempt_status
+            )
+            from edx_proctoring.runtime import set_runtime_service
+            from edx_proctoring.tests.test_services import MockCreditService
+
+            set_runtime_service(
+                'credit',
+                MockCreditService(enrollment_mode=enrollment_mode)
+            )
+
+            exam_id = create_exam(
+                course_id=unicode(self.course_key),
+                content_id=unicode(sequence.location),
+                exam_name='foo',
+                time_limit_mins=10,
+                is_proctored=True,
+                is_practice_exam=is_practice_exam
+            )
+
+            if attempt_status:
+                create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
+                update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
+            module = render.get_module(
+                self.request.user,
+                self.request,
+                usage_key,
+                self.field_data_cache,
+                wrap_xmodule_display=True,
+            )
+            content = module.render(STUDENT_VIEW).content
+
+            self.assertIn(expected, content)
 
     def _find_url_name(self, toc, url_name):
         """
