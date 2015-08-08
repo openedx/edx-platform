@@ -687,7 +687,11 @@ class TestTOC(ModuleStoreTestCase):
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
 class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
-    def setup_modulestore(self, default_ms, num_finds, num_sends):
+    def setUp(self):
+        """
+        Set up the initial mongo datastores
+        """
+        super(TestProctoringRendering, self).setUp()
         self.course_key = self.create_toy_course()
         self.chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
@@ -696,11 +700,10 @@ class TestProctoringRendering(ModuleStoreTestCase):
         self.request.user = UserFactory()
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
-            with check_mongo_calls(num_finds, num_sends):
-                self.toy_course = self.store.get_course(self.toy_loc, depth=2)
-                self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                    self.toy_loc, self.request.user, self.toy_course, depth=2
-                )
+            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                self.toy_loc, self.request.user, self.toy_course, depth=2
+            )
 
     @ddt.data(
         ('honor', False, None, None),
@@ -811,7 +814,6 @@ class TestProctoringRendering(ModuleStoreTestCase):
         Generate TOC for a course with a single chapter/sequence which contains proctored exam
         """
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            self.setup_modulestore(ModuleStoreEnum.Type.mongo, 3, 0)
             usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
             sequence = self.modulestore.get_item(usage_key)
 
@@ -928,7 +930,6 @@ class TestProctoringRendering(ModuleStoreTestCase):
         this is labeled as a proctored exam
         """
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            self.setup_modulestore(ModuleStoreEnum.Type.mongo, 3, 0)
             usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
             sequence = self.modulestore.get_item(usage_key)
 
