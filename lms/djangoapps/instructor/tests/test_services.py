@@ -52,8 +52,8 @@ class InstructorServiceTests(ModuleStoreTestCase):
         self.assertEqual(
             StudentModule.objects.filter(
                 student=self.module_to_reset.student,
-                course_id=self.module_to_reset.course_id,
-                module_id=self.module_to_reset.module_id,
+                course_id=self.course.id,
+                module_state_key=self.module_to_reset.module_state_key,
             ).count(),
             0
         )

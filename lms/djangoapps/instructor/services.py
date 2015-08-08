@@ -45,4 +45,3 @@ class InstructorService(object):
             except enrollment.sub_api.SubmissionError:
                 # Trust the submissions API to log the error
                 log.error("An error occurred while deleting the score.")
-
