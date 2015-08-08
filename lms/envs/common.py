@@ -2623,7 +2623,7 @@ NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.pn
 #### PROCTORING CONFIGURATION DEFAULTS
 
 PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.NullBackendProvider',
+    'class': 'edx_proctoring.backends.null.NullBackendProvider',
     'options': {},
 }
 PROCTORING_SETTINGS = {}
