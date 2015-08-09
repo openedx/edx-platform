@@ -415,6 +415,9 @@ FEATURES = {
 
     # Enable the max score cache to speed up grading
     'ENABLE_MAX_SCORE_CACHE': True,
+
+    # Enable LTI Provider feature.
+    'ENABLE_LTI_PROVIDER': False,
 }
 
 # Ignore static asset files on import which match this pattern
