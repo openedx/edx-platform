@@ -1000,6 +1000,7 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+PAYMENT_CONFIRM_EMAIL = PAYMENT_SUPPORT_EMAIL
 
 ##### Using cybersource by default #####
 
