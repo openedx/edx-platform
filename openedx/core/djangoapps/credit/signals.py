@@ -13,7 +13,7 @@ from util.db import generate_int_id, MYSQL_MAX_INT
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import (
     get_course_xblocks,
-    filter_by_scheme,
+    exclude_by_scheme,
     get_group_access_blocks,
     get_course_partitions_used_ids,
 )
@@ -56,7 +56,7 @@ def on_course_publish(course_key):  # pylint: disable=unused-argument
         log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
 
     # now synchronously tag course content with ICRV access control
-    with modulestore().bulk_operations(course_key, emit_signals=True):
+    with modulestore().bulk_operations(course_key, emit_signals=False):
         log.info(u'Start tagging course "%s" content with ICRV Access Control', course_key)
         tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
         log.info(u'Finished tagging course "%s" content with ICRV Access Control', course_key)
@@ -139,8 +139,8 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):  # p
             # update the 'group_access' of provided xblock 'block' and its ancestor.
             _update_content_group_access(block, group_configuration)
 
-    # Now update and add all newly created partition in 'user_partitions'
-    # field of course
+    # Now update course 'user_partitions' field and add all newly created user
+    # partitions
     _update_course_user_partitions(course_key, partition_scheme, new_user_partitions)
 
 
@@ -178,10 +178,17 @@ def _update_content_group_access(block, group_configuration):
     # Assuming that there will be only one user partition for a block
     block.group_access = _access_dict(group_configuration, access_groups_id_list)
 
-    # Update the published branch only
-    with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
-        # save updated block with the last editor
-        modulestore().update_item(block, block.edited_by)
+    # TODO: Use or delete 'block.group_access.update' after consultation with developers
+    # Uncomment bottom line when we support multiple partitions for
+    # 'group_access' field for a block, since for now when course author will
+    # try to access 'Group Configurations' page then the method
+    # '_get_content_groups_usage_info' in the file
+    # 'cms/djangoapps/contentstore/course_group_config.py' will raise
+    # exception 'ValueError: too many values to unpack'
+    # block.group_access.update(_access_dict(group_configuration, access_groups_id_list))
+
+    # Update only published version of the block in database
+    _update_published_block(block)
 
     # now for course content access control, add groups
     # 'non_verified' and 'verified_allow' in 'group_access' field of
@@ -197,15 +204,15 @@ def _update_content_group_access(block, group_configuration):
     # update 'group_access' field of parent only (immediate siblings
     # will have access control)
     ancestor_for_update = parent_block
-    if len(set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES))) == 0:
+    if not set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES)):
         # category of parent and grand parent are 'vertical' and
         # 'sequential' respectively so update 'group_access' field of
         # grandparent
         ancestor_for_update = grandparent_block
 
     ancestor_for_update.group_access = access_dict
-    # save updated block with the last editor
-    modulestore().update_item(ancestor_for_update, ancestor_for_update.edited_by)
+    # Update only published version of the block in database
+    _update_published_block(ancestor_for_update)
 
 
 def _update_course_user_partitions(course_key, partition_scheme, new_user_partitions):
@@ -224,12 +231,12 @@ def _update_course_user_partitions(course_key, partition_scheme, new_user_partit
     course = modulestore().get_course(course_key, depth=0)
     # get list of user partitions for the course before updating them
     course_user_partitions_old = [user_partition.id for user_partition in course.user_partitions]
-    course_user_partitions = filter_by_scheme(course.user_partitions, partition_scheme)
+    course_user_partitions = exclude_by_scheme(course.user_partitions, partition_scheme)
     # set filtered 'course_user_partitions' and new 'new_user_partitions' user
     # partitions as course user partitions
     course.user_partitions = course_user_partitions + new_user_partitions
-    # save updated course with the last editor
-    modulestore().update_item(course, course.edited_by)
+    # Update only published version of the block in database
+    _update_published_block(course)
 
     # get list of user partitions for the course after updating them
     course_user_partitions_new = [user_partition.id for user_partition in course.user_partitions]
@@ -269,10 +276,8 @@ def _sync_course_content_deleted_partitions(course_key, deleted_partitions):  # 
             for group_id in deleted_group_access:
                 del block.group_access[group_id]
 
-                # Update the published branch only
-                with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
-                    # save updated block with the last editor
-                    modulestore().update_item(block, block.edited_by)
+                # Update only published version of the block in database
+                _update_published_block(block)
 
 
 def _verification_partition_group_configuration(course_key, user_partition, block):  # pylint: disable=invalid-name
@@ -337,3 +342,21 @@ def _get_credit_xblocks_for_access_control(course_key):  # pylint: disable=inval
         credit_blocks.extend(xblocks)
 
     return credit_blocks
+
+
+def _update_published_block(block):
+    """ Update the provided XBlock in modulestore for published branch only.
+
+    Use the xblock's last editor as modifier.
+
+    Args:
+        block (XBlock): XBlock mixin
+
+    Returns:
+        List of XBlocks that are published and haven't been deleted.
+
+    """
+    # Update the published branch only
+    with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
+        # save updated block with the last editor
+        modulestore().update_item(block, block.edited_by)
