@@ -100,6 +100,7 @@ class TeamsDashboardView(View):
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
             "teams_membership_url": reverse('team_membership_list', request=request),
+            "teams_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
             "username": user.username,

@@ -742,3 +742,179 @@
 }
 
 
+// Below rules copied from cms/static/sass/elements/_system-feedback.scss
+// Will be removed once we will be able to use styles from common/static/sass/_mixins-inherited.scss?
+
+
+#page-prompt {
+
+  .wrapper-prompt:before {
+    display: inline-block;
+  }
+}
+
+// alerts, notifications, prompts, and status communication
+// ====================
+
+$orange: rgb(237, 189, 60);
+
+// shared
+.wrapper-notification, .wrapper-alert, .prompt {
+  @include box-sizing(border-box);
+
+  .copy {
+    @extend %t-copy-sub1;
+  }
+}
+
+.wrapper-notification, .wrapper-alert, .prompt {
+  background: $gray-d3;
+
+  .copy {
+    color: $gray-l2;
+
+    .title {
+      color: $white;
+    }
+
+    .nav-actions {
+
+      .action-primary {
+        color: $gray-d4;
+      }
+    }
+  }
+}
+
+.alert, .notification, .prompt {
+
+  // types - warning
+  &.warning {
+
+    .nav-actions .action-primary {
+      @include blue-button;
+      @extend %t-action4;
+      border-color: $orange;
+      color: $gray-d4;
+    }
+
+    a {
+      color: $orange;
+
+      &:hover {
+        color: $orange;
+      }
+    }
+  }
+
+}
+
+// prompts
+.wrapper-prompt {
+  @extend %ui-depth5;
+  @include transition(all $tmg-f3 ease-in-out  0s);
+  position: fixed;
+  top: 0;
+  background: $black-t1;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  &:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -0.25em; /* Adjusts for spacing */
+  }
+
+  .prompt {
+    border-radius: ($baseline/5);
+    box-shadow: 0 0 3px $shadow-d1;
+    display: inline-block;
+    vertical-align: middle;
+    width: $baseline*17.5;
+    border: 4px solid $black;
+    @include text-align(left);
+
+    .copy {
+      border-top: 4px solid $blue;
+      padding: $baseline;
+    }
+
+    .nav-actions {
+      box-shadow: inset 0 1px 2px $shadow-d1;
+      border-top: 1px solid $black-t1;
+      padding: ($baseline*0.75) $baseline;
+      background: $gray-d4;
+
+      .nav-item {
+        display: inline-block;
+        @include margin-right($baseline*0.75);
+
+        &:last-child {
+          @include margin-right(0);
+        }
+      }
+
+      .action-primary {
+        @extend %t-action4;
+        @extend %t-strong;
+      }
+
+      .action-secondary {
+        @extend %t-action4;
+      }
+    }
+  }
+
+  // types of prompts - error
+  .prompt.warning {
+
+    .feedback-symbol {
+      color: $orange;
+    }
+
+    .copy {
+      border-top-color: $orange;
+    }
+  }
+}
+
+// js enabled
+.js {
+
+  // prompt set-up
+  .wrapper-prompt {
+    visibility: hidden;
+    pointer-events: none;
+
+    .prompt {
+
+    }
+  }
+
+  // prompt showing
+  &.prompt-is-shown {
+
+    .wrapper-prompt.is-shown {
+      visibility: visible;
+      pointer-events: auto;
+
+      .prompt {
+        @include animation(bounceIn $tmg-f1 ease-in-out 1);
+      }
+    }
+  }
+
+  // prompt hiding
+  &.prompt-is-hiding {
+
+    .wrapper-prompt {
+
+      .prompt {
+        @include animation(bounceOut $tmg-f1 ease-in-out 1);
+      }
+    }
+  }
+}

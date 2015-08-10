@@ -5,7 +5,7 @@
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
-<%block name="bodyclass">view-teams is-in-course course</%block>
+<%block name="bodyclass">view-teams is-in-course course js</%block>
 <%block name="pagetitle">${_("Teams")}</%block>
 
 <%block name="headextra">
@@ -39,6 +39,7 @@
         topicsUrl: '${ topics_url }',
         teamsUrl: '${ teams_url }',
         teamsMembershipUrl: '${ teams_membership_url }',
+        teamsMembershipDetailUrl: '${ teams_membership_detail_url }',
         maxTeamSize: ${ course.teams_max_size },
         languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
         countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) }

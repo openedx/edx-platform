@@ -1,5 +1,8 @@
-define(["jquery", "underscore", "underscore.string", "backbone", "js/utils/templates"],
-    function($, _, str, Backbone, TemplateUtils) {
+;(function (define) {
+    'use strict';
+    define(["jquery", "underscore", "underscore.string", "backbone", "common/js/components/utils/templates",
+        'text!common/templates/components/system-feedback.underscore'],
+    function($, _, str, Backbone, TemplateUtils, system_feedback_template) {
         var SystemFeedback = Backbone.View.extend({
             options: {
                 title: "",
@@ -50,7 +53,8 @@ define(["jquery", "underscore", "underscore.string", "backbone", "js/utils/templ
                     throw "SystemFeedback: intent required (given " +
                         JSON.stringify(this.options) + ")";
                 }
-                this.template = TemplateUtils.loadTemplate("system-feedback");
+                //this.template = TemplateUtils.loadTemplate("system-feedback");
+                this.template = _.template(system_feedback_template);
                 this.setElement($("#page-" + this.options.type));
                 // handle single "secondary" action
                 if (this.options.actions && this.options.actions.secondary &&
@@ -144,3 +148,4 @@ define(["jquery", "underscore", "underscore.string", "backbone", "js/utils/templ
         });
         return SystemFeedback;
     });
+}).call(this, define || RequireJS.define);

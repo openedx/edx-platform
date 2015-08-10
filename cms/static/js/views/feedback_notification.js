@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "underscore.string", "js/views/feedback"], function($, _, str, SystemFeedbackView) {
+define(["jquery", "underscore", "underscore.string", "common/js/components/views/feedback"], function($, _, str, SystemFeedbackView) {
     var Notification = SystemFeedbackView.extend({
         options: $.extend({}, SystemFeedbackView.prototype.options, {
             type: "notification",
