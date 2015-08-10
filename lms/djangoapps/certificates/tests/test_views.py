@@ -447,11 +447,11 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         response = self.client.get(test_url)
         self.assertIn(
-            'a course of study offered by <span class="detail--xuniversity">test_organization</span>',
+            'a course of study offered by test_organization',
             response.content
         )
         self.assertNotIn(
-            'a course of study offered by <span class="detail--xuniversity">testorg</span>',
+            'a course of study offered by testorg',
             response.content
         )
         self.assertIn(

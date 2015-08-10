@@ -304,7 +304,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     organizations = organization_api.get_course_organizations(course_id=course.id)
     if organizations:
         #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
-        organization = next(iter(organizations))
+        organization = organizations[0]
         partner_name = organization.get('name', course.org)
         context['organization_logo'] = organization.get('logo', None)
 
@@ -338,14 +338,10 @@ def _update_certificate_context(context, course, user, user_certificate):
         year=user_certificate.modified_date.year
     )
 
-    accd_course_org_html = '<span class="detail--xuniversity">{partner_name}</span>'.format(partner_name=partner_name)
-    accd_platform_name_html = '<span class="detail--company">{platform_name}</span>'.format(platform_name=platform_name)
-    # Translators: This line appears on the certificate after the name of a course, and provides more
-    # information about the organizations providing the course material to platform users
     context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_name}, '
                                                           'through {platform_name}.').format(
-        partner_name=accd_course_org_html,
-        platform_name=accd_platform_name_html
+        partner_name=partner_name,
+        platform_name=platform_name
     )
 
     # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
