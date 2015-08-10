@@ -102,7 +102,7 @@ var GradingView = ValidatingView.extend({
     renderMinimumGradeCredit: function() {
         var minimum_grade_credit = this.model.get('minimum_grade_credit');
         this.$el.find('#course-minimum_grade_credit').val(
-            Math.round(parseFloat(minimum_grade_credit) * 100) + '%'
+            Math.round(parseFloat(minimum_grade_credit) * 100)
         );
     },
     setGracePeriod : function(event) {
