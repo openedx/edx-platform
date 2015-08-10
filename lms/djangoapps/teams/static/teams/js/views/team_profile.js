@@ -29,6 +29,7 @@
                     //this.country = options.countries[this.model.get('country')];
                     //this.language = options.languages[this.model.get('language')];
 
+                    this.teamsMembershipDetailUrl = options.teamsMembershipDetailUrl;
                     _.bindAll(this, 'leaveTeam', 'confirmThenRunOperation');
                 },
 
@@ -116,11 +117,20 @@
 
                 leaveTeam: function (event) {
                     event.preventDefault();
+                    var view = this;
                     this.confirmThenRunOperation(
                         gettext('Leave this team?'),
                         gettext('Leaving a team means you can no longer post on this team, and your spot is opened for another learner.'),
                         gettext('Leave'),
                         function() {
+                            $.ajax({
+                               type: 'DELETE',
+                               url: view.teamsMembershipDetailUrl.replace('team_id', view.model.get('id'))
+                            }).done(function (data) {
+                               view.model.fetch({});
+                            }).fail(function (data) {
+                               alert(data);
+                            });
                             console.log('Left the team!');
                         }
                     );

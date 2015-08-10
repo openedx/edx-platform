@@ -44,6 +44,7 @@
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
                     this.teamsMembershipUrl = options.teamsMembershipUrl;
+                    this.teamsMembershipDetailUrl = options.teamsMembershipDetailUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
@@ -227,7 +228,8 @@
                                 maxTeamSize: self.maxTeamSize,
                                 requestUsername: username,
                                 countries: self.countries,
-                                languages: self.languages    
+                                languages: self.languages ,
+                                teamsMembershipDetailUrl: self.teamsMembershipDetailUrl
                             });
                             var teamJoinView = new TeamJoinView(
                                 {

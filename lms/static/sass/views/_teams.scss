@@ -742,6 +742,10 @@
 }
 
 
+// Below rules copied from cms/static/sass/elements/_system-feedback.scss
+// Will be removed once we will be able to use styles from common/static/sass/_mixins-inherited.scss?
+
+
 #page-prompt {
 
   .wrapper-prompt:before {
@@ -783,24 +787,6 @@ $orange: rgb(237, 189, 60);
 }
 
 .alert, .notification, .prompt {
-
-  // types - confirm
-  &.confirm {
-
-    .nav-actions .action-primary {
-      @include blue-button();
-      @extend %t-action4;
-      border-color: $blue-d2;
-    }
-
-    a {
-      color: $blue;
-
-      &:hover {
-        color: $blue;
-      }
-    }
-  }
 
   // types - warning
   &.warning {
@@ -883,30 +869,6 @@ $orange: rgb(237, 189, 60);
   }
 
   // types of prompts - error
-  .prompt.error {
-
-    .feedback-symbol {
-      color: $red-l1;
-    }
-
-    .copy {
-      border-top-color: $red-l1;
-    }
-  }
-
-  // types of prompts - confirmation
-  .prompt.confirmation {
-
-    .feedback-symbol {
-      color: $green;
-    }
-
-    .copy {
-      border-top-color: $green;
-    }
-  }
-
-  // types of prompts - error
   .prompt.warning {
 
     .feedback-symbol {
@@ -953,25 +915,6 @@ $orange: rgb(237, 189, 60);
       .prompt {
         @include animation(bounceOut $tmg-f1 ease-in-out 1);
       }
-    }
-  }
-
-  // alert showing/hiding done by jQuery
-  .wrapper-alert { }
-
-  // notification showing/hiding
-  .wrapper-notification {
-    bottom: -($baseline*10);
-
-    // varying animations
-    &.is-shown {
-      @include animation(notificationSlideUp $tmg-s1 ease-in-out 1);
-      @include animation-fill-mode(forwards);
-    }
-
-    &.is-hiding {
-      @include animation(notificationSlideDown $tmg-s1 ease-in-out 1);
-      @include animation-fill-mode(forwards);
     }
   }
 }
