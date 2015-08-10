@@ -30,7 +30,9 @@ from enrollment.errors import (
     CourseNotFoundError, CourseEnrollmentError,
     CourseModeNotFoundError, CourseEnrollmentExistsError
 )
+from student.auth import user_has_role
 from student.models import User
+from student.roles import CourseStaffRole
 
 
 log = logging.getLogger(__name__)
@@ -452,14 +454,15 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     # cross-domain CSRF.
     @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
-        """Gets a list of all course enrollments for the currently logged in user."""
+        """Gets a list of all course enrollments for a user.
+
+        Returns a list for the currently logged in user, or for the user named by the 'user' GET
+        parameter.  If the username does not match the currently logged in user, only courses the
+        requesting user has staff permissions for are listed.
+        """
         username = request.GET.get('user', request.user.username)
-        if request.user.username != username and not self.has_api_key_permissions(request):
-            # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
-            # other users, do not let them deduce the existence of an enrollment.
-            return Response(status=status.HTTP_404_NOT_FOUND)
         try:
-            return Response(api.get_enrollments(username))
+            enrollment_data = api.get_enrollments(username)
         except CourseEnrollmentError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
@@ -469,6 +472,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     ).format(username=username)
                 }
             )
+        if username == request.user.username or self.has_api_key_permissions(request):
+            return Response(enrollment_data)
+        filtered_data = []
+        for enrollment in enrollment_data:
+            course_key = CourseKey.from_string(enrollment["course_details"]["course_id"])
+            if user_has_role(request.user, CourseStaffRole(course_key)):
+                filtered_data.append(enrollment)
+        return Response(filtered_data)
 
     def post(self, request):
         """Enrolls the currently logged-in user in a course.
