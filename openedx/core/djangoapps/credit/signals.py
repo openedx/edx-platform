@@ -36,16 +36,17 @@ GATED_CREDIT_XBLOCK_CATEGORIES = ['edx-reverification-block']
 
 
 def on_course_publish(course_key):  # pylint: disable=unused-argument
-    """
-    Will receive a delegated 'course_published' signal from cms/djangoapps/contentstore/signals.py
-    and kick off a celery task to update the credit course requirements.
+    """Update the credit course requirements on receiving a delegated signal
+    `course_published` from `cms/djangoapps/contentstore/signals.py` by
+    kicking off a celery task.
 
-    IMPORTANT: It is assumed that the edx-proctoring subsystem has been appropriate refreshed
-    with any on_publish event workflow *BEFORE* this method is called.
-    """
-    # synchronously tag course content with ICRV access control
-    tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
+    Add user partitions e.g., 'VerificationPartitionScheme' for the provided
+    course and tag course content with these newly created user partitions.
 
+    IMPORTANT: It is assumed that the edx-proctoring subsystem has been
+    refreshed appropriately with any `on_publish` event workflow *BEFORE* this
+    method is called.
+    """
     # Import here, because signal is registered at startup, but items in tasks
     # are not yet able to be loaded
     from openedx.core.djangoapps.credit import api, tasks
@@ -53,6 +54,11 @@ def on_course_publish(course_key):  # pylint: disable=unused-argument
     if api.is_credit_course(course_key):
         tasks.update_credit_course_requirements.delay(unicode(course_key))
         log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
+
+    # now synchronously tag course content with ICRV access control
+    log.info(u'Start tagging course "%s" content with ICRV Access Control', course_key)
+    tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
+    log.info(u'Finished tagging course "%s" content with ICRV Access Control', course_key)
 
 
 @receiver(GRADES_UPDATED)
