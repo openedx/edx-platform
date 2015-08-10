@@ -219,6 +219,9 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+    'lms.course_blocks': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
 }
 
 # Dummy secret key for dev
