@@ -132,6 +132,13 @@ div.course-wrapper {
           font-weight: 600;
         }
       }
+      button.gated-sequence {
+        background-color: transparent;
+        border-bottom: none;
+        &:hover {
+          background-color: transparent;
+        }
+      }
       .gated-sequence {
         color: #147ABA;
         font-weight: 600;
