@@ -218,9 +218,8 @@ def exec_summary_report_csv(entry_id, xmodule_instance_args):
 def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     """
     Compute proctored exam results report for a course and upload the
-    CSV to an S3 bucket for download.
+    CSV for download.
     """
-    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = 'generating_proctored_exam_results_report'
     task_fn = partial(upload_proctored_exam_results_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

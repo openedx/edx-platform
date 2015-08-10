@@ -252,7 +252,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             # than the actual sequence content
             #
             # This will return None if there is no
-            # overriden view to display given the
+            # overridden view to display given the
             # current state of the user
             view_html = proctoring_service.get_student_view(
                 user_id=user_id,
