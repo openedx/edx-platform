@@ -17,7 +17,6 @@ from edx_notifications.lib.publisher import register_notification_type, publish_
 import mock
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import Client
@@ -28,23 +27,15 @@ from django.utils.translation import ugettext as _
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.model_data import FieldDataCache
-from courseware.tests.factories import StudentModuleFactory
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import allow_access
-from notification_prefs import NOTIFICATION_PREF_KEY
 from projects.models import Project, Workgroup
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.user_api.models import UserPreference
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from django.contrib.auth.models import User
-from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore import Location
 
 from django.contrib.auth.models import User
 from notification_prefs import NOTIFICATION_PREF_KEY

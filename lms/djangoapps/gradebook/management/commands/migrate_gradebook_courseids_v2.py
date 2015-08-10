@@ -20,7 +20,7 @@ def _migrate_course_id(old_course_id):
 
 def _migrate_content_id(old_content_id):
     if "slashes:" in old_content_id or "course-v1:" in old_content_id:
-        new_content_id = self._migrate_course_id(old_content_id)
+        new_content_id = _migrate_course_id(old_content_id)
     else:
         content_id = old_content_id.replace("location:", "")
         content_components = content_id.split('+')
