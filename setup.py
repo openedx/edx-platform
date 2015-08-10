@@ -46,5 +46,10 @@ setup(
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
         ],
+        "openedx.block_structure_transformer": [
+            "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
+            "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
+        ],
     }
 )
