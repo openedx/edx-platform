@@ -20,7 +20,7 @@ from status.status import get_site_status_msg
 <%block>
 <%
 try:
-    course_id = course.id.to_deprecated_string()
+    course_id = course.id
 except:
     # can't figure out a better way to get at a possibly-defined course var
     course_id = None
