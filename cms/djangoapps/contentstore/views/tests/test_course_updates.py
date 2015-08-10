@@ -2,7 +2,6 @@
 unit tests for course_info views and models.
 """
 import json
-from mock import patch
 from django.test.utils import override_settings
 
 from contentstore.models import PushNotificationConfig

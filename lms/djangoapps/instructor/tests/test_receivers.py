@@ -7,7 +7,6 @@ from datetime import datetime
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

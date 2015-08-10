@@ -3,23 +3,13 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
 
-from django.contrib.auth.models import User
-
-from progress.models import CourseModuleCompletion
-from api_manager.management.commands import migrate_stage_prefix
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from django.conf import settings
-from django.contrib.auth.models import Group, User
-from django.test import TestCase
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from progress.models import CourseModuleCompletion
 from api_manager.management.commands import migrate_stage_prefix
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from django.db import connection
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
@@ -53,10 +43,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
         course_module_completion2 = CourseModuleCompletion.objects.create(user=user2, course_id=self.good_style_course_id2, content_id=self.good_style_content_id2, stage=self.bad_style_stage2)
 
-
         # Run the data migration
         migrate_stage_prefix.Command().handle()
-
 
         updated_course_module_completion = CourseModuleCompletion.objects.get(id=course_module_completion.id)
         self.assertEqual(updated_course_module_completion.stage, self.good_style_stage)

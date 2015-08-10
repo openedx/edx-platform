@@ -34,6 +34,7 @@ class ProjectsApiTests(TestCase):
     """ Test suite for Users API views """
 
     def setUp(self):
+        super(ProjectsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
         self.test_projects_uri = '/api/server/projects/'
         self.test_organizations_uri = '/api/server/organizations/'

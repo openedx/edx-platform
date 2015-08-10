@@ -6,7 +6,7 @@ paver test_system -s lms --test_id=lms/djangoapps/social_engagements/tests/test_
 
 from django.conf import settings
 
-from mock import MagicMock, patch
+from mock import patch
 
 from django.test.utils import override_settings
 
@@ -15,10 +15,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
-from social_engagement.models import StudentSocialEngagementScore, StudentSocialEngagementScoreHistory
-from social_engagement.engagement import update_user_engagement_score
-from social_engagement.engagement import update_course_engagement_scores
-from social_engagement.engagement import update_all_courses_engagement_scores
+from social_engagement.models import StudentSocialEngagementScore
 
 from edx_notifications.startup import initialize as initialize_notifications
 from edx_notifications.lib.consumer import get_notifications_count_for_user

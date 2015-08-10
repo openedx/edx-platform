@@ -6,16 +6,13 @@ from datetime import datetime
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
-from django.test import TestCase
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from projects.management.commands import migrate_project_courseids
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupSubmission, WorkgroupSubmissionReview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from django.db import connection
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
@@ -63,7 +60,6 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         self.new_style_course_id2 = unicode(self.course2.id)
         self.new_style_content_id2 = unicode(self.chapter2.location)
 
-
     def test_migrate_project_courseids(self):
         """
         Test the data migration
@@ -83,10 +79,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         workgroup_submission2 = WorkgroupSubmission.objects.create(workgroup=workgroup2, user=user2)
         workgroup_submission_review2 = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission2, content_id=self.new_style_content_id2)
 
-
         # Run the data migration
         migrate_project_courseids.Command().handle()
-
 
         # Confirm that the data has been properly migrated
         updated_project = Project.objects.get(id=project.id)
