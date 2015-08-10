@@ -2,8 +2,6 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
-from datetime import datetime
-import uuid
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -12,7 +10,6 @@ from django.test.utils import override_settings
 from gradebook import models as gradebook_models
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from gradebook.management.commands import migrate_gradebook_courseids_v2
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
@@ -25,7 +22,7 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-
+        super(MigrateCourseIdsTests, self).setUp()
         self.bad_style_course_id = "slashes:old+style+id"
         self.good_style_course_id = "old/style/id"
         self.bad_style_content_id = "location:old+style+id+chapter+1234567890"
@@ -47,10 +44,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
         gradebook_entry2 = gradebook_models.StudentGradebook.objects.create(user=user2, course_id=self.bad_style_course_id2, grade=0.95, proforma_grade=0.64)
 
-
         # Run the data migration
         migrate_gradebook_courseids_v2.Command().handle()
-
 
         # Confirm that the data has been properly migrated
         updated_gradebook_entries = gradebook_models.StudentGradebook.objects.get(id=gradebook_entry.id)

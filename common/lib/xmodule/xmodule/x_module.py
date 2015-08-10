@@ -1724,7 +1724,7 @@ class DiscussionService(object):
         cohorts = get_course_cohorts(course_id)
         cohorted_commentables = get_cohorted_commentables(course_id)
 
-        course_settings = make_course_settings(course)
+        course_settings = make_course_settings(course, user)
 
         context = {
             'user': user,
@@ -1770,7 +1770,7 @@ class DiscussionService(object):
         user = self.runtime.user
 
         course = get_course_with_access(user, 'load_forum', course_id)
-        category_map = get_discussion_category_map(course)
+        category_map = get_discussion_category_map(course, user)
 
         is_moderator = has_permission(user, "see_all_cohorts", course_id)
         flag_moderator =  has_permission(user, 'openclose_thread', course_id) or \

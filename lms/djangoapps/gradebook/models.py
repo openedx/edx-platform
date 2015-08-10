@@ -30,7 +30,7 @@ class StudentGradebook(TimeStampedModel):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
-    def generate_leaderboard(cls, course_key, user_id=None, count=3, exclude_users=[]):
+    def generate_leaderboard(cls, course_key, user_id=None, count=3, exclude_users=None):
         """
         Assembles a data set representing the Top N users, by grade, for a given course.
         Optionally provide a user_id to include user-specific info.  For example, you
@@ -55,6 +55,7 @@ class StudentGradebook(TimeStampedModel):
         those users who currently lack gradebook entries.  We assume zero grades for these users because they
         have not yet submitted a response to a scored assessment which means no grade has been calculated.
         """
+        exclude_users = exclude_users or []
         data = {}
         data['course_avg'] = 0
         data['course_max'] = 0
@@ -109,10 +110,11 @@ class StudentGradebook(TimeStampedModel):
         return data
 
     @classmethod
-    def get_user_position(cls, course_key, user_id, queryset=None, exclude_users=[]):
+    def get_user_position(cls, course_key, user_id, queryset=None, exclude_users=None):
         """
         Helper method to return the user's position in the leaderboard for Proficiency
         """
+        exclude_users = exclude_users or []
         data = {'user_position': 0, 'user_grade': 0}
         user_grade = 0
         users_above = 0

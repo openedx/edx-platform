@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.test import RequestFactory
 
-from api_manager.courseware_access import get_course, get_course_child
+from api_manager.courseware_access import get_course
 from opaque_keys import InvalidKeyError
 from projects.models import Project, WorkgroupReview, WorkgroupSubmissionReview
 
@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
         projects = Project.objects.all()
         for project in projects:
-            course_descriptor, course_key, course_content = get_course(request, request.user, project.course_id)
+            _course_descriptor, course_key, _course_content = get_course(request, request.user, project.course_id)
             project.course_id = unicode(course_key)
             try:
                 project.content_id = course_key.make_usage_key_from_deprecated_string(project.content_id)

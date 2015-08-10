@@ -996,9 +996,9 @@
     border-radius: ($baseline/10);
 
     input[type="button"].add {
-          @include idashbutton($blue);
-          position: absolute;
-          @include right($baseline);
+      @include idashbutton($blue);
+      position: absolute;
+      @include right($baseline);
     }
 
 
