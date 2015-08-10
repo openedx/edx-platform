@@ -133,8 +133,11 @@ class Textbook(object):
         return table_of_contents
 
     def __eq__(self, other):
-        return (self.title == other.title and
-                self.book_url == other.book_url)
+        try:
+            return (self.title == other.title and
+                    self.book_url == other.book_url)
+        except AttributeError:
+            return False
 
     def __ne__(self, other):
         return not self == other
