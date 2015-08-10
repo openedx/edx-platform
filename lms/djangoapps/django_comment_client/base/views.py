@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
-from django.core.files.storage import get_storage_class
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf

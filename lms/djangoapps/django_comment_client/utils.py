@@ -452,7 +452,6 @@ def add_courseware_context(content_list, course, user, id_map=None):
         id_map = get_discussion_id_map(course, user)
 
     for content in content_list:
-        print content
         commentable_id = content['commentable_id']
         if commentable_id in id_map:
             location = id_map[commentable_id]["location"].to_deprecated_string()

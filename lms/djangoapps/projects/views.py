@@ -10,10 +10,8 @@ from rest_framework.decorators import action, link
 from rest_framework import status
 from rest_framework.response import Response
 
-from xblock.fields import Scope
 from courseware.models import StudentModule
 from openedx.core.djangoapps.course_groups.models import CourseCohort
-from xblock.runtime import KeyValueStore
 
 
 from courseware import module_render
@@ -21,7 +19,7 @@ from courseware.courses import get_course
 from courseware.model_data import FieldDataCache
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import Location, InvalidLocationError
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.course_groups.cohorts import (
@@ -304,7 +302,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
 
         users = User.objects.filter(workgroups=pk)
         for user in users:
-            module, created = StudentModule.objects.get_or_create(
+            module, _created = StudentModule.objects.get_or_create(
                 student_id=user.id,
                 module_state_key=content_key,
                 course_id=course_key,

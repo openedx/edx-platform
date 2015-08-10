@@ -2,12 +2,8 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
-from datetime import datetime
-import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from django.contrib.auth.models import User
@@ -60,10 +56,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         workgroup_submission2 = WorkgroupSubmission.objects.create(workgroup=workgroup2, user=user2)
         workgroup_submission_review2 = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission2, content_id=self.bad_style_content_id2)
 
-
         # Run the data migration
         migrate_project_courseids_v2.Command().handle()
-
 
         # Confirm that the data has been properly migrated
         updated_project = Project.objects.get(id=project.id)

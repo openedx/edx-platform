@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 from api_manager.courseware_access import get_course_key
 from organizations.models import Organization
-from api_manager.users.serializers import UserSerializer, SimpleUserSerializer
+from api_manager.users.serializers import SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook

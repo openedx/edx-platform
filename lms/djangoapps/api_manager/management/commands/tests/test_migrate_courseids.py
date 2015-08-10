@@ -16,7 +16,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_st
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-from django.db import connection
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class MigrateCourseIdsTests(ModuleStoreTestCase):
@@ -61,7 +60,6 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         self.new_style_course_id2 = unicode(self.course2.id)
         self.new_style_content_id2 = unicode(self.chapter2.location)
 
-
     def test_migrate_courseids(self):
         """
         Test the data migration
@@ -81,10 +79,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         course_content_group2 = api_models.CourseContentGroupRelationship.objects.create(course_id=self.new_style_course_id2, content_id=self.new_style_content_id2, group_profile=group_profile2)
         course_module_completion2 = CourseModuleCompletion.objects.create(user=user2, course_id=self.new_style_course_id2, content_id=self.new_style_content_id2)
 
-
         # Run the data migration
         migrate_courseids.Command().handle()
-
 
         # Confirm that the data has been properly migrated
         updated_course_group = api_models.CourseGroupRelationship.objects.get(id=course_group.id)

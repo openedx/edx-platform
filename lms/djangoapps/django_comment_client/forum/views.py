@@ -36,10 +36,6 @@ from ccx.overrides import get_current_ccx
 
 from django_comment_client.permissions import has_permission
 from django_comment_client.utils import (
-    merge_dict,
-    extract,
-    strip_none,
-    add_courseware_context,
     get_group_id_for_comments_service
 )
 
@@ -144,14 +140,13 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
 
     #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
-    group_id = request.GET.get('group_id')
     is_cohorted = is_commentable_cohorted(course.id, discussion_id)
 
-    if group_id in ("all", "None"):
-        group_id = None
-
-
-    if not has_permission(request.user, "see_all_cohorts", course.id):
+    if has_permission(request.user, "see_all_cohorts", course.id):
+        group_id = request.GET.get('group_id')
+        if group_id in ("all", "None"):
+            group_id = None
+    else:
         group_id = get_cohort_id(request.user, course.id)
         if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
             default_query_params['exclude_groups'] = True

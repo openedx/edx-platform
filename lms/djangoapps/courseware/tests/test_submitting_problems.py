@@ -439,7 +439,7 @@ class TestCourseGrader(TestSubmittingProblems):
         student_module = StudentModule.objects.get(
             course_id=self.course.id,
             student=self.student_user,
-            module_state_key=self.problem_location('p1')
+            module_state_key=self.problem_location('p1'),
         )
         # count how many state history entries there are
         baseline = StudentModuleHistory.objects.filter(
