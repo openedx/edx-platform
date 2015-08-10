@@ -997,3 +997,61 @@ class TeamPageTest(TeamsTabBase):
             invite_text='Send this link to friends so that they can join too.'
         )
         self.assertEqual(self.team_page.team_invite_url, '{0}?invite=true'.format(self.team_page.url))
+
+    def test_join_team(self):
+        """
+        Scenario: User can join a Team if not a member already..
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I visit the Team page for that team
+        Then I should see Join Team button
+        When I click on Join Team button
+        Then there should be no Join Team button and no message
+        And I should see the updated information under Team Details
+        """
+        self._set_team_configuration_and_membership(create_membership=False)
+        self.team_page.visit()
+        self.assertTrue(self.team_page.join_team_button_present)
+        self.team_page.click_join_team_button()
+        self.assertFalse(self.team_page.join_team_button_present)
+        self.assertFalse(self.team_page.join_team_message_present)
+        self.assert_team_details(num_members=1, invite_text='Send this link to friends so that they can join too.')
+
+    def test_already_member_message(self):
+        """
+        Scenario: User should see `You are already in a team` if user is a
+            member of other team.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I am already a member of a team
+        And I visit a team other than mine
+        Then I should see `You are already in a team` message
+        """
+        self._set_team_configuration_and_membership(membership_team_index=0, visit_team_index=1)
+        self.team_page.visit()
+        self.assertEqual(self.team_page.join_team_message, 'You already belong to another team.')
+        self.assert_team_details(num_members=0, is_member=False)
+
+    def test_team_full_message(self):
+        """
+        Scenario: User should see `Team is full` message when team is full.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And team has no space left
+        And I am not a member of any team
+        And I visit the team
+        Then I should see `Team is full` message
+        """
+        self._set_team_configuration_and_membership(
+            create_membership=True,
+            max_team_size=1,
+            membership_team_index=0,
+            visit_team_index=0,
+            another_user=True
+        )
+        self.team_page.visit()
+        self.assertEqual(self.team_page.join_team_message, 'This team is full.')
+        self.assert_team_details(num_members=1, is_member=False, max_size=1)

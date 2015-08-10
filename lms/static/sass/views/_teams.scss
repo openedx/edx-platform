@@ -228,7 +228,7 @@
 
       .action-view {
         @extend %btn-pl-default-base;
-        float: right;
+        @include float(right);
         margin: ($baseline/4) 0;
       }
     }
@@ -242,11 +242,11 @@
 
       .meta-detail {
         margin-top: ($baseline/4);
-        margin-right: ($baseline*.75);
+        @include margin-right ($baseline*.75);
         color: $gray;
 
         .icon {
-          margin-right: ($baseline/4);
+          @include margin-right ($baseline/4);
         }
       }
 
@@ -306,7 +306,7 @@
       }
 
       .team-activity {
-        float: right;
+        @include float(right);
       }
 
       .card-actions {
@@ -328,7 +328,7 @@
         display: block;
         position: absolute;
         top: ($baseline/2);
-        left: -($baseline/4);
+        @include left(-($baseline/4));
         box-shadow: 1px 1px 1px 0 $blue-d1;
         background-color: $m-blue-l2;
         padding: ($baseline/10) ($baseline*.75);
@@ -400,8 +400,8 @@
         display: inline-block;
 
         @include tooltip-hover-style(-($baseline*2));
+        }
       }
-    }
   }
 
   .create-team {
@@ -484,7 +484,23 @@
         }
     }
 
-    .form-actions {
+    .required-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 60%; // TODO: susy grid
+    }
+
+    .optional-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 35%; // TODO: susy grid
+      @include margin-left(2%);
+      border-left: 2px solid $gray-l4;
+      padding-left: 2%;
+    }
+  }
+
+  .form-actions {
         margin-top: $baseline;
     }
 
@@ -512,23 +528,22 @@
       &:focus {
           border: 1px solid $link-color;
           color: $link-color;
-      }
     }
+  }
 
-    .required-wrapper {
-      display: inline-block;
-      vertical-align: top;
-      width: 60%; // TODO: susy grid
-    }
+  .header-action-view {
+    display: inline-block;
+    width: 33%;
+    vertical-align: text-bottom;
 
-    .optional-wrapper {
-      display: inline-block;
-      vertical-align: top;
-      width: 35%; // TODO: susy grid
-      margin-left: 2%;
-      border-left: 2px solid $gray-l4;
-      padding-left: 2%;
+    .join-team.form-actions, .join-team-message {
+      @include text-align(right);
     }
+  }
+
+  .join-team-message {
+    @extend %t-copy-sub1;
+    color: $gray-l1;
   }
 
   .team-actions {
@@ -687,3 +702,5 @@
 .create-team.form-actions {
   margin-top: $baseline;
 }
+
+

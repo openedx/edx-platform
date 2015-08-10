@@ -312,3 +312,25 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def team_invite_url(self):
         """Returns the url of invite link box"""
         return self.q(css='.page-content-secondary .invite-link-input').attrs('value')[0]
+
+    def click_join_team_button(self):
+        """ Click on Join Team button"""
+        self.q(css='.join-team .action-primary').first.click()
+        self.wait_for_ajax()
+
+    @property
+    def join_team_message(self):
+        """ Returns join team message """
+        self.wait_for_ajax()
+        return self.q(css='.join-team .join-team-message').text[0]
+
+    @property
+    def join_team_button_present(self):
+        """ Returns True if Join Team button is present else False """
+        self.wait_for_ajax()
+        return self.q(css='.join-team .action-primary').present
+
+    @property
+    def join_team_message_present(self):
+        """ Returns True if Join Team message is present else False """
+        return self.q(css='.join-team .join-team-message').present

@@ -17,11 +17,12 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
+            'teams/js/views/team_join',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  teamsTemplate) {
+                  TeamJoinView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function (attributes) {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -241,7 +242,14 @@
                                                 countries: self.countries
                                             }
                                         });
-                                        deferred.resolve(self.createViewWithHeader(teamsView, topic));
+                                        deferred.resolve(
+                                            self.createViewWithHeader(
+                                                {
+                                                    mainView: teamsView,
+                                                    subject: topic
+                                                }
+                                            )
+                                        );
                                     });
                             });
                     }
@@ -277,33 +285,52 @@
                                     requestUsername: self.userInfo.username,
                                     countries: self.countries,
                                     languages: self.languages,
-                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true'
+                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true'  
                                 });
-                            deferred.resolve(self.createViewWithHeader(view, team, topic));
+                            var teamJoinView = new TeamJoinView(
+                                {
+                                    model: team,
+                                    teamsUrl: self.teamsUrl,
+                                    maxTeamSize: self.maxTeamSize,
+                                    currentUsername: self.userInfo.username,
+                                    teamMembershipsUrl: self.teamMembershipsUrl
+                                }
+                            );
+                            deferred.resolve(
+                                self.createViewWithHeader(
+                                    {
+                                        mainView: view,
+                                        subject: team,
+                                        parentTopic: topic,
+                                        headerActionsView: teamJoinView
+                                    }
+                                )
+                            );
                         });
                     });
                     return deferred.promise();
                 },
 
-                createViewWithHeader: function (mainView, subject, parentTopic) {
+                createViewWithHeader: function (options) {
                     var router = this.router,
                         breadcrumbs, headerView;
                     breadcrumbs = [{
                         title: gettext('All Topics'),
                         url: '#browse'
                     }];
-                    if (parentTopic) {
+                    if (options.parentTopic) {
                         breadcrumbs.push({
-                            title: parentTopic.get('name'),
-                            url: '#topics/' + parentTopic.id
+                            title: options.parentTopic.get('name'),
+                            url: '#topics/' + options.parentTopic.id
                         });
                     }
                     headerView = new HeaderView({
                         model: new TeamsHeaderModel({
-                            description: subject.get('description'),
-                            title: subject.get('name'),
+                            description: options.subject.get('description'),
+                            title: options.subject.get('name'),
                             breadcrumbs: breadcrumbs
                         }),
+                        headerActionsView: options.headerActionsView,
                         events: {
                             'click nav.breadcrumbs a.nav-item': function (event) {
                                 var url = $(event.currentTarget).attr('href');
@@ -314,7 +341,7 @@
                     });
                     return new ViewWithHeader({
                         header: headerView,
-                        main: mainView
+                        main: options.mainView
                     });
                 },
 
