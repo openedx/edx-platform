@@ -1293,7 +1293,7 @@ def get_proctored_exam_results(request, course_id):
         'last_poll_ipaddr',
     ]
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     try:
         instructor_task.api.submit_proctored_exam_results_report(request, course_key, query_features)
         status_response = _("The proctored exam results report is being created."

@@ -26,7 +26,7 @@ class CreditService(object):
 
         ARGS:
             - user_id: The PK of the User in question
-            - course_key: The course ID (as string)
+            - course_key: The course ID (as string or CourseKey)
 
         RETURNS:
             NONE (user not found or is not enrolled or is not credit course)
@@ -45,20 +45,12 @@ class CreditService(object):
             get_credit_requirement_status,
         )
 
-        # course_key = CourseKey.from_string(course_id)
-
-        try:
-            user = User.objects.get(id=user_id)
-        except ObjectDoesNotExist:
-            # bad user_id
-            return None
-
         # since we have to do name matching during various
         # verifications, User must have a UserProfile
         try:
-            profile = UserProfile.objects.get(user_id=user_id)
+            user = User.objects.select_related('profile').get(id=user_id)
         except ObjectDoesNotExist:
-            # this shouldn't happen under normal circumstances
+            # bad user_id
             return None
 
         course_key = (
@@ -77,7 +69,7 @@ class CreditService(object):
 
         return {
             'enrollment_mode': enrollment.mode,
-            'profile_fullname': profile.name,
+            'profile_fullname': user.profile.name,
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
 
