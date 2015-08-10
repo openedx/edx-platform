@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from opaque_keys.edx.keys import CourseKey
 
-from student.models import CourseEnrollment, UserProfile
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
