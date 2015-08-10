@@ -34,7 +34,7 @@ class InstructorService(object):
         course_id = CourseKey.from_string(course_id)
         student = get_student_from_identifier(student_identifier)
         try:
-            module_state_key = course_id.make_usage_key(content_id)
+            module_state_key = course_id.make_usage_key_from_deprecated_string(content_id)
         except InvalidKeyError:
             log.error("Invalid content id %s .", content_id)
         if student:

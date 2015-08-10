@@ -211,7 +211,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         pip installed djangoapp
         """
 
-        # None = no overriden view rendering
+        # None = no overridden view rendering
         view_html = None
 
         # Is this sequent part of a timed or proctored exam?
