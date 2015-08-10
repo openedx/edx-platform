@@ -1228,7 +1228,7 @@ def submission_history(request, course_id, student_username, location):
             len(history_entries),
         )
         scores_by_date = {
-            score.modified: score
+            score.created: score
             for score in scores
         }
         scores = [
