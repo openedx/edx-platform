@@ -48,13 +48,13 @@ def get_course_xblocks(course_key, category):
     return xblocks
 
 
-def filter_by_scheme(course_user_partitions, filter_partition_schemes):
+def filter_by_scheme(course_user_partitions, filter_partition_scheme):
     """ Filter all user partitions for 'course_user_partitions' which have
-    scheme present in list 'filter_partition_schemes'.
+    scheme name as provided 'filter_partition_scheme'.
 
     Args:
         course_user_partitions (List): List of user partitions
-        filter_partition_schemes (List): List of user partitions scheme names
+        filter_partition_scheme (str): User partition scheme name
 
     Returns:
         List of filtered user partitions.
@@ -62,7 +62,7 @@ def filter_by_scheme(course_user_partitions, filter_partition_schemes):
     """
     filtered_user_partitions = []
     for user_partition in course_user_partitions:
-        if user_partition.scheme.name not in filter_partition_schemes:
+        if not user_partition.scheme.name == filter_partition_scheme:
             filtered_user_partitions.append(user_partition)
 
     return filtered_user_partitions

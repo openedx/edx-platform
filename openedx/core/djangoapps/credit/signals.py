@@ -14,11 +14,14 @@ from cms.djangoapps.contentstore.course_group_config import GroupConfiguration, 
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme, get_group_access_blocks
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition, NoSuchUserPartitionError
 
 
 log = logging.getLogger(__name__)
+# Used in
+MINIMUM_GROUP_ID = 100
 # User partition scheme
 VERIFICATION_SCHEME = "verification"
 # Course modules categories on which an ICRV has access control
@@ -125,8 +128,9 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):  # p
             # update the 'group_access' of provided xblock 'block' and its ancestor.
             _update_content_group_access(block, group_configuration)
 
-    # Now add all newly created partition in 'user_partitions' field of course
-    _update_course_user_partitions(course_key, new_user_partitions)
+    # Now update and add all newly created partition in 'user_partitions'
+    # field of course
+    _update_course_user_partitions(course_key, partition_scheme, new_user_partitions)
 
 
 def _access_dict(group_configuration, access_groups_id_list):
@@ -152,7 +156,7 @@ def _update_content_group_access(block, group_configuration):
     """ Update the 'group_access' of provided xblock 'block' and its ancestor.
 
     Args:
-        block (xblock): XBlock mixin
+        block (XBlock): XBlock mixin
         group_configuration  (UserPartition): UserPartition object
 
     """
@@ -160,9 +164,13 @@ def _update_content_group_access(block, group_configuration):
     # 'verified_allow' and 'verified_deny' of provided user partition
     # 'group_configuration'
     access_groups_id_list = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
+    # Assuming that there will be only one user partition for a block
     block.group_access = _access_dict(group_configuration, access_groups_id_list)
-    # save updated block with the last editor
-    modulestore().update_item(block, block.edited_by)
+
+    # Update the published branch only
+    with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
+        # save updated block with the last editor
+        modulestore().update_item(block, block.edited_by)
 
     # now for course content access control, add groups
     # 'non_verified' and 'verified_allow' in 'group_access' field of
@@ -189,38 +197,39 @@ def _update_content_group_access(block, group_configuration):
     modulestore().update_item(ancestor_for_update, ancestor_for_update.edited_by)
 
 
-def _update_course_user_partitions(course_key, new_user_partitions):
+def _update_course_user_partitions(course_key, partition_scheme, new_user_partitions):
     """ Add provided user partitions in 'new_user_partitions' in
     'user_partitions' field of provided course.
 
     Remove all user partitions of course with same partition schemes as in
-    provided list 'new_user_partitions'.
+    provided 'partition_scheme'.
 
     Args:
         course_key (CourseKey): Identifier for the course
+        partition_scheme (str): Name of the user partition scheme
         new_user_partitions (List): List of user partitions
 
     """
     course = modulestore().get_course(course_key, depth=0)
-    # get unique set of partition schemes for update and filter course user
-    # partitions with any of the unique set of partition schemes
+    # get list of user partitions for the course before updating them
     course_user_partitions_old = [user_partition.id for user_partition in course.user_partitions]
-    filter_partition_schemes = set([user_partition.scheme.name for user_partition in new_user_partitions])
-    course_user_partitions = filter_by_scheme(course.user_partitions, filter_partition_schemes)
-    # new add user partitions 'new_user_partitions' in filter course user partitions
+    course_user_partitions = filter_by_scheme(course.user_partitions, partition_scheme)
+    # set filtered 'course_user_partitions' and new 'new_user_partitions' user
+    # partitions as course user partitions
     course.user_partitions = course_user_partitions + new_user_partitions
-
     # save updated course with the last editor
     modulestore().update_item(course, course.edited_by)
+
+    # get list of user partitions for the course after updating them
     course_user_partitions_new = [user_partition.id for user_partition in course.user_partitions]
-
-    # sync blocks with access roles according to new user partitions for course
+    # now get list of deleted user partitions for the course and update for
+    # all course group access blocks
     deleted_partitions = list(set(course_user_partitions_old) - set(course_user_partitions_new))
-
-    # sync blocks with access roles according to new user partitions for the
-    # course so that user is not denied access for blocks with non-existing
-    # user partitions/groups
-    _sync_course_content_deleted_partitions(course_key, deleted_partitions)
+    if deleted_partitions:
+        # sync blocks with access roles according to new user partitions for the
+        # course so that user is not denied access for blocks with non-existing
+        # user partitions/groups
+        _sync_course_content_deleted_partitions(course_key, deleted_partitions)
 
 
 def _sync_course_content_deleted_partitions(course_key, deleted_partitions):  # pylint: disable=invalid-name
@@ -249,8 +258,10 @@ def _sync_course_content_deleted_partitions(course_key, deleted_partitions):  # 
             for group_id in deleted_group_access:
                 del block.group_access[group_id]
 
-            # save updated block with the last editor
-            modulestore().update_item(block, block.edited_by)
+                # Update the published branch only
+                with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
+                    # save updated block with the last editor
+                    modulestore().update_item(block, block.edited_by)
 
 
 def _verification_partition_group_configuration(course_key, user_partition, block):  # pylint: disable=invalid-name
@@ -258,10 +269,10 @@ def _verification_partition_group_configuration(course_key, user_partition, bloc
 
     Group and UserPartition id's will be int.
 
-    Args:
+    Args:`
         course_key (CourseKey): Identifier for the course
         user_partition (UserPartition): UserPartition object
-        block (xblock): XBlock mixin
+        block (XBlock): XBlock mixin
 
     Returns:
         UserPartition object.
