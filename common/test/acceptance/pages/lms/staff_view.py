@@ -70,6 +70,10 @@ class StaffPage(CoursewarePage):
         self.q(css="li.next").click()
         self.wait_for_ajax()
 
+    @property
+    def problem_id(self):
+        return self.q(css='section.course-content').html
+
 
 class StaffDebugPage(PageObject):
     """
