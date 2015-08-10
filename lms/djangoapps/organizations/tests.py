@@ -22,8 +22,8 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 TEST_API_KEY = str(uuid.uuid4())
 
-TEST_API_KEY = str(uuid.uuid4())
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
 
 class SecureClient(Client):
 
@@ -501,7 +501,6 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 8)
         self.assertEqual(response.data['users_grade_average'], 0.504)
-
 
         courses = {'courses': unicode(course1.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))

@@ -20,9 +20,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_st
 from projects.models import Project, Workgroup
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from openedx.core.djangoapps.course_groups.cohorts import (get_cohort_by_name, remove_user_from_cohort,
-                                   delete_empty_cohort, is_user_in_cohort, get_course_cohort_names)
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_by_name, remove_user_from_cohort,
+    delete_empty_cohort, is_user_in_cohort, get_course_cohort_names
+)
 
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
@@ -468,7 +469,6 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         }
         response = self.do_post(self.test_peer_reviews_uri, pr_data)
         self.assertEqual(response.status_code, 201)
-        pr2_id = response.data['id']
 
         test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
         peer_reviews_uri = '{}peer_reviews/'.format(test_uri)
