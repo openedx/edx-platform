@@ -56,7 +56,9 @@ class DataDownload
         url: url
         error: (std_ajax_err) =>
           @clear_display()
-          @$reports_request_response_error.text gettext("Error generating student profile information. Please try again.")
+          @$reports_request_response_error.text gettext(
+            "Error generating proctored exam results. Please try again."
+          )
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @clear_display()

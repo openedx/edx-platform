@@ -35,7 +35,7 @@
 
     <p><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true"></p>
 
-    %if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+    %if section_data['show_generate_proctored_exam_report_button']:
       <p>${_("Click to generate a CSV file of all proctored exam results in this course.")}</p>
       <p><input type="button" name="proctored-exam-results-report" value="${_("Generate Proctored Exam Results Report")}" data-endpoint="${ section_data['list_proctored_results_url'] }"/></p>
     %endif

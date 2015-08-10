@@ -5,7 +5,7 @@ Implementation of "Instructor" service
 import logging
 
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from courseware.models import StudentModule
 from instructor.views.tools import get_student_from_identifier
 import instructor.enrollment as enrollment
@@ -31,17 +31,19 @@ class InstructorService(object):
             - unique_student_identifier is an email or username
             - course_id is the id for the course
         """
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         student = get_student_from_identifier(student_identifier)
         try:
-            module_state_key = course_id.make_usage_key_from_deprecated_string(content_id)
+            module_state_key = course_id.make_usage_key(content_id)
         except InvalidKeyError:
             log.error("Invalid content id %s .", content_id)
         if student:
             try:
                 enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=True)
             except StudentModule.DoesNotExist:
-                log.error("Module does not exist.")
+                log.error("Error occurred while attempting to reset student attempts: StudentModule does not exist.")
             except enrollment.sub_api.SubmissionError:
                 # Trust the submissions API to log the error
-                log.error("An error occurred while deleting the score.")
+                log.error(
+                    "Error occurred while attempting to reset student attempts: Score does not exist."
+                )
