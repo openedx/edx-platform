@@ -56,9 +56,10 @@ def on_course_publish(course_key):  # pylint: disable=unused-argument
         log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
 
     # now synchronously tag course content with ICRV access control
-    log.info(u'Start tagging course "%s" content with ICRV Access Control', course_key)
-    tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
-    log.info(u'Finished tagging course "%s" content with ICRV Access Control', course_key)
+    with modulestore().bulk_operations(course_key, emit_signals=True):
+        log.info(u'Start tagging course "%s" content with ICRV Access Control', course_key)
+        tag_course_content_with_partition_scheme(course_key, partition_scheme='verification')
+        log.info(u'Finished tagging course "%s" content with ICRV Access Control', course_key)
 
 
 @receiver(GRADES_UPDATED)
