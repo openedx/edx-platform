@@ -465,7 +465,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         """Create a dummy course. """
         super(GetUserPartitionInfoTest, self).setUp()
         self.course = CourseFactory()
-        self.block = ItemFactory.create(category="problem", parent_location=self.course.location)
+        self.block = ItemFactory.create(category="problem", parent_location=self.course.location)  # pylint: disable=no-member
 
         # Set up some default partitions
         self._set_partitions([
