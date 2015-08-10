@@ -1219,13 +1219,16 @@ def submission_history(request, course_id, student_username, location):
         log.warning(
             "Mismatch when fetching scores for student "
             "history for course %s, user %s, xblock %s. "
-            "Matching scores by date for display.",
+            "%d scores were found, and %d history entries were found. "
+            "Matching scores to history entries by date for display.",
             course_id,
             student_username,
-            location
+            location,
+            len(scores),
+            len(history_entries),
         )
         scores_by_date = {
-            score.modified: score
+            score.created: score
             for score in scores
         }
         scores = [
