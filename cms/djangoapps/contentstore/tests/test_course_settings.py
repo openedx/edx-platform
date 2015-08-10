@@ -1033,7 +1033,6 @@ class CourseMetadataEditingTest(CourseTestCase):
                 'id': 1,
                 'name': 'Certificate Config Name',
                 'course_title': 'Title override',
-                'org_logo_path': '/c4x/test/CSS101/asset/org_logo.png',
                 'signatories': [],
                 'is_active': True
             }
