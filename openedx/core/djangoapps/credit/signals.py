@@ -10,9 +10,13 @@ from opaque_keys.edx.keys import CourseKey
 
 from util.db import generate_int_id, MYSQL_MAX_INT
 
-from cms.djangoapps.contentstore.course_group_config import GroupConfiguration, MINIMUM_GROUP_ID
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
-from openedx.core.djangoapps.credit.utils import get_course_xblocks, filter_by_scheme, get_group_access_blocks
+from openedx.core.djangoapps.credit.utils import (
+    get_course_xblocks,
+    filter_by_scheme,
+    get_group_access_blocks,
+    get_course_partitions_used_ids,
+)
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -282,7 +286,7 @@ def _verification_partition_group_configuration(course_key, user_partition, bloc
 
     # make int id for user partition scheme `VerificationPartitionScheme` which
     # is unique in user partitions of the provided course
-    group_configuration_id = generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course))
+    group_configuration_id = generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, get_course_partitions_used_ids(course))
     group_configuration_name = u"Verification Checkpoint for {checkpoint_name}".format(
         checkpoint_name=block.display_name
     )

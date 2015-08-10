@@ -81,3 +81,17 @@ def get_group_access_blocks(course_key):
     items = modulestore().get_items(course_key, settings={'group_access': {'$exists': True}})
 
     return items
+
+
+def get_course_partitions_used_ids(course):
+    """ Returns list of user partitions 'user_partitions' ids for the provided
+    course.
+
+    Args:
+        course (CourseDescriptorWithMixins): Course object
+
+    Returns:
+        List of user partitions id's.
+
+    """
+    return set([p.id for p in course.user_partitions])
