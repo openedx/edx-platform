@@ -5,7 +5,7 @@ Implementation of "Instructor" service
 import logging
 
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from courseware.models import StudentModule
 from instructor.views.tools import get_student_from_identifier
 import instructor.enrollment as enrollment
@@ -34,7 +34,7 @@ class InstructorService(object):
         course_id = CourseKey.from_string(course_id)
         student = get_student_from_identifier(student_identifier)
         try:
-            module_state_key = course_id.make_usage_key_from_deprecated_string(content_id)
+            module_state_key = UsageKey.from_string(content_id)
         except InvalidKeyError:
             log.error("Invalid content id %s .", content_id)
         if student:
