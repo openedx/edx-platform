@@ -13,4 +13,4 @@
 -e git+https://github.com/edx/edx-notifications.git@4e3323da6775a101da5d8beab80c231278df69d2#egg=edx-notifications
 -e git+https://github.com/open-craft/problem-builder.git@f42c7c572c7c9e5155062f3f1874714abf63e92a#egg=problem-builder
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@8bfe329e74b77c4b66399b3c605dcb5600edb1b2#egg=xblock-group-project-v2
--e git+https://github.com/edx-solutions/xblock.git@07cfdf2e611375bccd481b4b388f70c6dbf6d6ab#egg=xblock
+-e git+https://github.com/edx-solutions/xblock.git@d6ef4173c4a6f15ca3409749168e03db68da95f9#egg=xblock
