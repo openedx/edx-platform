@@ -13,10 +13,13 @@ from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from lms.lib.comment_client import Thread
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
-from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
+from django_comment_client.tests.group_id import (
+    CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
+)
 from django_comment_client.tests.utils import CohortedContentTestCase, ForumsEnableMixin
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
@@ -34,8 +37,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, add_cohort, add_user_to_cohort
 
-from edx_notifications.lib.consumer import get_notifications_for_user, get_notifications_count_for_user
-from edx_notifications.startup import initialize  as initialize_notifications
+from edx_notifications.lib.consumer import get_notifications_count_for_user
+from edx_notifications.startup import initialize as initialize_notifications
 
 from social_engagement.models import StudentSocialEngagementScore
 

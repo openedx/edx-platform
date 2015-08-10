@@ -5,7 +5,6 @@ Run these tests @ Devstack:
 from datetime import datetime
 from django.test.utils import override_settings
 from mock import MagicMock, patch
-from unittest import skip
 import uuid
 
 from django.conf import settings

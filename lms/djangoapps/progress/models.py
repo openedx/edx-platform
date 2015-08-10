@@ -2,19 +2,13 @@
 Django database models supporting the progress app
 """
 
-from datetime import datetime
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum, Q
-from django.utils.timezone import UTC
 
 from model_utils.models import TimeStampedModel
 from xmodule_django.models import CourseKeyField
-from xmodule.modulestore.django import modulestore
-
-from opaque_keys.edx.keys import CourseKey
 
 
 class StudentProgress(TimeStampedModel):
