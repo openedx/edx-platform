@@ -14,6 +14,18 @@ from student.models import CourseEnrollment
 log = logging.getLogger(__name__)
 
 
+def _get_course_key(course_key_or_id):
+    """
+    Helper method to get a course key eith from a string or a CourseKey,
+    where the CourseKey will simply be returned
+    """
+    return (
+        CourseKey.from_string(course_key_or_id)
+        if isinstance(course_key_or_id, basestring)
+        else course_key_or_id
+    )
+
+
 class CreditService(object):
     """
     Course Credit XBlock service
@@ -53,11 +65,7 @@ class CreditService(object):
             # bad user_id
             return None
 
-        course_key = (
-            CourseKey.from_string(course_key_or_id)
-            if isinstance(course_key_or_id, basestring)
-            else course_key_or_id
-        )
+        course_key = _get_course_key(course_key_or_id)
 
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         if not enrollment or not enrollment.is_active:
@@ -82,6 +90,9 @@ class CreditService(object):
         For more information, see documentation on this method name in api.eligibility.py
         """
 
+        # always log any update activity to the credit requirements
+        # table. This will be to help debug any issues that might
+        # arise in production
         log_msg = (
             'set_credit_requirement_status was called with '
             'user_id={user_id}, course_key_or_id={course_key_or_id} '
@@ -97,14 +108,13 @@ class CreditService(object):
         )
         log.info(log_msg)
 
-        # need to get user_name
-        user = User.objects.get(id=user_id)
+        # need to get user_name from the user object
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return None
 
-        course_key = (
-            CourseKey.from_string(course_key_or_id)
-            if isinstance(course_key_or_id, basestring)
-            else course_key_or_id
-        )
+        course_key = _get_course_key(course_key_or_id)
 
         # This seems to need to be here otherwise we get
         # circular references when starting up the app

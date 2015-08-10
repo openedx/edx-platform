@@ -116,6 +116,37 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
         self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')
 
+    def test_bad_user(self):
+        """
+        Try setting requirements status with a bad user_id
+        """
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        # set course requirements
+        set_credit_requirements(
+            self.course.id,
+            [
+                {
+                    "namespace": "grade",
+                    "name": "grade",
+                    "display_name": "Grade",
+                    "criteria": {
+                        "min_grade": 0.8
+                    },
+                },
+            ]
+        )
+
+        # mark the grade as satisfied
+        retval = self.service.set_credit_requirement_status(
+            self.user.id,
+            self.course.id,
+            'grade',
+            'grade'
+        )
+        self.assertIsNone(retval)
+
     def test_course_id_string(self):
         """
         Make sure we can pass a course_id (string) and get back correct results as well
