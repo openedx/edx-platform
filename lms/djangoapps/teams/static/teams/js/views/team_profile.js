@@ -4,14 +4,16 @@
 ;(function (define) {
     'use strict';
     define(['backbone', 'underscore', 'gettext', 'teams/js/views/team_discussion',
+            "common/js/components/views/feedback_prompt",
             'text!teams/templates/team-profile.underscore',
             'text!teams/templates/team-member.underscore'
         ],
-        function (Backbone, _, gettext, TeamDiscussionView, teamTemplate, teamMemberTemplate) {
+        function (Backbone, _, gettext, TeamDiscussionView, PromptView, teamTemplate, teamMemberTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
                 events: {
-                    'click .invite-link-input': 'selectText'
+                    'click .invite-link-input': 'selectText',
+                    'click .leave-team-link': 'leaveTeam'
                 },
                 initialize: function (options) {
                     this.listenTo(this.model, "change", this.render);
@@ -26,6 +28,8 @@
                     // TODO un comment this when country and language PR merge in
                     //this.country = options.countries[this.model.get('country')];
                     //this.language = options.languages[this.model.get('language')];
+
+                    _.bindAll(this, 'leaveTeam', 'confirmThenRunOperation');
                 },
 
                 render: function () {
@@ -80,6 +84,46 @@
                 selectText: function(event) {
                     event.preventDefault();
                     $(event.currentTarget).select();
+                },
+
+                /**
+                 * Confirms with the user whether to run an operation or not, and then runs it if desired.
+                 */
+                confirmThenRunOperation: function(title, message, actionLabel, operation, onCancelCallback) {
+                    return new PromptView.Warning({
+                        title: title,
+                        message: message,
+                        actions: {
+                            primary: {
+                                text: actionLabel,
+                                click: function(prompt) {
+                                    prompt.hide();
+                                    operation();
+                                }
+                            },
+                            secondary: {
+                                text: gettext('Cancel'),
+                                click: function(prompt) {
+                                    if (onCancelCallback) {
+                                        onCancelCallback();
+                                    }
+                                    return prompt.hide();
+                                }
+                            }
+                        }
+                    }).show();
+                },
+
+                leaveTeam: function (event) {
+                    event.preventDefault();
+                    this.confirmThenRunOperation(
+                        gettext('Leave this team?'),
+                        gettext('Leaving a team means you can no longer post on this team, and your spot is opened for another learner.'),
+                        gettext('Leave'),
+                        function() {
+                            console.log('Left the team!');
+                        }
+                    );
                 }
             });
 

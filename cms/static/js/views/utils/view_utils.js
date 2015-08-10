@@ -1,7 +1,7 @@
 /**
  * Provides useful utilities for views.
  */
-define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt"],
+define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "common/js/components/views/feedback_prompt"],
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
