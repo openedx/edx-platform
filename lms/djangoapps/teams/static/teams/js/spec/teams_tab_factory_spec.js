@@ -15,7 +15,7 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
                     userInfo: {
                         username: 'test-user',
                         privileged: false,
-                        teamMembershipData: null
+                        team_memberships_data: null
                     }
                 });
             };
@@ -28,15 +28,9 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
                 Backbone.history.stop();
             });
 
-            it("can load templates", function() {
+            it('can render the "Teams" tab', function() {
                 initializeTeamsTabFactory();
-                expect($('.teams-content').text()).toContain("My Teams");
-                expect($('.teams-content').text()).toContain("Showing 0 out of 0 total");
-            });
-
-            it("displays a header", function() {
-                initializeTeamsTabFactory();
-                expect($('.teams-content').html()).toContain("See all teams in your course, organized by topic");
+                expect($('.teams-content').text()).toContain('See all teams in your course, organized by topic');
             });
         });
     }

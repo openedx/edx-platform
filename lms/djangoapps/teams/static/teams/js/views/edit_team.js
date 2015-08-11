@@ -19,10 +19,10 @@
                 },
 
                 initialize: function(options) {
-                    this.courseId = options.teamParams.courseId;
+                    this.courseID = options.teamParams.courseID;
+                    this.topicID = options.teamParams.topicID;
                     this.collection = options.collection;
                     this.teamsUrl = options.teamParams.teamsUrl;
-                    this.topicId = options.teamParams.topicId;
                     this.languages = options.teamParams.languages;
                     this.countries = options.teamParams.countries;
                     this.primaryButtonTitle = options.primaryButtonTitle || 'Submit';
@@ -103,8 +103,8 @@
                         teamCountry = this.teamCountryField.fieldValue();
 
                     var data = {
-                        course_id: this.courseId,
-                        topic_id: this.topicId,
+                        course_id: this.courseID,
+                        topic_id: this.topicID,
                         name: this.teamNameField.fieldValue(),
                         description: this.teamDescriptionField.fieldValue(),
                         language: _.isNull(teamLanguage) ? '' : teamLanguage,
@@ -120,7 +120,7 @@
                     this.teamModel.save(data, { wait: true })
                         .done(function(result) {
                             Backbone.history.navigate(
-                                'teams/' + view.topicId + '/' + view.teamModel.id,
+                                'teams/' + view.topicID + '/' + view.teamModel.id,
                                 {trigger: true}
                             );
                         })
@@ -184,7 +184,7 @@
                },
 
                goBackToTopic: function () {
-                   Backbone.history.navigate('topics/' + this.topicId, {trigger: true});
+                   Backbone.history.navigate('topics/' + this.topicID, {trigger: true});
                 }
             });
         });

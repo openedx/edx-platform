@@ -5,8 +5,7 @@
         function ($, _, Backbone, TeamsTabView) {
             return function (options) {
                 var teamsTab = new TeamsTabView(_.extend(options, {el: $('.teams-content')}));
-                teamsTab.render();
-                Backbone.history.start();
+                teamsTab.start();
             };
         });
 }).call(this, define || RequireJS.define);

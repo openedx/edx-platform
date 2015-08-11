@@ -16,20 +16,32 @@
                     itemViewClass: this.itemViewClass
                 });
                 this.listView = new ItemListView({collection: this.options.collection});
-                this.headerView = this.headerView = new PagingHeader({collection: this.options.collection});
-                this.footerView = new PagingFooter({
-                    collection: this.options.collection, hideWhenOnePage: true
-                });
+                this.headerView = this.createHeaderView();
+                this.footerView = this.createFooterView();
                 this.collection.on('page_changed', function () {
                     this.$('.sr-is-focusable.sr-' + this.type + '-view').focus();
                 }, this);
             },
 
+            createHeaderView: function() {
+                return new PagingHeader({collection: this.options.collection});
+            },
+
+            createFooterView: function() {
+                return new PagingFooter({
+                    collection: this.options.collection, hideWhenOnePage: true
+                });
+            },
+
             render: function () {
                 this.$el.html(_.template(paginatedViewTemplate, {type: this.type}));
                 this.assign(this.listView, '.' + this.type + '-list');
-                this.assign(this.headerView, '.' + this.type + '-paging-header');
-                this.assign(this.footerView, '.' + this.type + '-paging-footer');
+                if (this.headerView) {
+                    this.assign(this.headerView, '.' + this.type + '-paging-header');
+                }
+                if (this.footerView) {
+                    this.assign(this.footerView, '.' + this.type + '-paging-footer');
+                }
                 return this;
             },
 

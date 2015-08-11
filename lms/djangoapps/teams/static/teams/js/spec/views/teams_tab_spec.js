@@ -2,8 +2,9 @@ define([
     'jquery',
     'backbone',
     'common/js/spec_helpers/ajax_helpers',
-    'teams/js/views/teams_tab'
-], function ($, Backbone, AjaxHelpers, TeamsTabView) {
+    'teams/js/views/teams_tab',
+    'teams/js/spec_helpers/team_spec_helpers'
+], function ($, Backbone, AjaxHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function () {
@@ -21,39 +22,6 @@ define([
 
         var expectFocus = function (element) {
             expect(element.focus).toHaveBeenCalled();
-        };
-
-        var createUserInfo = function(options) {
-            var defaultTeamMembershipData = {
-                count: 1,
-                currentPage: 1,
-                numPages: 1,
-                next: null,
-                previous: null,
-                results: [
-                    {
-                        user: {
-                            username: 'andya',
-                            url: 'https://openedx.example.com/api/user/v1/accounts/andya'
-                        },
-                        team: {
-                            description: '',
-                            name: 'Discrete Maths',
-                            id: 'dm',
-                            topic_id: 'algorithms'
-                        },
-                        date_joined: '2015-04-09T17:31:56Z'
-                    }
-                ]
-            };
-            return _.extend(
-                {
-                    username: 'andya',
-                    privileged: false,
-                    teamMembershipData: defaultTeamMembershipData
-                },
-                options
-            );
         };
 
         var createTeamsTabView = function(options) {
@@ -74,7 +42,7 @@ define([
                         {
                             el: $('.teams-content'),
                             topics: defaultTopics,
-                            userInfo: createUserInfo(),
+                            userInfo: TeamSpecHelpers.createMockUserInfo(),
                             topicsUrl: 'api/topics/',
                             topicUrl: 'api/topics/topic_id,test/course/id',
                             teamsUrl: 'api/teams/',
@@ -82,13 +50,13 @@ define([
                         },
                         options || {}
                     )
-                ).render();
+                );
+            teamsTabView.start();
             return teamsTabView;
         };
 
         beforeEach(function () {
             setFixtures('<div class="teams-content"></div>');
-            Backbone.history.start();
             spyOn($.fn, 'focus');
         });
 
@@ -96,23 +64,7 @@ define([
             Backbone.history.stop();
         });
 
-        it('shows the my teams tab initially', function () {
-            var teamsTabView = createTeamsTabView();
-            expectHeader(teamsTabView, 'See all teams in your course, organized by topic');
-            expectContent(teamsTabView, 'Showing 1 out of 1 total');
-            expectContent(teamsTabView, 'Discrete Maths');
-        });
-
         describe('Navigation', function () {
-            it('can switch tabs', function () {
-                var teamsTabView = createTeamsTabView();
-                teamsTabView.$('a.nav-item[data-url="browse"]').click();
-                expectContent(teamsTabView, 'test description');
-                teamsTabView.$('a.nav-item[data-url="my-teams"]').click();
-                expectContent(teamsTabView, 'Showing 1 out of 1 total');
-                expectContent(teamsTabView, 'Discrete Maths');
-            });
-
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
@@ -144,7 +96,7 @@ define([
         describe('Discussion privileges', function () {
             it('allows privileged access to any team', function () {
                 var teamsTabView = createTeamsTabView({
-                    userInfo: createUserInfo({ privileged: true })
+                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: true })
                 });
                 // Note: using `undefined` here to ensure that we
                 // don't even look at the team when the user is
@@ -154,7 +106,7 @@ define([
 
             it('allows access to a team which an unprivileged user is a member of', function () {
                 var teamsTabView = createTeamsTabView({
-                    userInfo: createUserInfo({
+                    userInfo: TeamSpecHelpers.createMockUserInfo({
                         username: 'test-user',
                         privileged: false
                     })
@@ -172,7 +124,7 @@ define([
 
             it('does not allow access if the user is neither privileged nor a team member', function () {
                 var teamsTabView = createTeamsTabView({
-                    userInfo: createUserInfo({ privileged: false })
+                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: false })
                 });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: { membership: [] }

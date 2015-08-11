@@ -14,12 +14,13 @@
             'teams/js/collections/team_membership',
             'teams/js/views/topics',
             'teams/js/views/team_profile',
-            'teams/js/views/teams',
+            'teams/js/views/my_teams',
+            'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
-                  TopicsView, TeamProfileView, TeamsView, TeamEditView,
+                  TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   teamsTemplate) {
             var ViewWithHeader = Backbone.View.extend({
                 initialize: function (options) {
@@ -66,7 +67,7 @@
                     });
 
                     this.teamMemberships = new TeamMembershipCollection(
-                        this.userInfo.teamMembershipData,
+                        this.userInfo.team_memberships_data,
                         {
                             url: this.teamMembershipsUrl,
                             course_id: this.courseID,
@@ -76,13 +77,13 @@
                         }
                     ).bootstrap();
 
-                    this.myTeamsView = new TeamsView({
+                    this.myTeamsView = new MyTeamsView({
                         router: this.router,
                         collection: this.teamMemberships,
                         teamMemberships: this.teamMemberships,
                         maxTeamSize: this.maxTeamSize,
                         teamParams: {
-                            courseId: this.courseID,
+                            courseID: this.courseID,
                             teamsUrl: this.teamsUrl,
                             languages: this.languages,
                             countries: this.countries
@@ -108,7 +109,7 @@
                         }),
                         main: new TabbedView({
                             tabs: [{
-                                title: gettext('My Teams'),
+                                title: gettext('My Team'),
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
@@ -119,6 +120,24 @@
                             router: this.router
                         })
                     });
+                },
+
+                /**
+                 * Start up the Teams app
+                 */
+                start: function() {
+                    Backbone.history.start();
+
+                    // Navigate to the default page if there is no history:
+                    // 1. If the user belongs to at least one team, jump to the "My Teams" page
+                    // 2. If not, then jump to the "Browse" page
+                    if (Backbone.history.getFragment() === '') {
+                        if (this.teamMemberships.length > 0) {
+                            this.router.navigate('my-teams', {trigger: true});
+                        } else {
+                            this.router.navigate('browse', {trigger: true});
+                        }
+                    }
                 },
 
                 render: function() {
@@ -141,9 +160,9 @@
                 /**
                  * Render the create new team form.
                  */
-                newTeam: function (topicId) {
+                newTeam: function (topicID) {
                     var self = this;
-                    this.getTeamsView(topicId).done(function (teamsView) {
+                    this.getTeamsView(topicID).done(function (teamsView) {
                         self.mainView = new ViewWithHeader({
                             header: new HeaderView({
                                 model: new HeaderModel({
@@ -152,7 +171,7 @@
                                     breadcrumbs: [
                                         {
                                             title: teamsView.main.teamParams.topicName,
-                                            url: '#topics/' + teamsView.main.teamParams.topicId
+                                            url: '#topics/' + teamsView.main.teamParams.topicID
                                         }
                                     ]
                                 })
@@ -190,15 +209,16 @@
                                 self.teamsCollection = collection;
                                 collection.goTo(1)
                                     .done(function() {
-                                        var teamsView = new TeamsView({
+                                        var teamsView = new TopicTeamsView({
                                             router: router,
+                                            topic: topic,
                                             collection: collection,
                                             teamMemberships: self.teamMemberships,
                                             maxTeamSize: self.maxTeamSize,
                                             teamParams: {
-                                                courseId: self.courseID,
+                                                courseID: self.courseID,
+                                                topicID: topic.get('id'),
                                                 teamsUrl: self.teamsUrl,
-                                                topicId: topic.get('id'),
                                                 topicName: topic.get('name'),
                                                 languages: self.languages,
                                                 countries: self.countries
