@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from ccx_keys.locator import CCXLocator
-from ccx.tests.factories import CcxFactory, CcxMembershipFactory
+from ccx.tests.factories import CcxFactory
 
 
 @attr('shard_1')
@@ -65,7 +65,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
 
         MakoMiddleware().process_request(self.request)
 
-    def setup_course(self, size, enable_ccx):
+    def setup_course(self, size, enable_ccx, view_as_ccx):
         """
         Build a gradable course where each node has `size` children.
         """
@@ -112,17 +112,16 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         )
         self.populate_course(size)
 
+        course_key = self.course.id
+        if enable_ccx:
+            self.ccx = CcxFactory.create(course_id=self.course.id)
+            if view_as_ccx:
+                course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
+
         CourseEnrollment.enroll(
             self.student,
-            self.course.id
+            course_key
         )
-
-        if enable_ccx:
-            self.ccx = CcxFactory.create()
-            CcxMembershipFactory.create(
-                student=self.student,
-                ccx=self.ccx
-            )
 
     def grade_course(self, course, view_as_ccx):
         """
@@ -156,7 +155,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         """
         Renders the progress page, instrumenting Mongo reads and SQL queries.
         """
-        self.setup_course(course_width, enable_ccx)
+        self.setup_course(course_width, enable_ccx, view_as_ccx)
 
         # Switch to published-only mode to simulate the LMS
         with self.settings(MODULESTORE_BRANCH='published-only'):
