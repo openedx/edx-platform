@@ -206,16 +206,22 @@ def _update_content_group_access(block, group_configuration):
     ancestor_for_update = parent_block
     if not set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES)):
         # category of parent and grand parent are 'vertical' and 'sequential'
-        # respectively so update 'group_access' field of grand children
-        # (immediate sibling and horizontal siblings) of the grand parent
+        # respectively so update 'group_access' field of immediate siblings
+        # (unit components) and siblings of parent (verticals) of current block
         ancestor_for_update = grandparent_block
         for child in ancestor_for_update.get_children():
-            for grand_child in child.get_children():
-                if grand_child.location.category not in GATED_CREDIT_XBLOCK_CATEGORIES:
-                    # update `group_access` for non gated course content e.g.,
-                    # exclude ICRV blocks from updating
-                    grand_child.group_access = access_dict
-                    _update_published_block(grand_child)
+            if child.location != parent_block.location:
+                # siblings of parent (verticals) of current block
+                child.group_access = access_dict
+                _update_published_block(child)
+            else:
+                # immediate siblings (unit components) of current block
+                for grand_child in child.get_children():
+                    if grand_child.location.category not in GATED_CREDIT_XBLOCK_CATEGORIES:
+                        # update `group_access` for non gated course content e.g.,
+                        # exclude ICRV blocks from updating
+                        grand_child.group_access = access_dict
+                        _update_published_block(grand_child)
     else:
         # category of parent and grand parent are not 'vertical' and
         # 'sequential' respectively so update 'group_access' field of children
