@@ -7,7 +7,7 @@
             'js/views/fields',
             'teams/js/models/team',
             'text!teams/templates/edit-team.underscore'],
-        function (Backbone, _, gettext, FieldViews, TeamModel, edit_team_template) {
+        function (Backbone, _, gettext, FieldViews, TeamModel, editTeamTemplate) {
             return Backbone.View.extend({
 
                 maxTeamNameLength: 255,
@@ -79,7 +79,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(edit_team_template)({primaryButtonTitle: this.primaryButtonTitle}));
+                    this.$el.html(_.template(editTeamTemplate)({primaryButtonTitle: this.primaryButtonTitle}));
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
                     this.set(this.optionalDescriptionField, '.team-optional-fields');

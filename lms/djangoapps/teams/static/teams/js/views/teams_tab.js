@@ -41,18 +41,18 @@
                     var router;
                     this.courseID = options.courseID;
                     this.topics = options.topics;
-                    this.teamMemberships = options.teamMemberships;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
-                    this.username = options.username;
+                    this.userInfo = options.userInfo;
+
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
-                    // name is being routed to
+                    // name is being routed to.
                     router = this.router = new Backbone.Router();
                     _.each([
                         [':default', _.bind(this.routeNotFound, this)],
@@ -65,20 +65,21 @@
                         router.route.apply(router, route);
                     });
 
-                    this.teamMembershipsCollection = new TeamMembershipCollection(
-                        this.teamMemberships,
+                    this.teamMemberships = new TeamMembershipCollection(
+                        this.userInfo.teamMembershipData,
                         {
                             url: this.teamMembershipsUrl,
                             course_id: this.courseID,
-                            username: this.username,
-                            parse: true,
-
+                            username: this.userInfo.username,
+                            privileged: this.userInfo.privileged,
+                            parse: true
                         }
                     ).bootstrap();
 
                     this.myTeamsView = new TeamsView({
                         router: this.router,
-                        collection: this.teamMembershipsCollection,
+                        collection: this.teamMemberships,
+                        teamMemberships: this.teamMemberships,
                         maxTeamSize: this.maxTeamSize,
                         teamParams: {
                             courseId: this.courseID,
@@ -186,14 +187,14 @@
                                     url: self.teamsUrl,
                                     per_page: 10
                                 });
-                                this.teamsCollection = collection;
+                                self.teamsCollection = collection;
                                 collection.goTo(1)
                                     .done(function() {
                                         var teamsView = new TeamsView({
                                             router: router,
                                             collection: collection,
+                                            teamMemberships: self.teamMemberships,
                                             maxTeamSize: self.maxTeamSize,
-                                            showActions: true,
                                             teamParams: {
                                                 courseId: self.courseID,
                                                 teamsUrl: self.teamsUrl,
@@ -412,9 +413,9 @@
                 readOnlyDiscussion: function (team) {
                     var self = this;
                     return !(
-                        this.$el.data('privileged') ||
+                        self.userInfo.privileged ||
                         _.any(team.attributes.membership, function (membership) {
-                            return membership.user.username === self.$el.data('username');
+                            return membership.user.username === self.userInfo.username;
                         })
                     );
                 }
