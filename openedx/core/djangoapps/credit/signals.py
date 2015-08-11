@@ -205,22 +205,27 @@ def _update_content_group_access(block, group_configuration):
     # will have access control)
     ancestor_for_update = parent_block
     if not set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES)):
-        # category of parent and grand parent are 'vertical' and
-        # 'sequential' respectively so update 'group_access' field of
-        # child's only
+        # category of parent and grand parent are 'vertical' and 'sequential'
+        # respectively so update 'group_access' field of grand children
+        # (immediate sibling and horizontal siblings) of the grand parent
         ancestor_for_update = grandparent_block
         for child in ancestor_for_update.get_children():
             for grand_child in child.get_children():
-                grand_child.group_access = access_dict
-                _update_published_block(grand_child)
+                if grand_child.location.category not in GATED_CREDIT_XBLOCK_CATEGORIES:
+                    # update `group_access` for non gated course content e.g.,
+                    # exclude ICRV blocks from updating
+                    grand_child.group_access = access_dict
+                    _update_published_block(grand_child)
     else:
+        # category of parent and grand parent are not 'vertical' and
+        # 'sequential' respectively so update 'group_access' field of children
+        # (only immediate siblings of current block) of the parent
         for child in ancestor_for_update.get_children():
-            child.group_access = access_dict
-            _update_published_block(child)
-
-    # ancestor_for_update.group_access = access_dict
-    # # Update only published version of the block in database
-    # _update_published_block(ancestor_for_update)
+            if child.location.category not in GATED_CREDIT_XBLOCK_CATEGORIES:
+                # update `group_access` for non gated course content e.g.,
+                # exclude ICRV blocks from updating
+                child.group_access = access_dict
+                _update_published_block(child)
 
 
 def _update_course_user_partitions(course_key, partition_scheme, new_user_partitions):
