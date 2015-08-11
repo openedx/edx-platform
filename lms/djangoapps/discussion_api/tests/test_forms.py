@@ -186,6 +186,7 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "endorsed": False,
                 "page": 2,
                 "page_size": 13,
+                "mark_as_read": False
             }
         )
 

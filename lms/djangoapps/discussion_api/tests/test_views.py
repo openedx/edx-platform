@@ -698,7 +698,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "resp_skip": ["0"],
                 "resp_limit": ["10"],
                 "user_id": [str(self.user.id)],
-                "mark_as_read": ["True"],
+                "mark_as_read": ["False"],
             }
         )
 
@@ -732,7 +732,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "resp_skip": ["68"],
                 "resp_limit": ["4"],
                 "user_id": [str(self.user.id)],
-                "mark_as_read": ["True"],
+                "mark_as_read": ["False"],
             }
         )
 
