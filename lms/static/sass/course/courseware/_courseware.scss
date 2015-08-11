@@ -136,9 +136,17 @@ div.course-wrapper {
         background-color: transparent;
         border-bottom: none;
         box-shadow: none;
+        text-align: left;
         &:hover {
           background-color: transparent;
         }
+      }
+      button.gated-sequence > a {
+        color: #147ABA;
+      }
+      span.proctored-exam-code {
+        margin-top: 5px;
+        font-size: 1.3em;
       }
       .gated-sequence {
         color: #147ABA;
