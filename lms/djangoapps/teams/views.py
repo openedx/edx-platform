@@ -118,6 +118,7 @@ class TeamsDashboardView(View):
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
             "disable_courseware_js": True,
+            "allowMultipleTeamMembership": False,  # TODO: support enabling of multiple team membership
         }
         return render_to_response("teams/teams.html", context)
 

@@ -14,12 +14,13 @@
             'teams/js/collections/team_membership',
             'teams/js/views/topics',
             'teams/js/views/team_profile',
-            'teams/js/views/teams',
+            'teams/js/views/my_teams',
+            'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
-                  TopicsView, TeamProfileView, TeamsView, TeamEditView,
+                  TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   teamsTemplate) {
             var ViewWithHeader = Backbone.View.extend({
                 initialize: function (options) {
@@ -45,6 +46,7 @@
                     this.teamsUrl = options.teamsUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.maxTeamSize = options.maxTeamSize;
+                    this.allowMultipleTeamMembership = options.allowMultipleTeamMembership;
                     this.languages = options.languages;
                     this.countries = options.countries;
                     this.userInfo = options.userInfo;
@@ -72,11 +74,12 @@
                             course_id: this.courseID,
                             username: this.userInfo.username,
                             privileged: this.userInfo.privileged,
+                            allowMultipleTeamMembership: this.allowMultipleTeamMembership,
                             parse: true
                         }
                     ).bootstrap();
 
-                    this.myTeamsView = new TeamsView({
+                    this.myTeamsView = new MyTeamsView({
                         router: this.router,
                         collection: this.teamMemberships,
                         teamMemberships: this.teamMemberships,
@@ -108,7 +111,7 @@
                         }),
                         main: new TabbedView({
                             tabs: [{
-                                title: gettext('My Teams'),
+                                title: this.allowMultipleTeamMembership ? gettext('My Teams') : gettext('My Team'),
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
@@ -119,6 +122,24 @@
                             router: this.router
                         })
                     });
+                },
+
+                /**
+                 * Start up the Teams app
+                 */
+                start: function() {
+                    Backbone.history.start();
+
+                    // Navigate to the default page if there is no history:
+                    // 1. If the user belongs to at least one team, jump to the "My Teams" page
+                    // 2. If not, then jump to the "Browse" page
+                    if (Backbone.history.getFragment() === '') {
+                        if (this.teamMemberships.length > 0) {
+                            this.router.navigate('my-teams', {trigger: true});
+                        } else {
+                            this.router.navigate('browse', {trigger: true});
+                        }
+                    }
                 },
 
                 render: function() {
@@ -190,8 +211,9 @@
                                 self.teamsCollection = collection;
                                 collection.goTo(1)
                                     .done(function() {
-                                        var teamsView = new TeamsView({
+                                        var teamsView = new TopicTeamsView({
                                             router: router,
+                                            topic: topic,
                                             collection: collection,
                                             teamMemberships: self.teamMemberships,
                                             maxTeamSize: self.maxTeamSize,

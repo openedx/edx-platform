@@ -88,33 +88,53 @@ define([
 
         beforeEach(function () {
             setFixtures('<div class="teams-content"></div>');
-            Backbone.history.start();
             spyOn($.fn, 'focus');
         });
 
-        afterEach(function () {
-            Backbone.history.stop();
-        });
+        describe('My Teams', function() {
+            it('shows the "My Teams" tab initially', function () {
+                var teamsTabView = createTeamsTabView();
+                expectHeader(teamsTabView, 'See all teams in your course, organized by topic');
+                expectContent(teamsTabView, 'Discrete Maths');
+                expect(teamsTabView.$el.text()).not.toContain('Are you having trouble finding a team to join?');
+            });
 
-        it('shows the my teams tab initially', function () {
-            var teamsTabView = createTeamsTabView();
-            expectHeader(teamsTabView, 'See all teams in your course, organized by topic');
-            expectContent(teamsTabView, 'Showing 1 out of 1 total');
-            expectContent(teamsTabView, 'Discrete Maths');
-        });
-
-        describe('Navigation', function () {
-            it('can switch tabs', function () {
+            it('can switch to the "My Teams" tab', function () {
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.$('a.nav-item[data-url="browse"]').click();
                 expectContent(teamsTabView, 'test description');
                 teamsTabView.$('a.nav-item[data-url="my-teams"]').click();
-                expectContent(teamsTabView, 'Showing 1 out of 1 total');
                 expectContent(teamsTabView, 'Discrete Maths');
             });
 
+        });
+
+        describe('Browse Topics', function() {
+            it('can switch to the "Browse" tab', function () {
+                var teamsTabView = createTeamsTabView();
+                teamsTabView.$('a.nav-item[data-url="my-teams"]').click();
+                expectContent(teamsTabView, 'Discrete Maths');
+                teamsTabView.$('a.nav-item[data-url="browse"]').click();
+                expectContent(teamsTabView, 'test description');
+            });
+        });
+
+        describe('Navigation', function () {
+            afterEach(function () {
+                Backbone.history.stop();
+            });
+
+            var lastUrl = null;
+            var spyOnRouter = function(router) {
+                spyOn(Backbone.history, '_updateHash').andCallFake(function (data, title, url) {
+                    lastUrl = url;
+                });
+                Backbone.history.start();
+            };
+
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
                 var teamsTabView = createTeamsTabView();
+                spyOnRouter();
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
                 expectError(teamsTabView, 'The page "no_such_page" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
@@ -123,6 +143,7 @@ define([
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
+                spyOnRouter();
                 teamsTabView.router.navigate('topics/no_such_topic', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', 'api/topics/no_such_topic,test/course/id', null);
                 AjaxHelpers.respondWithError(requests, 404);
@@ -133,6 +154,7 @@ define([
             it('displays and focuses an error message when trying to navigate to a nonexistent team', function () {
                 var requests = AjaxHelpers.requests(this),
                     teamsTabView = createTeamsTabView();
+                spyOnRouter();
                 teamsTabView.router.navigate('teams/test_topic/no_such_team', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team', null);
                 AjaxHelpers.respondWithError(requests, 404);

@@ -41,6 +41,7 @@
         teamsUrl: '${ teams_url }',
         teamMembershipsUrl: '${ team_memberships_url }',
         maxTeamSize: ${ course.teams_max_size },
+        allowMultipleTeamMembership: ${ 'true' if allowMultipleTeamMembership else 'false' },
         languages: ${ json.dumps(languages, cls=EscapedEdxJSONEncoder) },
         countries: ${ json.dumps(countries, cls=EscapedEdxJSONEncoder) }
     });
