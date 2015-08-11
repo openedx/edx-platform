@@ -18,7 +18,7 @@ from rest_framework.response import Response
 
 from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name,
     add_cohort,
@@ -746,7 +746,7 @@ class UsersCoursesList(SecureAPIView):
         try:
             default_cohort = get_cohort_by_name(course_key, CourseUserGroup.default_cohort_name)
         except CourseUserGroup.DoesNotExist:
-            default_cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name)
+            default_cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name, CourseCohort.RANDOM)
         add_user_to_cohort(default_cohort, user.username)
         log.debug('User "{}" has been automatically added in cohort "{}" for course "{}"'.format(
             user.username, default_cohort.name, course_descriptor.display_name)

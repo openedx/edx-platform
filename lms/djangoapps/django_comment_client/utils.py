@@ -78,7 +78,6 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 return False
         return True
-
     return [
         module for module in all_modules
         if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))

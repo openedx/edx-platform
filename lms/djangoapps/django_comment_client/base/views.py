@@ -219,33 +219,6 @@ def create_thread(request, course_id, commentable_id):
     if group_id is not None:
         thread.group_id = group_id
 
-    user = cc.User.from_django_user(request.user)
-
-    #kevinchugh because the new requirement is that all groups will be determined
-    #by the group id in the request this all goes away
-    #not anymore, only for admins
-
-    # Cohort the thread if the commentable is cohorted.
-    if is_commentable_cohorted(course_key, commentable_id):
-        user_group_id = get_cohort_id(user, course_key)
-
-        # TODO (vshnayder): once we have more than just cohorts, we'll want to
-        # change this to a single get_group_for_user_and_commentable function
-        # that can do different things depending on the commentable_id
-        if has_permission(request.user, "see_all_cohorts", course_key):
-            # admins can optionally choose what group to post as
-            try:
-                group_id = int(post.get('group_id', user_group_id))
-                get_cohort_by_id(course_key, group_id)
-            except (ValueError, CourseUserGroup.DoesNotExist):
-                return HttpResponseBadRequest("Invalid cohort id")
-        else:
-            # regular users always post with their own id.
-            group_id = user_group_id
-
-        if group_id:
-            thread.group_id = group_id
-
     thread.save()
 
     # patch for backward compatibility to comments service
@@ -288,7 +261,6 @@ def create_thread(request, course_id, commentable_id):
     # rescore this user
     _update_user_engagement_score(course_key, request.user.id)
 
-    add_courseware_context([data], course, user)
     add_thread_group_name(data, course_key)
     if thread.get('group_id') and not thread.get('group_name'):
         thread['group_name'] = get_cohort_by_id(course_key, thread.get('group_id')).name
@@ -412,7 +384,7 @@ def update_thread(request, course_id, thread_id):
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        commentable_ids = get_discussion_categories_ids(course)
+        commentable_ids = get_discussion_categories_ids(course, request.user)
         if request.POST.get("commentable_id") in commentable_ids:
             thread.commentable_id = request.POST["commentable_id"]
         else:

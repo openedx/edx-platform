@@ -15,37 +15,31 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class CohortedContentTestCase(ModuleStoreTestCase):
+class CohortedTestCase(ModuleStoreTestCase):
     """
     Sets up a course with a student, a moderator and their cohorts.
     """
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(CohortedContentTestCase, self).setUp()
+        super(CohortedTestCase, self).setUp()
 
         self.course = CourseFactory.create(
-            discussion_topics={
-                "cohorted topic": {"id": "cohorted_topic"},
-                "non-cohorted topic": {"id": "non_cohorted_topic"},
-            },
             cohort_config={
                 "cohorted": True,
                 "cohorted_discussions": ["cohorted_topic"]
             }
         )
+        self.student_cohort = CohortFactory.create(
+            name="student_cohort",
+            course_id=self.course.id
+        )
+        self.moderator_cohort = CohortFactory.create(
+            name="moderator_cohort",
+            course_id=self.course.id
+        )
         self.course.discussion_topics["cohorted topic"] = {"id": "cohorted_topic"}
         self.course.discussion_topics["non-cohorted topic"] = {"id": "non_cohorted_topic"}
         self.store.update_item(self.course, self.user.id)
-        self.student_cohort = CourseUserGroup.objects.create(
-            name="student_cohort",
-            course_id=self.course.id,
-            group_type=CourseUserGroup.COHORT
-        )
-        self.moderator_cohort = CourseUserGroup.objects.create(
-            name="moderator_cohort",
-            course_id=self.course.id,
-            group_type=CourseUserGroup.COHORT
-        )
 
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
