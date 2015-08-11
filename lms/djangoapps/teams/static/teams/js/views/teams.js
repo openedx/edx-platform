@@ -17,7 +17,7 @@
 
             initialize: function (options) {
                 this.topic = options.topic;
-                this.teamMembership = options.teamMembership;
+                this.teamMemberships = options.teamMemberships;
                 this.teamParams = options.teamParams;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
@@ -32,7 +32,7 @@
             render: function () {
                 PaginatedView.prototype.render.call(this);
 
-                if (this.teamMembership.canUserCreateTeam()) {
+                if (this.teamMemberships.canUserCreateTeam()) {
                     var message = interpolate_text(
                         _.escape(gettext("Try {browse_span_start}browsing all teams{span_end} or {search_span_start}searching team descriptions{span_end}. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
                         {

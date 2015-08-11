@@ -43,7 +43,7 @@
                     this.topics = options.topics;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
-                    this.teamMembershipUrl = options.teamMembershipUrl;
+                    this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
@@ -65,10 +65,10 @@
                         router.route.apply(router, route);
                     });
 
-                    this.teamMembership = new TeamMembershipCollection(
-                        this.userInfo.teamMembership,
+                    this.teamMemberships = new TeamMembershipCollection(
+                        this.userInfo.teamMembershipData,
                         {
-                            url: this.teamMembershipUrl,
+                            url: this.teamMembershipsUrl,
                             course_id: this.courseID,
                             username: this.userInfo.username,
                             privileged: this.userInfo.privileged,
@@ -78,8 +78,8 @@
 
                     this.myTeamsView = new TeamsView({
                         router: this.router,
-                        collection: this.teamMembership,
-                        teamMembership: this.teamMembership,
+                        collection: this.teamMemberships,
+                        teamMemberships: this.teamMemberships,
                         maxTeamSize: this.maxTeamSize,
                         teamParams: {
                             courseId: this.courseID,
@@ -193,7 +193,7 @@
                                         var teamsView = new TeamsView({
                                             router: router,
                                             collection: collection,
-                                            teamMembership: self.teamMembership,
+                                            teamMemberships: self.teamMemberships,
                                             maxTeamSize: self.maxTeamSize,
                                             teamParams: {
                                                 courseId: self.courseID,

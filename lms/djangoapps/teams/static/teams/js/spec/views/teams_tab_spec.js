@@ -24,7 +24,7 @@ define([
         };
 
         var createUserInfo = function(options) {
-            var defaultTeamMembership = {
+            var defaultTeamMembershipData = {
                 count: 1,
                 currentPage: 1,
                 numPages: 1,
@@ -50,7 +50,7 @@ define([
                 {
                     username: 'andya',
                     privileged: false,
-                    teamMembership: defaultTeamMembership
+                    teamMembershipData: defaultTeamMembershipData
                 },
                 options
             );

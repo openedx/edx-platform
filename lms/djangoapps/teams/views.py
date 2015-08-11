@@ -107,14 +107,14 @@ class TeamsDashboardView(View):
             "user_info": {
                 "username": user.username,
                 "privileged": has_discussion_privileges(user, course_key),
-                "team_membership": team_memberships_serializer.data,
+                "team_memberships_data": team_memberships_serializer.data,
             },
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
-            "team_membership_url": reverse('team_membership_list', request=request),
+            "team_memberships_url": reverse('team_membership_list', request=request),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
             "disable_courseware_js": True,

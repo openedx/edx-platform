@@ -48,7 +48,7 @@ define([
             );
         };
 
-        var createTeamMembershipData = function(startIndex, stopIndex) {
+        var createTeamMembershipsData = function(startIndex, stopIndex) {
             var teams = createTeamData(startIndex, stopIndex);
             return _.map(_.range(startIndex, stopIndex + 1), function (i) {
                 return {
@@ -61,7 +61,7 @@ define([
             });
         };
 
-        var createTeamMembership = function(teamMembershipData, options) {
+        var createTeamMemberships = function(teamMembershipData, options) {
             return new TeamMembershipCollection(
                 {
                     count: 11,
@@ -95,7 +95,7 @@ define([
             return new TeamsView({
                 el: '.teams-container',
                 collection: options.teams || createTeams(createTeamData(1, 5)),
-                teamMembership: options.teamMembership || createTeamMembership(createTeamMembershipData(1, 5)),
+                teamMemberships: options.teamMemberships || createTeamMemberships(createTeamMembershipsData(1, 5)),
                 teamParams: {
                     topicID: 'test-topic',
                     countries: countries,
@@ -124,11 +124,11 @@ define([
         });
 
         it('can render itself with team membership collection', function () {
-            var teamMembershipData = createTeamMembershipData(1, 5),
-                teamMembership = createTeamMembership(teamMembershipData),
+            var teamMembershipsData = createTeamMembershipsData(1, 5),
+                teamMemberships = createTeamMemberships(teamMembershipsData),
                 teamsView = createTeamsView({
-                    teams: teamMembership,
-                    teamMembership: teamMembership
+                    teams: teamMemberships,
+                    teamMemberships: teamMemberships
                 });
 
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 11 total');
@@ -136,13 +136,13 @@ define([
             expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+3');
             expect(footerEl).not.toHaveClass('hidden');
 
-            verifyCards(teamsView, teamMembershipData);
+            verifyCards(teamsView, teamMembershipsData);
         });
 
         describe("Team Actions View", function() {
             it('can render itself correctly', function () {
-                var emptyMembership = createTeamMembership([]),
-                    teamsView = createTeamsView({ teamMembership: emptyMembership });
+                var emptyMembership = createTeamMemberships([]),
+                    teamsView = createTeamsView({ teamMemberships: emptyMembership });
                 expect(teamsView.$('.title').text()).toBe('Are you having trouble finding a team to join?');
                 expect(teamsView.$('.copy').text()).toBe(
                     "Try browsing all teams or searching team descriptions. If you " +
@@ -152,8 +152,8 @@ define([
 
 
             it('can navigate to correct routes', function () {
-                var emptyMembership = createTeamMembership([]),
-                    teamsView = createTeamsView({ teamMembership: emptyMembership });
+                var emptyMembership = createTeamMemberships([]),
+                    teamsView = createTeamsView({ teamMemberships: emptyMembership });
                 spyOn(Backbone.history, 'navigate');
                 teamsView.$('a.browse-teams').click();
                 expect(Backbone.history.navigate.calls[0].args).toContain('browse');
@@ -167,8 +167,8 @@ define([
             });
 
             it('shows for a user not in a team', function () {
-                var emptyMembership = createTeamMembership([]),
-                    teamsView = createTeamsView({ teamMembership: emptyMembership });
+                var emptyMembership = createTeamMemberships([]),
+                    teamsView = createTeamsView({ teamMemberships: emptyMembership });
                 expect(teamsView.$el.text()).toContain(
                     'Are you having trouble finding a team to join?'
                 );
@@ -182,11 +182,11 @@ define([
             });
 
             it('shows for a privileged user already in a team', function () {
-                var staffMembership = createTeamMembership(
-                        createTeamMembershipData(1, 5),
+                var staffMembership = createTeamMemberships(
+                        createTeamMembershipsData(1, 5),
                         { privileged: true }
                     ),
-                    teamsView = createTeamsView({ teamMembership: staffMembership });
+                    teamsView = createTeamsView({ teamMemberships: staffMembership });
                 expect(teamsView.$el.text()).toContain(
                     'Are you having trouble finding a team to join?'
                 );

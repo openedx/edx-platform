@@ -13,7 +13,7 @@ from .models import CourseTeam, CourseTeamMembership
 
 
 class UserMembershipSerializer(serializers.ModelSerializer):
-    """Serializes CourseTeamMembership with only user and date_joined
+    """Serializes CourseTeamMemberships with only user and date_joined
 
     Used for listing team members.
     """
@@ -86,7 +86,7 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    """Serializes CourseTeamMembership with information about both teams and users."""
+    """Serializes CourseTeamMemberships with information about both teams and users."""
     user = ExpandableField(
         collapsed_serializer=CollapsedReferenceSerializer(
             model_class=User,

@@ -15,7 +15,7 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
                     userInfo: {
                         username: 'test-user',
                         privileged: false,
-                        teamMembership: null
+                        teamMembershipData: null
                     }
                 });
             };
