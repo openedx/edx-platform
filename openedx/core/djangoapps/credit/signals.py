@@ -195,8 +195,10 @@ def _update_content_group_access(block, group_configuration):
     # otherwise add groups to current ICRV's parent only
     access_groups_id_list = [VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW]
     access_dict = _access_dict(group_configuration, access_groups_id_list)
+
     parent_block = block.get_parent()
     grandparent_block = parent_block.get_parent()
+
     ancestor_categories = [parent_block.location.category, grandparent_block.location.category]
 
     # update 'group_access' field of parent only (immediate siblings
@@ -205,12 +207,20 @@ def _update_content_group_access(block, group_configuration):
     if not set(ancestor_categories).difference(set(GATED_COURSE_CATEGORIES)):
         # category of parent and grand parent are 'vertical' and
         # 'sequential' respectively so update 'group_access' field of
-        # grandparent
+        # child's only
         ancestor_for_update = grandparent_block
+        for child in ancestor_for_update.get_children():
+            for grand_child in child.get_children():
+                grand_child.group_access = access_dict
+                _update_published_block(grand_child)
+    else:
+        for child in ancestor_for_update.get_children():
+            child.group_access = access_dict
+            _update_published_block(child)
 
-    ancestor_for_update.group_access = access_dict
-    # Update only published version of the block in database
-    _update_published_block(ancestor_for_update)
+    # ancestor_for_update.group_access = access_dict
+    # # Update only published version of the block in database
+    # _update_published_block(ancestor_for_update)
 
 
 def _update_course_user_partitions(course_key, partition_scheme, new_user_partitions):
