@@ -1708,7 +1708,7 @@ class DiscussionService(object):
         request.user = user
         user_info = cc.User.from_django_user(self.runtime.user).to_dict()
         course_id = self.runtime.course_id
-        course = get_course_with_access(self.runtime.user, 'load_forum', course_id)
+        course = get_course_with_access(self.runtime.user, 'load', course_id)
         user_cohort_id = get_cohort_id(user, course_id)
 
         unsafethreads, query_params = get_threads(request, course_id)
@@ -1769,7 +1769,7 @@ class DiscussionService(object):
         course_id = self.runtime.course_id
         user = self.runtime.user
 
-        course = get_course_with_access(user, 'load_forum', course_id)
+        course = get_course_with_access(user, 'load', course_id)
         category_map = get_discussion_category_map(course, user)
 
         is_moderator = has_permission(user, "see_all_cohorts", course_id)

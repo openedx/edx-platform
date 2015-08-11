@@ -17,7 +17,7 @@ from django_comment_client.tests.group_id import (
     NonCohortedTopicGroupIdTestMixin
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedContentTestCase
+from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.utils import strip_none
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
@@ -182,7 +182,7 @@ def make_mock_request_impl(
                 text=text,
                 thread_id=thread_id,
                 num_children=num_thread_responses,
-                include_children=False,
+                include_children=True,
                 group_id=group_id,
                 commentable_id=commentable_id
             )
@@ -260,7 +260,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         self.assertEquals(
             response_data["content"],
             strip_none(make_mock_thread_data(
-                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=False
+                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=True
             ))
         )
         mock_request.assert_called_with(
@@ -297,7 +297,9 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
+            strip_none(make_mock_thread_data(
+                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=True,
+            ))
         )
         mock_request.assert_called_with(
             "get",
@@ -375,7 +377,7 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
         test_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses
+            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses,
         )
         request = RequestFactory().get(
             "dummy_url",
@@ -408,7 +410,7 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
 
 @patch('requests.request', autospec=True)
-class SingleCohortedThreadTestCase(CohortedContentTestCase):
+class SingleCohortedThreadTestCase(CohortedTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
@@ -554,7 +556,7 @@ class SingleThreadAccessTestCase(CohortedContentTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
@@ -748,7 +750,7 @@ class InlineDiscussionContextTestCase(ModuleStoreTestCase):
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionGroupIdTestCase(
-        CohortedContentTestCase,
+        CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
@@ -798,7 +800,7 @@ class InlineDiscussionGroupIdTestCase(
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
@@ -844,7 +846,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicG
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"
 
     def call_view_for_profiled_user(
@@ -1005,7 +1007,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/subscribed_threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
@@ -1100,24 +1102,12 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
 
 
 @patch('requests.request')
-class SingleCohortedThreadTestCase(ModuleStoreTestCase):
-    def setUp(self):
-        super(SingleCohortedThreadTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.student_cohort = CourseUserGroup.objects.create(
-            name="student_cohort",
-            course_id=self.course.id,
-            group_type=CourseUserGroup.COHORT
-        )
-
+class SingleCohortedThreadTestCase(CohortedTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            self.mock_text, self.mock_thread_id,
-            group_id=self.student_cohort.id
+            course=self.course, text=self.mock_text, thread_id=self.mock_thread_id, group_id=self.student_cohort.id
         )
 
     def test_ajax(self, mock_request):
@@ -1131,7 +1121,7 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
         response = views.single_thread(
             request,
             self.course.id.to_deprecated_string(),
-            "dummy_discussion_id",
+            "cohorted_topic",
             self.mock_thread_id
         )
 
@@ -1140,8 +1130,11 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
         self.assertEquals(
             response_data["content"],
             make_mock_thread_data(
-                self.course,
-                self.mock_text, self.mock_thread_id, 1, True,
+                course=self.course,
+                text=self.mock_text,
+                thread_id=self.mock_thread_id,
+                num_children=1,
+                include_children=True,
                 group_id=self.student_cohort.id,
                 group_name=self.student_cohort.name,
             )
@@ -1156,7 +1149,7 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
         response = views.single_thread(
             request,
             self.course.id.to_deprecated_string(),
-            "dummy_discussion_id",
+            "cohorted_topic",
             self.mock_thread_id
         )
 

@@ -21,7 +21,7 @@ from django_comment_client.base import views
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 )
-from django_comment_client.tests.utils import CohortedContentTestCase
+from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
@@ -36,6 +36,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
 from openedx.core.djangoapps.course_groups.cohorts import is_commentable_cohorted, add_cohort, add_user_to_cohort
+from openedx.core.djangoapps.course_groups.models import CourseCohort
 
 from edx_notifications.lib.consumer import get_notifications_count_for_user
 from edx_notifications.startup import initialize as initialize_notifications
@@ -62,7 +63,7 @@ class MockRequestSetupMixin(object):
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedContentTestCase,
+        CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
@@ -101,7 +102,7 @@ class CreateThreadGroupIdTestCase(
 @disable_signal(views, 'thread_deleted')
 class ThreadActionGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedContentTestCase,
+        CohortedTestCase,
         GroupIdAssertionMixin
 ):
     def call_view(
@@ -189,7 +190,7 @@ class ThreadActionGroupIdTestCase(
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class CreateCohortedThreadTestCase(CohortedContentTestCase):
+class CreateCohortedThreadTestCase(CohortedTestCase):
     """
     Tests how `views.create_thread` passes `group_id` to the comments service
     for cohorted topics.
@@ -222,7 +223,7 @@ class CreateCohortedThreadTestCase(CohortedContentTestCase):
 
     def test_moderator_without_group_id(self, mock_request):
         self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, pass_group_id=False)
-        self._assert_mock_request_called_with_group_id(mock_request, self.moderator_cohort.id)
+        self._assert_mock_request_called_without_group_id(mock_request)
 
     def test_moderator_none_group_id(self, mock_request):
         self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, expected_status_code=400)
@@ -243,7 +244,7 @@ class CreateCohortedThreadTestCase(CohortedContentTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class CreateNonCohortedThreadTestCase(CohortedContentTestCase):
+class CreateNonCohortedThreadTestCase(CohortedTestCase):
     """
     Tests how `views.create_thread` passes `group_id` to the comments service
     for non-cohorted topics.
@@ -717,8 +718,8 @@ class ViewsTestCase(
             assert_equal(get_notifications_count_for_user(self.student.id), 1)
 
         # create cohorts
-        groupA = add_cohort(self.course.id, "CohortA")
-        groupB = add_cohort(self.course.id, "CohortB")
+        groupA = add_cohort(self.course.id, "CohortA", CourseCohort.RANDOM)
+        groupB = add_cohort(self.course.id, "CohortB", CourseCohort.RANDOM)
 
         add_user_to_cohort(groupA, self.student.username)
 
@@ -728,7 +729,6 @@ class ViewsTestCase(
         a_user.save()
         CourseEnrollmentFactory(user=a_user, course_id=self.course_id)
         add_user_to_cohort(groupA, a_user.username)
-
 
         b_user = User.objects.create_user('cohortB', 'cohortBemail', 'test')
         b_user.is_active = True
