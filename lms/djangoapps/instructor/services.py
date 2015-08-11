@@ -8,6 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from courseware.models import StudentModule
 from instructor.views.tools import get_student_from_identifier
+from django.core.exceptions import ObjectDoesNotExist
 import instructor.enrollment as enrollment
 
 
@@ -35,7 +36,7 @@ class InstructorService(object):
 
         try:
             student = get_student_from_identifier(student_identifier)
-        except:
+        except ObjectDoesNotExist:
             err_msg = (
                 'Error occurred while attempting to reset student attempts for user '
                 '{student_identifier} for content_id {content_id}. '
