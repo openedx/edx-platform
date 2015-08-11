@@ -204,7 +204,7 @@ def make_mock_request_impl(
                 text=text,
                 thread_id=thread_id,
                 num_children=num_thread_responses,
-                include_children=False,
+                include_children=True,
                 group_id=group_id,
                 commentable_id=commentable_id
             )
@@ -282,7 +282,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.assertEquals(
             response_data["content"],
             strip_none(make_mock_thread_data(
-                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=False
+                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=True
             ))
         )
         mock_request.assert_called_with(
@@ -319,7 +319,9 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
+            strip_none(make_mock_thread_data(
+                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=True,
+            ))
         )
         mock_request.assert_called_with(
             "get",
@@ -413,7 +415,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         test_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses
+            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses,
         )
         request = RequestFactory().get(
             "dummy_url",
@@ -1158,8 +1160,7 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            self.mock_text, self.mock_thread_id,
-            group_id=self.student_cohort.id
+            course=self.course, text=self.mock_text, thread_id=self.mock_thread_id, group_id=self.student_cohort.id
         )
 
     def test_ajax(self, mock_request):
@@ -1173,7 +1174,7 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
         response = views.single_thread(
             request,
             self.course.id.to_deprecated_string(),
-            "dummy_discussion_id",
+            "cohorted_topic",
             self.mock_thread_id
         )
 
@@ -1182,8 +1183,11 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
         self.assertEquals(
             response_data["content"],
             make_mock_thread_data(
-                self.course,
-                self.mock_text, self.mock_thread_id, 1, True,
+                course=self.course,
+                text=self.mock_text,
+                thread_id=self.mock_thread_id,
+                num_children=1,
+                include_children=True,
                 group_id=self.student_cohort.id,
                 group_name=self.student_cohort.name,
             )

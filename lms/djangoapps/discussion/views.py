@@ -161,7 +161,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
             group_id = None
     else:
         group_id = get_cohort_id(request.user, course.id)
-        if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
+        if not group_id:
             default_query_params['exclude_groups'] = True
 
     if group_id:

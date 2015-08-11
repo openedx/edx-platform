@@ -16,6 +16,7 @@ class ScopeResolverTests(TestCase):
 
     def setUp(self):
         """Creates cohorts for testing"""
+        super(ScopeResolverTests, self).setUp()
         self.course_id = 'foo/bar/baz'
         self.cohort1_users = [UserFactory.create() for _ in range(3)]
         self.cohort2_users = [UserFactory.create() for _ in range(2)]

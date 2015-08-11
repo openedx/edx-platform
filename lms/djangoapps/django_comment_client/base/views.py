@@ -347,7 +347,6 @@ def create_thread(request, course_id, commentable_id):
     # rescore this user
     _update_user_engagement_score(course_key, request.user.id)
 
-    add_courseware_context([data], course, user)
     add_thread_group_name(data, course_key)
     if thread.get('group_id') and not thread.get('group_name'):
         thread['group_name'] = get_cohort_by_id(course_key, thread.get('group_id')).name
