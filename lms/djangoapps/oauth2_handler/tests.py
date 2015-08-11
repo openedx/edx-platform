@@ -5,10 +5,9 @@ from lang_pref import LANGUAGE_KEY
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
-from xmodule.modulestore.tests.factories import check_mongo_calls, check_mongo_calls_range
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
-from student.roles import CourseStaffRole, CourseInstructorRole, GlobalStaff
+from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -78,8 +77,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         self.assertEqual(language, locale)
 
     def test_no_special_course_access(self):
-        with check_mongo_calls(0):
-            scopes, claims = self.get_id_token_values('openid course_instructor course_staff')
+        scopes, claims = self.get_id_token_values('openid course_instructor course_staff')
         self.assertNotIn('course_staff', scopes)
         self.assertNotIn('staff_courses', claims)
 
@@ -88,15 +86,17 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
     def test_course_staff_courses(self):
         CourseStaffRole(self.course_key).add_users(self.user)
-        with check_mongo_calls(0):
-            scopes, claims = self.get_id_token_values('openid course_staff')
+
+        scopes, claims = self.get_id_token_values('openid course_staff')
+
         self.assertIn('course_staff', scopes)
         self.assertNotIn('staff_courses', claims)  # should not return courses in id_token
 
     def test_course_instructor_courses(self):
         CourseInstructorRole(self.course_key).add_users(self.user)
-        with check_mongo_calls(0):
-            scopes, claims = self.get_id_token_values('openid course_instructor')
+
+        scopes, claims = self.get_id_token_values('openid course_instructor')
+
         self.assertIn('course_instructor', scopes)
         self.assertNotIn('instructor_courses', claims)  # should not return courses in id_token
 
@@ -113,8 +113,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
             }
         }
 
-        with check_mongo_calls(0):
-            scopes, claims = self.get_id_token_values(scope='openid course_staff', claims=claims)
+        scopes, claims = self.get_id_token_values(scope='openid course_staff', claims=claims)
 
         self.assertIn('course_staff', scopes)
         self.assertIn('staff_courses', claims)
@@ -134,11 +133,6 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):
-    def setUp(self):
-        super(UserInfoTest, self).setUp()
-        # clear the course ID cache
-        cache.clear()
-
     def token_for_scope(self, scope):
         full_scope = 'openid %s' % scope
         self.set_access_token_scope(full_scope)
@@ -164,39 +158,19 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         self.assertEqual(result.status_code, 200)
         return claims
 
-    def test_request_global_staff_courses_using_scope(self):
-        GlobalStaff().add_users(self.user)
-        with check_mongo_calls_range(min_finds=1):
-            claims = self.get_with_scope('course_staff')
-        courses = claims['staff_courses']
-        self.assertIn(self.course_id, courses)
-        self.assertEqual(len(courses), 1)
-
     def test_request_staff_courses_using_scope(self):
         CourseStaffRole(self.course_key).add_users(self.user)
-        with check_mongo_calls(0):
-            claims = self.get_with_scope('course_staff')
+        claims = self.get_with_scope('course_staff')
+
         courses = claims['staff_courses']
         self.assertIn(self.course_id, courses)
         self.assertEqual(len(courses), 1)
 
     def test_request_instructor_courses_using_scope(self):
         CourseInstructorRole(self.course_key).add_users(self.user)
-        with check_mongo_calls(0):
-            claims = self.get_with_scope('course_instructor')
+        claims = self.get_with_scope('course_instructor')
+
         courses = claims['instructor_courses']
-        self.assertIn(self.course_id, courses)
-        self.assertEqual(len(courses), 1)
-
-    def test_request_global_staff_courses_with_claims(self):
-        GlobalStaff().add_users(self.user)
-
-        values = [self.course_id, 'some_invalid_course']
-        with check_mongo_calls_range(min_finds=1):
-            claims = self.get_with_claim_value('course_staff', 'staff_courses', values)
-        self.assertEqual(len(claims), 2)
-
-        courses = claims['staff_courses']
         self.assertIn(self.course_id, courses)
         self.assertEqual(len(courses), 1)
 
@@ -204,8 +178,7 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         CourseStaffRole(self.course_key).add_users(self.user)
 
         values = [self.course_id, 'some_invalid_course']
-        with check_mongo_calls(0):
-            claims = self.get_with_claim_value('course_staff', 'staff_courses', values)
+        claims = self.get_with_claim_value('course_staff', 'staff_courses', values)
         self.assertEqual(len(claims), 2)
 
         courses = claims['staff_courses']
@@ -216,8 +189,7 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         CourseInstructorRole(self.course_key).add_users(self.user)
 
         values = ['edX/toy/TT_2012_Fall', self.course_id, 'invalid_course_id']
-        with check_mongo_calls(0):
-            claims = self.get_with_claim_value('course_instructor', 'instructor_courses', values)
+        claims = self.get_with_claim_value('course_instructor', 'instructor_courses', values)
         self.assertEqual(len(claims), 2)
 
         courses = claims['instructor_courses']
