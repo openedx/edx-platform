@@ -1289,8 +1289,6 @@ def get_proctored_exam_results(request, course_id):
         'status',
         'attempt_code',
         'is_sample_attempt',
-        'last_poll_timestamp',
-        'last_poll_ipaddr',
     ]
 
     course_key = CourseKey.from_string(course_id)
