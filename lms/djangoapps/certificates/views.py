@@ -317,6 +317,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_copy_course_name'] = course.display_name
     context['course_image_url'] = course_image_url(course)
     context['share_settings'] = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
+    context['course_number'] = course.number
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
     except BadgeAssertion.DoesNotExist:
