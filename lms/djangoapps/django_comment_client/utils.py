@@ -87,7 +87,7 @@ def has_forum_access(uname, course_id, rolename):
 def has_required_keys(module):
     """Returns True iff module has the proper attributes for generating metadata with get_discussion_id_map_entry()"""
     for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-        if not getattr(module, key, None):
+        if getattr(module, key, None) is None:
             log.debug("Required key '%s' not in discussion %s, leaving out of category map", key, module.location)
             return False
     return True

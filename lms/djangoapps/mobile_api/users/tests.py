@@ -146,9 +146,9 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin):
 
     @ddt.data(
         (NEXT_WEEK, ADVERTISED_START, ADVERTISED_START, "string"),
-        (NEXT_WEEK, None, '', "string"),
+        (NEXT_WEEK, None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
         (DEFAULT_START_DATE, ADVERTISED_START, ADVERTISED_START, "string"),
-        (DEFAULT_START_DATE, None, '', "string")
+        (DEFAULT_START_DATE, None, None, "empty")
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
