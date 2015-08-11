@@ -121,8 +121,6 @@ class CreditServiceTests(ModuleStoreTestCase):
         Try setting requirements status with a bad user_id
         """
 
-        CourseEnrollment.enroll(self.user, self.course.id)
-
         # set course requirements
         set_credit_requirements(
             self.course.id,
@@ -140,7 +138,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         # mark the grade as satisfied
         retval = self.service.set_credit_requirement_status(
-            self.user.id,
+            0,
             self.course.id,
             'grade',
             'grade'
