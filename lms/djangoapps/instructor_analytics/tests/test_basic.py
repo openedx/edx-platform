@@ -141,8 +141,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             'status',
             'attempt_code',
             'is_sample_attempt',
-            'last_poll_timestamp',
-            'last_poll_ipaddr',
         ]
 
         proctored_exam_id = create_exam(self.course_key, 'Test Content', 'Test Exam', 1)
