@@ -145,7 +145,7 @@ def compile_sass(options):
     if debug:
         parts.append("--sourcemap")
     else:
-        parts.append("--style compressed --quiet")
+        parts.append("--style compressed")
     for load_path in SASS_LOAD_PATHS + SASS_DIRS.keys():
         parts.append("--load-path {path}".format(path=load_path))
 
