@@ -146,7 +146,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
             group_id = None
     else:
         group_id = get_cohort_id(request.user, course.id)
-        if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
+        if not group_id:
             default_query_params['exclude_groups'] = True
 
     if group_id:
@@ -375,11 +375,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
-            annotated_content_info = utils.get_annotated_content_infos(course_key, thread, request.user, user_info=user_info)
+            annotated_content_info = utils.get_annotated_content_infos(
+                course_key, thread, request.user, user_info=user_info
+            )
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
         add_thread_group_name(content, course_key)
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
-            add_courseware_context([content], course, request.user)
         return utils.JsonResponse({
             'content': content,
             'annotated_content_info': annotated_content_info,

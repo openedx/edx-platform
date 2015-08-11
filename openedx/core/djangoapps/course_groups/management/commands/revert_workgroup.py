@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name,
     add_cohort,
@@ -76,7 +76,9 @@ class Command(BaseCommand):
                         try:
                             default_cohort = get_cohort_by_name(course.id, CourseUserGroup.default_cohort_name)
                         except CourseUserGroup.DoesNotExist:
-                            default_cohort = add_cohort(course.id, CourseUserGroup.default_cohort_name)
+                            default_cohort = add_cohort(
+                                course.id, CourseUserGroup.default_cohort_name, CourseCohort.RANDOM
+                            )
                             self.stdout.write(
                                 'Default cohort "{}" created for course "{}"'.format(
                                     default_cohort.name, course.display_name
@@ -108,8 +110,11 @@ class Command(BaseCommand):
                                     user.username, cohort.name, course.display_name
                                 )
                             )
-                        self.stdout.write("User '{}' is now only in cohort '{}' in course '{}'.\n".format(
-                            user.username, cohort.name, course.display_name)
+                        self.stdout.write(
+                            "User '{}' is now only in cohort '{}' in course '{}'.\n".format(
+                                # pylint: disable=undefined-loop-variable
+                                user.username, cohort.name, course.display_name
+                            )
                         )
                     else:
                         error = True
