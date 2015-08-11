@@ -21,6 +21,11 @@ class DataDownload
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
+    @$get_student_responses_btn = @$section.find("input[name='get-student-responses']'")
+    @$ora2_response_btn = @$section.find("input[name='ora2-response-btn']'")
+    @$ora2_response_btn_email = @$section.find("input[name='ora2-response-btn-email']'")
+    @$course_forums_btn = @$section.find("input[name='course-forums-btn']'")
+    @$student_forums_btn = @$section.find("input[name='student-forums-btn']'")
     @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
 
     # response areas
@@ -111,8 +116,20 @@ class DataDownload
     @$calculate_grades_csv_btn.click (e) =>
       @onClickGradeDownload @$calculate_grades_csv_btn, gettext("Error generating grades. Please try again.")
 
-    @$problem_grade_report_csv_btn.click (e) =>
-      @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating problem grade report. Please try again.")
+    @$get_student_responses_btn.click (e) =>
+      @onClickGradeDownload @$get_student_responses_btn, gettext("Error generating student responses. Please try again.")
+
+    @$ora2_response_btn.click (e) =>
+     @onClickGradeDownload @$ora2_response_btn, gettext("Error generating Open Responses. Please try again.")
+
+    @$ora2_response_btn_email.click (e) =>
+     @onClickGradeDownload @$ora2_response_btn_email, gettext("Error generating Open Responses. Please try again.")
+
+    @$course_forums_btn.click (e) =>
+     @onClickGradeDownload @$course_forums_btn, gettext("Error generating Course Forum Report. Please try again.")
+
+    @$student_forums_btn.click (e) =>
+     @onClickGradeDownload @$student_forums_btn, gettext("Error generating Student Forum Report. Please try again.")
 
   onClickGradeDownload: (button, errorMessage) ->
       # Clear any CSS styling from the request-response areas
@@ -130,7 +147,9 @@ class DataDownload
           else if e.target.name == 'get-student-responses'
             @$reports_request_response_error.text gettext("Error getting student responses. Please try again.")
           else if e.target.name == 'ora2-response-btn'
-            @$reports_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
+            @$reports_request_response_error.text gettext("Error generating Open Responses. Please try again.")
+          else if e.target.name == 'ora2-response-btn_email'
+            @$reports_request_response_error.text gettext("Error getting Open Responses. Please try again.")
           else if e.target.name == 'course-forums-btn'
             @$reports_request_response_error.text gettext("Error getting Course Forums data. Please try again.")
           else if e.target.name == 'student-forums-btn'
