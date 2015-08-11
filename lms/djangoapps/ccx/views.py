@@ -36,21 +36,23 @@ from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
-from student.roles import CourseCcxCoachRole
+from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.models import CourseEnrollment
 
-from instructor.offline_gradecalc import student_grades
-from instructor.views.api import _split_input_list
-from instructor.views.tools import get_student_from_identifier
+from instructor.offline_gradecalc import student_grades  # pylint: disable=import-error
+from instructor.views.api import _split_input_list  # pylint: disable=import-error
+from instructor.views.tools import get_student_from_identifier  # pylint: disable=import-error
+from instructor.enrollment import (
+    enroll_email,
+    unenroll_email,
+    get_email_params,
+)
 
-from .models import CustomCourseForEdX, CcxMembership
+from .models import CustomCourseForEdX
 from .overrides import (
     clear_override_for_ccx,
     get_override_for_ccx,
     override_field_for_ccx,
-)
-from .utils import (
-    enroll_email,
-    unenroll_email,
 )
 
 
@@ -127,7 +129,7 @@ def dashboard(request, course, ccx=None):
         context['schedule'] = json.dumps(schedule, indent=4)
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
-        context['ccx_members'] = CcxMembership.objects.filter(ccx=ccx)
+        context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator)
         context['gradebook_url'] = reverse(
             'ccx_gradebook', kwargs={'course_id': ccx_locator})
         context['grades_csv_url'] = reverse(
@@ -156,7 +158,7 @@ def create_ccx(request, course, ccx=None):
             "You cannot create a CCX from a course using a deprecated id. "
             "Please create a rerun of this course in the studio to allow "
             "this action."))
-        url = reverse('ccx_coach_dashboard', kwargs={'course_id', course.id})
+        url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
         return redirect(url)
 
     ccx = CustomCourseForEdX(
@@ -407,15 +409,18 @@ def ccx_invite(request, course, ccx=None):
             email = user.email
         try:
             validate_email(email)
+            course_key = CCXLocator.from_course_locator(course.id, ccx.id)
+            email_params = get_email_params(course, auto_enroll)
             if action == 'Enroll':
                 enroll_email(
-                    ccx,
+                    course_key,
                     email,
                     auto_enroll=auto_enroll,
-                    email_students=email_students
+                    email_students=email_students,
+                    email_params=email_params
                 )
             if action == "Unenroll":
-                unenroll_email(ccx, email, email_students=email_students)
+                unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
         except ValidationError:
             log.info('Invalid user name or email when trying to invite students: %s', email)
     url = reverse(
@@ -444,20 +449,21 @@ def ccx_student_management(request, course, ccx=None):
     else:
         email = user.email
 
+    course_key = CCXLocator.from_course_locator(course.id, ccx.id)
     try:
         validate_email(email)
         if action == 'add':
             # by decree, no emails sent to students added this way
             # by decree, any students added this way are auto_enrolled
-            enroll_email(ccx, email, auto_enroll=True, email_students=False)
+            enroll_email(course_key, email, auto_enroll=True, email_students=False)
         elif action == 'revoke':
-            unenroll_email(ccx, email, email_students=False)
+            unenroll_email(course_key, email, email_students=False)
     except ValidationError:
         log.info('Invalid user name or email when trying to enroll student: %s', email)
 
     url = reverse(
         'ccx_coach_dashboard',
-        kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
+        kwargs={'course_id': course_key}
     )
     return redirect(url)
 
@@ -496,8 +502,8 @@ def ccx_gradebook(request, course, ccx=None):
         prep_course_for_grading(course, request)
 
         enrolled_students = User.objects.filter(
-            ccxmembership__ccx=ccx,
-            ccxmembership__active=1
+            courseenrollment__course_id=ccx_key,
+            courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
 
         student_info = [
@@ -535,8 +541,8 @@ def ccx_grades_csv(request, course, ccx=None):
         prep_course_for_grading(course, request)
 
         enrolled_students = User.objects.filter(
-            ccxmembership__ccx=ccx,
-            ccxmembership__active=1
+            courseenrollment__course_id=ccx_key,
+            courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
         grades = iterate_grades_for(course, enrolled_students)
 
