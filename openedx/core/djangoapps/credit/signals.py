@@ -156,9 +156,7 @@ def _access_dict(group_configuration, access_groups_id_list):
 
     """
     access_dict = {
-        group_configuration.id: [
-            group_configuration.get_group(group_id).id for group_id in access_groups_id_list
-        ]
+        group_configuration.id: access_groups_id_list
     }
     return access_dict
 
