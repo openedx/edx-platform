@@ -28,8 +28,9 @@
                         maxMemberCount
                     ),
                     {memberCount: memberCount, maxMemberCount: maxMemberCount}, true
-                )
+                );
             },
+
             isUserMemberOfTeam: function(memberships, requestUsername) {
                 return _.isObject(
                     _.find(memberships, function(membership)
@@ -37,8 +38,27 @@
                         return membership.user.username === requestUsername;
                     })
                 );
+            },
+
+            showMessage: function (message) {
+                var messageElement = $('.teams-content .wrapper-msg');
+                messageElement.removeClass('is-hidden');
+                $('.teams-content .msg-content .copy').text(message);
+                messageElement.focus();
+            },
+
+            /**
+             * Parse `data` and show user message. If parsing fails than show `genericErrorMessage`
+             */
+            parseAndShowMessage: function (data, genericErrorMessage) {
+                try {
+                   var errors = JSON.parse(data.responseText);
+                   this.showMessage(_.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message);
+                } catch (error) {
+                   this.showMessage(genericErrorMessage);
+                }
             }
-        }
+        };
     });
 
 }).call(this, define || RequireJS.define);

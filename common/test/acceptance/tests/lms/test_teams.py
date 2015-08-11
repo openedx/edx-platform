@@ -750,6 +750,9 @@ class CreateTeamTest(TeamsTabBase):
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
     """Tests for viewing a specific team"""
+
+    SEND_INVITE_TEXT = 'Send this link to friends so that they can join too.'
+
     def setUp(self):
         super(TeamPageTest, self).setUp()
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
@@ -900,10 +903,12 @@ class TeamPageTest(TeamsTabBase):
             self.assertTrue(self.team_page.team_leave_link_present)
             self.assertTrue(self.team_page.team_invite_section_present)
             self.assertEqual(self.team_page.team_invite_help_text, invite_text)
+            self.assertTrue(self.team_page.new_post_button_present)
         else:
             self.assertEqual(self.team_page.team_user_membership_text, '')
             self.assertFalse(self.team_page.team_leave_link_present)
             self.assertFalse(self.team_page.team_invite_section_present)
+            self.assertFalse(self.team_page.new_post_button_present)
 
     def test_team_member_can_see_full_team_details(self):
         """
@@ -922,7 +927,7 @@ class TeamPageTest(TeamsTabBase):
 
         self.assert_team_details(
             num_members=1,
-            invite_text='Send this link to friends so that they can join too.'
+            invite_text=self.SEND_INVITE_TEXT
         )
 
     def test_other_users_can_see_limited_team_details(self):
@@ -994,7 +999,7 @@ class TeamPageTest(TeamsTabBase):
 
         self.assert_team_details(
             num_members=1,
-            invite_text='Send this link to friends so that they can join too.'
+            invite_text=self.SEND_INVITE_TEXT
         )
         self.assertEqual(self.team_page.team_invite_url, '{0}?invite=true'.format(self.team_page.url))
 
@@ -1006,9 +1011,11 @@ class TeamPageTest(TeamsTabBase):
             and a team belonging to that topic
         And I visit the Team page for that team
         Then I should see Join Team button
+        And I should not see New Post button
         When I click on Join Team button
         Then there should be no Join Team button and no message
         And I should see the updated information under Team Details
+        And I should see New Post button
         """
         self._set_team_configuration_and_membership(create_membership=False)
         self.team_page.visit()
@@ -1016,7 +1023,7 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.click_join_team_button()
         self.assertFalse(self.team_page.join_team_button_present)
         self.assertFalse(self.team_page.join_team_message_present)
-        self.assert_team_details(num_members=1, invite_text='Send this link to friends so that they can join too.')
+        self.assert_team_details(num_members=1, is_member=True, invite_text=self.SEND_INVITE_TEXT)
 
     def test_already_member_message(self):
         """
@@ -1055,3 +1062,27 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.visit()
         self.assertEqual(self.team_page.join_team_message, 'This team is full.')
         self.assert_team_details(num_members=1, is_member=False, max_size=1)
+
+    def test_leave_team(self):
+        """
+        Scenario: User can leave a team.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I am a member of team
+        And I visit the team
+        And I should not see Join Team button
+        And I should see New Post button
+        Then I should see Leave Team link
+        When I click on Leave Team link
+        Then user should be removed from team
+        And I should see Join Team button
+        And I should not see New Post button
+        """
+        self._set_team_configuration_and_membership()
+        self.team_page.visit()
+        self.assertFalse(self.team_page.join_team_button_present)
+        self.assert_team_details(num_members=1, invite_text=self.SEND_INVITE_TEXT)
+        self.team_page.click_leave_team_link()
+        self.assert_team_details(num_members=0, is_member=False)
+        self.assertTrue(self.team_page.join_team_button_present)
