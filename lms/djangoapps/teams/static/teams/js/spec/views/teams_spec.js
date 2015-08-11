@@ -158,20 +158,12 @@ define([
                 teamsView.$('a.browse-teams').click();
                 expect(Backbone.history.navigate.calls[0].args).toContain('browse');
 
-                teamsView.$('a.search-team-descriptions').click();
+                teamsView.$('a.search-teams').click();
                 // TODO! Should be updated once team description search feature is available
                 expect(Backbone.history.navigate.calls[1].args).toContain('browse');
 
                 teamsView.$('a.create-team').click();
                 expect(Backbone.history.navigate.calls[2].args).toContain('topics/test-topic/create-team');
-            });
-
-            it('shows for a user not in a team', function () {
-                var emptyMembership = createTeamMemberships([]),
-                    teamsView = createTeamsView({ teamMemberships: emptyMembership });
-                expect(teamsView.$el.text()).toContain(
-                    'Are you having trouble finding a team to join?'
-                );
             });
 
             it('does not show for a user already in a team', function () {

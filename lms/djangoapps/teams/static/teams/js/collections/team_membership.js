@@ -20,8 +20,11 @@
                 model: TeamMembershipModel,
 
                 canUserCreateTeam: function() {
-                    // Note: non-privileged users can only be in one team, so they
-                    // can only create a team when they don't belong to one.
+                    // Note: users can only belong to one team at a time, and
+                    // non-privileged users are automatically added to any team
+                    // that they create. This means that non-privileged users
+                    // are not allowed to create a new team when they already
+                    // belong to a different one.
                     return this.privileged || this.length === 0;
                 }
             });
