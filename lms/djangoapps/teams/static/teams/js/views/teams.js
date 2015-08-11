@@ -20,16 +20,20 @@
                 });
                 PaginatedView.prototype.initialize.call(this);
                 this.teamParams = options.teamParams;
+                this.showActions = options.showActions;
             },
 
             render: function () {
                 PaginatedView.prototype.render.call(this);
 
-                var teamActionsView = new TeamActionsView({
-                    teamParams: this.teamParams
-                });
-                this.$el.append(teamActionsView.$el);
-                teamActionsView.render();
+                if (this.showActions === true) {
+                    var teamActionsView = new TeamActionsView({
+                        teamParams: this.teamParams
+                    });
+                    this.$el.append(teamActionsView.$el);
+                    teamActionsView.render();
+                }
+
                 return this;
             },
 

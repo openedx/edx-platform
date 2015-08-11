@@ -52,12 +52,14 @@ from .serializers import (
     BaseTopicSerializer,
     TopicSerializer,
     PaginatedTopicSerializer,
-    MembershipSerializer
+    MembershipSerializer,
+    PaginatedMembershipSerializer,
 )
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 
 # Constants
+TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 
 
@@ -91,14 +93,24 @@ class TeamsDashboardView(View):
             context={'course_id': course.id, 'sort_order': sort_order}
         )
         user = request.user
+
+        team_memberships = CourseTeamMembership.get_memberships(request.user.username, [course.id])
+        team_memberships_page = Paginator(team_memberships, TEAM_MEMBERSHIPS_PER_PAGE).page(1)
+        team_memberships_serializer = PaginatedMembershipSerializer(
+            instance=team_memberships_page,
+            context={'expand': ('team',)},
+        )
+
         context = {
             "course": course,
             "topics": topics_serializer.data,
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
+            "team_memberships": team_memberships_serializer.data,
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
+            "team_memberships_url": reverse('team_membership_list', request=request),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
             "username": user.username,
@@ -789,9 +801,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
     def get(self, request):
         """GET /api/team/v0/team_membership"""
-        queryset = CourseTeamMembership.objects.all()
-
         specified_username_or_team = False
+        username = None
+        valid_courses = None
+        team_id = None
 
         if 'team_id' in request.QUERY_PARAMS:
             specified_username_or_team = True
@@ -802,10 +815,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
             if not has_team_api_access(request.user, team.course_id):
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            queryset = queryset.filter(team__team_id=team_id)
 
         if 'username' in request.QUERY_PARAMS:
             specified_username_or_team = True
+            username = request.QUERY_PARAMS['username']
             if not request.user.is_staff:
                 enrolled_courses = (
                     CourseEnrollment.enrollments_for_user(request.user).values_list('course_id', flat=True)
@@ -818,8 +831,6 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     for course_list in [enrolled_courses, staff_courses]
                     for course_key_string in course_list
                 ]
-                queryset = queryset.filter(team__course_id__in=valid_courses)
-            queryset = queryset.filter(user__username=request.QUERY_PARAMS['username'])
 
         if not specified_username_or_team:
             return Response(
@@ -827,6 +838,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        queryset = CourseTeamMembership.get_memberships(username, valid_courses, team_id)
         page = self.paginate_queryset(queryset)
         serializer = self.get_pagination_serializer(page)
         return Response(serializer.data)  # pylint: disable=maybe-no-member

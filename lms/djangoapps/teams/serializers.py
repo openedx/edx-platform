@@ -113,6 +113,13 @@ class MembershipSerializer(serializers.ModelSerializer):
         read_only_fields = ("date_joined",)
 
 
+class PaginatedMembershipSerializer(PaginationSerializer):
+    """Serializes team memberships with support for pagination."""
+    class Meta(object):
+        """Defines meta information for the PaginatedMembershipSerializer."""
+        object_serializer_class = MembershipSerializer
+
+
 class BaseTopicSerializer(serializers.Serializer):
     """Serializes a topic without team_count."""
     description = serializers.CharField()

@@ -66,30 +66,35 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({model: this.model, maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({model: this.teamModel(), maxTeamSize: this.maxTeamSize}),
                     new TeamCountryLanguageView({
-                        model: this.model,
+                        model: this.teamModel(),
                         countries: this.countries,
                         languages: this.languages
                     })
                 ];
             },
 
+            teamModel: function () {
+                if (this.model.has('team')) { return this.model.get('team'); };
+                return this.model;
+            },
+
             configuration: 'list_card',
             cardClass: 'team-card',
-            title: function () { return this.model.get('name'); },
-            description: function () { return this.model.get('description'); },
+            title: function () { return this.teamModel().get('name'); },
+            description: function () { return this.teamModel().get('description'); },
             details: function () { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
                 return interpolate(
                     gettext('View %(span_start)s %(team_name)s %(span_end)s'),
-                    {span_start: '<span class="sr">', team_name: this.model.get('name'), span_end: '</span>'},
+                    {span_start: '<span class="sr">', team_name: this.teamModel().get('name'), span_end: '</span>'},
                     true
                 );
             },
             action: function (event) {
-                var url = 'teams/' + this.topic.get('id') + '/' + this.model.get('id');
+                var url = 'teams/' + this.teamModel().get('topic_id') + '/' + this.teamModel().get('id');
                 event.preventDefault();
                 this.router.navigate(url, {trigger: true});
             }
