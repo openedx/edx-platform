@@ -10,7 +10,6 @@ html, body {
   font-size: 1em;
   font-style: normal;
   line-height: 1em;
-  //-webkit-font-smoothing: antialiased;
 }
 
 html{
@@ -33,7 +32,6 @@ h1 {
   letter-spacing: 1px;
   margin-bottom: ($baseline*1.5);
   text-align: center;
-  //text-transform: uppercase;
 }
 
 h2 {
@@ -50,14 +48,13 @@ p + h2, ul + h2, ol + h2 {
 }
 
 p {
-  color: $base-font-color;
-  font: normal 1em/1.6em $serif;
+  color: inherit;
   margin: 0;
 }
 
 span {
-  font: normal 1em/1.6em $sans-serif;
-  color: $base-font-color;
+  font: inherit;
+  color: inherit;
 }
 
 /* Fix for CodeMirror: prevent top-level span from affecting deeply-embedded span in CodeMirror */
@@ -79,9 +76,10 @@ p + p, ul + p, ol + p {
 }
 
 p {
-  a:link, a:visited {
+  a, a:visited {
     color: $link-color;
-    font: normal 1em/1em $serif;
+    font: inherit;
+    font-weight: inherit;
     text-decoration: none;
     @include transition(all 0.1s linear 0s);
 
@@ -92,9 +90,9 @@ p {
   }
 }
 
-a:link, a:visited {
+a, a:visited {
   color: $link-color;
-  font: normal 1em/1em $sans-serif;
+  font: inherit;
   text-decoration: none;
   @include transition(all 0.1s linear 0s);
 
@@ -107,14 +105,6 @@ a:link, a:visited {
     opacity: 0.5;
     cursor: not-allowed;
   }
-}
-
-a:focus {
-  /**
-   *  Add general focus styling here
-   *  for example:
-   *      outline: 3px groove $black;
-   **/
 }
 
 .content-wrapper {
