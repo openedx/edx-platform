@@ -185,16 +185,9 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def problem_types(self):
         """ Low-level problem type introspection for content libraries filtering by problem type """
-        tree = etree.XML(self.data)  # pylint: disable=no-member
+        tree = etree.XML(self.data)
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
-
-    @property
-    def has_responsive_ui(self):
-        """
-        Returns whether this module has support for responsive UI.
-        """
-        return self.lcp.has_responsive_ui
 
     def index_dictionary(self):
         """
@@ -210,6 +203,17 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         }
         result.update(index)
         return result
+
+    def has_support(self, view, functionality):
+        """
+        Override the XBlock.has_support method to return appropriate
+        value for the multi-device functionality.
+        Returns whether the given view has support for the given functionality.
+        """
+        if functionality == "multi_device":
+            return self.lcp.has_multi_device_support
+        else:
+            return False
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

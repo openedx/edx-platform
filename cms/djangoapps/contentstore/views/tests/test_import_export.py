@@ -439,19 +439,52 @@ class ExportTestCase(CourseTestCase):
         root_dir = path(tempfile.mkdtemp())
         try:
             export_library_to_xml(self.store, contentstore(), lib_key, root_dir, name)
-            # pylint: disable=no-member
             lib_xml = lxml.etree.XML(open(root_dir / name / LIBRARY_ROOT).read())
             self.assertEqual(lib_xml.get('org'), lib_key.org)
             self.assertEqual(lib_xml.get('library'), lib_key.library)
             block = lib_xml.find('video')
             self.assertIsNotNone(block)
             self.assertEqual(block.get('url_name'), video_block.url_name)
-            # pylint: disable=no-member
             video_xml = lxml.etree.XML(open(root_dir / name / 'video' / video_block.url_name + '.xml').read())
             self.assertEqual(video_xml.tag, 'video')
             self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)
         finally:
             shutil.rmtree(root_dir / name)
+
+    def test_library_import_then_export(self):
+        """
+        Verify that a library exports successfully after being imported.
+        """
+        library = LibraryFactory.create(modulestore=self.store)
+        lib_key = library.location.library_key
+        name = library.url_name
+
+        # import the library
+        extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
+        extract_dir_relative = path.relpath(extract_dir, settings.DATA_DIR)
+        try:
+            with tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz') as tar:
+                safetar_extractall(tar, extract_dir)
+            library_items = import_library_from_xml(
+                self.store,
+                self.user.id,
+                settings.GITHUB_REPO_ROOT,
+                [extract_dir_relative / 'library'],
+                load_error_modules=False,
+                static_content_store=contentstore(),
+                target_id=lib_key
+            )
+
+            # verify library import correctly
+            self.assertEqual(lib_key, library_items[0].location.library_key)
+            library = self.store.get_library(lib_key)
+            self.assertEqual(len(library.children), 3)
+
+            # export library again
+            export_library_to_xml(self.store, contentstore(), lib_key, extract_dir, name)
+
+        finally:
+            shutil.rmtree(extract_dir)
 
     def test_export_success_with_custom_tag(self):
         """

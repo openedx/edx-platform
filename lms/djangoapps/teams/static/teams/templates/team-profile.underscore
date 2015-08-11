@@ -1,0 +1,10 @@
+<div class="team-profile">
+    <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
+            data-read-only="<%= readOnly %>"
+            data-user-create-comment="<%= !readOnly %>"
+            data-user-create-subcomment="<%= !readOnly %>">
+        <% if ( !readOnly) { %>
+            <a href="#" class="new-post-btn" role="button"><span class="icon fa fa-edit new-post-icon"></span><%= gettext("New Post") %></a>
+        <% } %>
+    </div>
+</div>

@@ -18,6 +18,7 @@ from courseware.access import has_access
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
+from django_comment_common.utils import ThreadContext
 from django_comment_client.utils import (
     add_courseware_context,
     get_annotated_content_info,
@@ -30,7 +31,7 @@ from django_comment_client.utils import (
     discussion_category_id_access,
     get_cached_discussion_id_map,
 )
-from django_comment_client.permissions import check_permissions_by_view, has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from eventtracking import tracker
 import lms.lib.comment_client as cc
 
@@ -51,6 +52,8 @@ def permitted(fn):
                 content = cc.Thread.find(kwargs["thread_id"]).to_dict()
             elif "comment_id" in kwargs:
                 content = cc.Comment.find(kwargs["comment_id"]).to_dict()
+            elif "commentable_id" in kwargs:
+                content = cc.Commentable.find(kwargs["commentable_id"]).to_dict()
             else:
                 content = None
             return content
@@ -185,8 +188,11 @@ def create_thread(request, course_id, commentable_id):
         'title': post["title"],
     }
 
-    if 'context' in post:
-        params['context'] = post['context']
+    # Check for whether this commentable belongs to a team, and add the right context
+    if get_team(commentable_id) is not None:
+        params['context'] = ThreadContext.STANDALONE
+    else:
+        params['context'] = ThreadContext.COURSE
 
     thread = cc.Thread(**params)
 
@@ -244,11 +250,13 @@ def update_thread(request, course_id, thread_id):
     if "thread_type" in request.POST:
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
+        commentable_id = request.POST["commentable_id"]
         course = get_course_with_access(request.user, 'load', course_key)
-        if discussion_category_id_access(course, request.user, request.POST.get("commentable_id")):
-            thread.commentable_id = request.POST["commentable_id"]
-        else:
+        thread_context = getattr(thread, "context", "course")
+        if thread_context == "course" and not discussion_category_id_access(course, request.user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
+        else:
+            thread.commentable_id = commentable_id
 
     thread.save()
     if request.is_ajax():
@@ -608,16 +616,6 @@ def follow_commentable(request, course_id, commentable_id):
 @require_POST
 @login_required
 @permitted
-def follow_user(request, course_id, followed_user_id):
-    user = cc.User.from_django_user(request.user)
-    followed_user = cc.User.find(followed_user_id)
-    user.follow(followed_user)
-    return JsonResponse({})
-
-
-@require_POST
-@login_required
-@permitted
 def unfollow_thread(request, course_id, thread_id):
     """
     given a course id and thread id, stop following this thread
@@ -640,20 +638,6 @@ def unfollow_commentable(request, course_id, commentable_id):
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
     user.unfollow(commentable)
-    return JsonResponse({})
-
-
-@require_POST
-@login_required
-@permitted
-def unfollow_user(request, course_id, followed_user_id):
-    """
-    given a course id and user id, stop following this user
-    ajax only
-    """
-    user = cc.User.from_django_user(request.user)
-    followed_user = cc.User.find(followed_user_id)
-    user.unfollow(followed_user)
     return JsonResponse({})
 
 

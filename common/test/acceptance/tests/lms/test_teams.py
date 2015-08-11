@@ -3,15 +3,21 @@ Acceptance tests for the teams feature.
 """
 import json
 
+import ddt
 from nose.plugins.attrib import attr
+from uuid import uuid4
 
 from ..helpers import UniqueCourseTest
-from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage
 from ...fixtures import LMS_BASE_URL
 from ...fixtures.course import CourseFixture
-from ...pages.lms.tab_nav import TabNavPage
+from ...fixtures.discussion import (
+    Thread,
+    MultipleThreadFixture
+)
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
+from ...pages.lms.tab_nav import TabNavPage
+from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
 
 
 class TeamsTabBase(UniqueCourseTest):
@@ -24,7 +30,34 @@ class TeamsTabBase(UniqueCourseTest):
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
-        return [{u"description": str(i), u"name": str(i), u"id": i} for i in xrange(num_topics)]
+        return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
+
+    def create_teams(self, topic, num_teams):
+        """Create `num_teams` teams belonging to `topic`."""
+        teams = []
+        for i in xrange(num_teams):
+            team = {
+                'course_id': self.course_id,
+                'topic_id': topic['id'],
+                'name': 'Team {}'.format(i),
+                'description': 'Description {}'.format(i)
+            }
+            response = self.course_fixture.session.post(
+                LMS_BASE_URL + '/api/team/v0/teams/',
+                data=json.dumps(team),
+                headers=self.course_fixture.headers
+            )
+            teams.append(json.loads(response.text))
+        return teams
+
+    def create_membership(self, username, team_id):
+        """Assign `username` to `team_id`."""
+        response = self.course_fixture.session.post(
+            LMS_BASE_URL + '/api/team/v0/team_membership/',
+            data=json.dumps({'username': username, 'team_id': team_id}),
+            headers=self.course_fixture.headers
+        )
+        return json.loads(response.text)
 
     def set_team_configuration(self, configuration, enroll_in_course=True, global_staff=False):
         """
@@ -56,6 +89,7 @@ class TeamsTabBase(UniqueCourseTest):
             self.assertNotIn("Teams", self.tab_nav.tab_names)
 
 
+@ddt.ddt
 @attr('shard_5')
 class TeamsTabTest(TeamsTabBase):
     """
@@ -122,6 +156,39 @@ class TeamsTabTest(TeamsTabBase):
             global_staff=True
         )
         self.verify_teams_present(True)
+
+    @ddt.data(
+        ('browse', 'div.topics-list'),
+        ('teams', 'p.temp-tab-view'),
+        ('teams/{topic_id}/{team_id}', 'div.discussion-module'),
+        ('topics/{topic_id}/create-team', 'div.create-team-instructions'),
+        ('topics/{topic_id}', 'div.teams-list'),
+        ('not-a-real-route', 'div.warning')
+    )
+    @ddt.unpack
+    def test_url_routing(self, route, selector):
+        """Ensure that navigating to a URL route correctly updates the page
+        content.
+        """
+        topics = self.create_topics(1)
+        topic = topics[0]
+        self.set_team_configuration({
+            u'max_team_size': 10,
+            u'topics': topics
+        })
+        team = self.create_teams(topic, 1)[0]
+        self.teams_page.visit()
+        self.browser.get(
+            '{url}#{route}'.format(
+                url=self.browser.current_url,
+                route=route.format(
+                    topic_id=topic['id'],
+                    team_id=team['id']
+                ))
+        )
+        self.teams_page.wait_for_ajax()
+        self.assertTrue(self.teams_page.q(css=selector).present)
+        self.assertTrue(self.teams_page.q(css=selector).visible)
 
 
 @attr('shard_5')
@@ -270,33 +337,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
-
-    def create_teams(self, num_teams):
-        """Create `num_teams` teams belonging to `self.topic`."""
-        teams = []
-        for i in xrange(num_teams):
-            team = {
-                'course_id': self.course_id,
-                'topic_id': self.topic['id'],
-                'name': 'Team {}'.format(i),
-                'description': 'Description {}'.format(i)
-            }
-            response = self.course_fixture.session.post(
-                LMS_BASE_URL + '/api/team/v0/teams/',
-                data=json.dumps(team),
-                headers=self.course_fixture.headers
-            )
-            teams.append(json.loads(response.text))
-        return teams
-
-    def create_membership(self, username, team_id):
-        """Assign `username` to `team_id`."""
-        response = self.course_fixture.session.post(
-            LMS_BASE_URL + '/api/team/v0/team_membership/',
-            data=json.dumps({'username': username, 'team_id': team_id}),
-            headers=self.course_fixture.headers
-        )
-        return json.loads(response.text)
+        self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
 
     def verify_page_header(self):
         """Verify that the page header correctly reflects the current topic's name and description."""
@@ -379,7 +420,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And I should see a button to add a team
         And I should not see a pagination footer
         """
-        teams = self.create_teams(self.TEAMS_PAGE_SIZE)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1-10 out of 10 total')
@@ -402,7 +443,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And when I click on the previous page button
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.TEAMS_PAGE_SIZE + 1)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_on_page(1, teams, 'Showing 1-10 out of 11 total', True)
@@ -424,7 +465,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         When I input the first page
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.TEAMS_PAGE_SIZE + 10)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
@@ -444,7 +485,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And I should see the team for that topic
         And I should see that the team card shows my membership
         """
-        teams = self.create_teams(1)
+        teams = self.create_teams(self.topic, 1)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_teams(teams)
@@ -455,3 +496,284 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             self.browse_teams_page.team_cards[0].find_element_by_css_selector('.member-count').text,
             '1 / 10 Members'
         )
+
+    def test_navigation_links(self):
+        """
+        Scenario: User should be able to navigate to "browse all teams" and "search team description" links.
+        Given I am enrolled in a course with a team configuration and a topic
+            containing one team
+        When I visit the Teams page for that topic
+        Then I should see the correct page header
+        And I should see the link to "browse all team"
+        And I should navigate to that link
+        And I see the relevant page loaded
+        And I should see the link to "search teams"
+        And I should navigate to that link
+        And I see the relevant page loaded
+        """
+        self.browse_teams_page.visit()
+        self.verify_page_header()
+
+        self.browse_teams_page.click_browse_all_teams_link()
+        self.assertTrue(self.topics_page.is_browser_on_page())
+
+        self.browse_teams_page.visit()
+        self.verify_page_header()
+        self.browse_teams_page.click_search_team_link()
+        # TODO Add search page expectation once that implemented.
+
+
+@attr('shard_5')
+class CreateTeamTest(TeamsTabBase):
+    """
+    Tests for creating a new Team within a Topic on the Teams page.
+    """
+
+    def setUp(self):
+        super(CreateTeamTest, self).setUp()
+        self.topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        self.browse_teams_page.visit()
+        self.create_team_page = CreateTeamPage(self.browser, self.course_id, self.topic)
+        self.team_name = 'Avengers'
+
+    def verify_page_header(self):
+        """
+        Verify that the page header correctly reflects the
+        create team header, description and breadcrumb.
+        """
+        self.assertEqual(self.create_team_page.header_page_name, 'Create a New Team')
+        self.assertEqual(
+            self.create_team_page.header_page_description,
+            'Create a new team if you can\'t find existing teams to join, '
+            'or if you would like to learn with friends you know.'
+        )
+        self.assertEqual(self.create_team_page.header_page_breadcrumbs, self.topic['name'])
+
+    def verify_and_navigate_to_create_team_page(self):
+        """Navigates to the create team page and verifies."""
+        self.browse_teams_page.click_create_team_link()
+        self.verify_page_header()
+
+    def fill_create_form(self):
+        """Fill the create team form fields with appropriate values."""
+        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name)
+        self.create_team_page.value_for_textarea_field(
+            field_id='description',
+            value='The Avengers are a fictional team of superheroes.'
+        )
+        self.create_team_page.value_for_dropdown_field(field_id='language', value='English')
+        self.create_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+
+    def test_user_can_see_create_team_page(self):
+        """
+        Scenario: The user should be able to see the create team page via teams list page.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Teams page for that topic
+        Then I should see the Create Team page link on bottom
+        And When I click create team link
+        Then I should see the create team page.
+        And I should see the create team header
+        And I should also see the help messages for fields.
+        """
+        self.verify_and_navigate_to_create_team_page()
+        self.assertEqual(
+            self.create_team_page.message_for_field('name'),
+            'A name that identifies your team (maximum 255 characters).'
+        )
+        self.assertEqual(
+            self.create_team_page.message_for_textarea_field('description'),
+            'A short description of the team to help other learners understand '
+            'the goals or direction of the team (maximum 300 characters).'
+        )
+        self.assertEqual(
+            self.create_team_page.message_for_field('country'),
+            'The country that team members primarily identify with.'
+        )
+        self.assertEqual(
+            self.create_team_page.message_for_field('language'),
+            'The language that team members primarily use to communicate with each other.'
+        )
+
+    def test_user_can_see_error_message_for_missing_data(self):
+        """
+        Scenario: The user should be able to see error message in case of missing required field.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        And When I click create team button without filling required fields
+        Then I should see the error message and highlighted fields.
+        """
+        self.verify_and_navigate_to_create_team_page()
+        self.create_team_page.submit_form()
+
+        self.assertEqual(
+            self.create_team_page.validation_message_text,
+            'Check the highlighted fields below and try again.'
+        )
+        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.create_team_page.error_for_field(field_id='description'))
+
+    def test_user_can_see_error_message_for_incorrect_data(self):
+        """
+        Scenario: The user should be able to see error message in case of increasing length for required fields.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        When I add text > than 255 characters for name field
+        And I click Create button
+        Then I should see the error message for exceeding length.
+        """
+        self.verify_and_navigate_to_create_team_page()
+
+        # Fill the name field with >255 characters to see validation message.
+        self.create_team_page.value_for_text_field(
+            field_id='name',
+            value='EdX is a massive open online course (MOOC) provider and online learning platform. '
+                  'It hosts online university-level courses in a wide range of disciplines to a worldwide '
+                  'audience, some at no charge. It also conducts research into learning based on how '
+                  'people use its platform. EdX was created for students and institutions that seek to'
+                  'transform themselves through cutting-edge technologies, innovative pedagogy, and '
+                  'rigorous courses. More than 70 schools, nonprofits, corporations, and international'
+                  'organizations offer or plan to offer courses on the edX website. As of 22 October 2014,'
+                  'edX has more than 4 million users taking more than 500 courses online.'
+        )
+        self.create_team_page.submit_form()
+
+        self.assertEqual(
+            self.create_team_page.validation_message_text,
+            'Check the highlighted fields below and try again.'
+        )
+        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
+
+    def test_user_can_create_new_team_successfully(self):
+        """
+        Scenario: The user should be able to create new team.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        When I fill all the fields present with appropriate data
+        And I click Create button
+        Then I should see the page for my team
+        """
+        self.verify_and_navigate_to_create_team_page()
+
+        self.fill_create_form()
+        self.create_team_page.submit_form()
+
+        # Verify that the page is shown for the new team
+        team_page = TeamPage(self.browser, self.course_id)
+        team_page.wait_for_page()
+        self.assertEqual(team_page.team_name, self.team_name)
+        self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
+
+    def test_user_can_cancel_the_team_creation(self):
+        """
+        Scenario: The user should be able to cancel the creation of new team.
+        Given I am enrolled in a course with a team configuration and a topic
+        When I visit the Create Team page for that topic
+        Then I should see the Create Team header and form
+        When I click Cancel button
+        Then I should see teams list page without any new team.
+        """
+        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+
+        self.verify_and_navigate_to_create_team_page()
+        self.create_team_page.cancel_team()
+
+        self.assertTrue(self.browse_teams_page.is_browser_on_page())
+        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+
+
+@attr('shard_5')
+@ddt.ddt
+class TeamPageTest(TeamsTabBase):
+    """Tests for viewing a specific team"""
+    def setUp(self):
+        super(TeamPageTest, self).setUp()
+        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.team = self.create_teams(self.topic, 1)[0]
+        self.team_page = TeamPage(self.browser, self.course_id, self.team)
+
+    def setup_thread(self):
+        """
+        Create and return a thread for this test's discussion topic.
+        """
+        thread = Thread(
+            id="test_thread_{}".format(uuid4().hex),
+            commentable_id=self.team['discussion_topic_id'],
+            body="Dummy text body."
+        )
+        thread_fixture = MultipleThreadFixture([thread])
+        thread_fixture.push()
+        return thread
+
+    def setup_discussion_user(self, role=None, staff=False):
+        """Set this test's user to have the given role in its
+        discussions. Role is one of 'Community TA', 'Moderator',
+        'Administrator', or 'Student'.
+        """
+        kwargs = {
+            'course_id': self.course_id,
+            'staff': staff
+        }
+        if role is not None:
+            kwargs['roles'] = role
+        #pylint: disable=attribute-defined-outside-init
+        self.user_info = AutoAuthPage(self.browser, **kwargs).visit().user_info
+
+    def verify_teams_discussion_permissions(self, should_have_permission):
+        """Verify that the teams discussion component is in the correct state
+        for the test user. If `should_have_permission` is True, assert that
+        the user can see controls for posting replies, voting, editing, and
+        deleting. Otherwise, assert that those controls are hidden.
+        """
+        thread = self.setup_thread()
+        self.team_page.visit()
+        self.assertEqual(self.team_page.discussion_id, self.team['discussion_topic_id'])
+        discussion = self.team_page.discussion_page
+        self.assertTrue(discussion.is_browser_on_page())
+        self.assertTrue(discussion.is_discussion_expanded())
+        self.assertEqual(discussion.get_num_displayed_threads(), 1)
+        self.assertTrue(discussion.has_thread(thread['id']))
+        assertion = self.assertTrue if should_have_permission else self.assertFalse
+        assertion(discussion.q(css='.post-header-actions').present)
+        assertion(discussion.q(css='.add-response').present)
+        assertion(discussion.q(css='.new-post-btn').present)
+
+    def test_discussion_on_my_team_page(self):
+        """
+        Scenario: Team Page renders a discussion for a team to which I belong.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When the team has a discussion with a thread
+        And I visit the Team page for that team
+        Then I should see a discussion with the correct discussion_id
+        And I should see the existing thread
+        And I should see controls to change the state of the discussion
+        """
+        self.create_membership(self.user_info['username'], self.team['id'])
+        self.verify_teams_discussion_permissions(True)
+
+    @ddt.data(True, False)
+    def test_discussion_on_other_team_page(self, is_staff):
+        """
+        Scenario: Team Page renders a team discussion for a team to which I do
+            not belong.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am not a member
+        When the team has a discussion with a thread
+        And I visit the Team page for that team
+        Then I should see a discussion with the correct discussion_id
+        And I should see the team's thread
+        And I should not see controls to change the state of the discussion
+        """
+        self.setup_discussion_user(staff=is_staff)
+        self.verify_teams_discussion_permissions(False)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator')
+    def test_discussion_privileged(self, role):
+        self.setup_discussion_user(role=role)
+        self.verify_teams_discussion_permissions(True)

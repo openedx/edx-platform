@@ -39,6 +39,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
+    - xmodule_js/common_static/js/vendor/jquery.timeago.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
@@ -66,8 +67,10 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - js
+    - coffee/src
     - common/js
     - teams/js
+    - xmodule_js/common_static/coffee
 
 # Paths to spec (test) JavaScript files
 spec_paths:

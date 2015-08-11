@@ -361,7 +361,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
 
         # Now setup the masquerade for the test user
         setup_masquerade(request, self.test_user, True)
-        scheme = self.user_partition.scheme    # pylint: disable=no-member
+        scheme = self.user_partition.scheme
         self.assertEqual(
             scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
             group

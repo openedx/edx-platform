@@ -787,7 +787,7 @@ def _rerun_course(request, org, number, run, fields):
     CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
 
     # Clear the fields that must be reset for the rerun
-    fields['advertised_start'] = None
+    fields['advertised_start'] = ''
 
     # Rerun the course as a new celery task
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
@@ -1459,7 +1459,7 @@ def group_configurations_list_handler(request, course_key_string):
                 response["Location"] = reverse_course_url(
                     'group_configurations_detail_handler',
                     course.id,
-                    kwargs={'group_configuration_id': new_configuration.id}  # pylint: disable=no-member
+                    kwargs={'group_configuration_id': new_configuration.id}
                 )
                 store.update_item(course, request.user.id)
                 return response

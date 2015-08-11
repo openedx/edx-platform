@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=no-member
 # pylint: disable=protected-access
 """
 Tests for import_course_from_xml using the mongo modulestore.

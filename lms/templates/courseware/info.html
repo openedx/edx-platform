@@ -20,7 +20,7 @@ from courseware.courses import get_course_info_section
         <h2 class="title">${_("You are not enrolled yet")}</h2>
         <div class="copy">
           <p class='enroll-message'>
-            ${_(u"You are not currently enrolled in this course. Sign up for it {link_start}here{link_end}!").format(
+            ${_(u"You are not currently enrolled in this course. {link_start}Sign up now!{link_end}").format(
             link_start=u"<a href={}>".format(url_to_enroll),
             link_end=u"</a>"
             )}
@@ -49,7 +49,9 @@ $(document).ready(function(){
     <section class="updates">
       % if studio_url is not None and masquerade and masquerade.role == 'staff':
         <div class="wrap-instructor-info studio-view">
-          <a class="instructor-info-action" href="${studio_url}">${_("View Updates in Studio")}</a>
+          <a class="instructor-info-action" href="${studio_url}">
+            ${_("View Updates in Studio")}
+          </a>
         </div>
       % endif
 

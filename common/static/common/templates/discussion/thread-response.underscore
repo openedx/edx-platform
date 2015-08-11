@@ -12,16 +12,16 @@
 </a>
 <ol class="comments">
     <li class="new-comment">
-    <% if (create_sub_comment) { %>
-        <form class="comment-form" data-id="<%- wmdId %>">
-            <ul class="discussion-errors"></ul>
-            <label class="sr" for="add-new-comment"><%- gettext("Add a comment") %></label>
-            <div class="comment-body" id="add-new-comment" data-id="<%- wmdId %>"
-            data-placeholder="<%- gettext('Add a comment') %>"></div>
-            <div class="comment-post-control">
-                <a class="discussion-submit-comment control-button" href="#"><%- gettext("Submit") %></a>
-            </div>
-        </form>
-    <% } %>
+        <% if (create_sub_comment && !readOnly) { %>
+            <form class="comment-form" data-id="<%- wmdId %>">
+                <ul class="discussion-errors"></ul>
+                <label class="sr" for="add-new-comment"><%- gettext("Add a comment") %></label>
+                <div class="comment-body" id="add-new-comment" data-id="<%- wmdId %>"
+                data-placeholder="<%- gettext('Add a comment') %>"></div>
+                <div class="comment-post-control">
+                    <a class="discussion-submit-comment control-button" href="#"><%- gettext("Submit") %></a>
+                </div>
+            </form>
+        <% } %>
     </li>
 </ol>

@@ -22,7 +22,7 @@ invoked each time that changes have been made.
 
 from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
-TEST_ROOT = REPO_ROOT / "test_root"  # pylint: disable=no-value-for-parameter
+TEST_ROOT = REPO_ROOT / "test_root"
 
 ############################ STATIC FILES #############################
 

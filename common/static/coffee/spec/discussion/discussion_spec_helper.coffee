@@ -44,6 +44,7 @@ class @DiscussionSpecHelper
             'thread-list-item', 'discussion-home', 'search-alert',
             'new-post', 'thread-type', 'new-post-menu-entry',
             'new-post-menu-category', 'topic', 'post-user-display',
+            'inline-discussion', 'pagination', 'user-profile', 'profile-thread'
         ]
         templateNamesNoTrailingTemplate = [
             'forum-action-endorse', 'forum-action-answer', 'forum-action-follow',
@@ -66,5 +67,6 @@ class @DiscussionSpecHelper
                 data-course-name="Fake Course"
                 data-user-create-comment="true"
                 data-user-create-subcomment="true"
+                data-read-only="false"
             ></div>
         """)

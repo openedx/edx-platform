@@ -47,11 +47,16 @@
         TeamCountryLanguageView = Backbone.View.extend({
             template: _.template(teamCountryLanguageTemplate),
 
+            initialize: function (options) {
+                this.countries = options.countries;
+                this.languages = options.languages;
+            },
+
             render: function() {
                 // this.$el should be the card meta div
                 this.$el.append(this.template({
-                    country: this.model.get('country'),
-                    language: this.model.get('language')
+                    country: this.countries[this.model.get('country')],
+                    language: this.languages[this.model.get('language')]
                 }));
             }
         });
@@ -62,7 +67,11 @@
                 // TODO: show last activity detail view
                 this.detailViews = [
                     new TeamMembershipView({model: this.model, maxTeamSize: this.maxTeamSize}),
-                    new TeamCountryLanguageView({model: this.model})
+                    new TeamCountryLanguageView({
+                        model: this.model,
+                        countries: this.countries,
+                        languages: this.languages
+                    })
                 ];
             },
 
@@ -78,6 +87,11 @@
                     {span_start: '<span class="sr">', team_name: this.model.get('name'), span_end: '</span>'},
                     true
                 );
+            },
+            action: function (event) {
+                var url = 'teams/' + this.topic.get('id') + '/' + this.model.get('id');
+                event.preventDefault();
+                this.router.navigate(url, {trigger: true});
             }
         });
         return TeamCardView;

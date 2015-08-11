@@ -1953,7 +1953,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         # verify that Google Analytics event fires after successfully
         # submitting the photo verification
         self.mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
-            self.user.id,  # pylint: disable=no-member
+            self.user.id,
             'edx.bi.reverify.started',
             {
                 'category': "verification",

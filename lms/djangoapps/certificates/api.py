@@ -274,7 +274,6 @@ def example_certificates_status(course_key):
     return ExampleCertificateSet.latest_status(course_key)
 
 
-# pylint: disable=no-member
 def get_certificate_url(user_id, course_id):
     """
     :return certificate url

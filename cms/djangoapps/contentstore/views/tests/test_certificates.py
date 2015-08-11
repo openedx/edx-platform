@@ -67,7 +67,7 @@ class HelperMethods(object):
             )
             contentstore().save(content)
 
-    def _add_course_certificates(self, count=1, signatory_count=0):
+    def _add_course_certificates(self, count=1, signatory_count=0, is_active=False):
         """
         Create certificate for the course.
         """
@@ -96,7 +96,7 @@ class HelperMethods(object):
                 'org_logo_path': '/c4x/test/CSS101/asset/org_logo{}.png'.format(i),
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
-                'is_active': False
+                'is_active': is_active
             } for i in xrange(0, count)
         ]
         self._create_fake_images([certificate['org_logo_path'] for certificate in certificates])
@@ -194,7 +194,6 @@ class CertificatesBaseTestCase(object):
         self.assertTrue('must have name of the certificate' in context.exception)
 
 
-# pylint: disable=no-member
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
@@ -221,6 +220,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'name': u'Test certificate',
             u'description': u'Test description',
             u'org_logo_path': '',
+            u'is_active': False,
             u'signatories': []
         }
         response = self.client.ajax_post(
@@ -389,6 +389,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'description': u'Test description',
             u'course_title': u'Course Title Override',
             u'org_logo_path': '',
+            u'is_active': False,
             u'signatories': []
         }
 
@@ -420,6 +421,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'description': u'New test description',
             u'course_title': u'Course Title Override',
             u'org_logo_path': '',
+            u'is_active': False,
             u'signatories': []
 
         }
@@ -494,15 +496,43 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
 
     def test_delete_certificate_without_global_staff_permissions(self):
         """
-        Tests certificate deletion without global staff permission on course.
+        Tests deletion of an active certificate without global staff permission on course.
         """
-        self._add_course_certificates(count=2, signatory_count=1)
+        self._add_course_certificates(count=2, signatory_count=1, is_active=True)
         user = UserFactory()
         for role in [CourseInstructorRole, CourseStaffRole]:
             role(self.course.id).add_users(user)
         self.client.login(username=user.username, password='test')
         response = self.client.delete(
             self._url(cid=1),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_active_certificate_without_global_staff_permissions(self):
+        """
+        Tests update of an active certificate without global staff permission on course.
+        """
+        self._add_course_certificates(count=2, signatory_count=1, is_active=True)
+        cert_data = {
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'course_title': u'Course Title Override',
+            u'org_logo_path': '',
+            u'is_active': False,
+            u'signatories': []
+        }
+        user = UserFactory()
+        for role in [CourseInstructorRole, CourseStaffRole]:
+            role(self.course.id).add_users(user)
+        self.client.login(username=user.username, password='test')
+        response = self.client.put(
+            self._url(cid=1),
+            data=json.dumps(cert_data),
             content_type="application/json",
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",

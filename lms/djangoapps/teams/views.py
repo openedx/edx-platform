@@ -21,6 +21,7 @@ from rest_framework import permissions
 
 from django.db.models import Count
 from django.contrib.auth.models import User
+from django_countries import countries
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 
@@ -41,6 +42,8 @@ from xmodule.modulestore.django import modulestore
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from django_comment_client.utils import has_discussion_privileges
 
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
@@ -87,6 +90,7 @@ class TeamsDashboardView(View):
             instance=topics_page,
             context={'course_id': course.id, 'sort_order': sort_order}
         )
+        user = request.user
         context = {
             "course": course,
             "topics": topics_serializer.data,
@@ -94,7 +98,12 @@ class TeamsDashboardView(View):
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
             "topics_url": reverse('topics_list', request=request),
-            "teams_url": reverse('teams_list', request=request)
+            "teams_url": reverse('teams_list', request=request),
+            "languages": settings.ALL_LANGUAGES,
+            "countries": list(countries),
+            "username": user.username,
+            "privileged": has_discussion_privileges(user, course_key),
+            "disable_courseware_js": True,
         }
         return render_to_response("teams/teams.html", context)
 
@@ -368,6 +377,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
+            if not (has_access(request.user, 'staff', course_key)
+                    or has_discussion_privileges(request.user, course_key)):
+                # Add the creating user to the team.
+                team.add_user(request.user)
             return Response(CourseTeamSerializer(team).data)
 
 
@@ -575,7 +588,7 @@ class TopicListView(GenericAPIView):
 
         page = self.paginate_queryset(topics)
         serializer = self.pagination_serializer_class(page, context={'course_id': course_id, 'sort_order': ordering})
-        return Response(serializer.data)  # pylint: disable=maybe-no-member
+        return Response(serializer.data)
 
 
 def get_ordered_topics(course_module, ordering):

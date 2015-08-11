@@ -558,7 +558,7 @@ class UserSettingsEventTestMixin(EventTestMixin):
             kwargs['truncated'] = []
         self.assert_event_emitted(
             USER_SETTINGS_CHANGED_EVENT_NAME,
-            table=self.table,  # pylint: disable=no-member
+            table=self.table,
             user_id=self.user.id,
             **kwargs
         )

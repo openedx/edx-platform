@@ -1,13 +1,13 @@
 <% import json  %>
 <h3>${username | h} > ${course_id | h} > ${location | h}</h3>
 
-% for i, entry in enumerate(history_entries):
+% for i, (entry, score) in enumerate(zip(history_entries, scores)):
 <hr/>
 <div>
-<b>#${len(history_entries) - i}</b>: ${entry.created} (${TIME_ZONE} time)</br>
-Score: ${entry.grade} / ${entry.max_grade}
+<b>#${len(history_entries) - i}</b>: ${entry.updated} (${TIME_ZONE} time)</br>
+Score: ${score.grade} / ${score.max_grade}
 <pre>
-${json.dumps(json.loads(entry.state), indent=2, sort_keys=True) | h}
+${json.dumps(entry.state, indent=2, sort_keys=True) | h}
 </pre>
 </div>
 % endfor

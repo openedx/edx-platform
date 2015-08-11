@@ -368,8 +368,8 @@ class UserStateCache(object):
             self.user.username,
             _all_usage_keys(xblocks, aside_types),
         )
-        for usage_key, field_state in block_field_state:
-            self._cache[usage_key] = field_state
+        for user_state in block_field_state:
+            self._cache[user_state.block_key] = user_state.state
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
@@ -392,11 +392,14 @@ class UserStateCache(object):
 
         Returns: datetime if there was a modified date, or None otherwise
         """
-        return self._client.get_mod_date(
-            self.user.username,
-            kvs_key.block_scope_id,
-            fields=[kvs_key.field_name],
-        ).get(kvs_key.field_name)
+        try:
+            return self._client.get(
+                self.user.username,
+                kvs_key.block_scope_id,
+                fields=[kvs_key.field_name],
+            ).updated
+        except self._client.DoesNotExist:
+            return None
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):

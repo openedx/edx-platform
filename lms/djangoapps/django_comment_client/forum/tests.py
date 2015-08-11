@@ -8,7 +8,9 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from edxmako.tests import mako_middleware_process_request
 
+from django_comment_common.utils import ThreadContext
 from django_comment_client.forum import views
+from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
     NonCohortedTopicGroupIdTestMixin
@@ -32,6 +34,8 @@ from nose.tools import assert_true  # pylint: disable=E0611
 from mock import patch, Mock, ANY, call
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+
+from teams.tests.factories import CourseTeamFactory
 
 log = logging.getLogger(__name__)
 
@@ -112,21 +116,23 @@ def make_mock_thread_data(
         group_id=None,
         group_name=None,
         commentable_id=None,
-        context=None
 ):
+    data_commentable_id = (
+        commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
+    )
     thread_data = {
         "id": thread_id,
         "type": "thread",
         "title": text,
         "body": text,
-        "commentable_id": (
-            commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
-        ),
+        "commentable_id": data_commentable_id,
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
         "group_id": group_id,
-        "context": context if context else "course"
+        "context": (
+            ThreadContext.COURSE if get_team(data_commentable_id) is None else ThreadContext.STANDALONE
+        )
     }
     if group_id is not None:
         thread_data['group_name'] = group_name
@@ -146,7 +152,6 @@ def make_mock_request_impl(
         group_id=None,
         commentable_id=None,
         num_thread_responses=1,
-        context=None
 ):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
@@ -161,7 +166,6 @@ def make_mock_request_impl(
                         num_children=None,
                         group_id=group_id,
                         commentable_id=commentable_id,
-                        context=context
                     )
                 ]
             }
@@ -172,7 +176,7 @@ def make_mock_request_impl(
                 thread_id=thread_id,
                 num_children=num_thread_responses,
                 group_id=group_id,
-                context=context
+                commentable_id=commentable_id
             )
         elif "/users/" in url:
             data = {
@@ -333,11 +337,11 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
     @ddt.data(
         # old mongo with cache
-        (ModuleStoreEnum.Type.mongo, 1, 7, 5, 13, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 7, 5, 13, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 14, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 14, 8),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 13, 8),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 13, 8),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 14, 8),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 14, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -665,6 +669,40 @@ class SingleThreadContentGroupTestCase(ContentGroupTestCase):
 
         self.assert_can_access(self.non_cohorted_user, self.beta_module.discussion_id, thread_id, False)
 
+    def test_course_context_respected(self, mock_request):
+        """
+        Verify that course threads go through discussion_category_id_access method.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id
+        )
+
+        # Beta user does not have access to alpha_module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+
+    def test_standalone_context_respected(self, mock_request):
+        """
+        Verify that standalone threads don't go through discussion_category_id_access method.
+        """
+        # For this rather pathological test, we are assigning the alpha module discussion_id (commentable_id)
+        # to a team so that we can verify that standalone threads don't go through discussion_category_id_access.
+        thread_id = "test_thread_id"
+        CourseTeamFactory(
+            name="A team",
+            course_id=self.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=self.alpha_module.discussion_id
+        )
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", thread_id=thread_id,
+            commentable_id=self.alpha_module.discussion_id
+        )
+
+        # If a thread returns context other than "course", the access check is not done, and the beta user
+        # can see the alpha discussion module.
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
+
 
 @patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionContextTestCase(ModuleStoreTestCase):
@@ -672,12 +710,20 @@ class InlineDiscussionContextTestCase(ModuleStoreTestCase):
         super(InlineDiscussionContextTestCase, self).setUp()
         self.course = CourseFactory.create()
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        self.discussion_topic_id = "dummy_topic"
+        self.team = CourseTeamFactory(
+            name="A team",
+            course_id=self.course.id,
+            topic_id='topic_id',
+            discussion_topic_id=self.discussion_topic_id
+        )
+        self.team.add_user(self.user)  # pylint: disable=no-member
 
     def test_context_can_be_standalone(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(
             course=self.course,
             text="dummy text",
-            context="standalone"
+            commentable_id=self.discussion_topic_id
         )
 
         request = RequestFactory().get("dummy_url")
@@ -686,11 +732,11 @@ class InlineDiscussionContextTestCase(ModuleStoreTestCase):
         response = views.inline_discussion(
             request,
             unicode(self.course.id),
-            "dummy_topic",
+            self.discussion_topic_id,
         )
 
         json_response = json.loads(response.content)
-        self.assertEqual(json_response['discussion_data'][0]['context'], 'standalone')
+        self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -1041,8 +1087,15 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
         self.verify_response(self.send_request(mock_request))
 
     def test_context(self, mock_request):
-        response = self.send_request(mock_request, {'context': 'standalone'})
-        self.assertEqual(mock_request.call_args[1]['params']['context'], 'standalone')
+        team = CourseTeamFactory(
+            name='Team Name',
+            topic_id='A topic',
+            course_id=self.course.id,
+            discussion_topic_id=self.discussion1.discussion_id
+        )
+        team.add_user(self.student)  # pylint: disable=no-member
+        response = self.send_request(mock_request)
+        self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
         self.verify_response(response)
 
 

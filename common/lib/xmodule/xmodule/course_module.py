@@ -948,7 +948,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
 
-        if self.wiki_slug is None:
+        if not self.wiki_slug:
             self.wiki_slug = self.location.course
 
         if self.due_date_display_format is None and self.show_timezone is False:

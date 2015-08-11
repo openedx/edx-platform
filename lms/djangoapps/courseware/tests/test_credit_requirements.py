@@ -37,11 +37,11 @@ class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
 
         # Create a course and configure it as a credit course
         self.course = CourseFactory.create()
-        CreditCourse.objects.create(course_key=self.course.id, enabled=True)  # pylint: disable=no-member
+        CreditCourse.objects.create(course_key=self.course.id, enabled=True)
 
         # Configure credit requirements (passing grade and in-course reverification)
         credit_api.set_credit_requirements(
-            self.course.id,  # pylint: disable=no-member
+            self.course.id,
             [
                 {
                     "namespace": "grade",
@@ -71,7 +71,7 @@ class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
         # Enroll the user in the course as "verified"
         self.enrollment = CourseEnrollmentFactory(
             user=self.user,
-            course_id=self.course.id,  # pylint: disable=no-member
+            course_id=self.course.id,
             mode="verified"
         )
 

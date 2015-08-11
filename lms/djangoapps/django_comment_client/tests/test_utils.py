@@ -22,10 +22,12 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
+from teams.tests.factories import CourseTeamFactory
 
 
 @attr('shard_1')
@@ -79,11 +81,21 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.community_ta_role.users.add(self.community_ta1)
         self.community_ta2 = UserFactory(username='community_ta2', email='community_ta2@edx.org')
         self.community_ta_role.users.add(self.community_ta2)
+        self.course_staff = UserFactory(username='course_staff', email='course_staff@edx.org')
+        CourseStaffRole(self.course_id).add_users(self.course_staff)
 
     def test_get_role_ids(self):
         ret = utils.get_role_ids(self.course_id)
         expected = {u'Moderator': [3], u'Community TA': [4, 5]}
         self.assertEqual(ret, expected)
+
+    def test_has_discussion_privileges(self):
+        self.assertFalse(utils.has_discussion_privileges(self.student1, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.student2, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.course_staff, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.moderator, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta1, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta2, self.course_id))
 
     def test_has_forum_access(self):
         ret = utils.has_forum_access('student', self.course_id, 'Student')
@@ -1209,3 +1221,14 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
             utils.is_commentable_cohorted(course.id, to_id("Feedback")),
             "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
         )
+
+    def test_is_commentable_cohorted_team(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        config_course_cohorts(course, is_cohorted=True)
+        team = CourseTeamFactory(course_id=course.id)
+
+        # Verify that team discussions are not cohorted, but other discussions are
+        self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
+        self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))

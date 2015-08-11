@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,maybe-no-member
+# pylint: disable=missing-docstring
 
 from unittest import TestCase
 

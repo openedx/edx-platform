@@ -203,7 +203,6 @@ class GroupConfigurationsBaseTestCase(object):
         self.assertIn("error", content)
 
 
-# pylint: disable=no-member
 class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_list_handler.
@@ -296,7 +295,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(len(self.course.user_partitions), 0)
 
 
-# pylint: disable=no-member
 class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_detail_handler.
@@ -588,7 +586,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
 
-# pylint: disable=no-member
 class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.

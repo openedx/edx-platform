@@ -64,7 +64,7 @@ class SyllabusTab(EnrolledTab):
     is_default = False
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if not super(SyllabusTab, cls).is_enabled(course, user=user):
             return False
         return getattr(course, 'syllabus_present', False)

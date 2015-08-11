@@ -625,7 +625,7 @@ class TestEditItem(TestEditItemSetup):
             data={'nullout': ['markdown']}
         )
         problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
-        self.assertIsNone(problem.markdown)
+        self.assertEqual(problem.markdown, '')
 
     def test_date_fields(self):
         """

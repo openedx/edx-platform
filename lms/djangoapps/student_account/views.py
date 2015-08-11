@@ -381,6 +381,7 @@ def account_settings_context(request):
         'platform_name': settings.PLATFORM_NAME,
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
+        'disable_courseware_js': True,
     }
 
     if third_party_auth.is_enabled():

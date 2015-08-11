@@ -60,7 +60,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
 
 @ddt.ddt
-class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
     """
@@ -101,7 +101,7 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCo
         response = self.api_response()
         for course_index in range(num_courses):
             self.assertEqual(
-                response.data[course_index]['course']['id'],  # pylint: disable=no-member
+                response.data[course_index]['course']['id'],
                 unicode(courses[num_courses - course_index - 1].id)
             )
 
@@ -138,7 +138,7 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCo
         # Verify courses have the correct response through error code. Last enrolled course is first course in response
         response = self.api_response()
         for course_index in range(len(courses)):
-            result = response.data[course_index]['course']['courseware_access']  # pylint: disable=no-member
+            result = response.data[course_index]['course']['courseware_access']
             self.assertEqual(result['error_code'], expected_error_codes[::-1][course_index])
 
             if result['error_code'] is not None:
@@ -146,9 +146,9 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCo
 
     @ddt.data(
         (NEXT_WEEK, ADVERTISED_START, ADVERTISED_START, "string"),
-        (NEXT_WEEK, None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
+        (NEXT_WEEK, None, '', "string"),
         (DEFAULT_START_DATE, ADVERTISED_START, ADVERTISED_START, "string"),
-        (DEFAULT_START_DATE, None, None, "empty")
+        (DEFAULT_START_DATE, None, '', "string")
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
@@ -162,14 +162,14 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCo
         self.enroll(course.id)
 
         response = self.api_response()
-        self.assertEqual(response.data[0]['course']['start_type'], expected_type)  # pylint: disable=no-member
-        self.assertEqual(response.data[0]['course']['start_display'], expected_display)  # pylint: disable=no-member
+        self.assertEqual(response.data[0]['course']['start_type'], expected_type)
+        self.assertEqual(response.data[0]['course']['start_display'], expected_display)
 
     def test_no_certificate(self):
         self.login_and_enroll()
 
         response = self.api_response()
-        certificate_data = response.data[0]['certificate']  # pylint: disable=no-member
+        certificate_data = response.data[0]['certificate']
         self.assertDictEqual(certificate_data, {})
 
     def test_certificate(self):
@@ -185,14 +185,14 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCo
         )
 
         response = self.api_response()
-        certificate_data = response.data[0]['certificate']  # pylint: disable=no-member
+        certificate_data = response.data[0]['certificate']
         self.assertEquals(certificate_data['url'], certificate_url)
 
     def test_no_facebook_url(self):
         self.login_and_enroll()
 
         response = self.api_response()
-        course_data = response.data[0]['course']  # pylint: disable=no-member
+        course_data = response.data[0]['course']
         self.assertIsNone(course_data['social_urls']['facebook'])
 
     def test_facebook_url(self):
@@ -202,7 +202,7 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileCo
         self.store.update_item(self.course, self.user.id)
 
         response = self.api_response()
-        course_data = response.data[0]['course']  # pylint: disable=no-member
+        course_data = response.data[0]['course']
         self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
 
 
@@ -249,11 +249,11 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mobi
 
         response = self.api_response()
         self.assertEqual(
-            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            response.data["last_visited_module_id"],
             unicode(self.sub_section.location)
         )
         self.assertEqual(
-            response.data["last_visited_module_path"],  # pylint: disable=no-member
+            response.data["last_visited_module_path"],
             [unicode(module.location) for module in [self.sub_section, self.section, self.course]]
         )
 
@@ -270,7 +270,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
         self.login_and_enroll()
         response = self.api_response(data={"last_visited_module_id": unicode(self.other_unit.location)})
         self.assertEqual(
-            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            response.data["last_visited_module_id"],
             unicode(self.other_sub_section.location)
         )
 
@@ -278,7 +278,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
         self.login_and_enroll()
         response = self.api_response(data={"last_visited_module_id": "abc"}, expected_response_code=400)
         self.assertEqual(
-            response.data,  # pylint: disable=no-member
+            response.data,
             errors.ERROR_INVALID_MODULE_ID
         )
 
@@ -287,7 +287,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
         non_existent_key = self.course.id.make_usage_key('video', 'non-existent')
         response = self.api_response(data={"last_visited_module_id": non_existent_key}, expected_response_code=400)
         self.assertEqual(
-            response.data,  # pylint: disable=no-member
+            response.data,
             errors.ERROR_INVALID_MODULE_ID
         )
 
@@ -297,12 +297,12 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
         response = self.api_response(
             data={
                 "last_visited_module_id": unicode(self.other_unit.location),
-                "modification_date": past_date.isoformat()  # pylint: disable=maybe-no-member
+                "modification_date": past_date.isoformat()
             },
             expected_response_code=400
         )
         self.assertEqual(
-            response.data,  # pylint: disable=no-member
+            response.data,
             errors.ERROR_INVALID_MODIFICATION_DATE
         )
 
@@ -324,7 +324,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
             }
         )
         self.assertEqual(
-            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            response.data["last_visited_module_id"],
             unicode(expected_subsection.location)
         )
 
@@ -347,7 +347,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
             }
         )
         self.assertEqual(
-            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            response.data["last_visited_module_id"],
             unicode(self.other_sub_section.location)
         )
 
@@ -355,7 +355,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
         self.login_and_enroll()
         response = self.api_response(data={"modification_date": "abc"}, expected_response_code=400)
         self.assertEqual(
-            response.data,  # pylint: disable=no-member
+            response.data,
             errors.ERROR_INVALID_MODIFICATION_DATE
         )
 
@@ -367,7 +367,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase):
     def test_success(self):
         self.login_and_enroll()
 
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data
         self.assertEqual(serialized['course']['video_outline'], None)
         self.assertEqual(serialized['course']['name'], self.course.display_name)
         self.assertEqual(serialized['course']['number'], self.course.id.course)
@@ -380,6 +380,6 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase):
         self.course.display_organization = "overridden_org"
         self.store.update_item(self.course, self.user.id)
 
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)

@@ -113,7 +113,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
                 name: 'Test Name',
-                description: 'Test Description'
+                description: 'Test Description',
+                is_active: true
 
             }, this.newModelOptions);
 
@@ -151,7 +152,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.view.$('.action-delete')).toExist();
             });
 
-            it('should not have delete button is user is not global staff', function() {
+            it('should not have delete button if user is not global staff and certificate is active', function() {
                 window.CMS.User = {isGlobalStaff: false};
                 appendSetFixtures(this.view.render().el);
                 expect(this.view.$('.action-delete')).not.toExist();

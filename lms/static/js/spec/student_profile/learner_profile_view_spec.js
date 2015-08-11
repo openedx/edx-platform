@@ -101,7 +101,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
                             "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: "bio",
-                        helpMessage: ''
+                        helpMessage: '',
+                        messagePosition: 'header'
                     })
                 ];
 

@@ -242,7 +242,7 @@
 <br>
 This email was automatically sent from {platform_name}. <br>
 You are receiving this email at address {email} because you are enrolled in <a href='{course_url}'>{course_title}</a>.<br>
-To stop receiving email like this, update your course email settings <a href='{account_settings_url}'>here</a>. <br>
+To stop receiving email like this, update your course email settings <a href='{email_settings_url}'>here</a>. <br>
                         </td>
                     </tr>
                 </tbody></table>

@@ -14,9 +14,9 @@ function(_, str, Backbone, BackboneRelational, gettext) {
     var Signatory = Backbone.RelationalModel.extend({
         idAttribute: "id",
         defaults: {
-            name: 'Name of the signatory',
-            title: 'Title of the signatory',
-            organization: 'Organization of the signatory',
+            name: '',
+            title: '',
+            organization: '',
             signature_image_path: ''
         },
 

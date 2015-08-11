@@ -6,7 +6,7 @@
     define(['backbone'], function (Backbone) {
         var Team = Backbone.Model.extend({
             defaults: {
-                id: '',
+                id: null,
                 name: '',
                 is_active: null,
                 course_id: '',
@@ -16,6 +16,10 @@
                 country: '',
                 language: '',
                 membership: []
+            },
+
+            initialize: function(options) {
+                this.url = options.url;
             }
         });
         return Team;
