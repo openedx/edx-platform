@@ -63,6 +63,8 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
+FEATURES['ENABLE_CREDIT_API'] = True
+
 # Enable this feature for course staff grade downloads, to enable acceptance tests
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
