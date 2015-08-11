@@ -21,7 +21,8 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
             });
 
             it("can load templates", function() {
-                expect($("body").text()).toContain("This is the new Teams tab");
+                expect($("body").text()).toContain("My Teams");
+                expect($("body").text()).toContain("Showing 0 out of 0 total");
             });
 
             it("displays a header", function() {

@@ -20,7 +20,6 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
         defaults: {
             // Metadata fields currently displayed in web forms
             course_title: '',
-            org_logo_path: '',
 
             // Metadata fields not currently displayed in web forms
             name: 'Name of the certificate',

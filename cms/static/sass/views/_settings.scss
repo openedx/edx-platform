@@ -225,6 +225,16 @@
             }
           }
         }
+        
+        .input-minimum-grade {
+          @include float(left);
+          @include size(92%,100%);
+        }
+
+        .minimum-grade-percentage-sign {
+          @include line-height(30);
+          padding-left: ($baseline/4);;
+        }
 
         textarea.long {
           height: ($baseline*5);

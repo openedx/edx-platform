@@ -88,3 +88,23 @@ class CourseTeamMembership(models.Model):
     user = models.ForeignKey(User)
     team = models.ForeignKey(CourseTeam, related_name='membership')
     date_joined = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def get_memberships(cls, username=None, course_ids=None, team_id=None):
+        """
+        Get a queryset of memberships.
+
+        Args:
+            username (unicode, optional): The username to filter on.
+            course_ids (list of unicode, optional) Course Ids to filter on.
+            team_id (unicode, optional): The team_id to filter on.
+        """
+        queryset = cls.objects.all()
+        if username is not None:
+            queryset = queryset.filter(user__username=username)
+        if course_ids is not None:
+            queryset = queryset.filter(team__course_id__in=course_ids)
+        if team_id is not None:
+            queryset = queryset.filter(team__team_id=team_id)
+
+        return queryset

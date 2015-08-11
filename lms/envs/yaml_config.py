@@ -316,3 +316,8 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
+
+##################### LTI Provider #####################
+if FEATURES.get('ENABLE_LTI_PROVIDER'):
+    INSTALLED_APPS += ('lti_provider',)
+    AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )

@@ -7,12 +7,10 @@ define([ // jshint ignore:line
     'gettext',
     'js/views/list_item_editor',
     'js/certificates/models/signatory',
-    'js/certificates/views/signatory_editor',
-    'js/models/uploads',
-    'js/views/uploads'
+    'js/certificates/views/signatory_editor'
 ],
 function($, _, Backbone, gettext,
-         ListItemEditorView, SignatoryModel, SignatoryEditorView, FileUploadModel, FileUploadDialog) {
+         ListItemEditorView, SignatoryModel, SignatoryEditorView) {
     'use strict';
     var MAX_SIGNATORIES_LIMIT = 4;
     var CertificateEditorView = ListItemEditorView.extend({
@@ -21,13 +19,11 @@ function($, _, Backbone, gettext,
             'change .collection-name-input': 'setName',
             'change .certificate-description-input': 'setDescription',
             'change .certificate-course-title-input': 'setCourseTitle',
-            'change .org-logo-input': 'setOrgLogoPath',
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
             'submit': 'setAndClose',
             'click .action-cancel': 'cancel',
-            'click .action-add-signatory': 'addSignatory',
-            'click .action-upload-org-logo': 'uploadLogoImage'
+            'click .action-add-signatory': 'addSignatory'
         },
 
         className: function () {
@@ -141,45 +137,12 @@ function($, _, Backbone, gettext,
             );
         },
 
-        setOrgLogoPath: function(event) {
-            // Updates the indicated model field (still requires persistence on server)
-            if (event && event.preventDefault) { event.preventDefault(); }
-            var org_logo_path = this.$('.org-logo-input').val();
-            this.model.set(
-                'org_logo_path', org_logo_path,
-                { silent: true }
-            );
-            this.$('.current-org-logo img.org-logo').attr('src', org_logo_path);
-        },
-
         setValues: function() {
             // Update the specified values in the local model instance
             this.setName();
             this.setDescription();
             this.setCourseTitle();
-            this.setOrgLogoPath();
             return this;
-        },
-
-        uploadLogoImage: function(event) {
-            event.preventDefault();
-            var upload = new FileUploadModel({
-                title: gettext("Upload organization logo."),
-                message: gettext("Maximum logo height should be 125px."),
-                mimeTypes: ['image/png', 'image/jpeg']
-            });
-            var self = this;
-            var modal = new FileUploadDialog({
-                model: upload,
-                onSuccess: function(response) {
-                    var org_logo_path = response.asset.url;
-                    self.model.set('org_logo_path', org_logo_path);
-                    self.$('.current-org-logo img.org-logo').attr('src', org_logo_path);
-                    self.$('.current-org-logo').show();
-                    self.$('input.org-logo-input').attr('value', org_logo_path);
-                }
-            });
-            modal.show();
         }
     });
     return CertificateEditorView;

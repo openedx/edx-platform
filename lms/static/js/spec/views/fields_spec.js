@@ -1,6 +1,5 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
-        'js/views/fields',
-        'js/spec/views/fields_helpers',
+define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers', 'js/views/fields', 'js/spec/views/fields_helpers',
         'string_utils'],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers) {
         'use strict';
@@ -19,16 +18,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 FieldViews.DropdownFieldView,
                 FieldViews.LinkFieldView,
                 FieldViews.TextareaFieldView
-
             ];
 
             beforeEach(function () {
-                TemplateHelpers.installTemplate('templates/fields/field_readonly');
-                TemplateHelpers.installTemplate('templates/fields/field_dropdown');
-                TemplateHelpers.installTemplate('templates/fields/field_link');
-                TemplateHelpers.installTemplate('templates/fields/field_text');
-                TemplateHelpers.installTemplate('templates/fields/field_textarea');
-
                 timerCallback = jasmine.createSpy('timerCallback');
                 jasmine.Clock.useMock();
             });
