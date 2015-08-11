@@ -1,6 +1,4 @@
-define([
-    'underscore', 'common/js/spec_helpers/ajax_helpers'
-], function (_, AjaxHelpers) {
+define(['underscore'], function (_) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         testCourseID = 'course/1',

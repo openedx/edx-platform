@@ -104,17 +104,19 @@ class TeamsDashboardView(View):
         context = {
             "course": course,
             "topics": topics_serializer.data,
+            "user_info": {
+                "username": user.username,
+                "privileged": has_discussion_privileges(user, course_key),
+                "team_membership": team_memberships_serializer.data,
+            },
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
-            "team_memberships": team_memberships_serializer.data,
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
-            "team_memberships_url": reverse('team_membership_list', request=request),
+            "team_membership_url": reverse('team_membership_list', request=request),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
-            "username": user.username,
-            "privileged": has_discussion_privileges(user, course_key),
             "disable_courseware_js": True,
         }
         return render_to_response("teams/teams.html", context)
