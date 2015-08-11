@@ -50,6 +50,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.api import (
+    set_credit_requirements,
+    set_credit_requirement_status
+)
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
@@ -877,54 +883,62 @@ class TestProctoringRendering(ModuleStoreTestCase):
             'honor',
             True,
             None,
-            'Would you like to take "Toy Videos" as a practice proctored exam?'
+            'Would you like to take "Toy Videos" as a practice proctored exam?',
+            True
         ),
         (
             'honor',
             True,
             'submitted',
-            'You have submitted this practice proctored exam'
+            'You have submitted this practice proctored exam',
+            False
         ),
         (
             'honor',
             True,
             'error',
-            'There was a problem with your practice proctoring session'
+            'There was a problem with your practice proctoring session',
+            True
         ),
         (
             'verified',
             False,
             None,
-            'Would you like to take "Toy Videos" as a proctored exam?'
+            'Would you like to take "Toy Videos" as a proctored exam?',
+            False
         ),
         (
             'verified',
             False,
             'submitted',
-            'You have submitted this proctored exam for review'
+            'You have submitted this proctored exam for review',
+            True
         ),
         (
             'verified',
             False,
             'verified',
-            'Your proctoring session was reviewed and passed all requirements'
+            'Your proctoring session was reviewed and passed all requirements',
+            False
         ),
         (
             'verified',
             False,
             'rejected',
-            'Your proctoring session was reviewed and did not pass requirements'
+            'Your proctoring session was reviewed and did not pass requirements',
+            True
         ),
         (
             'verified',
             False,
             'error',
-            'There was a problem with your proctoring session'
+            'There was a problem with your proctoring session',
+            False
         ),
     )
     @ddt.unpack
     def test_render_proctored_exam(self, enrollment_mode, is_practice_exam,
-                                   attempt_status, expected):
+                                   attempt_status, expected, with_credit_context):
         """
         Verifies gated content from the student view rendering of a sequence
         this is labeled as a proctored exam
@@ -971,6 +985,35 @@ class TestProctoringRendering(ModuleStoreTestCase):
             if attempt_status:
                 create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
                 update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
+            # initialize some credit requirements, if so specified
+            if with_credit_context:
+                credit_course = CreditCourse(course_key=self.course_key, enabled=True)
+                credit_course.save()
+                set_credit_requirements(
+                    self.course_key,
+                    [
+                        {
+                            'namespace': 'reverification',
+                            'name': 'reverification-1',
+                            'display_name': 'ICRV1',
+                            'criteria': {},
+                        },
+                        {
+                            'namespace': 'proctored-exam',
+                            'name': 'Exam1',
+                            'display_name': 'A Proctored Exam',
+                            'criteria': {}
+                        }
+                    ]
+                )
+
+                set_credit_requirement_status(
+                    self.request.user.username,
+                    self.course_key,
+                    'reverification',
+                    'ICRV1'
+                )
 
             module = render.get_module(
                 self.request.user,

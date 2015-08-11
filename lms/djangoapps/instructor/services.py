@@ -32,18 +32,39 @@ class InstructorService(object):
             - course_id is the id for the course
         """
         course_id = CourseKey.from_string(course_id)
-        student = get_student_from_identifier(student_identifier)
+
+        try:
+            student = get_student_from_identifier(student_identifier)
+        except:
+            err_msg = (
+                'Error occurred while attempting to reset student attempts for user '
+                '{student_identifier} for content_id {content_id}. '
+                'User does not exist!'.format(
+                    student_identifier=student_identifier,
+                    content_id=content_id
+                )
+            )
+            log.error(err_msg)
+            return
+
         try:
             module_state_key = UsageKey.from_string(content_id)
         except InvalidKeyError:
-            log.error("Invalid content id %s .", content_id)
+            err_msg = (
+                'Invalid content_id {content_id}!'.format(content_id=content_id)
+            )
+            log.error(err_msg)
+            return
+
         if student:
             try:
                 enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=True)
-            except StudentModule.DoesNotExist:
-                log.error("Error occurred while attempting to reset student attempts: StudentModule does not exist.")
-            except enrollment.sub_api.SubmissionError:
-                # Trust the submissions API to log the error
-                log.error(
-                    "Error occurred while attempting to reset student attempts: Score does not exist."
+            except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
+                err_msg = (
+                    'Error occurred while attempting to reset student attempts for user '
+                    '{student_identifier} for content_id {content_id}.'.format(
+                        student_identifier=student_identifier,
+                        content_id=content_id
+                    )
                 )
+                log.error(err_msg)

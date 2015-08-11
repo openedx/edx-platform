@@ -32,7 +32,14 @@ class InstructorServiceTests(ModuleStoreTestCase):
             'robot-some-problem-urlname'
         )
 
-        self.problem_urlname = self.problem_location.to_deprecated_string()
+        self.other_problem_location = msk_from_problem_urlname(
+            self.course.id,
+            'robot-some-other_problem-urlname'
+        )
+
+        self.problem_urlname = unicode(self.problem_location)
+        self.other_problem_urlname = unicode(self.other_problem_location)
+
         self.service = InstructorService()
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
@@ -46,7 +53,21 @@ class InstructorServiceTests(ModuleStoreTestCase):
         Test delete student state.
         """
 
-        self.service.delete_student_attempt(self.student.username, unicode(self.course.id), self.problem_urlname)
+        # make sure the attempt is there
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.module_to_reset.student,
+                course_id=self.course.id,
+                module_state_key=self.module_to_reset.module_state_key,
+            ).count(),
+            1
+        )
+
+        self.service.delete_student_attempt(
+            self.student.username,
+            unicode(self.course.id),
+            self.problem_urlname
+        )
 
         # make sure the module has been deleted
         self.assertEqual(
@@ -57,3 +78,39 @@ class InstructorServiceTests(ModuleStoreTestCase):
             ).count(),
             0
         )
+
+    def test_reset_bad_content_id(self):
+        """
+        Negative test of trying to reset attempts with bad content_id
+        """
+
+        result = self.service.delete_student_attempt(
+            self.student.username,
+            unicode(self.course.id),
+            'foo/bar/baz'
+        )
+        self.assertIsNone(result)
+
+    def test_reset_bad_user(self):
+        """
+        Negative test of trying to reset attempts with bad user identifier
+        """
+
+        result = self.service.delete_student_attempt(
+            'bad_student',
+            unicode(self.course.id),
+            'foo/bar/baz'
+        )
+        self.assertIsNone(result)
+
+    def test_reset_non_existing_attempt(self):
+        """
+        Negative test of trying to reset attempts with bad user identifier
+        """
+
+        result = self.service.delete_student_attempt(
+            self.student.username,
+            unicode(self.course.id),
+            self.other_problem_urlname
+        )
+        self.assertIsNone(result)
