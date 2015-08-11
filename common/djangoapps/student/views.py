@@ -655,13 +655,6 @@ def dashboard(request):
     )
     courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
-    ccx_membership_triplets = []
-    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-        from ccx.utils import get_ccx_membership_triplets
-        ccx_membership_triplets = get_ccx_membership_triplets(
-            user, course_org_filter, org_filter_out_set
-        )
-
     if 'notlive' in request.GET:
         redirect_message = _("The course you are looking for does not start until {date}.").format(
             date=request.GET['notlive']
@@ -697,7 +690,6 @@ def dashboard(request):
         'provider_states': [],
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
-        'ccx_membership_triplets': ccx_membership_triplets,
         'nav_hidden': True,
     }
 
@@ -1903,16 +1895,6 @@ def activate_account(request, key):
                             manual_enrollment_audit.enrolled_by, student[0].email, ALLOWEDTOENROLL_TO_ENROLLED,
                             manual_enrollment_audit.reason, enrollment
                         )
-
-            # enroll student in any pending CCXs he/she may have if auto_enroll flag is set
-            if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
-                from ccx.models import CcxMembership, CcxFutureMembership
-                ccxfms = CcxFutureMembership.objects.filter(
-                    email=student[0].email
-                )
-                for ccxfm in ccxfms:
-                    if ccxfm.auto_enroll:
-                        CcxMembership.auto_enroll(student[0], ccxfm)
 
         resp = render_to_response(
             "registration/activation_complete.html",
