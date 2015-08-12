@@ -64,10 +64,6 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    # Note: these are older versions of the User API that will eventually be
-    # subsumed by api/user listed below.
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-
     url(r'^notifier_api/', include('notifier_api.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -86,9 +82,6 @@ urlpatterns = (
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
-
-    # User API endpoints
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Bookmarks API endpoints
     url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
@@ -147,6 +140,25 @@ if settings.FEATURES["API"]:
         url(r'^api/server/', include('api_manager.urls')),
     )
 
+# OPEN EDX USER API
+# mattdrayer: Please note that the user_api declaration must follow
+# the server api declaration.  When declared ahead of the server api
+# the user_api will oddly begin to return server-oriented user URIs
+# At this time I'm not sure why this seems to be a one-way scenario.
+urlpatterns += (
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
+)
+urlpatterns += (
+    # User API endpoints
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+)
+
+# if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
+urlpatterns += (
+    # TODO Namespace these!
+    url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^course_modes/', include('course_modes.urls')),
+)
 if settings.FEATURES["ENABLE_OPENBADGES"]:
     urlpatterns += (
         url(r'^api/badges/v1/', include('badges.api.urls', app_name="badges", namespace="badges_api")),
