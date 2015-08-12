@@ -5,6 +5,7 @@
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope
 
+
 class LmsFieldData(SplitFieldData):
     """
     A :class:`~xblock.field_data.FieldData` that
