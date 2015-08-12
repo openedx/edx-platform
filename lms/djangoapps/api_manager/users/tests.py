@@ -3,7 +3,7 @@
 
 """
 Run these tests @ Devstack:
-    rake fasttest_lms[common/djangoapps/api_manager/tests/test_user_views.py]
+    paver test_system -s lms --fasttest --fail_fast --verbose --test_id=lms/djangoapps/api_manager/users
 """
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -95,7 +95,7 @@ class UsersApiTests(ModuleStoreTestCase):
         return module
 
     def setUp(self):
-        super(UsersApiTests, self).setUp()
+        super(UsersApiTests, self).setUp(create_user=False)
         self.test_server_prefix = 'https://testserver'
         self.test_username = str(uuid.uuid4())
         self.test_password = 'Test.Me64!'
@@ -221,9 +221,9 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         # ID 1 is a Robot Test (results[0]) so the users list starts with ID 2 (results[1])
-        self.assertEqual(response.data['results'][1]['is_staff'], False)        
-        self.assertEqual(response.data['results'][3]['is_staff'], False)        
-        self.assertEqual(response.data['results'][5]['is_staff'], False)        
+        self.assertEqual(response.data['results'][1]['is_staff'], False)
+        self.assertEqual(response.data['results'][3]['is_staff'], False)
+        self.assertEqual(response.data['results'][5]['is_staff'], False)
         self.assertTrue(response.data['results'][2]['is_staff'])
         self.assertTrue(response.data['results'][4]['is_staff'])
         self.assertTrue(response.data['results'][6]['is_staff'])
@@ -311,8 +311,8 @@ class UsersApiTests(ModuleStoreTestCase):
         # create a 7 new users
         for i in xrange(1, 8):
             data = {
-                'email': 'test{}@example.com'.format(i),
-                'username': 'test_user{}'.format(i),
+                'email': 'test_orgfilter{}@example.com'.format(i),
+                'username': 'test_user_orgfilter{}'.format(i),
                 'password': self.test_password,
                 'first_name': 'John{}'.format(i),
                 'last_name': 'Doe{}'.format(i)
@@ -393,7 +393,7 @@ class UsersApiTests(ModuleStoreTestCase):
         confirm_uri = self.test_server_prefix + \
             test_uri + '/' + str(response.data['id'])
         user = User.objects.get(id=response.data['id'])
-        self.assertIsNotNone(UserPreference.get_preference(user, NOTIFICATION_PREF_KEY))
+        self.assertIsNotNone(UserPreference.get_value(user, NOTIFICATION_PREF_KEY))
 
     def test_user_detail_get(self):
         test_uri = self.users_base_uri
@@ -1452,7 +1452,6 @@ class UsersApiTests(ModuleStoreTestCase):
         module.system.publish(module, 'grade', grade_dict)
 
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
-
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
@@ -1476,17 +1475,16 @@ class UsersApiTests(ModuleStoreTestCase):
         grading_policy = response.data['grading_policy']
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
-
-        self.assertEqual(response.data['current_grade'], 0.74)
-        self.assertEqual(response.data['proforma_grade'], 0.9174999999999999)
+        self.assertAlmostEqual(response.data['current_grade'], 0.74, 1)
+        self.assertAlmostEqual(response.data['proforma_grade'], 0.9375, 1)
 
         test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['course_id'], unicode(course.id))
-        self.assertEqual(response.data[0]['current_grade'], 0.74)
-        self.assertEqual(response.data[0]['proforma_grade'], 0.9174999999999999)
+        self.assertAlmostEqual(response.data[0]['current_grade'], 0.74, 1)
+        self.assertAlmostEqual(response.data[0]['proforma_grade'], 0.9375, 1)
         self.assertEqual(response.data[0]['complete_status'], False)
 
     def is_user_profile_created_updated(self, response, data):

@@ -19,13 +19,6 @@ from rest_framework.response import Response
 
 from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseCohort
-from openedx.core.djangoapps.course_groups.cohorts import (
-    get_cohort_by_name,
-    add_cohort,
-    add_user_to_cohort,
-    remove_user_from_cohort
-)
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
@@ -36,10 +29,17 @@ from notification_prefs.views import enable_notifications
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseCohort
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_by_name,
+    add_cohort,
+    add_user_to_cohort,
+    remove_user_from_cohort
+)
+from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
-from openedx.core.djangoapps.user_api.models import UserPreference
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -55,7 +55,6 @@ from organizations.serializers import OrganizationSerializer
 from api_manager.utils import generate_base_uri, dict_has_items, extract_data_params
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer, UserRolesSerializer
-
 
 
 log = logging.getLogger(__name__)
@@ -984,7 +983,6 @@ class UsersCoursesGradesDetail(SecureAPIView):
         """
         GET /api/users/{user_id}/courses/{course_id}/grades
         """
-
         # The pre-fetching of groups is done to make auth checks not require an
         # additional DB lookup (this kills the Progress page in particular).
         try:
