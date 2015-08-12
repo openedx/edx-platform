@@ -310,18 +310,13 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
 
 
 @attr(shard=2)
-class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
     """
 
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
-
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.tab_nav = TabNavPage(self.browser)
 
@@ -554,16 +549,10 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
 
 
 @attr('shard_1')
-class DiscussionCommentDeletionTest(UniqueCourseTest):
+class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
     """
-
-    def setUp(self):
-        super(DiscussionCommentDeletionTest, self).setUp()
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
 
     def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
@@ -859,12 +848,6 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
     """
-
-    def setUp(self):
-        super(DiscussionCommentEditTest, self).setUp()
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
 
     def setup_user(self, roles=[]):
         roles_str = ','.join(roles)

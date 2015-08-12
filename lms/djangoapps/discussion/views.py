@@ -445,7 +445,6 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         threads = [thread.to_dict()]
 
         for thread in threads:
-            add_thread_group_name(thread, course_key)
             # patch for backward compatibility with comments service
             if "pinned" not in thread:
                 thread["pinned"] = False
