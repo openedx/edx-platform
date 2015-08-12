@@ -352,8 +352,8 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
     @ddt.data(
         # old mongo with cache
-        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 17, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 17, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 8, 6, 17, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 8, 6, 17, 8),
         # split mongo: 3 queries, regardless of thread response size.
         (ModuleStoreEnum.Type.split, 1, 3, 3, 17, 8),
         (ModuleStoreEnum.Type.split, 50, 3, 3, 17, 8),
