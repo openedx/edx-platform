@@ -127,17 +127,24 @@ def tag_course_content_with_partition_scheme(course_key, partition_scheme):  # p
         )
         raise NoSuchUserPartitionError
 
+    course = modulestore().get_course(course_key, depth=0)
+
     access_control_credit_xblocks = _get_credit_xblocks_for_access_control(course_key)
     new_user_partitions = []
     for block in access_control_credit_xblocks:
         # for now we are entertaining only verification partition scheme
         if partition_scheme == VERIFICATION_SCHEME:
             # create group configuration for VerificationPartitionScheme
-            group_configuration = _verification_partition_group_configuration(course_key, user_partition, block)
-            new_user_partitions.append(group_configuration)
+            verification_partition = _verification_partition_group_configuration(
+                course,
+                user_partition,
+                block
+            )
+
+            new_user_partitions.append(verification_partition)
 
             # update the 'group_access' of provided xblock 'block' and its ancestor.
-            _update_content_group_access(block, group_configuration)
+            _update_content_group_access(block, verification_partition)
 
     # Now update course 'user_partitions' field and add all newly created user
     # partitions
@@ -161,20 +168,20 @@ def _access_dict(group_configuration, access_groups_id_list):
     return access_dict
 
 
-def _update_content_group_access(block, group_configuration):
+def _update_content_group_access(block, verification_partition):
     """ Update the 'group_access' of provided xblock 'block' and its ancestor.
 
     Args:
         block (XBlock): XBlock mixin
-        group_configuration  (UserPartition): UserPartition object
+        verification_partition  (UserPartition): UserPartition object
 
     """
     # update 'group_access' field of gating xblock with groups
     # 'verified_allow' and 'verified_deny' of provided user partition
     # 'group_configuration'
-    access_groups_id_list = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
+    icrv_block_access_groups_ids = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
     # Assuming that there will be only one user partition for a block
-    block.group_access = _access_dict(group_configuration, access_groups_id_list)
+    block.group_access = _access_dict(verification_partition, icrv_block_access_groups_ids)
 
     # TODO: Use or delete 'block.group_access.update' after consultation with developers
     # Uncomment bottom line when we support multiple partitions for
@@ -193,8 +200,10 @@ def _update_content_group_access(block, group_configuration):
     # current ICRV's grand parent (if category of parent and grand
     # parent are 'vertical' and 'sequential' respectively);
     # otherwise add groups to current ICRV's parent only
-    access_groups_id_list = [VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW]
-    access_dict = _access_dict(group_configuration, access_groups_id_list)
+    gated_contents_access_groups_ids = [
+        VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW
+    ]
+    access_dict = _access_dict(verification_partition, gated_contents_access_groups_ids)
 
     parent_block = block.get_parent()
     grandparent_block = parent_block.get_parent()
@@ -299,13 +308,13 @@ def _sync_course_content_deleted_partitions(course_key, deleted_partitions):  # 
                 _update_published_block(block)
 
 
-def _verification_partition_group_configuration(course_key, user_partition, block):  # pylint: disable=invalid-name
+def _verification_partition_group_configuration(course, user_partition, block):  # pylint: disable=invalid-name
     """ Create verification user partition for given block.
 
     Group and UserPartition id's will be int.
 
     Args:`
-        course_key (CourseKey): Identifier for the course
+        course (Course): Course Object
         user_partition (UserPartition): UserPartition object
         block (XBlock): XBlock mixin
 
@@ -313,8 +322,6 @@ def _verification_partition_group_configuration(course_key, user_partition, bloc
         UserPartition object.
 
     """
-    course = modulestore().get_course(course_key, depth=0)
-
     # make int id for user partition scheme `VerificationPartitionScheme` which
     # is unique in user partitions of the provided course
     group_configuration_id = generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, get_course_partitions_used_ids(course))
@@ -333,7 +340,7 @@ def _verification_partition_group_configuration(course_key, user_partition, bloc
     ]
     group_configuration_parameters = {'location': unicode(block.location)}
 
-    group_configuration = UserPartition(
+    verification_partition_configuration = UserPartition(
         id=group_configuration_id,
         name=group_configuration_name,
         description=group_configuration_description,
@@ -341,7 +348,7 @@ def _verification_partition_group_configuration(course_key, user_partition, bloc
         scheme=user_partition,
         parameters=group_configuration_parameters,
     )
-    return group_configuration
+    return verification_partition_configuration
 
 
 def _get_credit_xblocks_for_access_control(course_key):  # pylint: disable=invalid-name
