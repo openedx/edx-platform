@@ -1,14 +1,12 @@
 <div class="exam-timer">
-    <%- gettext("You are taking") %>
-    <a href='<%= exam_url_path %>' >
-        <%= exam_display_name %>
-    </a>
-    <%- gettext(" exam as a proctored exam. Good Luck!") %>
+    <%- gettext("You are taking \"") %>
+    <a href='<%= exam_url_path %>' ><%=exam_display_name %></a>
+    <%- gettext("\" as a proctored exam. The timer on the right shows the time remaining in the exam.") %>
     <span id="turn_in_exam_id" class="pull-right">
         <span id="turn_in_exam_id">
             <% if(attempt_status != 'ready_to_submit') {%>
                 <button class="exam-button-turn-in-exam">
-                    <%- gettext("Turn in Exam") %>
+                    <%- gettext("End My Exam") %>
                 </button>
             <% } %>
         </span>
