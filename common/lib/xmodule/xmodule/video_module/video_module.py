@@ -209,22 +209,16 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
                 # download youtube transcript for html5 video
                 if not self.sub and val_video_urls["youtube"]:
-                    #cache the transcript request
-                    cache_key = 'html5_' + val_video_urls["youtube"]
-                    html5_transcript_cache = cache.get(cache_key)
-                    if not html5_transcript_cache:
-                        try:
-                            download_youtube_subs(val_video_urls["youtube"], self, settings)
-                            item = self.runtime.modulestore.get_item(self.location)
-                            youtube_sub = val_video_urls["youtube"]
-                            item.sub = youtube_sub
-                            user = User.objects.get(id=self.system.user_id)
-                            item.save_with_metadata(user)
-                            transcript_found = True
-                        except GetTranscriptsFromYouTubeException:
-                            transcript_found = False
-
-                        cache.set(cache_key, {'youtube_hit': True, 'found': transcript_found})
+                    try:
+                        download_youtube_subs(val_video_urls["youtube"], self, settings)
+                        item = self.runtime.modulestore.get_item(self.location)
+                        youtube_sub = val_video_urls["youtube"]
+                        item.sub = youtube_sub
+                        user = User.objects.get(id=self.system.user_id)
+                        item.save_with_metadata(user)
+                    except GetTranscriptsFromYouTubeException:
+                        # Todo should we cache the youtube hit ?
+                        pass
 
                 # VAL will always give us the keys for the profiles we asked for, but
                 # if it doesn't have an encoded video entry for that Video + Profile, the
