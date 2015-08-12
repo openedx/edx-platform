@@ -568,11 +568,14 @@ class UserStateCache(object):
         user = user_by_anonymous_id(kvs_key.user_id)
         field_name = kvs_key.field_name
         block_key = kvs_key.block_scope_id
-        return self._client.get(
-            user.username, 
-            block_key, 
-            Scope.user_state, 
-            [field_name])[field_name]
+        try:
+            return self._client.get(
+                user.username, 
+                block_key, 
+                Scope.user_state, 
+                [field_name])[field_name]
+        except self._client.DoesNotExist:
+            raise KeyError
 
     @contract(
         kv_dict="dict(DjangoKeyValueStore_Key: *)",
