@@ -1,19 +1,30 @@
 """
-Views for support dashboard
+Views for manual refunds in the student support UI.
+
+This interface is used by the support team to track refunds
+entered manually in CyberSource (our payment gateway).
+
+DEPRECATION WARNING:
+We are currently in the process of replacing lms/djangoapps/shoppingcart
+with an E-Commerce service that supports automatic refunds.  Once that
+transition is complete, we can remove this view.
+
 """
 import logging
 
 from django.contrib.auth.models import User
 from django.views.generic.edit import FormView
-from django.views.generic.base import TemplateView
 from django.utils.translation import ugettext as _
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django import forms
+from django.utils.decorators import method_decorator
+
 from student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from support.decorators import require_support_permission
 
 log = logging.getLogger(__name__)
 
@@ -59,11 +70,16 @@ class RefundForm(forms.Form):
         if user and course_id:
             self.cleaned_data['enrollment'] = enrollment = CourseEnrollment.get_or_create_enrollment(user, course_id)
             if enrollment.refundable():
-                raise forms.ValidationError(_("Course {course_id} not past the refund window.").format(course_id=course_id))
+                msg = _("Course {course_id} not past the refund window.").format(course_id=course_id)
+                raise forms.ValidationError(msg)
             try:
-                self.cleaned_data['cert'] = enrollment.certificateitem_set.filter(mode='verified', status='purchased')[0]
+                self.cleaned_data['cert'] = enrollment.certificateitem_set.filter(
+                    mode='verified',
+                    status='purchased'
+                )[0]
             except IndexError:
-                raise forms.ValidationError(_("No order found for {user} in course {course_id}").format(user=user, course_id=course_id))
+                msg = _("No order found for {user} in course {course_id}").format(user=user, course_id=course_id)
+                raise forms.ValidationError(msg)
         return self.cleaned_data
 
     def is_valid(self):
@@ -82,20 +98,17 @@ class RefundForm(forms.Form):
         return is_valid
 
 
-class SupportDash(TemplateView):
-    """
-    Support dashboard view
-    """
-    template_name = 'dashboard/support.html'
-
-
-class Refund(FormView):
+class RefundSupportView(FormView):
     """
     Refund form view
     """
-    template_name = 'dashboard/_dashboard_refund.html'
+    template_name = 'support/refund.html'
     form_class = RefundForm
     success_url = '/support/'
+
+    @method_decorator(require_support_permission)
+    def dispatch(self, *args, **kwargs):
+        return super(RefundSupportView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
@@ -119,6 +132,18 @@ class Refund(FormView):
         enrollment.update_enrollment(is_active=False)
 
         log.info(u"%s manually refunded %s %s", self.request.user, user, course_id)
-        messages.success(self.request, _("Unenrolled {user} from {course_id}").format(user=user, course_id=course_id))
-        messages.success(self.request, _("Refunded {cost} for order id {order_id}").format(cost=cert.unit_cost, order_id=cert.order.id))
+        messages.success(
+            self.request,
+            _("Unenrolled {user} from {course_id}").format(
+                user=user,
+                course_id=course_id
+            )
+        )
+        messages.success(
+            self.request,
+            _("Refunded {cost} for order id {order_id}").format(
+                cost=cert.unit_cost,
+                order_id=cert.order.id
+            )
+        )
         return HttpResponseRedirect('/support/refund/')

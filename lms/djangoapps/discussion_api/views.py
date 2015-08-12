@@ -314,6 +314,9 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * page_size: The number of items per page (default is 10, max is 100)
 
+        * mark_as_read: Will mark the thread of the comments as read. (default
+            is False)
+
     **POST Parameters**:
 
         * thread_id (required): The thread to post the comment in
@@ -404,7 +407,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
                 form.cleaned_data["thread_id"],
                 form.cleaned_data["endorsed"],
                 form.cleaned_data["page"],
-                form.cleaned_data["page_size"]
+                form.cleaned_data["page_size"],
+                form.cleaned_data["mark_as_read"]
             )
         )
 

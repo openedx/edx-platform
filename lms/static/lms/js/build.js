@@ -28,7 +28,8 @@
             'js/student_account/views/finish_auth_factory',
             'js/student_profile/views/learner_profile_factory',
             'js/views/message_banner',
-            'teams/js/teams_tab_factory'
+            'teams/js/teams_tab_factory',
+            'support/js/certificates_factory'
         ]),
 
         /**

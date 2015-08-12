@@ -19,6 +19,7 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.testing import UrlResetMixin
 
 from certificates.api import get_certificate_url
 from certificates.models import (
@@ -36,7 +37,7 @@ from certificates.tests.factories import (
     LinkedInAddToProfileConfigurationFactory,
     BadgeAssertionFactory,
 )
-from lms import urls
+from util import organizations_helpers as organizations_api
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -259,7 +260,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
@@ -428,6 +428,39 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.store.update_item(self.course, self.user.id)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_rendering_course_organization_data(self):
+        """
+        Test: organization data should render on certificate web view if course has organization.
+        """
+        test_organization_data = {
+            'name': 'test_organization',
+            'description': 'Test Organization Description',
+            'active': True,
+            'logo': '/logo_test1.png/'
+        }
+        test_org = organizations_api.add_organization(organization_data=test_organization_data)
+        organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn(
+            'a course of study offered by test_organization',
+            response.content
+        )
+        self.assertNotIn(
+            'a course of study offered by testorg',
+            response.content
+        )
+        self.assertIn(
+            '<title>test_organization {} Certificate |'.format(self.course.number, ),
+            response.content
+        )
+        self.assertIn('logo_test1.png', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -458,7 +491,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
         self.assertIn('course_title_0', response.content)
-        self.assertIn('/t4x/orgX/testX/asset/org-logo-0.png', response.content)
         self.assertIn('Signatory_Name 0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
         self.assertIn('Signatory_Organization 0', response.content)
@@ -693,12 +725,14 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
 
-class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
+class TrackShareRedirectTest(UrlResetMixin, ModuleStoreTestCase, EventTrackingTestCase):
     """
     Verifies the badge image share event is sent out.
     """
+
+    @patch.dict(settings.FEATURES, {"ENABLE_OPENBADGES": True})
     def setUp(self):
-        super(TrackShareRedirectTest, self).setUp()
+        super(TrackShareRedirectTest, self).setUp('certificates.urls')
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='trackable course'
@@ -710,13 +744,6 @@ class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
                 'issuer': 'http://www.example.com/issuer.json',
             },
         )
-        # Enabling the feature flag isn't enough to change the URLs-- they're already loaded by this point.
-        self.old_patterns = urls.urlpatterns
-        urls.urlpatterns += (urls.BADGE_SHARE_TRACKER_URL,)
-
-    def tearDown(self):
-        super(TrackShareRedirectTest, self).tearDown()
-        urls.urlpatterns = self.old_patterns
 
     def test_social_event_sent(self):
         test_url = '/certificates/badge_share_tracker/{}/social_network/{}/'.format(

@@ -50,9 +50,7 @@ $(document).ready(function(){
       % if studio_url is not None and masquerade and masquerade.role == 'staff':
         <div class="wrap-instructor-info studio-view">
           <a class="instructor-info-action" href="${studio_url}">
-            ${_("View Updates in {studio_name}").format(
-                studio_name=settings.STUDIO_SHORT_NAME,
-            )}
+            ${_("View Updates in Studio")}
           </a>
         </div>
       % endif

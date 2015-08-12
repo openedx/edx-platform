@@ -253,7 +253,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
-                student_module.state = None
+                student_module.state = "{}"
             else:
                 current_state = json.loads(student_module.state)
                 for field in fields:

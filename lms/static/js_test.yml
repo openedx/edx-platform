@@ -71,11 +71,13 @@ src_paths:
     - common/js
     - teams/js
     - xmodule_js/common_static/coffee
+    - support/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - js/spec
     - teams/js/spec
+    - support/js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -105,6 +107,7 @@ fixture_paths:
     - templates/discovery
     - common/templates
     - teams/templates
+    - support/templates
 
 requirejs:
   paths:

@@ -1,16 +1,16 @@
 define([
     'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/views/team_discussion',
-    'teams/js/spec_helpers/team_discussion_helpers',
+    'teams/js/spec_helpers/team_spec_helpers',
     'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
-], function (_, AjaxHelpers, TeamDiscussionView, TeamDiscussionSpecHelper, DiscussionSpecHelper) {
+], function (_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper) {
     'use strict';
     describe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
 
         beforeEach(function() {
             setFixtures('<div class="discussion-module""></div>');
-            $('.discussion-module').data('course-id', TeamDiscussionSpecHelper.testCourseID);
-            $('.discussion-module').data('discussion-id', TeamDiscussionSpecHelper.testTeamDiscussionID);
+            $('.discussion-module').data('course-id', TeamSpecHelpers.testCourseID);
+            $('.discussion-module').data('discussion-id', TeamSpecHelpers.testTeamDiscussionID);
             $('.discussion-module').data('user-create-comment', true);
             $('.discussion-module').data('user-create-subcomment', true);
             DiscussionSpecHelper.setUnderscoreFixtures();
@@ -26,14 +26,14 @@ define([
                 interpolate(
                     '/courses/%(courseID)s/discussion/forum/%(discussionID)s/inline?page=1&ajax=1',
                     {
-                        courseID: TeamDiscussionSpecHelper.testCourseID,
-                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                        courseID: TeamSpecHelpers.testCourseID,
+                        discussionID: TeamSpecHelpers.testTeamDiscussionID
                     },
                     true
 
                 )
             );
-            AjaxHelpers.respondWithJson(requests, TeamDiscussionSpecHelper.createMockDiscussionResponse(threads));
+            AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse(threads));
             return discussionView;
         };
 
@@ -50,8 +50,8 @@ define([
                 interpolate(
                     '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
                     {
-                        courseID: TeamDiscussionSpecHelper.testCourseID,
-                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                        courseID: TeamSpecHelpers.testCourseID,
+                        discussionID: TeamSpecHelpers.testTeamDiscussionID
                     },
                     true
                 ),
@@ -65,12 +65,12 @@ define([
                 )
             );
             AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockPostResponse({
+                content: TeamSpecHelpers.createMockPostResponse({
                     id: threadID,
                     title: title,
                     body: body
                 }),
-                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+                annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
         };
 
@@ -81,16 +81,16 @@ define([
                 interpolate(
                     '/courses/%(courseID)s/discussion/forum/%(discussionID)s/threads/%(threadID)s?ajax=1&resp_skip=0&resp_limit=25',
                     {
-                        courseID: TeamDiscussionSpecHelper.testCourseID,
-                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID,
+                        courseID: TeamSpecHelpers.testCourseID,
+                        discussionID: TeamSpecHelpers.testTeamDiscussionID,
                         threadID: threadID || "999"
                     },
                     true
                 )
             );
             AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockThreadResponse(),
-                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+                content: TeamSpecHelpers.createMockThreadResponse(),
+                annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
         };
 
@@ -103,7 +103,7 @@ define([
                 interpolate(
                     '/courses/%(courseID)s/discussion/threads/%(threadID)s/reply?ajax=1',
                     {
-                        courseID: TeamDiscussionSpecHelper.testCourseID,
+                        courseID: TeamSpecHelpers.testCourseID,
                         threadID: threadID || "999"
                     },
                     true
@@ -111,11 +111,11 @@ define([
                 'body=' + reply.replace(/ /g, '+')
             );
             AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockThreadResponse({
+                content: TeamSpecHelpers.createMockThreadResponse({
                     body: reply,
                     comments_count: 1
                 }),
-                "annotated_content_info": TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+                "annotated_content_info": TeamSpecHelpers.createAnnotatedContentInfo()
             });
         };
 
@@ -180,18 +180,18 @@ define([
                 interpolate(
                     '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
                     {
-                        courseID: TeamDiscussionSpecHelper.testCourseID,
-                        discussionID: TeamDiscussionSpecHelper.testTeamDiscussionID
+                        courseID: TeamSpecHelpers.testCourseID,
+                        discussionID: TeamSpecHelpers.testTeamDiscussionID
                     },
                     true
                 ),
                 'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'
             );
             AjaxHelpers.respondWithJson(requests, {
-                content: TeamDiscussionSpecHelper.createMockPostResponse({
+                content: TeamSpecHelpers.createMockPostResponse({
                     id: "999", title: updatedTitle, body: updatedBody
                 }),
-                annotated_content_info: TeamDiscussionSpecHelper.createAnnotatedContentInfo()
+                annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
 
             // Expect the thread to have been updated

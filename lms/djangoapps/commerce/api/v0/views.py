@@ -111,7 +111,7 @@ class BasketsView(APIView):
             # If there are no course modes with SKUs, enroll the user without contacting the external API.
             msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode=CourseMode.HONOR, course_id=course_id,
                                                   username=user.username)
-            log.debug(msg)
+            log.info(msg)
             self._enroll(course_key, user)
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)

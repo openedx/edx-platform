@@ -789,16 +789,18 @@
         'lms/include/js/spec/discovery/views/search_form_spec.js',
         'lms/include/js/spec/discovery/discovery_factory_spec.js',
         'lms/include/js/spec/ccx/schedule_spec.js',
+        'lms/include/support/js/spec/certificates_spec.js'
         'lms/include/teams/js/spec/collections/topic_collection_spec.js',
-        'lms/include/teams/js/spec/edit_team_spec.js',
-        'lms/include/teams/js/spec/team_actions_spec.js',
-        'lms/include/teams/js/spec/teams_factory_spec.js',
+        'lms/include/teams/js/spec/teams_tab_factory_spec.js',
+        'lms/include/teams/js/spec/views/edit_team_spec.js',
+        'lms/include/teams/js/spec/views/my_teams_spec.js',
         'lms/include/teams/js/spec/views/team_discussion_spec.js',
         'lms/include/teams/js/spec/views/team_profile_spec.js',
         'lms/include/teams/js/spec/views/teams_spec.js',
         'lms/include/teams/js/spec/views/teams_tab_spec.js',
         'lms/include/teams/js/spec/views/topic_card_spec.js',
-        'lms/include/teams/js/spec/views/topics_spec.js',
+        'lms/include/teams/js/spec/views/topic_teams_spec.js',
+        'lms/include/teams/js/spec/views/topics_spec.js'
     ]);
 
 }).call(this, requirejs, define);

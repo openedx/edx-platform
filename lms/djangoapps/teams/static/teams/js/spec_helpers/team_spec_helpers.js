@@ -1,11 +1,103 @@
 define([
-    'underscore', 'common/js/spec_helpers/ajax_helpers'
-], function (_, AjaxHelpers) {
+    'underscore',
+    'teams/js/collections/team',
+    'teams/js/collections/team_membership',
+], function (_, TeamCollection, TeamMembershipCollection) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         testCourseID = 'course/1',
         testUser = 'testUser',
-        testTeamDiscussionID = "12345";
+        testTeamDiscussionID = "12345",
+        testCountries = [
+            ['', ''],
+            ['US', 'United States'],
+            ['CA', 'Canada'],
+            ['MX', 'Mexico']
+        ],
+        testLanguages = [
+            ['', ''],
+            ['en', 'English'],
+            ['es', 'Spanish'],
+            ['fr', 'French']
+        ];
+
+    var createMockTeamData = function (startIndex, stopIndex) {
+        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            return {
+                name: "team " + i,
+                id: "id " + i,
+                language: testLanguages[i%4][0],
+                country: testCountries[i%4][0],
+                is_active: true,
+                membership: []
+            };
+        });
+    };
+
+    var createMockTeams = function(teamData) {
+        if (!teamData) {
+            teamData = createMockTeamData(1, 5);
+        }
+        return new TeamCollection(
+            {
+                count: 6,
+                num_pages: 2,
+                current_page: 1,
+                start: 0,
+                results: teamData
+            },
+            {
+                course_id: 'my/course/id',
+                parse: true
+            }
+        );
+    };
+
+    var createMockTeamMembershipsData = function(startIndex, stopIndex) {
+        var teams = createMockTeamData(startIndex, stopIndex);
+        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            return {
+                user: {
+                    'username': 'andya',
+                    'url': 'https://openedx.example.com/api/user/v1/accounts/andya'
+                },
+                team: teams[i-1]
+            };
+        });
+    };
+
+    var createMockTeamMemberships = function(teamMembershipData, options) {
+        if (!teamMembershipData) {
+            teamMembershipData = createMockTeamMembershipsData(1, 5);
+        }
+        return new TeamMembershipCollection(
+            {
+                count: 11,
+                num_pages: 3,
+                current_page: 1,
+                start: 0,
+                results: teamMembershipData
+            },
+            _.extend(_.extend({}, {
+                    course_id: 'my/course/id',
+                    parse: true,
+                    url: 'api/teams/team_memberships',
+                    username: 'andya',
+                    privileged: false
+                }),
+                options)
+        );
+    };
+
+    var verifyCards = function(view, teams) {
+        var teamCards = view.$('.team-card');
+        _.each(teams, function (team, index) {
+            var currentCard = teamCards.eq(index);
+            expect(currentCard.text()).toMatch(team.name);
+            expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
+            expect(currentCard.text()).toMatch(_.object(testCountries)[team.country]);
+        });
+    };
 
     createMockPostResponse = function(options) {
         return _.extend(
@@ -124,10 +216,17 @@ define([
     return {
         testCourseID: testCourseID,
         testUser: testUser,
+        testCountries: testCountries,
+        testLanguages: testLanguages,
         testTeamDiscussionID: testTeamDiscussionID,
+        createMockTeamData: createMockTeamData,
+        createMockTeams: createMockTeams,
+        createMockTeamMembershipsData: createMockTeamMembershipsData,
+        createMockTeamMemberships: createMockTeamMemberships,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,
-        createMockThreadResponse: createMockThreadResponse
+        createMockThreadResponse: createMockThreadResponse,
+        verifyCards: verifyCards
     };
 });

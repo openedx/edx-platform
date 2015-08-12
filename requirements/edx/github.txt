@@ -8,7 +8,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
+git+https://github.com/edx/django-staticfiles.git@031bdeaea85798b8c284e2a09977df3e32d06b5d#egg=django-staticfiles==1.2.1.0003
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
 -e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-5#egg=django-oauth2-provider
@@ -34,7 +34,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@0d3d43bd1ef0f882ef70d19d4f652d35dd37eb01#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@d1ff8cf31a9b94916ce06ba06d4176bd72e15768#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
@@ -57,6 +57,7 @@ git+https://github.com/edx/edx-lint.git@ed8c8d2a0267d4d42f43642d193e25f8bd575d9b
 git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-client==1.1.0
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
 -e git+https://github.com/edx/edx-proctoring.git@release-2015-07-29#egg=edx-proctoring
+-e git+https://github.com/edx/edx-organizations.git@release-2015-08-03#egg=edx-organizations
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

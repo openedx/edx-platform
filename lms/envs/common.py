@@ -346,6 +346,9 @@ FEATURES = {
     # Milestones application flag
     'MILESTONES_APP': False,
 
+    # Organizations application flag
+    'ORGANIZATIONS_APP': False,
+
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
@@ -590,7 +593,7 @@ LMS_MIGRATION_ALLOWED_IPS = []
 # Note: these intentionally greedily grab all chars up to the next slash including any pluses
 # DHM: I really wanted to ensure the separators were the same (+ or /) but all patts I tried had
 # too many inadvertent side effects :-(
-COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/]+)'
+COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
 COURSE_KEY_REGEX = COURSE_KEY_PATTERN.replace('P<course_key_string>', ':')
 
@@ -1832,6 +1835,9 @@ INSTALLED_APPS = (
     'bulk_email',
     'branding',
 
+    # Student support tools
+    'support',
+
     # External auth (OpenID, shib)
     'external_auth',
     'django_openid_auth',
@@ -2402,6 +2408,9 @@ OPTIONAL_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 )
 
 for app_name in OPTIONAL_APPS:

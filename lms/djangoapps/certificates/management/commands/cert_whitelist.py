@@ -28,15 +28,19 @@ class Command(BaseCommand):
 
     help = """
     Sets or gets the certificate whitelist for a given
-    user/course
+    user(s)/course
 
-        Add a user to the whitelist for a course
+        Add a user or list of users to the whitelist for a course
 
         $ ... cert_whitelist --add joe -c "MITx/6.002x/2012_Fall"
+        OR
+        $ ... cert_whitelist --add joe,jenny,tom,jerry -c "MITx/6.002x/2012_Fall"
 
-        Remove a user from the whitelist for a course
+        Remove a user or list of users from the whitelist for a course
 
         $ ... cert_whitelist --del joe -c "MITx/6.002x/2012_Fall"
+        OR
+        $ ... cert_whitelist --del joe,jenny,tom,jerry -c "MITx/6.002x/2012_Fall"
 
         Print out who is whitelisted for a course
 
@@ -49,13 +53,13 @@ class Command(BaseCommand):
                     metavar='USER',
                     dest='add',
                     default=False,
-                    help='user to add to the certificate whitelist'),
+                    help='user or list of users to add to the certificate whitelist'),
 
         make_option('-d', '--del',
                     metavar='USER',
                     dest='del',
                     default=False,
-                    help='user to remove from the certificate whitelist'),
+                    help='user or list of users to remove from the certificate whitelist'),
 
         make_option('-c', '--course-id',
                     metavar='COURSE_ID',

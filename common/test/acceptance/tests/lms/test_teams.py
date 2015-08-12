@@ -84,8 +84,7 @@ class TeamsTabBase(UniqueCourseTest):
         if present:
             self.assertIn("Teams", self.tab_nav.tab_names)
             self.teams_page.visit()
-            self.assertEqual(self.teams_page.active_tab(), 'my-teams')
-            self.assertEqual("Showing 0 out of 0 total", self.teams_page.get_body_text())
+            self.assertEqual(self.teams_page.active_tab(), 'browse')
         else:
             self.assertNotIn("Teams", self.tab_nav.tab_names)
 
@@ -182,7 +181,7 @@ class TeamsTabTest(TeamsTabBase):
 
     @ddt.data(
         ('browse', 'div.topics-list'),
-        ('my-teams', 'div.teams-paging-header'),
+        ('my-teams', 'div.my-teams'),
         ('teams/{topic_id}/{team_id}', 'div.discussion-module'),
         ('topics/{topic_id}/create-team', 'div.create-team-instructions'),
         ('topics/{topic_id}', 'div.teams-list'),
@@ -201,9 +200,16 @@ class TeamsTabTest(TeamsTabBase):
         })
         team = self.create_teams(topic, 1)[0]
         self.teams_page.visit()
+
+        # Get the base URL (the URL without any trailing fragment)
+        url = self.browser.current_url
+        fragment_index = url.find('#')
+        if fragment_index >= 0:
+            url = url[0:fragment_index]
+
         self.browser.get(
             '{url}#{route}'.format(
-                url=self.browser.current_url,
+                url=url,
                 route=route.format(
                     topic_id=topic['id'],
                     team_id=team['id']
@@ -231,16 +237,14 @@ class MyTeamsTest(TeamsTabBase):
         Scenario: Visiting the My Teams page when user is not a member of any team should not display any teams.
         Given I am enrolled in a course with a team configuration and a topic but am not a member of a team
         When I visit the My Teams page
-        Then I should see a pagination header showing no teams
         And I should see no teams
-        And I should not see a pagination footer
+        And I should see a message that I belong to no teams.
         """
         self.my_teams_page.visit()
-        self.assertEqual(self.my_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
-        self.assertFalse(
-            self.my_teams_page.pagination_controls_visible(),
-            msg='Expected paging footer to be invisible'
+        self.assertEqual(
+            self.my_teams_page.q(css='.page-content-main').text,
+            [u'You are not currently a member of any teams.']
         )
 
     def test_member_of_a_team(self):
@@ -255,12 +259,7 @@ class MyTeamsTest(TeamsTabBase):
         teams = self.create_teams(self.topic, 1)
         self.create_membership(self.user_info['username'], teams[0]['id'])
         self.my_teams_page.visit()
-        self.assertEqual(self.my_teams_page.get_pagination_header_text(), 'Showing 1 out of 1 total')
         self.verify_teams(self.my_teams_page, teams)
-        self.assertFalse(
-            self.my_teams_page.pagination_controls_visible(),
-            msg='Expected paging footer to be invisible'
-        )
 
 
 @attr('shard_5')

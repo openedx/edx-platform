@@ -34,11 +34,24 @@ class CourseMasquerade(object):
     Masquerade settings for a particular course.
     """
     def __init__(self, course_key, role='student', user_partition_id=None, group_id=None, user_name=None):
+        # All parameters to this function must be named identically to the corresponding attribute.
+        # If you remove or rename an attribute, also update the __setstate__() method to migrate
+        # old data from users' sessions.
         self.course_key = course_key
         self.role = role
         self.user_partition_id = user_partition_id
         self.group_id = group_id
         self.user_name = user_name
+
+    def __setstate__(self, state):
+        """
+        Ensure that all attributes are initialised when unpickling CourseMasquerade objects.
+
+        Users might still have CourseMasquerade objects from older versions of the code in their
+        session.  These old objects might not have all attributes set, possibly resulting in
+        AttributeErrors.
+        """
+        self.__init__(**state)
 
 
 @require_POST
