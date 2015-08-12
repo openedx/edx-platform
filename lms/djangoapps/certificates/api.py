@@ -29,6 +29,54 @@ from certificates.queue import XQueueCertInterface
 log = logging.getLogger("edx.certificate")
 
 
+def get_certificates_for_user(username):
+    """
+    Retrieve certificate information for a particular user.
+
+    Arguments:
+        username (unicode): The identifier of the user.
+
+    Returns: list
+
+    Example Usage:
+    >>> get_certificates_for_user("bob")
+    [
+        {
+            "username": "bob",
+            "course_key": "edX/DemoX/Demo_Course",
+            "type": "verified",
+            "status": "downloadable",
+            "download_url": "http://www.example.com/cert.pdf",
+            "grade": "0.98",
+            "created": 2015-07-31T00:00:00Z,
+            "modified": 2015-07-31T00:00:00Z
+        }
+    ]
+
+    """
+    return [
+        {
+            "username": username,
+            "course_key": cert.course_id,
+            "type": cert.mode,
+            "status": cert.status,
+            "grade": cert.grade,
+            "created": cert.created_date,
+            "modified": cert.modified_date,
+
+            # NOTE: the download URL is not currently being set for webview certificates.
+            # In the future, we can update this to construct a URL to the webview certificate
+            # for courses that have this feature enabled.
+            "download_url": (
+                cert.download_url
+                if cert.status == CertificateStatuses.downloadable
+                else None
+            ),
+        }
+        for cert in GeneratedCertificate.objects.filter(user__username=username).order_by("course_id")
+    ]
+
+
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
                                forced_grade=None):
     """
@@ -96,7 +144,14 @@ def regenerate_user_certificates(student, course_key, course=None,
         xqueue.use_https = False
 
     generate_pdf = not has_html_certificates_enabled(course_key, course)
-    return xqueue.regen_cert(student, course_key, course, forced_grade, template_file, generate_pdf)
+    return xqueue.regen_cert(
+        student,
+        course_key,
+        course=course,
+        forced_grade=forced_grade,
+        template_file=template_file,
+        generate_pdf=generate_pdf
+    )
 
 
 def certificate_downloadable_status(student, course_key):
@@ -281,7 +336,11 @@ def get_certificate_url(user_id, course_id):
     url = ""
     if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         url = reverse(
-            'cert_html_view', kwargs=dict(user_id=str(user_id), course_id=unicode(course_id))
+            'certificates:html_view',
+            kwargs={
+                "user_id": str(user_id),
+                "course_id": unicode(course_id),
+            }
         )
     else:
         try:

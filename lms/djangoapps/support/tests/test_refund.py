@@ -1,21 +1,25 @@
 """
-Tests for support dashboard
+Tests for refunds on the support dashboard
+
+DEPRECATION WARNING:
+This test suite is deliberately separate from the other view tests
+so we can easily deprecate it once the transition from shoppingcart
+to the E-Commerce service is complete.
+
 """
 import datetime
 
-from django.contrib.auth.models import Permission
 from django.test.client import Client
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
+from student.roles import SupportStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@attr('shard_1')
 class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page
@@ -33,8 +37,9 @@ class RefundTests(ModuleStoreTestCase):
             email='test_admin+support@edx.org',
             password='foo'
         )
-        self.admin.user_permissions.add(Permission.objects.get(codename='change_courseenrollment'))
+        SupportStaffRole().add_users(self.admin)
         self.client.login(username=self.admin.username, password='foo')
+
         self.student = UserFactory.create(
             username='student',
             email='student+refund@edx.org'
@@ -67,7 +72,7 @@ class RefundTests(ModuleStoreTestCase):
         self.assertTrue(response.status_code, 200)
 
         # users without the permission can't access support
-        self.admin.user_permissions.clear()
+        SupportStaffRole().remove_users(self.admin)
         response = self.client.get('/support/')
         self.assertTrue(response.status_code, 302)
 
