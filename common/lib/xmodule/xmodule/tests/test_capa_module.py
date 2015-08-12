@@ -1724,8 +1724,11 @@ class CapaDescriptorTest(unittest.TestCase):
         self.assertEquals(descriptor.problem_types, {response_tag})
         self.assertEquals(descriptor.index_dictionary(), {
             'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
-            'display_name': name,
-            'problem_types': [response_tag]
+            'problem_types': [response_tag],
+            'content': {
+                'display_name': name,
+                'capa_content': ''
+            }
         })
 
     def test_response_types_ignores_non_response_tags(self):
@@ -1748,8 +1751,11 @@ class CapaDescriptorTest(unittest.TestCase):
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
         self.assertEquals(descriptor.index_dictionary(), {
             'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
-            'display_name': name,
-            'problem_types': ["multiplechoiceresponse"]
+            'problem_types': ["multiplechoiceresponse"],
+            'content': {
+                'display_name': name,
+                'capa_content': ' Label Some comment Apple Banana Chocolate Donut '
+            }
         })
 
     def test_response_types_multiple_tags(self):
@@ -1778,8 +1784,11 @@ class CapaDescriptorTest(unittest.TestCase):
         self.assertEquals(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
-                'display_name': name,
-                'problem_types': ["optionresponse", "multiplechoiceresponse"]
+                'problem_types': ["optionresponse", "multiplechoiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': ' Label Some comment Donut Buggy '
+                }
             }
         )
 
