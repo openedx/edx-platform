@@ -911,7 +911,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         this is labeled as a proctored exam
         """
 
-        self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
+        usage_key = self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
         # initialize some credit requirements, if so then specify
         if with_credit_context:
@@ -945,7 +945,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         module = render.get_module(
             self.request.user,
             self.request,
-            self.usage_key,
+            usage_key,
             self.field_data_cache,
             wrap_xmodule_display=True,
         )
@@ -958,8 +958,8 @@ class TestProctoringRendering(ModuleStoreTestCase):
         Helper method to consolidate some courseware/proctoring/credit
         test harness data
         """
-        self.usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
-        sequence = self.modulestore.get_item(self.usage_key)
+        usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
+        sequence = self.modulestore.get_item(usage_key)
 
         sequence.is_time_limited = True
         sequence.is_proctored_enabled = True
@@ -992,6 +992,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
             create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
             update_attempt_status(exam_id, self.request.user.id, attempt_status)
 
+        return usage_key
 
     def _find_url_name(self, toc, url_name):
         """
