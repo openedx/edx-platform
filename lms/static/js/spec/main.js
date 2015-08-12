@@ -800,7 +800,6 @@
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
         'lms/include/support/js/spec/certificates_spec.js',
-        'lms/include/js/spec/courseware/proctored_exams_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js'
     ]);
 
