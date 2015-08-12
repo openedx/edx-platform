@@ -2,6 +2,7 @@
 import json
 import logging
 import sys
+import re
 from lxml import etree
 
 from pkg_resources import resource_string
@@ -10,6 +11,7 @@ import dogstats_wrapper as dog_stats_api
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
+from xmodule.annotator_mixin import html_to_text
 from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -193,16 +195,26 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        result = super(CapaDescriptor, self).index_dictionary()
-        if not result:
-            result = {}
-        index = {
-            'content_type': self.INDEX_CONTENT_TYPE,
-            'problem_types': list(self.problem_types),
-            "display_name": self.display_name
+        xblock_body = super(CapaDescriptor, self).index_dictionary()
+        # Removing solution
+        capa_content = re.sub(re.compile(r"<solution>.*</solution>", re.DOTALL), "", self.data)
+        # Removing HTML-encoded non-breaking space characters
+        capa_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(capa_content))
+        # Removing HTML CDATA
+        capa_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", capa_content)
+        # Removing HTML comments
+        capa_content = re.sub(r"<!--.*-->", "", capa_content)
+        capa_body = {
+            "capa_content": capa_content,
+            "display_name": self.display_name,
         }
-        result.update(index)
-        return result
+        if "content" in xblock_body:
+            xblock_body["content"].update(capa_body)
+        else:
+            xblock_body["content"] = capa_body
+        xblock_body["content_type"] = self.INDEX_CONTENT_TYPE
+        xblock_body["problem_types"] = list(self.problem_types)
+        return xblock_body
 
     def has_support(self, view, functionality):
         """
