@@ -1,13 +1,11 @@
 """HTTP endpoints for the Teams API."""
 
 from django.shortcuts import render_to_response
-from courseware.courses import get_course_with_access, has_access
 from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.views.generic.base import View
 import newrelic.agent
-
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -18,16 +16,11 @@ from rest_framework.authentication import (
 )
 from rest_framework import status
 from rest_framework import permissions
-
 from django.db.models import Count
 from django.contrib.auth.models import User
 from django_countries import countries
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-
-from student.models import CourseEnrollment, CourseAccessRole
-from student.roles import CourseStaffRole
-
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -37,14 +30,15 @@ from openedx.core.lib.api.view_utils import (
     ExpandableFieldViewMixin
 )
 from openedx.core.lib.api.serializers import PaginationSerializer
-
 from xmodule.modulestore.django import modulestore
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from courseware.courses import get_course_with_access, has_access
+from student.models import CourseEnrollment, CourseAccessRole
+from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
-
+from teams import is_feature_enabled
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
@@ -58,7 +52,6 @@ from .serializers import (
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
 
-# Constants
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 
@@ -118,13 +111,6 @@ class TeamsDashboardView(View):
             "disable_courseware_js": True,
         }
         return render_to_response("teams/teams.html", context)
-
-
-def is_feature_enabled(course):
-    """
-    Returns True if the teams feature is enabled.
-    """
-    return settings.FEATURES.get('ENABLE_TEAMS', False) and course.teams_enabled
 
 
 def has_team_api_access(user, course_key, access_username=None):

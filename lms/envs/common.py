@@ -2520,6 +2520,25 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'username',
         'profile_image',
     ],
+
+    # The list of account fields that are visible only to staff and users viewing their own profiles
+    "admin_fields": [
+        "username",
+        "email",
+        "date_joined",
+        "is_active",
+        "bio",
+        "country",
+        "profile_image",
+        "language_proficiencies",
+        "name",
+        "gender",
+        "goals",
+        "year_of_birth",
+        "level_of_education",
+        "mailing_address",
+        "requires_parental_consent",
+    ]
 }
 
 # E-Commerce API Configuration
