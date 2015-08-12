@@ -62,3 +62,13 @@ def microsite_css_overrides_file():
         return "<link href='{}' rel='stylesheet' type='text/css'>".format(static(file_path))
     else:
         return ""
+
+
+@register.filter(name="microsite_template_path")
+def microsite_template_path(relative_path):
+    """
+    Django filter that resolves relative path to a template. The resolved path can either
+    be in a microsite directory (as an override) or will just return what is passed in.
+    {% include "some template"|microsite_template_path %}
+    """
+    return microsite.get_template_path(relative_path)

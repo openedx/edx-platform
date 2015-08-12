@@ -72,10 +72,7 @@ def get_template_path(relative_path):
         search_path = os.path.join(microsite_template_path, relative_path)
 
         if os.path.isfile(search_path):
-            path = '/{0}/templates/{1}'.format(
-                get_value('microsite_name'),
-                relative_path
-            )
+            path = os.path.join(get_value('microsite_name'), 'templates', relative_path)
             return path
 
     return relative_path
