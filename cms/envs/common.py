@@ -55,6 +55,7 @@ import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 
+
 ############################ FEATURE CONFIGURATION #############################
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
@@ -768,8 +769,10 @@ INSTALLED_APPS = (
     # Additional problem types
     'edx_jsme',    # Molecular Structure
 
-    'openedx.core.djangoapps.content.course_overviews',
+    # Course data caching
     'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.content.course_overviews',
+    'lms.djangoapps.lms_course_cache',
 
     # Credit courses
     'openedx.core.djangoapps.credit',
