@@ -637,6 +637,14 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         )
 
     def _get_remote_object(self, user, field_name, block_key):
+        """
+        Access db model directly to get data for shared fields.
+        
+        Arguments:
+            user (User): target User object
+            field_name (str): a name of a field
+            block_key (str): a block_scope_id str
+        """
         return XModuleUserStateSummaryField.objects.get(
             usage_id=block_key,
             field_name=field_name
@@ -706,6 +714,14 @@ class PreferencesCache(DjangoOrmFieldCache):
         )
 
     def _get_remote_object(self, user, field_name, block_key):
+        """
+        Access db model directly to get data for shared fields.
+        
+        Arguments:
+            user (User): target User object
+            field_name (str): a name of a field
+            block_key (str): a block_scope_id str
+        """
         return XModuleStudentPrefsField.objects.filter(
             module_type=block_key,
             student=user.pk,
@@ -772,8 +788,15 @@ class UserInfoCache(DjangoOrmFieldCache):
             field_name__in=set(field.name for field in fields),
         )
 
-    def _get_remote_object(self, user, field_name, block_type):
-
+    def _get_remote_object(self, user, field_name, block_key):
+        """
+        Access db model directly to get data for shared fields.
+        
+        Arguments:
+            user (User): target User object
+            field_name (str): a name of a field
+            block_key (str): a block_scope_id str
+        """
         return XModuleStudentInfoField.objects.get(
             student=user.pk,
             field_name=field_name
