@@ -41,7 +41,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
-from xblock.fields import Scope, UserScope, RemoteScope
+from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
 from courseware.user_state_client import DjangoXBlockUserStateClient
@@ -111,7 +111,7 @@ class DjangoKeyValueStore(KeyValueStore):
         Scope.user_state_summary,
         Scope.user_state,
         Scope.preferences,
-        Scope.user_info
+        Scope.user_info,
     )
 
     def __init__(self, field_data_cache):
@@ -730,6 +730,7 @@ class PreferencesCache(DjangoOrmFieldCache):
         """
         return (BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
 
+
 class UserInfoCache(DjangoOrmFieldCache):
     """
     Cache for Scope.user_info xblock field data
@@ -795,6 +796,7 @@ class UserInfoCache(DjangoOrmFieldCache):
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
         return key.field_name
+
 
 class FieldDataCache(object):
     """
