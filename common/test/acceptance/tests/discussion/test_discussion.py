@@ -8,6 +8,7 @@ from uuid import uuid4
 from nose.plugins.attrib import attr
 from pytz import UTC
 from flaky import flaky
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
 
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
