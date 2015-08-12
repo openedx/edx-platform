@@ -198,6 +198,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             topic_id='topic_6'
         )
 
+        self.test_team_name_id_map = {team.name: team for team in (
+            self.test_team_1,
+            self.test_team_2,
+            self.test_team_3,
+            self.test_team_4,
+            self.test_team_5,
+        )}
+
         for user, course in [('staff', self.test_course_1), ('course_staff', self.test_course_1)]:
             CourseEnrollment.enroll(
                 self.users[user], course.id, check_access=True
@@ -776,6 +784,40 @@ class TestListMembershipAPI(TeamAPITestCase):
                 self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_1.team_id)
             else:
                 self.assertEqual(membership['count'], 0)
+
+    @ddt.data(
+        ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
+        ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'sólar team'),
+        ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
+    )
+    @ddt.unpack
+    def test_course_filter_with_username(self, user, course_id, status, team_name):
+        membership = self.get_membership_list(
+            status,
+            {
+                'username': self.users[user],
+                'course_id': course_id
+            },
+            user=user
+        )
+        if status == 200:
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_name_id_map[team_name].team_id)
+
+    @ddt.data(
+        ('TestX/TS101/Test_Course', 200),
+        ('MIT/6.002x/Circuits', 400),
+    )
+    @ddt.unpack
+    def test_course_filter_with_team_id(self, course_id, status):
+        membership = self.get_membership_list(status, {'team_id': self.test_team_1.team_id, 'course_id': course_id})
+        if status == 200:
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_1.team_id)
+
+    def test_bad_course_id(self):
+        self.get_membership_list(404, {'course_id': 'no_such_course'})
 
     def test_no_username_or_team_id(self):
         self.get_membership_list(400, {})
