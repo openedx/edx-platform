@@ -5,7 +5,7 @@ import logging
 import itertools
 from lxml import etree
 from StringIO import StringIO
-from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
@@ -1062,7 +1062,7 @@ class CoursesUsersList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
         # Get a list of all enrolled students
-        users = CourseEnrollment.users_enrolled_in(course_key)
+        users = CourseEnrollment.objects.users_enrolled_in(course_key)
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
         if orgs:
             orgs = orgs.split(",")[:upper_bound]
@@ -1315,7 +1315,7 @@ class CourseContentUsersList(SecureAPIView):
 
         lookup_group_ids = relationships.values_list('group_profile', flat=True)
         users = User.objects.filter(groups__id__in=lookup_group_ids)
-        enrolled_users = CourseEnrollment.users_enrolled_in(course_key).filter(groups__id__in=lookup_group_ids)
+        enrolled_users = CourseEnrollment.objects.users_enrolled_in(course_key).filter(groups__id__in=lookup_group_ids)
         if enrolled in ['True', 'true']:
             queryset = enrolled_users
         else:
@@ -1446,7 +1446,6 @@ class CoursesMetricsGradesList(SecureListAPIView):
                                                    user__courseenrollment__is_active=True,
                                                    user__courseenrollment__course_id__exact=course_key)\
             .exclude(user__in=exclude_users)
-
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 200)
         user_ids = self.request.QUERY_PARAMS.get('user_id', None)
         if user_ids:
@@ -1515,7 +1514,7 @@ class CoursesMetrics(SecureAPIView):
         course_descriptor, course_key, course_content = get_course(request, request.user, course_id)
         slash_course_id = get_course_key(course_id, slashseparated=True)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        users_enrolled_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        users_enrolled_qs = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         organization = request.QUERY_PARAMS.get('organization', None)
         org_ids = None
         if organization:
@@ -1615,23 +1614,36 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         total_enrolled = enrolled_qs.filter(created__lt=start_dt).count()
         total_started_count = users_started_qs.filter(created__lt=start_dt).aggregate(Count('user', distinct=True))
         total_started = total_started_count['user__count'] or 0
-        enrolled_series = get_time_series_data(enrolled_qs, start_dt, end_dt, interval=interval,
-                                               date_field='created', aggregate=Count('id'))
-        started_series = get_time_series_data(users_started_qs, start_dt, end_dt, interval=interval,
-                                              date_field='created', date_field_model=StudentProgress,
-                                              aggregate=Count('user'))
-        completed_series = get_time_series_data(grades_complete_qs, start_dt, end_dt, interval=interval,
-                                                date_field='modified', date_field_model=StudentGradebook,
-                                                aggregate=Count('id'))
-        modules_completed_series = get_time_series_data(modules_completed_qs, start_dt, end_dt, interval=interval,
-                                                        date_field='created', date_field_model=CourseModuleCompletion,
-                                                        aggregate=Count('id'))
+        enrolled_series = get_time_series_data(
+            enrolled_qs, start_dt, end_dt, interval=interval,
+            date_field='created', date_field_model=CourseEnrollment,
+            aggregate=Count('id')
+        )
+        started_series = get_time_series_data(
+            users_started_qs, start_dt, end_dt, interval=interval,
+            date_field='created', date_field_model=StudentProgress,
+            aggregate=Count('user')
+        )
+        completed_series = get_time_series_data(
+            grades_complete_qs, start_dt, end_dt, interval=interval,
+            date_field='modified', date_field_model=StudentGradebook,
+            aggregate=Count('id')
+        )
+        modules_completed_series = get_time_series_data(
+            modules_completed_qs, start_dt, end_dt, interval=interval,
+            date_field='created', date_field_model=CourseModuleCompletion,
+            aggregate=Count('id')
+        )
+
         # active users are those who accessed course in last 24 hours
-        start_dt = start_dt + relativedelta(hours=-24)
-        end_dt = end_dt + relativedelta(hours=-24)
-        active_users_series = get_time_series_data(active_users_qs, start_dt, end_dt, interval=interval,
-                                                   date_field='modified', date_field_model=StudentModule,
-                                                   aggregate=Count('student', distinct=True))
+        start_dt = start_dt - timedelta(hours=24)
+        end_dt = end_dt - timedelta(hours=24)
+        active_users_series = get_time_series_data(
+            active_users_qs, start_dt, end_dt, interval=interval,
+            date_field='modified', date_field_model=StudentModule,
+            aggregate=Count('student', distinct=True)
+        )
+
         not_started_series = []
         for enrolled, started in zip(enrolled_series, started_series):
             not_started_series.append((started[0], (total_enrolled + enrolled[1]) - (total_started + started[1])))
@@ -1646,6 +1658,7 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
             'users_enrolled': enrolled_series,
             'active_users': active_users_series
         }
+
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -1740,7 +1753,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
                 completion_percentage = min(100 * (user_completions/total_possible_completions), 100)
             data['completions'] = completion_percentage
 
-        total_users_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        total_users_qs = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         if orgs_filter:
             total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
         total_users = total_users_qs.count()
@@ -1809,7 +1822,7 @@ class CoursesMetricsSocial(SecureListAPIView):
             for user_id in exclude_users:
                 if str(user_id) in data:
                     del data[str(user_id)]
-            enrollment_qs = CourseEnrollment.users_enrolled_in(course_key).filter(is_active=True)\
+            enrollment_qs = CourseEnrollment.objects.users_enrolled_in(course_key).filter(is_active=True)\
                 .exclude(id__in=exclude_users)
             actual_data = {}
             if organization:
@@ -1829,7 +1842,6 @@ class CoursesMetricsSocial(SecureListAPIView):
                 "err_msg": str(e)
             }
             http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
-
         return Response(data, http_status)
 
 
@@ -1853,7 +1865,7 @@ class CoursesMetricsCities(SecureListAPIView):
             raise Http404
         course_key = get_course_key(course_id)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        queryset = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        queryset = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         if city:
             city = city.split(',')[:upper_bound]
             q_list = [Q(profile__city__iexact=item.strip()) for item in city]

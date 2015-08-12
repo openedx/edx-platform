@@ -317,19 +317,19 @@ def grade_for_percentage(grade_cutoffs, percentage):
 
 
 @transaction.commit_manually
-def progress_summary(student, request, course):
+def progress_summary(student, request, course, locators_as_strings=False):
     """
     Wraps "_progress_summary" with the manual_transaction context manager just
     in case there are unanticipated errors.
     """
     with manual_transaction():
-        return _progress_summary(student, request, course)
+        return _progress_summary(student, request, course, locators_as_strings)
 
 
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def _progress_summary(student, request, course):
+def _progress_summary(student, request, course, locators_as_strings=False):
     """
     Unwrapped version of "progress_summary".
 
@@ -398,13 +398,15 @@ def _progress_summary(student, request, course):
                     if correct is None and total is None:
                         continue
 
+                    module_locator = unicode(module_descriptor.location) if locators_as_strings else module_descriptor.location
+
                     scores.append(
                         Score(
                             correct,
                             total,
                             graded,
                             module_descriptor.display_name_with_default,
-                            module_descriptor.location,
+                            module_locator,
                             due,
                         )
                     )
