@@ -30,6 +30,7 @@ urlpatterns = patterns(
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/roles/(?P<role>[a-z_]+)/courses/{0}$'.format(COURSE_ID_PATTERN), users_views.UsersRolesCoursesDetail.as_view(), name='users-roles-courses-detail'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/roles/*$', users_views.UsersRolesList.as_view(), name='users-roles-list'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)/workgroups/$', users_views.UsersWorkgroupsList.as_view(), name='users-workgroups-list'),
+    url(r'^(?P<user_id>[a-zA-Z0-9]+)/notifications/(?P<msg_id>[0-9]+)/$', users_views.UsersNotificationsDetail.as_view(), name='users-notifications-detail'),
     url(r'^(?P<user_id>[a-zA-Z0-9]+)$', users_views.UsersDetail.as_view(), name='apimgr-users-detail'),
     url(r'/*$^', users_views.UsersList.as_view(), name='apimgr-users-list'),
 )
