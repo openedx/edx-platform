@@ -44,23 +44,27 @@ class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
 
     **Example Requests**:
 
-        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015
+        GET /api/discussion/v1/courses/{course_id}
 
     **Response Values**:
 
-        * id: The identifier of the course
+        * id: The unique identifier for the course.
 
-        * blackouts: A list of objects representing blackout periods (during
-            which discussions are read-only except for privileged users). Each
-            item in the list includes:
+        * blackouts: A list of objects that represent any defined blackout 
+            periods during the course run. Discussions are read-only during a 
+            blackout period, except for users who have privileged discussion 
+            moderation roles in the course. Each item in the list includes the 
+            following values.
 
-            * start: The ISO 8601 timestamp for the start of the blackout period
+            * start: The ISO 8601 timestamp for the start of the blackout 
+                period.
 
-            * end: The ISO 8601 timestamp for the end of the blackout period
+            * end: The ISO 8601 timestamp for the end of the blackout period.
 
-        * thread_list_url: The URL of the list of all threads in the course.
+        * thread_list_url: The URL of the list of all discussion threads, or 
+            posts, in the course.
 
-        * topics_url: The URL of the topic listing for the course.
+        * topics_url: The URL of the list of discussion topics in the course.
     """
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
@@ -72,27 +76,47 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
 
-        Retrieve the topic listing for a course. Only topics accessible to the
-        authenticated user are included.
+        Retrieve the list of discussion topics for a course. Only topics that 
+          are accessible to the authenticated user are included: cohort 
+          assignments, content groups, release dates, and other access controls 
+          affect access to content.
 
     **Example Requests**:
 
-        GET /api/discussion/v1/course_topics/course-v1:ExampleX+Subject101+2015
+        GET /api/discussion/v1/course_topics/{course_id}
 
     **Response Values**:
 
-        * courseware_topics: The list of topic trees for courseware-linked
-          topics. Each item in the list includes:
+        * courseware_topics: The list of topic trees for the content-specific 
+            discussion topics in the course. In Studio, course teams use 
+            discussion components to add content-specific discussion topics 
+            which are classified by category and identified by display name. 
+            The array includes a separate object for each category. 
 
-            * id: The id of the discussion topic (null for a topic that only
-              has children but cannot contain threads itself).
+            Each item in the list includes the following values.
 
-            * name: The display name of the topic.
+            * children: An array of child subtrees, with a separate object for 
+                each defined discussion category. For each category, includes 
+                an array with values to identify the ids, display names, and 
+                thread_list_urls for the discussion topics in that category. 
+                The children value is present, but null, for the 
+                individual topics within a category.
 
-            * children: A list of child subtrees of the same format.
+            * id: The internal id assigned to the discussion topic. The id is 
+                null for a topic that only has children but cannot contain 
+                threads, or posts, itself.
 
-        * non_courseware_topics: The list of topic trees that are not linked to
-              courseware. Items are of the same format as in courseware_topics.
+            * name: The category name defined for the discussion topic or 
+                topics.
+
+            * thread_list_url: The URL of the list of all discussion threads, 
+                or posts, in the category.
+
+        * non_courseware_topics: The list of topic trees for the course-wide 
+            discussion topics defined for the course. In Studio, course teams 
+            add course-wide discussion topics on the Advanced Settings page. 
+            Each item in the list includes the same values as for 
+            courseware_topics.
     """
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
