@@ -5,7 +5,7 @@ Tests for In-Course Reverification Access Control Partition scheme
 
 import ddt
 import unittest
-from mock import Mock
+
 from django.test import TestCase
 
 from lms.djangoapps.verify_student.models import (
@@ -14,8 +14,7 @@ from lms.djangoapps.verify_student.models import (
     SkippedReverification,
 )
 from student.models import CourseEnrollment
-from xmodule.partitions.partitions import UserPartition, UserPartitionError
-
+from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 
 from django.conf import settings
 from xmodule.modulestore.django import modulestore
@@ -36,6 +35,27 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     APPROVED = "approved"
     DENIED = "denied"
 
+    NON_VERIFIED_GROUP = Group(
+        VerificationPartitionScheme.NON_VERIFIED,
+        'Not enrolled in a verified track'
+    )
+
+    VERIFIED_ALLOW_GROUP = Group(
+        VerificationPartitionScheme.VERIFIED_ALLOW,
+        'Enrolled in a verified track and has access'
+    )
+
+    VERIFIED_DENY_GROUP = Group(
+        VerificationPartitionScheme.VERIFIED_DENY,
+        'Enrolled in a verified track and does not have access'
+    )
+
+    group_configuration_groups = [
+        NON_VERIFIED_GROUP,
+        VERIFIED_ALLOW_GROUP,
+        VERIFIED_DENY_GROUP,
+    ]
+
     def setUp(self):
         super(ReverificationPartitionTest, self).setUp()
 
@@ -44,10 +64,18 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
         self.checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/first_uuid'.format(
             org=self.course.id.org, course=self.course.id.course
         )
-        self.user_partition = Mock(user_partitions=[])
-        self.user_partition.parameters = {
-            "location": self.checkpoint_location
-        }
+
+        user_partition = UserPartition.get_scheme('verification')
+        group_configuration_parameters = {'location': unicode(self.checkpoint_location)}
+
+        self.verification_partition_configuration = UserPartition(
+            id=0,
+            name='Verification Checkpoint',
+            description='verification',
+            groups=self.group_configuration_groups,
+            scheme=user_partition,
+            parameters=group_configuration_parameters,
+        )
 
         self.first_checkpoint = VerificationCheckpoint.objects.create(
             course_id=self.course.id,
@@ -78,7 +106,6 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     @ddt.data(
         ("verified", SUBMITTED),
         ("verified", APPROVED),
-        ("verified", SUBMITTED),
         ("verified", DENIED),
         ("verified", None),
         ("honor", False),
@@ -92,11 +119,11 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
 
         if enrollment_type == 'honor':
             self.assertEqual(
-                VerificationPartitionScheme.NON_VERIFIED,
+                self.NON_VERIFIED_GROUP,
                 VerificationPartitionScheme.get_group_for_user(
                     self.course.id,
                     user,
-                    self.user_partition
+                    self.verification_partition_configuration
                 )
             )
 
@@ -109,21 +136,21 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
                 and enrollment_type == 'verified'
         ):
             self.assertEqual(
-                VerificationPartitionScheme.VERIFIED_ALLOW,
+                self.VERIFIED_ALLOW_GROUP,
                 VerificationPartitionScheme.get_group_for_user(
                     self.course.id,
                     user,
-                    self.user_partition
+                    self.verification_partition_configuration
                 )
             )
 
         else:
             self.assertEqual(
-                VerificationPartitionScheme.VERIFIED_DENY,
+                self.VERIFIED_DENY_GROUP,
                 VerificationPartitionScheme.get_group_for_user(
                     self.course.id,
                     user,
-                    self.user_partition
+                    self.verification_partition_configuration
                 )
             )
 
@@ -139,11 +166,11 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
         )
 
         self.assertEqual(
-            VerificationPartitionScheme.VERIFIED_ALLOW,
+            self.VERIFIED_ALLOW_GROUP,
             VerificationPartitionScheme.get_group_for_user(
                 self.course.id,
                 user,
-                self.user_partition
+                self.verification_partition_configuration
             )
         )
 
