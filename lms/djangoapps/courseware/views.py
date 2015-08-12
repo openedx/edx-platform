@@ -27,8 +27,9 @@ from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
-from courseware.access import has_access, in_preview_mode, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
+from courseware.access_utils import in_preview_mode
 from courseware.courses import (
     get_courses, get_course, get_course_by_id,
     get_studio_url, get_course_with_access,
