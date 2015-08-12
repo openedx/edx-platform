@@ -58,8 +58,7 @@ git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-clie
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
 -e git+https://github.com/edx/edx-organizations.git@release-2015-08-03#egg=edx-organizations
 
-# when working in devstack comment out edx-proctoring. It's best to not have this in requirements while doing localdev work
--e git+https://github.com/edx/edx-proctoring.git@743a4dbb4cdbfa3c216eff37e7c47c2bb6ef8f2b#egg=edx-proctoring==0.0.4
+-e git+https://github.com/edx/edx-proctoring.git@f33e09d97aff393e7de45a3d64b357ffc1d270a2#egg=edx-proctoring==0.0.4
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

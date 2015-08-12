@@ -48,7 +48,7 @@
                   <i class="fa ${section['proctoring'].get('suggested_icon', 'fa-lock')}  ${section['proctoring'].get('status', 'eligible')}"></i>&nbsp;
                   <span class="subtitle-name">${section['proctoring'].get('short_description', '')}
                   </span>
-                  ## competed proctored exam statuses should not show the due date
+                  ## completed proctored exam statuses should not show the due date
                   ## since the exam has already been submitted by the user
                   % if not section['proctoring'].get('in_completed_state', False):
                     <span class="subtitle-name">${due_date}</span>

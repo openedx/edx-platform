@@ -28,8 +28,8 @@ class InstructorService(object):
         Deletes student state for a problem.
 
         Takes some of the following query parameters
+            - student_identifier is an email or username
             - content_id is a url-name of a problem
-            - unique_student_identifier is an email or username
             - course_id is the id for the course
         """
         course_id = CourseKey.from_string(course_id)

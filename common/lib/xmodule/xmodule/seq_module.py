@@ -164,6 +164,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         fragment = Fragment()
 
+        # Is this sequential part of a timed or proctored exam?
         if self.is_time_limited:
             view_html = self._time_limited_student_view(context)
 
@@ -214,7 +215,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # None = no overridden view rendering
         view_html = None
 
-        # Is this sequent part of a timed or proctored exam?
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
 

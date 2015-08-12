@@ -56,6 +56,14 @@ from openedx.core.djangoapps.credit.api import (
     set_credit_requirement_status
 )
 
+from edx_proctoring.api import (
+    create_exam,
+    create_exam_attempt,
+    update_attempt_status
+)
+from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.tests.test_services import MockCreditService
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
@@ -819,64 +827,23 @@ class TestProctoringRendering(ModuleStoreTestCase):
         """
         Generate TOC for a course with a single chapter/sequence which contains proctored exam
         """
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
-            sequence = self.modulestore.get_item(usage_key)
+        self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
-            sequence.is_time_limited = True
-            sequence.is_proctored_enabled = True
-            sequence.is_practice_exam = is_practice_exam
+        actual = render.toc_for_course(
+            self.request.user,
+            self.request,
+            self.toy_course,
+            self.chapter,
+            'Toy_Videos',
+            self.field_data_cache
+        )
+        section_actual = self._find_section(actual, 'Overview', 'Toy_Videos')
 
-            self.modulestore.update_item(sequence, self.user.id)
-
-            self.toy_course = self.modulestore.get_course(self.course_key)
-
-            # refresh cache after update
-            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.course_key, self.request.user, self.toy_course, depth=2
-            )
-
-            from edx_proctoring.api import (
-                create_exam,
-                create_exam_attempt,
-                update_attempt_status
-            )
-            from edx_proctoring.runtime import set_runtime_service
-            from edx_proctoring.tests.test_services import MockCreditService
-
-            set_runtime_service(
-                'credit',
-                MockCreditService(enrollment_mode=enrollment_mode)
-            )
-
-            exam_id = create_exam(
-                course_id=unicode(self.course_key),
-                content_id=unicode(sequence.location),
-                exam_name='foo',
-                time_limit_mins=10,
-                is_proctored=True,
-                is_practice_exam=is_practice_exam
-            )
-
-            if attempt_status:
-                create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
-                update_attempt_status(exam_id, self.request.user.id, attempt_status)
-
-            actual = render.toc_for_course(
-                self.request.user,
-                self.request,
-                self.toy_course,
-                self.chapter,
-                'Toy_Videos',
-                self.field_data_cache
-            )
-            section_actual = self._find_section(actual, 'Overview', 'Toy_Videos')
-
-            if expected:
-                self.assertIn(expected, [section_actual['proctoring']])
-            else:
-                # we expect there not to be a 'proctoring' key in the dict
-                self.assertNotIn('proctoring', section_actual)
+        if expected:
+            self.assertIn(expected, [section_actual['proctoring']])
+        else:
+            # we expect there not to be a 'proctoring' key in the dict
+            self.assertNotIn('proctoring', section_actual)
 
     @ddt.data(
         (
@@ -943,88 +910,88 @@ class TestProctoringRendering(ModuleStoreTestCase):
         Verifies gated content from the student view rendering of a sequence
         this is labeled as a proctored exam
         """
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
-            sequence = self.modulestore.get_item(usage_key)
 
-            sequence.is_time_limited = True
-            sequence.is_proctored_enabled = True
-            sequence.is_practice_exam = is_practice_exam
+        self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
-            self.modulestore.update_item(sequence, self.user.id)
-
-            self.toy_course = self.modulestore.get_course(self.course_key)
-
-            # refresh cache after update
-            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.course_key, self.request.user, self.toy_course, depth=2
+        # initialize some credit requirements, if so then specify
+        if with_credit_context:
+            credit_course = CreditCourse(course_key=self.course_key, enabled=True)
+            credit_course.save()
+            set_credit_requirements(
+                self.course_key,
+                [
+                    {
+                        'namespace': 'reverification',
+                        'name': 'reverification-1',
+                        'display_name': 'ICRV1',
+                        'criteria': {},
+                    },
+                    {
+                        'namespace': 'proctored-exam',
+                        'name': 'Exam1',
+                        'display_name': 'A Proctored Exam',
+                        'criteria': {}
+                    }
+                ]
             )
 
-            from edx_proctoring.api import (
-                create_exam,
-                create_exam_attempt,
-                update_attempt_status
-            )
-            from edx_proctoring.runtime import set_runtime_service
-            from edx_proctoring.tests.test_services import MockCreditService
-
-            set_runtime_service(
-                'credit',
-                MockCreditService(enrollment_mode=enrollment_mode)
+            set_credit_requirement_status(
+                self.request.user.username,
+                self.course_key,
+                'reverification',
+                'ICRV1'
             )
 
-            exam_id = create_exam(
-                course_id=unicode(self.course_key),
-                content_id=unicode(sequence.location),
-                exam_name='foo',
-                time_limit_mins=10,
-                is_proctored=True,
-                is_practice_exam=is_practice_exam
-            )
+        module = render.get_module(
+            self.request.user,
+            self.request,
+            self.usage_key,
+            self.field_data_cache,
+            wrap_xmodule_display=True,
+        )
+        content = module.render(STUDENT_VIEW).content
 
-            if attempt_status:
-                create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
-                update_attempt_status(exam_id, self.request.user.id, attempt_status)
+        self.assertIn(expected, content)
 
-            # initialize some credit requirements, if so specified
-            if with_credit_context:
-                credit_course = CreditCourse(course_key=self.course_key, enabled=True)
-                credit_course.save()
-                set_credit_requirements(
-                    self.course_key,
-                    [
-                        {
-                            'namespace': 'reverification',
-                            'name': 'reverification-1',
-                            'display_name': 'ICRV1',
-                            'criteria': {},
-                        },
-                        {
-                            'namespace': 'proctored-exam',
-                            'name': 'Exam1',
-                            'display_name': 'A Proctored Exam',
-                            'criteria': {}
-                        }
-                    ]
-                )
+    def _setup_test_data(self, enrollment_mode, is_practice_exam, attempt_status):
+        """
+        Helper method to consolidate some courseware/proctoring/credit
+        test harness data
+        """
+        self.usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
+        sequence = self.modulestore.get_item(self.usage_key)
 
-                set_credit_requirement_status(
-                    self.request.user.username,
-                    self.course_key,
-                    'reverification',
-                    'ICRV1'
-                )
+        sequence.is_time_limited = True
+        sequence.is_proctored_enabled = True
+        sequence.is_practice_exam = is_practice_exam
 
-            module = render.get_module(
-                self.request.user,
-                self.request,
-                usage_key,
-                self.field_data_cache,
-                wrap_xmodule_display=True,
-            )
-            content = module.render(STUDENT_VIEW).content
+        self.modulestore.update_item(sequence, self.user.id)
 
-            self.assertIn(expected, content)
+        self.toy_course = self.modulestore.get_course(self.course_key)
+
+        # refresh cache after update
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course_key, self.request.user, self.toy_course, depth=2
+        )
+
+        set_runtime_service(
+            'credit',
+            MockCreditService(enrollment_mode=enrollment_mode)
+        )
+
+        exam_id = create_exam(
+            course_id=unicode(self.course_key),
+            content_id=unicode(sequence.location),
+            exam_name='foo',
+            time_limit_mins=10,
+            is_proctored=True,
+            is_practice_exam=is_practice_exam
+        )
+
+        if attempt_status:
+            create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
+            update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
 
     def _find_url_name(self, toc, url_name):
         """
