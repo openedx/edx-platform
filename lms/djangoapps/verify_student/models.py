@@ -1286,6 +1286,8 @@ class SkippedReverification(models.Model):
     If a user skipped a Reverification checkpoint for a specific course then in
     future that user cannot see the reverification link.
     """
+
+    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}"
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, db_index=True)
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
@@ -1307,6 +1309,8 @@ class SkippedReverification(models.Model):
             None
         """
         cls.objects.create(checkpoint=checkpoint, user_id=user_id, course_id=course_id)
+        cache_key = cls.cache_key_name(*[user_id, unicode(course_id)])
+        cache.set(cache_key, True)
 
     @classmethod
     def check_user_skipped_reverification_exists(cls, user, course_id):
@@ -1320,4 +1324,18 @@ class SkippedReverification(models.Model):
         Returns:
             Boolean
         """
-        return cls.objects.filter(user=user, course_id=course_id).exists()
+        cache_key = cls.cache_key_name(*[user.id, unicode(course_id)])
+        has_skipped = cache.get(cache_key)
+        if has_skipped is None:
+            has_skipped = cls.objects.filter(user=user, course_id=course_id).exists()
+            cache.set(cache_key, has_skipped)
+        return has_skipped
+
+    @classmethod
+    def cache_key_name(cls, *args):
+        """Return the name of the key to use to cache the current configuration"""
+        if len(args) != 2:
+            raise TypeError(
+                "cache_key_name() takes exactly {} arguments ({} given)".format(2, len(args))
+            )
+        return cls.USER_SKIPPED_VERIFICATION_CACHE_KEY.format(u','.join(unicode(arg) for arg in args))
