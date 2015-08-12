@@ -43,14 +43,14 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         Test the data migration
         """
         # Set up the data to be migrated
-        user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
+        user = User.objects.create(email='testuser@edx.org', username='testuser_tmcv2', password='testpassword', is_active=True)
         group = Group.objects.create(name='Test Group')
         group_profile = api_models.GroupProfile.objects.create(group=group)
         course_group = api_models.CourseGroupRelationship.objects.create(course_id=self.bad_style_course_id, group=group)
         course_content_group = api_models.CourseContentGroupRelationship.objects.create(course_id=self.bad_style_course_id, content_id=self.bad_style_content_id, group_profile=group_profile)
         course_module_completion = CourseModuleCompletion.objects.create(user=user, course_id=self.bad_style_course_id, content_id=self.bad_style_content_id)
 
-        user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
+        user2 = User.objects.create(email='testuser2@edx.org', username='testuser_tmcv2_2', password='testpassword2', is_active=True)
         group2 = Group.objects.create(name='Test Group2')
         group_profile2 = api_models.GroupProfile.objects.create(group=group2)
         course_group2 = api_models.CourseGroupRelationship.objects.create(course_id=self.bad_style_course_id2, group=group2)

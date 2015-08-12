@@ -40,7 +40,7 @@ class ApiManagerReceiversTests(ModuleStoreTestCase):
             display_name="Overview"
         )
 
-        self.user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
+        self.user = User.objects.create(email='testuser@edx.org', username='testuser_amrt', password='testpassword', is_active=True)
 
     def test_receiver_on_course_deleted(self):
         """
