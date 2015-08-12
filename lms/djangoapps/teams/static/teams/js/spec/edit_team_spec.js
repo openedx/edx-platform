@@ -94,6 +94,7 @@ define([
 
         it('can create a team', function () {
             var requests = AjaxHelpers.requests(this);
+            spyOn(Backbone, 'trigger');
 
             teamEditView.$('.u-field-name input').val(teamsData.name);
             teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
@@ -105,6 +106,7 @@ define([
             AjaxHelpers.respondWithJson(requests, _.extend(_.extend({}, teamsData), { id: '123'}));
 
             expect(teamEditView.$('.create-team.wrapper-msg .copy').text().trim().length).toBe(0);
+            expect(Backbone.trigger.calls[0].args[0]).toBe('teamModel:add');
             expect(Backbone.history.navigate.calls[0].args).toContain('teams/awesomeness/123');
         });
 
