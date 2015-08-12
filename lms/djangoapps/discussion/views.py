@@ -376,7 +376,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
             add_courseware_context(threads, course, request.user)
 
         for thread in threads:
-            add_thread_group_name(thread, course_key)
             # patch for backward compatibility with comments service
             if "pinned" not in thread:
                 thread["pinned"] = False
