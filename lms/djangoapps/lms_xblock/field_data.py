@@ -3,8 +3,7 @@
 """
 
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
-from xblock.fields import Scope, RemoteScope
-from xblock.runtime import KeyValueStore
+from xblock.fields import Scope
 
 class LmsFieldData(SplitFieldData):
     """
@@ -13,7 +12,7 @@ class LmsFieldData(SplitFieldData):
     and all UserScope.NONE fields from `authored_data`. It also prevents
     writing to `authored_data`.
     """
-    def __init__(self, authored_data, student_data, shared_data=None):
+    def __init__(self, authored_data, student_data):
         # Make sure that we don't repeatedly nest LmsFieldData instances
         if isinstance(authored_data, LmsFieldData):
             authored_data = authored_data._authored_data  # pylint: disable=protected-access
@@ -31,7 +30,7 @@ class LmsFieldData(SplitFieldData):
             Scope.user_state_summary: student_data,
             Scope.user_state: student_data,
             Scope.user_info: student_data,
-            Scope.preferences: student_data
+            Scope.preferences: student_data,
         })
 
     def __repr__(self):

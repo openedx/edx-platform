@@ -315,8 +315,6 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     """
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
 
-    shared_data = student_data
-
     def make_xqueue_callback(dispatch='score_update'):
         """
         Returns fully qualified callback URL for external queueing system
@@ -602,7 +600,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
-    field_data = LmsFieldData(descriptor._field_data, student_data, shared_data)  # pylint: disable=protected-access
+    field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
     user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
 
