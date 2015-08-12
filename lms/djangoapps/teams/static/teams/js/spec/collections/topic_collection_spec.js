@@ -69,5 +69,11 @@ define(['URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/co
                 topicCollection.course_id = 'my+course+id';
                 testRequestParam(this, 'course_id', 'my+course+id');
             });
+
+            it ('refreshes the page on "teamModel:add" event', function () {
+                spyOn(topicCollection, 'goTo');
+                Backbone.trigger('teamModel:add', {});
+                expect(topicCollection.goTo.calls[0].args[0]).toBe(1);
+            });
         });
     });

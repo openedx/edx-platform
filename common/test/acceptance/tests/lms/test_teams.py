@@ -721,6 +721,10 @@ class CreateTeamTest(TeamsTabBase):
         self.assertEqual(team_page.team_name, self.team_name)
         self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
 
+        topics_page = BrowseTopicsPage(self.browser, self.course_id)
+        topics_page.visit()
+        self.assertEqual(topics_page.topic_card_counts[0], '1 Team')
+
     def test_user_can_cancel_the_team_creation(self):
         """
         Scenario: The user should be able to cancel the creation of new team.

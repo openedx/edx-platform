@@ -119,6 +119,8 @@
 
                     this.teamModel.save(data, { wait: true })
                         .done(function(result) {
+                            // So that the topics list can be refreshed.
+                            Backbone.trigger('teamModel:add', view.teamModel);
                             Backbone.history.navigate(
                                 'teams/' + view.topicId + '/' + view.teamModel.id,
                                 {trigger: true}

@@ -11,6 +11,7 @@ from .fields import FieldsMixin
 
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
+TOPIC_CARD_COUNT_CSS = 'div.wrapper-card-meta .team-count'
 TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
 TEAMS_LINK_CSS = '.action-view'
@@ -84,6 +85,11 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
     def topic_cards(self):
         """Return a list of the topic cards present on the page."""
         return self.q(css=TOPIC_CARD_CSS).results
+
+    @property
+    def topic_card_counts(self):
+        """Return a list of the topic card counts present on the page."""
+        return self.q(css=TOPIC_CARD_COUNT_CSS).text
 
     def browse_teams_for_topic(self, topic_name):
         """

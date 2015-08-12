@@ -15,9 +15,15 @@
                     this.registerSortableField('name', gettext('name'));
                     // Translators: This refers to the number of teams (a count of how many teams there are)
                     this.registerSortableField('team_count', gettext('team count'));
+
+                    this.listenTo(Backbone, 'teamModel:add', this.refreshCurrentPage);
                 },
 
-                model: TopicModel
+                model: TopicModel,
+
+                refreshCurrentPage: function() {
+                    this.goTo(this.currentPage);
+                }
             });
             return TopicCollection;
     });
