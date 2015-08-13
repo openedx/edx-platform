@@ -90,7 +90,7 @@
         width: flex-grid(.5) + flex-gutter();
 
         &:hover, &:focus {
-          color: #333;
+          color: $link-color;
         }
 
         .calc-button-label {
@@ -134,8 +134,6 @@
           padding: 10px;
           -webkit-appearance: none;
           width: 100%;
-          background: $black;
-          color: $white;
 
           &:focus {
             border: none;
