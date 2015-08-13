@@ -8,6 +8,3 @@
 -e common/lib/sandbox-packages
 -e common/lib/symmath
 -e common/lib/xmodule
--e common/lib/XBlock
--e common/lib/RecommenderXBlock
--e common/lib/RichReviewXBlock
