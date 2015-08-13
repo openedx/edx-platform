@@ -1343,6 +1343,9 @@ class SkippedReverification(models.Model):
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # caceh key format e.g skipped_reverification.{}.{}=skipped_reverification.1.edx/demo/course
+    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}.{}"
+
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
 
@@ -1372,4 +1375,28 @@ class SkippedReverification(models.Model):
         Returns:
             Boolean
         """
-        return cls.objects.filter(user=user, course_id=course_id).exists()
+        #return cls.objects.filter(user=user, course_id=course_id).exists()
+        cache_key = cls.cache_key_name(user.id, unicode(course_id))
+        has_skipped = cache.get(cache_key)
+        if has_skipped is None:
+            has_skipped = cls.objects.filter(user=user, course_id=course_id).exists()
+            cache.set(cache_key, has_skipped)
+        return has_skipped
+
+    @classmethod
+    def cache_key_name(cls, user_id, course_key):
+        """Return the name of the key to use to cache the current configuration"""
+        return cls.USER_SKIPPED_VERIFICATION_CACHE_KEY.format(user_id, unicode(course_key))
+
+
+@receiver(models.signals.post_save, sender=SkippedReverification)
+@receiver(models.signals.post_delete, sender=SkippedReverification)
+def invalidate_skipped_verification_cache(sender, **kwargs):  # pylint: disable=unused-argument
+    """Invalidate the cache of skipped verification model. """
+    instance = kwargs['instance']
+
+    cache_key = SkippedReverification.cache_key_name(
+        instance.user.id,
+        unicode(unicode(instance.course_id))
+    )
+    cache.delete(cache_key)
