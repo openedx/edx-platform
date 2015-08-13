@@ -45,6 +45,42 @@ class TeamsPage(CoursePage):
         """ View the Browse tab of the Teams page. """
         self.q(css=BROWSE_BUTTON_CSS).click()
 
+    def verify_team_count_in_first_topic(self, expected_count):
+        """
+        Verify that the team count on the first topic card in the topic list is correct
+        (browse topics page).
+        """
+        self.wait_for(
+            lambda: self.q(css='.team-count')[0].text == "0 Teams" if expected_count == 0 else "1 Team",
+            description="Team count text on topic is wrong"
+        )
+
+    def verify_topic_team_count(self, expected_count):
+        """ Verify the number of teams listed on the topic page (browse teams within topic). """
+        self.wait_for(
+            lambda: len(self.q(css='.team-card')) == expected_count,
+            description="Expected number of teams is wrong"
+        )
+
+    def verify_my_team_count(self, expected_count):
+        """ Verify the number of teams on 'My Team'. """
+
+        # Click to "My Team" and verify that it contains the expected number of teams.
+        self.q(css=MY_TEAMS_BUTTON_CSS).click()
+
+        self.wait_for(
+            lambda: len(self.q(css='.team-card')) == expected_count,
+            description="Expected number of teams is wrong"
+        )
+
+    def click_all_topics(self):
+        """ Click on the "All Topics" breadcrumb """
+        self.q(css='a.nav-item').filter(text='All Topics')[0].click()
+
+    def click_specific_topic(self, topic):
+        """ Click on the breadcrumb for a specific topic """
+        self.q(css='a.nav-item').filter(text=topic)[0].click()
+
 
 class MyTeamsPage(CoursePage, PaginatedUIMixin):
     """
@@ -284,10 +320,14 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         """Verifies that team leave link is present"""
         return self.q(css='.leave-team-link').present
 
-    def click_leave_team_link(self):
+    def click_leave_team_link(self, remaining_members=0):
         """ Click on Leave Team link"""
         self.q(css='.leave-team-link').first.click()
-        self.wait_for_ajax()
+        self.wait_for(
+            lambda: self.join_team_button_present,
+            description="Join Team button did not become present"
+        )
+        self.wait_for_capacity_text(remaining_members)
 
     @property
     def team_members(self):
@@ -303,10 +343,29 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         """Returns the username of team member"""
         return self.q(css='.page-content-secondary .tooltip-custom').text[0]
 
-    def click_join_team_button(self):
+    def click_join_team_button(self, total_members=1):
         """ Click on Join Team button"""
         self.q(css='.join-team .action-primary').first.click()
-        self.wait_for_ajax()
+        self.wait_for(
+            lambda: not self.join_team_button_present,
+            description="Join Team button did not go away"
+        )
+        self.wait_for_capacity_text(total_members)
+
+    def wait_for_capacity_text(self, num_members, max_size=10):
+        """ Wait for the team capacity text to be correct. """
+        self.wait_for(
+            lambda: self.team_capacity_text == self.format_capacity_text(num_members, max_size),
+            description="Team capacity text is not correct"
+        )
+
+    def format_capacity_text(self, num_members, max_size):
+        """ Helper method to format the expected team capacity text. """
+        return '{num_members} / {max_size} {members_text}'.format(
+            num_members=num_members,
+            max_size=max_size,
+            members_text='Member' if num_members == max_size else 'Members'
+        )
 
     @property
     def join_team_message(self):
@@ -317,7 +376,6 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     @property
     def join_team_button_present(self):
         """ Returns True if Join Team button is present else False """
-        self.wait_for_ajax()
         return self.q(css='.join-team .action-primary').present
 
     @property
