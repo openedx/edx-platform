@@ -1359,7 +1359,7 @@ class CourseEnrollment(models.Model):
 
 @receiver(models.signals.post_save, sender=CourseEnrollment)
 @receiver(models.signals.post_delete, sender=CourseEnrollment)
-def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
+def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """Invalidate the cache of CourseEnrollment model. """
 
     cache_key = CourseEnrollment.cache_key_name(

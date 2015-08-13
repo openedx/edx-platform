@@ -1301,7 +1301,7 @@ class VerificationStatus(models.Model):
 
 @receiver(models.signals.post_save, sender=VerificationStatus)
 @receiver(models.signals.post_delete, sender=VerificationStatus)
-def invalidate_verification_status_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
+def invalidate_verification_status_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """Invalidate the cache of VerificationStatus model. """
 
     cache_key = VerificationStatus.cache_key_name(
@@ -1340,7 +1340,7 @@ class SkippedReverification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     # caceh key format e.g skipped_reverification.{}.{}=skipped_reverification.1.edx/demo/course
-    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}.{}"
+    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}.{}"  # pylint: disable=invalid-name
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
@@ -1392,7 +1392,7 @@ class SkippedReverification(models.Model):
 
 @receiver(models.signals.post_save, sender=SkippedReverification)
 @receiver(models.signals.post_delete, sender=SkippedReverification)
-def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
+def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """Invalidate the cache of skipped verification model. """
 
     cache_key = SkippedReverification.cache_key_name(
