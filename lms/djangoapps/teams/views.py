@@ -793,8 +793,17 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         """GET /api/team/v0/team_membership"""
         specified_username_or_team = False
         username = None
-        valid_courses = None
         team_id = None
+        requested_course_id = None
+        requested_course_key = None
+        accessible_course_ids = None
+
+        if 'course_id' in request.QUERY_PARAMS:
+            requested_course_id = request.QUERY_PARAMS['course_id']
+            try:
+                requested_course_key = CourseKey.from_string(requested_course_id)
+            except InvalidKeyError:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         if 'team_id' in request.QUERY_PARAMS:
             specified_username_or_team = True
@@ -803,6 +812,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 team = CourseTeam.objects.get(team_id=team_id)
             except CourseTeam.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
+            if requested_course_key is not None and requested_course_key != team.course_id:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             if not has_team_api_access(request.user, team.course_id):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -816,11 +827,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 staff_courses = (
                     CourseAccessRole.objects.filter(user=request.user, role='staff').values_list('course_id', flat=True)
                 )
-                valid_courses = [
-                    CourseKey.from_string(course_key_string)
-                    for course_list in [enrolled_courses, staff_courses]
-                    for course_key_string in course_list
-                ]
+                accessible_course_ids = [item for sublist in (enrolled_courses, staff_courses) for item in sublist]
+                if requested_course_id is not None and requested_course_id not in accessible_course_ids:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not specified_username_or_team:
             return Response(
@@ -828,7 +837,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        queryset = CourseTeamMembership.get_memberships(username, valid_courses, team_id)
+        course_keys = None
+        if requested_course_key is not None:
+            course_keys = [requested_course_key]
+        elif accessible_course_ids is not None:
+            course_keys = [CourseKey.from_string(course_string) for course_string in accessible_course_ids]
+
+        queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)
         serializer = self.get_pagination_serializer(page)
         return Response(serializer.data)  # pylint: disable=maybe-no-member
