@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
+from util.organizations_helpers import get_course_organizations
 
 from certificates.models import (
     CertificateStatuses,
@@ -21,7 +22,8 @@ from certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateGenerationConfiguration,
     ExampleCertificateSet,
-    GeneratedCertificate
+    GeneratedCertificate,
+    CertificateTemplate,
 )
 from certificates.queue import XQueueCertInterface
 
@@ -371,6 +373,46 @@ def get_active_web_certificate(course, is_preview_mode=None):
         if config.get('is_active') or is_preview_mode:
             return config
     return None
+
+
+def get_certificate_template(course_key, mode):
+    """
+    Retrieves the custom certificate template based on course_key and mode.
+    """
+    org_id, template = None, None
+    # fetch organization of the course
+    course_organization = get_course_organizations(course_key)
+    if course_organization:
+        org_id = course_organization[0]['id']
+
+    if org_id and mode:
+        template = CertificateTemplate.objects.filter(
+            organization_id=org_id,
+            course_key=course_key,
+            mode=mode,
+            is_active=True
+        )
+    # if don't template find by org and mode
+    if not template and org_id and mode:
+        template = CertificateTemplate.objects.filter(
+            organization_id=org_id,
+            mode=mode,
+            is_active=True
+        )
+    # if don't template find by only org
+    if not template and org_id:
+        template = CertificateTemplate.objects.filter(
+            organization_id=org_id,
+            is_active=True
+        )
+    # if we still don't template find by only course mode
+    if not template and mode:
+        template = CertificateTemplate.objects.filter(
+            mode=mode,
+            is_active=True
+        )
+
+    return template[0].template if template else None
 
 
 def emit_certificate_event(event_name, user, course_id, course=None, event_data=None):
