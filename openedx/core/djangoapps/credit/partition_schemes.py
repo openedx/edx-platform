@@ -54,6 +54,8 @@ class VerificationPartitionScheme(object):
             string of allowed access group
         """
         checkpoint = user_partition.parameters['location']
+        # here getting cache key names for all models. So that we can make the
+        # list of keys and get the cache.get_many
 
         enrollment_cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
         has_skipped_cache_key = SkippedReverification.cache_key_name(user.id, unicode(course_key))
