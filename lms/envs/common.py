@@ -1806,6 +1806,9 @@ INSTALLED_APPS = (
     # Monitor the status of services
     'service_status',
 
+    # Display status message to students
+    'status',
+
     # For asset pipelining
     'edxmako',
     'pipeline',
