@@ -1,3 +1,6 @@
+<% if (!_.isUndefined(srInfo)) { %>
+  <h2 class="sr" id="<%= srInfo.id %>"><%- srInfo.text %></h2>
+<% } %>
 <div class="search-tools">
     <span class="search-count">
         <%= message %>

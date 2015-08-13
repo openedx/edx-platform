@@ -22,6 +22,13 @@
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   teamsTemplate) {
+            var TeamsHeaderModel = HeaderModel.extend({
+                initialize: function (attributes) {
+                    _.extend(this.defaults, {nav_aria_label: gettext('teams')});
+                    HeaderModel.prototype.initialize.call(this);
+                }
+            });
+
             var ViewWithHeader = Backbone.View.extend({
                 initialize: function (options) {
                     this.header = options.header;
@@ -57,6 +64,12 @@
                     router = this.router = new Backbone.Router();
                     _.each([
                         [':default', _.bind(this.routeNotFound, this)],
+                        ['content', _.bind(function () {
+                            // The backbone router unfortunately usurps the
+                            // default behavior of in-page-links.  This hack
+                            // prevents the screen reader in-page-link from
+                            // being picked up by the backbone router.
+                        }, this)],
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
@@ -102,7 +115,7 @@
 
                     this.mainView = this.tabbedView = new ViewWithHeader({
                         header: new HeaderView({
-                            model: new HeaderModel({
+                            model: new TeamsHeaderModel({
                                 description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
                                 title: gettext("Teams")
                             })
@@ -113,7 +126,11 @@
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
-                                title: gettext('Browse'),
+                                title: interpolate(
+                                    // Translators: sr_start and sr_end surround text meant only for screen readers.  The whole string will be shown to users as "Browse teams" if they are using a screenreader, and "Browse" otherwise.
+                                    gettext("Browse %(sr_start)s teams %(sr_end)s"),
+                                    {"sr_start": '<span class="sr">', "sr_end": '</span>'}, true
+                                ),
                                 url: 'browse',
                                 view: this.topicsView
                             }],
@@ -165,7 +182,7 @@
                     this.getTeamsView(topicID).done(function (teamsView) {
                         self.mainView = new ViewWithHeader({
                             header: new HeaderView({
-                                model: new HeaderModel({
+                                model: new TeamsHeaderModel({
                                     description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know."),
                                     title: gettext("Create a New Team"),
                                     breadcrumbs: [
@@ -277,7 +294,7 @@
                         });
                     }
                     headerView = new HeaderView({
-                        model: new HeaderModel({
+                        model: new TeamsHeaderModel({
                             description: subject.get('description'),
                             title: subject.get('name'),
                             breadcrumbs: breadcrumbs

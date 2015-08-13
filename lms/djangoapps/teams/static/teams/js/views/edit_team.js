@@ -15,6 +15,7 @@
 
                 events: {
                     'click .action-primary': 'createTeam',
+                    'submit form': 'createTeam',
                     'click .action-cancel': 'goBackToTopic'
                 },
 
@@ -48,13 +49,6 @@
                         helpMessage: gettext('A short description of the team to help other learners understand the goals or direction of the team (maximum 300 characters).')
                     });
 
-                    this.optionalDescriptionField = new FieldViews.ReadonlyFieldView({
-                        model: this.teamModel,
-                        title: gettext('Optional Characteristics'),
-                        valueAttribute: 'optional_description',
-                        helpMessage: gettext('Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.')
-                    });
-
                     this.teamLanguageField = new FieldViews.DropdownFieldView({
                         model: this.teamModel,
                         title: gettext('Language'),
@@ -82,7 +76,6 @@
                     this.$el.html(_.template(editTeamTemplate)({primaryButtonTitle: this.primaryButtonTitle}));
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
-                    this.set(this.optionalDescriptionField, '.team-optional-fields');
                     this.set(this.teamLanguageField, '.team-optional-fields');
                     this.set(this.teamCountryField, '.team-optional-fields');
                     return this;
@@ -97,7 +90,8 @@
                     }
                 },
 
-                createTeam: function () {
+                createTeam: function (event) {
+                    event.preventDefault();
                     var view = this,
                         teamLanguage = this.teamLanguageField.fieldValue(),
                         teamCountry = this.teamCountryField.fieldValue();

@@ -4,7 +4,12 @@
         <% if (pennant) { %>
             <small class="card-type"><%- pennant %></small>
         <% } %>
-        <h3 class="card-title"><%- title %></h3>
+        <h3 class="card-title"
+            <% if (!_.isUndefined(srInfo)) { %>
+                aria-describedby="<%= srInfo.id %>"
+            <% } %>
+            ><%- title %>
+        </h3>
         <p class="card-description"><%- description %></p>
     </div>
 </div>
@@ -21,7 +26,12 @@
         <% if (pennant) { %>
             <small class="card-type"><%- pennant %></small>
         <% } %>
-        <h3 class="card-title"><%- title %></h3>
+        <h3 class="card-title"
+            <% if (!_.isUndefined(srInfo)) { %>
+                aria-describedby="<%= srInfo.id %>"
+            <% } %>
+            ><%- title %>
+        </h3>
         <p class="card-description"><%- description %></p>
     </div>
     <div class="card-actions">

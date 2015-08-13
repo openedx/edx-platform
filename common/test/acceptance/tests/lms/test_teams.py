@@ -180,12 +180,12 @@ class TeamsTabTest(TeamsTabBase):
         self.verify_teams_present(True)
 
     @ddt.data(
-        ('browse', 'div.topics-list'),
+        ('browse', '.topics-list'),
         # TODO: find a reliable way to match the "My Teams" tab
         # ('my-teams', 'div.teams-list'),
         ('teams/{topic_id}/{team_id}', 'div.discussion-module'),
         ('topics/{topic_id}/create-team', 'div.create-team-instructions'),
-        ('topics/{topic_id}', 'div.teams-list'),
+        ('topics/{topic_id}', '.teams-list'),
         ('not-a-real-route', 'div.warning')
     )
     @ddt.unpack
@@ -612,7 +612,7 @@ class CreateTeamTest(TeamsTabBase):
 
     def fill_create_form(self):
         """Fill the create team form fields with appropriate values."""
-        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name)
+        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name, press_enter=False)
         self.create_team_page.value_for_textarea_field(
             field_id='description',
             value='The Avengers are a fictional team of superheroes.'
@@ -691,7 +691,8 @@ class CreateTeamTest(TeamsTabBase):
                   'transform themselves through cutting-edge technologies, innovative pedagogy, and '
                   'rigorous courses. More than 70 schools, nonprofits, corporations, and international'
                   'organizations offer or plan to offer courses on the edX website. As of 22 October 2014,'
-                  'edX has more than 4 million users taking more than 500 courses online.'
+                  'edX has more than 4 million users taking more than 500 courses online.',
+            press_enter=False
         )
         self.create_team_page.submit_form()
 

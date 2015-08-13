@@ -8,6 +8,7 @@
     ], function (Backbone, _, gettext, headerTemplate) {
         var PagingHeader = Backbone.View.extend({
             initialize: function (options) {
+                this.srInfo = options.srInfo;
                 this.collections = options.collection;
                 this.collection.bind('add', _.bind(this.render, this));
                 this.collection.bind('remove', _.bind(this.render, this));
@@ -28,7 +29,10 @@
                         context, true
                     );
                 }
-                this.$el.html(_.template(headerTemplate, {message: message}));
+                this.$el.html(_.template(headerTemplate, {
+                    message: message,
+                    srInfo: this.srInfo
+                }));
                 return this;
             }
         });
