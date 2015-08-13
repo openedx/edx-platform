@@ -168,7 +168,7 @@ def has_skipped_any_checkpoint(user, course_key):
     Returns:
         Boolean
     """
-    return SkippedReverification.check_user_skipped_reverification_exists(user, course_key)
+    return SkippedReverification.check_user_skipped_reverification_exists(user.id, course_key)
 
 
 def has_completed_checkpoint(user, course_key, checkpoint):

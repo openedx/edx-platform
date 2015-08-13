@@ -1360,19 +1360,19 @@ class SkippedReverification(models.Model):
         cls.objects.create(checkpoint=checkpoint, user_id=user_id, course_id=course_id)
 
     @classmethod
-    def check_user_skipped_reverification_exists(cls, user, course_id):
+    def check_user_skipped_reverification_exists(cls, user_id, course_id):
         """Check existence of a user's skipped re-verification attempt for a
         specific course.
 
         Arguments:
-            user(User): user object
+            user_id(str): user id
             course_id(CourseKey): CourseKey
 
         Returns:
             Boolean
         """
-        cache_key = cls.cache_key_name(user.id, unicode(course_id))
-        has_skipped = cls.objects.filter(user=user, course_id=course_id).exists()
+        cache_key = cls.cache_key_name(user_id, unicode(course_id))
+        has_skipped = cls.objects.filter(user_id=user_id, course_id=course_id).exists()
         # Set in the cache so that get_many() call can get it from cache.
         cache.set(cache_key, has_skipped)
         return has_skipped
