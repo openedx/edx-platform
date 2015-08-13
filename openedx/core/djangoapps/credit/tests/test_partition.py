@@ -125,21 +125,32 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
         # Check that a user is in verified allow group if that user has skipped
         # any ICRV block.
         user = self.created_user_and_enroll('verified')
-
         SkippedReverification.add_skipped_reverification_attempt(
             checkpoint=self.first_checkpoint,
             user_id=user.id,
             course_id=self.course.id
         )
-
-        self.assertEqual(
-            VerificationPartitionScheme.VERIFIED_ALLOW,
-            VerificationPartitionScheme.get_group_for_user(
-                self.course.id,
-                user,
-                self.user_partition
+        # this will warm the cache.
+        with self.assertNumQueries(2):
+            self.assertEqual(
+                VerificationPartitionScheme.VERIFIED_ALLOW,
+                VerificationPartitionScheme.get_group_for_user(
+                    self.course.id,
+                    user,
+                    self.user_partition
+                )
             )
-        )
+
+        # no db queries this time.
+        with self.assertNumQueries(0):
+            self.assertEqual(
+                VerificationPartitionScheme.VERIFIED_ALLOW,
+                VerificationPartitionScheme.get_group_for_user(
+                    self.course.id,
+                    user,
+                    self.user_partition
+                )
+            )
 
     def test_key_for_partition(self):
         # Test that 'key_for_partition' method of partition scheme

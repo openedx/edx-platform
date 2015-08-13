@@ -1267,7 +1267,7 @@ class VerificationStatus(models.Model):
 
     @classmethod
     def get_all_checkpoints(cls, user_id, course_key):
-        """Return the dict of all checking for a user with specific course
+        """Return dict of all the checkpoints with their status.
         Args:
             user_id(int): Id of user.
             course_key(unicode): Unicode of course key
@@ -1304,9 +1304,8 @@ class VerificationStatus(models.Model):
 
 @receiver(models.signals.post_save, sender=VerificationStatus)
 @receiver(models.signals.post_delete, sender=VerificationStatus)
-def invalidate_enrollment_mode_cache(sender, **kwargs):  # pylint: disable=unused-argument
+def invalidate_verification_status_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
     """Invalidate the cache of VerificationStatus model. """
-    instance = kwargs['instance']
 
     cache_key = VerificationStatus.cache_key_name(
         instance.user.id,
@@ -1384,18 +1383,24 @@ class SkippedReverification(models.Model):
 
     @classmethod
     def cache_key_name(cls, user_id, course_key):
-        """Return the name of the key to use to cache the current configuration"""
+        """Return the name of the key to use to cache the current configuration
+        Arguments:
+            user(User): user object
+            course_key(CourseKey): CourseKey
+
+        Returns:
+            string: cache key name
+        """
         return cls.USER_SKIPPED_VERIFICATION_CACHE_KEY.format(user_id, unicode(course_key))
 
 
 @receiver(models.signals.post_save, sender=SkippedReverification)
 @receiver(models.signals.post_delete, sender=SkippedReverification)
-def invalidate_skipped_verification_cache(sender, **kwargs):  # pylint: disable=unused-argument
+def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
     """Invalidate the cache of skipped verification model. """
-    instance = kwargs['instance']
 
     cache_key = SkippedReverification.cache_key_name(
         instance.user.id,
-        unicode(unicode(instance.course_id))
+        unicode(instance.course_id)
     )
     cache.delete(cache_key)
