@@ -252,7 +252,13 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        student_modules = self._get_student_modules(username, block_keys)
+        if fields is None:
+            self._ddog_increment(evt_time, 'delete_many.empty_state')
+        else:
+            self._ddog_histogram(evt_time, 'delete_many.field_count', len(fields))
+
+        self._ddog_histogram(evt_time, 'delete_many.block_count', len(block_keys))
+
         for student_module, _ in student_modules:
             if fields is None:
                 student_module.state = "{}"
