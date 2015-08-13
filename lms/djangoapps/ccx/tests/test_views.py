@@ -13,7 +13,6 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id  # pyline: disable=import-error
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory  # pylint: disable=import-error
 from courseware.tests.helpers import LoginEnrollmentTestCase  # pylint: disable=import-error
 from courseware.tabs import get_course_tab_list
 from django.core.urlresolvers import reverse
@@ -548,24 +547,16 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for chapter in self.course.get_children():
             for i, section in enumerate(chapter.get_children()):
                 for j, problem in enumerate(section.get_children()):
-                    if not j:
-                        # First iteration. Post-save signal will make the rest.
-                        StudentModuleFactory.create(
-                            grade=1 if i < j else 0,
-                            max_grade=1,
-                            student=self.student,
-                            course_id=self.course.id,
-                            module_state_key=problem.location
-                        )
-                        continue
-                    StudentModule.objects.filter(
+                    # Modules can be created elsewhere as a side effect in the code.
+                    # Don't assume their existence.
+                    module, _created = StudentModule.objects.get_or_create(
                         student=self.student,
                         course_id=self.course.id,
                         module_state_key=problem.location
-                    ).update(
-                        grade=1 if i < j else 0,
-                        max_grade=1
                     )
+                    module.grade = 1 if i < j else 0
+                    module.max_grade = 1
+                    module.save()
 
         self.client.login(username=coach.username, password="test")
 
