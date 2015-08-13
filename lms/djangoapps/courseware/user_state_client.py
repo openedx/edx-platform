@@ -245,12 +245,20 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         Arguments:
             username: The name of the user whose state should be deleted
-            block_key (UsageKey): The UsageKey identifying which xblock state to delete.
+            block_keys (list): The UsageKey identifying which xblock state to delete.
             scope (Scope): The scope to delete data from
             fields: A list of fields to delete. If None, delete all stored fields.
         """
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
+
+        evt_time = time()
+        if fields is None:
+            self._ddog_increment(evt_time, 'delete_many.empty_state')
+        else:
+            self._ddog_histogram(evt_time, 'delete_many.field_count', len(fields))
+
+        self._ddog_histogram(evt_time, 'delete_many.block_count', len(block_keys))
 
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
