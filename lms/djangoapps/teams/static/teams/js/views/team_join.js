@@ -60,12 +60,7 @@ define(['backbone',
                    }).done(function (data) {
                        view.model.fetch({});
                    }).fail(function (data) {
-                       try {
-                           var errors = JSON.parse(data.responseText);
-                           view.showMessage(errors.user_message);
-                       } catch (error) {
-                           view.showMessage(view.errorMessage);
-                       }
+                       TeamUtils.parseAndShowMessage(data, view.errorMessage);
                    });
                },
 
@@ -97,12 +92,7 @@ define(['backbone',
                                info.teamHasSpace = teamHasSpace;
                                deferred.resolve(info);
                            }).fail(function (data) {
-                               try {
-                                   var errors = JSON.parse(data.responseText);
-                                   view.showMessage(errors.user_message);
-                               } catch (error) {
-                                   view.showMessage(view.errorMessage);
-                               }
+                               TeamUtils.parseAndShowMessage(data, view.errorMessage);
                                deferred.reject();
                            });
                        } else {
@@ -111,12 +101,6 @@ define(['backbone',
                    }
 
                    return deferred.promise();
-               },
-
-               showMessage: function (message) {
-                   $('.wrapper-msg').removeClass('is-hidden');
-                   $('.msg-content .copy').text(message);
-                   $('.wrapper-msg').focus();
                }
            });
        });

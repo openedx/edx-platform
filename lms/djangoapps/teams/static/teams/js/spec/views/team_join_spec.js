@@ -1,22 +1,34 @@
 define([
     'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
-    'teams/js/views/team_join', 'teams/js/views/team_profile'
-], function (_, AjaxHelpers, TeamModel, TeamJoinView, TeamProfileView) {
+    'teams/js/views/team_join'
+], function (_, AjaxHelpers, TeamModel, TeamJoinView) {
     'use strict';
     describe('TeamJoinView', function () {
         var createTeamsUrl,
             createTeamModelData,
             createMembershipData,
             createJoinView,
+            verifyErrorMessage,
             ACCOUNTS_API_URL = '/api/user/v1/accounts/',
             TEAMS_URL = '/api/team/v0/teams/',
             TEAMS_MEMBERSHIP_URL = '/api/team/v0/team_membership/';
 
         beforeEach(function () {
             setFixtures(
-                '<div class="msg-content"><div class="copy"></div></div><div class="header-action-view"></div>'
+                '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div><div class="header-action-view"></div></div>'
             );
         });
+
+        verifyErrorMessage = function (requests, errorMessage, expectedMessage, joinTeam) {
+            var view = createJoinView(1, 'ma', createTeamModelData('teamA', 'teamAlpha', []));
+            if (joinTeam) {
+                // if we want the error to return when user try to join team, respond with no membership
+                AjaxHelpers.respondWithJson(requests, {"count": 0});
+                view.$('.action.action-primary').click();
+            }
+            AjaxHelpers.respondWithTextError(requests, 400, errorMessage);
+            expect($('.msg-content .copy').text().trim()).toBe(expectedMessage);
+        };
 
         createTeamsUrl = function (teamId) {
             return TEAMS_URL + teamId + '?expand=user';
@@ -148,27 +160,52 @@ define([
             expect(requests.length).toBe(0);
         });
 
-        it('shows correct error messages', function () {
+        it('shows correct error message if user fails to join team', function () {
             var requests = AjaxHelpers.requests(this);
-
-            var verifyErrorMessage = function (requests, errorMessage, expectedMessage) {
-                createJoinView(1, 'ma', createTeamModelData('teamA', 'teamAlpha', []));
-                AjaxHelpers.respondWithTextError(requests, 400, errorMessage);
-                expect($('.msg-content .copy').text().trim()).toBe(expectedMessage);
-            };
 
             // verify user_message
             verifyErrorMessage(
                 requests,
-                JSON.stringify({'user_message': 'Awesome! You got an error.'}),
-                'Awesome! You got an error.'
+                JSON.stringify({'user_message': "Can't be made member"}),
+                "Can't be made member",
+                true
             );
 
             // verify generic error message
             verifyErrorMessage(
                 requests,
                 '',
-                'An error occurred. Try again.'
+                'An error occurred. Try again.',
+                true
+            );
+
+            // verify error message when json parsing succeeded but error message format is incorrect
+            verifyErrorMessage(
+                requests,
+                JSON.stringify({'blah': "Can't be made member"}),
+                'An error occurred. Try again.',
+                true
+            );
+        });
+
+        it('shows correct error message if initializing the view fails', function () {
+            // Rendering the view sometimes require fetching user's memberships. This may fail.
+            var requests = AjaxHelpers.requests(this);
+
+            // verify user_message
+            verifyErrorMessage(
+                requests,
+                JSON.stringify({'user_message': "Can't return user memberships"}),
+                "Can't return user memberships",
+                false
+            );
+
+            // verify generic error message
+            verifyErrorMessage(
+                requests,
+                '',
+                'An error occurred. Try again.',
+                false
             );
         });
     });
