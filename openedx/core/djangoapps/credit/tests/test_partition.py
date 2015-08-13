@@ -145,7 +145,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
             course_id=self.course.id
         )
         # this will warm the cache.
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             self.assertEqual(
                 VerificationPartitionScheme.VERIFIED_ALLOW,
                 VerificationPartitionScheme.get_group_for_user(
@@ -226,7 +226,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
         # any ICRV block.
         user = self.created_user_and_enroll('honor')
         # this will warm the cache.
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             self.assertEqual(
                 VerificationPartitionScheme.NON_VERIFIED,
                 VerificationPartitionScheme.get_group_for_user(
