@@ -1146,7 +1146,7 @@ class VerificationStatus(models.Model):
     error = models.TextField(null=True, blank=True)
 
     # cache key format e.g verification.<username>.<course_key> = '{verification.1.edx/demo/course}'
-    VERIFICATION_STATUS_CACHE_KEY = "verification.{}.{}"
+    VERIFICATION_STATUS_CACHE_KEY = u"verification.{}.{}"
 
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "timestamp"

@@ -844,7 +844,7 @@ class CourseEnrollment(models.Model):
     objects = CourseEnrollmentManager()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
-    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"
+    COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
