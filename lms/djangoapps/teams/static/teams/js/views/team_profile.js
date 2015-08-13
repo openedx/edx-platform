@@ -6,21 +6,24 @@
     define(['backbone', 'underscore', 'gettext', 'teams/js/views/team_discussion',
             'teams/js/views/team_utils',
             'text!teams/templates/team-profile.underscore',
-            'text!teams/templates/team-member.underscore'
-        ],
+            'text!teams/templates/team-member.underscore'],
         function (Backbone, _, gettext, TeamDiscussionView, TeamUtils, teamTemplate, teamMemberTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
+                errorMessage: gettext("An error occurred. Try again."),
+
                 events: {
-                    'click .invite-link-input': 'selectText'
+                    'click .invite-link-input': 'selectText',
+                    'click .leave-team-link': 'leaveTeam'
                 },
                 initialize: function (options) {
                     this.listenTo(this.model, "change", this.render);
                     this.courseID = options.courseID;
                     this.maxTeamSize = options.maxTeamSize;
-                    this.readOnly = options.readOnly;
                     this.requestUsername = options.requestUsername;
+                    this.isPrivileged = options.isPrivileged;
                     this.teamInviteUrl = options.teamInviteUrl;
+                    this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
 
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(options.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(options.languages);
@@ -28,16 +31,18 @@
                 },
 
                 render: function () {
-                    var memberships = this.model.get('membership');
-                    var discussionTopicID = this.model.get('discussion_topic_id');
+                    var memberships = this.model.get('membership'),
+                        discussionTopicID = this.model.get('discussion_topic_id'),
+                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.requestUsername);
+
                     this.$el.html(_.template(teamTemplate, {
                         courseID: this.courseID,
                         discussionTopicID: discussionTopicID,
-                        readOnly: this.readOnly,
+                        readOnly: !(this.isPrivileged || isMember),
                         country: this.countries[this.model.get('country')],
                         language: this.languages[this.model.get('language')],
                         membershipText: TeamUtils.teamCapacityText(memberships.length, this.maxTeamSize),
-                        isMember: TeamUtils.isUserMemberOfTeam(memberships, this.requestUsername),
+                        isMember: isMember,
                         hasCapacity: memberships.length < this.maxTeamSize,
                         inviteLink: this.teamInviteUrl
 
@@ -65,6 +70,19 @@
                 selectText: function(event) {
                     event.preventDefault();
                     $(event.currentTarget).select();
+                },
+
+                leaveTeam: function (event) {
+                    event.preventDefault();
+                    var view = this;
+                    $.ajax({
+                       type: 'DELETE',
+                       url: view.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
+                    }).done(function (data) {
+                       view.model.fetch({});
+                    }).fail(function (data) {
+                        TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                    });
                 }
             });
 

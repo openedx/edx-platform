@@ -53,6 +53,7 @@
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
+                    this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
@@ -276,16 +277,16 @@
                         courseID = this.courseID;
                     self.getTopic(topicID).done(function(topic) {
                         self.getTeam(teamID, true).done(function(team) {
-                            var readOnly = self.readOnlyDiscussion(team),
-                                view = new TeamProfileView({
+                            var view = new TeamProfileView({
                                     courseID: courseID,
                                     model: team,
-                                    readOnly: readOnly,
                                     maxTeamSize: self.maxTeamSize,
+                                    isPrivileged: self.userInfo.privileged,
                                     requestUsername: self.userInfo.username,
                                     countries: self.countries,
                                     languages: self.languages,
-                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true'  
+                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true',
+                                    teamMembershipDetailUrl: self.teamMembershipDetailUrl
                                 });
                             var teamJoinView = new TeamJoinView(
                                 {
@@ -389,11 +390,11 @@
                     var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                         self = this,
                         deferred = $.Deferred(),
-                        teamUrl;
+                        teamUrl = this.teamsUrl + teamID + (expandUser ? '?expand=user': '');
                     if (team) {
+                        team.url = teamUrl;
                         deferred.resolve(team);
                     } else {
-                        teamUrl = this.teamsUrl + teamID + (expandUser ? '?expand=user': '');
                         team = new TeamModel({
                             id: teamID,
                             url: teamUrl
