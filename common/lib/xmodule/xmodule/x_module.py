@@ -1721,7 +1721,7 @@ class DiscussionService(object):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
         category_map = utils.get_discussion_category_map(course, user)
 
-        cohorts = get_course_cohorts(course_id)
+        cohorts = [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)]
         cohorted_commentables = get_cohorted_commentables(course_id)
 
         course_settings = make_course_settings(course, user)
