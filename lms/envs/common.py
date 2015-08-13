@@ -1259,6 +1259,7 @@ base_application_js = [
     'js/form.ext.js',
     'js/src/ie_shim.js',
     'js/src/accessibility_tools.js',
+    'js/toggle_login_modal.js',
 ]
 
 dashboard_js = (
@@ -1295,7 +1296,6 @@ instructor_dash_js = (
 # JavaScript modules.
 student_account_js = [
     'js/utils/edx.utils.validate.js',
-    'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
     'js/student_account/models/LoginModel.js',
@@ -1312,7 +1312,6 @@ student_account_js = [
 ]
 
 verify_student_js = [
-    'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
     'js/verify_student/models/verification_model.js',
@@ -1505,7 +1504,6 @@ PIPELINE_JS = {
 
         # Application will contain all paths not in courseware_only_js
         'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
-            'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
         ],
