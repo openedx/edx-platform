@@ -772,6 +772,8 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
             requested_group_id = request.GET.get('group_id')
         elif request.method == "POST":
             requested_group_id = request.POST.get('group_id')
+        else:
+            requested_group_id = request.GET.get('group_id')
         if has_permission(request.user, "see_all_cohorts", course_key):
             if not requested_group_id:
                 return None
