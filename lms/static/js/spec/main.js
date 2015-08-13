@@ -800,7 +800,8 @@
         'lms/include/teams/js/spec/views/teams_tab_spec.js',
         'lms/include/teams/js/spec/views/topic_card_spec.js',
         'lms/include/teams/js/spec/views/topic_teams_spec.js',
-        'lms/include/teams/js/spec/views/topics_spec.js'
+        'lms/include/teams/js/spec/views/topics_spec.js',
+        'lms/include/teams/js/spec/views/team_join_spec.js'
     ]);
 
 }).call(this, requirejs, define);

@@ -15,10 +15,9 @@
                     'click .invite-link-input': 'selectText'
                 },
                 initialize: function (options) {
+                    this.listenTo(this.model, "change", this.render);
                     this.courseID = options.courseID;
-                    this.discussionTopicID = this.model.get('discussion_topic_id');
                     this.maxTeamSize = options.maxTeamSize;
-                    this.memberships = this.model.get('membership');
                     this.readOnly = options.readOnly;
                     this.requestUsername = options.requestUsername;
                     this.teamInviteUrl = options.teamInviteUrl;
@@ -29,15 +28,17 @@
                 },
 
                 render: function () {
+                    var memberships = this.model.get('membership');
+                    var discussionTopicID = this.model.get('discussion_topic_id');
                     this.$el.html(_.template(teamTemplate, {
                         courseID: this.courseID,
-                        discussionTopicID: this.discussionTopicID,
+                        discussionTopicID: discussionTopicID,
                         readOnly: this.readOnly,
                         country: this.countries[this.model.get('country')],
                         language: this.languages[this.model.get('language')],
-                        membershipText: TeamUtils.teamCapacityText(this.memberships.length, this.maxTeamSize),
-                        isMember: TeamUtils.isUserMemberOfTeam(this.memberships, this.requestUsername),
-                        hasCapacity: this.memberships.length < this.maxTeamSize,
+                        membershipText: TeamUtils.teamCapacityText(memberships.length, this.maxTeamSize),
+                        isMember: TeamUtils.isUserMemberOfTeam(memberships, this.requestUsername),
+                        hasCapacity: memberships.length < this.maxTeamSize,
                         inviteLink: this.teamInviteUrl
 
                     }));
@@ -52,7 +53,7 @@
 
                 renderTeamMembers: function() {
                     var view = this;
-                    _.each(this.memberships, function(membership) {
+                    _.each(this.model.get('membership'), function(membership) {
                         view.$('.members-info').append(_.template(teamMemberTemplate, {
                             imageUrl: membership.user.profile_image.image_url_medium,
                             username: membership.user.username,
