@@ -58,7 +58,7 @@ git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-clie
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
 -e git+https://github.com/edx/edx-organizations.git@release-2015-08-03#egg=edx-organizations
 
--e git+https://github.com/edx/edx-proctoring.git@a938e7f2b93058a91700544d38bc06b8432c559e#egg=edx-proctoring==0.0.4
+git+https://github.com/edx/edx-proctoring.git@a938e7f2b93058a91700544d38bc06b8432c559e#egg=edx-proctoring==0.0.4
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
