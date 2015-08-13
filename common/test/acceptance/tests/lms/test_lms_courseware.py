@@ -92,9 +92,6 @@ class CoursewareTest(UniqueCourseTest):
         # Set release date for subsection in future.
         self.course_outline.change_problem_release_date_in_studio()
 
-        # Wait for 2 seconds to save new date.
-        time.sleep(2)
-
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
         self._auto_auth(self.USERNAME, self.EMAIL, False)
@@ -218,7 +215,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         # When I Make the exam proctored.
         self.course_outline.make_exam_proctored()
-        time.sleep(2)  # Wait for 2 seconds to save the settings.
 
         # And I login as a verified student.
         LogoutPage(self.browser).visit()
@@ -243,7 +239,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         # When I Make the exam timed.
         self.course_outline.make_exam_timed()
-        time.sleep(2)  # Wait for 2 seconds to save the settings.
 
         # And I login as a verified student.
         LogoutPage(self.browser).visit()

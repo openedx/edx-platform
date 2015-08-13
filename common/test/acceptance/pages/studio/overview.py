@@ -526,6 +526,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".subsection-header-actions .configure-button").first.click()
         self.q(css="#start_date").fill("01/01/2030")
         self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
 
     def make_exam_proctored(self):
         """
@@ -534,6 +535,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css="#id_timed_examination").first.click()
         self.q(css="#id_exam_proctoring").first.click()
         self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
 
     def make_exam_timed(self):
         """
@@ -541,6 +543,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.q(css="#id_timed_examination").first.click()
         self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
 
     def proctoring_items_are_displayed(self):
         """
