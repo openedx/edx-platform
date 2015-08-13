@@ -5,8 +5,9 @@
         'underscore',
         'gettext',
         'js/components/card/views/card',
+        'teams/js/views/team_utils',
         'text!teams/templates/team-country-language.underscore'
-    ], function (Backbone, _, gettext, CardView, teamCountryLanguageTemplate) {
+    ], function (Backbone, _, gettext, CardView, TeamUtils, teamCountryLanguageTemplate) {
         var TeamMembershipView, TeamCountryLanguageView, TeamCardView;
 
         TeamMembershipView = Backbone.View.extend({
@@ -25,15 +26,7 @@
                 var memberships = this.model.get('membership'),
                     maxMemberCount = this.maxTeamSize;
                 this.$el.html(this.template({
-                    membership_message: interpolate(
-                        // Translators: The following message displays the number of members on a team.
-                        ngettext(
-                            '%(member_count)s / %(max_member_count)s Member',
-                            '%(member_count)s / %(max_member_count)s Members',
-                            maxMemberCount
-                        ),
-                        {member_count: memberships.length, max_member_count: maxMemberCount}, true
-                    )
+                    membership_message: TeamUtils.teamCapacityText(memberships.length, maxMemberCount)
                 }));
                 _.each(memberships, function (membership) {
                     this.$('list-member-thumbs').append(

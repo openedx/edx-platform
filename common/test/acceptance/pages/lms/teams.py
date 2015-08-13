@@ -252,3 +252,95 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def team_description(self):
         """Get the team's description as displayed in the page header"""
         return self.q(css=TEAMS_HEADER_CSS + ' .page-description')[0].text
+
+    @property
+    def team_members_present(self):
+        """Verifies that team members are present"""
+        return self.q(css='.page-content-secondary .team-members .team-member').present
+
+    @property
+    def team_capacity_text(self):
+        """Returns team capacity text"""
+        return self.q(css='.page-content-secondary .team-capacity :last-child').text[0]
+
+    @property
+    def team_location(self):
+        """ Returns team location/country. """
+        return self.q(css='.page-content-secondary .team-country :last-child').text[0]
+
+    @property
+    def team_language(self):
+        """ Returns team location/country. """
+        return self.q(css='.page-content-secondary .team-language :last-child').text[0]
+
+    @property
+    def team_user_membership_text(self):
+        """Returns the team membership text"""
+        query = self.q(css='.page-content-secondary > .team-user-membership-status')
+        return query.text[0] if query.present else ''
+
+    @property
+    def team_leave_link_present(self):
+        """Verifies that team leave link is present"""
+        return self.q(css='.leave-team-link').present
+
+    def click_leave_team_link(self):
+        """ Click on Leave Team link"""
+        self.q(css='.leave-team-link').first.click()
+        self.wait_for_ajax()
+
+    @property
+    def team_invite_section_present(self):
+        """Verifies that invite section is present"""
+        return self.q(css='.page-content-secondary .invite-team').present
+
+    @property
+    def team_members(self):
+        """Returns the number of team members in this team"""
+        return len(self.q(css='.page-content-secondary .team-member'))
+
+    def click_first_profile_image(self):
+        """Clicks on first team member's profile image"""
+        self.q(css='.page-content-secondary .members-info > .team-member').first.click()
+
+    @property
+    def first_member_username(self):
+        """Returns the username of team member"""
+        return self.q(css='.page-content-secondary .tooltip-custom').text[0]
+
+    @property
+    def team_invite_help_text(self):
+        """Returns the team invite help text"""
+        return self.q(css='.page-content-secondary .invite-text').text[0]
+
+    @property
+    def team_invite_url(self):
+        """Returns the url of invite link box"""
+        return self.q(css='.page-content-secondary .invite-link-input').attrs('value')[0]
+
+    def click_join_team_button(self):
+        """ Click on Join Team button"""
+        self.q(css='.join-team .action-primary').first.click()
+        self.wait_for_ajax()
+
+    @property
+    def join_team_message(self):
+        """ Returns join team message """
+        self.wait_for_ajax()
+        return self.q(css='.join-team .join-team-message').text[0]
+
+    @property
+    def join_team_button_present(self):
+        """ Returns True if Join Team button is present else False """
+        self.wait_for_ajax()
+        return self.q(css='.join-team .action-primary').present
+
+    @property
+    def join_team_message_present(self):
+        """ Returns True if Join Team message is present else False """
+        return self.q(css='.join-team .join-team-message').present
+
+    @property
+    def new_post_button_present(self):
+        """ Returns True if New Post button is present else False """
+        return self.q(css='.discussion-module .new-post-btn').present

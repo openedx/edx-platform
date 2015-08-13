@@ -17,11 +17,12 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
+            'teams/js/views/team_join',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  teamsTemplate) {
+                  TeamJoinView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function (attributes) {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -52,11 +53,12 @@
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
+                    this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
                     this.userInfo = options.userInfo;
-
+                    this.teamsBaseUrl = options.teamsBaseUrl;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
@@ -241,7 +243,14 @@
                                                 countries: self.countries
                                             }
                                         });
-                                        deferred.resolve(self.createViewWithHeader(teamsView, topic));
+                                        deferred.resolve(
+                                            self.createViewWithHeader(
+                                                {
+                                                    mainView: teamsView,
+                                                    subject: topic
+                                                }
+                                            )
+                                        );
                                     });
                             });
                     }
@@ -267,38 +276,62 @@
                         deferred = $.Deferred(),
                         courseID = this.courseID;
                     self.getTopic(topicID).done(function(topic) {
-                        self.getTeam(teamID).done(function(team) {
-                            var readOnly = self.readOnlyDiscussion(team),
-                                view = new TeamProfileView({
+                        self.getTeam(teamID, true).done(function(team) {
+                            var view = new TeamProfileView({
                                     courseID: courseID,
                                     model: team,
-                                    readOnly: readOnly
+                                    maxTeamSize: self.maxTeamSize,
+                                    isPrivileged: self.userInfo.privileged,
+                                    requestUsername: self.userInfo.username,
+                                    countries: self.countries,
+                                    languages: self.languages,
+                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true',
+                                    teamMembershipDetailUrl: self.teamMembershipDetailUrl
                                 });
-                            deferred.resolve(self.createViewWithHeader(view, team, topic));
+                            var teamJoinView = new TeamJoinView(
+                                {
+                                    model: team,
+                                    teamsUrl: self.teamsUrl,
+                                    maxTeamSize: self.maxTeamSize,
+                                    currentUsername: self.userInfo.username,
+                                    teamMembershipsUrl: self.teamMembershipsUrl
+                                }
+                            );
+                            deferred.resolve(
+                                self.createViewWithHeader(
+                                    {
+                                        mainView: view,
+                                        subject: team,
+                                        parentTopic: topic,
+                                        headerActionsView: teamJoinView
+                                    }
+                                )
+                            );
                         });
                     });
                     return deferred.promise();
                 },
 
-                createViewWithHeader: function (mainView, subject, parentTopic) {
+                createViewWithHeader: function (options) {
                     var router = this.router,
                         breadcrumbs, headerView;
                     breadcrumbs = [{
                         title: gettext('All Topics'),
                         url: '#browse'
                     }];
-                    if (parentTopic) {
+                    if (options.parentTopic) {
                         breadcrumbs.push({
-                            title: parentTopic.get('name'),
-                            url: '#topics/' + parentTopic.id
+                            title: options.parentTopic.get('name'),
+                            url: '#topics/' + options.parentTopic.id
                         });
                     }
                     headerView = new HeaderView({
                         model: new TeamsHeaderModel({
-                            description: subject.get('description'),
-                            title: subject.get('name'),
+                            description: options.subject.get('description'),
+                            title: options.subject.get('name'),
                             breadcrumbs: breadcrumbs
                         }),
+                        headerActionsView: options.headerActionsView,
                         events: {
                             'click nav.breadcrumbs a.nav-item': function (event) {
                                 var url = $(event.currentTarget).attr('href');
@@ -309,7 +342,7 @@
                     });
                     return new ViewWithHeader({
                         header: headerView,
-                        main: mainView
+                        main: options.mainView
                     });
                 },
 
@@ -350,18 +383,21 @@
                  * promise, since the team may need to be fetched from the
                  * server.
                  * @param teamID the string identifier for the requested team
+                 * @param expandUser bool to add the users info.
                  * @returns {promise} a jQuery deferred promise for the team.
                  */
-                getTeam: function (teamID) {
+                getTeam: function (teamID, expandUser) {
                     var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                         self = this,
-                        deferred = $.Deferred();
+                        deferred = $.Deferred(),
+                        teamUrl = this.teamsUrl + teamID + (expandUser ? '?expand=user': '');
                     if (team) {
+                        team.url = teamUrl;
                         deferred.resolve(team);
                     } else {
                         team = new TeamModel({
                             id: teamID,
-                            url: this.teamsUrl + teamID
+                            url: teamUrl
                         });
                         team.fetch()
                             .done(function() {
