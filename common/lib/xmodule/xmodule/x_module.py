@@ -1711,7 +1711,7 @@ class DiscussionService(object):
         course = get_course_with_access(self.runtime.user, 'load', course_id, check_if_enrolled=True)
         user_cohort_id = get_cohort_id(user, course_id)
 
-        unsafethreads, query_params = get_threads(request, course_id)
+        unsafethreads, query_params = get_threads(request, course)
         threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
         utils.add_courseware_context(threads, course, user)
 
