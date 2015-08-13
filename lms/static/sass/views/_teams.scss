@@ -173,6 +173,12 @@
     }
   }
 
+  // reset general ul styles
+  .cards-list {
+    margin: 0;
+    padding: 0;
+  }
+
   .card {
     @include clearfix();
     transition: all $tmg-f2 ease-in-out;
