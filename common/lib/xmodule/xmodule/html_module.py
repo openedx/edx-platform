@@ -275,8 +275,20 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: d
 
     def index_dictionary(self):
         xblock_body = super(HtmlDescriptor, self).index_dictionary()
+        # Removing script and style
+        html_content = re.sub(
+            re.compile(
+                r"""
+                    <script>.*?</script> |
+                    <style>.*?</style>
+                """,
+                re.DOTALL |
+                re.VERBOSE),
+            "",
+            self.data
+        )
         # Removing HTML-encoded non-breaking space characters
-        html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(self.data))
+        html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(html_content))
         # Removing HTML CDATA
         html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
         # Removing HTML comments

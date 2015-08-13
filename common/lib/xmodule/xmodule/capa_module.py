@@ -196,8 +196,20 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Return dictionary prepared with module content and type for indexing.
         """
         xblock_body = super(CapaDescriptor, self).index_dictionary()
-        # Removing solution
-        capa_content = re.sub(re.compile(r"<solution>.*</solution>", re.DOTALL), "", self.data)
+        # Removing solutions and hints, as well as script and style
+        capa_content = re.sub(
+            re.compile(
+                r"""
+                    <solution>.*?</solution> |
+                    <script>.*?</script> |
+                    <style>.*?</style> |
+                    <[a-z]*hint.*?>.*?</[a-z]*hint>
+                """,
+                re.DOTALL |
+                re.VERBOSE),
+            "",
+            self.data
+        )
         # Removing HTML-encoded non-breaking space characters
         capa_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(capa_content))
         # Removing HTML CDATA
