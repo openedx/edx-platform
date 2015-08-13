@@ -1375,7 +1375,6 @@ class SkippedReverification(models.Model):
         Returns:
             Boolean
         """
-        #return cls.objects.filter(user=user, course_id=course_id).exists()
         cache_key = cls.cache_key_name(user.id, unicode(course_id))
         has_skipped = cache.get(cache_key)
         if has_skipped is None:

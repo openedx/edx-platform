@@ -55,17 +55,44 @@ class VerificationPartitionScheme(object):
         """
         checkpoint = user_partition.parameters['location']
 
-        if (
-                not is_enrolled_in_verified_mode(user, course_key)
-        ):
+        enrollment_cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
+        has_skipped_cache_key = SkippedReverification.cache_key_name(user.id, unicode(course_key))
+        verification_status_cache_key = VerificationStatus.cache_key_name(user.id, unicode(course_key))
+
+        cache_keys = [
+            enrollment_cache_key, has_skipped_cache_key, verification_status_cache_key
+        ]
+
+        cache_values = cache.get_many(cache_keys)
+
+        if enrollment_cache_key not in cache_values:
+            is_verified = is_enrolled_in_verified_mode(user, course_key)
+        else:
+            enrollment_mode = cache_values[enrollment_cache_key]
+            is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
+
+        if has_skipped_cache_key not in cache_values:
+            has_skipped = has_skipped_any_checkpoint(user, course_key)
+        else:
+            has_skipped = cache_values[has_skipped_cache_key]
+
+        if verification_status_cache_key not in cache_values:
+            verification_statuses = VerificationStatus.get_all_checkpoints(user.id, course_key)
+        else:
+            verification_statuses = cache_values[verification_status_cache_key]
+
+        was_denied = VerificationStatus.DENIED_STATUS in verification_statuses.values()
+        has_completed_check = checkpoint in verification_statuses and (
+            verification_statuses[checkpoint] in [
+                VerificationStatus.SUBMITTED_STATUS, VerificationStatus.APPROVED_STATUS
+            ]
+        )
+
+        if not is_verified:
             # the course content tagged with given 'user_partition' is
             # accessible/visible to all the students
             return cls.NON_VERIFIED
-        elif (
-                has_skipped_any_checkpoint(user, course_key) or
-                was_denied_at_any_checkpoint(user, course_key) or
-                has_completed_checkpoint(user, course_key, checkpoint)
-        ):
+        elif has_skipped or was_denied or has_completed_check:
             # the course content tagged with given 'user_partition' is
             # accessible/visible to the students enrolled as `verified` users
             # and has either `skipped any ICRV` or `was denied at any ICRV
