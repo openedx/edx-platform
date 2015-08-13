@@ -1267,7 +1267,7 @@ class VerificationStatus(models.Model):
 
     @classmethod
     def get_all_checkpoints(cls, user_id, course_key):
-        """Return the dict of all checking for a user with specific course
+        """Return dict of all the checkpoints with their status.
         Args:
             user_id(int): Id of user.
             course_key(unicode): Unicode of course key
@@ -1304,9 +1304,8 @@ class VerificationStatus(models.Model):
 
 @receiver(models.signals.post_save, sender=VerificationStatus)
 @receiver(models.signals.post_delete, sender=VerificationStatus)
-def invalidate_enrollment_mode_cache(sender, **kwargs):  # pylint: disable=unused-argument
+def invalidate_verification_status_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
     """Invalidate the cache of VerificationStatus model. """
-    instance = kwargs['instance']
 
     cache_key = VerificationStatus.cache_key_name(
         instance.user.id,
@@ -1375,7 +1374,6 @@ class SkippedReverification(models.Model):
         Returns:
             Boolean
         """
-        #return cls.objects.filter(user=user, course_id=course_id).exists()
         cache_key = cls.cache_key_name(user.id, unicode(course_id))
         has_skipped = cache.get(cache_key)
         if has_skipped is None:
@@ -1391,9 +1389,8 @@ class SkippedReverification(models.Model):
 
 @receiver(models.signals.post_save, sender=SkippedReverification)
 @receiver(models.signals.post_delete, sender=SkippedReverification)
-def invalidate_skipped_verification_cache(sender, **kwargs):  # pylint: disable=unused-argument
+def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
     """Invalidate the cache of skipped verification model. """
-    instance = kwargs['instance']
 
     cache_key = SkippedReverification.cache_key_name(
         instance.user.id,

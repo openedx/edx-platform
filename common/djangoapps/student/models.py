@@ -1346,7 +1346,7 @@ class CourseEnrollment(models.Model):
 
     @classmethod
     def cache_key_name(cls, user_id, course_key):
-        """Return the name of the key to use to cache the current configuration
+        """Return cache key name to be used to cache current configuration.
         Args:
             user_id(int): Id of user.
             course_key(unicode): Unicode of course key
@@ -1359,9 +1359,8 @@ class CourseEnrollment(models.Model):
 
 @receiver(models.signals.post_save, sender=CourseEnrollment)
 @receiver(models.signals.post_delete, sender=CourseEnrollment)
-def invalidate_enrollment_mode_cache(sender, **kwargs):  # pylint: disable=unused-argument
+def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, disable=invalid-name
     """Invalidate the cache of CourseEnrollment model. """
-    instance = kwargs['instance']
 
     cache_key = CourseEnrollment.cache_key_name(
         instance.user.id,
