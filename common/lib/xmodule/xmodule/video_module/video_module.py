@@ -211,11 +211,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 if not self.sub and val_video_urls["youtube"]:
                     try:
                         download_youtube_subs(val_video_urls["youtube"], self, settings)
-                        item = self.runtime.modulestore.get_item(self.location)
                         youtube_sub = val_video_urls["youtube"]
-                        item.sub = youtube_sub
-                        user = User.objects.get(id=self.system.user_id)
-                        item.save_with_metadata(user)
+                        # item = self.runtime.modulestore.get_item(self.location)
+                        # item.sub = youtube_sub
+                        # user = User.objects.get(id=self.system.user_id)
+                        # item.save_with_metadata(user)
                     except GetTranscriptsFromYouTubeException:
                         # Todo should we cache the youtube hit ?
                         pass
