@@ -1276,17 +1276,14 @@ class VerificationStatus(models.Model):
             dict: {checkpoint:status}
         """
         cache_key = VerificationStatus.cache_key_name(user_id, unicode(course_key))
-        check_points = cache.get(cache_key)
-        if check_points is None:
-            all_checks_points = cls.objects.filter(
-                user_id=user_id,
-                checkpoint__course_id=course_key
-            )
-            check_points = {}
-            for check in all_checks_points:
-                check_points[check.checkpoint.checkpoint_location] = check.status
+        all_checks_points = cls.objects.filter(
+            user_id=user_id, checkpoint__course_id=course_key
+        )
+        check_points = {}
+        for check in all_checks_points:
+            check_points[check.checkpoint.checkpoint_location] = check.status
 
-            cache.set(cache_key, check_points)
+        cache.set(cache_key, check_points)
         return check_points
 
     @classmethod
@@ -1375,10 +1372,9 @@ class SkippedReverification(models.Model):
             Boolean
         """
         cache_key = cls.cache_key_name(user.id, unicode(course_id))
-        has_skipped = cache.get(cache_key)
-        if has_skipped is None:
-            has_skipped = cls.objects.filter(user=user, course_id=course_id).exists()
-            cache.set(cache_key, has_skipped)
+        has_skipped = cls.objects.filter(user=user, course_id=course_id).exists()
+        # Set in the cache so that get_many() call can get it from cache.
+        cache.set(cache_key, has_skipped)
         return has_skipped
 
     @classmethod

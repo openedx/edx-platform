@@ -131,11 +131,11 @@ def is_enrolled_in_verified_mode(user, course_key):
     Returns:
         Boolean
     """
+    # Don't get from cache because this is get through get_many() call from caller
     cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
-    enrollment_mode = cache.get(cache_key)
-    if enrollment_mode is None:
-        enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-        cache.set(cache_key, enrollment_mode)
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    # Set the cache so that get_many call get it.
+    cache.set(cache_key, enrollment_mode)
 
     return enrollment_mode in CourseMode.VERIFIED_MODES
 
