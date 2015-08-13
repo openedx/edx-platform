@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for tagging course content against different user groups.
+Tests for checking user access on ICRV and content blocks
 """
 
 import ddt
@@ -94,8 +94,20 @@ class UserAccessToContent(ModuleStoreTestCase):
         self.gated_problem2 = ItemFactory.create(
             parent=self.gated_vertical,
             category='problem',
-            display_name='Problem 1'
+            display_name='Problem 2'
         )
+
+        self.gated_icrv_x_block = ItemFactory.create(
+            parent=self.gated_vertical,
+            category='edx-reverification-block',
+            display_name='Test Unit Gated X Block 1'
+        )
+
+        self.second_checkpoint = VerificationCheckpoint.objects.create(
+            course_id=self.course.id,
+            checkpoint_location=self.gated_icrv_x_block.location
+        )
+
 
     @ddt.data(
         ("verified", SUBMITTED),
@@ -125,6 +137,7 @@ class UserAccessToContent(ModuleStoreTestCase):
         gated_vertical = modulestore().get_item(self.gated_vertical.location)
         gated_problem1 = modulestore().get_item(self.gated_problem1.location)
         gated_problem2 = modulestore().get_item(self.gated_problem2.location)
+        gated_icrv_xblock = modulestore().get_item(self.gated_icrv_x_block.location)
 
         # creating user and enroll them.
         user = self.created_user_and_enroll(enrollment_type)
@@ -150,6 +163,7 @@ class UserAccessToContent(ModuleStoreTestCase):
             self.assertFalse(_has_group_access(gated_vertical, user, course.id).has_access)
             self.assertFalse(_has_group_access(gated_problem1, user, course.id).has_access)
             self.assertFalse(_has_group_access(gated_problem2, user, course.id).has_access)
+            self.assertTrue(_has_group_access(gated_icrv_xblock, user, course.id).has_access)
 
         # user is in non-verified mode, user group will be NON_VERIFIED
         # Non verified users will have access to all content excluding ICRVs
@@ -169,15 +183,16 @@ class UserAccessToContent(ModuleStoreTestCase):
             self.assertTrue(_has_group_access(gated_vertical, user, course.id).has_access)
             self.assertTrue(_has_group_access(gated_problem1, user, course.id).has_access)
             self.assertTrue(_has_group_access(gated_problem2, user, course.id).has_access)
+            self.assertFalse(_has_group_access(gated_icrv_xblock, user, course.id).has_access)
 
         # user has submitted, denied or approved, user group will be VERIFIED_ALLOW
         elif enrollment_type == 'verified' and verification_status in [self.SUBMITTED, self.APPROVED, self.DENIED, self.SKIPPED]:
             if verification_status == self.SKIPPED:
                 SkippedReverification.add_skipped_reverification_attempt(
-                checkpoint=self.first_checkpoint,
-                user_id=user.id,
-                course_id=self.course.id
-            )
+                    checkpoint=self.first_checkpoint,
+                    user_id=user.id,
+                    course_id=self.course.id
+                )
 
             # allowed users will have access to all content
             self.assertTrue(_has_group_access(course, user, course.id).has_access)
@@ -195,3 +210,4 @@ class UserAccessToContent(ModuleStoreTestCase):
             self.assertTrue(_has_group_access(gated_vertical, user, course.id).has_access)
             self.assertTrue(_has_group_access(gated_problem1, user, course.id).has_access)
             self.assertTrue(_has_group_access(gated_problem2, user, course.id).has_access)
+            self.assertTrue(_has_group_access(gated_icrv_xblock, user, course.id).has_access)

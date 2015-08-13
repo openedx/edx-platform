@@ -578,6 +578,67 @@ class TestCourseTaggingWithVerPartitions(ModuleStoreTestCase):
 
         self._assert_icrv_subtree()
 
+    def test_single_partition_with_multiple_icrv(self):
+        self.icrv_x_block2 = ItemFactory.create(
+            parent=self.icrv_parent_vertical, category='edx-reverification-block', display_name='Test Unit X Block 2'
+        )
+        self.icrv_sibling_problem = ItemFactory.create(
+            parent=self.icrv_parent_vertical,
+            category='problem',
+            display_name='ICRV Sibling Problem'
+        )
+        on_course_publish(self.course.id)
+        icrv_x_block2 = modulestore().get_item(self.icrv_x_block2.location)
+        icrv_x_block = modulestore().get_item(self.icrv_x_block.location)
+        icrv_sibling_problem = modulestore().get_item(self.icrv_sibling_problem.location)
+        icrv_xblock_groups = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
+        sibling_problem_groups = [VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW]
+        self._assert_partitions(icrv_x_block2, icrv_xblock_groups)
+        self._assert_partitions(icrv_x_block, icrv_xblock_groups)
+        self._assert_partitions(icrv_sibling_problem, sibling_problem_groups)
+
+    def test_sequential_icrv_vertical_problem(self):
+        self.section_with_tree3 = ItemFactory.create(
+            parent=self.course, category='chapter', display_name='Test Section Tree 3'
+        )
+        self.subsection_with_problem3 = ItemFactory.create(
+            parent=self.section_with_tree3, category='sequential', display_name='Test Subsection No Tree3'
+        )
+
+        self.icrv_x_block3 = ItemFactory.create(
+            parent=self.section_with_tree3,
+            category='edx-reverification-block',
+            display_name='Test Unit X Block 3'
+        )
+
+        self.gated_vertical3 = ItemFactory.create(
+            parent=self.subsection_with_problem3,
+            category='vertical',
+            display_name='Vertical with gated contents 3'
+        )
+        self.gated_problem31 = ItemFactory.create(
+            parent=self.gated_vertical3,
+            category='problem',
+            display_name='Problem 31'
+        )
+        self.gated_problem32 = ItemFactory.create(
+            parent=self.gated_vertical3,
+            category='problem',
+            display_name='Problem 32'
+        )
+        on_course_publish(self.course.id)
+        icrv_x_block3 = modulestore().get_item(self.icrv_x_block3.location)
+        icrv_xblock_groups = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
+        self._assert_partitions(icrv_x_block3, icrv_xblock_groups)
+
+        gated_vertical3 = modulestore().get_item(self.gated_vertical3.location)
+        gated_problem31 = modulestore().get_item(self.gated_problem31.location)
+        gated_problem32 = modulestore().get_item(self.gated_problem32.location)
+        gated_contents_group_access = [VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW]
+        self._assert_partitions(gated_vertical3, gated_contents_group_access)
+        self._assert_partitions(gated_problem31, gated_contents_group_access)
+        self._assert_partitions(gated_problem32, gated_contents_group_access)
+
     def _get_access_groups_of_verification_partition(self, xblock):
         group_access = []
         for partition_id, group_access in xblock.group_access.items():
