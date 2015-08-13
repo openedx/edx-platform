@@ -96,7 +96,7 @@ class CourseTeamMembership(models.Model):
 
         Args:
             username (unicode, optional): The username to filter on.
-            course_ids (list of unicode, optional) Course Ids to filter on.
+            course_ids (list of unicode, optional) Course IDs to filter on.
             team_id (unicode, optional): The team_id to filter on.
         """
         queryset = cls.objects.all()

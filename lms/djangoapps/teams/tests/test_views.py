@@ -481,11 +481,11 @@ class TestCreateTeamAPI(TeamAPITestCase):
         )
 
     @ddt.data((400, {
-        'name': 'Bad Course Id',
+        'name': 'Bad Course ID',
         'course_id': 'no_such_course',
         'description': "Filler Description"
     }), (404, {
-        'name': "Non-existent course id",
+        'name': "Non-existent course ID",
         'course_id': 'no/such/course',
         'description': "Filler Description"
     }))

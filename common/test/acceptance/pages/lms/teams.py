@@ -11,7 +11,7 @@ from .fields import FieldsMixin
 
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
-TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
+MY_TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
 TEAMS_LINK_CSS = '.action-view'
 TEAMS_HEADER_CSS = '.teams-header'
@@ -55,7 +55,7 @@ class MyTeamsPage(CoursePage, PaginatedUIMixin):
 
     def is_browser_on_page(self):
         """Check if the "My Teams" tab is being viewed."""
-        button_classes = self.q(css=TEAMS_BUTTON_CSS).attrs('class')
+        button_classes = self.q(css=MY_TEAMS_BUTTON_CSS).attrs('class')
         if len(button_classes) == 0:
             return False
         return 'is-active' in button_classes[0]

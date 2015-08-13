@@ -66,8 +66,8 @@ define([
                 el: $('.teams-content'),
                 teamParams: {
                     teamsUrl: teamsUrl,
-                    courseId: "a/b/c",
-                    topicId: 'awesomeness',
+                    courseID: "a/b/c",
+                    topicID: 'awesomeness',
                     topicName: 'Awesomeness',
                     languages: [['a', 'aaa'], ['b', 'bbb']],
                     countries: [['c', 'ccc'], ['d', 'ddd']]

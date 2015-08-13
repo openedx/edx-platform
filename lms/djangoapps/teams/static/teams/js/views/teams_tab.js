@@ -14,12 +14,13 @@
             'teams/js/collections/team_membership',
             'teams/js/views/topics',
             'teams/js/views/team_profile',
-            'teams/js/views/teams',
+            'teams/js/views/my_teams',
+            'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
-                  TopicsView, TeamProfileView, TeamsView, TeamEditView,
+                  TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   teamsTemplate) {
             var ViewWithHeader = Backbone.View.extend({
                 initialize: function (options) {
@@ -41,18 +42,18 @@
                     var router;
                     this.courseID = options.courseID;
                     this.topics = options.topics;
-                    this.teamMemberships = options.teamMemberships;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.maxTeamSize = options.maxTeamSize;
                     this.languages = options.languages;
                     this.countries = options.countries;
-                    this.username = options.username;
+                    this.userInfo = options.userInfo;
+
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
                     // routes, allowing us to capture which tab
-                    // name is being routed to
+                    // name is being routed to.
                     router = this.router = new Backbone.Router();
                     _.each([
                         [':default', _.bind(this.routeNotFound, this)],
@@ -65,23 +66,24 @@
                         router.route.apply(router, route);
                     });
 
-                    this.teamMembershipsCollection = new TeamMembershipCollection(
-                        this.teamMemberships,
+                    this.teamMemberships = new TeamMembershipCollection(
+                        this.userInfo.team_memberships_data,
                         {
                             url: this.teamMembershipsUrl,
                             course_id: this.courseID,
-                            username: this.username,
-                            parse: true,
-
+                            username: this.userInfo.username,
+                            privileged: this.userInfo.privileged,
+                            parse: true
                         }
                     ).bootstrap();
 
-                    this.myTeamsView = new TeamsView({
+                    this.myTeamsView = new MyTeamsView({
                         router: this.router,
-                        collection: this.teamMembershipsCollection,
+                        collection: this.teamMemberships,
+                        teamMemberships: this.teamMemberships,
                         maxTeamSize: this.maxTeamSize,
                         teamParams: {
-                            courseId: this.courseID,
+                            courseID: this.courseID,
                             teamsUrl: this.teamsUrl,
                             languages: this.languages,
                             countries: this.countries
@@ -107,7 +109,7 @@
                         }),
                         main: new TabbedView({
                             tabs: [{
-                                title: gettext('My Teams'),
+                                title: gettext('My Team'),
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
@@ -118,6 +120,24 @@
                             router: this.router
                         })
                     });
+                },
+
+                /**
+                 * Start up the Teams app
+                 */
+                start: function() {
+                    Backbone.history.start();
+
+                    // Navigate to the default page if there is no history:
+                    // 1. If the user belongs to at least one team, jump to the "My Teams" page
+                    // 2. If not, then jump to the "Browse" page
+                    if (Backbone.history.getFragment() === '') {
+                        if (this.teamMemberships.length > 0) {
+                            this.router.navigate('my-teams', {trigger: true});
+                        } else {
+                            this.router.navigate('browse', {trigger: true});
+                        }
+                    }
                 },
 
                 render: function() {
@@ -140,9 +160,9 @@
                 /**
                  * Render the create new team form.
                  */
-                newTeam: function (topicId) {
+                newTeam: function (topicID) {
                     var self = this;
-                    this.getTeamsView(topicId).done(function (teamsView) {
+                    this.getTeamsView(topicID).done(function (teamsView) {
                         self.mainView = new ViewWithHeader({
                             header: new HeaderView({
                                 model: new HeaderModel({
@@ -151,7 +171,7 @@
                                     breadcrumbs: [
                                         {
                                             title: teamsView.main.teamParams.topicName,
-                                            url: '#topics/' + teamsView.main.teamParams.topicId
+                                            url: '#topics/' + teamsView.main.teamParams.topicID
                                         }
                                     ]
                                 })
@@ -186,18 +206,19 @@
                                     url: self.teamsUrl,
                                     per_page: 10
                                 });
-                                this.teamsCollection = collection;
+                                self.teamsCollection = collection;
                                 collection.goTo(1)
                                     .done(function() {
-                                        var teamsView = new TeamsView({
+                                        var teamsView = new TopicTeamsView({
                                             router: router,
+                                            topic: topic,
                                             collection: collection,
+                                            teamMemberships: self.teamMemberships,
                                             maxTeamSize: self.maxTeamSize,
-                                            showActions: true,
                                             teamParams: {
-                                                courseId: self.courseID,
+                                                courseID: self.courseID,
+                                                topicID: topic.get('id'),
                                                 teamsUrl: self.teamsUrl,
-                                                topicId: topic.get('id'),
                                                 topicName: topic.get('name'),
                                                 languages: self.languages,
                                                 countries: self.countries
@@ -412,9 +433,9 @@
                 readOnlyDiscussion: function (team) {
                     var self = this;
                     return !(
-                        this.$el.data('privileged') ||
+                        self.userInfo.privileged ||
                         _.any(team.attributes.membership, function (membership) {
-                            return membership.user.username === self.$el.data('username');
+                            return membership.user.username === self.userInfo.username;
                         })
                     );
                 }
