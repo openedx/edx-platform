@@ -1,7 +1,8 @@
 define([
     'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
+    'teams/js/spec_helpers/team_spec_helpers',
     'teams/js/views/team_join'
-], function (_, AjaxHelpers, TeamModel, TeamJoinView) {
+], function (_, AjaxHelpers, TeamModel, TeamSpecHelpers, TeamJoinView) {
     'use strict';
     describe('TeamJoinView', function () {
         var createTeamsUrl,
@@ -61,6 +62,7 @@ define([
 
             var teamJoinView = new TeamJoinView(
                 {
+                    courseID: TeamSpecHelpers.testCourseID,
                     model: model,
                     teamsUrl: createTeamsUrl(teamId),
                     maxTeamSize: maxTeamSize,
@@ -91,7 +93,9 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                TEAMS_MEMBERSHIP_URL + '?' + $.param({"username": currentUsername})
+                TEAMS_MEMBERSHIP_URL + '?' + $.param({
+                    'username': currentUsername, 'course_id': TeamSpecHelpers.testCourseID
+                })
             );
 
             // current user is not a member of any team so we should see the Join Team button
@@ -134,7 +138,9 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                TEAMS_MEMBERSHIP_URL + '?' + $.param({"username": currentUsername})
+                TEAMS_MEMBERSHIP_URL + '?' + $.param({
+                    'username': currentUsername, 'course_id': TeamSpecHelpers.testCourseID
+                })
             );
 
             // current user is a member of another team so we should see the correct message

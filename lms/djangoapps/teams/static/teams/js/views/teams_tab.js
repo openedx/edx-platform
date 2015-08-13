@@ -290,6 +290,7 @@
                                 });
                             var teamJoinView = new TeamJoinView(
                                 {
+                                    courseID: courseID,
                                     model: team,
                                     teamsUrl: self.teamsUrl,
                                     maxTeamSize: self.maxTeamSize,
