@@ -1,13 +1,15 @@
 define([
+    'backbone',
     'underscore',
     'teams/js/collections/team',
     'teams/js/collections/team_membership',
-], function (_, TeamCollection, TeamMembershipCollection) {
+], function (Backbone, _, TeamCollection, TeamMembershipCollection) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTeamDiscussionID = "12345",
+        teamEvents = _.clone(Backbone.Events),
         testCountries = [
             ['', ''],
             ['US', 'United States'],
@@ -47,6 +49,7 @@ define([
                 results: teamData
             },
             {
+                teamEvents: teamEvents,
                 course_id: 'my/course/id',
                 parse: true
             }
@@ -79,6 +82,7 @@ define([
                 results: teamMembershipData
             },
             _.extend(_.extend({}, {
+                    teamEvents: teamEvents,
                     course_id: 'my/course/id',
                     parse: true,
                     url: 'api/teams/team_memberships',
@@ -225,6 +229,7 @@ define([
     };
 
     return {
+        teamEvents: teamEvents,
         testCourseID: testCourseID,
         testUser: testUser,
         testCountries: testCountries,

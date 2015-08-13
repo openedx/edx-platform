@@ -5,11 +5,8 @@ define(['jquery',
     function ($, _, TopicCardView, Topic) {
 
         describe('topic card view', function () {
-            var view;
-
-            beforeEach(function () {
-                spyOn(TopicCardView.prototype, 'action');
-                view = new TopicCardView({
+            var createTopicCardView = function() {
+                return new TopicCardView({
                     model: new Topic({
                         'id': 'renewables',
                         'name': 'Renewable Energy',
@@ -17,9 +14,14 @@ define(['jquery',
                         'team_count': 34
                     })
                 });
+            };
+
+            beforeEach(function () {
+                spyOn(TopicCardView.prototype, 'action');
             });
 
             it('can render itself', function () {
+                var view = createTopicCardView();
                 expect(view.$el).toHaveClass('square-card');
                 expect(view.$el.find('.card-title').text()).toContain('Renewable Energy');
                 expect(view.$el.find('.card-description').text()).toContain('changes in <ⓡⓔⓝⓔⓦⓐⓑⓛⓔ> ʎƃɹǝuǝ');
@@ -28,6 +30,7 @@ define(['jquery',
             });
 
             it('navigates when action button is clicked', function () {
+                var view = createTopicCardView();
                 view.$el.find('.action').trigger('click');
                 // TODO test actual navigation once implemented
                 expect(view.action).toHaveBeenCalled();

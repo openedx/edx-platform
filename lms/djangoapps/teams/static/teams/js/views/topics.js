@@ -1,9 +1,10 @@
 ;(function (define) {
     'use strict';
     define([
+        'gettext',
         'teams/js/views/topic_card',
         'common/js/components/views/paginated_view'
-    ], function (TopicCardView, PaginatedView) {
+    ], function (gettext, TopicCardView, PaginatedView) {
         var TopicsView = PaginatedView.extend({
             type: 'topics',
 
@@ -18,6 +19,16 @@
                     srInfo: this.srInfo
                 });
                 PaginatedView.prototype.initialize.call(this);
+            },
+
+            render: function() {
+                var self = this;
+                this.collection.refresh()
+                    .done(function() {
+                        self.collection.isStale = false;
+                        PaginatedView.prototype.render.call(self);
+                    });
+                return this;
             }
         });
         return TopicsView;

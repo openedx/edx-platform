@@ -17,20 +17,26 @@
                 },
 
                 render: function() {
-                    TeamsView.prototype.render.call(this);
+                    var self = this;
+                    $.when(
+                        this.collection.refresh(),
+                        this.teamMemberships.refresh()
+                    ).done(function() {
+                        TeamsView.prototype.render.call(self);
 
-                    if (this.teamMemberships.canUserCreateTeam()) {
-                        var message = interpolate_text(
-                            _.escape(gettext("Try {browse_span_start}browsing all teams{span_end} or {search_span_start}searching team descriptions{span_end}. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
-                            {
-                                'browse_span_start': '<a class="browse-teams" href="">',
-                                'search_span_start': '<a class="search-teams" href="">',
-                                'create_span_start': '<a class="create-team" href="">',
-                                'span_end': '</a>'
-                            }
-                        );
-                        this.$el.append(_.template(teamActionsTemplate, {message: message}));
-                    }
+                        if (self.teamMemberships.canUserCreateTeam()) {
+                            var message = interpolate_text(
+                                _.escape(gettext("Try {browse_span_start}browsing all teams{span_end} or {search_span_start}searching team descriptions{span_end}. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
+                                {
+                                    'browse_span_start': '<a class="browse-teams" href="">',
+                                    'search_span_start': '<a class="search-teams" href="">',
+                                    'create_span_start': '<a class="create-team" href="">',
+                                    'span_end': '</a>'
+                                }
+                            );
+                            self.$el.append(_.template(teamActionsTemplate, {message: message}));
+                        }
+                    });
                     return this;
                 },
 

@@ -1,9 +1,10 @@
 define([
-    'teams/js/collections/topic', 'teams/js/views/topics'
-], function (TopicCollection, TopicsView) {
+    'backbone', 'teams/js/collections/topic', 'teams/js/views/topics',
+    'teams/js/spec_helpers/team_spec_helpers'
+], function (Backbone, TopicCollection, TopicsView, TeamSpecHelpers) {
     'use strict';
     describe('TopicsView', function () {
-        var initialTopics, topicCollection, topicsView,
+        var initialTopics, topicCollection, createTopicsView,
             generateTopics = function (startIndex, stopIndex) {
             return _.map(_.range(startIndex, stopIndex + 1), function (i) {
                 return {
@@ -13,6 +14,14 @@ define([
                     "team_count": 0
                 };
             });
+        };
+
+        createTopicsView = function() {
+            return new TopicsView({
+                teamEvents: TeamSpecHelpers.teamEvents,
+                el: '.topics-container',
+                collection: topicCollection
+            }).render();
         };
 
         beforeEach(function () {
@@ -26,13 +35,17 @@ define([
                     "start": 0,
                     "results": initialTopics
                 },
-                {course_id: 'my/course/id', parse: true}
+                {
+                    teamEvents: TeamSpecHelpers.teamEvents,
+                    course_id: 'my/course/id',
+                    parse: true
+                }
             );
-            topicsView = new TopicsView({el: '.topics-container', collection: topicCollection}).render();
         });
 
         it('can render the first of many pages', function () {
-            var footerEl = topicsView.$('.topics-paging-footer'),
+            var topicsView = createTopicsView(),
+                footerEl = topicsView.$('.topics-paging-footer'),
                 topicCards = topicsView.$('.topic-card');
             expect(topicsView.$('.topics-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
             _.each(initialTopics, function (topic, index) {

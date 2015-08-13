@@ -248,7 +248,7 @@ class MyTeamsTest(TeamsTabBase):
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertEqual(
             self.my_teams_page.q(css='.page-content-main').text,
-            [u'You are not currently a member of any teams.']
+            [u'You are not currently a member of any team.']
         )
 
     def test_member_of_a_team(self):
@@ -530,7 +530,12 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.go_to_page(1)
         self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
 
-    def test_teams_membership(self):
+    @ddt.data(
+        ['Moderator', False]
+        ['Community TA', False],
+        ['Administrator', False]
+    )
+    def test_create_team(self, role, should_join_team):
         """
         Scenario: Team cards correctly reflect membership of the team.
         Given I am enrolled in a course with a team configuration and a topic
@@ -540,6 +545,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         Then I should see the correct page header
         And I should see the team for that topic
         And I should see that the team card shows my membership
+        When I visit the My Teams page
         """
         teams = self.create_teams(self.topic, 1)
         self.browse_teams_page.visit()
@@ -548,11 +554,10 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.create_membership(self.user_info['username'], teams[0]['id'])
         self.browser.refresh()
         self.browse_teams_page.wait_for_ajax()
-        ## TODO: fix this!
-        # self.assertEqual(
-        #     self.browse_teams_page.team_cards[0].find_element_by_css_selector('.member-count').text,
-        #     '1 / 10 Members'
-        # )
+        self.assertEqual(
+            self.browse_teams_page.team_cards[0].find_element_by_css_selector('.member-count').text,
+            '1 / 10 Members'
+        )
 
     def test_navigation_links(self):
         """

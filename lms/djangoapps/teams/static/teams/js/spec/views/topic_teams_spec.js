@@ -3,8 +3,9 @@ define([
     'teams/js/collections/team',
     'teams/js/collections/team_membership',
     'teams/js/views/topic_teams',
-    'teams/js/spec_helpers/team_spec_helpers'
-], function (Backbone, TeamCollection, TeamMembershipCollection, TopicTeamsView, TeamSpecHelpers) {
+    'teams/js/spec_helpers/team_spec_helpers',
+    'common/js/spec_helpers/ajax_helpers'
+], function (Backbone, TeamCollection, TeamMembershipCollection, TopicTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
     describe('Topic Teams View', function () {
         var createTopicTeamsView = function(options) {
@@ -19,6 +20,24 @@ define([
                     languages: TeamSpecHelpers.testLanguages
                 }
             }).render();
+        };
+
+        var verifyActions = function(teamsView, options) {
+            if (!options) {
+                options = {showActions: true};
+            }
+            var expectedTitle = 'Are you having trouble finding a team to join?',
+                expectedMessage = 'Try browsing all teams or searching team descriptions. If you ' +
+                    'still can\'t find a team to join, create a new team in this topic.',
+                title = teamsView.$('.title').text().trim(),
+                message = teamsView.$('.copy').text().trim();
+            if (options.showActions) {
+                expect(title).toBe(expectedTitle);
+                expect(message).toBe(expectedMessage);
+            } else {
+                expect(title).not.toBe(expectedTitle);
+                expect(message).not.toBe(expectedMessage);
+            }
         };
 
         beforeEach(function () {
@@ -39,12 +58,7 @@ define([
             expect(footerEl).not.toHaveClass('hidden');
 
             TeamSpecHelpers.verifyCards(teamsView, testTeamData);
-
-            expect(teamsView.$('.title').text()).toBe('Are you having trouble finding a team to join?');
-            expect(teamsView.$('.copy').text()).toBe(
-                "Try browsing all teams or searching team descriptions. If you " +
-                "still can't find a team to join, create a new team in this topic."
-            );
+            verifyActions(teamsView);
         });
 
         it('can browse all teams', function () {
@@ -74,9 +88,7 @@ define([
 
         it('does not show actions for a user already in a team', function () {
             var teamsView = createTopicTeamsView({});
-            expect(teamsView.$el.text()).not.toContain(
-                'Are you having trouble finding a team to join?'
-            );
+            verifyActions(teamsView, {showActions: false});
         });
 
         it('shows actions for a privileged user already in a team', function () {
@@ -85,9 +97,32 @@ define([
                     { privileged: true }
                 ),
                 teamsView = createTopicTeamsView({ teamMemberships: staffMembership });
-            expect(teamsView.$el.text()).toContain(
-                'Are you having trouble finding a team to join?'
-            );
+            verifyActions(teamsView);
         });
+
+        /*
+        // TODO: make this ready for prime time
+        it('refreshes when the team membership changes', function() {
+            var requests = AjaxHelpers.requests(this),
+                teamMemberships = TeamSpecHelpers.createMockTeamMemberships([]),
+                teamsView = createTopicTeamsView({ teamMemberships: teamMemberships });
+            verifyActions(teamsView, {showActions: true});
+            teamMemberships.teamEvents.trigger('teams:update', { action: 'create' });
+            teamsView.render();
+            AjaxHelpers.expectJsonRequestURL(
+                requests,
+                'foo',
+                {
+                    expand : 'team',
+                    username : 'testUser',
+                    course_id : 'my/course/id',
+                    page : '1',
+                    page_size : '10'
+                }
+            );
+            AjaxHelpers.respondWithJson(requests, {});
+            verifyActions(teamsView, {showActions: false});
+        });
+        */
     });
 });
