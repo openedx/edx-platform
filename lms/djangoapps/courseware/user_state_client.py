@@ -40,7 +40,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
 
     # Use this sample rate for DataDog events.
-    API_DATADOG_SAMPLE_RATE = 0.01
+    API_DATADOG_SAMPLE_RATE = 0.1
 
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
         """
