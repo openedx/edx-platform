@@ -1145,6 +1145,9 @@ class VerificationStatus(models.Model):
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
+    # cache key format e.g verification.<username>.<course_key> = '{verification.1.edx/demo/course}'
+    VERIFICATION_STATUS_CACHE_KEY = "verification.{}.{}"
+
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "timestamp"
         verbose_name = "Verification Status"
@@ -1261,6 +1264,55 @@ class VerificationStatus(models.Model):
             checkpoint__checkpoint_location=related_assessment_location,
             status__in=[cls.SUBMITTED_STATUS, cls.APPROVED_STATUS]
         ).exists()
+
+    @classmethod
+    def get_all_checkpoints(cls, user_id, course_key):
+        """Return the dict of all checking for a user with specific course
+        Args:
+            user_id(int): Id of user.
+            course_key(unicode): Unicode of course key
+
+        Returns:
+            dict: {checkpoint:status}
+        """
+        cache_key = VerificationStatus.cache_key_name(user_id, unicode(course_key))
+        check_points = cache.get(cache_key)
+        if check_points is None:
+            all_checks_points = cls.objects.filter(
+                user_id=user_id,
+                checkpoint__course_id=course_key
+            )
+            check_points = {}
+            for check in all_checks_points:
+                check_points[check.checkpoint.checkpoint_location] = check.status
+
+            cache.set(cache_key, check_points)
+        return check_points
+
+    @classmethod
+    def cache_key_name(cls, user_id, course_key):
+        """Return the name of the key to use to cache the current configuration
+        Args:
+            user_id(int): Id of user.
+            course_key(unicode): Unicode of course key
+
+        Returns:
+            Unicode cache key
+        """
+        return cls.VERIFICATION_STATUS_CACHE_KEY.format(user_id, unicode(course_key))
+
+
+@receiver(models.signals.post_save, sender=VerificationStatus)
+@receiver(models.signals.post_delete, sender=VerificationStatus)
+def invalidate_enrollment_mode_cache(sender, **kwargs):  # pylint: disable=unused-argument
+    """Invalidate the cache of VerificationStatus model. """
+    instance = kwargs['instance']
+
+    cache_key = VerificationStatus.cache_key_name(
+        instance.user.id,
+        unicode(instance.checkpoint.course_id)
+    )
+    cache.delete(cache_key)
 
 
 # DEPRECATED: this feature has been permanently enabled.

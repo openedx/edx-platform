@@ -35,6 +35,7 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
+from django.core.cache import cache
 from django_countries.fields import CountryField
 import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
@@ -842,6 +843,9 @@ class CourseEnrollment(models.Model):
 
     objects = CourseEnrollmentManager()
 
+    # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
+    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"
+
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
         ordering = ('user', 'course_id')
@@ -1339,6 +1343,31 @@ class CourseEnrollment(models.Model):
         Check the course enrollment mode is verified or not
         """
         return CourseMode.is_verified_slug(self.mode)
+
+    @classmethod
+    def cache_key_name(cls, user_id, course_key):
+        """Return the name of the key to use to cache the current configuration
+        Args:
+            user_id(int): Id of user.
+            course_key(unicode): Unicode of course key
+
+        Returns:
+            Unicode cache key
+        """
+        return cls.COURSE_ENROLLMENT_CACHE_KEY.format(user_id, unicode(course_key))
+
+
+@receiver(models.signals.post_save, sender=CourseEnrollment)
+@receiver(models.signals.post_delete, sender=CourseEnrollment)
+def invalidate_enrollment_mode_cache(sender, **kwargs):  # pylint: disable=unused-argument
+    """Invalidate the cache of CourseEnrollment model. """
+    instance = kwargs['instance']
+
+    cache_key = CourseEnrollment.cache_key_name(
+        instance.user.id,
+        unicode(instance.course_id)
+    )
+    cache.delete(cache_key)
 
 
 class ManualEnrollmentAudit(models.Model):

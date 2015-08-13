@@ -1,6 +1,7 @@
 """
 Provides partition support to the user service.
 """
+from django.core.cache import cache
 
 import logging
 
@@ -103,7 +104,12 @@ def is_enrolled_in_verified_mode(user, course_key):
     Returns:
         Boolean
     """
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
+    enrollment_mode = cache.get(cache_key)
+    if enrollment_mode is None:
+        enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+        cache.set(cache_key, enrollment_mode)
+
     return enrollment_mode in CourseMode.VERIFIED_MODES
 
 
@@ -118,11 +124,8 @@ def was_denied_at_any_checkpoint(user, course_key):
     Returns:
         Boolean
     """
-    return VerificationStatus.objects.filter(
-        user=user,
-        checkpoint__course_id=course_key,
-        status='denied'
-    ).exists()
+    checkpoints_dict = VerificationStatus.get_all_checkpoints(user.id, course_key)
+    return VerificationStatus.DENIED_STATUS in checkpoints_dict.values()
 
 
 def has_skipped_any_checkpoint(user, course_key):
@@ -152,4 +155,8 @@ def has_completed_checkpoint(user, course_key, checkpoint):
     Returns:
         unicode or None
     """
-    return VerificationStatus.check_user_has_completed_checkpoint(user, course_key, checkpoint)
+
+    checkpoints_dict = VerificationStatus.get_all_checkpoints(user.id, course_key)
+    return checkpoint in checkpoints_dict and checkpoints_dict[checkpoint] in [
+        VerificationStatus.SUBMITTED_STATUS, VerificationStatus.APPROVED_STATUS
+    ]
