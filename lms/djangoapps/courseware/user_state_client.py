@@ -139,10 +139,13 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
+                self._ddog_increment(evt_time, 'get_many.empty_state')
                 continue
 
             state = json.loads(module.state)
             state_length += len(module.state)
+
+            self._ddog_histogram(evt_time, 'get_many.block_size', len(module.state))
 
             # If the state is the empty dict, then it has been deleted, and so
             # conformant UserStateClients should treat it as if it doesn't exist.
@@ -161,7 +164,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # The rest of this method exists only to submit DataDog events.
         # Remove it once we're no longer interested in the data.
         self._ddog_histogram(evt_time, 'get_many.blks_out', block_count)
-        self._ddog_histogram(evt_time, 'get_many.blks_size', state_length)
 
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
