@@ -45,7 +45,7 @@ def configure_paths():
             css_dir.mkdir_p()
             SASS_DIRS.append(sass_dir)
 
-    if edxapp_env.env_tokens.get("COMP_THEME_DIR", None):
+    if edxapp_env.env_tokens.get("COMP_THEME_DIR", ""):
         theme_dir = path(edxapp_env.env_tokens["COMP_THEME_DIR"])
         lms_sass = theme_dir / "lms" / "static" / "sass"
         lms_css = theme_dir / "lms" / "static" / "css"
