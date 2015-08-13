@@ -285,7 +285,6 @@
                                     requestUsername: self.userInfo.username,
                                     countries: self.countries,
                                     languages: self.languages,
-                                    teamInviteUrl: self.teamsBaseUrl + '#teams/' + topicID + '/' + teamID + '?invite=true',
                                     teamMembershipDetailUrl: self.teamMembershipDetailUrl
                                 });
                             var teamJoinView = new TeamJoinView(

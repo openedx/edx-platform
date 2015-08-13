@@ -13,7 +13,6 @@
                 errorMessage: gettext("An error occurred. Try again."),
 
                 events: {
-                    'click .invite-link-input': 'selectText',
                     'click .leave-team-link': 'leaveTeam'
                 },
                 initialize: function (options) {
@@ -22,7 +21,6 @@
                     this.maxTeamSize = options.maxTeamSize;
                     this.requestUsername = options.requestUsername;
                     this.isPrivileged = options.isPrivileged;
-                    this.teamInviteUrl = options.teamInviteUrl;
                     this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
 
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(options.countries);
@@ -44,7 +42,6 @@
                         membershipText: TeamUtils.teamCapacityText(memberships.length, this.maxTeamSize),
                         isMember: isMember,
                         hasCapacity: memberships.length < this.maxTeamSize,
-                        inviteLink: this.teamInviteUrl
 
                     }));
                     this.discussionView = new TeamDiscussionView({
