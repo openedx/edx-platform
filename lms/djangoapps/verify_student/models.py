@@ -1383,7 +1383,14 @@ class SkippedReverification(models.Model):
 
     @classmethod
     def cache_key_name(cls, user_id, course_key):
-        """Return the name of the key to use to cache the current configuration"""
+        """Return the name of the key to use to cache the current configuration
+        Arguments:
+            user(User): user object
+            course_key(CourseKey): CourseKey
+
+        Returns:
+            string: cache key name
+        """
         return cls.USER_SKIPPED_VERIFICATION_CACHE_KEY.format(user_id, unicode(course_key))
 
 
@@ -1394,6 +1401,6 @@ def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint
 
     cache_key = SkippedReverification.cache_key_name(
         instance.user.id,
-        unicode(unicode(instance.course_id))
+        unicode(instance.course_id)
     )
     cache.delete(cache_key)

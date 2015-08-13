@@ -153,7 +153,7 @@ def has_completed_checkpoint(user, course_key, checkpoint):
         checkpoint (UsageKey): The location of the checkpoint in the course.
 
     Returns:
-        unicode or None
+        Boolean
     """
 
     checkpoints_dict = VerificationStatus.get_all_checkpoints(user.id, course_key)
