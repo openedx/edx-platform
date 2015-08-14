@@ -57,7 +57,7 @@ class VerificationPartitionScheme(object):
         # here getting cache key names for all models. So that we can make the
         # list of keys and get the cache.get_many
 
-        is_verified, has_skipped, verification_statuses, was_denied, has_completed_check = get_user_statuses(
+        is_verified, has_skipped, was_denied, has_completed_check = get_user_statuses(
             user,
             course_key,
             checkpoint
@@ -172,7 +172,6 @@ def get_user_statuses(user, course_key, checkpoint):
         tuple containing student' status
         verified mode : boolean
         has_skipped: boolean
-        verification_statuses: dict
         was_denied: boolean
         has_completed_check: boolean
     """
@@ -220,7 +219,6 @@ def get_user_statuses(user, course_key, checkpoint):
     return (
         is_verified,
         has_skipped,
-        verification_statuses,
         was_denied,
         has_completed_check
 
