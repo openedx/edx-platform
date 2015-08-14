@@ -20,6 +20,7 @@ class DataDownload
     # gather elements
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
+    @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']'")
     @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
@@ -44,6 +45,25 @@ class DataDownload
     @$list_anon_btn.click (e) =>
       url = @$list_anon_btn.data 'endpoint'
       location.href = url
+
+    # attach click handlers
+    # The list_proctored_exam_results case is always CSV
+    @$list_proctored_exam_results_csv_btn.click (e) =>
+      url = @$list_proctored_exam_results_csv_btn.data 'endpoint'
+      # display html from proctored exam results config endpoint
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: (std_ajax_err) =>
+          @clear_display()
+          @$reports_request_response_error.text gettext(
+            "Error generating proctored exam results. Please try again."
+          )
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @clear_display()
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     # this handler binds to both the download
     # and the csv button

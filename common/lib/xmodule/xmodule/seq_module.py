@@ -1,9 +1,16 @@
+"""
+xModule implementation of a learning sequence
+"""
+
+# pylint: disable=abstract-method
+
 import json
 import logging
 import warnings
 
 from lxml import etree
 
+from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
@@ -91,7 +98,9 @@ class ProctoringFields(object):
     )
 
 
-class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disable=abstract-method
+@XBlock.wants('proctoring')
+@XBlock.wants('credit')
+class SequenceModule(SequenceFields, ProctoringFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {
@@ -141,6 +150,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
             else:
                 self.position = 1
             return json.dumps({'success': True})
+
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
@@ -153,6 +163,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
         contents = []
 
         fragment = Fragment()
+
+        # Is this sequential part of a timed or proctored exam?
+        if self.is_time_limited:
+            view_html = self._time_limited_student_view(context)
+
+            # Do we have an alternate rendering
+            # from the edx_proctoring subsystem?
+            if view_html:
+                fragment.add_content(view_html)
+                return fragment
 
         for child in self.get_display_items():
             progress = child.get_progress()
@@ -181,9 +201,71 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):  # pylint: disa
                   'ajax_url': self.system.ajax_url,
                   }
 
-        fragment.add_content(self.system.render_template('seq_module.html', params))
+        fragment.add_content(self.system.render_template("seq_module.html", params))
 
         return fragment
+
+    def _time_limited_student_view(self, context):
+        """
+        Delegated rendering of a student view when in a time
+        limited view. This ultimately calls down into edx_proctoring
+        pip installed djangoapp
+        """
+
+        # None = no overridden view rendering
+        view_html = None
+
+        proctoring_service = self.runtime.service(self, 'proctoring')
+        credit_service = self.runtime.service(self, 'credit')
+
+        # Is the feature turned on and do we have all required services
+        # Also, the ENABLE_PROCTORED_EXAMS feature flag must be set to
+        # True and the Sequence in question, should have the
+        # fields set to indicate this is a timed/proctored exam
+        feature_enabled = (
+            proctoring_service and
+            credit_service and
+            proctoring_service.is_feature_enabled()
+        )
+        if feature_enabled:
+            user_id = self.runtime.user_id
+            user_role_in_course = 'staff' if self.runtime.user_is_staff else 'student'
+            course_id = self.runtime.course_id
+            content_id = self.location
+
+            context = {
+                'display_name': self.display_name,
+                'default_time_limit_mins': (
+                    self.default_time_limit_minutes if
+                    self.default_time_limit_minutes else 0
+                ),
+                'is_practice_exam': self.is_practice_exam
+            }
+
+            # inject the user's credit requirements and fulfillments
+            if credit_service:
+                credit_state = credit_service.get_credit_state(user_id, course_id)
+                if credit_state:
+                    context.update({
+                        'credit_state': credit_state
+                    })
+
+            # See if the edx-proctoring subsystem wants to present
+            # a special view to the student rather
+            # than the actual sequence content
+            #
+            # This will return None if there is no
+            # overridden view to display given the
+            # current state of the user
+            view_html = proctoring_service.get_student_view(
+                user_id=user_id,
+                course_id=course_id,
+                content_id=content_id,
+                context=context,
+                user_role=user_role_in_course
+            )
+
+        return view_html
 
     def get_icon_class(self):
         child_classes = set(child.get_icon_class()

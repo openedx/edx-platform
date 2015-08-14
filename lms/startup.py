@@ -9,12 +9,16 @@ from django.conf import settings
 # Force settings to run so that the python path is modified
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
+from instructor.services import InstructorService
+
 from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 from monkey_patch import django_utils_translation
 import analytics
 
+from edx_proctoring.runtime import set_runtime_service
+from openedx.core.djangoapps.credit.services import CreditService
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +46,13 @@ def run():
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+
+    # register any dependency injections that we need to support in edx_proctoring
+    # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
+    # as well as the instructor dashboard (for deleting student attempts)
+    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+        set_runtime_service('credit', CreditService())
+        set_runtime_service('instructor', InstructorService())
 
 
 def add_mimetypes():

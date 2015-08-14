@@ -26,6 +26,17 @@
         </div>
         <ul class="list-fields list-input">
             <li class="field field-checkbox checkbox-cosmetic">
+                <input type="checkbox" id="id_practice_exam" name="practice_exam" class="input input-checkbox" />
+                <label for="id_practice_exam" class="label">
+                  <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+                  <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+                  <%- gettext('This exam is for practice only') %>
+                </label>
+            </li>
+            <p class='field-message'> <%- gettext('Learners can experience the proctoring software setup process and try some example problems. Make sure this practice exam is set up as an ungraded exam.') %> </p>
+        </ul>
+        <ul class="list-fields list-input">
+            <li class="field field-checkbox checkbox-cosmetic">
                 <input type="checkbox" id="id_exam_proctoring" name="exam_proctoring" class="input input-checkbox" />
                 <label for="id_exam_proctoring" class="label">
                     <i class="icon fa fa-check-square-o input-checkbox-checked"></i>

@@ -104,6 +104,36 @@ class CoursewarePage(CoursePage):
         """
         return self.q(css='.chapter ul li.active a').attrs('href')[0]
 
+    @property
+    def can_start_proctored_exam(self):
+        """
+        Returns True if the timed/proctored exam timer bar is visible on the courseware.
+        """
+        return self.q(css='button.start-timed-exam[data-start-immediately="false"]').is_present()
+
+    def start_timed_exam(self):
+        """
+        clicks the start this timed exam link
+        """
+        self.q(css=".xblock-student_view .timed-exam .start-timed-exam").first.click()
+        self.wait_for_element_presence(".proctored_exam_status .exam-timer", "Timer bar")
+
+    def start_proctored_exam(self):
+        """
+        clicks the start this timed exam link
+        """
+        self.q(css='button.start-timed-exam[data-start-immediately="false"]').first.click()
+
+        # Wait for the unique exam code to appear.
+        # elf.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+
+    @property
+    def is_timer_bar_present(self):
+        """
+        Returns True if the timed/proctored exam timer bar is visible on the courseware.
+        """
+        return self.q(css=".proctored_exam_status .exam-timer").is_present()
+
 
 class CoursewareSequentialTabPage(CoursePage):
     """

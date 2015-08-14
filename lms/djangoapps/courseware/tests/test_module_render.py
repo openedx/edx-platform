@@ -50,6 +50,20 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.api import (
+    set_credit_requirements,
+    set_credit_requirement_status
+)
+
+from edx_proctoring.api import (
+    create_exam,
+    create_exam_attempt,
+    update_attempt_status
+)
+from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.tests.test_services import MockCreditService
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
@@ -680,6 +694,327 @@ class TestTOC(ModuleStoreTestCase):
                 )
             for toc_section in expected:
                 self.assertIn(toc_section, actual)
+
+
+@attr('shard_1')
+@ddt.ddt
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+class TestProctoringRendering(ModuleStoreTestCase):
+    """Check the Table of Contents for a course"""
+    def setUp(self):
+        """
+        Set up the initial mongo datastores
+        """
+        super(TestProctoringRendering, self).setUp()
+        self.course_key = self.create_toy_course()
+        self.chapter = 'Overview'
+        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
+        factory = RequestFactory()
+        self.request = factory.get(chapter_url)
+        self.request.user = UserFactory()
+        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
+        with self.modulestore.bulk_operations(self.course_key):
+            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                self.toy_loc, self.request.user, self.toy_course, depth=2
+            )
+
+    @ddt.data(
+        ('honor', False, None, None),
+        (
+            'honor',
+            True,
+            'eligible',
+            {
+                'status': 'eligible',
+                'short_description': 'Ungraded Practice Exam',
+                'suggested_icon': 'fa-lock',
+                'in_completed_state': False
+            }
+        ),
+        (
+            'honor',
+            True,
+            'submitted',
+            {
+                'status': 'submitted',
+                'short_description': 'Practice Exam Completed',
+                'suggested_icon': 'fa-check',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'honor',
+            True,
+            'error',
+            {
+                'status': 'error',
+                'short_description': 'Practice Exam Failed',
+                'suggested_icon': 'fa-exclamation-triangle',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            None,
+            {
+                'status': 'eligible',
+                'short_description': 'Proctored Option Available',
+                'suggested_icon': 'fa-lock',
+                'in_completed_state': False
+            }
+        ),
+        (
+            'verified',
+            False,
+            'declined',
+            {
+                'status': 'declined',
+                'short_description': 'Taking As Open Exam',
+                'suggested_icon': 'fa-unlock',
+                'in_completed_state': False
+            }
+        ),
+        (
+            'verified',
+            False,
+            'submitted',
+            {
+                'status': 'submitted',
+                'short_description': 'Pending Session Review',
+                'suggested_icon': 'fa-spinner fa-spin',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            'verified',
+            {
+                'status': 'verified',
+                'short_description': 'Passed Proctoring',
+                'suggested_icon': 'fa-check',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            'rejected',
+            {
+                'status': 'rejected',
+                'short_description': 'Failed Proctoring',
+                'suggested_icon': 'fa-exclamation-triangle',
+                'in_completed_state': True
+            }
+        ),
+        (
+            'verified',
+            False,
+            'error',
+            {
+                'status': 'error',
+                'short_description': 'Failed Proctoring',
+                'suggested_icon': 'fa-exclamation-triangle',
+                'in_completed_state': True
+            }
+        ),
+    )
+    @ddt.unpack
+    def test_proctored_exam_toc(self, enrollment_mode, is_practice_exam,
+                                attempt_status, expected):
+        """
+        Generate TOC for a course with a single chapter/sequence which contains proctored exam
+        """
+        self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
+
+        actual = render.toc_for_course(
+            self.request.user,
+            self.request,
+            self.toy_course,
+            self.chapter,
+            'Toy_Videos',
+            self.field_data_cache
+        )
+        section_actual = self._find_section(actual, 'Overview', 'Toy_Videos')
+
+        if expected:
+            self.assertIn(expected, [section_actual['proctoring']])
+        else:
+            # we expect there not to be a 'proctoring' key in the dict
+            self.assertNotIn('proctoring', section_actual)
+
+    @ddt.data(
+        (
+            'honor',
+            True,
+            None,
+            'Would you like to take "Toy Videos" as a practice proctored exam?',
+            True
+        ),
+        (
+            'honor',
+            True,
+            'submitted',
+            'You have submitted this practice proctored exam',
+            False
+        ),
+        (
+            'honor',
+            True,
+            'error',
+            'There was a problem with your practice proctoring session',
+            True
+        ),
+        (
+            'verified',
+            False,
+            None,
+            'Would you like to take "Toy Videos" as a proctored exam?',
+            False
+        ),
+        (
+            'verified',
+            False,
+            'submitted',
+            'You have submitted this proctored exam for review',
+            True
+        ),
+        (
+            'verified',
+            False,
+            'verified',
+            'Your proctoring session was reviewed and passed all requirements',
+            False
+        ),
+        (
+            'verified',
+            False,
+            'rejected',
+            'Your proctoring session was reviewed and did not pass requirements',
+            True
+        ),
+        (
+            'verified',
+            False,
+            'error',
+            'There was a problem with your proctoring session',
+            False
+        ),
+    )
+    @ddt.unpack
+    def test_render_proctored_exam(self, enrollment_mode, is_practice_exam,
+                                   attempt_status, expected, with_credit_context):
+        """
+        Verifies gated content from the student view rendering of a sequence
+        this is labeled as a proctored exam
+        """
+
+        usage_key = self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
+
+        # initialize some credit requirements, if so then specify
+        if with_credit_context:
+            credit_course = CreditCourse(course_key=self.course_key, enabled=True)
+            credit_course.save()
+            set_credit_requirements(
+                self.course_key,
+                [
+                    {
+                        'namespace': 'reverification',
+                        'name': 'reverification-1',
+                        'display_name': 'ICRV1',
+                        'criteria': {},
+                    },
+                    {
+                        'namespace': 'proctored-exam',
+                        'name': 'Exam1',
+                        'display_name': 'A Proctored Exam',
+                        'criteria': {}
+                    }
+                ]
+            )
+
+            set_credit_requirement_status(
+                self.request.user.username,
+                self.course_key,
+                'reverification',
+                'ICRV1'
+            )
+
+        module = render.get_module(
+            self.request.user,
+            self.request,
+            usage_key,
+            self.field_data_cache,
+            wrap_xmodule_display=True,
+        )
+        content = module.render(STUDENT_VIEW).content
+
+        self.assertIn(expected, content)
+
+    def _setup_test_data(self, enrollment_mode, is_practice_exam, attempt_status):
+        """
+        Helper method to consolidate some courseware/proctoring/credit
+        test harness data
+        """
+        usage_key = self.course_key.make_usage_key('videosequence', 'Toy_Videos')
+        sequence = self.modulestore.get_item(usage_key)
+
+        sequence.is_time_limited = True
+        sequence.is_proctored_enabled = True
+        sequence.is_practice_exam = is_practice_exam
+
+        self.modulestore.update_item(sequence, self.user.id)
+
+        self.toy_course = self.modulestore.get_course(self.course_key)
+
+        # refresh cache after update
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course_key, self.request.user, self.toy_course, depth=2
+        )
+
+        set_runtime_service(
+            'credit',
+            MockCreditService(enrollment_mode=enrollment_mode)
+        )
+
+        exam_id = create_exam(
+            course_id=unicode(self.course_key),
+            content_id=unicode(sequence.location),
+            exam_name='foo',
+            time_limit_mins=10,
+            is_proctored=True,
+            is_practice_exam=is_practice_exam
+        )
+
+        if attempt_status:
+            create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
+            update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
+        return usage_key
+
+    def _find_url_name(self, toc, url_name):
+        """
+        Helper to return the dict TOC section associated with a Chapter of url_name
+        """
+
+        for entry in toc:
+            if entry['url_name'] == url_name:
+                return entry
+
+        return None
+
+    def _find_section(self, toc, chapter_url_name, section_url_name):
+        """
+        Helper to return the dict TOC section associated with a section of url_name
+        """
+
+        chapter = self._find_url_name(toc, chapter_url_name)
+        if chapter:
+            return self._find_url_name(chapter['sections'], section_url_name)
+
+        return None
 
 
 @attr('shard_1')
