@@ -7,11 +7,13 @@ Change Log
 *****************
 
 .. list-table::
-   :widths: 10 70
+   :widths: 20 70
    :header-rows: 1
 
    * - Date
      - Change
+   * - 17 August 2015
+     - Added the :ref:`Discussion API Version 1.0` section.
    * - 10 June 2015
      - Added the section :ref:`Profile Images API Version 1.0`.
    * - 11 May 2015

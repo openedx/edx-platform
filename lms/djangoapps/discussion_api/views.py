@@ -64,8 +64,8 @@ class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
         * following_thread_list_url: The URL of the list of threads that the
           requesting user is following.
 
-        * thread_list_url: The URL of the list of all discussion threads, or
-          posts, in the course.
+        * thread_list_url: The URL of the list of all discussion threads in
+          the course.
 
         * topics_url: The URL of the list of discussion topics in the course.
     """
@@ -96,24 +96,24 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
           are classified by category and identified by display name. The array
           includes a separate object for each category.
 
-            Each item in the list includes the following values.
+          Each item in the list includes the following values.
 
-            * children: An array of child subtrees, with a separate object for
-              each defined discussion category. For each category, includes an
-              array with values to identify the ids, display names, and
-              thread_list_urls for the discussion topics in that category. The
-              children value is present, but null, for the individual topics
-              within a category.
+          * children: An array of child subtrees, with a separate object for
+            each defined discussion category. For each category, includes an
+            array with values to identify the ids, display names, and
+            thread_list_urls for the discussion topics in that category. The
+            children value is present, but null, for the individual topics
+            within a category.
 
-            * id: The internal ID assigned to the discussion topic. The ID is
-              null for a topic that only has children but cannot contain
-              threads itself.
+          * id: The internal ID assigned to the discussion topic. The ID is
+            null for a topic that only has children but cannot contain
+            threads itself.
 
-            * name: The category name defined for the discussion topic or
-              topics.
+          * name: The category name defined for the discussion topic or
+            topics.
 
-            * thread_list_url: The URL of the list of all discussion threads
-              in the category.
+          * thread_list_url: The URL of the list of all discussion threads
+            in the category.
 
         * non_courseware_topics: The list of topic trees for the course-wide
           discussion topics defined for the course. In Studio, course teams add
@@ -135,7 +135,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
     **Example Requests**
 
-        GET /api/discussion/v1/threads/?course_id=ExampleX/Demo/2015
+        GET /api/discussion/v1/threads/?course_id={course_id}
 
         POST /api/discussion/v1/threads
         {
@@ -149,7 +149,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         PATCH /api/discussion/v1/threads/thread_id
         {"raw_body": "Edited text"}
 
-        DELETE /api/discussion/v1/threads/thread_id
+        DELETE /api/discussion/v1/threads/{thread_id}
 
     **GET Parameters**
 
