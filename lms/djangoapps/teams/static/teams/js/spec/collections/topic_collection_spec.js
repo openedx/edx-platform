@@ -7,7 +7,6 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 
                 topicCollection = new TopicCollection(
                     {
                         "count": 6,
-                        "num_pages": 2,
                         "current_page": 1,
                         "start": 0,
                         "results": [

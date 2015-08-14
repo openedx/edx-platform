@@ -1,7 +1,7 @@
 ;(function (define) {
     'use strict';
-    define(['teams/js/collections/base', 'teams/js/models/topic', 'gettext'],
-        function(BaseCollection, TopicModel, gettext) {
+    define(['teams/js/collections/base', 'teams/js/models/topic', 'gettext', 'underscore'],
+        function(BaseCollection, TopicModel, gettext, _) {
             var TopicCollection = BaseCollection.extend({
                 initialize: function(topics, options) {
                     var self = this;

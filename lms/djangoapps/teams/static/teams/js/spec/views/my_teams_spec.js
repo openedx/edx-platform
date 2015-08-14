@@ -64,7 +64,7 @@ define([
             myTeamsView.render();
             AjaxHelpers.expectJsonRequestURL(
                 requests,
-                'foo',
+                'api/teams/team_memberships',
                 {
                     expand : 'team',
                     username : 'testUser',

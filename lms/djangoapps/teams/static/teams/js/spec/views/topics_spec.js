@@ -1,7 +1,7 @@
 define([
-    'backbone', 'teams/js/collections/topic', 'teams/js/views/topics',
-    'teams/js/spec_helpers/team_spec_helpers'
-], function (Backbone, TopicCollection, TopicsView, TeamSpecHelpers) {
+    'backbone', 'underscore', 'teams/js/collections/topic', 'teams/js/views/topics',
+    'teams/js/spec_helpers/team_spec_helpers', 'common/js/spec_helpers/ajax_helpers'
+], function (Backbone, _, TopicCollection, TopicsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
     describe('TopicsView', function () {
         var initialTopics, topicCollection, createTopicsView,
@@ -33,12 +33,14 @@ define([
                     "num_pages": 2,
                     "current_page": 1,
                     "start": 0,
-                    "results": initialTopics
+                    "results": initialTopics,
+                    "sort_order": "name"
                 },
                 {
                     teamEvents: TeamSpecHelpers.teamEvents,
                     course_id: 'my/course/id',
-                    parse: true
+                    parse: true,
+                    url: 'api/teams/topics'
                 }
             );
         });
@@ -56,6 +58,24 @@ define([
             });
             expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2');
             expect(footerEl).not.toHaveClass('hidden');
+        });
+
+        it('refreshes the topics when a team is created', function() {
+            var requests = AjaxHelpers.requests(this),
+                topicsView = createTopicsView();
+
+            topicsView.collection.teamEvents.trigger('teams:update', { action: 'create' });
+            topicsView.render();
+            AjaxHelpers.expectJsonRequestURL(
+                requests,
+                'api/teams/topics',
+                {
+                    course_id : 'my/course/id',
+                    page : '1',
+                    page_size : '5',  // currently the page size is determined by the size of the collection
+                    order_by : 'name'
+                }
+            );
         });
     });
 });
