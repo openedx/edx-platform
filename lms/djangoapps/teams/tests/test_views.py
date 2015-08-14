@@ -140,7 +140,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'name': 'Public Profiles',
                     'description': 'Description for topic 6.'
                 },
-            ]
+            ],
+            'max_team_size': 1
         }
         cls.test_course_2 = CourseFactory.create(
             org='MIT',
@@ -181,6 +182,13 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         profile = self.users['student_enrolled_public_profile'].profile
         profile.year_of_birth = 1970
         profile.save()
+
+        # This student is enrolled in the other course, but not yet a member of a team. This is to allow
+        # course_2 to use a max_team_size of 1 without breaking other tests on course_1
+        self.create_and_enroll_student(
+            courses=[self.test_course_2],
+            username='student_enrolled_other_course_not_on_team'
+        )
 
         # 'solar team' is intentionally lower case to test case insensitivity in name ordering
         self.test_team_1 = CourseTeamFactory.create(
@@ -934,6 +942,14 @@ class TestCreateMembershipAPI(TeamAPITestCase):
             user=user
         )
         self.assertIn('not enrolled', json.loads(response.content)['developer_message'])
+
+    def test_over_max_team_size_in_course_2(self):
+        response = self.post_create_membership(
+            400,
+            self.build_membership_data('student_enrolled_other_course_not_on_team', self.test_team_5),
+            user='student_enrolled_other_course_not_on_team'
+        )
+        self.assertIn('full', json.loads(response.content)['developer_message'])
 
 
 @ddt.ddt
