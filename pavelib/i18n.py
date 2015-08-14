@@ -196,6 +196,8 @@ def i18n_robot_pull():
     """
     # sh('paver test_i18n')  # TODO tests were removed from repo, but there should still be tests that cover the translations...
     # Validate the recently pulled translations, and give a bail option
+    sh('git clean -fdX conf/locale/rtl')
+    sh('git clean -fdX conf/locale/eo')
     cmd = "i18n_tool validate"
     print("\n\nValidating translations with `i18n_tool validate`...")
     sh("{cmd}".format(cmd=cmd))
