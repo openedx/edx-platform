@@ -160,7 +160,8 @@ define([
         });
 
         it("shows correct error message when server returns an error", function () {
-            var requests = AjaxHelpers.requests(this);
+            var requests = AjaxHelpers.requests(this),
+                teamEditView = createTeamEditView();
 
             teamEditView.$('.u-field-name input').val(teamsData.name);
             teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
