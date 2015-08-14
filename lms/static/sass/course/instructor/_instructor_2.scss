@@ -1362,7 +1362,6 @@ input[name="subject"] {
     }
   }
 }
-
 .ecommerce-wrapper{
   h2{
     height: 26px;
@@ -1401,6 +1400,7 @@ input[name="subject"] {
   input[name='list-order-sale-csv'] {
     @include margin-right(14px);
   }
+
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1486,7 +1486,7 @@ input[name="subject"] {
       th {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
-        font-size: 16px;
+        font-size: 13px;
 
         &.c_code {
           width: 110px;
@@ -1588,7 +1588,7 @@ input[name="subject"] {
       font-size: 12px;
       color: #646464
     }
-    top:-95px !important;
+    top: 100px !important;
     width: 650px;
     @include margin-left(-325px);
     border-radius: 2px;
@@ -1872,7 +1872,13 @@ input[name="subject"] {
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
+      line-height: 14px;
+      font-size: 0.7em;
     }
+  }
+  .content {
+    display: block;
+    width: 100%;
   }
   span.code_tip {
     display: block;
