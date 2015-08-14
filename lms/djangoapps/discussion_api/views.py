@@ -61,7 +61,8 @@ class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
 
             * end: The ISO 8601 timestamp for the end of the blackout period.
 
-        * following_thread_list_url: TBD
+        * following_thread_list_url: The URL of the list of threads that the
+          requesting user is following.
 
         * thread_list_url: The URL of the list of all discussion threads, or
           posts, in the course.
@@ -104,15 +105,15 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
               children value is present, but null, for the individual topics
               within a category.
 
-            * id: The internal id assigned to the discussion topic. The id is
+            * id: The internal ID assigned to the discussion topic. The ID is
               null for a topic that only has children but cannot contain
-              threads, or posts, itself.
+              threads itself.
 
             * name: The category name defined for the discussion topic or
               topics.
 
-            * thread_list_url: The URL of the list of all discussion threads, or
-              posts, in the category.
+            * thread_list_url: The URL of the list of all discussion threads
+              in the category.
 
         * non_courseware_topics: The list of topic trees for the course-wide
           discussion topics defined for the course. In Studio, course teams add
@@ -203,7 +204,9 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
     **PATCH Parameters**:
 
         topic_id, type, title, and raw_body are accepted with the same meaning
-        as in a POST request.
+        as in a POST request. 
+
+        In addition, abuse_flagged, following, and voted are accepted 
 
     **GET Response Values**:
 
@@ -240,32 +243,34 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * rendered_body: The text for the thread, including HTML tags.
 
-        * abuse_flagged: Boolean that indicates whether the requesting user has
-          flagged the thread for abuse.
+        * abuse_flagged: A Boolean that indicates whether the requesting user
+          has flagged the thread for abuse.
 
-        * voted: Boolean that indicates whether the requesting user has voted
-          for the thread.
+        * voted: A Boolean that indicates whether the requesting user has
+          voted for the thread.
 
         * vote_count: The number of votes that the thread has received.
 
         * editable_fields: The fields that the requesting user is allowed to
           modify with a PATCH request: abuse_flagged, following, and voted.
 
-        * course_id: The id of the thread's course.
+        * course_id: The ID of the thread's course.
 
-        * topic_id: The id of the thread's topic.
+        * topic_id: The ID of the thread's topic.
 
-        * group_id: TBD
+        * group_id: The ID of the cohort that can view and comment on this
+          thread.
 
-        * group_name: TBD
+        * group_name: The name of the cohort that can view and comment on this
+          thread.
 
-        * title: The thread's title.
+        * title: The title of the thread.
 
-        * pinned: Boolean that indicates whether the thread has been pinned.
+        * pinned: A Boolean that indicates whether the thread has been pinned.
 
-        * closed: Boolean that indicates whether the thread has been closed.
+        * closed: A Boolean that indicates whether the thread has been closed.
 
-        * following (optional): Boolean that indicates whether the requesting
+        * following (optional): A Boolean that indicates whether the requesting
           user is following the thread.
 
         * comment_count: The number of comments within the thread.
@@ -283,13 +288,13 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           the URL of the list of responses that are not marked as correct (if
           any).
 
-        * read: Boolean that indicates whether the user has read this thread.
+        * read: A Boolean that indicates whether the user has read this thread.
 
-        * has_endorsed: For threads with a type of "question", Boolean that
+        * has_endorsed: For threads with a type of "question", a Boolean that
           indicates whether this thread has any responses that are marked as
           answers.
 
-        * id: The id of the thread.
+        * id: The ID of the thread.
 
         * type: The thread's type: either "question" or "discussion".
 
@@ -374,9 +379,10 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * thread_id (required): The ID of the thread to retrieve comments for.
 
-        * endorsed: If specified, retrieves only comments that have been marked
-          as answering the question or that have been left unendorsed. Required
-          for a question thread, must be absent for a discussion thread.
+        * endorsed: If specified as true, retrieves only comments that are
+          marked as answers to the question. If false, retrieves only comments
+          that are not endorsed as answers. Only applies to question threads,
+          must be null for discussion threads.
 
         * page: The (1-indexed) page to retrieve. Defaults to 1.
 
@@ -430,10 +436,10 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * rendered_body: The text for the comment, including HTML tags.
 
-        * abuse_flagged: Boolean that indicates whether the requesting user has
+        * abuse_flagged: A Boolean that indicates whether the requesting user has
           flagged the comment for abuse.
 
-        * voted: Boolean that indicates whether the requesting user has voted
+        * voted: A Boolean that indicates whether the requesting user has voted
           for the comment.
 
         * vote_count: The number of votes that the comment has received.
@@ -446,7 +452,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * parent_id: The ID of the parent comment that the comment was made to.
           Null for a comment that is posted directly under the thread.
 
-        * endorsed: Boolean that indicates whether the comment is marked as the
+        * endorsed: A Boolean that indicates whether the comment is marked as the
           answer to a question by either the thread author or by a privileged
           user.
 
@@ -462,7 +468,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           comment. For each comment, an object contains the same set of values
           as for the parent comment.
 
-        * id: The id of the comment.
+        * id: The ID of the comment.
 
     **DELETE Response Value**
 
