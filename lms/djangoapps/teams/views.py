@@ -51,7 +51,6 @@ from .serializers import (
 )
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
-
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 
@@ -888,6 +887,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        course_module = modulestore().get_course(team.course_id)
+        if course_module.teams_max_size is not None and team.users.count() >= course_module.teams_max_size:
+            return Response(
+                build_api_error(ugettext_noop("The team is already full.")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             membership = team.add_user(user)
