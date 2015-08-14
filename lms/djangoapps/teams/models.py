@@ -23,13 +23,13 @@ class CourseTeam(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    # last_activity is computed through a query
     description = models.CharField(max_length=300)
     country = CountryField(blank=True)
     language = LanguageField(
         blank=True,
         help_text=ugettext_lazy("Optional language the team uses as ISO 639-1 code."),
     )
+    last_activity_at = models.DateTimeField(auto_now_add=True, editable=True)
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
 
     @classmethod
@@ -88,6 +88,7 @@ class CourseTeamMembership(models.Model):
     user = models.ForeignKey(User)
     team = models.ForeignKey(CourseTeam, related_name='membership')
     date_joined = models.DateTimeField(auto_now_add=True)
+    last_activity_at = models.DateTimeField(auto_now_add=True, editable=True)
 
     @classmethod
     def get_memberships(cls, username=None, course_ids=None, team_id=None):
