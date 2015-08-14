@@ -1,0 +1,5 @@
+{{ object.name }}
+{{ object.description }}
+{{ object.country }}
+{{ object.country.name }}
+{{ object.language }}

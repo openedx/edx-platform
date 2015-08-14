@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.views.generic.base import View
 import newrelic.agent
+from haystack.query import SearchQuerySet
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -482,6 +483,26 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     def get_queryset(self):
         """Returns the queryset used to access the given team."""
         return CourseTeam.objects.all()
+
+
+class TeamsSearchView(APIView):
+    """
+    Search teams.
+    """
+    def get(self, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        Search teams using ES storage
+        """
+        params = self.request.QUERY_PARAMS.dict()
+        valid_search_fields = ('name', 'description', 'language', 'country')
+        query = SearchQuerySet().models(CourseTeam).filter(
+            **{
+                field: value for (field, value) in params.items() if field in valid_search_fields}
+        )
+
+        results = [item.get_additional_fields() for item in query]
+
+        return Response({'total': len(results), 'rows': results})
 
 
 class TopicListView(GenericAPIView):
