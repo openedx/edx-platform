@@ -82,6 +82,16 @@ class ThirdPartyAuthTestMixin(object):
         kwargs.setdefault("secret", "test")
         return cls.configure_oauth_provider(**kwargs)
 
+    @classmethod
+    def configure_twitter_provider(cls, **kwargs):
+        """ Update the settings for the Twitter third party auth provider/backend """
+        kwargs.setdefault("name", "Twitter")
+        kwargs.setdefault("backend_name", "twitter")
+        kwargs.setdefault("icon_class", "fa-twitter")
+        kwargs.setdefault("key", "test")
+        kwargs.setdefault("secret", "test")
+        return cls.configure_oauth_provider(**kwargs)
+
 
 class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
     """Base class for auth test cases."""
