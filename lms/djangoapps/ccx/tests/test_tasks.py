@@ -99,6 +99,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
         overview = CourseOverview(id=course_key)
+        overview.version = 1
         overview.save()
         overview = CourseOverview.objects.filter(id=course_key)
         self.assertEqual(len(overview), 1)
