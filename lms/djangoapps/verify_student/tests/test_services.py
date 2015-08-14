@@ -107,6 +107,12 @@ class TestReverificationService(ModuleStoreTestCase):
             1
         )
 
+        # testing service for skipped attempt.
+        self.assertEqual(
+            reverification_service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location),
+            'skipped'
+        )
+
     def test_get_attempts(self):
         """Check verification attempts count against a user for a given
         'checkpoint' and 'course_id'.
