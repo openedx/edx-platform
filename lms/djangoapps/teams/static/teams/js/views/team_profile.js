@@ -16,7 +16,7 @@
                     'click .leave-team-link': 'leaveTeam'
                 },
                 initialize: function (options) {
-                    this.listenTo(this.model, "change", this.render);
+                    this.teamEvents = options.teamEvents;
                     this.courseID = options.courseID;
                     this.maxTeamSize = options.maxTeamSize;
                     this.requestUsername = options.requestUsername;
@@ -26,13 +26,13 @@
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(options.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(options.languages);
 
+                    this.listenTo(this.model, "change", this.render);
                 },
 
                 render: function () {
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.requestUsername);
-
                     this.$el.html(_.template(teamTemplate, {
                         courseID: this.courseID,
                         discussionTopicID: discussionTopicID,
@@ -73,10 +73,16 @@
                     event.preventDefault();
                     var view = this;
                     $.ajax({
-                       type: 'DELETE',
-                       url: view.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
+                        type: 'DELETE',
+                        url: view.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
                     }).done(function (data) {
-                       view.model.fetch({});
+                        view.model.fetch()
+                            .done(function() {
+                                view.teamEvents.trigger('teams:update', {
+                                    action: 'leave',
+                                    team: view.model
+                                });
+                            });
                     }).fail(function (data) {
                         TeamUtils.parseAndShowMessage(data, view.errorMessage);
                     });

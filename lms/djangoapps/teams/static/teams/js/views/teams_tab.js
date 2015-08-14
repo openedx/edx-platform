@@ -81,9 +81,13 @@
                         router.route.apply(router, route);
                     });
 
+                    // Create an event queue to track team changes
+                    this.teamEvents = _.clone(Backbone.Events);
+
                     this.teamMemberships = new TeamMembershipCollection(
                         this.userInfo.team_memberships_data,
                         {
+                            teamEvents: this.teamEvents,
                             url: this.teamMembershipsUrl,
                             course_id: this.courseID,
                             username: this.userInfo.username,
@@ -94,6 +98,7 @@
 
                     this.myTeamsView = new MyTeamsView({
                         router: this.router,
+                        teamEvents: this.teamEvents,
                         collection: this.teamMemberships,
                         teamMemberships: this.teamMemberships,
                         maxTeamSize: this.maxTeamSize,
@@ -107,12 +112,18 @@
 
                     this.topicsCollection = new TopicCollection(
                         this.topics,
-                        {url: options.topicsUrl, course_id: this.courseID, parse: true}
+                        {
+                            teamEvents: this.teamEvents,
+                            url: options.topicsUrl,
+                            course_id: this.courseID,
+                            parse: true
+                        }
                     ).bootstrap();
 
                     this.topicsView = new TopicsView({
-                        collection: this.topicsCollection,
-                        router: this.router
+                        router: this.router,
+                        teamEvents: this.teamEvents,
+                        collection: this.topicsCollection
                     });
 
                     this.mainView = this.tabbedView = new ViewWithHeader({
@@ -196,6 +207,7 @@
                                 })
                             }),
                             main: new TeamEditView({
+                                teamEvents: self.teamEvents,
                                 tagName: 'create-new-team',
                                 teamParams: teamsView.main.teamParams,
                                 primaryButtonTitle: 'Create'
@@ -220,6 +232,7 @@
                         this.getTopic(topicID)
                             .done(function(topic) {
                                 var collection = new TeamCollection([], {
+                                    teamEvents: self.teamEvents,
                                     course_id: self.courseID,
                                     topic_id: topicID,
                                     url: self.teamsUrl,
@@ -229,7 +242,7 @@
                                 collection.goTo(1)
                                     .done(function() {
                                         var teamsView = new TopicTeamsView({
-                                            router: router,
+                                            router: self.router,
                                             topic: topic,
                                             collection: collection,
                                             teamMemberships: self.teamMemberships,
@@ -278,25 +291,26 @@
                     self.getTopic(topicID).done(function(topic) {
                         self.getTeam(teamID, true).done(function(team) {
                             var view = new TeamProfileView({
+                                teamEvents: self.teamEvents,
+                                router: self.router,
+                                courseID: courseID,
+                                model: team,
+                                maxTeamSize: self.maxTeamSize,
+                                isPrivileged: self.userInfo.privileged,
+                                requestUsername: self.userInfo.username,
+                                countries: self.countries,
+                                languages: self.languages,
+                                teamMembershipDetailUrl: self.teamMembershipDetailUrl
+                            });
+                            var teamJoinView = new TeamJoinView({
+                                teamEvents: self.teamEvents,
                                     courseID: courseID,
-                                    model: team,
-                                    maxTeamSize: self.maxTeamSize,
-                                    isPrivileged: self.userInfo.privileged,
-                                    requestUsername: self.userInfo.username,
-                                    countries: self.countries,
-                                    languages: self.languages,
-                                    teamMembershipDetailUrl: self.teamMembershipDetailUrl
-                                });
-                            var teamJoinView = new TeamJoinView(
-                                {
-                                    courseID: courseID,
-                                    model: team,
-                                    teamsUrl: self.teamsUrl,
-                                    maxTeamSize: self.maxTeamSize,
-                                    currentUsername: self.userInfo.username,
-                                    teamMembershipsUrl: self.teamMembershipsUrl
-                                }
-                            );
+                               model: team,
+                                teamsUrl: self.teamsUrl,
+                                maxTeamSize: self.maxTeamSize,
+                                currentUsername: self.userInfo.username,
+                                teamMembershipsUrl: self.teamMembershipsUrl
+                            });
                             deferred.resolve(
                                 self.createViewWithHeader(
                                     {

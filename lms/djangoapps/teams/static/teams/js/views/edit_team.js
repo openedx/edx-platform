@@ -20,6 +20,7 @@
                 },
 
                 initialize: function(options) {
+                    this.teamEvents = options.teamEvents;
                     this.courseID = options.teamParams.courseID;
                     this.topicID = options.teamParams.topicID;
                     this.collection = options.collection;
@@ -28,7 +29,7 @@
                     this.countries = options.teamParams.countries;
                     this.primaryButtonTitle = options.primaryButtonTitle || 'Submit';
 
-                   _.bindAll(this, 'goBackToTopic', 'createTeam');
+                    _.bindAll(this, 'goBackToTopic', 'createTeam');
 
                     this.teamModel = new TeamModel({});
                     this.teamModel.url = this.teamsUrl;
@@ -113,6 +114,10 @@
 
                     this.teamModel.save(data, { wait: true })
                         .done(function(result) {
+                            view.teamEvents.trigger('teams:update', {
+                                action: 'create',
+                                team: result
+                            });
                             Backbone.history.navigate(
                                 'teams/' + view.topicID + '/' + view.teamModel.id,
                                 {trigger: true}
@@ -179,10 +184,10 @@
                     if (screenReaderMessage) {
                         this.$('.screen-reader-message').text(screenReaderMessage);
                     }
-               },
+                },
 
-               goBackToTopic: function () {
-                   Backbone.history.navigate('topics/' + this.topicID, {trigger: true});
+                goBackToTopic: function () {
+                    Backbone.history.navigate('topics/' + this.topicID, {trigger: true});
                 }
             });
         });

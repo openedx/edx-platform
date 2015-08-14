@@ -113,6 +113,12 @@ class TeamsTabBase(UniqueCourseTest):
         ]
         map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
 
+    def verify_my_team_count(self, expected_number_of_teams):
+        """ Verify the number of teams shown on "My Team". """
+
+        # We are doing these operations on this top-level page object to avoid reloading the page.
+        self.teams_page.verify_my_team_count(expected_number_of_teams)
+
 
 @ddt.ddt
 @attr('shard_5')
@@ -248,7 +254,7 @@ class MyTeamsTest(TeamsTabBase):
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertEqual(
             self.my_teams_page.q(css='.page-content-main').text,
-            [u'You are not currently a member of any teams.']
+            [u'You are not currently a member of any team.']
         )
 
     def test_member_of_a_team(self):
@@ -530,30 +536,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.go_to_page(1)
         self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
 
-    def test_teams_membership(self):
-        """
-        Scenario: Team cards correctly reflect membership of the team.
-        Given I am enrolled in a course with a team configuration and a topic
-            containing one team
-        And I add myself to the team
-        When I visit the Teams page for that topic
-        Then I should see the correct page header
-        And I should see the team for that topic
-        And I should see that the team card shows my membership
-        """
-        teams = self.create_teams(self.topic, 1)
-        self.browse_teams_page.visit()
-        self.verify_page_header()
-        self.verify_teams(self.browse_teams_page, teams)
-        self.create_membership(self.user_info['username'], teams[0]['id'])
-        self.browser.refresh()
-        self.browse_teams_page.wait_for_ajax()
-        ## TODO: fix this!
-        # self.assertEqual(
-        #     self.browse_teams_page.team_cards[0].find_element_by_css_selector('.member-count').text,
-        #     '1 / 10 Members'
-        # )
-
     def test_navigation_links(self):
         """
         Scenario: User should be able to navigate to "browse all teams" and "search team description" links.
@@ -715,6 +697,9 @@ class CreateTeamTest(TeamsTabBase):
         And I click Create button
         Then I should see the page for my team
         And I should see the message that says "You are member of this team"
+        And the new team should be added to the list of teams within the topic
+        And the number of teams should be updated on the topic card
+        And if I switch to "My Team", the newly created team is displayed
         """
         self.verify_and_navigate_to_create_team_page()
 
@@ -728,6 +713,16 @@ class CreateTeamTest(TeamsTabBase):
         self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
         self.assertEqual(team_page.team_user_membership_text, 'You are a member of this team.')
 
+        # Verify the new team was added to the topic list
+        self.teams_page.click_specific_topic("Example Topic")
+        self.teams_page.verify_topic_team_count(1)
+
+        self.teams_page.click_all_topics()
+        self.teams_page.verify_team_count_in_first_topic(1)
+
+        # Verify that if one switches to "My Team" without reloading the page, the newly created team is shown.
+        self.verify_my_team_count(1)
+
     def test_user_can_cancel_the_team_creation(self):
         """
         Scenario: The user should be able to cancel the creation of new team.
@@ -736,6 +731,7 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see the Create Team header and form
         When I click Cancel button
         Then I should see teams list page without any new team.
+        And if I switch to "My Team", it shows no teams
         """
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
 
@@ -744,6 +740,11 @@ class CreateTeamTest(TeamsTabBase):
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+
+        self.teams_page.click_all_topics()
+        self.teams_page.verify_team_count_in_first_topic(0)
+
+        self.verify_my_team_count(0)
 
 
 @attr('shard_5')
@@ -882,11 +883,7 @@ class TeamPageTest(TeamsTabBase):
         """
         self.assertEqual(
             self.team_page.team_capacity_text,
-            '{num_members} / {max_size} {members_text}'.format(
-                num_members=num_members,
-                max_size=max_size,
-                members_text='Member' if num_members == max_size else 'Members'
-            )
+            self.team_page.format_capacity_text(num_members, max_size)
         )
         self.assertEqual(self.team_page.team_location, 'Afghanistan')
         self.assertEqual(self.team_page.team_language, 'Afar')
@@ -975,6 +972,7 @@ class TeamPageTest(TeamsTabBase):
         Then there should be no Join Team button and no message
         And I should see the updated information under Team Details
         And I should see New Post button
+        And if I switch to "My Team", the team I have joined is displayed
         """
         self._set_team_configuration_and_membership(create_membership=False)
         self.team_page.visit()
@@ -983,6 +981,10 @@ class TeamPageTest(TeamsTabBase):
         self.assertFalse(self.team_page.join_team_button_present)
         self.assertFalse(self.team_page.join_team_message_present)
         self.assert_team_details(num_members=1, is_member=True)
+
+        # Verify that if one switches to "My Team" without reloading the page, the newly created team is shown.
+        self.teams_page.click_all_topics()
+        self.verify_my_team_count(1)
 
     def test_already_member_message(self):
         """
@@ -1037,6 +1039,7 @@ class TeamPageTest(TeamsTabBase):
         Then user should be removed from team
         And I should see Join Team button
         And I should not see New Post button
+        And if I switch to "My Team", the team I have left is not displayed
         """
         self._set_team_configuration_and_membership()
         self.team_page.visit()
@@ -1045,3 +1048,7 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.click_leave_team_link()
         self.assert_team_details(num_members=0, is_member=False)
         self.assertTrue(self.team_page.join_team_button_present)
+
+        # Verify that if one switches to "My Team" without reloading the page, the old team no longer shows.
+        self.teams_page.click_all_topics()
+        self.verify_my_team_count(0)

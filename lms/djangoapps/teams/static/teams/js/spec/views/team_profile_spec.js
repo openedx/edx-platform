@@ -5,16 +5,18 @@ define([
 ], function (_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {
     'use strict';
     describe('TeamProfileView', function () {
-        var profileView, createTeamProfileView, createTeamModelData, teamModel,
+        var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
+            teamModel,
+            leaveTeamLinkSelector = '.leave-team-link',
             DEFAULT_MEMBERSHIP = [
                 {
                     'user': {
                         'username': 'bilbo',
                         'profile_image': {
                             'has_image': true,
-                                'image_url_medium': '/image-url'
-                            }
+                            'image_url_medium': '/image-url'
                         }
+                    }
                 }
             ];
 
@@ -38,6 +40,7 @@ define([
         createTeamProfileView = function(requests, options) {
             teamModel = new TeamModel(createTeamModelData(options), { parse: true });
             profileView = new TeamProfileView({
+                teamEvents: TeamSpecHelpers.teamEvents,
                 courseID: TeamSpecHelpers.testCourseID,
                 model: teamModel,
                 maxTeamSize: options.maxTeamSize || 3,
@@ -71,6 +74,21 @@ define([
             return profileView;
         };
 
+        clickLeaveTeam = function(requests, view) {
+            expect(view.$(leaveTeamLinkSelector).length).toBe(1);
+
+            // click on Leave Team link under Team Details
+            view.$(leaveTeamLinkSelector).click();
+
+            // expect a request to DELETE the team membership
+            AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'api/team/v0/team_membership/test-team,bilbo');
+            AjaxHelpers.respondWithNoContent(requests);
+
+            // expect a request to refetch the user's team memberships
+            AjaxHelpers.expectJsonRequest(requests, 'GET', '/api/team/v0/teams/test-team');
+            AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
+        };
+
         describe('DiscussionsView', function() {
             it('can render itself', function () {
                 var requests = AjaxHelpers.requests(this),
@@ -84,6 +102,7 @@ define([
 
                 expect(view.$('.new-post-btn').length).toEqual(0);
                 teamModel.set('membership', DEFAULT_MEMBERSHIP);  // This should re-render the view.
+                view.render();
                 expect(view.$('.new-post-btn').length).toEqual(1);
             });
 
@@ -92,7 +111,7 @@ define([
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
                 expect(view.$('.new-post-btn').length).toEqual(1);
-                teamModel.set('membership', []);
+                clickLeaveTeam(requests, view);
                 expect(view.$('.new-post-btn').length).toEqual(0);
             });
         });
@@ -119,7 +138,10 @@ define([
                     assertTeamDetails(view, 0, false);
                     expect(view.$('.team-user-membership-status').length).toBe(0);
 
+                    // Verify that the leave team link is not present.
+                    expect(view.$(leaveTeamLinkSelector).length).toBe(0);
                 });
+
                 it('cannot see the country & language if empty', function() {
                     var requests = AjaxHelpers.requests(this);
                     var view = createTeamProfileView(requests, {});
@@ -145,29 +167,21 @@ define([
                     // assert user profile page url.
                     expect(view.$('.member-profile').attr('href')).toBe('/u/bilbo');
 
+                    //Verify that the leave team link is present
+                    expect(view.$(leaveTeamLinkSelector).text()).toContain('Leave Team');
                 });
+
                 it('can leave team successfully', function() {
                     var requests = AjaxHelpers.requests(this);
-                    var leaveTeamLinkSelector = '.leave-team-link';
 
                     var view = createTeamProfileView(
-                        requests, { country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
+                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
                     assertTeamDetails(view, 1, true);
-
-                    expect(view.$(leaveTeamLinkSelector).length).toBe(1);
-
-                    // click on Leave Team link under Team Details
-                    view.$(leaveTeamLinkSelector).click();
-
-                    // response to DELETE
-                    AjaxHelpers.respondWithNoContent(requests);
-
-                    // response to model fetch request
-                    AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
-
+                    clickLeaveTeam(requests, view);
                     assertTeamDetails(view, 0, false);
                 });
+
                 it('shows correct error messages', function () {
                     var requests = AjaxHelpers.requests(this);
 

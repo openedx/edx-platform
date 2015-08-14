@@ -5,10 +5,17 @@
         function (Backbone, gettext, TeamsView) {
             var MyTeamsView = TeamsView.extend({
                 render: function() {
-                    TeamsView.prototype.render.call(this);
-                    if (this.collection.length === 0) {
-                        this.$el.append('<p>' + gettext('You are not currently a member of any teams.') + '</p>');
+                    var view = this;
+                    if (this.collection.isStale) {
+                        this.$el.html('');
                     }
+                    this.collection.refresh()
+                        .done(function() {
+                            TeamsView.prototype.render.call(view);
+                            if (view.collection.length === 0) {
+                                view.$el.append('<p>' + gettext('You are not currently a member of any team.') + '</p>');
+                            }
+                        });
                     return this;
                 },
 

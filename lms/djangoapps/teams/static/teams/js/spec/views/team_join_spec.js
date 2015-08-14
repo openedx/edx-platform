@@ -1,8 +1,7 @@
 define([
-    'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
-    'teams/js/spec_helpers/team_spec_helpers',
-    'teams/js/views/team_join'
-], function (_, AjaxHelpers, TeamModel, TeamSpecHelpers, TeamJoinView) {
+    'backbone', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
+    'teams/js/views/team_join', 'teams/js/spec_helpers/team_spec_helpers'
+], function (Backbone, _, AjaxHelpers, TeamModel, TeamJoinView, TeamSpecHelpers) {
     'use strict';
     describe('TeamJoinView', function () {
         var createTeamsUrl,
@@ -63,6 +62,7 @@ define([
             var teamJoinView = new TeamJoinView(
                 {
                     courseID: TeamSpecHelpers.testCourseID,
+                    teamEvents: TeamSpecHelpers.teamEvents,
                     model: model,
                     teamsUrl: createTeamsUrl(teamId),
                     maxTeamSize: maxTeamSize,

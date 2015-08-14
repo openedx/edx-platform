@@ -1,5 +1,7 @@
-define(['sinon', 'underscore'], function(sinon, _) {
-    var fakeServer, fakeRequests, expectRequest, expectJsonRequest, expectPostRequest,
+define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
+    'use strict';
+
+    var fakeServer, fakeRequests, expectRequest, expectJsonRequest, expectPostRequest, expectJsonRequestURL,
         respondWithJson, respondWithError, respondWithTextError, respondWithNoContent;
 
     /* These utility methods are used by Jasmine tests to create a mock server or
@@ -66,6 +68,24 @@ define(['sinon', 'underscore'], function(sinon, _) {
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
         expect(JSON.parse(request.requestBody)).toEqual(jsonRequest);
+    };
+
+    /**
+     * Expect that a JSON request be made with the given URL and parameters.
+     * @param requests The collected requests
+     * @param expectedUrl The expected URL excluding the parameters
+     * @param expectedParameters An object representing the URL parameters
+     * @param requestIndex An optional index for the request (by default, the last request is used)
+     */
+    expectJsonRequestURL = function(requests, expectedUrl, expectedParameters, requestIndex) {
+        var request, parameters;
+        if (_.isUndefined(requestIndex)) {
+            requestIndex = requests.length - 1;
+        }
+        request = requests[requestIndex];
+        parameters = new URI(request.url).query(true);
+        delete parameters._;  // Ignore the cache-busting argument
+        expect(parameters).toEqual(expectedParameters);
     };
 
     /**
@@ -136,6 +156,7 @@ define(['sinon', 'underscore'], function(sinon, _) {
         'requests': fakeRequests,
         'expectRequest': expectRequest,
         'expectJsonRequest': expectJsonRequest,
+        'expectJsonRequestURL': expectJsonRequestURL,
         'expectPostRequest': expectPostRequest,
         'respondWithJson': respondWithJson,
         'respondWithError': respondWithError,

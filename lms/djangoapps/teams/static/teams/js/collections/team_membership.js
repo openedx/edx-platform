@@ -1,18 +1,24 @@
 ;(function (define) {
     'use strict';
-    define(['common/js/components/collections/paging_collection', 'teams/js/models/team_membership'],
-        function(PagingCollection, TeamMembershipModel) {
-            var TeamMembershipCollection = PagingCollection.extend({
+    define(['teams/js/collections/base', 'teams/js/models/team_membership'],
+        function(BaseCollection, TeamMembershipModel) {
+            var TeamMembershipCollection = BaseCollection.extend({
                 initialize: function(team_memberships, options) {
-                    PagingCollection.prototype.initialize.call(this);
+                    var self = this;
+                    BaseCollection.prototype.initialize.call(this, options);
 
-                    this.course_id = options.course_id;
+                    this.perPage = options.per_page || 10;
                     this.username = options.username;
                     this.privileged = options.privileged;
-                    this.perPage = options.per_page || 10;
-                    this.server_api['expand'] = 'team';
-                    this.server_api['course_id'] = function () { return encodeURIComponent(options.course_id); };
-                    this.server_api['username'] = this.username;
+
+                    this.server_api = _.extend(
+                        {
+                            expand: 'team',
+                            username: this.username,
+                            course_id: function () { return encodeURIComponent(self.course_id); }
+                        },
+                        BaseCollection.prototype.server_api
+                    );
                     delete this.server_api['sort_order']; // Sort order is not specified for the TeamMembership API
                     delete this.server_api['order_by']; // Order by is not specified for the TeamMembership API
                 },
@@ -28,5 +34,5 @@
                 }
             });
             return TeamMembershipCollection;
-    });
+        });
 }).call(this, define || RequireJS.define);
