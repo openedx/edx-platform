@@ -829,6 +829,48 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         actual = GroupConfiguration.get_content_experiment_usage_info(self.store, self.course)
         self.assertEqual(actual, {0: []})
 
+    def test_can_handle_multiple_partitions(self):
+        # Create the user partitions
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name='Cohort user partition',
+                scheme=UserPartition.get_scheme('cohort'),
+                description='Cohorted user partition',
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name='Random user partition',
+                scheme=UserPartition.get_scheme('random'),
+                description='Random user partition',
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+        ]
+        self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+
+        # Assign group access rules for multiple partitions, one of which is a cohorted partition
+        __, problem = self._create_problem_with_content_group(0, 1)
+        problem.group_access = {
+            0: [0],
+            1: [1],
+        }
+        self.store.update_item(problem, ModuleStoreEnum.UserID.test)
+
+        # This used to cause an exception since the code assumed that
+        # only one partition would be available.
+        actual = GroupConfiguration.get_content_groups_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0])
+
+        actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0])
+
 
 class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     """

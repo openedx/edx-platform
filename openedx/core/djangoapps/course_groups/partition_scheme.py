@@ -107,6 +107,14 @@ def get_cohorted_user_partition(course_key):
     one cohorted user partition.
     """
     course = courses.get_course_by_id(course_key)
+    return get_cohorted_user_partition_for_course(course)
+
+
+def get_cohorted_user_partition_for_course(course):  # pylint: disable=invalid-name
+    """
+    Retrieve the first user partition in the course which uses the CohortPartitionScheme.
+    Unlike `get_cohorted_user_partition`, this does NOT look up the course by its course key.
+    """
     for user_partition in course.user_partitions:
         if user_partition.scheme == CohortPartitionScheme:
             return user_partition
