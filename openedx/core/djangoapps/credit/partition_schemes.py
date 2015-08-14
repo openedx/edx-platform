@@ -57,31 +57,7 @@ class VerificationPartitionScheme(object):
         # here getting cache key names for all models. So that we can make the
         # list of keys and get the cache.get_many
 
-        enrollment_cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
-        has_skipped_cache_key = SkippedReverification.cache_key_name(user.id, unicode(course_key))
-        verification_status_cache_key = VerificationStatus.cache_key_name(user.id, unicode(course_key))
-
-        cache_keys = [
-            enrollment_cache_key, has_skipped_cache_key, verification_status_cache_key
-        ]
-
-        cache_values = cache.get_many(cache_keys)
-
-        if enrollment_cache_key not in cache_values:
-            is_verified = is_enrolled_in_verified_mode(user, course_key)
-        else:
-            enrollment_mode = cache_values[enrollment_cache_key]
-            is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
-
-        if has_skipped_cache_key not in cache_values:
-            has_skipped = has_skipped_any_checkpoint(user, course_key)
-        else:
-            has_skipped = cache_values[has_skipped_cache_key]
-
-        if verification_status_cache_key not in cache_values:
-            verification_statuses = VerificationStatus.get_all_checkpoints(user.id, course_key)
-        else:
-            verification_statuses = cache_values[verification_status_cache_key]
+        is_verified, has_skipped, verification_statuses = update_multi_key_cache(user, course_key)
 
         was_denied = VerificationStatus.DENIED_STATUS in verification_statuses.values()
         has_completed_check = checkpoint in verification_statuses and (
@@ -133,12 +109,7 @@ def is_enrolled_in_verified_mode(user, course_key):
     Returns:
         Boolean
     """
-    # Don't get from cache because this is get through get_many() call from caller
-    cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    # Set the cache so that get_many call get it.
-    cache.set(cache_key, enrollment_mode)
-
     return enrollment_mode in CourseMode.VERIFIED_MODES
 
 
@@ -189,3 +160,52 @@ def has_completed_checkpoint(user, course_key, checkpoint):
     return checkpoint in checkpoints_dict and checkpoints_dict[checkpoint] in [
         VerificationStatus.SUBMITTED_STATUS, VerificationStatus.APPROVED_STATUS
     ]
+
+
+def update_multi_key_cache(user, course_key):
+    """This method will make multi key cache for all 3 db models in use. So that instead of hitting the cache
+    seperately will hit the cache only once and get the values for all three keys.
+
+    Args:
+        user(User): user object
+        course_key(CourseKey): CourseKey
+
+    Returns:
+        tuple containing student' status
+        verified mode : boolean
+        has_skipped: boolean
+        verification_statuses: dict
+    """
+    enrollment_cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
+    has_skipped_cache_key = SkippedReverification.cache_key_name(user.id, unicode(course_key))
+    verification_status_cache_key = VerificationStatus.cache_key_name(user.id, unicode(course_key))
+
+    cache_keys = [
+        enrollment_cache_key, has_skipped_cache_key, verification_status_cache_key
+    ]
+
+    cache_values = cache.get_many(cache_keys)
+
+    is_verified = cache_values.get(enrollment_cache_key)
+    if is_verified is None:
+        is_verified = is_enrolled_in_verified_mode(user, course_key)
+        cache.set(enrollment_cache_key, is_verified)
+
+    has_skipped = cache_values.get(has_skipped_cache_key)
+    if has_skipped is None:
+        has_skipped = has_skipped_any_checkpoint(user, course_key)
+        cache.set(has_skipped_cache_key, has_skipped)
+
+    verification_statuses = cache_values.get(verification_status_cache_key)
+    if verification_statuses is None:
+        verification_statuses = VerificationStatus.get_all_checkpoints(
+            user.id,
+            course_key
+        )
+        cache.set(verification_status_cache_key, verification_statuses)
+
+    return (
+        is_verified,
+        has_skipped,
+        verification_statuses
+    )
