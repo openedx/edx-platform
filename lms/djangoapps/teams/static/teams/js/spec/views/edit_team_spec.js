@@ -162,6 +162,25 @@ define([
             expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("An error occurred. Please try again.");
         });
 
+        it("shows correct error message when server returns an error", function () {
+            var requests = AjaxHelpers.requests(this);
+
+            teamEditView.$('.u-field-name input').val(teamsData.name);
+            teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
+
+            teamEditView.$('.create-team.form-actions .action-primary').click();
+            teamsData.country = '';
+            teamsData.language = '';
+            AjaxHelpers.expectJsonRequest(requests, 'POST', teamsUrl, teamsData);
+            AjaxHelpers.respondWithError(
+                    requests,
+                    400,
+                    {'error_message': {'user_message': 'User message', 'developer_message': 'Developer message' }}
+            );
+
+            expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("User message");
+        });
+
         it("changes route on cancel click", function () {
             teamEditView.$('.create-team.form-actions .action-cancel').click();
             expect(Backbone.history.navigate.calls[0].args).toContain('topics/awesomeness');

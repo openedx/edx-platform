@@ -501,15 +501,25 @@ class TestCreateTeamAPI(TeamAPITestCase):
     def test_bad_course_data(self, status, data):
         self.post_create_team(status, data)
 
+    def test_student_in_team(self):
+        self.post_create_team(
+            400,
+            {
+                'course_id': str(self.test_course_1.id),
+                'description': "You are already on a team in this course."
+            },
+            user='student_enrolled'
+        )
+
+    @ddt.data({'description': ''}, {'name': 'x' * 1000}, {'name': ''})
+    def test_bad_fields(self, kwargs):
+        self.post_create_team(400, self.build_team_data(**kwargs))
+
     def test_missing_name(self):
         self.post_create_team(400, {
             'course_id': str(self.test_course_1.id),
             'description': "foobar"
         })
-
-    @ddt.data({'description': ''}, {'name': 'x' * 1000}, {'name': ''})
-    def test_bad_fields(self, kwargs):
-        self.post_create_team(400, self.build_team_data(**kwargs))
 
     def test_full_student_creator(self):
         creator = self.create_and_enroll_student()

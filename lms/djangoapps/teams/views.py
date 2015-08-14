@@ -363,6 +363,18 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 ugettext_noop('The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
+            return Response({
+                'field_errors': field_errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if CourseTeamMembership.user_in_team_for_course(request.user, course_key):
+            error_message = build_api_error(
+                ugettext_noop('You are already in a team in this course.'),
+                course_id=course_id
+            )
+            return Response({
+                'error_message': error_message,
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
