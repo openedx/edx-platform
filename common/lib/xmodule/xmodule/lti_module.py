@@ -626,6 +626,11 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         except ValueError:  # Scheme not in url.
             # https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
             # Stubbing headers for now:
+            log.info(
+                u"LTI module %s in course %s does not have oauth parameters correctly configured.",
+                self.location,
+                self.location.course_key,
+            )
             headers = {
                 u'Content-Type': u'application/x-www-form-urlencoded',
                 u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
