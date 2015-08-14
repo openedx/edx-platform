@@ -51,7 +51,6 @@ from .serializers import (
 )
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
-
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 
@@ -120,7 +119,7 @@ class TeamsDashboardView(View):
 def has_team_api_access(user, course_key, access_username=None):
     """Returns True if the user has access to the Team API for the course
     given by `course_key`. The user must either be enrolled in the course,
-    be course staff, or be global staff.
+    be course staff, be global staff, or have discussion privileges.
 
     Args:
       user (User): The user to check access for.
@@ -133,6 +132,8 @@ def has_team_api_access(user, course_key, access_username=None):
     if user.is_staff:
         return True
     if CourseStaffRole(course_key).has_user(user):
+        return True
+    if has_discussion_privileges(user, course_key):
         return True
     if not access_username or access_username == user.username:
         return CourseEnrollment.is_enrolled(user, course_key)
@@ -250,8 +251,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             If the user is not logged in, a 401 error is returned.
 
-            If the user is not enrolled in the course, or is not course or
-            global staff, a 403 error is returned.
+            If the user is not enrolled in the course, is not course or
+            global staff, or does not have discussion privileges a 403 error
+            is returned.
 
             If the course_id is not valid or extra fields are included in the
             request, a 400 error is returned.
@@ -467,8 +469,8 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is anonymous or inactive, a 401 is returned.
 
             If the user is logged in and the team does not exist, a 404 is returned.
-            If the user is not course or global staff and the team does exist,
-            a 403 is returned.
+            If the user is not course or global staff, does not have discussion
+            privileges, and the team does exist, a 403 is returned.
 
             If "application/merge-patch+json" is not the specified content type,
             a 415 error is returned.
@@ -485,8 +487,20 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             """Returns true if the user is enrolled or is staff."""
             return has_team_api_access(request.user, obj.course_id)
 
+    class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
+        """Permission that checks to see if the user is global staff, course
+        staff, or has discussion privileges. If none of those conditions are
+        met, only read access will be granted.
+        """
+
+        def has_object_permission(self, request, view, obj):
+            return (
+                has_discussion_privileges(request.user, obj.course_id) or
+                IsStaffOrReadOnly.has_object_permission(self, request, view, obj)
+            )
+
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrReadOnly, IsEnrolledOrIsStaff,)
+    permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
     parser_classes = (MergePatchParser,)
@@ -765,8 +779,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         **Response Values for POST**
 
             Any logged in user enrolled in a course can enroll themselves in a
-            team in the course. Course and global staff can enroll any user in
-            a team, with a few exceptions noted below.
+            team in the course. Course staff, global staff, and discussion
+            privileged users can enroll any user in a team, with a few
+            exceptions noted below.
 
             If the user is not logged in and active, a 401 error is returned.
 
@@ -775,11 +790,11 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
             If the specified team does not exist, a 404 error is returned.
 
-            If the user is not staff and is not enrolled in the course
-            associated with the team they are trying to join, or if they are
-            trying to add a user other than themselves to a team, a 404 error
-            is returned. This is to prevent leaking information about the
-            existence of teams and users.
+            If the user is not staff, does not have discussion privileges,
+            and is not enrolled in the course associated with the team they
+            are trying to join, or if they are trying to add a user other
+            than themselves to a team, a 404 error is returned. This is to
+            prevent leaking information about the existence of teams and users.
 
             If the specified user does not exist, a 404 error is returned.
 
@@ -789,7 +804,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
             If the user is not enrolled in the course associated with the team
             they are trying to join, a 400 error is returned. This can occur
-            when a staff user posts a request adding another user to a team.
+            when a staff or discussion privileged user posts a request adding
+            another user to a team.
     """
 
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
@@ -961,18 +977,19 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         **Response Values for DELETE**
 
             Any logged in user enrolled in a course can remove themselves from
-            a team in the course. Course and global staff can remove any user
-            from a team. Successfully deleting a membership will return a 204
-            response with no content.
+            a team in the course. Course staff, global staff, and discussion
+            privileged users can remove any user from a team. Successfully
+            deleting a membership will return a 204 response with no content.
 
             If the user is not logged in and active, a 401 error is returned.
 
             If the specified team or username does not exist, a 404 error is
             returned.
 
-            If the user is not staff and is attempting to remove another user
-            from a team, a 404 error is returned. This prevents leaking
-            information about team and user existence.
+            If the user is not staff or a discussion privileged user and is
+            attempting to remove another user from a team, a 404 error is
+            returned. This prevents leaking information about team and user
+            existence.
 
             If the membership does not exist, a 404 error is returned.
     """
