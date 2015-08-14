@@ -18,12 +18,8 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 @patch.dict(settings.FEATURES, {'SIGNAL_ON_SCORE_CHANGED': True})
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
-@patch.dict("django.conf.settings.FEATURES", {'SIGNAL_ON_SCORE_CHANGED': False})
 class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     """
     Test suite for grade generation script
@@ -32,97 +28,97 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     def setUp(self):
         super(GenerateGradebookEntriesTests, self).setUp()
         # Turn off the signalling mechanism temporarily
-        settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
+        with patch.dict(settings.FEATURES, {'SIGNAL_ON_SCORE_CHANGED': False}):
 
-        # Create a couple courses to work with
-        self.course = CourseFactory.create(
-            start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2020, 1, 16),
-            org='GRADEBOOK'
-        )
-        self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+            # Create a couple courses to work with
+            self.course = CourseFactory.create(
+                start=datetime(2014, 6, 16, 14, 30),
+                end=datetime(2020, 1, 16),
+                org='GRADEBOOK'
+            )
+            self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
-        chapter1 = ItemFactory.create(
-            category="chapter",
-            parent_location=self.course.location,
-            data=self.test_data,
-            due=datetime(2014, 5, 16, 14, 30),
-            display_name="Overview"
-        )
+            chapter1 = ItemFactory.create(
+                category="chapter",
+                parent_location=self.course.location,
+                data=self.test_data,
+                due=datetime(2014, 5, 16, 14, 30),
+                display_name="Overview"
+            )
 
-        chapter2 = ItemFactory.create(
-            category="chapter",
-            parent_location=self.course.location,
-            data=self.test_data,
-            due=datetime(2014, 5, 16, 14, 30),
-            display_name="Overview"
-        )
-        self.problem = ItemFactory.create(
-            parent_location=chapter1.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name="homework problem 1",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
-        )
-        self.problem2 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name="homework problem 2",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
-        )
-        self.problem3 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name="lab problem 1",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
-        )
-        self.problem4 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name="midterm problem 2",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
-        )
-        self.problem5 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name="final problem 2",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
-        )
+            chapter2 = ItemFactory.create(
+                category="chapter",
+                parent_location=self.course.location,
+                data=self.test_data,
+                due=datetime(2014, 5, 16, 14, 30),
+                display_name="Overview"
+            )
+            self.problem = ItemFactory.create(
+                parent_location=chapter1.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name="homework problem 1",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+            )
+            self.problem2 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name="homework problem 2",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+            )
+            self.problem3 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name="lab problem 1",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
+            )
+            self.problem4 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name="midterm problem 2",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
+            )
+            self.problem5 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name="final problem 2",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+            )
 
-        # Create some users and enroll them
-        self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(2)]
-        self.users.insert(0, self.user)
-        for user in self.users:
-            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            # Create some users and enroll them
+            self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(2)]
+            self.users.insert(0, self.user)
+            for user in self.users:
+                CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-            grade = 0.15 * user.id
-            module = self.get_module_for_user(user, self.course, self.problem)
-            grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
-            module.system.publish(module, 'grade', grade_dict)
+                grade = 0.15 * user.id
+                module = self.get_module_for_user(user, self.course, self.problem)
+                grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
 
-            grade = 0.20 * user.id
-            module = self.get_module_for_user(user, self.course, self.problem2)
-            grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
-            module.system.publish(module, 'grade', grade_dict)
+                grade = 0.20 * user.id
+                module = self.get_module_for_user(user, self.course, self.problem2)
+                grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
 
-            grade = 0.25 * user.id
-            module = self.get_module_for_user(user, self.course, self.problem3)
-            grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
-            module.system.publish(module, 'grade', grade_dict)
+                grade = 0.25 * user.id
+                module = self.get_module_for_user(user, self.course, self.problem3)
+                grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
 
-            grade = 0.30 * user.id
-            module = self.get_module_for_user(user, self.course, self.problem4)
-            grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
-            module.system.publish(module, 'grade', grade_dict)
+                grade = 0.30 * user.id
+                module = self.get_module_for_user(user, self.course, self.problem4)
+                grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
 
-            grade = 0.33 * user.id
-            module = self.get_module_for_user(user, self.course, self.problem5)
-            grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
-            module.system.publish(module, 'grade', grade_dict)
+                grade = 0.33 * user.id
+                module = self.get_module_for_user(user, self.course, self.problem5)
+                grade_dict = {'value': grade, 'max_value': 1, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
 
     def get_module_for_user(self, user, course, problem):
         """Helper function to get useful module at self.location in self.course_id for user"""
