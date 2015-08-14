@@ -41,6 +41,7 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2015
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
+# Ahmed Jazzar <ajazzar@edraak.org>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2014
@@ -79,9 +80,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-07 13:41+0000\n"
-"PO-Revision-Date: 2015-08-06 09:32+0000\n"
-"Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
+"POT-Creation-Date: 2015-08-14 13:42+0000\n"
+"PO-Revision-Date: 2015-08-14 13:44+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -163,7 +164,7 @@ msgstr "حذف"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-#: lms/static/js/views/fields.js
+#: lms/static/js/views/image_field.js
 msgid "Uploading"
 msgstr "جاري التحميل"
 
@@ -2190,11 +2191,13 @@ msgstr "جرى الإسقاط على الهدف"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "%s ago"
 msgstr "منذ %s ثوانٍ "
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "%s from now"
 msgstr "%s ثوانٍ من الآن"
 
@@ -2207,6 +2210,7 @@ msgid "about a minute"
 msgstr "حوالي دقيقة"
 
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d دقيقة"
@@ -2221,6 +2225,7 @@ msgid "about an hour"
 msgstr "حوالي ساعة"
 
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "حوالي %d ساعة"
@@ -2235,6 +2240,7 @@ msgid "a day"
 msgstr "يوم واحد"
 
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d يوم"
@@ -2249,6 +2255,7 @@ msgid "about a month"
 msgstr "حوالي شهر"
 
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d شهر"
@@ -2263,6 +2270,7 @@ msgid "about a year"
 msgstr "حوالي سنة"
 
 #: common/static/js/src/jquery.timeago.locale.js
+#, c-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d سنة"
@@ -2412,7 +2420,8 @@ msgstr "نصّ"
 msgid "Video"
 msgstr "فيديو"
 
-#: common/static/js/vendor/ova/catch/js/catch.js lms/static/js/views/fields.js
+#: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/static/js/views/image_field.js
 msgid "Image"
 msgstr "صورة"
 
@@ -2425,6 +2434,10 @@ msgstr "الرد"
 msgid "Tags:"
 msgstr "العلامات: "
 
+#: lms/djangoapps/support/static/support/js/views/certificates.js
+msgid "An unexpected error occurred.  Please try again."
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
@@ -2435,6 +2448,8 @@ msgstr "الاسم  "
 msgid "open_slots"
 msgstr "open_slots"
 
+#. Translators: This refers to the number of teams (a count of how many teams
+#. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "عدد أعضاء الفريق"
@@ -2455,17 +2470,6 @@ msgstr ""
 msgid ""
 "A short description of the team to help other learners understand the goals "
 "or direction of the team (maximum 300 characters)."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
-msgid "Optional Characteristics"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/edit_team.js
-msgid ""
-"Help other learners decide whether to join your team by specifying some "
-"characteristics for your team. Choose carefully, because fewer people might "
-"be interested in joining your team if it seems too restrictive."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
@@ -2512,27 +2516,44 @@ msgstr ""
 msgid "Team description cannot have more than 300 characters."
 msgstr ""
 
-#: lms/djangoapps/teams/static/teams/js/views/team_actions.js
-msgid ""
-"Try {browse_span_start}browsing all teams{span_end} or "
-"{search_span_start}searching team descriptions{span_end}. If you still can't"
-" find a team to join, {create_span_start}create a new team in this "
-"topic{span_end}."
+#: lms/djangoapps/teams/static/teams/js/views/my_teams.js
+msgid "You are not currently a member of any teams."
 msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "%(member_count)s / %(max_member_count)s Member"
-msgid_plural "%(member_count)s / %(max_member_count)s Members"
-msgstr[0] "%(member_count)s / %(max_member_count)s عضو"
-msgstr[1] "%(member_count)s / %(max_member_count)s عضو"
-msgstr[2] "%(member_count)s / %(max_member_count)s عضو"
-msgstr[3] "%(member_count)s / %(max_member_count)s عضو"
-msgstr[4] "%(member_count)s / %(max_member_count)s عضو"
-msgstr[5] "%(member_count)s / %(max_member_count)s عضو"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View %(span_start)s %(team_name)s %(span_end)s"
 msgstr "مشاهدة %(span_start)s %(team_name)s %(span_end)s"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "An error occurred. Try again."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+msgid "You already belong to another team."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_join.js
+msgid "This team is full."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_utils.js
+msgid "%(memberCount)s / %(maxMemberCount)s Member"
+msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "All teams"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "teams"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -2547,12 +2568,15 @@ msgid "Teams"
 msgstr "الفِرَق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "My Teams"
-msgstr "فِرَقي"
+msgid "My Team"
+msgstr ""
 
+#. Translators: sr_start and sr_end surround text meant only for screen
+#. readers.  The whole string will be shown to users as "Browse teams" if they
+#. are using a screenreader, and "Browse" otherwise.
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Browse"
-msgstr "تصفّح"
+msgid "Browse %(sr_start)s teams %(sr_end)s"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -2594,6 +2618,18 @@ msgstr[5] "%(team_count)s فريقاً"
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr "استعراض الفِرق في موضوع %(topic_name)s"
 
+#: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
+msgid ""
+"Try {browse_span_start}browsing all teams{span_end} or "
+"{search_span_start}searching team descriptions{span_end}. If you still can't"
+" find a team to join, {create_span_start}create a new team in this "
+"topic{span_end}."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/topics.js
+msgid "All topics"
+msgstr ""
+
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "فتح الآلة الحاسبة "
@@ -2605,6 +2641,10 @@ msgstr "إغلاق الآلة الحاسبة "
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "محتوى المنشور"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating proctored exam results. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
@@ -3441,6 +3481,11 @@ msgstr "جميع الأقسام الفرعية"
 msgid "All units"
 msgstr "جميع الوحدات"
 
+#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/templates/ccx/schedule.underscore
+msgid "Click to change"
+msgstr ""
+
 #: lms/static/js/ccx/schedule.js
 msgid "Select a chapter"
 msgstr "اختر فصلًا"
@@ -3450,12 +3495,12 @@ msgid "Save changes"
 msgstr "حفظ التغييرات"
 
 #: lms/static/js/ccx/schedule.js
-msgid "Enter Due Date"
-msgstr "يُرجى إدخال تاريخ الاستحقاق."
+msgid "Enter Due Date and Time"
+msgstr ""
 
 #: lms/static/js/ccx/schedule.js
-msgid "Enter Start Date"
-msgstr "يُرجى إدخال تاريخ البدء"
+msgid "Enter Start Date and Time"
+msgstr ""
 
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
@@ -3476,6 +3521,7 @@ msgid "An error occurred. Please try again later."
 msgstr "ناسف لحدوث خطأ. يُرجى إعادة المحاولة لاحقًا. "
 
 #: lms/static/js/discovery/views/search_form.js
+#, c-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "إظهار %s مساق"
@@ -3486,6 +3532,7 @@ msgstr[4] "إظهار %s مساقات"
 msgstr[5] "إظهار %s مساقات"
 
 #: lms/static/js/discovery/views/search_form.js
+#, c-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "عذرًا، لم نجد أي نتائج لـ\"%s\"."
 
@@ -3734,6 +3781,7 @@ msgid "Mark enrollment code as unused"
 msgstr "وسم رمز التسجيل على أنّه غير مستخدم"
 
 #: lms/static/js/search/base/views/search_results_view.js
+#, c-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s نتيجة"
@@ -3765,8 +3813,7 @@ msgstr ""
 
 #: lms/static/js/student_account/account.js
 msgid "We weren't able to send you a password reset email."
-msgstr ""
-"عذرًا، لم نتمكّن من مراسلتك عبر البريد الإلكتروني لإعادة ضبط كلمة السر. "
+msgstr "عذرًا، لم نتمكّن من مراسلتك عبر البريد الإلكتروني لتغيير كلمة السر. "
 
 #: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
@@ -3830,12 +3877,12 @@ msgstr "كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset your Password"
-msgstr "إعادة ضبط كلمة السر"
+msgstr "تغيير كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
-msgstr "إعادة ضبط كلمة السر"
+msgstr "تغيير كلمة السر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4118,63 +4165,6 @@ msgstr "قيد المعالجة"
 msgid "Placeholder"
 msgstr "موضع الفلاش"
 
-#: lms/static/js/views/fields.js
-msgid "Upload an image"
-msgstr "تحميل صورة"
-
-#: lms/static/js/views/fields.js
-msgid "Change image"
-msgstr "تغيير الصورة"
-
-#: lms/static/js/views/fields.js
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Remove"
-msgstr "حذف"
-
-#: lms/static/js/views/fields.js
-msgid "Removing"
-msgstr "جاري الحذف"
-
-#: lms/static/js/views/fields.js
-msgid "An error has occurred. Refresh the page, and then try again."
-msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة ثمّ المحاولة مرّة أخرى."
-
-#: lms/static/js/views/fields.js
-msgid "The file must be at least {size} in size."
-msgstr "يجب ألّا يقل حجم الملف عن {size}."
-
-#: lms/static/js/views/fields.js
-msgid "The file must be smaller than {size} in size."
-msgstr "يجب ألّا يزيد حجم الملف عن {size}."
-
-#: lms/static/js/views/fields.js
-msgid ""
-"Upload is in progress. To avoid errors, stay on this page until the process "
-"is complete."
-msgstr ""
-"جاري التحميل. يُرجى البقاء في هذه الصفحة حتى استكمال العملية لتفادي وقوع "
-"الأخطاء."
-
-#: lms/static/js/views/fields.js
-msgid ""
-"Removal is in progress. To avoid errors, stay on this page until the process"
-" is complete."
-msgstr ""
-"جاري الحذف. يُرجى البقاء في هذه الصفحة حتى استكمال العملية لتفادي وقوع "
-"الأخطاء."
-
-#: lms/static/js/views/fields.js
-msgid "bytes"
-msgstr "بايت"
-
-#: lms/static/js/views/fields.js
-msgid "KB"
-msgstr "كيلو بايت"
-
-#: lms/static/js/views/fields.js
-msgid "MB"
-msgstr "ميغا بايت"
-
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' succeeded."
 msgstr "نجح تحميلك لملف '{file}'. "
@@ -4182,6 +4172,63 @@ msgstr "نجح تحميلك لملف '{file}'. "
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' failed."
 msgstr "عذرًا، فشل تحميلك لملف '{file}'. "
+
+#: lms/static/js/views/image_field.js
+msgid "Upload an image"
+msgstr "تحميل صورة"
+
+#: lms/static/js/views/image_field.js
+msgid "Change image"
+msgstr "تغيير الصورة"
+
+#: lms/static/js/views/image_field.js
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
+msgstr "حذف"
+
+#: lms/static/js/views/image_field.js
+msgid "Removing"
+msgstr "جاري الحذف"
+
+#: lms/static/js/views/image_field.js
+msgid "An error has occurred. Refresh the page, and then try again."
+msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة ثمّ المحاولة مرّة أخرى."
+
+#: lms/static/js/views/image_field.js
+msgid "The file must be at least {size} in size."
+msgstr "يجب ألّا يقل حجم الملف عن {size}."
+
+#: lms/static/js/views/image_field.js
+msgid "The file must be smaller than {size} in size."
+msgstr "يجب ألّا يزيد حجم الملف عن {size}."
+
+#: lms/static/js/views/image_field.js
+msgid ""
+"Upload is in progress. To avoid errors, stay on this page until the process "
+"is complete."
+msgstr ""
+"جاري التحميل. يُرجى البقاء في هذه الصفحة حتى استكمال العملية لتفادي وقوع "
+"الأخطاء."
+
+#: lms/static/js/views/image_field.js
+msgid ""
+"Removal is in progress. To avoid errors, stay on this page until the process"
+" is complete."
+msgstr ""
+"جاري الحذف. يُرجى البقاء في هذه الصفحة حتى استكمال العملية لتفادي وقوع "
+"الأخطاء."
+
+#: lms/static/js/views/image_field.js
+msgid "bytes"
+msgstr "بايت"
+
+#: lms/static/js/views/image_field.js
+msgid "KB"
+msgstr "كيلو بايت"
+
+#: lms/static/js/views/image_field.js
+msgid "MB"
+msgstr "ميغا بايت"
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -4241,8 +4288,8 @@ msgstr "تأكيد حذف الصفحة"
 msgid ""
 "Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
-"هل أنت واثق من أنّك تريد حذف هذه الصفحة؟ فإنّه لا يمكن التراجع عن هذه "
-"العملية لاحقًا."
+"هل أنت واثق من أنّك تريد حذف هذه الصفحة؟ لا يمكن التراجع عن هذه العملية "
+"لاحقًا."
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/certificates/views/signatory_editor.js
@@ -4306,14 +4353,6 @@ msgstr ""
 msgid "Yes, allow edits to the active Certificate"
 msgstr ""
 
-#: cms/static/js/certificates/views/certificate_editor.js
-msgid "Upload organization logo."
-msgstr "يُرجى تحميل شعار الشركة."
-
-#: cms/static/js/certificates/views/certificate_editor.js
-msgid "Maximum logo height should be 125px."
-msgstr "يجب أنّ يبلغ الارتفاع الأقصى للشعار 125 بكسل."
-
 #. Translators: This field pertains to the custom label for a certificate.
 #. Translators: this refers to a collection of certificates.
 #: cms/static/js/certificates/views/certificate_item.js
@@ -4345,6 +4384,7 @@ msgid "Image must be 450px X 150px transparent PNG."
 msgstr "يجب أن تكون الصورة شفّافة بصيغة PNG وأبعادها 450 × 150 بكسل."
 
 #: cms/static/js/collections/group.js
+#, c-format
 msgid "Group %s"
 msgstr "المجموعة %s"
 
@@ -5374,6 +5414,14 @@ msgid "Status"
 msgstr "الحالة"
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "الوحدة"
 
@@ -5386,8 +5434,24 @@ msgid "remove all"
 msgstr "حذف الكل"
 
 #: lms/templates/ccx/schedule.underscore
+msgid "toggle chapter"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Section"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "حذف"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "toggle subsection"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Subsection"
+msgstr ""
 
 #: lms/templates/commerce/provider.underscore
 #: lms/templates/commerce/receipt.underscore
@@ -5396,10 +5460,12 @@ msgid "gettext("
 msgstr "gettext("
 
 #: lms/templates/commerce/provider.underscore
+#, python-format
 msgid "<img src='%s' alt='%s'></image>"
 msgstr "<img src='%s' alt='%s'></image>"
 
 #: lms/templates/commerce/provider.underscore
+#, python-format
 msgid ""
 "<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
 "class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
@@ -5462,6 +5528,7 @@ msgstr "الذهاب إلى لوحة المعلومات"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#, python-format
 msgid ""
 "If you don't verify your identity now, you can still explore your course "
 "from your dashboard. You will receive periodic reminders from "
@@ -5478,6 +5545,14 @@ msgstr "هل تريد تأكيد هويّتك لاحقًا؟"
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
 msgstr "إجراء التحقّق الآن"
+
+#: lms/templates/courseware/proctored-exam-controls.underscore
+msgid "Mark Exam As Completed"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr ""
 
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
@@ -5674,6 +5749,7 @@ msgid "Create a content group"
 msgstr "إنشاء مجموعة محتوى"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
+#, python-format
 msgid "(contains %(student_count)s student)"
 msgid_plural "(contains %(student_count)s students)"
 msgstr[0] "(يحتوي على %(student_count)s طالب)"
@@ -5704,6 +5780,7 @@ msgid "Select a cohort"
 msgstr "انتقاء مجموعة"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+#, python-format
 msgid "%(cohort_name)s (%(user_count)s)"
 msgstr "%(cohort_name)s (%(user_count)s)"
 
@@ -5724,6 +5801,7 @@ msgid "Assign students to cohorts by uploading a CSV file"
 msgstr "توزيع الطلّاب على المجموعات عبر تحميل ملف CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+#, python-format
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
 "file, download course profile information or cohort results on "
@@ -5743,6 +5821,7 @@ msgstr "صالح"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
+#, python-format
 msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
 msgstr[0] "تحميل النتائج الـ %(num_items)s التالية"
@@ -5803,10 +5882,12 @@ msgid "Sign in"
 msgstr "تسجيل الدخول"
 
 #: lms/templates/student_account/hinted_login.underscore
+#, python-format
 msgid "Would you like to sign in using your %(providerName)s credentials?"
 msgstr "هل تريد تسجيل الدخول باستخدام بيانات حسابك لدى %(providerName)s؟"
 
 #: lms/templates/student_account/hinted_login.underscore
+#, python-format
 msgid "Sign in using %(providerName)s"
 msgstr "تسجيل الدخول باستخدام %(providerName)s"
 
@@ -5836,6 +5917,7 @@ msgid "Register through edX"
 msgstr "التسجيل من خلال edX"
 
 #: lms/templates/student_account/login.underscore
+#, python-format
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
 "%(currentProvider)s account does not have a linked %(platformName)s account."
@@ -5862,6 +5944,7 @@ msgid "We couldn't sign you in."
 msgstr "عذرًا، لم نتمكّن من تسجيل دخولك. "
 
 #: lms/templates/student_account/login.underscore
+#, python-format
 msgid "An error occurred when signing you in to %(platformName)s."
 msgstr "نأسف لحدوث خطأ أثناء تسجيل دخولك إلى %(platformName)s."
 
@@ -5886,6 +5969,7 @@ msgid "or sign in with"
 msgstr "أو سجّل الدخول باستخدام"
 
 #: lms/templates/student_account/login.underscore
+#, python-format
 msgid "Sign in with %(providerName)s"
 msgstr "يُرجى منك تسجيل دخولك باستخدام %(providerName)s"
 
@@ -5895,8 +5979,9 @@ msgid "Use my institution/campus credentials"
 msgstr "استخدام بياناتي لدى المؤسّسة/ الحرم الجامعي"
 
 #: lms/templates/student_account/login.underscore
+#, python-format
 msgid "New to %(platformName)s?"
-msgstr "هل أنت جديد على %(platformName)s؟ أنشئ حسابًا جديدًا اﻵن."
+msgstr "هل أنت جديد على %(platformName)s؟"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an account"
@@ -5928,10 +6013,12 @@ msgid "We couldn't create your account."
 msgstr "عذرًا، لم نتمكّن من إنشاء حسابك. "
 
 #: lms/templates/student_account/register.underscore
+#, python-format
 msgid "You've successfully signed into %(currentProvider)s."
 msgstr "نجح تسجيل دخولك في %(currentProvider)s. "
 
 #: lms/templates/student_account/register.underscore
+#, python-format
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
@@ -5944,6 +6031,7 @@ msgid "Create an account using"
 msgstr "إنشاء حساب باستخدام"
 
 #: lms/templates/student_account/register.underscore
+#, python-format
 msgid "Create account using %(providerName)s."
 msgstr "إنشاء حساب باستخدام %(providerName)s."
 
@@ -5953,7 +6041,7 @@ msgstr "أو أنشئ حساباً جديداً باستخدام"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create a new account"
-msgstr "أنشئ حسابًا جديدًا"
+msgstr "أنشئ حساباً جديداً"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create your account"
@@ -5976,6 +6064,7 @@ msgid "This edX learner is currently sharing a limited profile."
 msgstr "يُشارك حاليًّا هذا الطالب لدى edX ملفًّا شخصيًّا محدودًا."
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
 msgstr "تهانينا! هويّتك موثّقة الآن على %(platformName)s!"
 
@@ -5992,6 +6081,7 @@ msgid "Course"
 msgstr "المساق "
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#, python-format
 msgid "Starts: %(start)s"
 msgstr "يبدأ: %(start)s"
 
@@ -6008,6 +6098,7 @@ msgid "Verified Status"
 msgstr "حالة جرى التحقّق منها"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
+#, python-format
 msgid ""
 "Thank you for submitting your photos. We will review them shortly. You can "
 "now sign up for any %(platformName)s course that offers verified "
@@ -6060,6 +6151,7 @@ msgid "Take Your Photo"
 msgstr "التقط صورتك  "
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#, python-format
 msgid ""
 "When your face is in position, use the camera button %(icon)s below to take "
 "your photo."
@@ -6084,6 +6176,7 @@ msgid "The photo of your face matches the photo on your ID."
 msgstr "أن تطابق الصورة على بطاقتك الشخصية صورة وجهك. "
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#, python-format
 msgid ""
 "To use the current photo, select the camera button %(icon)s. To take another"
 " photo, select the retake button %(icon)s."
@@ -6100,6 +6193,7 @@ msgstr "الأسئلة الشائعة"
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
 msgid "Why does %(platformName)s need my photo?"
 msgstr "لماذا تحتاج %(platformName)s إلى صورتي؟"
 
@@ -6118,12 +6212,14 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
 msgid "What does %(platformName)s do with this photo?"
 msgstr "ما الذي تفعله %(platformName)s بهذه الصورة؟"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
 "send it to our authorization service for review. Your photo and information "
@@ -6138,6 +6234,7 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "التالي: %(nextStepTitle)s"
 
@@ -6175,6 +6272,7 @@ msgid "Make sure your ID is well-lit"
 msgstr "تأكّد من أنّ الإضاءة جيّدة  على بطاقتك الشخصية"
 
 #: lms/templates/verify_student/id_photo_step.underscore
+#, python-format
 msgid "Once in position, use the camera button %(icon)s to capture your ID"
 msgstr ""
 "حالما تضبط وضعية بطاقتك الشخصية، استخدم زر الكاميرا %(icon)s لالتقاط صورة "
@@ -6210,6 +6308,7 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "تأكّد من أنّ وجهك داخل إطار الصورة بالكامل "
 
 #: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
 msgid "Once in position, use the camera button %(icon)s to capture your photo"
 msgstr ""
 "حالما تتّخذ وضعية الجلوس المناسبة، يُرجى استخدام زر الكاميرا %(icon)s لتلتقط"
@@ -6221,6 +6320,7 @@ msgstr ""
 "هل يمكننا مطابقة الصورة التي التقطتها مع صورتك الموجودة على بطاقتك الشخصية؟ "
 
 #: lms/templates/verify_student/intro_step.underscore
+#, python-format
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
 msgstr "شكرًا لك على العودة لتأكيد هويّتك في: %(courseName)s"
 
@@ -6260,10 +6360,12 @@ msgstr ""
 "واحدة من هذه الوثائق اسمك وصورتك "
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#, python-format
 msgid "You are enrolling in: %(courseName)s"
 msgstr "إنّك تسجّل في: %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#, python-format
 msgid "You are upgrading your enrollment for: %(courseName)s"
 msgstr "إنّك تجدّد تسجيلك في: %(courseName)s"
 
@@ -6273,6 +6375,7 @@ msgid ""
 msgstr "يمكنك الآن إدخال معلومات الدفع واستكمال تسجيلك. "
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these by %(date)s to qualify to earn a Verified "
@@ -6311,6 +6414,7 @@ msgid "You have already verified your ID!"
 msgstr "سبق أن خضتَ عملية التحقّق من بطاقتك الشخصية! "
 
 #: lms/templates/verify_student/make_payment_step.underscore
+#, python-format
 msgid "Your verification status is good until %(verificationGoodUntil)s."
 msgstr ""
 "يسري مفعول عملية التحقّق من هويّتك حتى تاريخ %(verificationGoodUntil)s."
@@ -6320,6 +6424,7 @@ msgid "price"
 msgstr "السعر"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+#, python-format
 msgid "Thank you! We have received your payment for %(courseName)s."
 msgstr "شكرًا جزيلًا! لقد تلقّينا المبلغ الذي ساهمت به في %(courseName)s"
 
@@ -6379,10 +6484,12 @@ msgstr ""
 "هويّتك. "
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#, python-format
 msgid "Photo of %(fullName)s"
 msgstr "صورة لـ %(fullName)s"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#, python-format
 msgid "Photo of %(fullName)s's ID"
 msgstr "صورة البطاقة الشخصية لـ %(fullName)s"
 
@@ -6403,6 +6510,7 @@ msgid "Is your name on your ID readable?"
 msgstr "هل اسمك الموجود على بطاقتك الشخصية سهل القراءة؟"
 
 #: lms/templates/verify_student/review_photos_step.underscore
+#, python-format
 msgid "Does the name on your ID match your account name: %(fullName)s?"
 msgstr ""
 "هل يتطابق الاسم الذي تحمله بطاقتك الشخصية مع اسمك في الحساب: %(fullName)s؟"
@@ -6578,18 +6686,6 @@ msgstr ""
 "الحقل فارغًا لاستخدام العنوان الرسمي للمساق."
 
 #: cms/templates/js/certificate-editor.underscore
-msgid "Organization Logo"
-msgstr "شعار المؤسّسة"
-
-#: cms/templates/js/certificate-editor.underscore
-msgid "Path to organization logo"
-msgstr "المسار لشعار الشركة"
-
-#: cms/templates/js/certificate-editor.underscore
-msgid "Maximum logo height 125px, width variable"
-msgstr "يجب ألّا يزيد ارتفاع الشعار عن 125 بكسل، والعرض قابل للتغيير"
-
-#: cms/templates/js/certificate-editor.underscore
 msgid "Add Signatory"
 msgstr "إضافة مُوَقّع"
 
@@ -6682,6 +6778,7 @@ msgstr "تغييرات غير منشورة جرى إدخالها على المح
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
+#, python-format
 msgid "Collapse/Expand this %(xblock_type)s"
 msgstr "تصغير/تكبير هذه %(xblock_type)s"
 
@@ -6740,6 +6837,7 @@ msgstr "لم تُضِف أي محتوى إلى هذا المساق بعد."
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
+#, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "يُرجى النقر لإضافة %(xblock_type)s جديد"
 
@@ -6828,6 +6926,7 @@ msgid "Chapter Name"
 msgstr "إسم الفصل"
 
 #: cms/templates/js/edit-chapter.underscore
+#, python-format
 msgid "Chapter %s"
 msgstr "الفصل %s"
 
@@ -6840,6 +6939,7 @@ msgid "Chapter Asset"
 msgstr "مادة ملحقة بالفصل"
 
 #: cms/templates/js/edit-chapter.underscore
+#, python-format
 msgid "path/to/introductionToCookieBaking-CH%d.pdf"
 msgstr "path/to/introductionToCookieBaking-CH%d.pdf"
 
@@ -6994,10 +7094,12 @@ msgid "Some Rights Reserved"
 msgstr "بعض الحقوق محفوظة"
 
 #: cms/templates/js/list.underscore
+#, python-format
 msgid "Add your first %(item_type)s"
 msgstr "أَضِف أوَّل %(item_type)s"
 
 #: cms/templates/js/list.underscore
+#, python-format
 msgid "New %(item_type)s"
 msgstr "%(item_type)s جديد"
 
@@ -7056,6 +7158,7 @@ msgstr "لم تُنشَر قطّ"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
+#, python-format
 msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr ""
 "جرى النشر لآخر مرّة في %(last_published_date)s من قِبل %(publish_username)s."
@@ -7100,10 +7203,12 @@ msgid "Publishing Status"
 msgstr "حالة النشر"
 
 #: cms/templates/js/publish-xblock.underscore
+#, python-format
 msgid "Draft saved on %(last_saved_date)s by %(edit_username)s"
 msgstr "مسودة محفّظة في %(last_saved_date)s من قِبل %(edit_username)s"
 
 #: cms/templates/js/publish-xblock.underscore
+#, python-format
 msgid "with %(release_date_from)s"
 msgstr "مع %(release_date_from)s"
 
@@ -7120,6 +7225,7 @@ msgid "Staff Only"
 msgstr "طاقم المساق فقط"
 
 #: cms/templates/js/publish-xblock.underscore
+#, python-format
 msgid "with %(section_or_subsection)s"
 msgstr "مع %(section_or_subsection)s"
 
@@ -7224,6 +7330,7 @@ msgstr ""
 "عليها عندما كانت مخفيّة ستصبح الآن مرئيّة للطلّاب."
 
 #: cms/templates/js/staff-lock-editor.underscore
+#, python-format
 msgid ""
 "If you make this %(xblockType)s visible to students, students will be able "
 "to see its content after the release date has passed and you have published "
@@ -7289,6 +7396,7 @@ msgid "Time Allotted (HH:MM):"
 msgstr "الوقت المخصَّص (HH:MM): "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+#, python-format
 msgid ""
 "Students see warnings when 20% and 5% of the allotted time remains. In "
 "certain cases, students can be granted allowances that give them extra time "
@@ -7296,6 +7404,17 @@ msgid ""
 msgstr ""
 "يرى الطلّاب تحذيرًا عندما يتبقى 20% و 5% من الوقت المقرر. في بعض الحالات، "
 "يمكن للطلاب أن يحصلوا على وقت إضافي  لمساعدتهم في إنهاء الاختبار."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "This exam is for practice only"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Learners can experience the proctoring software setup process and try some "
+"example problems. Make sure this practice exam is set up as an ungraded "
+"exam."
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "This exam is proctored"
@@ -7328,6 +7447,7 @@ msgid "Edit the name"
 msgstr "تعديل الاسم"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
+#, python-format
 msgid "Edit %(display_name)s (required)"
 msgstr "التعديل %(display_name)s (مطلوب)"
 
@@ -7383,6 +7503,7 @@ msgid "Error."
 msgstr "خطأ."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#, python-format
 msgid "Timed Transcript from %(filename)s"
 msgstr "نص محدَّد التوقيت من %(filename)s"
 

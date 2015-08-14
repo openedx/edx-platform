@@ -31,7 +31,7 @@
 # omarithawi <oithawi@qrf.org>, 2014-2015
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
-# SiddigSami <siddigsami@live.com>, 2014
+# SiddigSami <siddigsami@live.com>, 2014-2015
 # soliman osman <solimanosman@windowslive.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -119,6 +119,7 @@
 # 
 # Translators:
 # Almaazon <Ahmed.Almaazon@hotmail.com>, 2014
+# Ahmed Jazzar <ajazzar@edraak.org>, 2015
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # mabdelhaq <mabdelhaq@qou.edu>, 2014
 # may <may@qordoba.com>, 2014
@@ -128,9 +129,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-07 13:42+0000\n"
-"PO-Revision-Date: 2015-07-26 12:28+0000\n"
-"Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
+"POT-Creation-Date: 2015-08-14 13:42+0000\n"
+"PO-Revision-Date: 2015-08-12 08:13+0000\n"
+"Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -477,6 +478,12 @@ msgstr "{country} المُضاف على اللائحة البيضاء للمسا
 msgid "Blacklist {country} for {course}"
 msgstr "{country} المُضاف على اللائحة السوداء للمساق {course}"
 
+#: common/djangoapps/external_auth/views.py
+msgid ""
+"You have already created an account using an external login like WebAuth or "
+"Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+
 #: common/djangoapps/student/forms.py
 msgid "Username must be minimum of two characters long"
 msgstr "يجب أن يتألّف اسم المستخدم من حرفين على الأقلّ"
@@ -500,10 +507,12 @@ msgstr ""
 "تضمين مسافات. "
 
 #: common/djangoapps/student/forms.py
+#, python-format
 msgid "Username cannot be more than %(limit_value)s characters long"
 msgstr "لا يمكن أن يزيد عدد أحرف اسم المستخدم عن %(limit_value)s"
 
 #: common/djangoapps/student/forms.py
+#, python-format
 msgid "Email cannot be more than %(limit_value)s characters long"
 msgstr "لا يمكن أن يزيد عدد أحرف البريد الإلكتروني عن %(limit_value)s"
 
@@ -673,7 +682,7 @@ msgstr "عذرًا، المساق الذي تبحث عنه لن يبدأ حتى 
 msgid "Course id not specified"
 msgstr "رقم المساق غير محدَّد "
 
-#: common/djangoapps/student/views.py lms/djangoapps/dashboard/support.py
+#: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
 msgstr "رقم المساق غير صحيح"
 
@@ -869,7 +878,7 @@ msgstr[5] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
-msgstr "عذرًا، لم تنجح عملية إعادة ضبط كلمة السر."
+msgstr "عذرًا، لم تنجح عملية تغيير كلمة السر."
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -1373,6 +1382,10 @@ msgid "incorrect"
 msgstr "غير صحيح"
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "partially correct"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
 msgstr "ناقص"
 
@@ -1393,6 +1406,10 @@ msgstr "هذا صحيح"
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is incorrect."
 msgstr "هذا خطأ"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "This is partially correct."
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This is unanswered."
@@ -4941,7 +4958,7 @@ msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
 #. website's use of personal information
-#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views.py
+#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
@@ -5076,8 +5093,60 @@ msgstr ""
 msgid "There can be only one default image."
 msgstr "لا يمكن أن توجد سوى صورة افتراضية واحدة فقط."
 
+#: lms/djangoapps/certificates/models.py
+msgid "Name of template."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "Description and/or admin notes."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "Django template HTML."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "Organization of template."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "The course mode for this template."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "On/Off switch."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "Description of the asset."
+msgstr ""
+
+#: lms/djangoapps/certificates/models.py
+msgid "Asset file. It could be an image or css file."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/support.py
+msgid "User {username} does not exist"
+msgstr ""
+
+#: lms/djangoapps/certificates/views/support.py
+msgid "{course_key} is not a valid course key"
+msgstr ""
+
+#: lms/djangoapps/certificates/views/support.py
+msgid "The course {course_key} does not exist"
+msgstr ""
+
+#: lms/djangoapps/certificates/views/support.py
+msgid "User {username} is not enrolled in the course {course_key}"
+msgstr ""
+
+#: lms/djangoapps/certificates/views/support.py
+msgid "An unexpected error occurred while regenerating certificates."
+msgstr ""
+
 #. Translators:  This text describes the 'Honor' course certificate type.
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "An {cert_type} Certificate signifies that an {platform_name} learner has "
 "agreed to abide by {platform_name}'s honor code and completed all of the "
@@ -5091,7 +5160,7 @@ msgstr ""
 #. type, which is a higher level of
 #. verification offered by edX.  This type of verification is useful for
 #. professional education/certifications
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "An {cert_type} Certificate signifies that an {platform_name} learner has "
 "agreed to abide by {platform_name}'s honor code and completed all of the "
@@ -5107,7 +5176,7 @@ msgstr ""
 #. An XSeries is a collection of
 #. courses related to each other in a meaningful way, such as a specific topic
 #. or theme, or even an organization
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "An {cert_type} Certificate demonstrates a high level of achievement in a "
 "program of study, and includes verification of the student's identity."
@@ -5116,41 +5185,37 @@ msgstr ""
 "وتتضمّن عملية التحقّق من هوية الطالب."
 
 #. Translators:  The format of the date includes the full name of the month
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "{month} {day}, {year}"
 msgstr "{month} {day}، {year}"
 
-#. Translators: This line appears on the certificate after the name of a
-#. course, and provides more
-#. information about the organizations providing the course material to
-#. platform users
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "a course of study offered by {partner_name}, through {platform_name}."
 msgstr "مساق دروس يقدِّمه {partner_name}، عبر {platform_name}."
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "About {platform_name} Accomplishments"
 msgstr "نبذة عن إنجازات {platform_name}"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "More Information About {user_name}'s Certificate:"
 msgstr "المزيد من المعلومات عن شهادة {user_name}"
 
 #. Translators:  This line appears on the page just before the generation date
 #. for the certificate
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Issued On:"
 msgstr "صادرة في:"
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
 #. each individual certificate
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Certificate ID Number"
 msgstr "الرقم التعريفي للشهادة"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "About {platform_name} Certificates"
 msgstr "نبذة عن شهادات {platform_name}"
 
@@ -5158,7 +5223,7 @@ msgstr "نبذة عن شهادات {platform_name}"
 #. course certificate
 #. 'verifying your identity' refers to the process for establishing the
 #. authenticity of the student
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "{platform_name} acknowledges achievements through certificates, which are "
 "awarded for various activities {platform_name} students complete under the "
@@ -5172,13 +5237,13 @@ msgstr ""
 "استكمال خطوات إضافية، مثل <a href='{verified_cert_url}'>التحقّق من "
 "هويّتك</a>."
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "How {platform_name} Validates Student Certificates"
 msgstr "كيف توثِّق {platform_name} شهادات الطلّاب"
 
 #. Translators:  This text describes the validation mechanism for a
 #. certificate file (known as GPG security)
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "Certificates issued by {platform_name} are signed by a gpg key so that they "
 "can be validated independently by anyone with the {platform_name} public "
@@ -5189,13 +5254,13 @@ msgstr ""
 "بشكل مستقلّ من قبل أي شخص يملك مفتاح {platform_name} العام. وللتحقّق "
 "المستقلّ، تستخدم {platform_name} ما يُسمّى \"توقيع منفصل\"."
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Validate this certificate for yourself"
 msgstr "وثِّق هذه الشهادة لنفسك"
 
 #. Translators:  This text describes (at a high level) the mission and charter
 #. the edX platform and organization
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "{platform_name} offers interactive online classes and MOOCs from the world's"
 " best universities, including MIT, Harvard, Berkeley, University of Texas, "
@@ -5207,34 +5272,34 @@ msgstr ""
 " وجامعة بيركلي وجامعة تكساس. وتشكّل {platform_name} مبادرة إلكترونية غير "
 "ربحية أسّسَتها جامعة هارفارد بالاشتراك مع معهد ماساتشوستس للتكنولوجيا."
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "About {platform_name}"
 msgstr "نبذة عن {platform_name}"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Learn more about {platform_name}"
 msgstr "اعرف المزيد عن {platform_name}"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Learn with {platform_name}"
 msgstr "تعلَّم عبر {platform_name}"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Work at {platform_name}"
 msgstr "اعمل لدى {platform_name}"
 
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Contact {platform_name}"
 msgstr "للاتصال بـ {platform_name} "
 
 #. Translators:  This text appears near the top of the certficate and
 #. describes the guarantee provided by edX
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "{platform_name} acknowledges the following student accomplishment"
 msgstr "تُقِرّ {platform_name} بإنجازات الطالب التالية"
 
 #. Translators:  This text represents the verification of the certificate
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
 "participated in {partner_name} {course_number}"
@@ -5244,7 +5309,7 @@ msgstr ""
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "{partner_name} {course_number} Certificate | {platform_name}"
 msgstr "شهادة {partner_name} {course_number} | {platform_name}"
 
@@ -5252,7 +5317,7 @@ msgstr "شهادة {partner_name} {course_number} | {platform_name}"
 #. (displayed in a large font) on the certificate
 #. screen.  The text describes the accomplishment represented by the
 #. certificate information displayed to the user
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "successfully completed, received a passing grade, and was awarded a "
 "{platform_name} {certificate_type} Certificate of Completion in "
@@ -5262,13 +5327,13 @@ msgstr ""
 
 #. Translators: This line is displayed to a user who has completed a course
 #. and achieved a certification
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "{fullname}, you've earned a certificate!"
 msgstr "{fullname}، تهانينا لك على نيل شهادة!"
 
 #. Translators: This line congratulates the user and instructs them to share
 #. their accomplishment on social networks
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid ""
 "Congratulations! This page summarizes all of the details of what you've "
 "accomplished. Show it off to family, friends, and colleagues in your social "
@@ -5279,13 +5344,13 @@ msgstr ""
 
 #. Translators: This line leads the reader to understand more about the
 #. certificate that a student has been awarded
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "More about {fullname}'s accomplishment"
 msgstr "المزيد من التفاصيل عن إنجازات {fullname}"
 
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "All rights reserved"
 msgstr "جميع الحقوق محفوظة"
 
@@ -5293,19 +5358,19 @@ msgstr "جميع الحقوق محفوظة"
 #. and appears
 #. in the browser title bar when a requested certificate is not found or
 #. recognized
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Invalid Certificate"
 msgstr "شهادة غير صالحة"
 
 #. Translators: The &amp; characters represent an ampersand character and can
 #. be ignored
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Terms of Service &amp; Honor Code"
 msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
-#: lms/djangoapps/certificates/views.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Certificate Validation"
 msgstr "تصديق الشهادة"
 
@@ -5436,6 +5501,10 @@ msgstr "مرحبًا بك في صفحة ويكي لمنصّة  {platform_name} "
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "تفضّل بزيارة إحدى صفحات الويكي الخاصة بالمساق لتضيف مقالًا. "
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "Course has not started"
+msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course does not start until {}"
@@ -5627,38 +5696,6 @@ msgstr "الفرع الخارجي المحدّد غير موجود."
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr "نأسف لتعذّر التغيير إلى الفرع المحدّد. يُرجى التحقق من اسم فرعك."
-
-#: lms/djangoapps/dashboard/support.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "عنوان البريد الإلكتروني"
-
-#: lms/djangoapps/dashboard/support.py
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Course ID"
-msgstr "رقم تعريف المساق "
-
-#: lms/djangoapps/dashboard/support.py
-msgid "User not found"
-msgstr "المستخدم غير موجود"
-
-#: lms/djangoapps/dashboard/support.py
-msgid "Course {course_id} not past the refund window."
-msgstr "لم يتخطّ المساق {course_id} نافذة استرداد القيمة."
-
-#: lms/djangoapps/dashboard/support.py
-msgid "No order found for {user} in course {course_id}"
-msgstr "لا يوجد طلب خاص بالمستخدم {user} في المساق {course_id}"
-
-#: lms/djangoapps/dashboard/support.py
-msgid "Unenrolled {user} from {course_id}"
-msgstr " إلغاء تسجيل المستخدم {user} من المساق {course_id}"
-
-#: lms/djangoapps/dashboard/support.py
-msgid "Refunded {cost} for order id {order_id}"
-msgstr "استرداد مبلغ {cost} لصاحب رقم الطلب {order_id}"
 
 #. Translators: This message means that the user could not be authenticated
 #. (that is, we could
@@ -6232,6 +6269,19 @@ msgstr ""
 " قسم ’مهام الأستاذ المعلَّقة‘ أدناه. ويمكنك تنزيل التقرير حالما يَكتمل."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The proctored exam results report is being created. To view the status of "
+"the report, see Pending Instructor Tasks below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The proctored exam results report is currently being created. To view the "
+"status of the report, see Pending Instructor Tasks below. You will be able "
+"to download the report when it is complete."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
 msgstr "تَعذَّر تحليل القيمة كرقم عشري"
 
@@ -6331,10 +6381,12 @@ msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr "نجحت إعادة ضبط تاريخ الاستحقاق للطالب {0} من {1} إلى {2}"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-format
 msgid "This student (%s) will skip the entrance exam."
 msgstr "سيتخطّى الطالب (%s) امتحان الدخول."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-format
 msgid "This student (%s) is already allowed to skip the entrance exam."
 msgstr "سبق أن سُمِح للطالب (%s) بتخطّي امتحان الدخول."
 
@@ -6415,8 +6467,12 @@ msgid "E-Commerce"
 msgstr "التجارة الإلكترونية"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: cms/templates/certificates.html cms/templates/export.html
-#: cms/templates/widgets/header.html
+msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/djangoapps/support/views/index.py cms/templates/certificates.html
+#: cms/templates/export.html cms/templates/widgets/header.html
 msgid "Certificates"
 msgstr "الشهادات"
 
@@ -8302,6 +8358,50 @@ msgstr "لا يوجد مستخدم يمتلك عنوان البريد الإلك
 msgid "No email address provided."
 msgstr "لم يُحدَّد عنوان بريد إلكتروني."
 
+#: lms/djangoapps/support/views/index.py
+msgid "View and regenerate certificates."
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
+msgid "Manual Refund"
+msgstr "استرداد المبلغ يدويًّا "
+
+#: lms/djangoapps/support/views/index.py
+msgid "Track refunds issued directly through CyberSource."
+msgstr ""
+
+#: lms/djangoapps/support/views/refund.py
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: lms/djangoapps/support/views/refund.py
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Course ID"
+msgstr "رقم تعريف المساق "
+
+#: lms/djangoapps/support/views/refund.py
+msgid "User not found"
+msgstr "المستخدم غير موجود"
+
+#: lms/djangoapps/support/views/refund.py
+msgid "Course {course_id} not past the refund window."
+msgstr "لم يتخطّ المساق {course_id} نافذة استرداد القيمة."
+
+#: lms/djangoapps/support/views/refund.py
+msgid "No order found for {user} in course {course_id}"
+msgstr "لا يوجد طلب خاص بالمستخدم {user} في المساق {course_id}"
+
+#: lms/djangoapps/support/views/refund.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr " إلغاء تسجيل المستخدم {user} من المساق {course_id}"
+
+#: lms/djangoapps/support/views/refund.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr "استرداد مبلغ {cost} لصاحب رقم الطلب {order_id}"
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "اللغة الاختيارية التي يستخدمها الفريق كرمز ISO 639-1."
@@ -8584,56 +8684,12 @@ msgstr "ميثاق الشرف"
 msgid "Skip to main content"
 msgstr "الانتقال إلى المحتوى الرئيسي"
 
-#: lms/templates/dashboard/_dashboard_refund.html
-#: lms/templates/dashboard/support.html
-msgid "Manual Refund"
-msgstr "استرداد المبلغ يدويًّا "
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "About to refund this order:"
-msgstr "على وشك استرداد قيمة هذا الطلب:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "Order Id:"
-msgstr "رقم الطلب:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "Enrollment:"
-msgstr "التسجيل:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "enrolled"
-msgstr "مسجَّل"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "unenrolled"
-msgstr "أُلغِيَ التسجيل"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "Cost:"
-msgstr "التكلفة:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "CertificateItem Status:"
-msgstr "حالة الشهادة:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "Order Status:"
-msgstr "حالة الطلب:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "Fulfilled Time:"
-msgstr "الوقت المَقضِيّ:"
-
-#: lms/templates/dashboard/_dashboard_refund.html
-msgid "Refund Request Time:"
-msgstr "وقت طلب استرداد المبلغ:"
-
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
-msgstr "استُكملت عملية إعادة ضبط كلمة السر الخاصة بك"
+msgstr "استُكملت عملية تغيير كلمة السر الخاصة بك"
 
 #: lms/templates/registration/password_reset_complete.html
+#, python-format
 msgid ""
 "\n"
 "      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
@@ -8643,28 +8699,31 @@ msgstr ""
 "جرى ضبط كلمة السر الخاصة بك. ويمكنك الآن %(link_start)s تسجيل الدخول %(link_end)s."
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "      Reset Your %(platform_name)s Password\n"
 "  "
 msgstr ""
 "\n"
-"إعادة ضبط كلمة السر الخاصة بك في %(platform_name)s"
+"تغيير كلمة السر الخاصة بك في %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "          Reset Your %(platform_name)s Password\n"
 "          "
 msgstr ""
 "\n"
-"إعادة ضبط كلمة السر الخاصة بك في %(platform_name)s"
+"تغيير كلمة السر الخاصة بك في %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
-msgstr "نموذج إعادة ضبط كلمة السر"
+msgstr "نموذج تغيير كلمة السر"
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "                We're sorry, %(platform_name)s enrollment is not available in your region\n"
@@ -8690,10 +8749,10 @@ msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
 msgstr ""
-"عذرًا، يبدو أنّ أنظمتنا تواجه مشكلة في معالجة طلب إعادة ضبط كلمة السر الخاصة"
-" بك"
+"عذرًا، يبدو أنّ أنظمتنا تواجه مشكلة في معالجة طلب تغيير كلمة السر الخاصة بك"
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
@@ -8709,6 +8768,7 @@ msgid ""
 msgstr "يُرجى إدخال كلمة السر الجديدة مرّتين لنتمكّن من تأكيد صحّة إدخالها."
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
@@ -8742,20 +8802,21 @@ msgstr "تغيير كلمة السر الخاصة بي"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr "نأسف لفشل عملية إعادة ضبط  كلمة السر الخاصة بك"
+msgstr "نأسف لفشل عملية تغيير  كلمة السر الخاصة بك"
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
 "        "
 msgstr ""
 "\n"
-"لم يكن الرابط الخاص بإعادة ضبط  كلمة السر صالحًا، ربّما لأنّه مستخدم مسبقًا. لذا يُرجى العودة إلى %(start_link)sصفحة تسجيل الدخول%(end_link)s والبدء من جديد بعملية إعادة ضبط كلمة السر."
+"لم يكن الرابط الخاص بإعادة ضبط  كلمة السر صالحًا، ربّما لأنّه مستخدم مسبقًا. لذا يُرجى العودة إلى %(start_link)sصفحة تسجيل الدخول%(end_link)s والبدء من جديد بعملية تغيير كلمة السر."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
-msgstr "المساعدة في إعادة ضبط كلمة السر"
+msgstr "المساعدة في تغيير كلمة السر"
 
 #: lms/templates/registration/password_reset_confirm.html
 #: cms/templates/login.html lms/templates/login-sidebar.html
@@ -8764,6 +8825,7 @@ msgid "Need Help?"
 msgstr "هل تحتاج إلى مساعدة؟"
 
 #: lms/templates/registration/password_reset_confirm.html
+#, python-format
 msgid ""
 "\n"
 "              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
@@ -8773,6 +8835,7 @@ msgstr ""
 "تفضّل بزيارة %(start_link)sقسم المساعدة للحصول على معلومات الاتصال وإجابات بعض الأسئلة الشائعة%(end_link)s"
 
 #: lms/templates/registration/password_reset_email.html
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at %(site_name)s."
@@ -8789,16 +8852,57 @@ msgid ""
 "If you didn't request this change, you can disregard this email - we have "
 "not yet reset your password."
 msgstr ""
-"إذا لم تطلب هذا التغيير، يمكنك تجاهل هذه الرسالة - لم نقم بعد بإعادة ضبط "
-"كلمة السر الخاصة بك."
+"إذا لم تطلب هذا التغيير، يمكنك تجاهل هذه الرسالة - لم نقم بعد بتغيير كلمة "
+"السر الخاصة بك."
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
 msgstr "شكرًا لك على استخدام موقعنا!"
 
 #: lms/templates/registration/password_reset_email.html
+#, python-format
 msgid "The %(platform_name)s Team"
 msgstr "فريق %(platform_name)s"
+
+#: lms/templates/support/refund.html
+msgid "About to refund this order:"
+msgstr "على وشك استرداد قيمة هذا الطلب:"
+
+#: lms/templates/support/refund.html
+msgid "Order Id:"
+msgstr "رقم الطلب:"
+
+#: lms/templates/support/refund.html
+msgid "Enrollment:"
+msgstr "التسجيل:"
+
+#: lms/templates/support/refund.html
+msgid "enrolled"
+msgstr "مسجَّل"
+
+#: lms/templates/support/refund.html
+msgid "unenrolled"
+msgstr "أُلغِيَ التسجيل"
+
+#: lms/templates/support/refund.html
+msgid "Cost:"
+msgstr "التكلفة:"
+
+#: lms/templates/support/refund.html
+msgid "CertificateItem Status:"
+msgstr "حالة الشهادة:"
+
+#: lms/templates/support/refund.html
+msgid "Order Status:"
+msgstr "حالة الطلب:"
+
+#: lms/templates/support/refund.html
+msgid "Fulfilled Time:"
+msgstr "الوقت المَقضِيّ:"
+
+#: lms/templates/support/refund.html
+msgid "Refund Request Time:"
+msgstr "وقت طلب استرداد المبلغ:"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -9011,6 +9115,7 @@ msgid "Restoring to this revision will mark the article as deleted."
 msgstr "ستشير العودة إلى هذه المراجعة أنّ المقال قد حُذِف "
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
+#, python-format
 msgid ""
 "\n"
 "  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
@@ -9066,6 +9171,7 @@ msgid "[Article Name](wiki:ArticleName)"
 msgstr "[Article Name](wiki:ArticleName)"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-format
 msgid "%(platform_name)s Additions:"
 msgstr "إضافات %(platform_name)s:"
 
@@ -9082,6 +9188,7 @@ msgid "Wikipedia"
 msgstr "ويكيبيديا"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-format
 msgid "%(platform_name)s Wiki"
 msgstr "صفحة الويكي الخاصة بـ %(platform_name)s"
 
@@ -9128,6 +9235,7 @@ msgid "Quotes"
 msgstr "اقتباسات"
 
 #: lms/templates/wiki/includes/editor_widget.html
+#, python-format
 msgid ""
 "\n"
 "        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
@@ -9465,9 +9573,7 @@ msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
-msgstr ""
-"أوافق على شروط الخدمة {terms_of_service} وميثاق الشرف الخاصين بمنصّة "
-"{platform_name}. "
+msgstr "أوافق على {terms_of_service} الخاصين بمنصّة {platform_name}. "
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
@@ -10467,7 +10573,7 @@ msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
 "setting a new password."
 msgstr ""
-"يُرجى إدخال عنوان بريدك الإلكتروني أدناه وسنرسل لك تعليمات ضبط كلمة سر "
+"يُرجى إدخال عنوان بريدك الإلكتروني أدناه وسنرسل لك تعليمات تغيير كلمة سر "
 "جديدة."
 
 #: lms/templates/forgot_password_modal.html
@@ -10480,7 +10586,7 @@ msgstr "هذا هو عنوان البريد الإلكتروني الذي است
 
 #: lms/templates/forgot_password_modal.html
 msgid "Reset My Password"
-msgstr "إعادة ضبط كلمة السر الخاصة بي"
+msgstr "تغيير السر الخاصة بي"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -11031,6 +11137,7 @@ msgstr ""
 "السائدة هناك."
 
 #: lms/templates/provider_login.html
+#, python-format
 msgid "Return To %s"
 msgstr "العودة إلى %s "
 
@@ -11841,6 +11948,10 @@ msgid "CCX Coach Dashboard"
 msgstr "لوحة معلومات المدرب CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Name your CCX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Enrollment"
 msgstr "التسجيل "
@@ -11958,6 +12069,18 @@ msgstr "قد لا يحتاج معظم المدربين إلى إجراء أي ت
 msgid "Save Grading Policy"
 msgstr "حفظ سياسة التقييم"
 
+#. Translators: This explains to people using a screen reader how to interpret
+#. the format of YYYY-MM-DD
+#: lms/templates/ccx/schedule.html
+msgid "Date format four digit year dash two digit month dash two digit day"
+msgstr ""
+
+#. Translators: This explains to people using a screen reader how to interpret
+#. the format of HH:MM
+#: lms/templates/ccx/schedule.html
+msgid "Time format two digit hours colon two digit minutes"
+msgstr ""
+
 #: lms/templates/ccx/schedule.html
 msgid "Set date"
 msgstr "تحديد تاريخ"
@@ -11978,9 +12101,27 @@ msgstr "وضع جدول لوحدة"
 msgid "Start Date"
 msgstr "تاريخ البدء"
 
+#. Translators: This explains to people using a screen reader how to interpret
+#. the format of YYYY-MM-DD
+#: lms/templates/ccx/schedule.html
+msgid "format four digit year dash two digit month dash two digit day"
+msgstr ""
+
+#. Translators: This explains to people using a screen reader how to interpret
+#. the format of HH:MM
+#: lms/templates/ccx/schedule.html
+msgid "Start time format two digit hours colon two digit minutes"
+msgstr ""
+
 #: lms/templates/ccx/schedule.html
 msgid "(Optional)"
 msgstr "(اختياري)"
+
+#. Translators: This explains to people using a screen reader how to interpret
+#. the format of HH:MM
+#: lms/templates/ccx/schedule.html
+msgid "Due Time format two digit hours colon two digit minutes"
+msgstr ""
 
 #: lms/templates/ccx/schedule.html
 msgid "Add Unit"
@@ -12515,6 +12656,7 @@ msgid "No content has been added to this course"
 msgstr "لم يُضاف أي محتوى إلى هذا المساق بعد"
 
 #: lms/templates/courseware/courseware.html
+#, python-format
 msgid ""
 "To access course materials, you must score {required_score}% or higher on "
 "this                 exam. Your current score is {current_score}%."
@@ -12559,7 +12701,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/info.html
-msgid "View Updates in {studio_name}"
+msgid "View Updates in Studio"
 msgstr ""
 
 #: lms/templates/courseware/info.html
@@ -12957,12 +13099,8 @@ msgid ""
 msgstr "{student_name}، لقد حققت متطلبات النجاح هذا المساق"
 
 #: lms/templates/courseware/progress.html
-msgid "{link} to purchase course credit."
-msgstr "{link} لشراء مواد المساق"
-
-#: lms/templates/courseware/progress.html
-msgid "Go to your dashboard"
-msgstr "اذهب إلى لوحة معلوماتك"
+msgid "{a_start}Go to your dashboard{a_end} to purchase course credit."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -12993,8 +13131,8 @@ msgid "Less"
 msgstr "أقل"
 
 #: lms/templates/courseware/progress.html
-msgid "{earned:.3n} of {total:.3n} possible points"
-msgstr "{earned:.3n} نقاط محتملة من أصل {total:.3n}"
+msgid "{earned} of {total} possible points"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
@@ -13018,7 +13156,7 @@ msgid ""
 "another section on the left."
 msgstr ""
 "لقد زرتَ مؤخّرًا القسم {section_link}. فإذا انتهيت من العمل فيه، يُرجى "
-"اختيار قسم آخر على الجهة اليسرى. "
+"اختيار قسم آخر على الجهة اليمنى. "
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -13029,10 +13167,9 @@ msgstr "مرحبًا {name}،"
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
-"completing your edX course! Click {link} to get your credit now."
+"completing your {platform_name} course! {link_start}Get your credit "
+"now.{link_end}"
 msgstr ""
-"تهانينا! أنت مؤهل لاجتياز مواد المساق لنجاحك في إكمال مساقك في edX! انقر "
-"{link} للحصول على موادك الآن."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -13045,27 +13182,28 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get course credit, simply go to your {link} and click the <b>Get "
-"Credit</b> button. No application, transcript, or grade report is required."
+"To get course credit, simply go to your {link_start}{platform_name} "
+"dashboard{link_end} and click the <b>Get Credit</b> button. No application, "
+"transcript, or grade report is required."
 msgstr ""
-"للحصول على موادك اذهب على الرابط {link} وانقر على زر <b>الحصول على "
-"المواد</b>. لا حاجة لأي تطبيق أو نص أو تقرير بالدرجات."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"We hope you enjoyed the course, and we hope to see you in future edX "
-"courses!"
+"We hope you enjoyed the course, and we hope to see you in future "
+"{platform_name} courses!"
 msgstr ""
-"نأمل أن تكون قد استمتعتَ بالمساق ونتمنى أن نراك مجددًا في مساقات مستقبلية في"
-" edX!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid "The edX team"
-msgstr "فريق edX"
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "The {platform_name} Team"
+msgstr "فريق {platform_name}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid "For more information on credit at edX, click {link}."
-msgstr "للمزيد من المعلومات عن المواد في edX انقر {link}."
+msgid ""
+"{link_start}Click here for more information on credit at "
+"{platform_name}{link_end}."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -13225,6 +13363,7 @@ msgid "Available Actions"
 msgstr "الإجراءات المتاحة"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
 msgid ""
 "Are you sure you want to unenroll from the purchased course "
 "%(course_number)s?"
@@ -13240,10 +13379,12 @@ msgid "You will not be refunded the amount you paid."
 msgstr "لن يعاد لك المبلغ الذي دفعته."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
 msgid "Are you sure you want to unenroll from %(course_number)s?"
 msgstr "هل أنت متأكد من رغبتك بإلغاء تسجيلك في %(course_number)s؟"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#, python-format
 msgid ""
 "Are you sure you want to unenroll from the verified {cert_name_long} track "
 "of %(course_number)s?"
@@ -13361,59 +13502,64 @@ msgstr ""
 "{support_email}."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
-msgid "You are now eligible for credit. {congrats}"
-msgstr "أنت الآن مؤهَّل للوحدات الدراسية. {congrats}"
+msgid "You are now eligible for credit. <b>Congratulations!</b>"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get credit"
 msgstr "الحصول على الوحدات الدراسية"
 
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you. Your credit is processing. Please see {link} for more "
-"information."
+"Thank you. Your credit is processing. Please see {link_to_provider_site} for"
+" more information."
 msgstr ""
-"شكرًا لك. جاري الآن معالجة وحداتك. يُرجى مراجعة {link} لمزيد من المعلومات."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Learn more"
 msgstr "تعلّم المزيد"
 
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Thank you for your purchase. Please proceed to {link} to finalize your "
-"credit."
+"Thank you for your purchase. Please proceed to {link_to_provider_site} to "
+"finalize your credit."
 msgstr ""
-"نشكرك على الشراء. يُرجى المتابعة عبر {link} لاستكمال الحصول على وحداتك "
-"الدراسية."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Finalize credit"
 msgstr "استكمال الحصول على الوحدات الدراسية"
 
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been processed and approved. {congrats}. Please see {link} "
-"for more information."
+"Your credit has been processed and approved. <b>Congratulations</b>. Please "
+"see {link_to_provider_site} for more information."
 msgstr ""
-"جرت معالجة وحداتك والموافقة عليها. {congrats}. يُرجى مراجعة {link} لمزيد من "
-"المعلومات."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Access credit"
 msgstr "الوصول للمواد"
 
+#. Translators: link_to_provider_site is a link to an external webpage. The
+#. text of the link will be the name of a
+#. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been processed but denied. Please contact {link} for more "
-"information."
+"Your credit has been processed but denied. Please contact "
+"{link_to_provider_site} for more information."
 msgstr ""
-"جرت معالجة وحداتك ولكن رُفِضَت للأسف. يُرجى مراجعة {link} لمزيد من "
-"المعلومات."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Contact {provider}"
-msgstr "يُرى الاتصال بـ {provider_link}"
+msgstr "يُرجى الاتصال بـ {provider}"
 
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
@@ -13596,6 +13742,7 @@ msgid ", "
 msgstr ","
 
 #: lms/templates/discussion/_user_profile.html
+#, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
 msgstr[0] "بدأ %s نقاش"
@@ -13606,6 +13753,7 @@ msgstr[4] "بدأ %s نقاش"
 msgstr[5] "%s نقاشات بدأت "
 
 #: lms/templates/discussion/_user_profile.html
+#, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s تعليق"
@@ -13761,11 +13909,6 @@ msgstr ""
 #: lms/templates/emails/activation_email.txt
 msgid "We hope you enjoy learning with {platform_name}!"
 msgstr "نتمنّى لك الاستمتاع بالتعلّم مع {platform_name}!"
-
-#: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "The {platform_name} Team"
-msgstr "فريق {platform_name}"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -14775,6 +14918,15 @@ msgstr "قم بتنزيل ملف CSV بأسماء المتعلمين الذين 
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
+"Click to generate a CSV file of all proctored exam results in this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Proctored Exam Results Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
 "For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
@@ -15587,7 +15739,7 @@ msgstr "إضافة شخص إلى مختبر النسخة التجريبية"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admins"
-msgstr "مشرفو النقاشات"
+msgstr "مشرفوا النقاشات"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -15744,6 +15896,14 @@ msgstr "هذه قائمة جزئية، لعرض جميع الطلاب يرجى �
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There are no problems in this section."
 msgstr "لا توجد مسائل في هذا القسم."
+
+#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
+msgid "Allowance Section"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/proctoring.html
+msgid "Student Proctored Exam Section"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
@@ -16318,7 +16478,7 @@ msgstr "أو بإمكانك العودة لـ {link_start}الصفحة الرئ�
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
-msgstr "تمت إعادة ضبط كلمة السر بنجاح "
+msgstr "تم تغيير كلمة السر بنجاح "
 
 #: lms/templates/registration/password_reset_done.html
 msgid ""
@@ -16903,6 +17063,14 @@ msgstr "افصل"
 msgid "Link"
 msgstr "اربط"
 
+#: lms/templates/support/certificates.html lms/templates/support/index.html
+msgid "Student Support"
+msgstr ""
+
+#: lms/templates/support/certificates.html
+msgid "Student Support: Certificates"
+msgstr ""
+
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "استبيان المستخدم"
@@ -17078,7 +17246,7 @@ msgstr "إضافة مقال"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
-msgstr "عذرًا، لم توجد الصفحة التي كنت تبحث عنها."
+msgstr "عذراً، لم توجد الصفحة التي كنت تبحث عنها."
 
 #: cms/templates/404.html
 msgid ""
@@ -17101,16 +17269,16 @@ msgid ""
 "An error occurred in {studio_name} and the page could not be loaded. Please "
 "try again in a few moments."
 msgstr ""
-"عذرًا، حصل خطأ في {studio_name} ولم يمكن تحميل الصفحة. يُرجى المحاولة "
-"مجدّدًا بعد لحظات قليلة. "
+"عذراً، حصل خطأ في {studio_name} ولم يتم تحميل الصفحة. يُرجى المحاولة مجدّداً"
+" بعد لحظات قليلة. "
 
 #: cms/templates/500.html
 msgid ""
 "We've logged the error and our staff is currently working to resolve this "
 "error as soon as possible."
 msgstr ""
-"لقد سجّلنا الخطأ، ويعمل طاقم المساق حاليًّا على إيجاد حلّ لهذا الخطأ في أقرب"
-" وقت ممكن."
+"لقد سجّلنا الخطأ، يعمل طاقم المساق حاليّاً على إيجاد حلّ له في أقرب وقت "
+"ممكن."
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
@@ -19205,6 +19373,7 @@ msgstr ""
 "{link_start}الاتّصال بطاقم {platform_name} للمزيد من الاستفسار{link_end}."
 
 #: cms/templates/index.html
+#, python-format
 msgid "Thanks for signing up, %(name)s!"
 msgstr "نشكرك على تسجيل عضويتك، %(name)s!"
 
@@ -19213,6 +19382,7 @@ msgid "We need to verify your email address"
 msgstr "نحتاج إلى التحقّق من عنوان بريدك الإلكتروني لو سمحت. "
 
 #: cms/templates/index.html
+#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
 "email address (%(email)s). An activation message and next steps should be "
@@ -19785,6 +19955,7 @@ msgid "your course summary page"
 msgstr "صفحة ملخّص المساق"
 
 #: cms/templates/settings.html
+#, python-format
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
 msgstr ""
@@ -20513,7 +20684,8 @@ msgid ""
 "articles etc..."
 msgstr ""
 "هذه محتويات أوّلية فقط لمقالك. ويمكنك بعد إنشائه أن تستخدم مزايا أكثر "
-"تعقيدًا، مثل إضافة برامج مساعدة، أو بيانات وصفية، أو مقالات ذات صلة، الخ. "
+"تعقيدًا، مثل إضافة برامج مساعدة، أو بيانات وصفية، أو مقالات ذات صلة، أو .. ."
+" "
 
 #: wiki/forms.py
 msgid "Contents"
@@ -20568,10 +20740,12 @@ msgid "A slug may not begin with an underscore."
 msgstr "قد لا يبدأ العنوان المختصر بتسطير سفلي."
 
 #: wiki/forms.py
+#, python-format
 msgid "A deleted article with slug \"%s\" already exists."
 msgstr "المقال المحذوف الذي يحتوي على العنوان المختصر \"%s\" موجود مسبقًا."
 
 #: wiki/forms.py
+#, python-format
 msgid "A slug named \"%s\" already exists."
 msgstr "العنوان المختصر المسمّى \"%s\" موجود مسبقًا."
 
@@ -20726,6 +20900,7 @@ msgid "others write access"
 msgstr "إتاحة الكتابة من قبل الآخرين"
 
 #: wiki/models/article.py
+#, python-format
 msgid "Article without content (%(id)d)"
 msgstr "مقال خالي المحتوى (%(id)d)"
 
@@ -20829,6 +21004,7 @@ msgid "A non-root note must always have a slug."
 msgstr "يجب أن يتوفّر دائمًا عنوان مختصر للملاحظة غير الجذرية."
 
 #: wiki/models/urlpath.py
+#, python-format
 msgid "There is already a root node on %s"
 msgstr "توجد مسبقًا عقدة جذرية في %s"
 
@@ -20858,7 +21034,7 @@ msgstr "نعم أنا متأكدّ..."
 
 #: wiki/plugins/attachments/markdown_extensions.py
 msgid "Click to download file"
-msgstr "أضغط لتحميل الملف"
+msgstr "اضغط لتحميل الملف"
 
 #: wiki/plugins/attachments/models.py
 msgid ""
@@ -20893,10 +21069,12 @@ msgid "attachment revisions"
 msgstr "عمليات مراجعة الملف المرفق"
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "%s was successfully added."
 msgstr "نجحت إضافة %s."
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "Your file could not be saved: %s"
 msgstr "تَعذَّر حفظ ملفّك: %s"
 
@@ -20907,6 +21085,7 @@ msgid ""
 msgstr "لا يمكن حفظ ملفّك، ربما بسبب خطأ في الصلاحية على مخدّم الويب."
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "%s uploaded and replaces old attachment."
 msgstr "تجرى تحميل %s بدلًا من المرفق القديم."
 
@@ -20919,30 +21098,37 @@ msgstr ""
 "ملاحظة أنّه لا يُسمح بالملفات ذات الامتدادات المختلفة."
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "Current revision changed for %s."
 msgstr "تغيّرت المراجعة الحالية لـ %s."
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
 msgstr "أُضيف مرجع إلى \"%(att)s\" من \"%(art)s\"."
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "The file %s was deleted."
 msgstr "حُذِف الملف  %s."
 
 #: wiki/plugins/attachments/views.py
+#, python-format
 msgid "This article is no longer related to the file %s."
 msgstr "لم يعد هذا المقال مرتبطًا بالملف %s. "
 
 #: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
 msgid "A file was changed: %s"
 msgstr "جرى تغيير أحد الملفّات: %s"
 
 #: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
 msgid "A file was deleted: %s"
 msgstr "حُذِف أحد الملفّات: %s"
 
 #: wiki/plugins/images/forms.py
+#, python-format
 msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
@@ -20963,6 +21149,7 @@ msgid "images"
 msgstr "الصور"
 
 #: wiki/plugins/images/models.py
+#, python-format
 msgid "Image: %s"
 msgstr "الصورة: %s"
 
@@ -20979,22 +21166,27 @@ msgid "image revisions"
 msgstr "عمليات مراجعة الصورة"
 
 #: wiki/plugins/images/models.py
+#, python-format
 msgid "Image Revsion: %d"
 msgstr "مراجعة الصورة: %d"
 
 #: wiki/plugins/images/views.py
+#, python-format
 msgid "%s has been restored"
 msgstr "جرى استعادة %s"
 
 #: wiki/plugins/images/views.py
+#, python-format
 msgid "%s has been marked as deleted"
 msgstr "جرى الإشارة إلى %s على أنّه محذوف. "
 
 #: wiki/plugins/images/views.py
+#, python-format
 msgid "%(file)s has been changed to revision #%(revision)d"
 msgstr "جرى تغيير %(file)s إلى مراجعة #%(revision)d"
 
 #: wiki/plugins/images/views.py
+#, python-format
 msgid "%(file)s has been saved."
 msgstr "جرى حفظ %(file)s "
 
@@ -21003,6 +21195,7 @@ msgid "Images"
 msgstr "الصور"
 
 #: wiki/plugins/images/wiki_plugin.py
+#, python-format
 msgid "An image was added: %s"
 msgstr "جرت إضافة صورة: %s"
 
@@ -21033,18 +21226,22 @@ msgid "Your notification settings were unchanged, so nothing saved."
 msgstr "لم يجرِ تغيير الإعدادات الخاصة بإشعاراتك، وبالتالي لم يُحفَّظ شيء. "
 
 #: wiki/plugins/notifications/models.py
+#, python-format
 msgid "%(user)s subscribing to %(article)s (%(type)s)"
 msgstr "تسجيل %(user)s في %(article)s (%(type)s)"
 
 #: wiki/plugins/notifications/models.py
+#, python-format
 msgid "Article deleted: %s"
 msgstr "حُذِف المقال: %s"
 
 #: wiki/plugins/notifications/models.py
+#, python-format
 msgid "Article modified: %s"
 msgstr "عُدِّل المقال: %s"
 
 #: wiki/plugins/notifications/models.py
+#, python-format
 msgid "New article created: %s"
 msgstr "أُنشئ مقال جديد: %s "
 
@@ -21061,10 +21258,12 @@ msgid "You are now logged in! Have fun!"
 msgstr "تَسجَّل دخولك! نتمنّى لك وقتًا ممتعًا!"
 
 #: wiki/views/article.py
+#, python-format
 msgid "New article '%s' created."
 msgstr "أُنشئ مقال جديد ’%s‘. "
 
 #: wiki/views/article.py
+#, python-format
 msgid "There was an error creating this article: %s"
 msgstr "نأسف لحدوث خطأ أثناء إنشاء هذا المقال: %s"
 
@@ -21083,6 +21282,7 @@ msgid ""
 msgstr "جرى الآن التخلّص تمامًا من هذا المقال وكافة محتوياته! شكرًا لك!"
 
 #: wiki/views/article.py
+#, python-format
 msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
@@ -21103,10 +21303,12 @@ msgid "Restoring article"
 msgstr "استعادة المقال"
 
 #: wiki/views/article.py
+#, python-format
 msgid "The article \"%s\" and its children are now restored."
 msgstr "استُعيد الآن المقال \"%s\" وكافة مقالاته الفرعية."
 
 #: wiki/views/article.py
+#, python-format
 msgid "The article %s is now set to display revision #%d"
 msgstr "جرى الآن إعداد المقال %s لعرض المراجعة  #%d"
 
@@ -21115,10 +21317,12 @@ msgid "New title"
 msgstr "عنوان جديد"
 
 #: wiki/views/article.py
+#, python-format
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
 msgstr "الدمج بين المراجعة #%(r1)d والمراجعة #%(r2)d"
 
 #: wiki/views/article.py
+#, python-format
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
