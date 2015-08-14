@@ -164,7 +164,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                 view.save();
                 expect(requests.length).toEqual(1)
                 AjaxHelpers.expectJsonRequest(requests, 'POST', 'save_ccx', view.schedule);
-                expect($('#dirty-schedule #save-changes').text()).toEqual("Saving...");
+                expect($('#dirty-schedule #save-changes').text()).toEqual("Saving");
                 AjaxHelpers.respondWithJson(requests, {
                     data: view.schedule
                 });
