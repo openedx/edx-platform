@@ -204,9 +204,9 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
     **PATCH Parameters**
 
         topic_id, type, title, and raw_body are accepted with the same meaning
-        as in a POST request. 
+        as in a POST request.
 
-        In addition, abuse_flagged, following, and voted are accepted 
+        In addition, abuse_flagged, following, and voted are accepted.
 
     **GET Response Values**
 
@@ -290,7 +290,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           were created or updated since the last time the user read the thread.
 
         * vote_count: The number of votes that the thread has received.
-        
+
         * voted: A Boolean that indicates whether the requesting user has
           voted for the thread.
 
