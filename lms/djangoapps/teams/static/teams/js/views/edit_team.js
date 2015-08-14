@@ -118,8 +118,12 @@
                                 {trigger: true}
                             );
                         })
-                        .fail(function() {
-                            var message = gettext('An error occurred. Please try again.');
+                        .fail(function(data) {
+                            var response = JSON.parse(data.responseText);
+                            var message = gettext("An error occurred. Please try again.")
+                            if ('error_message' in response && 'user_message' in response['error_message']){
+                                message = response['error_message']['user_message'];
+                            }
                             view.showMessage(message, message);
                         });
                 },
