@@ -311,13 +311,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
         if 'include_inactive' in request.QUERY_PARAMS and request.QUERY_PARAMS['include_inactive'].lower() == 'true':
             del result_filter['is_active']
-        if 'text_search' in request.QUERY_PARAMS:
-            return Response(
-                build_api_error(ugettext_noop("text_search is not yet supported.")),
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
         queryset = CourseTeam.objects.filter(**result_filter)
+        if 'text_search' in request.QUERY_PARAMS:
+            text_search = request.QUERY_PARAMS['text_search']
+            search_queryset = SearchQuerySet().models(CourseTeam).autocomplete(content=text_search)
+            search_queryset_list = [obj.object.id for obj in search_queryset]
+            queryset = queryset.filter(pk__in=search_queryset_list)
 
         order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
         if order_by_input == 'name':
@@ -494,7 +494,7 @@ class TeamsSearchView(APIView):
         Search teams using ES storage
         """
         params = self.request.QUERY_PARAMS.dict()
-        valid_search_fields = ('name', 'description', 'language', 'country')
+        valid_search_fields = ('name', 'description', 'language_code', 'country')
         query = SearchQuerySet().models(CourseTeam).filter(
             **{
                 field: value for (field, value) in params.items() if field in valid_search_fields}
