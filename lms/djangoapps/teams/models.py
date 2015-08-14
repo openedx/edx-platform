@@ -1,6 +1,8 @@
 """Django models related to teams functionality."""
 
 from uuid import uuid4
+import pytz
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -23,13 +25,13 @@ class CourseTeam(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    # last_activity is computed through a query
     description = models.CharField(max_length=300)
     country = CountryField(blank=True)
     language = LanguageField(
         blank=True,
         help_text=ugettext_lazy("Optional language the team uses as ISO 639-1 code."),
     )
+    last_activity_at = models.DateTimeField()
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
 
     @classmethod
@@ -62,6 +64,7 @@ class CourseTeam(models.Model):
             description=description,
             country=country if country else '',
             language=language if language else '',
+            last_activity_at=datetime.utcnow().replace(tzinfo=pytz.utc)
         )
 
         return course_team
@@ -88,6 +91,14 @@ class CourseTeamMembership(models.Model):
     user = models.ForeignKey(User)
     team = models.ForeignKey(CourseTeam, related_name='membership')
     date_joined = models.DateTimeField(auto_now_add=True)
+    last_activity_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        """ Customize save method to set the last_activity_at if it does not currently exist. """
+        if not self.last_activity_at:
+            self.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        super(CourseTeamMembership, self).save(*args, **kwargs)
 
     @classmethod
     def get_memberships(cls, username=None, course_ids=None, team_id=None):

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
 import json
+import pytz
+from datetime import datetime
+from dateutil import parser
 
 import ddt
 
@@ -13,7 +16,7 @@ from courseware.tests.factories import StaffFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
-from .factories import CourseTeamFactory
+from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
@@ -540,6 +543,13 @@ class TestCreateTeamAPI(TeamAPITestCase):
         team_membership = team['membership']
         del team['membership']
 
+        # verify that it's been set to a time today.
+        self.assertEqual(
+            parser.parse(team['last_activity_at']).date(),
+            datetime.utcnow().replace(tzinfo=pytz.utc).date()
+        )
+        del team['last_activity_at']
+
         # Verify that the creating user gets added to the team.
         self.assertEqual(len(team_membership), 1)
         member = team_membership[0]['user']
@@ -587,6 +597,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         if status == 200:
             self.assertEqual(team['description'], self.test_team_1.description)
             self.assertEqual(team['discussion_topic_id'], self.test_team_1.discussion_topic_id)
+            self.assertEqual(parser.parse(team['last_activity_at']), LAST_ACTIVITY_AT)
 
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)
