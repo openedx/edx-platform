@@ -42,11 +42,11 @@ class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
 
         Retrieve general discussion metadata for a course.
 
-    **Example Requests**:
+    **Example Requests**
 
         GET /api/discussion/v1/courses/{course_id}
 
-    **Response Values**:
+    **Response Values**
 
         * id: The unique identifier for the course.
 
@@ -56,10 +56,10 @@ class CourseView(_ViewMixin, DeveloperErrorViewMixin, APIView):
           moderation roles in the course. Each item in the list includes the
           following values.
 
+            * end: The ISO 8601 timestamp for the end of the blackout period.
+
             * start: The ISO 8601 timestamp for the start of the blackout
               period.
-
-            * end: The ISO 8601 timestamp for the end of the blackout period.
 
         * following_thread_list_url: The URL of the list of threads that the
           requesting user is following.
@@ -80,15 +80,15 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     **Use Cases**
 
         Retrieve the list of discussion topics for a course. Only topics that
-          are accessible to the authenticated user are included: cohort
-          assignments, content groups, release dates, and other access
-          controls can affect access to content.
+        are accessible to the authenticated user are included: cohort
+        assignments, content groups, release dates, and other access
+        controls can affect access to content.
 
-    **Example Requests**:
+    **Example Requests**
 
         GET /api/discussion/v1/course_topics/{course_id}
 
-    **Response Values**:
+    **Response Values**
 
         * courseware_topics: The list of topic trees for the content-specific
           discussion topics in the course. In Studio, course teams use
@@ -133,7 +133,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         Retrieve the list of threads for a course, post a new thread, or modify
         or delete an existing thread.
 
-    **Example Requests**:
+    **Example Requests**
 
         GET /api/discussion/v1/threads/?course_id=ExampleX/Demo/2015
 
@@ -151,7 +151,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         DELETE /api/discussion/v1/threads/thread_id
 
-    **GET Parameters**:
+    **GET Parameters**
 
         * course_id (required): The ID of the course to retrieve threads for.
 
@@ -185,30 +185,30 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         The topic_id, text_search, and following parameters are mutually
         exclusive. Only one can be specified in a request.
 
-    **POST Parameters**:
+    **POST Parameters**
 
         * course_id (required): The course to create the thread in.
+
+        * following (optional): A Boolean that indicates whether the user will
+          follow the thread upon its creation. Defaults to false.
+
+        * raw_body (required): The text for the thread, without HTML markup.
+
+        * title (required): The title for the thread.
 
         * topic_id (required): The discussion topic to create the thread in.
 
         * type (required): Specifies either "question" or "discussion" as the
           type of thread to create.
 
-        * title (required): The title for the thread.
-
-        * raw_body (required): The text for the thread, without HTML markup.
-
-        * following (optional): A Boolean that indicates whether the user will
-          follow the thread upon its creation. Defaults to false.
-
-    **PATCH Parameters**:
+    **PATCH Parameters**
 
         topic_id, type, title, and raw_body are accepted with the same meaning
         as in a POST request. 
 
         In addition, abuse_flagged, following, and voted are accepted 
 
-    **GET Response Values**:
+    **GET Response Values**
 
         * next: The URL of the next page of results. Null for the last page.
 
@@ -223,7 +223,10 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           was rewritten to match thread content, such as a spelling correction,
           contains the rewritten string.
 
-    **POST/PATCH response values**:
+    **POST/PATCH response values**
+
+        * abuse_flagged: A Boolean that indicates whether the requesting user
+          has flagged the thread for abuse.
 
         * author: The username of the thread's author. None if the thread is
           anonymous.
@@ -233,30 +236,25 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           identified as "staff" and community TAs are identified as
           "community_ta". Null for other users.
 
+        * closed: A Boolean that indicates whether the thread has been closed.
+
+        * comment_count: The number of comments within the thread.
+
+        * comment_list_url: The URL of the list of all responses and comments to
+          this thread.
+
+        * course_id: The ID of the thread's course.
+
         * created_at: The ISO 8601 timestamp for the creation of the thread.
-
-        * updated_at: The ISO 8601 timestamp for the last modification of the
-          thread, which might be an edit to one of the editable_fields as well
-          as the title or body.
-
-        * raw_body: The text for the thread, without HTML markup.
-
-        * rendered_body: The text for the thread, including HTML tags.
-
-        * abuse_flagged: A Boolean that indicates whether the requesting user
-          has flagged the thread for abuse.
-
-        * voted: A Boolean that indicates whether the requesting user has
-          voted for the thread.
-
-        * vote_count: The number of votes that the thread has received.
 
         * editable_fields: The fields that the requesting user is allowed to
           modify with a PATCH request: abuse_flagged, following, and voted.
 
-        * course_id: The ID of the thread's course.
+        * endorsed_comment_list_url: For threads with a type of "question", the
+          URL of the list of endorsed responses (if any).
 
-        * topic_id: The ID of the thread's topic.
+        * following: A Boolean that indicates whether the requesting user is
+          following the thread.
 
         * group_id: The ID of the cohort that can view and comment on this
           thread.
@@ -264,39 +262,41 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         * group_name: The name of the cohort that can view and comment on this
           thread.
 
-        * title: The title of the thread.
-
-        * pinned: A Boolean that indicates whether the thread has been pinned.
-
-        * closed: A Boolean that indicates whether the thread has been closed.
-
-        * following (optional): A Boolean that indicates whether the requesting
-          user is following the thread.
-
-        * comment_count: The number of comments within the thread.
-
-        * unread_comment_count: The number of comments within the thread that
-          were created or updated since the last time the user read the thread.
-
-        * comment_list_url: The URL of the list of all responses and comments to
-          this thread.
-
-        * endorsed_comment_list_url: For threads with a type of "question", the
-          URL of the list of endorsed responses (if any).
-
-        * non_endorsed_comment_list_url: For threads with a type of "question",
-          the URL of the list of responses that are not marked as correct (if
-          any).
-
-        * read: A Boolean that indicates whether the user has read this thread.
-
         * has_endorsed: For threads with a type of "question", a Boolean that
           indicates whether this thread has any responses that are marked as
           answers.
 
         * id: The ID of the thread.
 
+        * pinned: A Boolean that indicates whether the thread has been pinned.
+
+        * raw_body: The text for the thread, without HTML markup.
+
+        * read: A Boolean that indicates whether the user has read this thread.
+
+        * rendered_body: The text for the thread, including HTML tags.
+
+        * title: The title of the thread.
+
+        * topic_id: The ID of the thread's topic.
+
         * type: The thread's type: either "question" or "discussion".
+
+        * updated_at: The ISO 8601 timestamp for the last modification of the
+          thread, which might be an edit to one of the editable_fields as well
+          as the title or body.
+
+        * unread_comment_count: The number of comments within the thread that
+          were created or updated since the last time the user read the thread.
+
+        * vote_count: The number of votes that the thread has received.
+        
+        * voted: A Boolean that indicates whether the requesting user has
+          voted for the thread.
+
+        * non_endorsed_comment_list_url: For threads with a type of "question",
+          the URL of the list of responses that are not marked as correct (if
+          any).
 
     **DELETE response values:
 
@@ -360,7 +360,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         comments that is currently used, comments include both the initial
         responses to a thread and comments on those responses.
 
-    **Example Requests**:
+    **Example Requests**
 
         GET /api/discussion/v1/comments/?thread_id=0123456789abcdef01234567
 
@@ -375,48 +375,49 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         DELETE /api/discussion/v1/comments/comment_id
 
-    **GET Parameters**:
-
-        * thread_id (required): The ID of the thread to retrieve comments for.
+    **GET Parameters**
 
         * endorsed: If specified as true, retrieves only comments that are
           marked as answers to the question. If false, retrieves only comments
           that are not endorsed as answers. Only applies to question threads,
           must be null for discussion threads.
 
+        * mark_as_read: Marks the thread of the comments as read. Defaults to 
+          False.
+
         * page: The (1-indexed) page to retrieve. Defaults to 1.
 
         * page_size: The number of items per page. Defaults to 10, with a
           maximum of 100.
 
-        * mark_as_read: Will mark the thread of the comments as read. (default
-            is False)
-
-    **POST Parameters**:
-
-        * thread_id (required): The thread to post the comment in.
+    **POST Parameters**
 
         * parent_id: The parent comment of the new comment. If null or omitted,
           the comment is posted as a response, directly under the thread.
 
         * raw_body: The text for the comment, without HTML markup.
 
-    **PATCH Parameters**:
+        * thread_id (required): The ID of the thread to post the comment in.
+
+    **PATCH Parameters**
 
         raw_body is accepted with the same meaning as in a POST request.
 
-    **GET Response Values**:
-
-        * results: An array that lists all of the returned comments. For each
-          comment, an object contains the same set of values as in a POST/PATCH
-          response, described below.
+    **GET Response Values**
 
         * next: The URL of the next page of results. Null for the last page.
 
         * previous: The URL of the previous page of results. Null for the first
           page.
 
-    **POST/PATCH Response Values**:
+        * results: An array that lists all of the returned comments. For each
+          comment, an object contains the same set of values as in a POST/PATCH
+          response, described below.
+
+    **POST/PATCH Response Values**
+
+        * abuse_flagged: A Boolean that indicates whether the requesting user has
+          flagged the comment for abuse.
 
         * author: The username of the comment's author. None if the comment is
           anonymous.
@@ -426,35 +427,20 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           identified as "staff" and community TAs are identified as
           "community_ta". Null for other users.
 
+        * children: An array that lists all of the child comments for this
+          comment. For each comment, an object contains the same set of values
+          as for the parent comment.
+
         * created_at: The ISO 8601 timestamp for the creation of the comment.
-
-        * updated_at: The ISO 8601 timestamp for the last modification of the
-          comment, which might be an edit to one of the editable_fields as well
-          as the body.
-
-        * raw_body: The text for the comment, without HTML markup.
-
-        * rendered_body: The text for the comment, including HTML tags.
-
-        * abuse_flagged: A Boolean that indicates whether the requesting user has
-          flagged the comment for abuse.
-
-        * voted: A Boolean that indicates whether the requesting user has voted
-          for the comment.
-
-        * vote_count: The number of votes that the comment has received.
 
         * editable_fields: The fields that the requesting user is allowed to
           modify with a PATCH request: abuse_flagged and voted.
 
-        * thread_id: The ID of the thread the comment was made to.
-
-        * parent_id: The ID of the parent comment that the comment was made to.
-          Null for a comment that is posted directly under the thread.
-
         * endorsed: A Boolean that indicates whether the comment is marked as the
           answer to a question by either the thread author or by a privileged
           user.
+
+        * endorsed_at: The ISO 8601 timestamp for the endorsement, if available.
 
         * endorsed_by: The username of the endorsing user, if available.
 
@@ -462,13 +448,25 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           privileged role in the course. The values are the same as for
           author_label.
 
-        * endorsed_at: The ISO 8601 timestamp for the endorsement, if available.
-
-        * children: An array that lists all of the child comments for this
-          comment. For each comment, an object contains the same set of values
-          as for the parent comment.
-
         * id: The ID of the comment.
+
+        * parent_id: The ID of the parent comment that the comment was made to.
+          Null for a comment that is posted directly under the thread.
+
+        * raw_body: The text for the comment, without HTML markup.
+
+        * rendered_body: The text for the comment, including HTML tags.
+
+        * thread_id: The ID of the thread the comment was made to.
+
+        * updated_at: The ISO 8601 timestamp for the last modification of the
+          comment, which might be an edit to one of the editable_fields as well
+          as the body.
+
+        * vote_count: The number of votes that the comment has received.
+
+        * voted: A Boolean that indicates whether the requesting user has voted
+          for the comment.
 
     **DELETE Response Value**
 
