@@ -57,13 +57,10 @@ class VerificationPartitionScheme(object):
         # here getting cache key names for all models. So that we can make the
         # list of keys and get the cache.get_many
 
-        is_verified, has_skipped, verification_statuses = update_multi_key_cache(user, course_key)
-
-        was_denied = VerificationStatus.DENIED_STATUS in verification_statuses.values()
-        has_completed_check = checkpoint in verification_statuses and (
-            verification_statuses[checkpoint] in [
-                VerificationStatus.SUBMITTED_STATUS, VerificationStatus.APPROVED_STATUS
-            ]
+        is_verified, has_skipped, verification_statuses, was_denied, has_completed_check = get_user_statuses(
+            user,
+            course_key,
+            checkpoint
         )
 
         if not is_verified:
@@ -162,19 +159,22 @@ def has_completed_checkpoint(user, course_key, checkpoint):
     ]
 
 
-def update_multi_key_cache(user, course_key):
-    """This method will make multi key cache for all 3 db models in use. So that instead of hitting the cache
-    seperately will hit the cache only once and get the values for all three keys.
+def get_user_statuses(user, course_key, checkpoint):
+    """This method will make multi key cache for all 3 db models. So that instead of hitting the cache
+    separately for each key it  will hit the cache only once and get the values for all three keys.
 
     Args:
         user(User): user object
         course_key(CourseKey): CourseKey
+        checkpoint: location object
 
     Returns:
         tuple containing student' status
         verified mode : boolean
         has_skipped: boolean
         verification_statuses: dict
+        was_denied: boolean
+        has_completed_check: boolean
     """
     enrollment_cache_key = CourseEnrollment.cache_key_name(user.id, unicode(course_key))
     has_skipped_cache_key = SkippedReverification.cache_key_name(user.id, unicode(course_key))
@@ -186,16 +186,19 @@ def update_multi_key_cache(user, course_key):
 
     cache_values = cache.get_many(cache_keys)
 
+    # getting the student verified mode.
     is_verified = cache_values.get(enrollment_cache_key)
     if is_verified is None:
         is_verified = is_enrolled_in_verified_mode(user, course_key)
         cache.set(enrollment_cache_key, is_verified)
 
+    # getting student has skipped any verification.
     has_skipped = cache_values.get(has_skipped_cache_key)
     if has_skipped is None:
         has_skipped = has_skipped_any_checkpoint(user, course_key)
         cache.set(has_skipped_cache_key, has_skipped)
 
+    # getting the dict of student verification statuses
     verification_statuses = cache_values.get(verification_status_cache_key)
     if verification_statuses is None:
         verification_statuses = VerificationStatus.get_all_checkpoints(
@@ -204,8 +207,21 @@ def update_multi_key_cache(user, course_key):
         )
         cache.set(verification_status_cache_key, verification_statuses)
 
+    #  user's denied status for any checkpoint
+    was_denied = VerificationStatus.DENIED_STATUS in verification_statuses.values()
+
+    # user's checkpoint completion status either submitted or approved
+    checkpoint = verification_statuses.get(checkpoint)
+    has_completed_check = checkpoint and checkpoint in [
+        VerificationStatus.SUBMITTED_STATUS,
+        VerificationStatus.APPROVED_STATUS
+    ]
+
     return (
         is_verified,
         has_skipped,
-        verification_statuses
+        verification_statuses,
+        was_denied,
+        has_completed_check
+
     )
