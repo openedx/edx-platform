@@ -19,6 +19,7 @@ define(['backbone',
 
                initialize: function(options) {
                    this.template = _.template(teamJoinTemplate);
+                   this.courseID = options.courseID;
                    this.maxTeamSize = options.maxTeamSize;
                    this.currentUsername = options.currentUsername;
                    this.teamMembershipsUrl = options.teamMembershipsUrl;
@@ -85,7 +86,7 @@ define(['backbone',
                            $.ajax({
                                type: 'GET',
                                url: view.teamMembershipsUrl,
-                               data: {'username': username}
+                               data: {'username': username, 'course_id': view.courseID}
                            }).done(function (data) {
                                info.alreadyMember = (data.count > 0);
                                info.memberOfCurrentTeam = false;
