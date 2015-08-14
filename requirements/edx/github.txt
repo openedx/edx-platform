@@ -32,7 +32,8 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
+# The Solutions fork commonly uses a customized version of XBlock. Comment it out here since we place it in custom.txt.
+#-e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
