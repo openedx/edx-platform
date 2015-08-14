@@ -53,19 +53,6 @@
 
             <div class="divider-lv1"></div>
 
-            <div class="invite-team">
-                <h4 class="invite-header"><%- gettext("Invite Others") %></h4>
-                <% if (hasCapacity) { %>
-                    <input type="text" class="invite-link-input" value="<%= inviteLink %>" aria-describedby="invite-text" readonly >
-                    <span class="invite-text" id="invite-text">
-                        <%- gettext("Send this link to friends so that they can join too.") %>
-                    </span>
-                <% } else {  %>
-                    <span class="invite-text">
-                        <%- gettext("No invitations are available. This team is full.") %>
-                    </span>
-                <% } %>
-            </div>
         <% } %>
     </div>
 </div>

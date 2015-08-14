@@ -871,7 +871,7 @@ class TeamPageTest(TeamsTabBase):
         self.setup_discussion_user(role=role)
         self.verify_teams_discussion_permissions(True)
 
-    def assert_team_details(self, num_members, is_member=True, max_size=10, invite_text=''):
+    def assert_team_details(self, num_members, is_member=True, max_size=10):
         """
         Verifies that user can see all the information, present on detail page according to their membership status.
 
@@ -879,7 +879,6 @@ class TeamPageTest(TeamsTabBase):
             num_members (int): number of users in a team
             is_member (bool) default True: True if request user is member else False
             max_size (int): number of users a team can have
-            invite_text (str): help text for invite link.
         """
         self.assertEqual(
             self.team_page.team_capacity_text,
@@ -901,13 +900,10 @@ class TeamPageTest(TeamsTabBase):
         if is_member:
             self.assertEqual(self.team_page.team_user_membership_text, 'You are a member of this team.')
             self.assertTrue(self.team_page.team_leave_link_present)
-            self.assertTrue(self.team_page.team_invite_section_present)
-            self.assertEqual(self.team_page.team_invite_help_text, invite_text)
             self.assertTrue(self.team_page.new_post_button_present)
         else:
             self.assertEqual(self.team_page.team_user_membership_text, '')
             self.assertFalse(self.team_page.team_leave_link_present)
-            self.assertFalse(self.team_page.team_invite_section_present)
             self.assertFalse(self.team_page.new_post_button_present)
 
     def test_team_member_can_see_full_team_details(self):
@@ -927,7 +923,6 @@ class TeamPageTest(TeamsTabBase):
 
         self.assert_team_details(
             num_members=1,
-            invite_text=self.SEND_INVITE_TEXT
         )
 
     def test_other_users_can_see_limited_team_details(self):
@@ -967,42 +962,6 @@ class TeamPageTest(TeamsTabBase):
         learner_profile_page.wait_for_field('username')
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
-    def test_team_member_cannot_see_invite_link_if_team_full(self):
-        """
-        Scenario: Team members should not see the invite link if the team is full.
-        Given I am enrolled in a course with a team configuration, a topic,
-            and a team belonging to that topic of which I am a member
-        When I visit the Team page for that team
-        Then I should see the "team is full" message
-        And I should not see the invite link
-        """
-        self._set_team_configuration_and_membership(max_team_size=1)
-        self.team_page.visit()
-
-        self.assert_team_details(
-            num_members=1,
-            max_size=1,
-            invite_text='No invitations are available. This team is full.'
-        )
-
-    def test_team_member_can_see_invite_link(self):
-        """
-        Scenario: Team members should see the invite link if the team has capacity.
-        Given I am enrolled in a course with a team configuration, a topic,
-            and a team belonging to that topic of which I am a member
-        When I visit the Team page for that team
-        Then I should see the invite link help message
-        And I should see the invite link that can be selected
-        """
-        self._set_team_configuration_and_membership()
-        self.team_page.visit()
-
-        self.assert_team_details(
-            num_members=1,
-            invite_text=self.SEND_INVITE_TEXT
-        )
-        self.assertEqual(self.team_page.team_invite_url, '{0}?invite=true'.format(self.team_page.url))
-
     def test_join_team(self):
         """
         Scenario: User can join a Team if not a member already..
@@ -1023,7 +982,7 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.click_join_team_button()
         self.assertFalse(self.team_page.join_team_button_present)
         self.assertFalse(self.team_page.join_team_message_present)
-        self.assert_team_details(num_members=1, is_member=True, invite_text=self.SEND_INVITE_TEXT)
+        self.assert_team_details(num_members=1, is_member=True)
 
     def test_already_member_message(self):
         """
@@ -1082,7 +1041,7 @@ class TeamPageTest(TeamsTabBase):
         self._set_team_configuration_and_membership()
         self.team_page.visit()
         self.assertFalse(self.team_page.join_team_button_present)
-        self.assert_team_details(num_members=1, invite_text=self.SEND_INVITE_TEXT)
+        self.assert_team_details(num_members=1)
         self.team_page.click_leave_team_link()
         self.assert_team_details(num_members=0, is_member=False)
         self.assertTrue(self.team_page.join_team_button_present)

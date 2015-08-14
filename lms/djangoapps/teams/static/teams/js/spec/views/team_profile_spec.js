@@ -119,10 +119,6 @@ define([
                     assertTeamDetails(view, 0, false);
                     expect(view.$('.team-user-membership-status').length).toBe(0);
 
-                    // Verify that invite and leave team sections are not present.
-                    expect(view.$('.leave-team').length).toBe(0);
-                    expect(view.$('.invite-team').length).toBe(0);
-
                 });
                 it('cannot see the country & language if empty', function() {
                     var requests = AjaxHelpers.requests(this);
@@ -149,65 +145,6 @@ define([
                     // assert user profile page url.
                     expect(view.$('.member-profile').attr('href')).toBe('/u/bilbo');
 
-                    //Verify that invite and leave team sections are present
-                    expect(view.$('.leave-team-link').text()).toContain('Leave Team');
-                    expect(view.$('.invite-header').text()).toContain('Invite Others');
-                    expect(view.$('.invite-text').text()).toContain('Send this link to friends so that they can join too.');
-                    expect(view.$('.invite-link-input').length).toBe(1);
-
-                });
-                it('cannot see invite url box if team is full', function() {
-                    var requests = AjaxHelpers.requests(this);
-                    var view = createTeamProfileView(requests , {
-                        country: 'US',
-                        language: 'en',
-                        membership: [{
-                            'user': {
-                                'username': 'bilbo',
-                                'profile_image': {
-                                    'has_image': true,
-                                    'image_url_medium': '/image-url'
-                                }
-                            }
-                        },
-                        {
-                            'user': {
-                                'username': 'bilbo1',
-                                'profile_image': {
-                                    'has_image': true,
-                                    'image_url_medium': '/image-url'
-                                }
-                            }
-                        },
-                        {
-                            'user': {
-                                'username': 'bilbo2',
-                                'profile_image': {
-                                    'has_image': true,
-                                    'image_url_medium': '/image-url'
-                                }
-                            }
-                        }]
-                    });
-
-                    assertTeamDetails(view, 3, true);
-                    expect(view.$('.invite-header').text()).toContain('Invite Others');
-                    expect(view.$('.invite-text').text()).toContain('No invitations are available. This team is full.');
-                    expect(view.$('.invite-link-input').length).toBe(0);
-                });
-                it('can see & select invite url if team has capacity', function() {
-                    var requests = AjaxHelpers.requests(this);
-                    spyOn(TeamProfileView.prototype, 'selectText');
-
-                    var view = createTeamProfileView(
-                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
-                    );
-                    assertTeamDetails(view, 1, true);
-
-                    expect(view.$('.invite-link-input').length).toBe(1);
-
-                    view.$('.invite-link-input').click();
-                    expect(view.selectText).toHaveBeenCalled();
                 });
                 it('can leave team successfully', function() {
                     var requests = AjaxHelpers.requests(this);

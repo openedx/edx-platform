@@ -290,11 +290,6 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         self.wait_for_ajax()
 
     @property
-    def team_invite_section_present(self):
-        """Verifies that invite section is present"""
-        return self.q(css='.page-content-secondary .invite-team').present
-
-    @property
     def team_members(self):
         """Returns the number of team members in this team"""
         return len(self.q(css='.page-content-secondary .team-member'))
@@ -307,16 +302,6 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def first_member_username(self):
         """Returns the username of team member"""
         return self.q(css='.page-content-secondary .tooltip-custom').text[0]
-
-    @property
-    def team_invite_help_text(self):
-        """Returns the team invite help text"""
-        return self.q(css='.page-content-secondary .invite-text').text[0]
-
-    @property
-    def team_invite_url(self):
-        """Returns the url of invite link box"""
-        return self.q(css='.page-content-secondary .invite-link-input').attrs('value')[0]
 
     def click_join_team_button(self):
         """ Click on Join Team button"""
