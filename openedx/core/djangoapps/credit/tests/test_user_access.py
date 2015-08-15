@@ -128,7 +128,7 @@ class UserAccessToContent(ModuleStoreTestCase):
         ("verified", SKIPPED),
         ("honor", None),
     )
-    @ddt.unpack
+    @ddt.unpack  # pylint: disable=too-many-statements
     def test_has_access_for_users(self, enrollment_type, verification_status):
 
         on_course_publish(self.course.id)

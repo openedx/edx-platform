@@ -349,7 +349,7 @@ class TestCourseTaggingWithVerPartitions(ModuleStoreTestCase):
         self.assertEqual(len(access_groups_of_verification_partition), 2)
         self.assertTrue(set(access_groups_of_verification_partition) == set(gated_vertical_groups))
 
-    def test_tagging_content_multiple_icrv(self):
+    def test_tagging_content_multiple_icrv(self):  # pylint: disable=too-many-statements
         section_with_tree2 = ItemFactory.create(
             parent=self.course, category='chapter', display_name='Test Section Tree 2'
         )
@@ -383,7 +383,6 @@ class TestCourseTaggingWithVerPartitions(ModuleStoreTestCase):
             display_name='Problem 22'
         )
 
-        # tag_course_content_with_partition_scheme(self.course.id, partition_scheme='verification')
         on_course_publish(self.course.id)
         course = modulestore().get_course(self.course.id)
 
@@ -459,7 +458,7 @@ class TestCourseTaggingWithVerPartitions(ModuleStoreTestCase):
         self._assert_partitions(gated_problem21_loc, gated_contents_group_access)
         self._assert_partitions(gated_problem22_loc, gated_contents_group_access)
 
-    def test_tagging_content_multiple_icrv_delete_icrv(self):
+    def test_tagging_content_multiple_icrv_delete_icrv(self):  # pylint: disable=too-many-statements
         section_with_tree2 = ItemFactory.create(
             parent=self.course, category='chapter', display_name='Test Section Tree 2'
         )
