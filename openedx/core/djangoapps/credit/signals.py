@@ -179,7 +179,9 @@ def _update_content_group_access(block, verification_partition):
     # update 'group_access' field of gating xblock with groups
     # 'verified_allow' and 'verified_deny' of provided user partition
     # 'group_configuration'
-    icrv_block_access_groups_ids = [VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY]
+    icrv_block_access_groups_ids = [
+        VerificationPartitionScheme.VERIFIED_ALLOW, VerificationPartitionScheme.VERIFIED_DENY
+    ]
     # Assuming that there will be only one user partition for a block
     block.group_access = _access_dict(verification_partition, icrv_block_access_groups_ids)
 
@@ -200,10 +202,10 @@ def _update_content_group_access(block, verification_partition):
     # current ICRV's grand parent (if category of parent and grand
     # parent are 'vertical' and 'sequential' respectively);
     # otherwise add groups to current ICRV's parent only
-    gated_contents_access_groups_ids = [
+    gated_content_access_groups_id = [
         VerificationPartitionScheme.NON_VERIFIED, VerificationPartitionScheme.VERIFIED_ALLOW
     ]
-    access_dict = _access_dict(verification_partition, gated_contents_access_groups_ids)
+    access_dict = _access_dict(verification_partition, gated_content_access_groups_id)
 
     parent_block = block.get_parent()
     grandparent_block = parent_block.get_parent()
@@ -340,6 +342,7 @@ def _verification_partition_group_configuration(course, user_partition, block): 
     ]
     group_configuration_parameters = {'location': unicode(block.location)}
 
+    # pylint: disable=invalid-name
     verification_partition_configuration = UserPartition(
         id=group_configuration_id,
         name=group_configuration_name,

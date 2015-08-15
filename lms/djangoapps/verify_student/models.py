@@ -1287,7 +1287,7 @@ class SkippedReverification(models.Model):
     future that user cannot see the reverification link.
     """
 
-    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}"
+    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}"  # pylint: disable=invalid-name
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, db_index=True)
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")

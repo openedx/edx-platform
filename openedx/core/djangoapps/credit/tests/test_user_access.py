@@ -21,9 +21,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
 
+
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class UserAccessToContent(ModuleStoreTestCase):
+    """Test for Reverification Partition Scheme user access to content."""
 
     SUBMITTED = "submitted"
     APPROVED = "approved"
@@ -56,15 +58,25 @@ class UserAccessToContent(ModuleStoreTestCase):
         # Create the course
         self.course = CourseFactory.create(org="MIT", course="DemoX", run="CS101")
 
-        self.section_alone = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Alone Section')
+        self.section_alone = ItemFactory.create(
+            parent=self.course, category='chapter', display_name='Test Alone Section'
+        )
 
-        self.section_with_tree = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section Tree')
+        self.section_with_tree = ItemFactory.create(
+            parent=self.course, category='chapter', display_name='Test Section Tree'
+        )
 
-        self.subsection_alone = ItemFactory.create(parent=self.section_with_tree, category='sequential', display_name='Test Subsection No Tree')
+        self.subsection_alone = ItemFactory.create(
+            parent=self.section_with_tree, category='sequential', display_name='Test Subsection No Tree'
+        )
 
-        self.subsection_with_tree = ItemFactory.create(parent=self.section_with_tree, category='sequential', display_name='Test Subsection With Tree')
+        self.subsection_with_tree = ItemFactory.create(
+            parent=self.section_with_tree, category='sequential', display_name='Test Subsection With Tree'
+        )
 
-        self.icrv_parent_vertical = ItemFactory.create(parent=self.subsection_with_tree, category='vertical', display_name='Test Unit X Block Parent')
+        self.icrv_parent_vertical = ItemFactory.create(
+            parent=self.subsection_with_tree, category='vertical', display_name='Test Unit X Block Parent'
+        )
 
         self.icrv_x_block = ItemFactory.create(
             parent=self.icrv_parent_vertical, category='edx-reverification-block', display_name='Test Unit X Block 1'
@@ -108,15 +120,13 @@ class UserAccessToContent(ModuleStoreTestCase):
             checkpoint_location=self.gated_icrv_x_block.location
         )
 
-
     @ddt.data(
         ("verified", SUBMITTED),
         ("verified", APPROVED),
         ("verified", DENIED),
         ("verified", None),
         ("verified", SKIPPED),
-        ("honor", False),
-
+        ("honor", None),
     )
     @ddt.unpack
     def test_has_access_for_users(self, enrollment_type, verification_status):
@@ -186,7 +196,8 @@ class UserAccessToContent(ModuleStoreTestCase):
             self.assertFalse(_has_group_access(gated_icrv_xblock, user, course.id).has_access)
 
         # user has submitted, denied or approved, user group will be VERIFIED_ALLOW
-        elif enrollment_type == 'verified' and verification_status in [self.SUBMITTED, self.APPROVED, self.DENIED, self.SKIPPED]:
+        elif enrollment_type == 'verified' and \
+                verification_status in [self.SUBMITTED, self.APPROVED, self.DENIED, self.SKIPPED]:
             if verification_status == self.SKIPPED:
                 SkippedReverification.add_skipped_reverification_attempt(
                     checkpoint=self.first_checkpoint,
