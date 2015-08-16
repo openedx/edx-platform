@@ -1187,10 +1187,13 @@ OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 
-USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
+# This pattern allow space in username
+USERNAME_PATTERN = r'(?P<username>[\w .@_+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
+
+
