@@ -148,4 +148,4 @@ class TestReverificationService(ModuleStoreTestCase):
         # Should be marked as "skipped" (opted out)
         service = ReverificationService()
         status = service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location)
-        self.assertEqual(status, 'skipped')
+        self.assertEqual(status, service.NON_VERIFIED_TRACK)
