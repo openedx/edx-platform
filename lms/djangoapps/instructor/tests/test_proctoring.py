@@ -39,6 +39,34 @@ class TestProctoringDashboardViews(ModuleStoreTestCase):
         """
         Test Pass Proctoring Tab is in the Instructor Dashboard
         """
+        self.instructor.is_staff = True
+        self.instructor.save()
+
         response = self.client.get(self.url)
         self.assertTrue(self.proctoring_link in response.content)
         self.assertTrue('Allowance Section' in response.content)
+
+    def test_no_tab_non_global_staff(self):
+        """
+        Test Pass Proctoring Tab is not in the Instructor Dashboard
+        for non global staff users
+        """
+        self.instructor.is_staff = False
+        self.instructor.save()
+
+        response = self.client.get(self.url)
+        self.assertFalse(self.proctoring_link in response.content)
+        self.assertFalse('Allowance Section' in response.content)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': False})
+    def test_no_tab_flag_unset(self):
+        """
+        Test Pass Proctoring Tab is not in the Instructor Dashboard
+        if the feature flag 'ENABLE_PROCTORED_EXAMS' is unset.
+        """
+        self.instructor.is_staff = True
+        self.instructor.save()
+
+        response = self.client.get(self.url)
+        self.assertFalse(self.proctoring_link in response.content)
+        self.assertFalse('Allowance Section' in response.content)
