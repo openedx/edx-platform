@@ -33,7 +33,7 @@ from courseware.courses import course_image_url, get_course_about_section
         </div>
         <div class="course-title">
           <h1>
-            ${course.display_name}
+            ${course.display_name | h}
               <span class="course-dates">
                 ${course.start_datetime_text()}
                 -
@@ -60,7 +60,7 @@ from courseware.courses import course_image_url, get_course_about_section
                 "This course has now been added to your dashboard."
               ).format(
                 course_name=course.display_name,
-              )}
+              ) | h}
             % elif registered_for_course:
               ${_(
                 "You're already enrolled for this course. "
@@ -80,7 +80,7 @@ from courseware.courses import course_image_url, get_course_about_section
               ).format(
                 course_name=course.display_name,
                 site_name=site_name,
-              )}
+              ) | h}
             % endif
           </p>
         </div>
