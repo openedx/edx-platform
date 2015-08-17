@@ -14,7 +14,7 @@
         <th><%- gettext('Start Date') %></th>
         <th><%- gettext('Due Date') %></th>
         <td><button id="remove-all" class="ccx-button-link">
-          <i class="fa fa-remove"></i> <%- gettext('remove all') %>
+          <i class="fa fa-remove" aria-hidden="true"></i> <%- gettext('remove all') %>
         </button></td>
       </tr>
     </thead>

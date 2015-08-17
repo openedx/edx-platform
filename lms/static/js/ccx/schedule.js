@@ -306,7 +306,6 @@ var edx = edx || {};
 	      row.removeClass('expanded').addClass('collapsed');
 	      children.hide();
 	    }
-
 	    else {
 				$(this).attr('aria-expanded', 'true');
 	      $(this).find(".fa-caret-right").removeClass('fa-caret-right').addClass('fa-caret-down');
