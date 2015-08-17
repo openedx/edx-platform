@@ -4,6 +4,7 @@ Acceptance tests for the teams feature.
 import json
 
 import ddt
+from flaky import flaky
 from nose.plugins.attrib import attr
 from uuid import uuid4
 
@@ -747,6 +748,7 @@ class CreateTeamTest(TeamsTabBase):
         self.verify_my_team_count(0)
 
 
+@flaky  # TODO fix this, see TNL-3069
 @attr('shard_5')
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
