@@ -42,6 +42,7 @@
                         membershipText: TeamUtils.teamCapacityText(memberships.length, this.maxTeamSize),
                         isMember: isMember,
                         hasCapacity: memberships.length < this.maxTeamSize,
+                        isEmpty: memberships.length < 1
 
                     }));
                     this.discussionView = new TeamDiscussionView({
@@ -50,6 +51,8 @@
                     this.discussionView.render();
 
                     this.renderTeamMembers();
+
+                    $('.sr-is-focusable').focus();
                     return this;
                 },
 
