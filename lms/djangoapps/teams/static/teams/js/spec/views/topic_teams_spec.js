@@ -100,6 +100,15 @@ define([
             verifyActions(teamsView);
         });
 
+        it('shows actions for a staff user already in a team', function () {
+            var staffMembership = TeamSpecHelpers.createMockTeamMemberships(
+                    TeamSpecHelpers.createMockTeamMembershipsData(1, 5),
+                    { privileged: false, staff: true }
+                ),
+                teamsView = createTopicTeamsView({ teamMemberships: staffMembership });
+            verifyActions(teamsView);
+        });
+
         /*
         // TODO: make this ready for prime time
         it('refreshes when the team membership changes', function() {

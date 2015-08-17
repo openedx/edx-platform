@@ -15,6 +15,7 @@ define(["jquery", "backbone", "teams/js/teams_tab_factory"],
                     userInfo: {
                         username: 'test-user',
                         privileged: false,
+                        staff: false,
                         team_memberships_data: null
                     }
                 });

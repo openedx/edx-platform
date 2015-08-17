@@ -10,6 +10,7 @@
                     this.perPage = options.per_page || 10;
                     this.username = options.username;
                     this.privileged = options.privileged;
+                    this.staff = options.staff;
 
                     this.server_api = _.extend(
                         {
@@ -26,11 +27,11 @@
                 model: TeamMembershipModel,
 
                 canUserCreateTeam: function() {
-                    // Note: non-privileged users are automatically added to any team
+                    // Note: non-staff and non-privileged users are automatically added to any team
                     // that they create. This means that if multiple team membership is
                     // disabled that they cannot create a new team when they already
                     // belong to one.
-                    return this.privileged || this.length === 0;
+                    return this.privileged || this.staff || this.length === 0;
                 }
             });
             return TeamMembershipCollection;
