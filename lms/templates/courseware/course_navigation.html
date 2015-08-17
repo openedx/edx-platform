@@ -33,9 +33,9 @@ specific_student_selected = selected(not staff_selected and masquerade.user_name
 student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
 include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and course.enable_proctored_exams
 %>
-<%static:js group='proctoring'/>
 
 % if include_proctoring:
+  <%static:js group='proctoring'/>
   % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="courseware/${template_name}.underscore" />
