@@ -521,7 +521,7 @@ def main():
         print(generate_pr_table(args.previous, args.current))
         return
 
-    print("Generating email and it's list of recipients for stage verification. This may take around a minute...")
+    print("Generating stage verification email and its list of recipients. This may take around a minute...")
     print(generate_email(args.previous, args.current, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")
