@@ -6,7 +6,6 @@ from django.conf.urls import patterns, url
 from .views import (
     TeamsListView,
     TeamsDetailView,
-    TeamsSearchView,
     TopicDetailView,
     TopicListView,
     MembershipListView,
@@ -48,10 +47,5 @@ urlpatterns = patterns(
         r'^v0/team_membership/' + TEAM_ID_PATTERN + ',' + USERNAME_PATTERN + '$',
         MembershipDetailView.as_view(),
         name="team_membership_detail"
-    ),
-    url(
-        r'^v0/search/$',
-        TeamsSearchView.as_view(),
-        name='teams_search'
-    ),
+    )
 )
