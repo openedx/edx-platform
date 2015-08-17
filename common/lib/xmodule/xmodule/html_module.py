@@ -10,7 +10,7 @@ from fs.errors import ResourceNotFoundError
 from pkg_resources import resource_string
 
 import dogstats_wrapper as dog_stats_api
-from xmodule.annotator_mixin import html_to_text
+from util.misc import escape_html_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
@@ -287,12 +287,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):  # pylint: d
             "",
             self.data
         )
-        # Removing HTML-encoded non-breaking space characters
-        html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(html_content))
-        # Removing HTML CDATA
-        html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
-        # Removing HTML comments
-        html_content = re.sub(r"<!--.*-->", "", html_content)
+        html_content = escape_html_characters(html_content)
         html_body = {
             "html_content": html_content,
             "display_name": self.display_name,

@@ -11,7 +11,7 @@ import dogstats_wrapper as dog_stats_api
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
-from xmodule.annotator_mixin import html_to_text
+from util.misc import escape_html_characters
 from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -210,12 +210,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             "",
             self.data
         )
-        # Removing HTML-encoded non-breaking space characters
-        capa_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(capa_content))
-        # Removing HTML CDATA
-        capa_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", capa_content)
-        # Removing HTML comments
-        capa_content = re.sub(r"<!--.*-->", "", capa_content)
+        capa_content = escape_html_characters(capa_content)
         capa_body = {
             "capa_content": capa_content,
             "display_name": self.display_name,
