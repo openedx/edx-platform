@@ -4,17 +4,7 @@ define([
 ], function (Backbone, _, TopicCollection, TopicsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
     describe('TopicsView', function () {
-        var initialTopics, topicCollection, createTopicsView,
-            generateTopics = function (startIndex, stopIndex) {
-            return _.map(_.range(startIndex, stopIndex + 1), function (i) {
-                return {
-                    "description": "description " + i,
-                    "name": "topic " + i,
-                    "id": "id " + i,
-                    "team_count": 0
-                };
-            });
-        };
+        var initialTopics, topicCollection, createTopicsView, triggerUpdateEvent;
 
         createTopicsView = function() {
             return new TopicsView({
@@ -24,25 +14,18 @@ define([
             }).render();
         };
 
+        triggerUpdateEvent = function(topicsView, sendJoinAfter) {
+            topicsView.collection.teamEvents.trigger('teams:update', { action: 'create' });
+            if (sendJoinAfter) {
+                topicsView.collection.teamEvents.trigger('teams:update', { action: 'join' });
+            }
+            topicsView.render();
+        };
+
         beforeEach(function () {
             setFixtures('<div class="topics-container"></div>');
-            initialTopics = generateTopics(1, 5);
-            topicCollection = new TopicCollection(
-                {
-                    "count": 6,
-                    "num_pages": 2,
-                    "current_page": 1,
-                    "start": 0,
-                    "results": initialTopics,
-                    "sort_order": "name"
-                },
-                {
-                    teamEvents: TeamSpecHelpers.teamEvents,
-                    course_id: 'my/course/id',
-                    parse: true,
-                    url: 'api/teams/topics'
-                }
-            );
+            initialTopics = TeamSpecHelpers.createMockTopicData(1, 5);
+            topicCollection = TeamSpecHelpers.createMockTopicCollection(initialTopics);
         });
 
         it('can render the first of many pages', function () {
@@ -64,8 +47,25 @@ define([
             var requests = AjaxHelpers.requests(this),
                 topicsView = createTopicsView();
 
-            topicsView.collection.teamEvents.trigger('teams:update', { action: 'create' });
-            topicsView.render();
+            triggerUpdateEvent(topicsView);
+            AjaxHelpers.expectJsonRequestURL(
+                requests,
+                'api/teams/topics',
+                {
+                    course_id : 'my/course/id',
+                    page : '1',
+                    page_size : '5',  // currently the page size is determined by the size of the collection
+                    order_by : 'name'
+                }
+            );
+        });
+
+        it('refreshes the topics staff creates a team and then joins it', function() {
+            var requests = AjaxHelpers.requests(this),
+                topicsView = createTopicsView();
+
+            // Staff are not immediately added to the team, but may choose to join after the create event.
+            triggerUpdateEvent(topicsView, true);
             AjaxHelpers.expectJsonRequestURL(
                 requests,
                 'api/teams/topics',
