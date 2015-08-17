@@ -4,13 +4,25 @@ from openedx.core.djangoapps.credit.partition_schemes import VerificationPartiti
 from contentstore.utils import ancestor_has_staff_lock, get_user_partition_info
 
 user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
-
-has_selected_groups = any(
-    any(g["selected"] for g in p["groups"])
-    for p in user_partitions
-)
-
 is_staff_locked = ancestor_has_staff_lock(xblock)
+
+# Pre-process the partitions to make it easier to display the UI
+cohort_partitions = []
+verification_partitions = []
+has_selected_groups = False
+selected_verified_partition_id = None
+
+for p in user_partitions:
+    has_selected = any(g["selected"] for g in p["groups"])
+    has_selected_groups = has_selected_groups or has_selected
+
+    if p["scheme"] == "cohort":
+        cohort_partitions.append(p)
+    elif p["scheme"] == "verification":
+        verification_partitions.append(p)
+        if has_selected:
+            selected_verified_partition_id = p["id"]
+
 %>
 
 <div class="modal-section visibility-summary">
@@ -70,13 +82,8 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                         <div class="visibility-controls-group">
                             <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
                             <ul class="list-fields list-checkbox">
-                            % for partition in user_partitions:
+                            % for partition in cohort_partitions:
                                 % for group in partition["groups"]:
-
-                                    ## In general, we show *all* groups for each partition.
-                                    ## For a verified partition scheme, we show only the "allow" group, since that's
-                                    ## the one course authors care about.
-                                    % if partition["scheme"] != "verification" or group["id"] == VerificationPartitionScheme.ALLOW:
                                     <li class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
                                         <input type="checkbox"
                                             id="visibility-content-group-${partition["id"]}-${group["id"]}"
@@ -85,10 +92,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                             class="input input-checkbox"
                                             ${'checked="checked"' if group["selected"] else ''}
                                         />
-
-                                        ## For cohorts, we show deleted groups so the user can remove them.
-                                        ## For verification, we don't bother, since the user can't delete groups (allow/deny).
-                                        % if partition["scheme"] == "cohort" and group["deleted"]:
+                                        % if group["deleted"]:
                                             <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">
                                                 ${_('Deleted Content Group')}
                                                 <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
@@ -97,9 +101,36 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                             <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">${group["name"] | h}</label>
                                         % endif
                                     </li>
-                                    % endif
                                 % endfor
                             % endfor
+
+                            ## Allow only one verification checkpoint to be selected at a time.
+                            % if verification_partitions:
+                                <li class="field field-checkbox field-visibility-verification">
+                                    <input type="checkbox"
+                                        id="verification-access-checkbox"
+                                        name="verification-access-checkbox"
+                                        class="input input-checkbox"
+                                        value=""
+                                        ${'checked="checked"' if selected_verified_partition_id is not None else ''}
+                                    />
+                                    <label for="verification-access-checkbox" class="label">
+                                        ${_('Verification Checkpoint')}:
+
+                                        ## TODO - a11y fix
+                                        <select id="verification-access-dropdown">
+                                            % for partition in verification_partitions:
+                                            <option
+                                                value="${partition["id"]}"
+                                                ${ "selected" if partition["id"] == selected_verified_partition_id else ""}
+                                            >${partition["name"]}</option>
+                                            % endfor
+                                        </select>
+                                    </label>
+
+                                    <span class="note">${_("Learners who require verification must pass the selected checkpoint to see the content in this component. Learners who do not require verification see this content by default.")}</span>
+                                </li>
+                            % endif
                             </ul>
                         </div>
                     </section>

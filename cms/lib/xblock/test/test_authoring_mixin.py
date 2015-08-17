@@ -155,7 +155,8 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.verify_visibility_view_contains(
             self.video_location,
             [
-                "Completed verification at Midterm A",
-                "Completed verification at Midterm B",
+                "Verification Checkpoint",
+                "Midterm A",
+                "Midterm B",
             ]
         )

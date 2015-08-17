@@ -456,13 +456,21 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         // defined by VerificationPartitionScheme on the backend!
         ALLOW_GROUP_ID: 1,
 
-        isPartitionSelected: function(id) {
-            return $("#partition-" + id).is(':checked');
+        getSelectedPartition: function() {
+            var hasRestrictions = $("#verification-access-checkbox").is(":checked"),
+                selectedPartitionID = null;
+
+            if (hasRestrictions) {
+                selectedPartitionID = $("#verification-partition-select").val();
+            }
+
+            return parseInt(selectedPartitionID, 10);
         },
 
         getGroupAccess: function() {
             var groupAccess = _.clone(this.model.get('group_access')) || [],
                 userPartitions = this.model.get('user_partitions') || [],
+                selectedPartition = this.getSelectedPartition(),
                 that = this;
 
             // We display a simplified UI to course authors.
@@ -474,20 +482,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // Midterm B: |-- ALLOW --|-- DENY --|
             //
             // To make life easier for course authors, we display
-            // *one* checkbox for each checkpoint, like this:
+            // *one* option for each checkpoint:
             //
-            // * Require verification for Midterm A
-            // * Require verification for Midterm B
+            // [X] Must complete verification checkpoint
+            //     Dropdown:
+            //        * Midterm A
+            //        * Midterm B
             //
-            // This is where we map the simplified checkbox to
+            // This is where we map the simplified UI to
             // the underlying user partition.  If the user checked
             // the box, that means there *is* a restriction,
-            // so only the "ALLOW" group has access.
+            // so only the "ALLOW" group for the selected partition has access.
             // Otherwise, all groups in the partition have access.
             //
             _.each(userPartitions, function(partition) {
                 if (partition.scheme === "verification") {
-                    if (that.isPartitionSelected(partition.id)) {
+                    if (selectedPartition === partition.id) {
                         groupAccess[partition.id] = [that.ALLOW_GROUP_ID];
                     } else {
                         delete groupAccess[partition.id];
@@ -505,14 +515,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return hasChanges ? {
                 publish: 'republish',
                 metadata: {
-                    group_access: this.getGroupAccess()
+                    group_access: groupAccess,
                 }
             } : {};
         },
 
         getContext: function() {
             var partitions = this.model.get("user_partitions"),
-                accessInfo = [];
+                hasRestrictions = false,
+                verificationPartitions = [],
+                isSelected = false;
 
             // Display a simplified version of verified partition schemes.
             // Although there are two groups defined (ALLOW and DENY),
@@ -521,16 +533,20 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // either sets the ALLOW group or doesn't set any groups (implicitly allow all).
             _.each(partitions, function(item) {
                 if (item.scheme === "verification") {
-                    accessInfo.push({
+                    isSelected = _.any(_.pluck(item.groups, "selected"));
+                    hasRestrictions = hasRestrictions || isSelected;
+
+                    verificationPartitions.push({
                         "id": item.id,
                         "name": item.name,
-                        "selected": _.any(_.pluck(item.groups, "selected"))
+                        "selected": isSelected,
                     });
                 }
             });
 
             return {
-                "access_info": accessInfo
+                "hasVerificationRestrictions": hasRestrictions,
+                "verificationPartitions": verificationPartitions,
             };
         }
     });
@@ -561,9 +577,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
                 editors.push(StaffLockEditor);
 
-                if (xblockInfo.hasVerifiedCheckpoints()) {
-                    editors.push(VerificationAccessEditor);
-                }
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
 
