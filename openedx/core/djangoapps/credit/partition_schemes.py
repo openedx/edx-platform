@@ -28,18 +28,17 @@ log = logging.getLogger(__name__)
 
 class VerificationPartitionScheme(object):
     """
-    This scheme assigns users into the partition 'VerificationPartitionScheme'
-    groups. Initially all the gated exams content will be hidden except the
-    ICRV blocks for a 'verified' student until that student skips or submits
-    verification for an ICRV then the related gated exam content for that ICRV
-    will be displayed.
+    Assign users to groups for a particular verification checkpoint.
 
+    Users in the ALLOW group can see gated content;
+    users in the DENY group cannot.
     """
+
     DENY = 0
     ALLOW = 1
 
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition):
+    def get_group_for_user(cls, course_key, user, user_partition, **kwargs):  # pylint: disable=unused-argument
         """
         Return the user's group depending their enrollment and verification
         status.

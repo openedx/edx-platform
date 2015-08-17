@@ -1145,9 +1145,6 @@ class VerificationStatus(models.Model):
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
-    # cache key format e.g verification.<username>.<course_key> = '{verification.1.edx/demo/course}'
-    VERIFICATION_STATUS_CACHE_KEY = u"verification.{}.{}"
-
     class Meta(object):  # pylint: disable=missing-docstring
         get_latest_by = "timestamp"
         verbose_name = "Verification Status"
@@ -1273,7 +1270,7 @@ class VerificationStatus(models.Model):
         Returns:
             Unicode cache key
         """
-        return cls.VERIFICATION_STATUS_CACHE_KEY.format(user_id, unicode(course_key))
+        return u"verification.{}.{}".format(user_id, unicode(course_key))
 
 
 @receiver(models.signals.post_save, sender=VerificationStatus)
@@ -1315,9 +1312,6 @@ class SkippedReverification(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
-
-    # caceh key format e.g skipped_reverification.{}.{}=skipped_reverification.1.edx/demo/course
-    USER_SKIPPED_VERIFICATION_CACHE_KEY = u"skipped_reverification.{}.{}"  # pylint: disable=invalid-name
 
     class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
@@ -1361,7 +1355,7 @@ class SkippedReverification(models.Model):
         Returns:
             string: cache key name
         """
-        return cls.USER_SKIPPED_VERIFICATION_CACHE_KEY.format(user_id, unicode(course_key))
+        return u"skipped_reverification.{}.{}".format(user_id, unicode(course_key))
 
 
 @receiver(models.signals.post_save, sender=SkippedReverification)

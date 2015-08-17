@@ -498,7 +498,7 @@ def _has_group_access(descriptor, user, course_key):
                 if group_ids is not None:
                     partitions.append(partition)
             else:
-                log.info(
+                log.debug(
                     "Skipping partition with ID %s in course %s because it is no longer active",
                     partition.id, course_key
                 )

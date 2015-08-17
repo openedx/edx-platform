@@ -236,7 +236,7 @@ class TestUserPartition(PartitionTestCase):
             "description": self.TEST_DESCRIPTION,
             "parameters": self.TEST_PARAMETERS,
             "groups": [group.to_json() for group in self.TEST_GROUPS],
-            "version": UserPartition.VERSION,
+            "version": 2,
         }
         with self.assertRaisesRegexp(TypeError, "missing value key 'scheme'"):
             UserPartition.from_json(jsonified)
@@ -249,12 +249,13 @@ class TestUserPartition(PartitionTestCase):
             "name": self.TEST_NAME,
             "description": self.TEST_DESCRIPTION,
             "groups": [group.to_json() for group in self.TEST_GROUPS],
-            "version": UserPartition.VERSION,
+            "version": 2,
             "scheme": self.TEST_SCHEME_NAME,
         }
         user_partition = UserPartition.from_json(jsonified)
         self.assertEqual(user_partition.scheme.name, self.TEST_SCHEME_NAME)
         self.assertEqual(user_partition.parameters, {})
+        self.assertTrue(user_partition.active)
 
         # now test that parameters dict is present in response with same value
         # as provided

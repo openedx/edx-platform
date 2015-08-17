@@ -57,7 +57,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
             checkpoint_location=self.checkpoint_location
         )
 
-    def created_user_and_enroll(self, enrollment_type):
+    def create_user_and_enroll(self, enrollment_type):
         """Create and enroll users with provided enrollment type."""
 
         user = UserFactory.create()
@@ -89,7 +89,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     @ddt.unpack
     def test_get_group_for_user(self, enrollment_type, verification_status, expected_group):
         # creating user and enroll them.
-        user = self.created_user_and_enroll(enrollment_type)
+        user = self.create_user_and_enroll(enrollment_type)
         if verification_status:
             self.add_verification_status(user, verification_status)
 
@@ -98,7 +98,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     def test_get_group_for_user_with_skipped(self):
         # Check that a user is in verified allow group if that user has skipped
         # any ICRV block.
-        user = self.created_user_and_enroll('verified')
+        user = self.create_user_and_enroll('verified')
 
         SkippedReverification.add_skipped_reverification_attempt(
             checkpoint=self.first_checkpoint,
@@ -111,7 +111,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     def test_cache_with_skipped_icrv(self):
         # Check that a user is in verified allow group if that user has skipped
         # any ICRV block.
-        user = self.created_user_and_enroll('verified')
+        user = self.create_user_and_enroll('verified')
         SkippedReverification.add_skipped_reverification_attempt(
             checkpoint=self.first_checkpoint,
             user_id=user.id,
@@ -128,7 +128,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     def test_cache_with_submitted_status(self):
         # Check that a user is in verified allow group if that user has approved status at
         # any ICRV block.
-        user = self.created_user_and_enroll('verified')
+        user = self.create_user_and_enroll('verified')
         self.add_verification_status(user, VerificationStatus.APPROVED_STATUS)
         # this will warm the cache.
         with self.assertNumQueries(4):
@@ -141,7 +141,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     def test_cache_with_denied_status(self):
         # Check that a user is in verified allow group if that user has denied at
         # any ICRV block.
-        user = self.created_user_and_enroll('verified')
+        user = self.create_user_and_enroll('verified')
         self.add_verification_status(user, VerificationStatus.DENIED_STATUS)
 
         # this will warm the cache.
@@ -155,7 +155,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     def test_cache_with_honor(self):
         # Check that a user is in honor mode.
         # any ICRV block.
-        user = self.created_user_and_enroll('honor')
+        user = self.create_user_and_enroll('honor')
         # this will warm the cache.
         with self.assertNumQueries(3):
             self._assert_group_assignment(user, VerificationPartitionScheme.ALLOW)
@@ -167,7 +167,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     def test_cache_with_verified_deny_group(self):
         # Check that a user is in verified mode. But not perform any action
 
-        user = self.created_user_and_enroll('verified')
+        user = self.create_user_and_enroll('verified')
         # this will warm the cache.
         with self.assertNumQueries(3):
             self._assert_group_assignment(user, VerificationPartitionScheme.DENY)

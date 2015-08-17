@@ -125,7 +125,7 @@ def _other_partitions(all_partitions, exclude_partitions, course_key):
             results.append(partition)
             log.info(
                 (
-                    "Preserved partition %s in course %s becuase it is not "
+                    "Preserved partition %s in course %s because it is not "
                     "using the verification partition scheme."
                 ),
                 partition.id, course_key

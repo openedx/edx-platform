@@ -320,7 +320,6 @@ class GetItemTest(ItemTest):
                 groups=[
                     Group(id=0, name="Group A"),
                     Group(id=1, name="Group B"),
-
                 ],
             ),
         ]

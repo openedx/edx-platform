@@ -129,17 +129,7 @@ class ReverificationService(object):
         Returns: bool
 
         """
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            log.warning(
-                (
-                    "Could not find user with ID %s while checking whether "
-                    "the user can submit an in-course reverification"
-                ), user_id
-            )
-            return False
-
+        user = User.objects.get(id=user_id)
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         return (
             enrollment is not None and

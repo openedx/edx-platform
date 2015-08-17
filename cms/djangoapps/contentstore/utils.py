@@ -393,8 +393,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     ]
 
     """
-    if course is None:
-        course = modulestore().get_course(xblock.location.course_key)
+    course = course or modulestore().get_course(xblock.location.course_key)
 
     if course is None:
         log.warning(

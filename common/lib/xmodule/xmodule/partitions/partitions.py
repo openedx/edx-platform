@@ -95,6 +95,10 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
     be unique per-course). The scheme is used to assign users into groups.
     The parameters field is used to save extra parameters e.g., location of
     the block in case of VerificationPartitionScheme.
+
+    Partitions can be marked as inactive by setting the "active" flag to False.
+    Any group access rule referencing inactive partitions will be ignored
+    when performing access checks.
     """
     VERSION = 3
 
