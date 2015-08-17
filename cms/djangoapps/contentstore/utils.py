@@ -406,42 +406,45 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     if schemes is not None:
         schemes = set(schemes)
 
-    partitions = [
-        {
-            "id": p.id,
-            "name": p.name,
-            "scheme": p.scheme.name,
-            "groups": [
-                {
+    partitions = []
+    for p in sorted(course.user_partitions, key=lambda p: p.name):
+
+        # Exclude disabled partitions, partitions with no groups defined
+        # Also filter by scheme name if there's a filter defined.
+        if p.active and p.groups and (schemes is None or p.scheme.name in schemes):
+
+            # First, add groups defined by the partition
+            groups = []
+            for g in p.groups:
+
+                # Falsey group access for a partition mean that all groups
+                # are selected.  In the UI, though, we don't show the particular
+                # groups selected, since there's a separate option for "all users".
+                selected_groups = set(xblock.group_access.get(p.id, []) or [])
+                groups.append({
                     "id": g.id,
                     "name": g.name,
-                    "selected": g.id in xblock.group_access.get(p.id, []),
+                    "selected": g.id in selected_groups,
                     "deleted": False,
-                }
-                for g in p.groups
-            ]
-        }
-        for p in sorted(course.user_partitions, key=lambda p: p.name)
-        if (
-            p.active and  # Exclude disabled partitions
-            p.groups and  # Exclude partitions with no groups defined
-            (schemes is None or p.scheme.name in schemes)  # Filter partitions by scheme
-        )
-    ]
+                })
 
-    # Add in groups for partitions that are stored in the XBlock
-    # but not in the course, but mark them as "deleted".
-    for p in partitions:
-        xblock_group_ids = set(xblock.group_access.get(p["id"], []))
-        defined_group_ids = set(g["id"] for g in p["groups"])
-        missing_group_ids = xblock_group_ids - defined_group_ids
+            # Next, add any groups set on the XBlock that have been deleted
+            all_groups = set(g.id for g in p.groups)
+            missing_group_ids = selected_groups - all_groups
+            for gid in missing_group_ids:
+                groups.append({
+                    "id": gid,
+                    "name": _("Deleted group"),
+                    "selected": True,
+                    "deleted": True,
+                })
 
-        for gid in missing_group_ids:
-            p["groups"].append({
-                "id": gid,
-                "name": _("Deleted group"),
-                "selected": True,
-                "deleted": True,
+            # Put together the entire partition dictionary
+            partitions.append({
+                "id": p.id,
+                "name": p.name,
+                "scheme": p.scheme.name,
+                "groups": groups,
             })
 
     return partitions

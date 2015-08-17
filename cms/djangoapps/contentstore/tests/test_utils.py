@@ -414,6 +414,43 @@ class GroupVisibilityTest(CourseTestCase):
         self.html = self.store.get_item(html.location)
         self.problem = self.store.get_item(problem.location)
 
+        # Add partitions to the course
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name="Partition 0",
+                description="Partition 0",
+                scheme=UserPartition.get_scheme("random"),
+                groups=[
+                    Group(id=0, name="Group A"),
+                    Group(id=1, name="Group B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name="Partition 1",
+                description="Partition 1",
+                scheme=UserPartition.get_scheme("random"),
+                groups=[
+                    Group(id=0, name="Group C"),
+                    Group(id=1, name="Group D"),
+                ],
+            ),
+            UserPartition(
+                id=2,
+                name="Partition 2",
+                description="Partition 2",
+                scheme=UserPartition.get_scheme("random"),
+                groups=[
+                    Group(id=0, name="Group E"),
+                    Group(id=1, name="Group F"),
+                    Group(id=2, name="Group G"),
+                    Group(id=3, name="Group H"),
+                ],
+            ),
+        ]
+        self.course = self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+
     def set_group_access(self, xblock, value):
         """ Sets group_access to specified value and calls update_item to persist the change. """
         xblock.group_access = value

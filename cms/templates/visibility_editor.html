@@ -77,7 +77,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                     ## For a verified partition scheme, we show only the "allow" group, since that's
                                     ## the one course authors care about.
                                     % if partition["scheme"] != "verification" or group["id"] == VerificationPartitionScheme.ALLOW:
-                                    <li class="field field-checkbox field-visibility-content-group">
+                                    <li class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
                                         <input type="checkbox"
                                             id="visibility-content-group-${partition["id"]}-${group["id"]}"
                                             name="visibility-content-group"
