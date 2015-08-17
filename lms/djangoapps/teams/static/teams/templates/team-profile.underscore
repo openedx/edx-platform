@@ -18,9 +18,7 @@
             </div>
         <% } %>
         <div class="team-members">
-            <% if (!isEmpty) { %>
-                <span class="sr"><%- gettext("Team member profiles") %></span>
-            <% } %>
+            <span class="sr"><%- gettext("Team member profiles") %></span>
             <div class="members-info"></div>
         </div>
 
