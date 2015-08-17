@@ -539,6 +539,13 @@ class UsersApiTests(ModuleStoreTestCase):
         # Testing profile updating scenario.
         # Must be updated
 
+        data['first_name'] = "First Name"
+        data['last_name'] = "Surname"
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.is_user_profile_created_updated(response, data)
+
         data["country"] = "US"
         data["year_of_birth"] = "1990"
         data["title"] = ""
@@ -1471,7 +1478,9 @@ class UsersApiTests(ModuleStoreTestCase):
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
 
-        fullname = '{} {}'.format(self.test_first_name, self.test_last_name)
+        first_name = data.get('first_name', self.test_first_name)
+        last_name = data.get('last_name', self.test_last_name)
+        fullname = '{} {}'.format(first_name, last_name)
         self.assertEqual(response.data['full_name'], fullname)
         self.assertEqual(response.data['city'], data["city"])
         self.assertEqual(response.data['country'], data["country"])
