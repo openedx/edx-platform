@@ -216,7 +216,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
         # (providers, course_width, enable_ccx, view_as_ccx): # of sql queries, # of mongo queries, # of xblocks
         ('no_overrides', 1, True, False): (24, 6, 13),
         ('no_overrides', 2, True, False): (69, 6, 84),
-        ('no_overrides', 3, True, False): (265, 6, 335),
+        ('no_overrides', 3, True, False): (264, 6, 335),
         ('ccx', 1, True, False): (24, 6, 13),
         ('ccx', 2, True, False): (69, 6, 84),
         ('ccx', 3, True, False): (264, 6, 335),

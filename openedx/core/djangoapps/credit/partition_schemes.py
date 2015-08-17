@@ -64,10 +64,9 @@ class VerificationPartitionScheme(object):
         #
         # Note that we do NOT wait the user's reverification attempt to be approved,
         # since this can take some time and the user might miss an assignment deadline.
-        partition_group = (
-            cls.ALLOW if not is_verified or has_skipped or has_completed
-            else cls.DENY
-        )
+        partition_group = cls.DENY
+        if not is_verified or has_skipped or has_completed:
+            partition_group = cls.ALLOW
 
         # Return matching user partition group if it exists
         try:
