@@ -2,32 +2,61 @@
 Entrance Exams view module -- handles all requests related to entrance exam management via Studio
 Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 """
+from functools import wraps
 import json
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django_future.csrf import ensure_csrf_cookie
-from django.http import HttpResponse
-from django.test import RequestFactory
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import HttpResponse, HttpResponseBadRequest
 
-from contentstore.views.item import create_item, delete_item
-from milestones import api as milestones_api
+from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
+from contentstore.views.item import delete_item
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 from student.auth import has_course_author_access
-from util.milestones_helpers import generate_milestone_namespace, NAMESPACE_CHOICES
+from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 __all__ = ['entrance_exam', ]
 
 log = logging.getLogger(__name__)
 
 
+# pylint: disable=invalid-name
+def _get_default_entrance_exam_minimum_pct():
+    """
+    Helper method to return the default value from configuration
+    Converts integer values to decimals, since that what we use internally
+    """
+    entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+    if entrance_exam_minimum_score_pct.is_integer():
+        entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+    return entrance_exam_minimum_score_pct
+
+
+# pylint: disable=missing-docstring
+def check_feature_enabled(feature_name):
+    """
+    Ensure the specified feature is turned on.  Return an HTTP 400 code if not.
+    """
+    def _check_feature_enabled(view_func):
+        def _decorator(request, *args, **kwargs):
+            # Deny access if the entrance exam feature is disabled
+            if not settings.FEATURES.get(feature_name, False):
+                return HttpResponseBadRequest()
+            return view_func(request, *args, **kwargs)
+        return wraps(view_func)(_decorator)
+    return _check_feature_enabled
+
+
 @login_required
 @ensure_csrf_cookie
+@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
 def entrance_exam(request, course_key_string):
     """
     The restful handler for entrance exams.
@@ -59,7 +88,7 @@ def entrance_exam(request, course_key_string):
             ee_min_score = request.POST.get('entrance_exam_minimum_score_pct', None)
 
             # if request contains empty value or none then save the default one.
-            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+            entrance_exam_minimum_score_pct = _get_default_entrance_exam_minimum_pct()
             if ee_min_score != '' and ee_min_score is not None:
                 entrance_exam_minimum_score_pct = float(ee_min_score)
             return create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
@@ -74,6 +103,7 @@ def entrance_exam(request, course_key_string):
         return HttpResponse(status=405)
 
 
+@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
 def create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct):
     """
     api method to create an entrance exam.
@@ -93,7 +123,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     """
     # Provide a default value for the minimum score percent if nothing specified
     if entrance_exam_minimum_score_pct is None:
-        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+        entrance_exam_minimum_score_pct = _get_default_entrance_exam_minimum_pct()
 
     # Confirm the course exists
     course = modulestore().get_course(course_key)
@@ -103,50 +133,63 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     # Create the entrance exam item (currently it's just a chapter)
     payload = {
         'category': "chapter",
-        'display_name': "Entrance Exam",
+        'display_name': _("Entrance Exam"),
         'parent_locator': unicode(course.location),
         'is_entrance_exam': True,
         'in_entrance_exam': True,
     }
-    factory = RequestFactory()
-    internal_request = factory.post('/', json.dumps(payload), content_type="application/json")
-    internal_request.user = request.user
-    created_item = json.loads(create_item(internal_request).content)
+    parent_locator = unicode(course.location)
+    created_block = create_xblock(
+        parent_locator=parent_locator,
+        user=request.user,
+        category='chapter',
+        display_name=_('Entrance Exam'),
+        is_entrance_exam=True
+    )
 
     # Set the entrance exam metadata flags for this course
     # Reload the course so we don't overwrite the new child reference
     course = modulestore().get_course(course_key)
     metadata = {
         'entrance_exam_enabled': True,
-        'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct / 100,
-        'entrance_exam_id': created_item['locator'],
+        'entrance_exam_minimum_score_pct': unicode(entrance_exam_minimum_score_pct),
+        'entrance_exam_id': unicode(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)
 
+    # Create the entrance exam section item.
+    create_xblock(
+        parent_locator=unicode(created_block.location),
+        user=request.user,
+        category='sequential',
+        display_name=_('Entrance Exam - Subsection')
+    )
+
     # Add an entrance exam milestone if one does not already exist
-    milestone_namespace = generate_milestone_namespace(
-        NAMESPACE_CHOICES['ENTRANCE_EXAM'],
+    namespace_choices = milestones_helpers.get_namespace_choices()
+    milestone_namespace = milestones_helpers.generate_milestone_namespace(
+        namespace_choices.get('ENTRANCE_EXAM'),
         course_key
     )
-    milestones = milestones_api.get_milestones(milestone_namespace)
+    milestones = milestones_helpers.get_milestones(milestone_namespace)
     if len(milestones):
         milestone = milestones[0]
     else:
         description = 'Autogenerated during {} entrance exam creation.'.format(unicode(course.id))
-        milestone = milestones_api.add_milestone({
-            'name': 'Completed Course Entrance Exam',
+        milestone = milestones_helpers.add_milestone({
+            'name': _('Completed Course Entrance Exam'),
             'namespace': milestone_namespace,
             'description': description
         })
-    relationship_types = milestones_api.get_milestone_relationship_types()
-    milestones_api.add_course_milestone(
+    relationship_types = milestones_helpers.get_milestone_relationship_types()
+    milestones_helpers.add_course_milestone(
         unicode(course.id),
         relationship_types['REQUIRES'],
         milestone
     )
-    milestones_api.add_course_content_milestone(
+    milestones_helpers.add_course_content_milestone(
         unicode(course.id),
-        created_item['locator'],
+        unicode(created_block.location),
         relationship_types['FULFILLS'],
         milestone
     )
@@ -176,6 +219,21 @@ def _get_entrance_exam(request, course_key):  # pylint: disable=W0613
         return HttpResponse(status=404)
 
 
+@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+def update_entrance_exam(request, course_key, exam_data):
+    """
+    Operation to update course fields pertaining to entrance exams
+    The update operation is not currently exposed directly via the API
+    Because the operation is not exposed directly, we do not return a 200 response
+    But we do return a 400 in the error case because the workflow is executed in a request context
+    """
+    course = modulestore().get_course(course_key)
+    if course:
+        metadata = exam_data
+        CourseMetadata.update_from_dict(metadata, course, request.user)
+
+
+@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
 def delete_entrance_exam(request, course_key):
     """
     api method to delete an entrance exam
@@ -199,7 +257,7 @@ def _delete_entrance_exam(request, course_key):
     for course_child in course_children:
         if course_child.is_entrance_exam:
             delete_item(request, course_child.scope_ids.usage_id)
-            milestones_api.remove_content_references(unicode(course_child.scope_ids.usage_id))
+            milestones_helpers.remove_content_references(unicode(course_child.scope_ids.usage_id))
 
     # Reset the entrance exam flags on the course
     # Reload the course so we have the latest state
@@ -211,6 +269,9 @@ def _delete_entrance_exam(request, course_key):
             'entrance_exam_id': None,
         }
         CourseMetadata.update_from_dict(metadata, course, request.user)
+
+        # Clean up any pre-existing entrance exam graders
+        remove_entrance_exam_graders(course_key, request.user)
 
     return HttpResponse(status=204)
 

@@ -1,17 +1,17 @@
 import os
 from uuid import uuid4
 from datetime import datetime
-from unittest import skipUnless
+from nose.plugins.attrib import attr
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
+from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
+from ..helpers import EventsTestMixin
 
 
-@skipUnless(os.environ.get("FEATURE_EDXNOTES"), "Requires Student Notes feature to be enabled")
 class EdxNotesTestMixin(UniqueCourseTest):
     """
     Creates a course with initial data and contains useful helper methods.
@@ -97,10 +97,9 @@ class EdxNotesTestMixin(UniqueCourseTest):
                 ),
             )).install()
 
-        AutoAuthPage(self.browser, username=self.username, email=self.email, course_id=self.course_id).visit()
+        self.addCleanup(self.edxnotes_fixture.cleanup)
 
-    def tearDown(self):
-        self.edxnotes_fixture.cleanup()
+        AutoAuthPage(self.browser, username=self.username, email=self.email, course_id=self.course_id).visit()
 
     def _add_notes(self):
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
@@ -119,6 +118,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
+@attr('shard_4')
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -140,6 +140,16 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
                 note.text = "TEST TEXT {}".format(index)
                 index += 1
 
+    def edit_tags_in_notes(self, components, tags):
+        self.assertGreater(len(components), 0)
+        index = 0
+        for component in components:
+            self.assertGreater(len(component.notes), 0)
+            for note in component.edit_note():
+                note.tags = tags[index]
+                index += 1
+        self.assertEqual(index, len(tags), "Number of supplied tags did not match components")
+
     def remove_notes(self, components):
         self.assertGreater(len(components), 0)
         for component in components:
@@ -153,6 +163,11 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     def assert_text_in_notes(self, notes):
         actual = [note.text for note in notes]
         expected = ["TEST TEXT {}".format(i) for i in xrange(len(notes))]
+        self.assertEqual(expected, actual)
+
+    def assert_tags_in_notes(self, notes, expected_tags):
+        actual = [note.tags for note in notes]
+        expected = [expected_tags[i] for i in xrange(len(notes))]
         self.assertEqual(expected, actual)
 
     def test_can_create_notes(self):
@@ -255,8 +270,72 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         components = self.note_unit_page.components
         self.assert_notes_are_removed(components)
 
+    def test_can_create_note_with_tags(self):
+        """
+        Scenario: a user of notes can define one with tags
+        Given I have a course with 3 annotatable components
+        And I open the unit with 2 annotatable components
+        When I add a note with tags for the first component
+        And I refresh the page
+        Then I see that note was correctly stored with its tags
+        """
+        self.note_unit_page.visit()
 
-class EdxNotesPageTest(EdxNotesTestMixin):
+        components = self.note_unit_page.components
+        for note in components[0].create_note(".{}".format(self.selector)):
+            note.tags = ["fruit", "tasty"]
+
+        self.note_unit_page.refresh()
+        self.assertEqual(["fruit", "tasty"], self.note_unit_page.notes[0].tags)
+
+    def test_can_change_tags(self):
+        """
+        Scenario: a user of notes can edit tags on notes
+        Given I have a course with 3 components with notes
+        When I open the unit with 2 annotatable components
+        And I edit tags on the notes for the 2 annotatable components
+        Then I see that the tags were correctly changed
+        And I again edit tags on the notes for the 2 annotatable components
+        And I refresh the page
+        Then I see that the tags were correctly changed
+        """
+        self._add_notes()
+        self.note_unit_page.visit()
+
+        components = self.note_unit_page.components
+        self.edit_tags_in_notes(components, [["hard"], ["apple", "pear"]])
+        self.assert_tags_in_notes(self.note_unit_page.notes, [["hard"], ["apple", "pear"]])
+
+        self.edit_tags_in_notes(components, [[], ["avocado"]])
+        self.assert_tags_in_notes(self.note_unit_page.notes, [[], ["avocado"]])
+
+        self.note_unit_page.refresh()
+        self.assert_tags_in_notes(self.note_unit_page.notes, [[], ["avocado"]])
+
+    def test_sr_labels(self):
+        """
+        Scenario: screen reader labels exist for text and tags fields
+        Given I have a course with 3 components with notes
+        When I open the unit with 2 annotatable components
+        And I open the editor for each note
+        Then the text and tags fields both have screen reader labels
+        """
+        self._add_notes()
+        self.note_unit_page.visit()
+
+        # First note is in the first annotatable component, will have field indexes 0 and 1.
+        for note in self.note_unit_page.components[0].edit_note():
+            self.assertTrue(note.has_sr_label(0, 0, "Note"))
+            self.assertTrue(note.has_sr_label(1, 1, "Tags (space-separated)"))
+
+        # Second note is in the second annotatable component, will have field indexes 2 and 3.
+        for note in self.note_unit_page.components[1].edit_note():
+            self.assertTrue(note.has_sr_label(0, 2, "Note"))
+            self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
+
+
+@attr('shard_4')
+class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
     Tests for Notes page.
     """
@@ -264,9 +343,14 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.edxnotes_fixture.create_notes(notes_list)
         self.edxnotes_fixture.install()
 
-    def _add_default_notes(self):
+    def _add_default_notes(self, tags=None):
+        """
+        Creates 5 test notes. If tags are not specified, will populate the notes with some test tag data.
+        If tags are specified, they will be used for each of the 3 notes that have tags.
+        """
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
-        self._add_notes([
+        # pylint: disable=attribute-defined-outside-init
+        self.raw_note_list = [
             Note(
                 usage_id=xblocks[4].locator,
                 user=self.username,
@@ -282,6 +366,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
                 text="",
                 quote=u"Annotate this text",
                 updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
+                tags=["Review", "cool"] if tags is None else tags
             ),
             Note(
                 usage_id=xblocks[0].locator,
@@ -291,6 +376,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
                 quote="Annotate this text",
                 updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
                 ranges=[Range(startOffset=0, endOffset=18)],
+                tags=["Cool", "TODO"] if tags is None else tags
             ),
             Note(
                 usage_id=xblocks[3].locator,
@@ -299,6 +385,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
                 text="Fourth note",
                 quote="",
                 updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
+                tags=["review"] if tags is None else tags
             ),
             Note(
                 usage_id=xblocks[1].locator,
@@ -306,29 +393,79 @@ class EdxNotesPageTest(EdxNotesTestMixin):
                 course_id=self.course_fixture._course_key,
                 text="Fifth note",
                 quote="Annotate this text",
-                updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat(),
+                updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat()
             ),
-        ])
+        ]
+        self._add_notes(self.raw_note_list)
 
-    def assertNoteContent(self, item, text=None, quote=None, unit_name=None, time_updated=None):
-        if item.text is not None:
-            self.assertEqual(text, item.text)
-        else:
-            self.assertIsNone(text)
+    def assertNoteContent(self, item, text=None, quote=None, unit_name=None, time_updated=None, tags=None):
+        """ Verifies the expected properties of the note. """
+        self.assertEqual(text, item.text)
         if item.quote is not None:
             self.assertIn(quote, item.quote)
         else:
             self.assertIsNone(quote)
         self.assertEqual(unit_name, item.unit_name)
         self.assertEqual(time_updated, item.time_updated)
+        self.assertEqual(tags, item.tags)
 
-    def assertGroupContent(self, item, title=None, subtitles=None):
+    def assertChapterContent(self, item, title=None, subtitles=None):
+        """
+        Verifies the expected title and subsection titles (subtitles) for the given chapter.
+        """
         self.assertEqual(item.title, title)
         self.assertEqual(item.subtitles, subtitles)
 
-    def assertSectionContent(self, item, title=None, notes=None):
+    def assertGroupContent(self, item, title=None, notes=None):
+        """
+        Verifies the expected title and child notes for the given group.
+        """
         self.assertEqual(item.title, title)
         self.assertEqual(item.notes, notes)
+
+    def assert_viewed_event(self, view=None):
+        """
+        Verifies that the correct view event was captured for the Notes page.
+        """
+        # There will always be an initial event for "Recent Activity" because that is the default view.
+        # If view is something besides "Recent Activity", expect 2 events, with the second one being
+        # the view name passed in.
+        if view == 'Recent Activity':
+            view = None
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.course.student_notes.notes_page_viewed'},
+            number_of_matches=1 if view is None else 2
+        )
+        expected_events = [{'event': {'view': 'Recent Activity'}}]
+        if view:
+            expected_events.append({'event': {'view': view}})
+        self.assert_events_match(expected_events, actual_events)
+
+    def assert_unit_link_event(self, usage_id, view):
+        """
+        Verifies that the correct used_unit_link event was captured for the Notes page.
+        """
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.course.student_notes.used_unit_link'},
+            number_of_matches=1
+        )
+        expected_events = [
+            {'event': {'component_usage_id': usage_id, 'view': view}}
+        ]
+        self.assert_events_match(expected_events, actual_events)
+
+    def assert_search_event(self, search_string, number_of_results):
+        """
+        Verifies that the correct searched event was captured for the Notes page.
+        """
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.course.student_notes.searched'},
+            number_of_matches=1
+        )
+        expected_events = [
+            {'event': {'search_string': search_string, 'number_of_results': number_of_results}}
+        ]
+        self.assert_events_match(expected_events, actual_events)
 
     def test_no_content(self):
         """
@@ -337,10 +474,11 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I open Notes page
         Then I see only "You do not have any notes within the course." message
         """
-        self.notes_page.visit()
+        notes_page_empty = EdxNotesPageNoContent(self.browser, self.course_id)
+        notes_page_empty.visit()
         self.assertIn(
             "You have not made any notes in this course yet. Other students in this course are using notes to:",
-            self.notes_page.no_content_text)
+            notes_page_empty.no_content_text)
 
     def test_recent_activity_view(self):
         """
@@ -349,6 +487,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I open Notes page
         Then I see 5 notes sorted by the updated date
         And I see correct content in the notes
+        And an event has fired indicating that the Recent Activity view was selected
         """
         self._add_default_notes()
         self.notes_page.visit()
@@ -367,7 +506,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             notes[1],
             text=u"Fourth note",
             unit_name="Test Unit 3",
-            time_updated="Jan 01, 2014 at 01:01 UTC"
+            time_updated="Jan 01, 2014 at 01:01 UTC",
+            tags=["review"]
         )
 
         self.assertNoteContent(
@@ -375,14 +515,16 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             quote="Annotate this text",
             text=u"Third note",
             unit_name="Test Unit 1",
-            time_updated="Jan 01, 2013 at 01:01 UTC"
+            time_updated="Jan 01, 2013 at 01:01 UTC",
+            tags=["Cool", "TODO"]
         )
 
         self.assertNoteContent(
             notes[3],
             quote=u"Annotate this text",
             unit_name="Test Unit 2",
-            time_updated="Jan 01, 2012 at 01:01 UTC"
+            time_updated="Jan 01, 2012 at 01:01 UTC",
+            tags=["Review", "cool"]
         )
 
         self.assertNoteContent(
@@ -393,6 +535,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
 
+        self.assert_viewed_event()
+
     def test_course_structure_view(self):
         """
         Scenario: User can view all notes by location in Course.
@@ -401,24 +545,25 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         And I switch to "Location in Course" view
         Then I see 2 groups, 3 sections and 5 notes
         And I see correct content in the notes and groups
+        And an event has fired indicating that the Location in Course view was selected
         """
         self._add_default_notes()
         self.notes_page.visit().switch_to_tab("structure")
 
         notes = self.notes_page.notes
-        groups = self.notes_page.groups
-        sections = self.notes_page.sections
+        groups = self.notes_page.chapter_groups
+        sections = self.notes_page.subsection_groups
         self.assertEqual(len(notes), 5)
         self.assertEqual(len(groups), 2)
         self.assertEqual(len(sections), 3)
 
-        self.assertGroupContent(
+        self.assertChapterContent(
             groups[0],
             title=u"Test Section 1",
             subtitles=[u"Test Subsection 1", u"Test Subsection 2"]
         )
 
-        self.assertSectionContent(
+        self.assertGroupContent(
             sections[0],
             title=u"Test Subsection 1",
             notes=[u"Fifth note", u"Third note", None]
@@ -437,17 +582,19 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             quote=u"Annotate this text",
             text=u"Third note",
             unit_name="Test Unit 1",
-            time_updated="Jan 01, 2013 at 01:01 UTC"
+            time_updated="Jan 01, 2013 at 01:01 UTC",
+            tags=["Cool", "TODO"]
         )
 
         self.assertNoteContent(
             notes[2],
             quote=u"Annotate this text",
             unit_name="Test Unit 2",
-            time_updated="Jan 01, 2012 at 01:01 UTC"
+            time_updated="Jan 01, 2012 at 01:01 UTC",
+            tags=["Review", "cool"]
         )
 
-        self.assertSectionContent(
+        self.assertGroupContent(
             sections[1],
             title=u"Test Subsection 2",
             notes=[u"Fourth note"]
@@ -457,16 +604,17 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             notes[3],
             text=u"Fourth note",
             unit_name="Test Unit 3",
-            time_updated="Jan 01, 2014 at 01:01 UTC"
+            time_updated="Jan 01, 2014 at 01:01 UTC",
+            tags=["review"]
         )
 
-        self.assertGroupContent(
+        self.assertChapterContent(
             groups[1],
             title=u"Test Section 2",
             subtitles=[u"Test Subsection 3"],
         )
 
-        self.assertSectionContent(
+        self.assertGroupContent(
             sections[2],
             title=u"Test Subsection 3",
             notes=[u"First note"]
@@ -480,40 +628,158 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
 
+        self.assert_viewed_event('Location in Course')
+
+    def test_tags_view(self):
+        """
+        Scenario: User can view all notes by associated tags.
+        Given I have a course with 5 notes and I am viewing the Notes page
+        When I switch to the "Tags" view
+        Then I see 4 tag groups
+        And I see correct content in the notes and groups
+        And an event has fired indicating that the Tags view was selected
+        """
+        self._add_default_notes()
+        self.notes_page.visit().switch_to_tab("tags")
+
+        notes = self.notes_page.notes
+        groups = self.notes_page.tag_groups
+        self.assertEqual(len(notes), 7)
+        self.assertEqual(len(groups), 4)
+
+        # Tag group "cool"
+        self.assertGroupContent(
+            groups[0],
+            title=u"cool (2)",
+            notes=[u"Third note", None]
+        )
+
+        self.assertNoteContent(
+            notes[0],
+            quote=u"Annotate this text",
+            text=u"Third note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2013 at 01:01 UTC",
+            tags=["Cool", "TODO"]
+        )
+
+        self.assertNoteContent(
+            notes[1],
+            quote=u"Annotate this text",
+            unit_name="Test Unit 2",
+            time_updated="Jan 01, 2012 at 01:01 UTC",
+            tags=["Review", "cool"]
+        )
+
+        # Tag group "review"
+        self.assertGroupContent(
+            groups[1],
+            title=u"review (2)",
+            notes=[u"Fourth note", None]
+        )
+
+        self.assertNoteContent(
+            notes[2],
+            text=u"Fourth note",
+            unit_name="Test Unit 3",
+            time_updated="Jan 01, 2014 at 01:01 UTC",
+            tags=["review"]
+        )
+
+        self.assertNoteContent(
+            notes[3],
+            quote=u"Annotate this text",
+            unit_name="Test Unit 2",
+            time_updated="Jan 01, 2012 at 01:01 UTC",
+            tags=["Review", "cool"]
+        )
+
+        # Tag group "todo"
+        self.assertGroupContent(
+            groups[2],
+            title=u"todo (1)",
+            notes=["Third note"]
+        )
+
+        self.assertNoteContent(
+            notes[4],
+            quote=u"Annotate this text",
+            text=u"Third note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2013 at 01:01 UTC",
+            tags=["Cool", "TODO"]
+        )
+
+        # Notes with no tags
+        self.assertGroupContent(
+            groups[3],
+            title=u"[no tags] (2)",
+            notes=["Fifth note", "First note"]
+        )
+
+        self.assertNoteContent(
+            notes[5],
+            quote=u"Annotate this text",
+            text=u"Fifth note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2015 at 01:01 UTC"
+        )
+
+        self.assertNoteContent(
+            notes[6],
+            quote=u"Annotate this text",
+            text=u"First note",
+            unit_name="Test Unit 4",
+            time_updated="Jan 01, 2011 at 01:01 UTC"
+        )
+
+        self.assert_viewed_event('Tags')
+
     def test_easy_access_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit works correctly.
         Given I have a course with 5 notes
         When I open Notes page
         And I click on the first unit link
-        Then I see correct text on the unit page
+        Then I see correct text on the unit page and a unit link event was fired
         When go back to the Notes page
         And I switch to "Location in Course" view
         And I click on the second unit link
-        Then I see correct text on the unit page
+        Then I see correct text on the unit page and a unit link event was fired
+        When go back to the Notes page
+        And I switch to "Tags" view
+        And I click on the first unit link
+        Then I see correct text on the unit page and a unit link event was fired
         When go back to the Notes page
         And I run the search with "Fifth" query
         And I click on the first unit link
-        Then I see correct text on the unit page
+        Then I see correct text on the unit page  and a unit link event was fired
         """
-        def assert_page(note):
+        def assert_page(note, usage_id, view):
+            """ Verify that clicking on the unit link works properly. """
             quote = note.quote
             note.go_to_unit()
             self.courseware_page.wait_for_page()
             self.assertIn(quote, self.courseware_page.xblock_component_html_content())
+            self.assert_unit_link_event(usage_id, view)
+            self.reset_event_tracking()
 
         self._add_default_notes()
         self.notes_page.visit()
         note = self.notes_page.notes[0]
-        assert_page(note)
+        assert_page(note, self.raw_note_list[4]['usage_id'], "Recent Activity")
 
         self.notes_page.visit().switch_to_tab("structure")
         note = self.notes_page.notes[1]
-        assert_page(note)
+        assert_page(note, self.raw_note_list[2]['usage_id'], "Location in Course")
+
+        self.notes_page.visit().switch_to_tab("tags")
+        note = self.notes_page.notes[0]
+        assert_page(note, self.raw_note_list[2]['usage_id'], "Tags")
 
         self.notes_page.visit().search("Fifth")
         note = self.notes_page.notes[0]
-        assert_page(note)
+        assert_page(note, self.raw_note_list[4]['usage_id'], "Search Results")
 
     def test_search_behaves_correctly(self):
         """
@@ -526,6 +792,8 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         When I run the search with "note" query
         Then I see that error message disappears
         And I see that "Search Results" tab appears with 4 notes found
+        And an event has fired indicating that the Search Results view was selected
+        And an event has fired recording the search that was performed
         """
         self._add_default_notes()
         self.notes_page.visit()
@@ -541,14 +809,105 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         # Error message disappears
         self.assertFalse(self.notes_page.is_error_visible)
         self.assertIn(u"Search Results", self.notes_page.tabs)
-        self.assertEqual(len(self.notes_page.notes), 4)
+        notes = self.notes_page.notes
+        self.assertEqual(len(notes), 4)
+
+        self.assertNoteContent(
+            notes[0],
+            quote=u"Annotate this text",
+            text=u"Fifth note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2015 at 01:01 UTC"
+        )
+
+        self.assertNoteContent(
+            notes[1],
+            text=u"Fourth note",
+            unit_name="Test Unit 3",
+            time_updated="Jan 01, 2014 at 01:01 UTC",
+            tags=["review"]
+        )
+
+        self.assertNoteContent(
+            notes[2],
+            quote="Annotate this text",
+            text=u"Third note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2013 at 01:01 UTC",
+            tags=["Cool", "TODO"]
+        )
+
+        self.assertNoteContent(
+            notes[3],
+            quote=u"Annotate this text",
+            text=u"First note",
+            unit_name="Test Unit 4",
+            time_updated="Jan 01, 2011 at 01:01 UTC"
+        )
+
+        self.assert_viewed_event('Search Results')
+        self.assert_search_event('note', 4)
+
+    def test_scroll_to_tag_recent_activity(self):
+        """
+        Scenario: Can scroll to a tag group from the Recent Activity view (default view)
+        Given I have a course with 5 notes and I open the Notes page
+        When I click on a tag associated with a note
+        Then the Tags view tab gets focus and I scroll to the section of notes associated with that tag
+        """
+        self._add_default_notes(["apple", "banana", "kiwi", "pear", "pumpkin", "squash", "zucchini"])
+        self.notes_page.visit()
+        self._scroll_to_tag_and_verify("pear", 3)
+
+    def test_scroll_to_tag_course_structure(self):
+        """
+        Scenario: Can scroll to a tag group from the Course Structure view
+        Given I have a course with 5 notes and I open the Notes page and select the Course Structure view
+        When I click on a tag associated with a note
+        Then the Tags view tab gets focus and I scroll to the section of notes associated with that tag
+        """
+        self._add_default_notes(["apple", "banana", "kiwi", "pear", "pumpkin", "squash", "zucchini"])
+        self.notes_page.visit().switch_to_tab("structure")
+        self._scroll_to_tag_and_verify("squash", 5)
+
+    def test_scroll_to_tag_search(self):
+        """
+        Scenario: Can scroll to a tag group from the Search Results view
+        Given I have a course with 5 notes and I open the Notes page and perform a search
+        Then the Search view tab opens and gets focus
+        And when I click on a tag associated with a note
+        Then the Tags view tab gets focus and I scroll to the section of notes associated with that tag
+        """
+        self._add_default_notes(["apple", "banana", "kiwi", "pear", "pumpkin", "squash", "zucchini"])
+        self.notes_page.visit().search("note")
+        self._scroll_to_tag_and_verify("pumpkin", 4)
+
+    def test_scroll_to_tag_from_tag_view(self):
+        """
+        Scenario: Can scroll to a tag group from the Tags view
+        Given I have a course with 5 notes and I open the Notes page and select the Tag view
+        When I click on a tag associated with a note
+        Then I scroll to the section of notes associated with that tag
+        """
+        self._add_default_notes(["apple", "banana", "kiwi", "pear", "pumpkin", "squash", "zucchini"])
+        self.notes_page.visit().switch_to_tab("tags")
+        self._scroll_to_tag_and_verify("kiwi", 2)
+
+    def _scroll_to_tag_and_verify(self, tag_name, group_index):
+        """ Helper method for all scroll to tag tests """
+        self.notes_page.notes[1].go_to_tag(tag_name)
+
+        # Because all the notes (with tags) have the same tags, they will end up ordered alphabetically.
+        pear_group = self.notes_page.tag_groups[group_index]
+        self.assertEqual(tag_name + " (3)", pear_group.title)
+        self.assertTrue(pear_group.scrolled_to_top(group_index))
 
     def test_tabs_behaves_correctly(self):
         """
         Scenario: Tabs behaves correctly.
         Given I have a course with 5 notes
         When I open Notes page
-        Then I see only "Recent Activity" and "Location in Course" tabs
+        Then I see only "Recent Activity", "Location in Course", and "Tags" tabs
         When I run the search with "note" query
         And I see that "Search Results" tab appears with 4 notes found
         Then I switch to "Recent Activity" tab
@@ -566,24 +925,24 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.notes_page.visit()
 
         # We're on Recent Activity tab.
-        self.assertEqual(len(self.notes_page.tabs), 2)
-        self.assertEqual([u"Recent Activity", u"Location in Course"], self.notes_page.tabs)
+        self.assertEqual(len(self.notes_page.tabs), 3)
+        self.assertEqual([u"Recent Activity", u"Location in Course", u"Tags"], self.notes_page.tabs)
         self.notes_page.search("note")
         # We're on Search Results tab
-        self.assertEqual(len(self.notes_page.tabs), 3)
+        self.assertEqual(len(self.notes_page.tabs), 4)
         self.assertIn(u"Search Results", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.notes), 4)
         # We can switch on Recent Activity tab and back.
         self.notes_page.switch_to_tab("recent")
         self.assertEqual(len(self.notes_page.notes), 5)
         self.notes_page.switch_to_tab("structure")
-        self.assertEqual(len(self.notes_page.groups), 2)
+        self.assertEqual(len(self.notes_page.chapter_groups), 2)
         self.assertEqual(len(self.notes_page.notes), 5)
         self.notes_page.switch_to_tab("search")
         self.assertEqual(len(self.notes_page.notes), 4)
         # Can close search results page
-        self.notes_page.close_tab("search")
-        self.assertEqual(len(self.notes_page.tabs), 2)
+        self.notes_page.close_tab()
+        self.assertEqual(len(self.notes_page.tabs), 3)
         self.assertNotIn(u"Search Results", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.notes), 5)
 
@@ -645,6 +1004,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.assertFalse(note.is_visible)
 
 
+@attr('shard_4')
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
     Tests for toggling single annotation.
@@ -699,9 +1059,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         And I move mouse out of the note
         Then I see that the note is still shown
         When I click on highlighted text in the second component
-        Then I do not see any notes
-        When I click again on highlighted text in the second component
-        Then I see appropriate note
+        Then I see that the new note is shown
         """
         note_1 = self.note_unit_page.notes[0]
         note_2 = self.note_unit_page.notes[1]
@@ -712,12 +1070,10 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
 
         note_2.click_on_highlight()
         self.assertFalse(note_1.is_visible)
-        self.assertFalse(note_2.is_visible)
-
-        note_2.click_on_highlight()
         self.assertTrue(note_2.is_visible)
 
 
+@attr('shard_4')
 class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """
     Tests for toggling visibility of all notes.

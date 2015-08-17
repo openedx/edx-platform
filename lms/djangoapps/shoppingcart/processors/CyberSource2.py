@@ -32,7 +32,7 @@ from collections import OrderedDict, defaultdict
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ugettext_noop
 from edxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
@@ -40,6 +40,10 @@ from shoppingcart.processors.helpers import get_processor_config
 from microsite_configuration import microsite
 
 log = logging.getLogger(__name__)
+
+# Translators: this text appears when an unfamiliar error code occurs during payment,
+# for which we don't know a user-friendly message to display in advance.
+DEFAULT_REASON = ugettext_noop("UNKNOWN REASON")
 
 
 def process_postpay_callback(params):
@@ -407,6 +411,11 @@ def _record_purchase(params, order):
     else:
         ccnum = "####"
 
+    if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
+        log.info(
+            "Order %d purchased with params: %s", order.id, json.dumps(params)
+        )
+
     # Mark the order as purchased and store the billing information
     order.purchase(
         first=params.get('req_bill_to_forename', ''),
@@ -433,6 +442,11 @@ def _record_payment_info(params, order):
     Returns:
         None
     """
+    if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
+        log.info(
+            "Order %d processed (but not completed) with params: %s", order.id, json.dumps(params)
+        )
+
     order.processor_reply_dump = json.dumps(params)
     order.save()
 
@@ -572,18 +586,29 @@ CARDTYPE_MAP.update(
     }
 )
 
-REASONCODE_MAP = defaultdict(lambda: "UNKNOWN REASON")
+
+# Note: these messages come directly from official Cybersource documentation at:
+# http://apps.cybersource.com/library/documentation/dev_guides/CC_Svcs_SO_API/html/wwhelp/wwhimpl/js/html/wwhelp.htm#href=reason_codes.html
+REASONCODE_MAP = defaultdict(lambda: DEFAULT_REASON)
 REASONCODE_MAP.update(
     {
         '100': _('Successful transaction.'),
+        '101': _('The request is missing one or more required fields.'),
         '102': _('One or more fields in the request contains invalid data.'),
         '104': dedent(_(
             """
-            The access_key and transaction_uuid fields for this authorization request matches the access_key and
-            transaction_uuid of another authorization request that you sent in the last 15 minutes.
-            Possible fix: retry the payment after 15 minutes.
+            The merchant reference code for this authorization request matches the merchant reference code of another
+            authorization request that you sent within the past 15 minutes.
+            Possible action: Resend the request with a unique merchant reference code.
             """)),
         '110': _('Only a partial amount was approved.'),
+        '150': _('General system failure.'),
+        '151': dedent(_(
+            """
+            The request was received but there was a server timeout. This error does not include timeouts between the
+            client and the server.
+            """)),
+        '152': _('The request was received, but a service did not finish running in time.'),
         '200': dedent(_(
             """
             The authorization request was approved by the issuing bank but declined by CyberSource
@@ -593,64 +618,101 @@ REASONCODE_MAP.update(
             """
             The issuing bank has questions about the request. You do not receive an
             authorization code programmatically, but you might receive one verbally by calling the processor.
-            Possible fix: retry with another form of payment
+            Possible action: retry with another form of payment.
             """)),
         '202': dedent(_(
             """
             Expired card. You might also receive this if the expiration date you
             provided does not match the date the issuing bank has on file.
-            Possible fix: retry with another form of payment
+            Possible action: retry with another form of payment.
             """)),
         '203': dedent(_(
             """
             General decline of the card. No other information provided by the issuing bank.
-            Possible fix: retry with another form of payment
+            Possible action: retry with another form of payment.
             """)),
-        '204': _('Insufficient funds in the account. Possible fix: retry with another form of payment'),
+        '204': _('Insufficient funds in the account. Possible action: retry with another form of payment.'),
         # 205 was Stolen or lost card.  Might as well not show this message to the person using such a card.
-        '205': _('Stolen or lost card'),
-        '207': _('Issuing bank unavailable. Possible fix: retry again after a few minutes'),
+        '205': _('Stolen or lost card.'),
+        '207': _('Issuing bank unavailable. Possible action: retry again after a few minutes.'),
         '208': dedent(_(
             """
             Inactive card or card not authorized for card-not-present transactions.
-            Possible fix: retry with another form of payment
+            Possible action: retry with another form of payment.
             """)),
-        '210': _('The card has reached the credit limit. Possible fix: retry with another form of payment'),
-        '211': _('Invalid card verification number (CVN). Possible fix: retry with another form of payment'),
+        '209': _('CVN did not match.'),
+        '210': _('The card has reached the credit limit. Possible action: retry with another form of payment.'),
+        '211': _('Invalid card verification number (CVN). Possible action: retry with another form of payment.'),
         # 221 was The customer matched an entry on the processor's negative file.
         # Might as well not show this message to the person using such a card.
         '221': _('The customer matched an entry on the processors negative file.'),
-        '222': _('Account frozen. Possible fix: retry with another form of payment'),
+        '222': _('Account frozen. Possible action: retry with another form of payment.'),
         '230': dedent(_(
             """
             The authorization request was approved by the issuing bank but declined by
             CyberSource because it did not pass the CVN check.
-            Possible fix: retry with another form of payment
+            Possible action: retry with another form of payment.
             """)),
-        '231': _('Invalid account number. Possible fix: retry with another form of payment'),
+        '231': _('Invalid account number. Possible action: retry with another form of payment.'),
         '232': dedent(_(
             """
             The card type is not accepted by the payment processor.
-            Possible fix: retry with another form of payment
+            Possible action: retry with another form of payment.
             """)),
-        '233': _('General decline by the processor.  Possible fix: retry with another form of payment'),
-        '234': dedent(_(
-            """
-            There is a problem with the information in your CyberSource account.  Please let us know at {0}
-            """.format(settings.PAYMENT_SUPPORT_EMAIL))),
-        '236': _('Processor Failure.  Possible fix: retry the payment'),
+        '233': _('General decline by the processor.  Possible action: retry with another form of payment.'),
+        '234': _(
+            "There is a problem with the information in your CyberSource account.  Please let us know at {0}"
+        ).format(settings.PAYMENT_SUPPORT_EMAIL),
+        '235': _('The requested capture amount exceeds the originally authorized amount.'),
+        '236': _('Processor Failure.  Possible action: retry the payment'),
+        '237': _('The authorization has already been reversed.'),
+        '238': _('The authorization has already been captured.'),
+        '239': _('The requested transaction amount must match the previous transaction amount.'),
         '240': dedent(_(
             """
             The card type sent is invalid or does not correlate with the credit card number.
-            Possible fix: retry with the same card or another form of payment
+            Possible action: retry with the same card or another form of payment.
             """)),
+        '241': _('The request ID is invalid.'),
+        '242': dedent(_(
+            """
+            You requested a capture, but there is no corresponding, unused authorization record. Occurs if there was
+            not a previously successful authorization request or if the previously successful authorization has already
+            been used by another capture request.
+            """)),
+        '243': _('The transaction has already been settled or reversed.'),
+        '246': dedent(_(
+            """
+            Either the capture or credit is not voidable because the capture or credit information has already been
+            submitted to your processor, or you requested a void for a type of transaction that cannot be voided.
+            """)),
+        '247': _('You requested a credit for a capture that was previously voided.'),
+        '250': _('The request was received, but there was a timeout at the payment processor.'),
+        '254': _('Stand-alone credits are not allowed.'),
         '475': _('The cardholder is enrolled for payer authentication'),
         '476': _('Payer authentication could not be authenticated'),
         '520': dedent(_(
             """
             The authorization request was approved by the issuing bank but declined by CyberSource based
             on your legacy Smart Authorization settings.
-            Possible fix: retry with a different form of payment.
+            Possible action: retry with a different form of payment.
             """)),
     }
 )
+
+
+def is_user_payment_error(reason_code):
+    """
+    Decide, based on the reason_code, whether or not it signifies a problem
+    with something the user did (rather than a system error beyond the user's
+    control).
+
+    This function is used to determine whether we can/should show the user a
+    message with suggested actions to fix the problem, or simply apologize and
+    ask her to try again later.
+    """
+    reason_code = str(reason_code)
+    if reason_code not in REASONCODE_MAP or REASONCODE_MAP[reason_code] == DEFAULT_REASON:
+        return False
+
+    return (200 <= int(reason_code) <= 233) or int(reason_code) in (101, 102, 240)

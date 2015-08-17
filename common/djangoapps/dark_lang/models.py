@@ -25,7 +25,7 @@ class DarkLangConfig(ConfigurationModel):
         if not self.released_languages.strip():  # pylint: disable=no-member
             return []
 
-        languages = [lang.strip() for lang in self.released_languages.split(',')]  # pylint: disable=no-member
+        languages = [lang.lower().strip() for lang in self.released_languages.split(',')]  # pylint: disable=no-member
         # Put in alphabetical order
         languages.sort()
         return languages

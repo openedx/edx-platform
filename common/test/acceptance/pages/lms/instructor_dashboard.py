@@ -6,7 +6,7 @@ Instructor (2) dashboard page.
 from bok_choy.page_object import PageObject
 from .course_page import CoursePage
 import os
-from bok_choy.promise import EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
 from ...tests.helpers import select_option_by_text, get_selected_option_text, get_options
 
 
@@ -28,6 +28,17 @@ class InstructorDashboardPage(CoursePage):
         membership_section.wait_for_page()
         return membership_section
 
+    def select_cohort_management(self):
+        """
+        Selects the cohort management tab and returns the CohortManagementSection
+        """
+        self.q(css='a[data-section=cohort_management]').first.click()
+        cohort_management_section = CohortManagementSection(self.browser)
+        # The first time cohort management is selected, an ajax call is made.
+        cohort_management_section.wait_for_ajax()
+        cohort_management_section.wait_for_page()
+        return cohort_management_section
+
     def select_data_download(self):
         """
         Selects the data download tab and returns a DataDownloadPage.
@@ -36,6 +47,24 @@ class InstructorDashboardPage(CoursePage):
         data_download_section = DataDownloadPage(self.browser)
         data_download_section.wait_for_page()
         return data_download_section
+
+    def select_student_admin(self):
+        """
+        Selects the student admin tab and returns the MembershipSection
+        """
+        self.q(css='a[data-section=student_admin]').first.click()
+        student_admin_section = StudentAdminPage(self.browser)
+        student_admin_section.wait_for_page()
+        return student_admin_section
+
+    def select_certificates(self):
+        """
+        Selects the certificates tab and returns the CertificatesSection
+        """
+        self.q(css='a[data-section=certificates]').first.click()
+        certificates_section = CertificatesPage(self.browser)
+        certificates_section.wait_for_page()
+        return certificates_section
 
     @staticmethod
     def get_asset_path(file_name):
@@ -75,16 +104,10 @@ class MembershipPage(PageObject):
         """
         return MembershipPageAutoEnrollSection(self.browser)
 
-    def select_cohort_management_section(self):
-        """
-        Returns the MembershipPageCohortManagementSection page object.
-        """
-        return MembershipPageCohortManagementSection(self.browser)
 
-
-class MembershipPageCohortManagementSection(PageObject):
+class CohortManagementSection(PageObject):
     """
-    The cohort management subsection of the Membership section of the Instructor dashboard.
+    The Cohort Management section of the Instructor dashboard.
     """
     url = None
     csv_browse_button_selector_css = '.csv-upload #file-upload-form-file'
@@ -92,21 +115,45 @@ class MembershipPageCohortManagementSection(PageObject):
     content_group_selector_css = 'select.input-cohort-group-association'
     no_content_group_button_css = '.cohort-management-details-association-course input.radio-no'
     select_content_group_button_css = '.cohort-management-details-association-course input.radio-yes'
+    assignment_type_buttons_css = '.cohort-management-assignment-type-settings input'
+    discussion_form_selectors = {
+        'course-wide': '.cohort-course-wide-discussions-form',
+        'inline': '.cohort-inline-discussions-form'
+    }
 
     def is_browser_on_page(self):
-        return self.q(css='.cohort-management.membership-section').present
+        """
+        Cohorts management exists under one class; however, render time can be longer because of sub-classes
+        that must be rendered beneath it. To determine if the browser is on the cohorts management page (and
+        allow for it to fully-render), we need to consider three different states of the page:
+        * When no cohorts have been added yet
+        * When a new cohort is being added (a confirmation state)
+        * When cohorts exist (the traditional management page)
+        """
+        cohorts_warning_title = '.message-warning .message-title'
+
+        if self.q(css=cohorts_warning_title).visible:
+            return self.q(css='.message-title').text[0] == u'You currently have no cohorts configured'
+        # The page may be in either the traditional management state, or an 'add new cohort' state.
+        # Confirm the CSS class is visible because the CSS class can exist on the page even in different states.
+        return self.q(css='.cohorts-state-section').visible or self.q(css='.new-cohort-form').visible
 
     def _bounded_selector(self, selector):
         """
         Return `selector`, but limited to the cohort management context.
         """
-        return '.cohort-management.membership-section {}'.format(selector)
+        return '.cohort-management {}'.format(selector)
 
     def _get_cohort_options(self):
         """
         Returns the available options in the cohort dropdown, including the initial "Select a cohort".
         """
-        return self.q(css=self._bounded_selector("#cohort-select option"))
+        def check_func():
+            """Promise Check Function"""
+            query = self.q(css=self._bounded_selector("#cohort-select option"))
+            return len(query) > 0, query
+
+        return Promise(check_func, "Waiting for cohort selector to populate").fulfill()
 
     def _cohort_name(self, label):
         """
@@ -119,6 +166,41 @@ class MembershipPageCohortManagementSection(PageObject):
         Returns the count for the cohort (as specified in the label in the selector).
         """
         return int(label.split(' (')[1].split(')')[0])
+
+    def save_cohort_settings(self):
+        """
+        Click on Save button shown after click on Settings tab or when we add a new cohort.
+        """
+        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+
+    @property
+    def is_assignment_settings_disabled(self):
+        """
+        Check if assignment settings are disabled.
+        """
+        attributes = self.q(css=self._bounded_selector('.cohort-management-assignment-type-settings')).attrs('class')
+        if 'is-disabled' in attributes[0].split():
+            return True
+
+        return False
+
+    @property
+    def assignment_settings_message(self):
+        """
+        Return assignment settings disabled message in case of default cohort.
+        """
+        query = self.q(css=self._bounded_selector('.copy-error'))
+        if query.visible:
+            return query.text[0]
+
+        return ''
+
+    @property
+    def cohort_name_in_header(self):
+        """
+        Return cohort name as shown in cohort header.
+        """
+        return self._cohort_name(self.q(css=self._bounded_selector(".group-header-title .title-value")).text[0])
 
     def get_cohorts(self):
         """
@@ -133,10 +215,6 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Returns the name of the selected cohort.
         """
-        EmptyPromise(
-            lambda: len(self._get_cohort_options().results) > 0,
-            "Waiting for cohort selector to populate"
-        ).fulfill()
         return self._cohort_name(
             self._get_cohort_options().filter(lambda el: el.is_selected()).first.text[0]
         )
@@ -153,29 +231,58 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Selects the given cohort in the drop-down.
         """
-        EmptyPromise(
-            lambda: cohort_name in self.get_cohorts(),
-            "Waiting for cohort selector to populate"
-        ).fulfill()
         # Note: can't use Select to select by text because the count is also included in the displayed text.
         self._get_cohort_options().filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
+        # wait for cohort to render as selected on screen
+        EmptyPromise(
+            lambda: self.q(css='.title-value').text[0] == cohort_name,
+            "Waiting to confirm cohort has been selected"
+        ).fulfill()
 
-    def add_cohort(self, cohort_name, content_group=None):
+    def set_cohort_name(self, cohort_name):
+        """
+        Set Cohort Name.
+        """
+        textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
+        textinput.clear()
+        textinput.send_keys(cohort_name)
+
+    def set_assignment_type(self, assignment_type):
+        """
+        Set assignment type for selected cohort.
+
+        Arguments:
+            assignment_type (str): Should be 'random' or 'manual'
+        """
+        css = self._bounded_selector(self.assignment_type_buttons_css)
+        self.q(css=css).filter(lambda el: el.get_attribute('value') == assignment_type).first.click()
+
+    def add_cohort(self, cohort_name, content_group=None, assignment_type=None):
         """
         Adds a new manual cohort with the specified name.
         If a content group should also be associated, the name of the content group should be specified.
         """
-        create_buttons = self.q(css=self._bounded_selector(".action-create"))
+        add_cohort_selector = self._bounded_selector(".action-create")
+
+        # We need to wait because sometime add cohort button is not in a state to be clickable.
+        self.wait_for_element_presence(add_cohort_selector, 'Add Cohort button is present.')
+        create_buttons = self.q(css=add_cohort_selector)
         # There are 2 create buttons on the page. The second one is only present when no cohort yet exists
         # (in which case the first is not visible). Click on the last present create button.
         create_buttons.results[len(create_buttons.results) - 1].click()
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
+
+        # Manual assignment type will be selected by default for a new cohort
+        # if we are not setting the assignment type explicitly
+        if assignment_type:
+            self.set_assignment_type(assignment_type)
+
         if content_group:
             self._select_associated_content_group(content_group)
-        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+        self.save_cohort_settings()
 
     def get_cohort_group_setup(self):
         """
@@ -186,6 +293,12 @@ class MembershipPageCohortManagementSection(PageObject):
     def select_edit_settings(self):
         self.q(css=self._bounded_selector(".action-edit")).first.click()
 
+    def select_manage_settings(self):
+        """
+        Click on Manage Students Tab under cohort management section.
+        """
+        self.q(css=self._bounded_selector(".tab-manage_students")).first.click()
+
     def add_students_to_selected_cohort(self, users):
         """
         Adds a list of users (either usernames or email addresses) to the currently selected cohort.
@@ -195,6 +308,11 @@ class MembershipPageCohortManagementSection(PageObject):
             textinput.send_keys(user)
             textinput.send_keys(",")
         self.q(css=self._bounded_selector("div.cohort-management-group-add .action-primary")).first.click()
+        # Expect the confirmation message substring. (The full message will differ depending on 1 or >1 students added)
+        self.wait_for(
+            lambda: "added to this cohort" in self.get_cohort_confirmation_messages(wait_for_messages=True)[0],
+            "Student(s) added confirmation message."
+        )
 
     def get_cohort_student_input_field_value(self):
         """
@@ -231,6 +349,15 @@ class MembershipPageCohortManagementSection(PageObject):
             return None
         return get_selected_option_text(self.q(css=self._bounded_selector(self.content_group_selector_css)))
 
+    def get_cohort_associated_assignment_type(self):
+        """
+        Returns the assignment type associated with the cohort currently being edited.
+        """
+        self.select_cohort_settings()
+        css_selector = self._bounded_selector(self.assignment_type_buttons_css)
+        radio_button = self.q(css=css_selector).filter(lambda el: el.is_selected()).results[0]
+        return radio_button.get_attribute('value')
+
     def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
         """
         Sets the content group associated with the cohort currently being edited.
@@ -243,7 +370,7 @@ class MembershipPageCohortManagementSection(PageObject):
             self.q(css=self._bounded_selector(self.no_content_group_button_css)).first.click()
         else:
             self._select_associated_content_group(content_group)
-        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+        self.save_cohort_settings()
 
     def _select_associated_content_group(self, content_group):
         """
@@ -280,14 +407,14 @@ class MembershipPageCohortManagementSection(PageObject):
 
         return self._get_messages(title_css, detail_css, wait_for_messages=wait_for_messages)
 
-    def _get_cohort_messages(self, type):
+    def _get_cohort_messages(self, type, wait_for_messages=False):
         """
         Returns array of messages related to manipulating cohorts directly through the UI for the given type.
         """
         title_css = "div.cohort-management-group-add .cohort-" + type + " .message-title"
         detail_css = "div.cohort-management-group-add .cohort-" + type + " .summary-item"
 
-        return self._get_messages(title_css, detail_css)
+        return self._get_messages(title_css, detail_css, wait_for_messages)
 
     def get_csv_messages(self):
         """
@@ -303,7 +430,7 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         if wait_for_messages:
             EmptyPromise(
-                lambda: self.q(css=self._bounded_selector(title_css)).results != 0,
+                lambda: len(self.q(css=self._bounded_selector(title_css)).results) != 0,
                 "Waiting for messages to appear"
             ).fulfill()
         message_title = self.q(css=self._bounded_selector(title_css))
@@ -315,12 +442,12 @@ class MembershipPageCohortManagementSection(PageObject):
             messages.append(detail.text)
         return messages
 
-    def get_cohort_confirmation_messages(self):
+    def get_cohort_confirmation_messages(self, wait_for_messages=False):
         """
         Returns an array of messages present in the confirmation area of the cohort management UI.
         The first entry in the array is the title. Any further entries are the details.
         """
-        return self._get_cohort_messages("confirmations")
+        return self._get_cohort_messages("confirmations", wait_for_messages)
 
     def get_cohort_error_messages(self):
         """
@@ -349,14 +476,154 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Uploads a file with cohort assignment information.
         """
-        # If the CSV upload section has not yet been toggled on, click on the toggle link.
-        cvs_upload_toggle = self.q(css=self._bounded_selector(".toggle-cohort-management-secondary")).first
+        # Toggle on the CSV upload section.
+        cvs_upload_toggle_css = '.toggle-cohort-management-secondary'
+        self.wait_for_element_visibility(cvs_upload_toggle_css, "Wait for csv upload link to appear")
+        cvs_upload_toggle = self.q(css=self._bounded_selector(cvs_upload_toggle_css)).first
         if cvs_upload_toggle:
             cvs_upload_toggle.click()
+            self.wait_for_element_visibility(
+                self._bounded_selector(self.csv_browse_button_selector_css),
+                'File upload link visible'
+            )
         path = InstructorDashboardPage.get_asset_path(filename)
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
         self.q(css=self._bounded_selector(self.csv_upload_button_selector_css)).first.click()
+
+    @property
+    def is_cohorted(self):
+        """
+        Returns the state of `Enable Cohorts` checkbox state.
+        """
+        return self.q(css=self._bounded_selector('.cohorts-state')).selected
+
+    @is_cohorted.setter
+    def is_cohorted(self, state):
+        """
+        Check/Uncheck the `Enable Cohorts` checkbox state.
+        """
+        if state != self.is_cohorted:
+            self.q(css=self._bounded_selector('.cohorts-state')).first.click()
+
+    def toggles_showing_of_discussion_topics(self):
+        """
+        Shows the discussion topics.
+        """
+        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).first.click()
+        self.wait_for_element_visibility("#cohort-management-discussion-topics", "Waiting for discussions to appear")
+
+    def discussion_topics_visible(self):
+        """
+        Returns the visibility status of cohort discussion controls.
+        """
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector('.cohort-discussions-nav')).results != 0,
+            "Waiting for discussion section to show"
+        ).fulfill()
+
+        return (self.q(css=self._bounded_selector('.cohort-course-wide-discussions-nav')).visible and
+                self.q(css=self._bounded_selector('.cohort-inline-discussions-nav')).visible)
+
+    def select_discussion_topic(self, key):
+        """
+        Selects discussion topic checkbox by clicking on it.
+        """
+        self.q(css=self._bounded_selector(".check-discussion-subcategory-%s" % key)).first.click()
+
+    def select_always_inline_discussion(self):
+        """
+        Selects the always_cohort_inline_discussions radio button.
+        """
+        self.q(css=self._bounded_selector(".check-all-inline-discussions")).first.click()
+
+    def always_inline_discussion_selected(self):
+        """
+        Returns the checked always_cohort_inline_discussions radio button.
+        """
+        return self.q(css=self._bounded_selector(".check-all-inline-discussions:checked"))
+
+    def cohort_some_inline_discussion_selected(self):
+        """
+        Returns the checked some_cohort_inline_discussions radio button.
+        """
+        return self.q(css=self._bounded_selector(".check-cohort-inline-discussions:checked"))
+
+    def select_cohort_some_inline_discussion(self):
+        """
+        Selects the cohort_some_inline_discussions radio button.
+        """
+        self.q(css=self._bounded_selector(".check-cohort-inline-discussions")).first.click()
+
+    def inline_discussion_topics_disabled(self):
+        """
+        Returns the status of inline discussion topics, enabled or disabled.
+        """
+        inline_topics = self.q(css=self._bounded_selector('.check-discussion-subcategory-inline'))
+        return all(topic.get_attribute('disabled') == 'true' for topic in inline_topics)
+
+    def is_save_button_disabled(self, key):
+        """
+        Returns the status for form's save button, enabled or disabled.
+        """
+        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        disabled = self.q(css=self._bounded_selector(save_button_css)).attrs('disabled')
+        return disabled[0] == 'true'
+
+    def is_category_selected(self):
+        """
+        Returns the status for category checkboxes.
+        """
+        return self.q(css=self._bounded_selector('.check-discussion-category:checked')).is_present()
+
+    def get_cohorted_topics_count(self, key):
+        """
+        Returns the count for cohorted topics.
+        """
+        cohorted_topics = self.q(css=self._bounded_selector('.check-discussion-subcategory-%s:checked' % key))
+        return len(cohorted_topics.results)
+
+    def save_discussion_topics(self, key):
+        """
+        Saves the discussion topics.
+        """
+        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        self.q(css=self._bounded_selector(save_button_css)).first.click()
+
+    def get_cohort_discussions_message(self, key, msg_type="confirmation"):
+        """
+        Returns the message related to modifying discussion topics.
+        """
+        title_css = "%s .message-%s .message-title" % (self.discussion_form_selectors[key], msg_type)
+
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector(title_css)),
+            "Waiting for message to appear"
+        ).fulfill()
+
+        message_title = self.q(css=self._bounded_selector(title_css))
+
+        if len(message_title.results) == 0:
+            return ''
+        return message_title.first.text[0]
+
+    def cohort_discussion_heading_is_visible(self, key):
+        """
+        Returns the visibility of discussion topic headings.
+        """
+        form_heading_css = '%s %s' % (self.discussion_form_selectors[key], '.subsection-title')
+        discussion_heading = self.q(css=self._bounded_selector(form_heading_css))
+
+        if len(discussion_heading) == 0:
+            return False
+        return discussion_heading.first.text[0]
+
+    def cohort_management_controls_visible(self):
+        """
+        Return the visibility status of cohort management controls(cohort selector section etc).
+        """
+        return (self.q(css=self._bounded_selector('.cohort-management-nav')).visible and
+                self.q(css=self._bounded_selector('.wrapper-cohort-supplemental')).visible)
 
 
 class MembershipPageAutoEnrollSection(PageObject):
@@ -449,9 +716,218 @@ class DataDownloadPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='a[data-section=data_download].active-section').present
 
+    @property
+    def generate_student_report_button(self):
+        """
+        Returns the "Download profile information as a CSV" button.
+        """
+        return self.q(css='input[name=list-profiles-csv]')
+
+    @property
+    def generate_grade_report_button(self):
+        """
+        Returns the "Generate Grade Report" button.
+        """
+        return self.q(css='input[name=calculate-grades-csv]')
+
+    @property
+    def generate_problem_report_button(self):
+        """
+        Returns the "Generate Problem Grade Report" button.
+        """
+        return self.q(css='input[name=problem-grade-report]')
+
+    @property
+    def report_download_links(self):
+        """
+        Returns the download links for the current page.
+        """
+        return self.q(css="#report-downloads-table .file-download-link>a")
+
+    def wait_for_available_report(self):
+        """
+        Waits for a downloadable report to be available.
+        """
+        EmptyPromise(
+            lambda: len(self.report_download_links) >= 1, 'Waiting for downloadable report'
+        ).fulfill()
+
     def get_available_reports_for_download(self):
         """
         Returns a list of all the available reports for download.
         """
-        reports = self.q(css="#report-downloads-table .file-download-link>a").map(lambda el: el.text)
-        return reports.results
+        return self.report_download_links.map(lambda el: el.text)
+
+
+class StudentAdminPage(PageObject):
+    """
+    Student admin section of the Instructor dashboard.
+    """
+    url = None
+    EE_CONTAINER = ".entrance-exam-grade-container"
+
+    def is_browser_on_page(self):
+        """
+        Confirms student admin section is present
+        """
+        return self.q(css='a[data-section=student_admin].active-section').present
+
+    @property
+    def student_email_input(self):
+        """
+        Returns email address/username input box.
+        """
+        return self.q(css='{} input[name=entrance-exam-student-select-grade]'.format(self.EE_CONTAINER))
+
+    @property
+    def reset_attempts_button(self):
+        """
+        Returns reset student attempts button.
+        """
+        return self.q(css='{} input[name=reset-entrance-exam-attempts]'.format(self.EE_CONTAINER))
+
+    @property
+    def rescore_submission_button(self):
+        """
+        Returns rescore student submission button.
+        """
+        return self.q(css='{} input[name=rescore-entrance-exam]'.format(self.EE_CONTAINER))
+
+    @property
+    def skip_entrance_exam_button(self):
+        """
+        Return Let Student Skip Entrance Exam button.
+        """
+        return self.q(css='{} input[name=skip-entrance-exam]'.format(self.EE_CONTAINER))
+
+    @property
+    def delete_student_state_button(self):
+        """
+        Returns delete student state button.
+        """
+        return self.q(css='{} input[name=delete-entrance-exam-state]'.format(self.EE_CONTAINER))
+
+    @property
+    def background_task_history_button(self):
+        """
+        Returns show background task history for student button.
+        """
+        return self.q(css='{} input[name=entrance-exam-task-history]'.format(self.EE_CONTAINER))
+
+    @property
+    def top_notification(self):
+        """
+        Returns show background task history for student button.
+        """
+        return self.q(css='{} .request-response-error'.format(self.EE_CONTAINER)).first
+
+    def is_student_email_input_visible(self):
+        """
+        Returns True if student email address/username input box is present.
+        """
+        return self.student_email_input.is_present()
+
+    def is_reset_attempts_button_visible(self):
+        """
+        Returns True if reset student attempts button is present.
+        """
+        return self.reset_attempts_button.is_present()
+
+    def is_rescore_submission_button_visible(self):
+        """
+        Returns True if rescore student submission button is present.
+        """
+        return self.rescore_submission_button.is_present()
+
+    def is_delete_student_state_button_visible(self):
+        """
+        Returns True if delete student state for entrance exam button is present.
+        """
+        return self.delete_student_state_button.is_present()
+
+    def is_background_task_history_button_visible(self):
+        """
+        Returns True if show background task history for student button is present.
+        """
+        return self.background_task_history_button.is_present()
+
+    def is_background_task_history_table_visible(self):
+        """
+        Returns True if background task history table is present.
+        """
+        return self.q(css='{} .entrance-exam-task-history-table'.format(self.EE_CONTAINER)).is_present()
+
+    def click_reset_attempts_button(self):
+        """
+        clicks reset student attempts button.
+        """
+        return self.reset_attempts_button.click()
+
+    def click_rescore_submissions_button(self):
+        """
+        clicks rescore submissions button.
+        """
+        return self.rescore_submission_button.click()
+
+    def click_skip_entrance_exam_button(self):
+        """
+        clicks let student skip entrance exam button.
+        """
+        return self.skip_entrance_exam_button.click()
+
+    def click_delete_student_state_button(self):
+        """
+        clicks delete student state button.
+        """
+        return self.delete_student_state_button.click()
+
+    def click_task_history_button(self):
+        """
+        clicks background task history button.
+        """
+        return self.background_task_history_button.click()
+
+    def set_student_email(self, email_addres):
+        """
+        Sets given email address as value of student email address/username input box.
+        """
+        input_box = self.student_email_input.first.results[0]
+        input_box.send_keys(email_addres)
+
+
+class CertificatesPage(PageObject):
+    """
+    Certificates section of the Instructor dashboard.
+    """
+    url = None
+    PAGE_SELECTOR = 'section#certificates'
+
+    def is_browser_on_page(self):
+        return self.q(css='a[data-section=certificates].active-section').present
+
+    def get_selector(self, css_selector):
+        """
+        Makes query selector by pre-pending certificates section
+        """
+        return self.q(css=' '.join([self.PAGE_SELECTOR, css_selector]))
+
+    @property
+    def generate_certificates_button(self):
+        """
+        Returns the "Generate Certificates" button.
+        """
+        return self.get_selector('#btn-start-generating-certificates')
+
+    @property
+    def certificate_generation_status(self):
+        """
+        Returns certificate generation status message container.
+        """
+        return self.get_selector('div.certificate-generation-status')
+
+    @property
+    def pending_tasks_section(self):
+        """
+        Returns the "Pending Instructor Tasks" section.
+        """
+        return self.get_selector('div.running-tasks-container')

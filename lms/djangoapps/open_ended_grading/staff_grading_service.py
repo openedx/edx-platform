@@ -11,7 +11,6 @@ from django.utils.translation import ugettext as _
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
-from xmodule.modulestore.django import ModuleI18nService
 
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_string
@@ -320,7 +319,7 @@ def get_problem_list(request, course_id):
                 u'If not, please do so and return to this page.'
             )
         valid_problem_list = []
-        for i in xrange(0, len(problem_list)):
+        for i in xrange(len(problem_list)):
             # Needed to ensure that the 'location' key can be accessed.
             try:
                 problem_list[i] = json.loads(problem_list[i])

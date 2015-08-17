@@ -9,10 +9,8 @@ import StringIO
 from textwrap import dedent
 
 from django.conf import settings
-from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
                                  CourseRegCodeItemAnnotation)
 from shoppingcart.views import initialize_report
@@ -22,7 +20,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ReportTypeTests(ModuleStoreTestCase):
     """
     Tests for the models used to generate certificate status reports
@@ -30,38 +27,17 @@ class ReportTypeTests(ModuleStoreTestCase):
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     def setUp(self):
+        super(ReportTypeTests, self).setUp()
+
         # Need to make a *lot* of users for this one
-        self.first_verified_user = UserFactory.create()
-        self.first_verified_user.profile.name = "John Doe"
-        self.first_verified_user.profile.save()
-
-        self.second_verified_user = UserFactory.create()
-        self.second_verified_user.profile.name = "Jane Deer"
-        self.second_verified_user.profile.save()
-
-        self.first_audit_user = UserFactory.create()
-        self.first_audit_user.profile.name = "Joe Miller"
-        self.first_audit_user.profile.save()
-
-        self.second_audit_user = UserFactory.create()
-        self.second_audit_user.profile.name = "Simon Blackquill"
-        self.second_audit_user.profile.save()
-
-        self.third_audit_user = UserFactory.create()
-        self.third_audit_user.profile.name = "Super Mario"
-        self.third_audit_user.profile.save()
-
-        self.honor_user = UserFactory.create()
-        self.honor_user.profile.name = "Princess Peach"
-        self.honor_user.profile.save()
-
-        self.first_refund_user = UserFactory.create()
-        self.first_refund_user.profile.name = u"King Bowsér"
-        self.first_refund_user.profile.save()
-
-        self.second_refund_user = UserFactory.create()
-        self.second_refund_user.profile.name = u"Súsan Smith"
-        self.second_refund_user.profile.save()
+        self.first_verified_user = UserFactory.create(profile__name="John Doe")
+        self.second_verified_user = UserFactory.create(profile__name="Jane Deer")
+        self.first_audit_user = UserFactory.create(profile__name="Joe Miller")
+        self.second_audit_user = UserFactory.create(profile__name="Simon Blackquill")
+        self.third_audit_user = UserFactory.create(profile__name="Super Mario")
+        self.honor_user = UserFactory.create(profile__name="Princess Peach")
+        self.first_refund_user = UserFactory.create(profile__name="King Bowsér")
+        self.second_refund_user = UserFactory.create(profile__name="Súsan Smith")
 
         # Two are verified, three are audit, one honor
 
@@ -179,7 +155,6 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     """
     Tests for the models used to generate itemized purchase reports
@@ -188,6 +163,8 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     TEST_ANNOTATION = u'Ba\xfc\u5305'
 
     def setUp(self):
+        super(ItemizedPurchaseReportTest, self).setUp()
+
         self.user = UserFactory.create()
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')

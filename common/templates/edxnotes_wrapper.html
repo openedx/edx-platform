@@ -1,5 +1,8 @@
-<%! import json %>
-<%! from student.models import anonymous_id_for_user %>
+<%!
+import json
+from django.utils.translation import ugettext as _
+from student.models import anonymous_id_for_user
+%>
 <%
     if user:
         params.update({'user': anonymous_id_for_user(user, None)})

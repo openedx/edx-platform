@@ -1,7 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! import json %>
-<%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+import json
+%>
 
 <%block name="bodyclass">view-student-notes is-in-course course</%block>
 <%block name="pagetitle">${_("Student Notes")}</%block>
@@ -56,6 +58,7 @@
           </span>
           <span class="copy">${_("Loading")}</span>
         </div>
+        <div class="sr-is-focusable sr-tab-panel" tabindex="-1"></div>
 
         % else:
         <section class="placeholder is-empty">

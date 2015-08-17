@@ -267,6 +267,14 @@ class LibraryUserRole(CourseRole):
         super(LibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+class CourseCcxCoachRole(CourseRole):
+    """A CCX Coach"""
+    ROLE = 'ccx_coach'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseCcxCoachRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class OrgStaffRole(OrgRole):
     """An organization staff member"""
     def __init__(self, *args, **kwargs):

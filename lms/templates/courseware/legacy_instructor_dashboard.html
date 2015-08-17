@@ -2,11 +2,12 @@
 ## We are no longer supporting this file or accepting changes into it.    ##
 ## Please see lms/templates/instructor for instructor dashboard templates ##
 
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 
 <%block name="pagetitle">${_("Legacy Instructor Dashboard")}</%block>
 <%block name="nav_skip">#instructor-dashboard-content</%block>
@@ -329,8 +330,14 @@ function goto( mode)
     </div>
     % endif
 
-    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
+    <p class="is-deprecated">
+      ${_("To download a CSV file containing profile information for students who are enrolled in this course, visit the Data Download section of the Instructor Dashboard.")}
+    </p>
+
+    <p class="is-deprecated">
+      ${_("To download a list of students who may enroll in this course but have not yet signed up for it, visit the Data Download section of the Instructor Dashboard.")}
+    </p>
+
     <hr width="40%" style="align:left">
 
   %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
@@ -372,7 +379,7 @@ function goto( mode)
 
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
-    %if course.is_cohorted:
+    %if course_is_cohorted:
       <p class="is-deprecated">${_("To manage beta tester roles and cohorts, visit the Membership section of the Instructor Dashboard.")}</p>
     %else:
       <p class="is-deprecated">${_("To manage beta tester roles, visit the Membership section of the Instructor Dashboard.")}</p>

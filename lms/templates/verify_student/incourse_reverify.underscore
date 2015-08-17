@@ -1,0 +1,51 @@
+<div id="wrapper-facephoto" class="wrapper-view block-photo face-photo-step">
+  <div class="facephoto view">
+    <h3 class="title"><%- gettext( "Take Your Photo" ) %></h3>
+    <div class="instruction">
+      <p><%- gettext( "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID." ) %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <div id="webcam" class="task cam"></div>
+
+      <div class="wrapper-help">
+        <div class="help help-task photo-tips facetips">
+          <h4 class="title"><%- gettext( "Tips on taking a successful photo" ) %></h4>
+
+          <div class="copy">
+            <ul class="list-help">
+              <li class="help-item"><%- gettext( "Make sure your face is well-lit" ) %></li>
+              <li class="help-item"><%- gettext( "Be sure your entire face is inside the frame" ) %></li>
+              <li class="help-item">
+                <%=  _.sprintf( gettext( "Once in position, use the camera button %(icon)s to capture your photo" ), { icon: '<span class="example">(<i class="icon fa fa-camera" aria-hidden="true"></i>)</span>' } ) %>
+              </li>
+              <li class="help-item"><%- gettext( "Can we match the photo you took with the one on your ID?" ) %></li>
+              <li class="help-item"><%- gettext( "Use the retake photo button if you are not pleased with your photo" ) %></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="help help-faq facefaq">
+          <h4 class="sr title"><%- gettext( "Frequently Asked Questions" ) %></h4>
+          <div class="copy">
+            <dl class="list-faq">
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer"><%- gettext( "As part of the verification process, you take a photo of both your face and a government-issued photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID." ) %></dd>
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer"><%- _.sprintf( gettext( "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button class="action action-primary" id="submit"><%= gettext("Submit") %></button>
+    </div>
+
+  </div>
+</div>

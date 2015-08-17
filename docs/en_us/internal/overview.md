@@ -6,13 +6,13 @@ This document explains the general structure of the edX platform, and defines so
 
 You should be familiar with the following.  If you're not, go read some docs...
 
- - python
- - django
+ - [python](http://docs.python.org)
+ - [django](http://docs.djangoproject.com)
  - javascript
  - html, xml -- xpath, xslt
  - css
- - git
- - mako templates -- we use these instead of django templates, because they support embedding real python.
+ - [git](http://git-scm.com/documentation)
+ - [mako templates](http://www.makotemplates.org/docs) -- we use these instead of django templates, because they support embedding real python.
 
 ## Other relevant terms
 
@@ -128,7 +128,7 @@ In development, we don't use collectstatic, instead accessing the files in place
 
 ## Testing
 
-See `testing.md`.
+See `testing.rst`.
 
 ## TODO:
 

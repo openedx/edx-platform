@@ -1,10 +1,24 @@
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "import" %></%def>
+<%def name="online_help_token()">
+<% 
+if library:
+    return "import_library" 
+else:
+    return "import_course"
+%>
+</%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
+  import json
 %>
-<%block name="title">${_("Course Import")}</%block>
+<%block name="title">
+%if library:
+    ${_("Library Import")}
+%else:
+    ${_("Course Import")}
+%endif
+</%block>
 <%block name="bodyclass">is-signedin course tools view-import</%block>
 
 <%block name="content">
@@ -12,7 +26,12 @@
   <header class="mast has-subtitle">
     <h1 class="page-header">
       <small class="subtitle">${_("Tools")}</small>
-      <span class="sr">&gt; </span>${_("Course Import")}
+      <span class="sr">&gt; </span>
+        %if library:
+            ${_("Library Import")}
+        %else:
+            ${_("Course Import")}
+        %endif
     </h1>
   </header>
 </div>
@@ -20,18 +39,30 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <article class="content-primary" role="main">
-
       <div class="introduction">
-          <p>${_("Be sure you want to import a course before continuing. Content of the imported course replaces all the content of this course. {em_start}You cannot undo a course import{em_end}. We recommend that you first export the current course, so you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
-          ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-          <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
-          <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        %if library:
+            <p>${_("Be sure you want to import a library before continuing. The contents of the imported library will replace the contents of the existing library. {em_start}You cannot undo a library import{em_end}. Before you proceed, we recommend that you export the current library, so that you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${_("The library that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a library.xml file. It may also contain other files.")}</p>
+            <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your library until the import operation has completed.")}</p>
+        %else:
+            <p>${_("Be sure you want to import a course before continuing. The contents of the imported course will replace the contents of the existing course. {em_start}You cannot undo a course import{em_end}. Before you proceed, we recommend that you export the current course, so that you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
+            <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
+        %endif
+
       </div>
 
       <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
 
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <h2 class="title">${_("Select a .tar.gz File to Replace Your Course Content")}</h2>
+        <h2 class="title">
+            %if library:
+                ${_("Select a .tar.gz File to Replace Your Library Content")}
+            %else:
+                ${_("Select a .tar.gz File to Replace Your Course Content")}
+            %endif
+        </h2>
 
         <p class="error-block"></p>
 
@@ -48,11 +79,23 @@
 
           <input type="file" name="course-data" class="file-input" />
 
-          <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" />
+          <input type="submit"
+          %if library:
+              value="${_('Replace my library with the selected file')}"
+          %else:
+              value="${_('Replace my course with the selected file')}"
+          %endif
+           class="submit-button" id="replace-courselike-button" />
         </div>
 
         <div class="wrapper wrapper-status is-hidden">
-          <h3 class="title">${_("Course Import Status")}</h3>
+          <h3 class="title">
+              %if library:
+                  ${_("Library Import Status")}
+              %else:
+                  ${_("Course Import Status")}
+              %endif
+          </h3>
 
           <ol class="status-progress list-progress">
             <li class="item-progresspoint item-progresspoint-upload is-complete">
@@ -72,7 +115,7 @@
 
             <li class="item-progresspoint item-progresspoint-unpack is-started">
               <span class="deco status-visual">
-                <i class="icon fa fa-cog fa-spin"></i>
+                <i class="icon fa fa-cog"></i>
                 <i class="icon fa fa-warning"></i>
               </span>
 
@@ -102,8 +145,20 @@
               </span>
 
               <div class="status-detail">
-                <h3 class="title">${_("Updating Course")}</h3>
-                <p class="copy">${_("Integrating your imported content into this course. This may take a while with larger courses.")}</p>
+                <h3 class="title">
+                    %if library:
+                        ${_("Updating Library")}
+                    %else:
+                        ${_("Updating Course")}
+                    %endif
+                </h3>
+                <p class="copy">
+                    %if Library:
+                        ${_("Integrating your imported content into this library. This process might take longer with larger libraries.")}
+                    %else:
+                        ${_("Integrating your imported content into this course. This process might take longer with larger courses.")}
+                    %endif
+                </p>
               </div>
             </li>
             <li class="item-progresspoint item-progresspoint-success has-actions is-not-started">
@@ -112,12 +167,27 @@
               </span>
 
               <div class="status-detail">
-                <h3 class="title">${_("Success")}</h3>
-                <p class="copy">${_("Your imported content has now been integrated into this course")}</p>
+                <h3 class="title">
+                  ${_("Success")}
+                  <span class="item-progresspoint-success-date"></span>
+                </h3>
+                <p class="copy">
+                    %if library:
+                        ${_("Your imported content has now been integrated into this library")}
+                    %else:
+                        ${_("Your imported content has now been integrated into this course")}
+                    %endif
+                </p>
 
                 <ul class="list-actions">
                   <li class="item-action">
-                    <a href="${successful_import_redirect_url}" class="action action-primary">${_("View Updated Outline")}</a>
+                    <a href="${successful_import_redirect_url}" id="view-updated-button" class="action action-primary">
+                        %if library:
+                            ${_("View Updated Library")}
+                        %else:
+                            ${_("View Updated Outline")}
+                        %endif
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -127,6 +197,22 @@
       </form>
     </article>
 
+  %if library:
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+          <h3 class="title-3">${_("Why import a library?")}</h3>
+          <p>${_("You might want to update an existing library to a new version, or replace an existing library entirely. You might also have developed a library outside of {studio_name}.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+      </div>
+
+      <div class="bit">
+          <h3 class="title-3">${_("Note: Library content is not automatically updated in courses")}</h3>
+          <p>${_("If you change and import a library that is referenced by randomized content blocks in one or more courses, those courses do not automatically use the updated content. You must manually refresh the randomized content blocks to bring them up to date with the latest library content.")}</p>
+      </div>
+      <div class="bit external-help">
+          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a library")}</a>
+      </div>      
+    </aside>
+  %else:
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title-3">${_("Why import a course?")}</h3>
@@ -142,13 +228,17 @@
         <h3 class="title-3">${_("Warning: Importing while a course is running")}</h3>
         <p>${_("If you perform an import while your course is running, and you change the URL names (or url_name nodes) of any Problem components, the student data associated with those Problem components may be lost. This data includes students' problem scores.")}</p>
       </div>
+      <div class="bit external-help">
+          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a course")}</a>
+      </div>      
     </aside>
+  %endif
   </section>
 </div>
 </%block>
 
 <%block name="requirejs">
   require(["js/factories/import"], function(ImportFactory) {
-      ImportFactory("${import_status_url}");
+      ImportFactory("${import_status_url}", ${json.dumps(library)});
   });
 </%block>

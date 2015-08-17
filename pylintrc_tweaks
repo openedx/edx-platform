@@ -1,0 +1,3 @@
+# pylintrc tweaks for use with edx_lint.
+[MASTER]
+ignore+ = ,migrations

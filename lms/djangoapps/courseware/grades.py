@@ -15,17 +15,18 @@ import dogstats_wrapper as dog_stats_api
 from courseware import courses
 from courseware.model_data import FieldDataCache
 from student.models import anonymous_id_for_user
+from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule import graders
 from xmodule.graders import Score
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.duedate import get_extended_due_date
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
-from .module_utils import yield_dynamic_descriptor_descendents
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 
 log = logging.getLogger("edx.courseware")
 
@@ -89,8 +90,9 @@ def answer_distributions(course_key):
             raw_answers = state_dict.get("student_answers", {})
         except ValueError:
             log.error(
-                "Answer Distribution: Could not parse module state for " +
-                "StudentModule id={}, course={}".format(module.id, course_key)
+                u"Answer Distribution: Could not parse module state for StudentModule id=%s, course=%s",
+                module.id,
+                course_key,
             )
             continue
 
@@ -125,9 +127,22 @@ def grade(student, request, course, keep_raw_scores=False):
     """
     Wraps "_grade" with the manual_transaction context manager just in case
     there are unanticipated errors.
+    Send a signal to update the minimum grade requirement status.
     """
     with manual_transaction():
-        return _grade(student, request, course, keep_raw_scores)
+        grade_summary = _grade(student, request, course, keep_raw_scores)
+        responses = GRADES_UPDATED.send_robust(
+            sender=None,
+            username=request.user.username,
+            grade_summary=grade_summary,
+            course_key=course.id,
+            deadline=course.end
+        )
+
+        for receiver, response in responses:
+            log.info('Signal fired when student grade is calculated. Receiver: %s. Response: %s', receiver, response)
+
+        return grade_summary
 
 
 def _grade(student, request, course, keep_raw_scores):
@@ -206,9 +221,13 @@ def _grade(student, request, course, keep_raw_scores):
                     # would be simpler
                     with manual_transaction():
                         field_data_cache = FieldDataCache([descriptor], course.id, student)
-                    return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
+                    return get_module_for_descriptor(
+                        student, request, descriptor, field_data_cache, course.id, course=course
+                    )
 
-                for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
+                for module_descriptor in yield_dynamic_descriptor_descendants(
+                        section_descriptor, student.id, create_module
+                ):
 
                     (correct, total) = get_score(
                         course.id, student, module_descriptor, create_module, scores_cache=submissions_scores
@@ -224,16 +243,24 @@ def _grade(student, request, course, keep_raw_scores):
 
                     graded = module_descriptor.graded
                     if not total > 0:
-                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                        # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    scores.append(
+                        Score(
+                            correct,
+                            total,
+                            graded,
+                            module_descriptor.display_name_with_default,
+                            module_descriptor.location
+                        )
+                    )
 
                 _, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
                     raw_scores += scores
             else:
-                graded_total = Score(0.0, 1.0, True, section_name)
+                graded_total = Score(0.0, 1.0, True, section_name, None)
 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
@@ -246,6 +273,8 @@ def _grade(student, request, course, keep_raw_scores):
 
         totaled_scores[section_format] = format_scores
 
+    # Grading policy might be overriden by a CCX, need to reset it
+    course.set_grading_policy(course.grading_policy)
     grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
 
     # We round the grade here, to make sure that the grade is an whole percentage and
@@ -324,10 +353,14 @@ def _progress_summary(student, request, course):
         )
         # TODO: We need the request to pass into here. If we could
         # forego that, our arguments would be simpler
-        course_module = get_module_for_descriptor(student, request, course, field_data_cache, course.id)
+        course_module = get_module_for_descriptor(
+            student, request, course, field_data_cache, course.id, course=course
+        )
         if not course_module:
             # This student must not have access to the course.
             return None
+
+        course_module = getattr(course_module, '_x_module', course_module)
 
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
 
@@ -351,7 +384,9 @@ def _progress_summary(student, request, course):
 
                 module_creator = section_module.xmodule_runtime.get_module
 
-                for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
+                for module_descriptor in yield_dynamic_descriptor_descendants(
+                        section_module, student.id, module_creator
+                ):
                     course_id = course.id
                     (correct, total) = get_score(
                         course_id, student, module_descriptor, module_creator, scores_cache=submissions_scores
@@ -359,7 +394,15 @@ def _progress_summary(student, request, course):
                     if correct is None and total is None:
                         continue
 
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    scores.append(
+                        Score(
+                            correct,
+                            total,
+                            graded,
+                            module_descriptor.display_name_with_default,
+                            module_descriptor.location
+                        )
+                    )
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(
@@ -372,7 +415,7 @@ def _progress_summary(student, request, course):
                     'scores': scores,
                     'section_total': section_total,
                     'format': module_format,
-                    'due': get_extended_due_date(section_module),
+                    'due': section_module.due,
                     'graded': graded,
                 })
 
@@ -479,7 +522,7 @@ def manual_transaction():
         transaction.commit()
 
 
-def iterate_grades_for(course_id, students):
+def iterate_grades_for(course_or_id, students, keep_raw_scores=False):
     """Given a course_id and an iterable of students (User), yield a tuple of:
 
     (student, gradeset, err_msg) for every student enrolled in the course.
@@ -497,7 +540,10 @@ def iterate_grades_for(course_id, students):
         make up the final grade. (For display)
     - raw_scores: contains scores for every graded module
     """
-    course = courses.get_course_by_id(course_id)
+    if isinstance(course_or_id, (basestring, CourseKey)):
+        course = courses.get_course_by_id(course_or_id)
+    else:
+        course = course_or_id
 
     # We make a fake request because grading code expects to be able to look at
     # the request. We have to attach the correct user to the request before
@@ -505,7 +551,7 @@ def iterate_grades_for(course_id, students):
     request = RequestFactory().get('/')
 
     for student in students:
-        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course_id)]):
+        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course.id)]):
             try:
                 request.user = student
                 # Grading calls problem rendering, which calls masquerading,
@@ -513,7 +559,7 @@ def iterate_grades_for(course_id, students):
                 # It's not pretty, but untangling that is currently beyond the
                 # scope of this feature.
                 request.session = {}
-                gradeset = grade(student, request, course)
+                gradeset = grade(student, request, course, keep_raw_scores)
                 yield student, gradeset, ""
             except Exception as exc:  # pylint: disable=broad-except
                 # Keep marching on even if this student couldn't be graded for
@@ -522,7 +568,7 @@ def iterate_grades_for(course_id, students):
                     'Cannot grade student %s (%s) in course %s because of exception: %s',
                     student.username,
                     student.id,
-                    course_id,
+                    course.id,
                     exc.message
                 )
                 yield student, {}, exc.message

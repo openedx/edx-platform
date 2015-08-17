@@ -3,45 +3,57 @@
 Tests courseware views.py
 """
 import cgi
-from datetime import datetime
-from pytz import UTC
-import unittest
 import ddt
+import json
+import unittest
+from datetime import datetime
+from nose.plugins.attrib import attr
 
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edxmako.middleware import MakoMiddleware
-from edxmako.tests import mako_middleware_process_request
-from mock import MagicMock, patch, create_autospec
+from mock import MagicMock, patch, create_autospec, Mock
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from pytz import UTC
+from xblock.core import XBlock
+from xblock.fields import String, Scope
+from xblock.fragment import Fragment
 
 import courseware.views as views
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
-)
-from course_modes.models import CourseMode
 import shoppingcart
+from certificates import api as certs_api
+from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
+from certificates.tests.factories import GeneratedCertificateFactory
+from course_modes.models import CourseMode
+from courseware.testutils import RenderXBlockTestMixin
+from courseware.tests.factories import StudentModuleFactory
+from edxmako.middleware import MakoMiddleware
+from edxmako.tests import mako_middleware_process_request
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
-class TestJumpTo(TestCase):
+@attr('shard_1')
+class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
+        super(TestJumpTo, self).setUp()
         # Use toy course from XML
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
@@ -68,6 +80,85 @@ class TestJumpTo(TestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+    def test_jumpto_from_section(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(section.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_from_module(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical1 = ItemFactory.create(category='vertical', parent_location=section.location)
+        vertical2 = ItemFactory.create(category='vertical', parent_location=section.location)
+        module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
+        module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
+
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(module1.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(module2.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_from_nested_module(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+        nested_section = ItemFactory.create(category='sequential', parent_location=vertical.location)
+        nested_vertical1 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
+        # put a module into nested_vertical1 for completeness
+        ItemFactory.create(category='html', parent_location=nested_vertical1.location)
+        nested_vertical2 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
+        module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
+
+        # internal position of module2 will be 1_2 (2nd item withing 1st item)
+
+        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1'.format(
+            course_id=unicode(course.id),
+            chapter_id=chapter.url_name,
+            section_id=section.url_name,
+        )
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
+            '/courses',
+            unicode(course.id),
+            unicode(module2.location),
+        )
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
     def test_jumpto_id_invalid_location(self):
         location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
@@ -75,13 +166,14 @@ class TestJumpTo(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@attr('shard_1')
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class ViewsTestCase(TestCase):
+class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
     """
     def setUp(self):
+        super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
@@ -172,7 +264,6 @@ class ViewsTestCase(TestCase):
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skip
     def test_unicode_handling_in_url(self):
         url_parts = [
             '/courses',
@@ -198,6 +289,24 @@ class ViewsTestCase(TestCase):
         mock_course = MagicMock()
         mock_course.id = self.course_key
         self.assertTrue(views.registered_for_course(mock_course, self.user))
+
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
+    def test_get_cosmetic_display_price(self):
+        """
+        Check that get_cosmetic_display_price() returns the correct price given its inputs.
+        """
+        registration_price = 99
+        self.course.cosmetic_display_price = 10
+        # Since registration_price is set, it overrides the cosmetic_display_price and should be returned
+        self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "$99")
+
+        registration_price = 0
+        # Since registration_price is not set, cosmetic_display_price should be returned
+        self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "$10")
+
+        self.course.cosmetic_display_price = 0
+        # Since both prices are not set, there is no price, thus "Free"
+        self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "Free")
 
     def test_jump_to_invalid(self):
         # TODO add a test for invalid location
@@ -351,13 +460,17 @@ class ViewsTestCase(TestCase):
         # in the label escaped as expected.
         self._email_opt_in_checkbox(response, cgi.escape(self.org_html))
 
-    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    @patch.dict(settings.FEATURES, {
+        'IS_EDX_DOMAIN': True,
+        'ENABLE_MKTG_EMAIL_OPT_IN': True
+    })
     def test_mktg_about_language_edx_domain(self):
         # Since we're in an edx-controlled domain, and our marketing site
         # supports only English, override the language setting
         # and use English.
-        response = self._load_mktg_about(language='eo')
+        response = self._load_mktg_about(language='eo', org=self.org_html)
         self.assertContains(response, "Enroll in")
+        self.assertContains(response, "and learn about its other programs")
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': False})
     def test_mktg_about_language_openedx(self):
@@ -446,8 +559,9 @@ class ViewsTestCase(TestCase):
             self.assertNotContains(response, checkbox_html, html=True)
 
 
+@attr('shard_1')
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE, TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
+@override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
@@ -472,9 +586,11 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
+        CourseEnrollmentFactory(user=self.user, course_id=course.id)
         return course
 
     def setUp(self):
+        super(BaseDueDateTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -562,7 +678,7 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -570,6 +686,7 @@ class StartDateTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(StartDateTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -617,13 +734,15 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertIn("2015-JULY-17", text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
+@ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
     Tests that verify that the progress page works correctly.
     """
 
     def setUp(self):
+        super(ProgressPageTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -636,6 +755,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
         self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
@@ -647,17 +767,150 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
-    def test_non_asci_grade_cutoffs(self):
-        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_student_progress_with_valid_and_invalid_id(self, default_store):
+        """
+         Check that invalid 'student_id' raises Http404 for both old mongo and
+         split mongo courses.
+        """
+
+        # Create new course with respect to 'default_store'
+        self.course = CourseFactory.create(default_store=default_store)
+
+        # Invalid Student Ids (Integer and Non-int)
+        invalid_student_ids = [
+            991021,
+            'azU3N_8$',
+        ]
+        for invalid_id in invalid_student_ids:
+
+            self.assertRaises(
+                Http404, views.progress,
+                self.request,
+                course_id=unicode(self.course.id),
+                student_id=invalid_id
+            )
+
+        # Enroll student into course
+        CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string(), student_id=self.user.id)
+        # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
 
+    def test_non_asci_grade_cutoffs(self):
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
 
+        self.assertEqual(resp.status_code, 200)
+
+    def test_generate_cert_config(self):
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, 'Request Certificate')
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, 'Request Certificate')
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, 'Request Certificate')
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                                         'grade_breakdown': []}))
+    def test_view_certificate_link(self):
+        """
+        If certificate web view is enabled then certificate web view button should appear for user who certificate is
+        available/generated
+        """
+        certificate = GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            download_url="http://www.example.com/certificate.pdf",
+            mode='honor'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+
+        #course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Name 1',
+                'description': 'Description 1',
+                'course_title': 'course_title_1',
+                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-1.png',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, u"View Certificate")
+
+        self.assertContains(resp, u"You can now access your certificate")
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course.id,
+            verify_uuid=certificate.verify_uuid
+        )
+        self.assertContains(resp, cert_url)
+
+        # when course certificate is not active
+        certificates[0]['is_active'] = False
+        self.store.update_item(self.course, self.user.id)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, u"View Your Certificate")
+        self.assertNotContains(resp, u"You can now view your certificate")
+        self.assertContains(resp, u"We're creating your certificate.")
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                                         'grade_breakdown': []}))
+    def test_view_certificate_link_hidden(self):
+        """
+        If certificate web view is disabled then certificate web view button should not appear for user who certificate
+        is available/generated
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            download_url="http://www.example.com/certificate.pdf",
+            mode='honor'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, u"Download Your Certificate")
+
+
+@attr('shard_1')
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
     Tests for the ensure_valid_course_key decorator.
     """
 
     def setUp(self):
+        super(VerifyCourseKeyDecoratorTests, self).setUp()
+
         self.request = RequestFactory().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"
@@ -673,3 +926,253 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         view_function = ensure_valid_course_key(mocked_view)
         self.assertRaises(Http404, view_function, self.request, course_id=self.invalid_course_id)
         self.assertFalse(mocked_view.called)
+
+
+@attr('shard_1')
+class IsCoursePassedTests(ModuleStoreTestCase):
+    """
+    Tests for the is_course_passed helper function
+    """
+
+    SUCCESS_CUTOFF = 0.5
+
+    def setUp(self):
+        super(IsCoursePassedTests, self).setUp()
+
+        self.student = UserFactory()
+        self.course = CourseFactory.create(
+            org='edx',
+            number='verified',
+            display_name='Verified Course',
+            grade_cutoffs={'cutoff': 0.75, 'Pass': self.SUCCESS_CUTOFF}
+        )
+        self.request = RequestFactory()
+        self.request.user = self.student
+
+    def test_user_fails_if_not_clear_exam(self):
+        # If user has not grade then false will return
+        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+
+    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.9}))
+    def test_user_pass_if_percent_appears_above_passing_point(self):
+        # Mocking the grades.grade
+        # If user has above passing marks then True will return
+        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
+
+    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.2}))
+    def test_user_fail_if_percent_appears_below_passing_point(self):
+        # Mocking the grades.grade
+        # If user has below passing marks then False will return
+        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+
+    @patch('courseware.grades.grade', Mock(return_value={'percent': SUCCESS_CUTOFF}))
+    def test_user_with_passing_marks_and_achieved_marks_equal(self):
+        # Mocking the grades.grade
+        # If user's achieved passing marks are equal to the required passing
+        # marks then it will return True
+        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
+
+
+@attr('shard_1')
+class GenerateUserCertTests(ModuleStoreTestCase):
+    """
+    Tests for the view function Generated User Certs
+    """
+
+    def setUp(self):
+        super(GenerateUserCertTests, self).setUp()
+
+        self.student = UserFactory(username='dummy', password='123456', email='test@mit.edu')
+        self.course = CourseFactory.create(
+            org='edx',
+            number='verified',
+            display_name='Verified Course',
+            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
+        )
+        self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
+        self.request = RequestFactory()
+        self.client.login(username=self.student, password='123456')
+        self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
+
+    def test_user_with_out_passing_grades(self):
+        # If user has no grading then json will return failed message and badrequest code
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Your certificate will be available when you pass the course.", resp.content)
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    def test_user_with_passing_grade(self):
+        # If user has above passing grading then json will return cert generating message and
+        # status valid code
+        # mocking xqueue and analytics
+
+        analytics_patcher = patch('courseware.views.analytics')
+        mock_tracker = analytics_patcher.start()
+        self.addCleanup(analytics_patcher.stop)
+
+        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+            mock_send_to_queue.return_value = (0, "Successfully queued")
+            resp = self.client.post(self.url)
+            self.assertEqual(resp.status_code, 200)
+
+            #Verify Google Analytics event fired after generating certificate
+            mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
+                self.student.id,  # pylint: disable=no-member
+                'edx.bi.user.certificate.generate',
+                {
+                    'category': 'certificates',
+                    'label': unicode(self.course.id)
+                },
+
+                context={
+                    'Google Analytics':
+                    {'clientId': None}
+                }
+            )
+            mock_tracker.reset_mock()
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    def test_user_with_passing_existing_generating_cert(self):
+        # If user has passing grade but also has existing generating cert
+        # then json will return cert generating message with bad request code
+        GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=CertificateStatuses.generating,
+            mode='verified'
+        )
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Certificate is being created.", resp.content)
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    def test_user_with_passing_existing_downloadable_cert(self):
+        # If user has already downloadable certificate
+        # then json will return cert generating message with bad request code
+
+        GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Certificate has already been created.", resp.content)
+
+    def test_user_with_non_existing_course(self):
+        # If try to access a course with valid key pattern then it will return
+        # bad request code with course is not valid message
+        resp = self.client.post('/courses/def/abc/in_valid/generate_user_cert')
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Course is not valid", resp.content)
+
+    def test_user_with_invalid_course_id(self):
+        # If try to access a course with invalid key pattern then 404 will return
+        resp = self.client.post('/courses/def/generate_user_cert')
+        self.assertEqual(resp.status_code, 404)
+
+    def test_user_without_login_return_error(self):
+        # If user try to access without login should see a bad request status code with message
+        self.client.logout()
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("You must be signed in to {platform_name} to create a certificate.".format(
+            platform_name=settings.PLATFORM_NAME
+        ), resp.content)
+
+
+class ViewCheckerBlock(XBlock):
+    """
+    XBlock for testing user state in views.
+    """
+    has_children = True
+    state = String(scope=Scope.user_state)
+
+    def student_view(self, context):  # pylint: disable=unused-argument
+        """
+        A student_view that asserts that the ``state`` field for this block
+        matches the block's usage_id.
+        """
+        msg = "{} != {}".format(self.state, self.scope_ids.usage_id)
+        assert self.state == unicode(self.scope_ids.usage_id), msg
+        fragments = self.runtime.render_children(self)
+        result = Fragment(
+            content=u"<p>ViewCheckerPassed: {}</p>\n{}".format(
+                unicode(self.scope_ids.usage_id),
+                "\n".join(fragment.content for fragment in fragments),
+            )
+        )
+        return result
+
+
+@attr('shard_1')
+@ddt.ddt
+class TestIndexView(ModuleStoreTestCase):
+    """
+    Tests of the courseware.index view.
+    """
+
+    @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_student_state(self, default_store):
+        """
+        Verify that saved student state is loaded for xblocks rendered in the index view.
+        """
+        user = UserFactory()
+
+        with modulestore().default_store(default_store):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            section = ItemFactory.create(parent=chapter, category='view_checker', display_name="Sequence Checker")
+            vertical = ItemFactory.create(parent=section, category='view_checker', display_name="Vertical Checker")
+            block = ItemFactory.create(parent=vertical, category='view_checker', display_name="Block Checker")
+
+        for item in (section, vertical, block):
+            StudentModuleFactory.create(
+                student=user,
+                course_id=course.id,
+                module_state_key=item.scope_ids.usage_id,
+                state=json.dumps({'state': unicode(item.scope_ids.usage_id)})
+            )
+
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+
+        request = RequestFactory().get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': chapter.url_name,
+                    'section': section.url_name,
+                }
+            )
+        )
+        request.user = user
+        mako_middleware_process_request(request)
+
+        # Trigger the assertions embedded in the ViewCheckerBlocks
+        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+
+
+class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
+    """
+    Tests for the courseware.render_xblock endpoint.
+    This class overrides the get_response method, which is used by
+    the tests defined in RenderXBlockTestMixin.
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_RENDER_XBLOCK_API': True})
+    def setUp(self):
+        reload_django_url_config()
+        super(TestRenderXBlock, self).setUp()
+
+    def get_response(self):
+        """
+        Overridable method to get the response from the endpoint that is being tested.
+        """
+        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        return self.client.get(url)

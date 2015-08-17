@@ -17,10 +17,11 @@ from django.utils.translation import ugettext as _
     </header>
 
     <article class="content-primary" role="main">
-      <form id="login_form" method="post" action="login_post">
+      <form id="login_form" method="post" action="login_post" onsubmit="return false;">
 
         <fieldset>
           <legend class="sr">${_("Required Information to Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf }" />
 
           <ol class="list-input">
             <li class="field text required" id="field-email">

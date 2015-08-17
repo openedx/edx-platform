@@ -5,7 +5,6 @@ from lettuce import world, step
 from common import *
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import InvalidElementStateException
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_course_url
 from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
 
@@ -31,6 +30,14 @@ def delete_grade(step):
     #world.css_find(range_css)[1].mouseover()
     #world.css_click(grade_css)
     world.browser.execute_script('document.getElementsByClassName("remove-button")[0].click()')
+
+
+@step(u'Grade list has "([^"]*)" grades$')
+def check_grade_values(step, grade_list):  # pylint: disable=unused-argument
+    visible_list = ''.join(
+        [grade.text for grade in world.css_find('.letter-grade')]
+    )
+    assert_equal(visible_list, grade_list, 'Grade lists should be equal')
 
 
 @step(u'I see I now have "([^"]*)" grades$')

@@ -6,12 +6,14 @@ import mock
 import unittest
 from ddt import ddt, data, unpack
 
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from contentstore.models import PushNotificationConfig
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.test_course_settings import CourseTestCase
@@ -88,6 +90,8 @@ class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
     def setUp(self):
+        super(AuthTestCase, self).setUp(create_user=False)
+
         self.email = 'a@b.com'
         self.pw = 'xyz'
         self.username = 'testuser'
@@ -317,6 +321,10 @@ class ForumTestCase(CourseTestCase):
         self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times2]
         self.assertFalse(self.course.forum_posts_allowed)
 
+        # test if user gives empty blackout date it should return true for forum_posts_allowed
+        self.course.discussion_blackouts = [[]]
+        self.assertTrue(self.course.forum_posts_allowed)
+
 
 @ddt
 class CourseKeyVerificationTestCase(CourseTestCase):
@@ -343,3 +351,15 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         )
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, status_code)
+
+
+class PushNotificationConfigTestCase(TestCase):
+    """
+    Tests PushNotificationConfig.
+    """
+    def test_notifications_defaults(self):
+        self.assertFalse(PushNotificationConfig.is_enabled())
+
+    def test_notifications_enabled(self):
+        PushNotificationConfig(enabled=True).save()
+        self.assertTrue(PushNotificationConfig.is_enabled())

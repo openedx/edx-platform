@@ -9,12 +9,12 @@ from abc import ABCMeta
 from courseware.models import StudentModule
 from django.conf import settings
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
+from nose.plugins.attrib import attr
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.enrollment import (
@@ -33,9 +33,11 @@ from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
+@attr('shard_1')
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
+        super(TestSettableEnrollmentState, self).setUp()
         self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def test_mes_create(self):
@@ -66,6 +68,7 @@ class TestEnrollmentChangeBase(TestCase):
     __metaclass__ = ABCMeta
 
     def setUp(self):
+        super(TestEnrollmentChangeBase, self).setUp()
         self.course_key = SlashSeparatedCourseKey('Robot', 'fAKE', 'C-%-se-%-ID')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
@@ -94,6 +97,7 @@ class TestEnrollmentChangeBase(TestCase):
         self.assertEqual(after, after_ideal)
 
 
+@attr('shard_1')
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     def test_enroll(self):
@@ -211,6 +215,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
+@attr('shard_1')
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
     def test_unenroll(self):
@@ -290,31 +295,103 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class TestInstructorEnrollmentStudentModule(TestCase):
+@attr('shard_1')
+class TestInstructorEnrollmentStudentModule(ModuleStoreTestCase):
     """ Test student module manipulations. """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey('fake', 'course', 'id')
+        super(TestInstructorEnrollmentStudentModule, self).setUp()
+        store = modulestore()
+        self.user = UserFactory()
+        self.course = CourseFactory(
+            name='fake',
+            org='course',
+            run='id',
+        )
+        # pylint: disable=no-member
+        self.course_key = self.course.location.course_key
+        self.parent = ItemFactory(
+            category="library_content",
+            # pylint: disable=no-member
+            user_id=self.user.id,
+            parent=self.course,
+            publish_item=True,
+            modulestore=store,
+        )
+        self.child = ItemFactory(
+            category="html",
+            # pylint: disable=no-member
+            user_id=self.user.id,
+            parent=self.parent,
+            publish_item=True,
+            modulestore=store,
+        )
+        self.unrelated = ItemFactory(
+            category="html",
+            # pylint: disable=no-member
+            user_id=self.user.id,
+            parent=self.course,
+            publish_item=True,
+            modulestore=store,
+        )
+        parent_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
+        child_state = json.dumps({'attempts': 10, 'whatever': 'things'})
+        unrelated_state = json.dumps({'attempts': 12, 'brains': 'zombie'})
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.parent.location,
+            state=parent_state,
+        )
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.child.location,
+            state=child_state,
+        )
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.unrelated.location,
+            state=unrelated_state,
+        )
 
     def test_reset_student_attempts(self):
-        user = UserFactory()
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
-        StudentModule.objects.create(student=user, course_id=self.course_key, module_state_key=msk, state=original_state)
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=msk,
+            state=original_state
+        )
         # lambda to reload the module state from the database
-        module = lambda: StudentModule.objects.get(student=user, course_id=self.course_key, module_state_key=msk)
+        module = lambda: StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
         self.assertEqual(json.loads(module().state)['attempts'], 32)
-        reset_student_attempts(self.course_key, user, msk)
+        reset_student_attempts(self.course_key, self.user, msk)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
     def test_delete_student_attempts(self):
-        user = UserFactory()
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
-        StudentModule.objects.create(student=user, course_id=self.course_key, module_state_key=msk, state=original_state)
-        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_state_key=msk).count(), 1)
-        reset_student_attempts(self.course_key, user, msk, delete_module=True)
-        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_key, module_state_key=msk).count(), 0)
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=msk,
+            state=original_state
+        )
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.user,
+                course_id=self.course_key,
+                module_state_key=msk
+            ).count(), 1)
+        reset_student_attempts(self.course_key, self.user, msk, delete_module=True)
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.user,
+                course_id=self.course_key,
+                module_state_key=msk
+            ).count(), 0)
 
     def test_delete_submission_scores(self):
         user = UserFactory()
@@ -347,6 +424,61 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)
         self.assertIs(score, None)
+
+    def get_state(self, location):
+        """Reload and grab the module state from the database"""
+        return StudentModule.objects.get(
+            student=self.user, course_id=self.course_key, module_state_key=location
+        ).state
+
+    def test_reset_student_attempts_children(self):
+        parent_state = json.loads(self.get_state(self.parent.location))
+        self.assertEqual(parent_state['attempts'], 32)
+        self.assertEqual(parent_state['otherstuff'], 'alsorobots')
+
+        child_state = json.loads(self.get_state(self.child.location))
+        self.assertEqual(child_state['attempts'], 10)
+        self.assertEqual(child_state['whatever'], 'things')
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
+
+        reset_student_attempts(self.course_key, self.user, self.parent.location)
+
+        parent_state = json.loads(self.get_state(self.parent.location))
+        self.assertEqual(json.loads(self.get_state(self.parent.location))['attempts'], 0)
+        self.assertEqual(parent_state['otherstuff'], 'alsorobots')
+
+        child_state = json.loads(self.get_state(self.child.location))
+        self.assertEqual(child_state['attempts'], 0)
+        self.assertEqual(child_state['whatever'], 'things')
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
+
+    def test_delete_submission_scores_attempts_children(self):
+        parent_state = json.loads(self.get_state(self.parent.location))
+        self.assertEqual(parent_state['attempts'], 32)
+        self.assertEqual(parent_state['otherstuff'], 'alsorobots')
+
+        child_state = json.loads(self.get_state(self.child.location))
+        self.assertEqual(child_state['attempts'], 10)
+        self.assertEqual(child_state['whatever'], 'things')
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
+
+        reset_student_attempts(self.course_key, self.user, self.parent.location, delete_module=True)
+
+        self.assertRaises(StudentModule.DoesNotExist, self.get_state, self.parent.location)
+        self.assertRaises(StudentModule.DoesNotExist, self.get_state, self.child.location)
+
+        unrelated_state = json.loads(self.get_state(self.unrelated.location))
+        self.assertEqual(unrelated_state['attempts'], 12)
+        self.assertEqual(unrelated_state['brains'], 'zombie')
 
 
 class EnrollmentObjects(object):
@@ -419,12 +551,14 @@ class SettableEnrollmentState(EmailEnrollmentState):
             return EnrollmentObjects(email, None, None, None)
 
 
+@attr('shard_1')
 class TestSendBetaRoleEmail(TestCase):
     """
     Test edge cases for `send_beta_role_email`
     """
 
     def setUp(self):
+        super(TestSendBetaRoleEmail, self).setUp()
         self.user = UserFactory.create()
         self.email_params = {'course': 'Robot Super Course'}
 
@@ -435,13 +569,15 @@ class TestSendBetaRoleEmail(TestCase):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestGetEmailParams(ModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
     production-like conditions.
     """
     def setUp(self):
+        super(TestGetEmailParams, self).setUp()
+
         self.course = CourseFactory.create()
 
         # Explicitly construct what we expect the course URLs to be
@@ -478,12 +614,14 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-class TestRenderMessageToString(TestCase):
+@attr('shard_1')
+class TestRenderMessageToString(ModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.
     """
 
     def setUp(self):
+        super(TestRenderMessageToString, self).setUp()
         self.subject_template = 'emails/enroll_email_allowedsubject.txt'
         self.message_template = 'emails/enroll_email_allowedmessage.txt'
         self.course = CourseFactory.create()

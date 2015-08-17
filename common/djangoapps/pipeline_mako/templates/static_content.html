@@ -27,6 +27,7 @@ except:
     % endfor
   %endif
 </%def>
+
 <%def name='js(group)'>
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
     ${compressed_js(group)}
@@ -36,6 +37,15 @@ except:
     % endfor
   %endif
 </%def>
+
+## A language-direction indicator, suitable for use in class="" attributes,
+## for example:
+##
+##      <body class="${dir_rtl()}">
+##
+<%def name="dir_rtl()"><%
+    return 'rtl' if get_language_bidi() else 'ltr'
+%></%def>
 
 <%def name="include(path)"><%
 from django.template.loaders.filesystem import _loader

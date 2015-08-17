@@ -1,11 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%inherit file="../main.html" />
-
 <%namespace name='static' file='../static_content.html'/>
-
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils import html %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.utils import html
+%>
 
 <%block name="pagetitle">${_("User Survey")}</%block>
 
@@ -31,7 +30,7 @@
         </div>
 
         <p class="instructions">
-          ${_("You can begin your course as soon as you complete the following form. Required fields are marked with an asterisk (*).")}
+          ${_("You can begin your course as soon as you complete the following form. Required fields are marked with an asterisk (*). This information is for the use of {platform_name} only. It will not be linked to your public profile in any way.").format(platform_name=platform_name)}
         </p>
       % endif
 

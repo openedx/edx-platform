@@ -70,6 +70,7 @@ class RoundTripTestCase(unittest.TestCase):
     """
 
     def setUp(self):
+        super(RoundTripTestCase, self).setUp()
         self.maxDiff = None
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
@@ -103,7 +104,7 @@ class RoundTripTestCase(unittest.TestCase):
         shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print("Starting import")
-        initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
+        initial_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
@@ -121,7 +122,7 @@ class RoundTripTestCase(unittest.TestCase):
             lxml.etree.ElementTree(root).write(course_xml)
 
         print("Starting second import")
-        second_import = XMLModuleStore(root_dir, course_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
+        second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)
@@ -158,6 +159,8 @@ class TestEdxJsonEncoder(unittest.TestCase):
     Tests for xml_exporter.EdxJSONEncoder
     """
     def setUp(self):
+        super(TestEdxJsonEncoder, self).setUp()
+
         self.encoder = EdxJSONEncoder()
 
         class OffsetTZ(tzinfo):
@@ -220,9 +223,11 @@ class ConvertExportFormat(unittest.TestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ConvertExportFormat, self).setUp()
 
         # Directory for expanding all the test archives
         self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
 
         # Directory where new archive will be created
         self.result_dir = path(self.temp_dir) / uuid.uuid4().hex
@@ -279,10 +284,6 @@ class ConvertExportFormat(unittest.TestCase):
         if self._no_version is None:
             self._no_version = self._expand_archive('NoVersionNumber.tar.gz')
         return self._no_version
-
-    def tearDown(self):
-        """ Common cleanup. """
-        shutil.rmtree(self.temp_dir)
 
     def _expand_archive(self, name):
         """ Expand archive into a directory and return the directory. """

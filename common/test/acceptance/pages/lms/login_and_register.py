@@ -42,6 +42,7 @@ class RegisterPage(PageObject):
         Fill in registration info.
         `email`, `password`, `username`, and `full_name` are the user's credentials.
         """
+        self.wait_for_element_visibility('input#email', 'Email field is shown')
         self.q(css='input#email').fill(email)
         self.q(css='input#password').fill(password)
         self.q(css='input#username').fill(username)
@@ -62,6 +63,30 @@ class RegisterPage(PageObject):
         return dashboard
 
 
+class ResetPasswordPage(PageObject):
+    """Initialize the page.
+
+        Arguments:
+            browser (Browser): The browser instance.
+    """
+    url = BASE_URL + "/login#forgot-password-modal"
+
+    def __init__(self, browser):
+        super(ResetPasswordPage, self).__init__(browser)
+
+    def is_browser_on_page(self):
+        return (
+            self.q(css="#login-anchor").is_present() and
+            self.q(css="#password-reset-anchor").is_present()
+        )
+
+    def is_form_visible(self):
+        return (
+            not self.q(css="#login-anchor").visible and
+            self.q(css="#password-reset-form").visible
+        )
+
+
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.
 
@@ -70,7 +95,9 @@ class CombinedLoginAndRegisterPage(PageObject):
     in the bok choy settings.
 
     When enabled, the new page is available from either
-    `/account/login` or `/account/register`.
+    `/login` or `/register`; the new page is also served at
+    `/account/login/` or `/account/register/`, where it was
+    available for a time during an A/B test.
 
     Users can reach this page while attempting to enroll
     in a course, in which case users will be auto-enrolled
@@ -159,10 +186,15 @@ class CombinedLoginAndRegisterPage(PageObject):
 
         """
         # Fill in the form
-        self.q(css="#register-email").fill(email)
-        self.q(css="#register-name").fill(full_name)
-        self.q(css="#register-username").fill(username)
-        self.q(css="#register-password").fill(password)
+        self.wait_for_element_visibility('#register-email', 'Email field is shown')
+        if email:
+            self.q(css="#register-email").fill(email)
+        if full_name:
+            self.q(css="#register-name").fill(full_name)
+        if username:
+            self.q(css="#register-username").fill(username)
+        if password:
+            self.q(css="#register-password").fill(password)
         if country:
             self.q(css="#register-country option[value='{country}']".format(country=country)).click()
         if (terms_of_service):
@@ -185,11 +217,22 @@ class CombinedLoginAndRegisterPage(PageObject):
 
         """
         # Fill in the form
+        self.wait_for_element_visibility('#login-email', 'Email field is shown')
         self.q(css="#login-email").fill(email)
         self.q(css="#login-password").fill(password)
 
         # Submit it
         self.q(css=".login-button").click()
+
+    def click_third_party_dummy_provider(self):
+        """Clicks on the Dummy third party provider login button.
+
+        Requires that the "login" form is visible.
+        This does NOT wait for the ensuing page[s] to load.
+        Only the "Dummy" provider is used for bok choy because it is the only
+        one that doesn't send traffic to external servers.
+        """
+        self.q(css="button.{}-oa2-dummy".format(self.current_form)).click()
 
     def password_reset(self, email):
         """Navigates to, fills in, and submits the password reset form.
@@ -212,6 +255,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         ).fulfill()
 
         # Fill in the form
+        self.wait_for_element_visibility('#password-reset-email', 'Email field is shown')
         self.q(css="#password-reset-email").fill(email)
 
         # Submit it
@@ -237,6 +281,23 @@ class CombinedLoginAndRegisterPage(PageObject):
             return "login"
         elif self.q(css=".js-reset").visible:
             return "password-reset"
+        elif self.q(css=".proceed-button").visible:
+            return "hinted-login"
+
+    @property
+    def email_value(self):
+        """ Current value of the email form field """
+        return self.q(css="#register-email").attrs('value')[0]
+
+    @property
+    def full_name_value(self):
+        """ Current value of the full_name form field """
+        return self.q(css="#register-name").attrs('value')[0]
+
+    @property
+    def username_value(self):
+        """ Current value of the username form field """
+        return self.q(css="#register-username").attrs('value')[0]
 
     @property
     def errors(self):
@@ -264,3 +325,21 @@ class CombinedLoginAndRegisterPage(PageObject):
             success = self.success
             return (bool(success), success)
         return Promise(_check_func, "Success message is visible").fulfill()
+
+    @unguarded  # Because we go from this page -> temporary page -> this page again when testing the Dummy provider
+    def wait_for_auth_status_message(self):
+        """Wait for a status message to be visible following third_party registration, then return it."""
+        def _check_func():
+            """Return third party auth status notice message."""
+            for selector in ['.already-authenticated-msg p', '.status p']:
+                msg_element = self.q(css=selector)
+                if msg_element.visible:
+                    return (True, msg_element.text[0])
+            return (False, None)
+        return Promise(_check_func, "Result of third party auth is visible").fulfill()
+
+    @property
+    def hinted_login_prompt(self):
+        """Get the message displayed to the user on the hinted-login form"""
+        if self.q(css=".wrapper-other-login .instructions").visible:
+            return self.q(css=".wrapper-other-login .instructions").text[0]

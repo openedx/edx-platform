@@ -17,19 +17,19 @@
     <h1 class="page-header">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</h1>
 
     % if user.is_active:
-    <nav class="nav-actions">
+    <nav class="nav-actions" aria-label="${_('Page Actions')}">
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Course")}</a>
-            % if libraries_enabled:
-              <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
-              ${_("New Library")}</a>
-            % endif
           % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
+          % endif
+          % if show_new_library_button:
+            <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
+            ${_("New Library")}</a>
           % endif
         </li>
       </ul>
@@ -103,57 +103,57 @@
         </form>
       </div>
 
-        %if libraries_enabled:
-        <div class="wrapper-create-element wrapper-create-library">
-          <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
-            <div class="wrap-error">
-              <div id="library_creation_error" name="library_creation_error" class="message message-status message-status error" role="alert">
-              <p>${_("Please correct the highlighted fields below.")}</p>
-              </div>
+      % endif
+
+      %if libraries_enabled and show_new_library_button:
+      <div class="wrapper-create-element wrapper-create-library">
+        <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
+          <div class="wrap-error">
+            <div id="library_creation_error" name="library_creation_error" class="message message-status message-status error" role="alert">
+            <p>${_("Please correct the highlighted fields below.")}</p>
             </div>
+          </div>
 
-            <div class="wrapper-form">
-              <h3 class="title">${_("Create a New Library")}</h3>
+          <div class="wrapper-form">
+            <h3 class="title">${_("Create a New Library")}</h3>
 
-              <fieldset>
-                <legend class="sr">${_("Required Information to Create a New Library")}</legend>
+            <fieldset>
+              <legend class="sr">${_("Required Information to Create a New Library")}</legend>
 
-                <ol class="list-input">
-                  <li class="field text required" id="field-library-name">
-                    <label for="new-library-name">${_("Library Name")}</label>
-                    ## Translators: This is an example name for a new content library, seen when filling out the form to create a new library. (A library is a collection of content or problems.)
-                    <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" required placeholder="${_('e.g. Computer Science Problems')}" aria-describedby="tip-new-library-name tip-error-new-library-name" />
-                    <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
-                    <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
-                  </li>
-                  <li class="field text required" id="field-organization">
-                    <label for="new-library-org">${_("Organization")}</label>
-                    <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
-                    <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
-                    <span class="tip tip-error is-hiding" id="tip-error-new-library-org"></span>
-                  </li>
+              <ol class="list-input">
+                <li class="field text required" id="field-library-name">
+                  <label for="new-library-name">${_("Library Name")}</label>
+                  ## Translators: This is an example name for a new content library, seen when filling out the form to create a new library. (A library is a collection of content or problems.)
+                  <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" required placeholder="${_('e.g. Computer Science Problems')}" aria-describedby="tip-new-library-name tip-error-new-library-name" />
+                  <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
+                </li>
+                <li class="field text required" id="field-organization">
+                  <label for="new-library-org">${_("Organization")}</label>
+                  <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                  <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-library-org"></span>
+                </li>
 
-                  <li class="field text required" id="field-library-number">
-                    <label for="new-library-number">${_("Library Code")}</label>
-                    ## Translators: This is an example for the "code" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
-                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
-                    <span class="tip" id="tip-new-library-number">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
-                    <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
-                  </li>
-                </ol>
+                <li class="field text required" id="field-library-number">
+                  <label for="new-library-number">${_("Library Code")}</label>
+                  ## Translators: This is an example for the "code" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
+                  <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
+                  <span class="tip" id="tip-new-library-number">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
+                </li>
+              </ol>
 
-              </fieldset>
-            </div>
+            </fieldset>
+          </div>
 
-            <div class="actions">
-              <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
-              <input type="submit" value="${_('Create')}" class="action action-primary new-library-save" />
-              <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-library-cancel" />
-            </div>
-          </form>
-        </div>
-        % endif
-
+          <div class="actions">
+            <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
+            <input type="submit" value="${_('Create')}" class="action action-primary new-library-save" />
+            <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-library-cancel" />
+          </div>
+        </form>
+      </div>
       % endif
 
       <!-- STATE: processing courses -->
@@ -302,9 +302,9 @@
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
         <div class="notice-item">
           <div class="msg">
-            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
+            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=set)}</h3>
             <div class="copy">
-              <p>${_('You will need to be added to the course in {studio_name} by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+              <p>${_('The course creator must give you access to the course. Contact the course creator or administrator for the course you are helping to author.')}</p>
             </div>
           </div>
         </div>
@@ -443,11 +443,28 @@
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
         <div class="notice-item">
           <div class="msg">
-            <div class="copy">
-              <p>${_("You don't have any content libraries yet.")}</p>
-            </div>
+              <h3 class="title">${_("Were you expecting to see a particular library here?")}</h3>
+              <div class="copy">
+                  <p>${_('The library creator must give you access to the library. Contact the library creator or administrator for the library you are helping to author.')}</p>
+              </div>
           </div>
         </div>
+        % if show_new_library_button:
+        <div class="notice-item has-actions">
+          <div class="msg">
+              <h3 class="title">${_('Create Your First Library')}</h3>
+              <div class="copy">
+                  <p>${_('Libraries hold a pool of components that can be re-used across multiple courses. Create your first library with the click of a button!')}</p>
+              </div>
+          </div>
+
+        <ul class="list-actions">
+          <li class="action-item">
+              <a href="#" class="action-primary action-create new-button action-create-library new-library-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Library')}</a>
+          </li>
+        </ul>
+        </div>
+        % endif
       </div>
       %endif
 
@@ -455,7 +472,7 @@
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title title-3">${_('New to {studio_name}?').format(studio_name=settings.STUDIO_NAME)}</h3>
-        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continually updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
         <ol class="list-actions">
           <li class="action-item">
@@ -464,7 +481,7 @@
           </li>
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
-              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary" title="${_("Use our feedback tool, Tender, to request help")}">
                 ${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}
               </a>
             </li>

@@ -113,11 +113,13 @@
           background: $pink-u3;
         }
 
-        &.flag-role-admin {
+        &.flag-role-admin,
+        &.flag-role-instructor {
           background: $pink;
         }
 
-        &.flag-role-user {
+        &.flag-role-user,
+        &.flag-role-library_user {
           background: $yellow-d1;
           .msg-you { color: $yellow-l1; }
         }

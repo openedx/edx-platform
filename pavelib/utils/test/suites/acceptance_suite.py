@@ -3,7 +3,7 @@ Acceptance test suite
 """
 from paver.easy import sh, call_task
 from pavelib.utils.test import utils as test_utils
-from pavelib.utils.test.suites import TestSuite
+from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
 __test__ = False  # do not collect
@@ -38,10 +38,11 @@ class AcceptanceTest(TestSuite):
 
         cmd = (
             "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
-            "--debug-mode --verbosity {verbosity} {report_args} {extra_args}".format(
+            "--debug-mode --verbosity {verbosity} {pdb}{report_args} {extra_args}".format(
                 default_store=self.default_store,
                 system=self.system,
                 verbosity=self.verbosity,
+                pdb="--pdb " if self.pdb else "",
                 report_args=report_args,
                 extra_args=self.extra_args,
             )
@@ -90,7 +91,8 @@ class AcceptanceTestSuite(TestSuite):
 
     def __enter__(self):
         super(AcceptanceTestSuite, self).__enter__()
-        test_utils.clean_test_files()
+        if not (self.fasttest or self.skip_clean):
+            test_utils.clean_test_files()
 
         if not self.fasttest:
             self._setup_acceptance_db()

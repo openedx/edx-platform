@@ -1,0 +1,57 @@
+<form class="collection-edit-form certificate-edit-form">
+    <div aria-live="polite">
+    <% if (error && error.message) { %>
+        <div class="certificate-edit-error message message-status message-status error is-shown" name="certificate-edit-error">
+          <%= gettext(error.message) %>
+        </div>
+    <% } %>
+    </div>
+    <div class="wrapper-form">
+        <fieldset class="collection-fields certificate-fields">
+            <legend class="sr"><%= gettext("Certificate Information") %></legend>
+            <div class="sr input-wrap field text required add-collection-name add-certificate-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+                <label for="certificate-name-<%= uniqueId %>"><%= gettext("Certificate Name") %></label>
+                <input id="certificate-name-<%= uniqueId %>" class="collection-name-input input-text" name="certificate-name" type="text" placeholder="<%= gettext("Name of the certificate") %>" value="<%= name %>" aria-describedby="certificate-name-<%=uniqueId %>-tip" />
+                <span id="certificate-name-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Name of the certificate") %></span>
+            </div>
+            <div class="sr input-wrap field text add-certificate-description">
+                <label for="certificate-description-<%= uniqueId %>"><%= gettext("Description") %></label>
+                <textarea id="certificate-description-<%= uniqueId %>" class="certificate-description-input text input-text" name="certificate-description" placeholder="<%= gettext("Description of the certificate") %>" aria-describedby="certificate-description-<%=uniqueId %>-tip"><%= description %></textarea>
+                <span id="certificate-description-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Description of the certificate") %></span>
+            </div>
+            <div class="input-wrap field text add-certificate-course-title">
+                <label for="certificate-course-title-<%= uniqueId %>"><%= gettext("Course Title Override") %></label>
+                <input id="certificate-course-title-<%= uniqueId %>" class="certificate-course-title-input input-text" name="certificate-course-title" type="text" placeholder="<%= gettext("Course title") %>" value="<%= course_title %>" aria-describedby="certificate-course-title-<%=uniqueId %>-tip" />
+                <span id="certificate-course-title-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Title of the course") %></span>
+            </div>
+            <div class="input-wrap field text add-org-logo">
+                <label for="certificate-org-logo-<%= uniqueId %>"><%= gettext("Organization Logo") %></label>
+                <div class="current-org-logo" <% if (org_logo_path == "") { print('style="display:none"'); } %>><span class="wrapper-org-logo"><img class="org-logo" src="<%= org_logo_path %>" alt="Organization Logo"></span></div>
+                <div class="org-logo-upload-wrapper">
+                  <div class="org-logo-upload-input-wrapper">
+                    <input id="certificate-org-logo-<%= uniqueId %>" class="collection-name-input input-text org-logo-input" name="org-logo-path" type="text" placeholder="<%= gettext("Path to organization logo") %>" value="<%= org_logo_path %>" aria-describedby="certificate-org-logo-<%=uniqueId %>-tip" readonly />
+                    <span id="certificate-org-logo-<%=uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Maximum logo height 125px, width variable") %></span>
+                  </div>
+                  <button type="button" class="action action-upload-org-logo">Upload Organization Logo</button>
+                </div>
+            </div>
+        </fieldset>
+         <header>
+            <span class="title"><%= gettext("Certificate Signatories") %></legend>
+         </header>
+        <div class="signatory-edit-list"> </div>
+        <span>
+           <button class="action action-add-signatory" type="button"><%= gettext("Add Signatory") %></button>
+           <span class="tip tip-stacked"><%= gettext("(Up to 4 signatories are allowed for a certificate)") %></span>
+        </span>
+    </div>
+    <div class="actions">
+        <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
+        <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+        <% if (!isNew) { %>
+            <span class="wrapper-delete-button">
+                <a class="button action-delete delete" href="#"><%= gettext("Delete") %></a>
+            </span>
+        <% } %>
+    </div>
+</form>

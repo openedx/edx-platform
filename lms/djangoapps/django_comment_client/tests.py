@@ -17,6 +17,7 @@ class PermissionsTestCase(TestCase):
         return ''.join(random.choice(chars) for x in range(length))
 
     def setUp(self):
+        super(PermissionsTestCase, self).setUp()
 
         self.course_id = "edX/toy/2012_Fall"
 
@@ -30,15 +31,12 @@ class PermissionsTestCase(TestCase):
         self.moderator.is_staff = True
         self.moderator.save()
         self.student_enrollment = CourseEnrollment.enroll(self.student, self.course_id)
+        self.addCleanup(self.student_enrollment.delete)
         self.moderator_enrollment = CourseEnrollment.enroll(self.moderator, self.course_id)
-
-    def tearDown(self):
-        self.student_enrollment.delete()
-        self.moderator_enrollment.delete()
-
-# Do we need to have this? We shouldn't be deleting students, ever
-#        self.student.delete()
-#        self.moderator.delete()
+        self.addCleanup(self.moderator_enrollment.delete)
+        # Do we need to have this in a cleanup? We shouldn't be deleting students, ever.
+        #   self.student.delete()
+        #   self.moderator.delete()
 
     def testDefaultRoles(self):
         self.assertTrue(self.student_role in self.student.roles.all())

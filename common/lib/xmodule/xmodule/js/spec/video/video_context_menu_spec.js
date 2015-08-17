@@ -68,6 +68,7 @@
             $('source').remove();
             _.result(state.storage, 'clear');
             _.result($('video').data('contextmenu'), 'destroy');
+            _.result(state.videoPlayer, 'destroy');
         });
 
         describe('constructor', function () {
@@ -217,43 +218,31 @@
                 expect(menuSubmenuItem).not.toHaveClass('is-opened');
             });
 
-            // Flaky-test resulting in timeout errors. Disabled 09/18/2014
-            // See TNL-439
-            xit('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
+            it('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
                 var menuItem = menuItems.first();
-                runs(function () {
-                    // Left-click on play
-                    menuItem.click();
+                spyOn(state.videoPlayer, 'isPlaying');
+                spyOn(state.videoPlayer, 'play').andCallFake(function () {
+                    state.videoPlayer.isPlaying.andReturn(true);
+                    state.el.trigger('play');
                 });
-
-                waitsFor(function () {
-                    return state.videoPlayer.isPlaying();
-                }, 'video to start playing', 200);
-
-                runs(function () {
-                    expect(menuItem).toHaveText('Pause');
-                    openMenu();
-                    // Left-click on pause
-                    menuItem.click();
+                spyOn(state.videoPlayer, 'pause').andCallFake(function () {
+                    state.videoPlayer.isPlaying.andReturn(false);
+                    state.el.trigger('pause');
                 });
-
-                waitsFor(function () {
-                    return !state.videoPlayer.isPlaying();
-                }, 'video to start playing', 200);
-
-                runs(function () {
-                    expect(menuItem).toHaveText('Play');
-                    // Right-click on play
-                    menuItem.trigger('contextmenu');
-                });
-
-                waitsFor(function () {
-                    return state.videoPlayer.isPlaying();
-                }, 'video to start playing', 200);
-
-                runs(function () {
-                    expect(menuItem).toHaveText('Pause');
-                });
+                // Left-click on play
+                menuItem.click();
+                expect(state.videoPlayer.play).toHaveBeenCalled();
+                expect(menuItem).toHaveText('Pause');
+                openMenu();
+                // Left-click on pause
+                menuItem.click();
+                expect(state.videoPlayer.pause).toHaveBeenCalled();
+                expect(menuItem).toHaveText('Play');
+                state.videoPlayer.play.reset();
+                // Right-click on play
+                menuItem.trigger('contextmenu');
+                expect(state.videoPlayer.play).toHaveBeenCalled();
+                expect(menuItem).toHaveText('Pause');
             });
 
             it('mouse left/right-clicking behaves as expected on mute/unmute menu item', function () {

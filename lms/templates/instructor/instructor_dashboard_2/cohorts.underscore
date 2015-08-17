@@ -1,50 +1,61 @@
-<h2 class="section-title">
-    <span class="value"><%- gettext('Cohort Management') %></span>
-    <span class="description"></span>
-</h2>
-
-<div class="cohort-management-nav">
-    <h3 class="subsection-title"><%- gettext('Assign students to cohorts manually') %></h3>
-    <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
-
-        <div class="cohort-management-nav-form-select field field-select">
-            <label for="cohort-select" class="label sr"><%- gettext("Select a cohort group to manage") %></label>
-            <select class="input cohort-select" name="cohort-select" id="cohort-select"></select>
-        </div>
-
-        <div class="form-actions">
-            <button class="form-submit button action-primary action-view sr"><%- gettext('View Cohort') %></button>
-        </div>
-    </form>
-
-    <a href="" class="action-primary action-create">
-        <i class="icon fa fa-plus" aria-hidden="true"></i>
-        <%- gettext('Add Cohort') %>
-    </a>
+<div class="cohorts-state-section">
+    <label> <input type="checkbox" class="cohorts-state" value="Cohorts-State" <%- cohortsEnabled ? 'checked="checked"' : '' %> /> <%- gettext('Enable Cohorts') %></label>
 </div>
 
-<!-- Add modal -->
-<div class="cohort-management-add-form"></div>
+<% if (cohortsEnabled) { %>
+    <div class="cohort-management-nav">
+        <hr class="divider divider-lv1" />
+        <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
 
-<!-- individual group -->
-<div class="cohort-management-group"></div>
+            <div class="cohort-management-nav-form-select field field-select">
+                <label for="cohort-select" class="label sr"><%- gettext("Select a cohort to manage") %></label>
+                <select class="input cohort-select" name="cohort-select" id="cohort-select"></select>
+            </div>
 
-<div class="wrapper-cohort-supplemental">
+            <div class="form-actions">
+                <button class="form-submit button action-primary action-view sr"><%- gettext('View Cohort') %></button>
+            </div>
+        </form>
 
-    <hr class="divider divider-lv1" />
-
-    <!-- Uploading a CSV file of cohort assignments. -->
-    <a class="toggle-cohort-management-secondary" href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></a>
-    <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload"></div>
-
-    <div class="cohort-management-supplemental">
-        <p class="">
-            <i class="icon fa fa-info-circle" aria-hidden="true"></i>
-            <%= interpolate(
-            gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on %(link_start)s the Data Download page. %(link_end)s'),
-                {link_start: '<a href="" class="link-cross-reference" data-section="data_download">', link_end: '</a>'},
-                true
-            ) %>
-        </p>
+        <button class="button action-primary action-create">
+            <i class="icon fa fa-plus" aria-hidden="true"></i>
+            <%- gettext('Add Cohort') %>
+        </button>
     </div>
-</div>
+
+    <!-- Add modal -->
+    <div class="cohort-management-add-form"></div>
+
+    <!-- individual group -->
+    <div class="cohort-management-group"></div>
+
+    <div class="wrapper-cohort-supplemental">
+
+        <hr class="divider divider-lv1" />
+
+        <!-- Uploading a CSV file of cohort assignments. -->
+        <a class="toggle-cohort-management-secondary" href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></a>
+        <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload"></div>
+
+        <div class="cohort-management-supplemental">
+            <p class="">
+                <i class="icon fa fa-info-circle" aria-hidden="true"></i>
+                <%= interpolate(
+                gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on %(link_start)s the Data Download page. %(link_end)s'),
+                    {link_start: '<a href="" class="link-cross-reference" data-section="data_download">', link_end: '</a>'},
+                    true
+                ) %>
+            </p>
+        </div>
+
+        <hr class="divider divider-lv1" />
+
+        <!-- Discussion Topics. -->
+        <a class="toggle-cohort-management-discussions" href="#cohort-discussions-management"><%- gettext('Specify whether discussion topics are divided by cohort') %></a>
+        <div class="cohort-discussions-nav is-hidden" id="cohort-management-discussion-topics">
+            <div class="cohort-course-wide-discussions-nav"></div>
+            <div class="cohort-inline-discussions-nav"></div>
+        </div>
+
+    </div>
+<% } %>

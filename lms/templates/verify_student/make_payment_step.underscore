@@ -1,100 +1,22 @@
-<div id="wrapper-review" class="wrapper-view make-payment-step">
+<div id="wrapper-review" tab-index="0" class="wrapper-view make-payment-step">
   <div class="review view">
     <% if ( !upgrade ) { %>
-      <h3 class="title center-col">
+      <h2 class="title center-col">
         <%= _.sprintf(
             gettext( "You are enrolling in: %(courseName)s"),
             { courseName: '<span class="course-title">' + courseName + '</span>' }
           ) %>
-      </h3>
+      </h2>
     <% } else { %>
-      <h3 class="title">
+      <h2 class="title">
         <%= _.sprintf(
             gettext( "You are upgrading your enrollment for: %(courseName)s"),
             { courseName: '<span class="course-title">' + courseName + '</span>' }
           ) %>
-      </h3>
+      </h2>
       <div class="instruction">
         <%- gettext( "You can now enter your payment information and complete your enrollment." ) %>
       </div>
-    <% } %>
-
-    <% if ( isActive && ( !hasVisibleReqs || upgrade ) ) { %>
-      <div class="wrapper-task hidden" aria-hidden="true">
-        <ol class="review-tasks">
-          <% if ( suggestedPrices.length > 0 ) { %>
-          <li class="review-task review-task-contribution">
-            <h4 class="title">
-              <% if ( upgrade ) { %>
-                <%- gettext( "Choose your contribution for your Verified Track upgrade" ) %>
-              <% } else { %>
-                <%- gettext( "Enter Your Contribution Level" ) %>
-              <% } %>
-            </h4>
-            <div class="copy">
-              <p>
-                <% if ( !upgrade ) { %>
-                  <%- _.sprintf(
-                      gettext( "Please confirm your contribution for this course (min. %(minPrice)s %(currency)s)" ),
-                      { minPrice: minPrice, currency: currency }
-                  ) %>
-                <% } %>
-              </p>
-            </div>
-
-            <ul class="list-fields contribution-options">
-              <% for ( var i = 0; i < suggestedPrices.length; i++ ) {
-                  price = suggestedPrices[i];
-              %>
-              <li class="field contribution-option">
-                <input type="radio" name="contribution" value="<%- price %>" id="contribution-<%- price %>" />
-                <label for="contribution-<%- price %>">
-                  <span class="deco-denomination">$</span>
-                  <span class="label-value"><%- price %></span>
-                  <span class="denomination-name"><%- currency %></span>
-                </label>
-              </li>
-              <% } %>
-
-             <li class="field contribution-option">
-                <ul class="field-group field-group-other">
-                <li class="contribution-option contribution-option-other1">
-                  <input type="radio" id="contribution-other" name="contribution" value="" />
-                  <label for="contribution-other"><span class="sr">Other</span></label>
-                </li>
-                <li class="contribution-option contribution-option-other2">
-                    <label for="contribution-other-amt">
-                      <span class="sr">Other Amount</span>
-                    </label>
-                    <div class="wrapper">
-                      <span class="deco-denomination">$</span>
-                      <input type="text" size="9" name="contribution-other-amt" id="contribution-other-amt" value=""/>
-                      <span class="denomination-name"><%- currency %></span>
-                    </div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-
-          <% } else {%>
-          <li class="review-task review-task-contribution">
-            <h4 class="title"><%- gettext( "Your Total Contribution" ) %></h4>
-            <div class="copy">
-              <p><%- gettext( "To complete your enrollment, you will need to pay:" ) %></p>
-            </div>
-            <ul class="list-fields contribution-options">
-              <li class="field contribution-option">
-                <span class="deco-denomination">$</span>
-                <span class="label-value"><%- minPrice %></span>
-                <span class="denomination-name"><%- currency %></span>
-              </li>
-            </ul>
-          </li>
-          <% } %>
-        </ol>
-      </div>
-    </div>
     <% } %>
 
     <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
@@ -107,18 +29,19 @@
           ) %>
         <% } else if ( !isActive ) { %>
           <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
-        <% } else if ( !upgrade ) { %>
+        <% } else { %>
             <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
         <% } %>
       </p>
       <% } %>
     </div>
 
+    <% if ( requirements['account-activation-required'] || requirements['photo-id-required'] || requirements['webcam-required']) { %>
     <div class="requirements-container">
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
         <% if ( requirements['account-activation-required'] ) { %>
           <li class="req req-0 req-activate">
-            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+            <h3 class="title"><%- gettext( "Activate Your Account" ) %></h3>
             <div class="placeholder-art">
               <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
             </div>
@@ -132,7 +55,7 @@
         <% } else {%>
           <% if ( requirements['photo-id-required'] ) { %>
           <li class="req req-1 req-id">
-            <h4 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h4>
+            <h3 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h3>
             <div class="placeholder-art fa-lg">
               <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
               <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
@@ -144,7 +67,7 @@
 
           <% if ( requirements['webcam-required'] ) { %>
           <li class="req req-2 req-webcam">
-            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+            <h3 class="title"><%- gettext( "Webcam" ) %></h3>
             <div class="placeholder-art">
               <i class="icon fa fa-video-camera" aria-hidden="true"></i>
             </div>
@@ -155,20 +78,37 @@
         <% } %>
       </ul>
     </div>
+    <% } %>
 
+    <% if ( courseModeSlug === 'no-id-professional') { %>
+    <div class="container register is-verified">
+      <h3 class="title"><%- gettext( "ID-Verification is not required for this Professional Education course." ) %></h3>
+      <p><%- gettext( "All professional education courses are fee-based, and require payment to complete the enrollment process." ) %></p>
+    </div>
+    <% } else if ( alreadyVerified && verificationGoodUntil ) { %>
+    <div class="container register is-verified">
+      <h3 class="title"><%- gettext( "You have already verified your ID!" ) %></h3>
+      <p>
+        <%= _.sprintf(
+        gettext( "Your verification status is good until %(verificationGoodUntil)s." ),
+         { verificationGoodUntil: verificationGoodUntil }
+        ) %>
+      </p>
+    </div>
+    <% } %>
 
   <% if ( isActive ) { %>
-  <nav class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
-    <% if ( upgrade ) { %>
-        <a class="next action-primary is-disabled right" id="pay_button" aria-disabled="true">
-          <%- gettext( "Next: Make payment" ) %>
-        </a>
-    <% } else { %>
-        <a class="next action-primary is-disabled" id="pay_button">
-          <%- gettext( "Continue to payment" ) %>
-        </a>
-    <% } %>
-  </nav>
+  <div class="payment-buttons nav-wizard is-ready center">
+    <input type="hidden" name="contribution" value="<%- minPrice %>" />
+    <div class="purchase">
+      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %></span></p>
+    </div>
+    <div class="pay-options">
+      <%
+      // payment buttons will go here
+      %>
+    </div>
+  </div>
   <% } %>
 
   <form id="payment-processor-form"></form>

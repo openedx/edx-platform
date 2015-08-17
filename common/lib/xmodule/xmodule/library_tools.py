@@ -2,10 +2,17 @@
 XBlock runtime services for LibraryContentModule
 """
 from django.core.exceptions import PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator
-from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from search.search_engine_base import SearchEngine
+from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.capa_module import CapaDescriptor
+
+
+def normalize_key_for_search(library_key):
+    """ Normalizes library key for use with search indexing """
+    return library_key.replace(version_guid=None, branch=None)
 
 
 class LibraryToolsService(object):
@@ -21,14 +28,17 @@ class LibraryToolsService(object):
         Given a library key like "library-v1:ProblemX+PR0B", return the
         'library' XBlock with meta-information about the library.
 
+        A specific version may be specified.
+
         Returns None on error.
         """
         if not isinstance(library_key, LibraryLocator):
             library_key = LibraryLocator.from_string(library_key)
-        assert library_key.version_guid is None
 
         try:
-            return self.store.get_library(library_key, remove_version=False, remove_branch=False)
+            return self.store.get_library(
+                library_key, remove_version=False, remove_branch=False, head_validation=False
+            )
         except ItemNotFoundError:
             return None
 
@@ -82,13 +92,25 @@ class LibraryToolsService(object):
             result_json.append(info)
         return result_json
 
+    def _problem_type_filter(self, library, capa_type):
+        """ Filters library children by capa type"""
+        search_engine = SearchEngine.get_search_engine(index="library_index")
+        if search_engine:
+            filter_clause = {
+                "library": unicode(normalize_key_for_search(library.location.library_key)),
+                "content_type": CapaDescriptor.INDEX_CONTENT_TYPE,
+                "problem_types": capa_type
+            }
+            search_result = search_engine.search(field_dictionary=filter_clause)
+            results = search_result.get('results', [])
+            return [LibraryUsageLocator.from_string(item['data']['id']) for item in results]
+        else:
+            return [key for key in library.children if self._filter_child(key, capa_type)]
+
     def _filter_child(self, usage_key, capa_type):
         """
         Filters children by CAPA problem type, if configured
         """
-        if capa_type == ANY_CAPA_TYPE_VALUE:
-            return True
-
         if usage_key.block_type != "problem":
             return False
 
@@ -102,40 +124,57 @@ class LibraryToolsService(object):
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def update_children(self, dest_block, user_id, user_perms=None):
+    def update_children(self, dest_block, user_id, user_perms=None, version=None):
         """
-        This method is to be used when any of the libraries that a LibraryContentModule
-        references have been updated. It will re-fetch all matching blocks from
+        This method is to be used when the library that a LibraryContentModule
+        references has been updated. It will re-fetch all matching blocks from
         the libraries, and copy them as children of dest_block. The children
         will be given new block_ids, but the definition ID used should be the
         exact same definition ID used in the library.
 
-        This method will update dest_block's 'source_libraries' field to store
-        the version number of the libraries used, so we easily determine if
-        dest_block is up to date or not.
+        This method will update dest_block's 'source_library_version' field to
+        store the version number of the libraries used, so we easily determine
+        if dest_block is up to date or not.
         """
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
 
-        new_libraries = []
+        if not dest_block.source_library_id:
+            dest_block.source_library_version = ""
+            return
+
         source_blocks = []
-        for library_key, __ in dest_block.source_libraries:
-            library = self._get_library(library_key)
-            if library is None:
-                raise ValueError("Required library not found.")
-            if user_perms and not user_perms.can_read(library_key):
-                raise PermissionDenied()
-            filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
-            if filter_children:
-                # Apply simple filtering based on CAPA problem types:
-                source_blocks.extend([key for key in library.children if self._filter_child(key, dest_block.capa_type)])
-            else:
-                source_blocks.extend(library.children)
-            new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
+        library_key = dest_block.source_library_key
+        if version:
+            library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
+        library = self._get_library(library_key)
+        if library is None:
+            raise ValueError("Requested library not found.")
+        if user_perms and not user_perms.can_read(library_key):
+            raise PermissionDenied()
+        filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+        if filter_children:
+            # Apply simple filtering based on CAPA problem types:
+            source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
+        else:
+            source_blocks.extend(library.children)
 
         with self.store.bulk_operations(dest_block.location.course_key):
-            dest_block.source_libraries = new_libraries
+            dest_block.source_library_version = unicode(library.location.library_key.version_guid)
             self.store.update_item(dest_block, user_id)
-            dest_block.children = self.store.copy_from_template(source_blocks, dest_block.location, user_id)
+            head_validation = not version
+            dest_block.children = self.store.copy_from_template(
+                source_blocks, dest_block.location, user_id, head_validation=head_validation
+            )
             # ^-- copy_from_template updates the children in the DB
             # but we must also set .children here to avoid overwriting the DB again
+
+    def list_available_libraries(self):
+        """
+        List all known libraries.
+        Returns tuples of (LibraryLocator, display_name)
+        """
+        return [
+            (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
+            for lib in self.store.get_libraries()
+        ]

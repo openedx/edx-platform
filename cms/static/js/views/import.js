@@ -2,234 +2,327 @@
  * Course import-related js.
  */
 define(
-    ["domReady", "jquery", "underscore", "gettext"],
-    function(domReady, $, _, gettext) {
+    ["jquery", "underscore", "gettext", "moment", "jquery.cookie"],
+    function($, _, gettext, moment) {
 
         "use strict";
 
-        /********** Private functions ************************************************/
+        /********** Private properties ****************************************/
 
-        /**
-         * Toggle the spin on the progress cog.
-         * @param {boolean} isSpinning Turns cog spin on if true, off otherwise.
-         */
-        var updateCog = function (elem, isSpinning) {
-            var cogI = elem.find('i.fa-cog');
-            if (isSpinning) { cogI.addClass("fa-spin");}
-            else { cogI.removeClass("fa-spin");}
+        var COOKIE_NAME = 'lastimportupload';
+
+        var STAGE = {
+            'UPLOADING': 0,
+            'UNPACKING': 1,
+            'VERIFYING': 2,
+            'UPDATING' : 3,
+            'SUCCESS'  : 4
         };
 
+        var STATE = {
+            'READY'      : 1,
+            'IN_PROGRESS': 2,
+            'SUCCESS'    : 3,
+            'ERROR'      : 4
+        };
+
+        var current = { stage: 0, state: STATE.READY };
+        var deferred = null;
+        var file = { name: null, url: null };
+        var timeout = { id: null, delay: 1000 };
+        var $dom = {
+            stages: $('ol.status-progress').children(),
+            successStage: $('.item-progresspoint-success'),
+            wrapper: $('div.wrapper-status')
+        };
+
+        /********** Private functions *****************************************/
 
         /**
-         * Manipulate the DOM to reflect current status of upload.
-         * @param {int} stageNo Current stage.
+         * Destroys any event listener Import might have needed
+         * during the process the import
+         *
          */
-        var updateStage = function (stageNo){
-            var all = $('ol.status-progress').children();
-            var prevList = all.slice(0, stageNo);
-            _.map(prevList, function (elem){
-                $(elem).
-                    removeClass("is-not-started").
-                    removeClass("is-started").
-                    addClass("is-complete");
-                updateCog($(elem), false);
+        var destroyEventListeners = function () {
+            $(window).off('beforeunload.import');
+        };
+
+        /**
+         * Makes Import feedback status list visible
+         *
+         */
+        var displayFeedbackList = function () {
+            $dom.wrapper.removeClass('is-hidden');
+        };
+
+        /**
+         * Sets the Import in the "error" status.
+         *
+         * Immediately stops any further polling from the server.
+         * Displays the error message at the list element that corresponds
+         * to the stage where the error occurred.
+         *
+         * @param {string} msg Error message to display.
+         * @param {int} [stage=current.stage] Stage of import process at which error occurred.
+         */
+        var error = function (msg, stage) {
+            current.stage = Math.abs(stage || current.stage); // Could be negative
+            current.state = STATE.ERROR;
+
+            destroyEventListeners();
+            clearTimeout(timeout.id);
+            updateFeedbackList(msg);
+
+            deferred.resolve();
+        };
+
+        /**
+         * Initializes the event listeners
+         *
+         */
+        var initEventListeners = function () {
+            $(window).on('beforeunload.import', function () {
+                if (current.stage <= STAGE.UNPACKING) {
+                    return gettext('Your import is in progress; navigating away will abort it.');
+                }
             });
-            var curList = all.eq(stageNo);
-            curList.removeClass("is-not-started").addClass("is-started");
-            updateCog(curList, true);
         };
 
         /**
-         * Check for import status updates every `timeout` milliseconds, and update
-         * the page accordingly.
-         * @param {string} url Url to call for status updates.
-         * @param {int} timeout Number of milliseconds to wait in between ajax calls
-         *     for new updates.
-         * @param {int} stage Starting stage.
+         * Stores in a cookie the current import data
+         *
+         * @param {boolean} [completed=false] If the import has been completed or not
          */
-        var getStatus = function (url, timeout, stage) {
-            var currentStage = stage || 0;
-            if (currentStage > 1) { CourseImport.okayToNavigateAway = true; }
-            if (CourseImport.stopGetStatus) { return ;}
+        var storeImport = function (completed) {
+            $.cookie(COOKIE_NAME, JSON.stringify({
+                file: file,
+                date: moment().valueOf(),
+                completed: completed || false
+            }));
+        };
 
-            if (currentStage === 4) {
-                // Succeeded
-                CourseImport.displayFinishedImport();
-                $('.view-import .choose-file-button').html(gettext("Choose new file")).show();
-            } else if (currentStage < 0) {
-                // Failed
-                var errMsg = gettext("Error importing course");
-                var failedStage = Math.abs(currentStage);
-                CourseImport.stageError(failedStage, errMsg);
-                $('.view-import .choose-file-button').html(gettext("Choose new file")).show();
-            } else {
-                // In progress
-                updateStage(currentStage);
+        /**
+         * Sets the Import on the "success" status
+         *
+         * If it wasn't already, marks the stored import as "completed",
+         * and updates its date timestamp
+         */
+        var success = function () {
+            current.state = STATE.SUCCESS;
+
+            if (CourseImport.storedImport().completed !== true) {
+                storeImport(true);
             }
 
-            var time = timeout || 1000;
-            $.getJSON(url,
-                function (data) {
-                    setTimeout(function () {
-                        getStatus(url, time, data.ImportStatus);
-                    }, time);
-                }
-            );
+            destroyEventListeners();
+            updateFeedbackList();
+
+            deferred.resolve();
         };
 
+        /**
+         * Updates the Import feedback status list
+         *
+         * @param {string} [currStageMsg=''] The message to show on the
+         *   current stage (for now only in case of error)
+         */
+        var updateFeedbackList = function (currStageMsg) {
+            var $checkmark, $curr, $prev, $next;
+            var date, successUnix, time;
 
+            $checkmark = $dom.successStage.find('.icon');
+            currStageMsg = currStageMsg || '';
 
-        /********** Public functions *************************************************/
+            function completeStage(stage) {
+                $(stage)
+                    .removeClass("is-not-started is-started")
+                    .addClass("is-complete");
+            }
+
+            function errorStage(stage) {
+                if (!$(stage).hasClass('has-error')) {
+                    $(stage)
+                        .removeClass('is-started')
+                        .addClass('has-error')
+                        .find('p.copy')
+                        .hide()
+                        .after("<p class='copy error'>" + currStageMsg + "</p>");
+                }
+            }
+
+            function resetStage(stage) {
+                $(stage)
+                    .removeClass("is-complete is-started has-error")
+                    .addClass("is-not-started")
+                    .find('p.error').remove().end()
+                    .find('p.copy').show();
+            }
+
+            switch (current.state) {
+                case STATE.READY:
+                    _.map($dom.stages, resetStage);
+
+                    break;
+
+                case STATE.IN_PROGRESS:
+                    $prev = $dom.stages.slice(0, current.stage);
+                    $curr = $dom.stages.eq(current.stage);
+
+                    _.map($prev, completeStage);
+                    $curr.removeClass("is-not-started").addClass("is-started");
+
+                    break;
+
+                case STATE.SUCCESS:
+                    successUnix = CourseImport.storedImport().date;
+                    date = moment(successUnix).utc().format('MM/DD/YYYY');
+                    time = moment(successUnix).utc().format('HH:mm');
+
+                    _.map($dom.stages, completeStage);
+
+                    $dom.successStage
+                        .find('.item-progresspoint-success-date')
+                        .html('(' + date + ' at ' + time + ' UTC)');
+
+                    break;
+
+                case STATE.ERROR:
+                    // Make all stages up to, and including, the error stage 'complete'.
+                    $prev = $dom.stages.slice(0, current.stage + 1);
+                    $curr = $dom.stages.eq(current.stage);
+                    $next = $dom.stages.slice(current.stage + 1);
+
+                    _.map($prev, completeStage);
+                    _.map($next, resetStage);
+                    errorStage($curr);
+
+                    break;
+            }
+
+            if (current.state === STATE.SUCCESS) {
+                $checkmark.removeClass('fa-square-o').addClass('fa-check-square-o');
+            } else {
+                $checkmark.removeClass('fa-check-square-o').addClass('fa-square-o');
+            }
+        };
+
+        /********** Public functions ******************************************/
 
         var CourseImport = {
 
             /**
-             * Whether to stop sending AJAX requests for updates on the import
-             * progress.
-             */
-            stopGetStatus: false,
-            /**
-             * Whether its fine to navigate away while import is in progress
-             */
-            okayToNavigateAway: false,
-
-            /**
-             * Update DOM to set all stages as not-started (for retrying an upload that
-             * failed).
-             */
-            clearImportDisplay: function () {
-                var all = $('ol.status-progress').children();
-                _.map(all, function (elem){
-                    $(elem).removeClass("is-complete").
-                        removeClass("is-started").
-                        removeClass("has-error").
-                        addClass("is-not-started");
-                    $(elem).find('p.error').remove(); // remove error messages
-                    $(elem).find('p.copy').show();
-                    updateCog($(elem), false);
-                });
-                this.stopGetStatus = false;
-            },
-
-            /**
-             * Update DOM to set all stages as complete, and stop asking for status
-             * updates.
-             */
-            displayFinishedImport: function () {
-                this.stopGetStatus = true;
-                var all = $('ol.status-progress').children();
-                _.map(all, function (elem){
-                    $(elem).
-                        removeClass("is-not-started").
-                        removeClass("is-started").
-                        addClass("is-complete");
-                    updateCog($(elem), false);
-                });
-            },
-
-            /**
-             * Make Import feedback status list visible.
-             */
-            displayFeedbackList: function (){
-                this.stopGetStatus = false;
-                $('div.wrapper-status').removeClass('is-hidden');
-                $('.status-info').show();
-            },
-
-            /**
-             * Start upload feedback. Makes status list visible and starts
-             * showing upload progress.
-             */
-            startUploadFeedback: function (){
-                this.displayFeedbackList();
-                updateStage(0);
-            },
-
-            /**
-             * Show last import status from server and start sending requests to the server for status updates.
-             */
-            getAndStartUploadFeedback: function (url, fileName){
-                var self = this;
-                $.getJSON(url,
-                    function (data) {
-                        if (data.ImportStatus != 0) {
-                            $('.file-name').html(fileName);
-                            $('.file-name-block').show();
-                            self.displayFeedbackList();
-                            if (data.ImportStatus === 4){
-                                self.displayFinishedImport();
-                            } else {
-                                $('.view-import .choose-file-button').hide();
-                                var time = 1000;
-                                setTimeout(function () {
-                                    getStatus(url, time, data.ImportStatus);
-                                }, time);
-                            }
-                        }
-                    }
-                );
-            },
-
-            /**
-             * Entry point for server feedback. Makes status list visible and starts
-             * sending requests to the server for status updates.
-             * @param {string} url The url to send Ajax GET requests for updates.
-             */
-            startServerFeedback: function (url){
-                this.stopGetStatus = false;
-                getStatus(url, 1000, 0);
-            },
-
-            /**
-             * Give error message at the list element that corresponds to the stage
-             * where the error occurred.
-             * @param {int} stageNo Stage of import process at which error occurred.
+             * Cancels the import and sets the Object to the error state
+             *
              * @param {string} msg Error message to display.
+             * @param {int} stage Stage of import process at which error occurred.
              */
-            stageError: function (stageNo, msg) {
-                this.stopGetStatus = true;
-                var all = $('ol.status-progress').children();
-                // Make all stages up to, and including, the error stage 'complete'.
-                var prevList = all.slice(0, stageNo + 1);
-                _.map(prevList, function (elem){
-                    $(elem).
-                        removeClass("is-not-started").
-                        removeClass("is-started").
-                        addClass("is-complete");
-                    updateCog($(elem), false);
-                });
-                var message = msg || gettext("There was an error with the upload");
-                var elem = $('ol.status-progress').children().eq(stageNo);
-                if (!elem.hasClass('has-error')) {
-                    elem.removeClass('is-started').addClass('has-error');
-                    elem.find('p.copy').hide().after("<p class='copy error'>" + message + "</p>");
+            cancel: function (msg, stage) {
+                error(msg, stage);
+            },
+
+            /**
+             * Entry point for server feedback
+             *
+             * Checks for import status updates every `timeout` milliseconds,
+             * and updates the page accordingly.
+             *
+             * @param {int} [stage=0] Starting stage.
+             */
+            pollStatus: function (stage) {
+                if (current.state !== STATE.IN_PROGRESS) {
+                    return;
                 }
+
+                current.stage = stage || STAGE.UPLOADING;
+
+                if (current.stage === STAGE.SUCCESS) {
+                    success();
+                } else if (current.stage < STAGE.UPLOADING) { // Failed
+                    error(gettext("Error importing course"));
+                } else { // In progress
+                    updateFeedbackList();
+
+                    $.getJSON(file.url, function (data) {
+                        timeout.id = setTimeout(function () {
+                            this.pollStatus(data.ImportStatus);
+                        }.bind(this), timeout.delay);
+                    }.bind(this));
+                }
+            },
+
+            /**
+             * Resets the Import internally and visually
+             *
+             */
+            reset: function () {
+                current.stage = STAGE.UPLOADING;
+                current.state = STATE.READY;
+
+                clearTimeout(timeout.id);
+                updateFeedbackList();
+            },
+
+            /**
+             * Show last import status from server and start sending requests
+             * to the server for status updates
+             *
+             * @return {jQuery promise}
+             */
+            resume: function () {
+                deferred = $.Deferred();
+                file = this.storedImport().file;
+
+                $.getJSON(file.url, function (data) {
+                    current.stage = data.ImportStatus;
+
+                    displayFeedbackList();
+
+                    if (current.stage !== STAGE.UPLOADING) {
+                        current.state = STATE.IN_PROGRESS;
+
+                        this.pollStatus(current.stage);
+                    } else {
+                        // An import in the upload stage cannot be resumed
+                        error(gettext("There was an error with the upload"));
+                    }
+                }.bind(this));
+
+                return deferred.promise();
+            },
+
+            /**
+             * Starts the importing process.
+             * Makes status list visible and starts showing upload progress.
+             *
+             * @param {string} fileName The name of the file to import
+             * @param {string} fileUrl The full URL to use to query the server
+             *     about the import status
+             * @return {jQuery promise}
+             */
+            start: function (fileName, fileUrl) {
+                current.state = STATE.IN_PROGRESS;
+                deferred = $.Deferred();
+
+                file.name = fileName;
+                file.url = fileUrl;
+
+                initEventListeners();
+                storeImport();
+                displayFeedbackList();
+                updateFeedbackList();
+
+                return deferred.promise();
+            },
+
+            /**
+             * Fetches the previous stored import
+             *
+             * @return {JSON} the data of the previous import
+             */
+            storedImport: function () {
+                return JSON.parse($.cookie(COOKIE_NAME));
             }
-
         };
-
-        var showImportSubmit = function (e) {
-            var filepath = $(this).val();
-            if (filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
-                $('.error-block').hide();
-                $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
-                $('.file-name-block').show();
-                $('.view-import .choose-file-button').hide();
-                $('.submit-button').show();
-                $('.progress').show();
-            } else {
-                $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
-            }
-        };
-
-        domReady(function () {
-            // import form setup
-            $('.view-import .file-input').bind('change', showImportSubmit);
-            $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function (e) {
-                e.preventDefault();
-                $('.view-import .file-input').click();
-            });
-        });
 
         return CourseImport;
     });

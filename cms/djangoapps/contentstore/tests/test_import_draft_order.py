@@ -1,4 +1,7 @@
-from xmodule.modulestore.xml_importer import import_from_xml
+"""
+Tests Draft import order.
+"""
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
@@ -12,8 +15,13 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 class DraftReorderTestCase(ModuleStoreTestCase):
 
     def test_order(self):
+        """
+        Verify that drafts are imported in the correct order.
+        """
         store = modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['import_draft_order'])
+        course_items = import_course_from_xml(
+            store, self.user.id, TEST_DATA_DIR, ['import_draft_order'], create_if_not_present=True
+        )
         course_key = course_items[0].id
         sequential = store.get_item(course_key.make_usage_key('sequential', '0f4f7649b10141b0bdc9922dcf94515a'))
         verticals = sequential.children

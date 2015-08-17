@@ -11,14 +11,13 @@
         });
 
         afterEach(function () {
-            $('.subtitles').remove();
-
             // `source` tags should be removed to avoid memory leak bug that we
             // had before. Removing of `source` tag, not `video` tag, stops
             // loading video source and clears the memory.
             $('source').remove();
             $.fn.scrollTo.reset();
             state.storage.clear();
+            state.videoPlayer.destroy();
 
             window.onTouchBasedDevice = oldOTBD;
         });
@@ -121,11 +120,6 @@
                     });
                 });
 
-                it('bind the hide caption button', function () {
-                    state = jasmine.initializePlayer();
-                    expect($('.hide-subtitles')).toHandle('click');
-                });
-
                 it('bind the mouse movement', function () {
                     state = jasmine.initializePlayer();
                     expect($('.subtitles')).toHandle('mouseover');
@@ -141,6 +135,27 @@
                         .toHandleWith('scroll', state.videoControl.showControls);
                  });
 
+            });
+
+            it('can destroy itself', function () {
+                spyOn($, 'ajaxWithPrefix');
+                state = jasmine.initializePlayer();
+                var plugin = state.videoCaption;
+
+                spyOn($.fn, 'off').andCallThrough();
+                state.videoCaption.destroy();
+
+                expect(state.videoCaption).toBeUndefined();
+                expect($.fn.off).toHaveBeenCalledWith({
+                    'caption:fetch': plugin.fetchCaption,
+                    'caption:resize': plugin.onResize,
+                    'caption:update': plugin.onCaptionUpdate,
+                    'ended': plugin.pause,
+                    'fullscreen': plugin.onResize,
+                    'pause': plugin.pause,
+                    'play': plugin.play,
+                    'destroy': plugin.destroy
+                });
             });
 
             describe('renderLanguageMenu', function () {
@@ -593,7 +608,7 @@
             it(msg, function () {
                 spyOn(Caption, 'fetchAvailableTranslations');
                 $.ajax.andCallFake(function (settings) {
-                    settings.error([]);
+                    _.result(settings, 'error');
                 });
 
                 state.config.transcriptLanguages = {};
@@ -612,7 +627,7 @@
             xit(msg, function () {
                 $.ajax
                     .andCallFake(function (settings) {
-                        settings.error([]);
+                        _.result(settings, 'error');
                     });
 
                 state.config.transcriptLanguages = {
@@ -690,7 +705,7 @@
             msg = 'on error: captions are hidden if there are no transcript';
             it(msg, function () {
                 $.ajax.andCallFake(function (settings) {
-                    settings.error();
+                    _.result(settings, 'error');
                 });
                 Caption.fetchAvailableTranslations();
 
@@ -799,6 +814,10 @@
                         state.videoCaption.updatePlayTime(25.000);
                         expect(state.videoCaption.currentIndex).toEqual(5);
 
+                        // To test speed, don't use start / end times.
+                        state.config.startTime = 0;
+                        state.config.endTime = null;
+
                         // Flash mode
                         state.speed = '2.0';
                         spyOn(state, 'isFlashMode').andReturn(true);
@@ -903,8 +922,8 @@
                             $('.subtitles').css('maxHeight'), 10
                         );
                         videoWrapperHeight = $('.video-wrapper').height();
-                        progressSliderHeight = videoControl.sliderEl.height();
-                        controlHeight = videoControl.el.height();
+                        progressSliderHeight = state.el.find('.slider').height();
+                        controlHeight = state.el.find('.video-controls').height();
                         shouldBeHeight = videoWrapperHeight -
                             0.5 * progressSliderHeight -
                             controlHeight;
@@ -1039,7 +1058,6 @@
         describe('toggle', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
-                spyOn(state.videoPlayer, 'log');
                 $('.subtitles li[data-index=1]').addClass('current');
             });
 
@@ -1047,15 +1065,6 @@
                 beforeEach(function () {
                     state.el.removeClass('closed');
                     state.videoCaption.toggle(jQuery.Event('click'));
-                });
-
-                it('log the hide_transcript event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'hide_transcript',
-                        {
-                            currentTime: state.videoPlayer.currentTime
-                        }
-                    );
                 });
 
                 it('hide the caption', function () {
@@ -1073,15 +1082,6 @@
                     state.el.addClass('closed');
                     state.videoCaption.toggle(jQuery.Event('click'));
                     jasmine.Clock.useMock();
-                });
-
-                it('log the show_transcript event', function () {
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'show_transcript',
-                        {
-                            currentTime: state.videoPlayer.currentTime
-                        }
-                    );
                 });
 
                 it('show the caption', function () {

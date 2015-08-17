@@ -1,0 +1,98 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "certificates" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+import json
+from contentstore import utils
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="title">${_("Course Certificates")}</%block>
+<%block name="bodyclass">is-signedin course view-certificates</%block>
+
+<%block name="header_extras">
+% for template_name in ["certificate-details", "certificate-editor", "signatory-editor", "signatory-details", "basic-modal", "modal-button", "list", "upload-dialog", "certificate-web-preview"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+</script>
+</%block>
+
+<%block name="requirejs">
+  require(["js/certificates/factories/certificates_page_factory"], function(CertificatesPageFactory) {
+      CertificatesPageFactory(${json.dumps(certificates)}, "${certificate_url}", "${course_outline_url}", ${json.dumps(course_modes)}, ${json.dumps(certificate_web_view_url)}, ${json.dumps(is_active)}, ${json.dumps(certificate_activation_handler_url)} );
+  });
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Settings")}</small>
+        <span class="sr">&gt; </span>${_("Certificates")}
+      </h1>
+      <div class="preview-certificate nav-actions"></div>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <article class="content-primary" role="main">
+        <div class="wrapper-certificates certificates-list">
+          <h2 class="sr title">${_("Certificates")}</h2>
+          % if certificates is None:
+            <div class="notice notice-incontext notice-moduledisabled">
+                <p class="copy">
+                    ${_("This module is not enabled.")}
+                </p>
+            </div>
+          % else:
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_("Loading")}</span></p>
+            </div>
+          % endif
+        </div>
+      </article>
+      <aside class="content-supplementary" role="complementary">
+        <div class="bit">
+          <div class="certificates-doc">
+            <h2 class="title-3">${_("Certificates")}</h2>
+            <p>${_("Upon successful completion of your course, learners receive a certificate to acknowledge their accomplishment. If you are a course team member with the Admin role in Studio, you can configure your course certificate.")}</p>
+            <p>${_("Click {em_start}Add your first certificate{em_end} to add a certificate configuration. Upload the organization logo to be used on the certificate, and specify at least one signatory. You can include up to four signatories for a certificate. You can also upload a signature image file for each signatory. {em_start}Note:{em_end} Signature images are used only for verified certificates. Optionally, specify a different course title to use on your course certificate. You might want to use a different title if, for example, the official course name is too long to display well on a certificate.") .format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${_("Select a course mode and click {em_start}Preview Certificate{em_end} to preview the certificate that a learner in the selected enrollment track would receive. When the certificate is ready for issuing, click {em_start}Activate.{em_end} To stop issuing an active certificate, click {em_start}Deactivate{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${_(" To edit the certificate configuration, hover over the top right corner of the form and click {em_start}Edit{em_end}. To delete a certificate, hover over the top right corner of the form and click the delete icon. In general, do not delete certificates after a course has started, because some certificates might already have been issued to learners.").format(em_start="<strong>", em_end="</strong>")}</p>
+            <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about certificates")}</a></p>
+          </div>
+        </div>
+        <div class="bit">
+        % if context_course:
+          <%
+            details_url = utils.reverse_course_url('settings_handler', context_course.id)
+            grading_url = utils.reverse_course_url('grading_handler', context_course.id)
+            course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
+            advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
+          %>
+        <h2 class="title-3">${_("Other Course Settings")}</h2>
+          <nav class="nav-related" aria-label="${_('Other Course Settings')}">
+            <ul>
+              <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+              <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
+              <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+              <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
+              <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+            </ul>
+          </nav>
+        % endif
+        </div>
+      </aside>
+    </section>
+  </div>
+</%block>

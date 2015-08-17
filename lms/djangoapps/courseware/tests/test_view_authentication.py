@@ -2,12 +2,11 @@ import datetime
 import pytz
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from courseware.access import has_access
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.factories import (
     BetaTesterFactory,
     StaffFactory,
@@ -22,7 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -389,12 +388,13 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(self.enroll(self.course))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestBetatesterAccess(ModuleStoreTestCase):
     """
     Tests for the beta tester feature
     """
     def setUp(self):
+        super(TestBetatesterAccess, self).setUp()
 
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)

@@ -2,15 +2,19 @@
 Acceptance tests for Content Libraries in Studio
 """
 from ddt import ddt, data
+from unittest import skip
+from nose.plugins.attrib import attr
+from flaky import flaky
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.utils import add_component
-from ...pages.studio.library import LibraryPage
+from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.users import LibraryUsersPage
 
 
+@attr('shard_4')
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -21,7 +25,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         Ensure a library exists and navigate to the library edit page.
         """
         super(LibraryEditPageTest, self).setUp()
-        self.lib_page = LibraryPage(self.browser, self.library_key)
+        self.lib_page = LibraryEditPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
 
@@ -51,7 +55,6 @@ class LibraryEditPageTest(StudioLibraryTest):
         Then one XBlock is displayed
         And displayed XBlock are second one
         """
-        self.browser.save_screenshot('library_page')
         self.assertEqual(len(self.lib_page.xblocks), 0)
 
         # Create a new block:
@@ -127,6 +130,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
 
+    @flaky  # TODO fix this, see TNL-2322
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.
@@ -139,7 +143,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         Then 10 are displayed.
         """
         self.assertEqual(len(self.lib_page.xblocks), 0)
-        for _ in range(0, 10):
+        for _ in range(10):
             add_component(self.lib_page, "problem", "Multiple Choice")
         self.assertEqual(len(self.lib_page.xblocks), 10)
         add_component(self.lib_page, "problem", "Multiple Choice")
@@ -183,6 +187,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
+@attr('shard_4')
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """
@@ -193,7 +198,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         Ensure a library exists and navigate to the library edit page.
         """
         super(LibraryNavigationTest, self).setUp()
-        self.lib_page = LibraryPage(self.browser, self.library_key)
+        self.lib_page = LibraryEditPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
 
@@ -343,6 +348,161 @@ class LibraryNavigationTest(StudioLibraryTest):
         self.assertEqual(self.lib_page.xblocks[-1].name, '11')
         self.assertEqual(self.lib_page.get_page_number(), '1')
 
+    def test_previews(self):
+        """
+        Scenario: Ensure the user is able to hide previews of XBlocks.
+        Given that I have a library in Studio with 40 XBlocks
+        Then previews are visible
+        And when I click the toggle previews button
+        Then the previews will not be visible
+        And when I click the toggle previews button
+        Then the previews are visible
+        """
+        self.assertTrue(self.lib_page.are_previews_showing())
+        self.lib_page.toggle_previews()
+        self.assertFalse(self.lib_page.are_previews_showing())
+        self.lib_page.toggle_previews()
+        self.assertTrue(self.lib_page.are_previews_showing())
+
+    def test_previews_navigation(self):
+        """
+        Scenario: Ensure preview settings persist across navigation.
+        Given that I have a library in Studio with 40 XBlocks
+        Then previews are visible
+        And when I click the toggle previews button
+        And click the next page button
+        Then the previews will not be visible
+        And the first XBlock will be the 11th one
+        And the last XBlock will be the 20th one
+        And when I click the toggle previews button
+        And I click the previous page button
+        Then the previews will be visible
+        And the first XBlock will be the first one
+        And the last XBlock will be the 11th one
+        """
+        self.assertTrue(self.lib_page.are_previews_showing())
+        self.lib_page.toggle_previews()
+        # Which set of arrows shouldn't matter for this test.
+        self.lib_page.move_forward('top')
+        self.assertFalse(self.lib_page.are_previews_showing())
+        self.assertEqual(self.lib_page.xblocks[0].name, '11')
+        self.assertEqual(self.lib_page.xblocks[-1].name, '20')
+        self.lib_page.toggle_previews()
+        self.lib_page.move_back('top')
+        self.assertTrue(self.lib_page.are_previews_showing())
+        self.assertEqual(self.lib_page.xblocks[0].name, '1')
+        self.assertEqual(self.lib_page.xblocks[-1].name, '10')
+
+    def test_preview_state_persistance(self):
+        """
+        Scenario: Ensure preview state persists between page loads.
+        Given that I have a library in Studio with 40 XBlocks
+        Then previews are visible
+        And when I click the toggle previews button
+        And I revisit the page
+        Then the previews will not be visible
+        """
+        self.assertTrue(self.lib_page.are_previews_showing())
+        self.lib_page.toggle_previews()
+        self.lib_page.visit()
+        self.lib_page.wait_until_ready()
+        self.assertFalse(self.lib_page.are_previews_showing())
+
+    def test_preview_add_xblock(self):
+        """
+        Scenario: Ensure previews are shown when adding new blocks, regardless of preview setting.
+        Given that I have a library in Studio with 40 XBlocks
+        Then previews are visible
+        And when I click the toggle previews button
+        Then the previews will not be visible
+        And when I add an XBlock
+        Then I will be on the 5th page
+        And the XBlock will have loaded a preview
+        And when I revisit the library
+        And I go to the 5th page
+        Then the top XBlock will be the one I added
+        And it will not have a preview
+        And when I add an XBlock
+        Then the XBlock I added will have a preview
+        And the top XBlock will not have one.
+        """
+        self.assertTrue(self.lib_page.are_previews_showing())
+        self.lib_page.toggle_previews()
+        self.assertFalse(self.lib_page.are_previews_showing())
+        add_component(self.lib_page, "problem", "Checkboxes")
+        self.assertEqual(self.lib_page.get_page_number(), '5')
+        first_added = self.lib_page.xblocks[0]
+        self.assertIn("Checkboxes", first_added.name)
+        self.assertFalse(self.lib_page.xblocks[0].is_placeholder())
+        self.lib_page.visit()
+        self.lib_page.wait_until_ready()
+        self.lib_page.go_to_page(5)
+        self.assertTrue(self.lib_page.xblocks[0].is_placeholder())
+        add_component(self.lib_page, "problem", "Multiple Choice")
+        # DOM has detatched the element since last assignment
+        first_added = self.lib_page.xblocks[0]
+        second_added = self.lib_page.xblocks[1]
+        self.assertIn("Multiple Choice", second_added.name)
+        self.assertFalse(second_added.is_placeholder())
+        self.assertTrue(first_added.is_placeholder())
+
+    def test_edit_with_preview(self):
+        """
+        Scenario: Editing an XBlock should show me a preview even if previews are hidden.
+        Given that I have a library in Studio with 40 XBlocks
+        Then previews are visible
+        And when I click the toggle previews button
+        Then the previews will not be visible
+        And when I edit the first XBlock
+        Then the first XBlock will show a preview
+        And the other XBlocks will still be placeholders
+        """
+        self.assertTrue(self.lib_page.are_previews_showing())
+        self.lib_page.toggle_previews()
+        self.assertFalse(self.lib_page.are_previews_showing())
+        target = self.lib_page.xblocks[0]
+        target.edit()
+        target.save_settings()
+        self.assertFalse(target.is_placeholder())
+        self.assertTrue(all([xblock.is_placeholder() for xblock in self.lib_page.xblocks[1:]]))
+
+    def test_duplicate_xblock_pagination(self):
+        """
+        Scenario: Duplicating an XBlock should not shift the page if the XBlock is not at the end.
+        Given that I have a library in Studio with 40 XBlocks
+        When I duplicate the third XBlock
+        Then the page should not change
+        And the duplicate XBlock should be there
+        And it should show a preview
+        And there should not be more than 10 XBlocks visible.
+        """
+        third_block_id = self.lib_page.xblocks[2].locator
+        self.lib_page.click_duplicate_button(third_block_id)
+        self.lib_page.wait_until_ready()
+        target = self.lib_page.xblocks[3]
+        self.assertIn('Duplicate', target.name)
+        self.assertFalse(target.is_placeholder())
+        self.assertEqual(len(self.lib_page.xblocks), 10)
+
+    def test_duplicate_xblock_pagination_end(self):
+        """
+        Scenario: Duplicating an XBlock if it's the last one should bring me to the next page with a preview.
+        Given that I have a library in Studio with 40 XBlocks
+        And when I hide previews
+        And I duplicate the last XBlock
+        The page should change to page 2
+        And the duplicate XBlock should be the first XBlock
+        And it should not be a placeholder
+        """
+        self.lib_page.toggle_previews()
+        last_block_id = self.lib_page.xblocks[-1].locator
+        self.lib_page.click_duplicate_button(last_block_id)
+        self.lib_page.wait_until_ready()
+        self.assertEqual(self.lib_page.get_page_number(), '2')
+        target_block = self.lib_page.xblocks[0]
+        self.assertIn('Duplicate', target_block.name)
+        self.assertFalse(target_block.is_placeholder())
+
 
 class LibraryUsersPageTest(StudioLibraryTest):
     """
@@ -357,12 +517,15 @@ class LibraryUsersPageTest(StudioLibraryTest):
         self.page = LibraryUsersPage(self.browser, self.library_key)
         self.page.visit()
 
-    def _expect_refresh(self):
+    def _refresh_page(self):
         """
-        Wait for the page to reload.
+        Reload the page.
         """
-        self.page = LibraryUsersPage(self.browser, self.library_key).wait_for_page()
+        self.page = LibraryUsersPage(self.browser, self.library_key)
+        self.page.visit()
+        self.page.wait_until_no_loading_indicator()
 
+    @flaky  # TODO fix this; see TNL-2647
     def test_user_management(self):
         """
         Scenario: Ensure that we can edit the permissions of users.
@@ -372,7 +535,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         Then there should be one user listed (myself), and I must
         not be able to remove myself or my instructor privilege.
 
-        When I click Add Intructor
+        When I click Add Instructor
         Then I see a form to complete
         When I complete the form and submit it
         Then I can see the new user is listed as a "User" of the library
@@ -426,7 +589,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
             else:
                 return users[1], users[0]
 
-        self._expect_refresh()
+        self._refresh_page()
         user_me, them = get_two_users()
         check_is_only_admin(user_me)
 
@@ -440,7 +603,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         # Add Staff permissions to the new user:
 
         them.click_promote()
-        self._expect_refresh()
+        self._refresh_page()
         user_me, them = get_two_users()
         check_is_only_admin(user_me)
 
@@ -455,7 +618,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         # Add Admin permissions to the new user:
 
         them.click_promote()
-        self._expect_refresh()
+        self._refresh_page()
         user_me, them = get_two_users()
         self.assertIn("admin", user_me.role_label.lower())
         self.assertFalse(user_me.can_promote)
@@ -473,7 +636,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         # Delete the new user:
 
         them.click_delete()
-        self._expect_refresh()
+        self._refresh_page()
         self.assertEqual(len(self.page.users), 1)
         user = self.page.users[0]
         self.assertTrue(user.is_current_user)

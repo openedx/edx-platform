@@ -1,6 +1,6 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/ajax_helpers',
-    'js/common_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
+    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
     'js/edxnotes/models/note', 'js/edxnotes/views/note_item',
     'js/spec/edxnotes/custom_matchers'
 ], function(
@@ -9,7 +9,7 @@ define([
 ) {
     'use strict';
     describe('EdxNotes NoteItemView', function() {
-        var getView = function (model) {
+        var getView = function (model, scrollToTag) {
             model = new NoteModel(_.defaults(model || {}, {
                 id: 'id-123',
                 user: 'user-123',
@@ -23,7 +23,7 @@ define([
                 }
             }));
 
-            return new NoteItemView({model: model}).render();
+            return new NoteItemView({model: model, scrollToTag: scrollToTag, view: "Test View"}).render();
         };
 
         beforeEach(function() {
@@ -53,20 +53,46 @@ define([
 
         it('should display update value and accompanying text', function() {
             var view = getView();
-            expect(view.$('.reference-title').last()).toContainText('Last Edited:');
-            expect(view.$('.reference-meta').last()).toContainText('December 11, 2014 at 11:12AM');
+            expect(view.$('.reference-title')[1]).toContainText('Last Edited:');
+            expect(view.$('.reference-updated-date').last()).toContainText('December 11, 2014 at 11:12AM');
         });
 
-        it('should log the edx.student_notes.used_unit_link event properly', function () {
+        it('should not display tags if there are none', function() {
+            var view = getView();
+            expect(view.$el).not.toContain('.reference-tags');
+            expect(view.$('.reference-title').length).toBe(2);
+        });
+
+        it('should display tags if they exist', function() {
+            var view = getView({tags: ["First", "Second"]});
+            expect(view.$('.reference-title').length).toBe(3);
+            expect(view.$('.reference-title')[2]).toContainText('Tags:');
+            expect(view.$('a.reference-tags').length).toBe(2);
+            expect(view.$('a.reference-tags')[0]).toContainText('First');
+            expect(view.$('a.reference-tags')[1]).toContainText('Second');
+        });
+
+        it('should handle a click event on the tag', function() {
+            var scrollToTagSpy = {
+                scrollToTag: function (tagName){}
+            };
+            spyOn(scrollToTagSpy, 'scrollToTag');
+            var view = getView({tags: ["only"]}, scrollToTagSpy.scrollToTag);
+            view.$('a.reference-tags').click();
+            expect(scrollToTagSpy.scrollToTag).toHaveBeenCalledWith("only");
+        });
+
+        it('should log the edx.course.student_notes.used_unit_link event properly', function () {
             var requests = AjaxHelpers.requests(this),
                 view = getView();
             spyOn(view, 'redirectTo');
             view.$('.reference-unit-link').click();
             expect(Logger.log).toHaveBeenCalledWith(
-                'edx.student_notes.used_unit_link',
+                'edx.course.student_notes.used_unit_link',
                 {
                     'note_id': 'id-123',
-                    'component_usage_id': 'usage_id-123'
+                    'component_usage_id': 'usage_id-123',
+                    'view': 'Test View'
                 },
                 null,
                 {

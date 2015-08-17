@@ -98,7 +98,7 @@ def ensure_pr_fetch():
     """
     modified = False
     remotes = git.remote().splitlines()
-    if not "edx" in remotes:
+    if 'edx' not in remotes:
         git.remote("add", "edx", "https://github.com/edx/edx-platform.git")
         modified = True
     # it would be nice to use the git-python API to do this, but it doesn't seem
@@ -251,9 +251,9 @@ def ensure_github_creds(attempts=3):
     else:
         config = {}
     # update config
-    if not "credentials" in config:
+    if 'credentials' not in config:
         config["credentials"] = {}
-    if not "api.github.com" in config["credentials"]:
+    if 'api.github.com' not in config['credentials']:
         config["credentials"]["api.github.com"] = {}
     config["credentials"]["api.github.com"]["username"] = username
     config["credentials"]["api.github.com"]["token"] = token
@@ -405,7 +405,7 @@ def generate_pr_table(start_ref, end_ref):
             rows.append("| {merged_by} | {author} | {title} | {pull_request} | {jira} | {verified} |".format(
                 merged_by=email if i == 0 else "",
                 author=user_link.format(user=author) if author else "",
-                title=title.replace("|", "\|"),
+                title=title.replace("|", "\|").replace('{', '\{').replace('}', '\}'),
                 pull_request=pr_link.format(num=pull_request),
                 jira=", ".join(parse_ticket_references(body)),
                 verified="",
@@ -466,7 +466,7 @@ def generate_email(start_ref, end_ref, release_date=None):
 
         https://openedx.atlassian.net/wiki/display/ENG/{date}+Release
 
-        The staging server is: https://www.stage.edx.org
+        The staging server is: https://stage.edx.org
 
         Note that you are responsible for verifying any pull requests that you
         merged, whether you wrote the code or not. (If you didn't write the code,
@@ -474,6 +474,9 @@ def generate_email(start_ref, end_ref, release_date=None):
         verify the changes -- but even if you can't, you're still responsible!)
         If you find any bugs, please notify me and record the bugs on the
         release page. Thanks!
+
+        By the way, if you have an @edx.org email address and are having trouble logging
+        into stage, you may need to reset your password.
     """.format(
         emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),

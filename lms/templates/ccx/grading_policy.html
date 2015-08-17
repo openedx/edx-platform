@@ -1,0 +1,23 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div id="warn-coach" class="wrapper-msg urgency-high warning">
+  <div class="msg">
+    <i class="msg-icon fa fa-warning"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("WARNING")}</h3>
+      <div class="copy">
+        <p>${_("For advanced users only. Errors in the grading policy can lead to the course failing to display. This form does not check the validity of the policy before saving.")}</p>
+        <p>${_("Most coaches should not need to make changes to the grading policy.")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>${_("Grading Policy")}</h2>
+
+<form action="${grading_policy_url}" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+  <textarea cols="80" style="height: 500px;"
+    name="policy" id="grading-policy">${grading_policy}</textarea><br/>
+  <button type="submit">${_("Save Grading Policy")}</button>
+</form>

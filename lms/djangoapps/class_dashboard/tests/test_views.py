@@ -1,26 +1,26 @@
 """
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
-from django.test.utils import override_settings
-from django.test.client import RequestFactory
-from django.utils import simplejson
-from mock import patch
+import json
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
-from student.tests.factories import AdminFactory
+from django.test.client import RequestFactory
+from mock import patch
+from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from class_dashboard import views
+from student.tests.factories import AdminFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py
     """
 
     def setUp(self):
+        super(TestViews, self).setUp()
 
         self.request_factory = RequestFactory()
         self.request = self.request_factory.get('')
@@ -35,7 +35,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
-        self.assertEqual(simplejson.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content)
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_problem_grade_distribution_no_access(self, has_access):
@@ -55,7 +55,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_sequential_open_distrib(self.request, 'test/test/test')
 
-        self.assertEqual(simplejson.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content)
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_sequential_open_distribution_no_access(self, has_access):
@@ -75,7 +75,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.section_problem_grade_distrib(self.request, 'test/test/test', '1')
 
-        self.assertEqual(simplejson.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content)
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_section_problem_grade_distribution_no_access(self, has_access):

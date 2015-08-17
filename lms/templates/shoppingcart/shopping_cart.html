@@ -6,145 +6,211 @@ from courseware.courses import course_image_url, get_course_about_section
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import marketing_link
 from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 
 %>
 
+<section class="wrapper confirm-enrollment shopping-cart cart-view">
+  <%block name="custom_content">
 
-<%block name="custom_content">
+  % if is_course_enrollment_closed:
+    <%
+      # Translators: course_names is a comma-separated list of one or more course names
+      expiry_message = ungettext(
+          "{course_names} has been removed because the enrollment period has closed.",
+          "{course_names} have been removed because the enrollment period has closed.",
+          len(expired_course_names)
+      ).format(
+          course_names=", ".join(expired_course_names),
+      )
+    %>
+  % endif
 
-<div class="container">
-  % if shoppingcart_items:
-        <%block name="billing_details_highlight">
-         % if order.order_type == 'business':
-            <li class="billing">${_('Billing Details')}</li>
-         % else:
-            <li class="billing hidden">${_('Billing Details')}</li>
-         % endif
-        </%block>
+  <div class="container">
+    % if shoppingcart_items:
+      <%block name="billing_details_highlight">
+        % if order.order_type == 'business':
+          <li class="billing">${_('Billing Details')}</li>
+        % else:
+          <li class="billing hidden">${_('Billing Details')}</li>
+        % endif
+      </%block>
 
-     % if is_course_enrollment_closed:
-      <p id="expiry-msg">${_('{course_names} has been removed because the enrollment period has closed.').format(course_names=appended_expired_course_names)}</p>
-     % endif:
- <%
-    discount_applied = False
-    order_type = 'personal'
- %>
+      % if is_course_enrollment_closed:
+        <p id="expiry-msg">${expiry_message}</p>
+      % endif
+   <%
+      discount_applied = False
+      order_type = 'personal'
+   %>
 
-  <section class="wrapper confirm-enrollment shopping-cart cart-view">
-    % for item, course in shoppingcart_items:
-       % if loop.index > 0 :
-        <hr>
-      %endif
-      % if item.order.order_type == 'business':
-       <% order_type = 'business' %>
-      %endif
-     <div class="user-data">
-      <div class="clearfix">
-      <div class="image">
-
-           <img style="width: 100%; height: 100%;" src="${course_image_url(course)}"
-                alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image" />
-
-      </div>
-      <div class="data-input">
-        <h3>${_('Registration for:')} <span class="pull-right">${_('Course Dates:')}</span></h3>
-        <h1>${ course.display_name }</h1><span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span>
-        <hr />
-        <div class="three-col">
-            <div class="col-1">
-                % if item.list_price != None:
-                <% discount_applied = True %>
-                <div class="price">${_('Price per student:')} <span class="line-through">  ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span></div>
-                <div class="price green">${_('Discount Applied:')} <span>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)} </span></div>
-                % else:
-                <div class="price">${_('Price per student:')} <span>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}</span></div>
-                % endif
-            </div>
-            <div class="col-2">
-              <div class="numbers-row">
-                <label for="students">${_('Students:')}</label>
-                <div class="counter">
-                    <input maxlength="3" title="Input qty and press enter." max="999" type="text" name="students" value="${item.qty}" id="${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}">
-                </div>
-                <div class="inc button"><i class="icon fa fa-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon fa fa-caret-down"></i></div>
-                    <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
-                <span class="error-text hidden" id="students-${item.id}"></span>
-            </div>
+    <article class="wrapper confirm-enrollment shopping-cart cart-view" aria-label="${_('Shopping Cart')}">
+      % for item, course in shoppingcart_items:
+        <%
+          ## Translators: currency_symbol is a symbol indicating type of currency, ex "$".
+          ## This string would look like this when all variables are in:
+          ## "$500.00"
+          unit_cost = _(
+            "{currency_symbol}{price}"
+          ).format(
+            currency_symbol=currency_symbol,
+            price="{0:0.2f}".format(item.unit_cost)
+          )
+        %>
+        % if loop.index > 0 :
+          <hr>
+        %endif
+        % if item.order.order_type == 'business':
+          <% order_type = 'business' %>
+        %endif
+        <div class="user-data">
+        <div class="clearfix">
+        <div class="image">
+          <img class="item-image" src="${course_image_url(course)}"
+              alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} ${_('Cover Image')}" />
+        </div>
+        <div class="data-input">
+          ## Translators: "Registration for:" is followed by a course name
+          <h3 class="course-title-info" id="course-title">
+            <span class="course-registration-title">${_('Registration for:')}</span>
+            <span class="course-display-name">${ course.display_name }</span>
+          </h3>
+          <p class="course-meta-info" aria-describedby="course-title">
+            <span class="course-dates-title">${_('Course Dates:')}</span>
+            <span class="course-display-dates">${ course.start_datetime_text() } - ${ course.end_datetime_text() }</span>
+          </p>
+          <hr>
+          <div class="three-col">
+              <div class="col-1">
+                  % if item.is_discounted:
+                    <% discount_applied = True %>
+                    <div class="price">${_('Price per student:')}
+                      <span class="line-through">
+                        ## Translators: currency_symbol is a symbol indicating type of currency, ex "$".
+                        ## This string would look like this when all variables are in:
+                        ## "$500.00"
+                        ${_("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price="{0:0.2f}".format(item.list_price))}
+                      </span>
+                    </div>
+                    <div class="price green">${_('Discount Applied:')}
+                      <span>${unit_cost}</span>
+                    </div>
+                  % else:
+                    <div class="price">${_('Price per student:')}
+                      <span>${unit_cost}</span>
+                    </div>
+                  % endif
               </div>
+              <div class="col-2">
+                <div class="numbers-row" aria-live="polite">
+                  <label for="field_${item.id}">${_('Students:')}</label>
+                  <div class="counter">
+                      <input maxlength="3" class="spin-counter" title="${_('Input quantity and press enter.')}" max="999" type="text" name="students" value="${item.qty}" id="field_${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}" data-item-id="${item.id}" aria-describedby="students-${item.id}">
+                  </div>
+                  <button class="inc button" data-operation="inc">
+                    <i class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></i>
+                    <span class="sr">Increase</span>
+                  </button>
+                  <button class="dec button" data-operation="dec">
+                    <i class="icon fa fa-caret-down"></i>
+                    <span class="sr">Decrease</span>
+                  </button>
+                      <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
+                  <span class="error-text hidden" id="students-${item.id}"></span>
+              </div>
+                </div>
 
-            <div class="col-3">
-               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon fa fa-times-circle"></i></a>
+              <div class="col-3">
+                 <button href="#" class="btn-remove" data-item-id="${item.id}">
+                  <i class="icon fa fa-times-circle" aria-hidden="true"></i>
+                  <span class="sr">Remove</span>
+                </button>
+              </div>
+          </div>
+        </div>
+            </div>
+
+        </div>
+      % endfor
+        <div class="discount">
+
+            <div class="code-text">
+            % if not discount_applied:
+              <div class="code-input" aria-live="polite">
+                <label for="input_code" class="sr">Discount or activation code</label>
+                <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
+                <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
+                <span class="error-text hidden" id="code"></span>
+              </div>
+            % else:
+              <div class="code-applied">
+                <span class="green"><i class="icon fa fa-check-square-o" aria-hidden="true"></i>${_('code has been applied')}</span>
+                <button type="submit" class="blue-border" id="submit-reset-redemption">${_('Reset')}</button>
+              </div>
+            % endif
+                <span class="pull-right">${_('TOTAL:')}
+                  <b id="total-amount" data-amount="${'{price:0.2f}'.format(price=amount)}">
+                    ## Translators: currency_symbol is a symbol indicating type of currency, ex "$". currency_abbr is
+                    ## an abbreviation for the currency, ex "USD". This string would look like this when all variables are in:
+                    ## "$500.00 USD"
+                    ${_("{currency_symbol}{price} {currency_abbr}").format(currency_symbol=currency_symbol, price="{0:0.2f}".format(amount), currency_abbr=currency.upper())}
+                  </b>
+                </span>
             </div>
         </div>
-      </div>
+        <div class="col-two">
+            <div class="col-2 relative">
+               % if order_type == 'business':
+                  <div name="billing">
+                      <button type="submit" name="billing-details" aria-describedby="billing_business_helper_text">
+                        ${_('Billing Details')}
+                        <i class="icon fa fa-caret-right" aria-hidden="true"></i>
+                      </button>
+                      <p id="billing_business_helper_text">
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                      </p>
+                  </div>
+                   <div name="payment" class="hidden">
+                    <div id="processor_form" aria-describedby="payment_business_helper_text">
+                      ${form_html}
+                    </div>
+                    <p id="payment_business_helper_text">
+                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                    </p>
+                  </div>
+               % else:
+                  <div name="payment" aria-describedby="payment_helper_text">
+                    ${form_html}
+                    <p id="payment_helper_text">
+                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                    </p>
+                  </div>
+                  <div name="billing" class="hidden">
+                      <button type="submit" name="billing-details" aria-describedby="billing_helper_text">
+                        ${_('Billing Details')}
+                        <i class="icon fa fa-caret-right" aria-hidden="true"></i>
+                      </button>
+                      <p id="billing_helper_text">
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                      </p>
+                  </div>
+               %endif
+            </div>
+        </div>
+     </article>
+      % else:
+        <article aria-label="${_('Empty Cart')}">
+          <div class="empty-cart" >
+            <h2>${_('Your Shopping cart is currently empty.')}</h2>
+            % if is_course_enrollment_closed:
+              <p>${expiry_message}</p>
+            % endif
+            <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
           </div>
-
+        </article>
+      % endif
   </div>
-    % endfor
-      <div class="discount">
-
-          <div class="code-text">
-           % if not discount_applied:
-           <div class="code-input">
-              <input type="text" placeholder="discount or activation code" id="input_code">
-              <input type="submit" value="Apply" class="blue" id="submit-code">
-              <span class="error-text hidden" id="code" ></span>
-           </div>
-           % else:
-           <div class="code-applied">
-              <span class="green"><i class="icon fa fa-check-square-o"></i>${_('code has been applied')}</span>
-              <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
-           </div>
-            %endif
-              <span class="pull-right">${_('TOTAL:')} <b id="total-amount" data-amount="${'{0:0.2f}'.format(amount)}">${currency_symbol}${"{0:0.2f}".format(amount)} ${currency.upper()}</b></span>
-          </div>
-      </div>
-      <div class="col-two">
-          <div class="col-2 relative">
-             % if order_type == 'business':
-              <div name="billing">
-                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon fa fa-caret-right"></i>
-                    <p>
-                        ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
-                    </p>
-              </div>
-               <div name="payment" class="hidden">
-                <div id="processor_form">
-                  ${form_html}
-                </div>
-                <p>
-                    ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
-                    ${_('will be enrolled in this course.')}
-                </p>
-              </div>
-             % else:
-              <div name="payment">
-                ${form_html}
-                <p>
-                    ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
-                    ${_('will be enrolled in this course.')}
-                </p>
-              </div>
-              <div name="billing" class="hidden">
-                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon fa fa-caret-right"></i>
-                    <p>
-                        ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
-                    </p>
-              </div>
-             %endif
-          </div>
-      </div>
-   </section>
-    % else:
-      <div class="empty-cart" >
-        <h2>${_('Your Shopping cart is currently empty.')}</h2>
-        % if is_course_enrollment_closed:
-          <p>${_('{course_names} has been removed because the enrollment period has closed.').format(course_names=appended_expired_course_names)}</p>
-        % endif
-        <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
-      </div>
-    % endif
-</div>
+</section>
 <form id='refresh_tracker'>
    <input id="reloadValue" type="hidden" name="reloadValue" value="" />
 </form>
@@ -170,7 +236,7 @@ from django.utils.translation import ugettext as _
           location.reload(true);
         }
 
-      $('a.btn-remove').click(function(event) {
+      $('button.btn-remove').click(function(event) {
       event.preventDefault();
       var post_url = "${reverse('shoppingcart.views.remove_item')}";
       $.post(post_url, {id:$(this).data('item-id')})
@@ -224,7 +290,7 @@ from django.utils.translation import ugettext as _
                })
    });
 
-   $("input[name='billing-details']").click(function(event){
+   $("button[name='billing-details']").click(function(event){
        // check if there is code exists in the inout_code field
        // before going to billing details page
        // if exists then trigger click event of the apply code button
@@ -244,15 +310,15 @@ from django.utils.translation import ugettext as _
          var wasBusinessType = false;
          var studentField =  $(this).parent().find("input[type='text']");
          var unit_cost = parseFloat(studentField.data('unit-cost'));
-         var ItemId = studentField.attr('id');
+         var ItemId = studentField.data('item-id');
 
          var $button = $(this);
-         var oldValue =   $("#"+ItemId).data('qty');
+         var oldValue =   studentField.data('qty');
          var newVal = 1; // initialize with 1.
          oldValue = parseFloat(oldValue);
          hideErrorMsg('students-'+ItemId);
          if ($.isNumeric(oldValue)){
-             if ($button.text() == "+") {
+             if ($button.data("operation") == "inc") {
                  if(oldValue > 0){
                      newVal = oldValue + 1;
                      if(newVal > 1000){
@@ -272,7 +338,7 @@ from django.utils.translation import ugettext as _
          $button.parent().find("input").val(newVal);
          isBusinessType = getBusinessType();
          update_user_cart(ItemId, newVal, oldValue, unit_cost, wasBusinessType, isBusinessType);
-         $("#"+ItemId).data('qty', newVal);
+         studentField.data('qty', newVal);
      }
  });
 
@@ -324,7 +390,7 @@ from django.utils.translation import ugettext as _
           typeChanged = true;
           $('html').css({'cursor':'wait'});
           $(".button").css({'cursor':'wait'});
-          $('.col-2.relative').find("input[type='submit']").attr('disabled', true);
+          $('.col-2.relative').find("button[type='submit']").attr('disabled', true);
       }
 
 
@@ -340,11 +406,14 @@ from django.utils.translation import ugettext as _
                   $(".button").css({'cursor':'default'});
                   $("#processor_form").html(data['form_html']);
                   if(typeChanged){
-                      var submit_button = $('.col-2.relative').find("input[type='submit']")
+                      var submit_button = $('.col-2.relative').find("button[type='submit']");
                       submit_button.removeAttr('disabled');
                       for (var i = 0; i< data['oldToNewIdMap'].length; i++) {
-                          $('#'+data['oldToNewIdMap'][i]['oldId']+'').attr('id',data['oldToNewIdMap'][i]['newId']);
-                          $('a.btn-remove[data-item-id]=' +data['oldToNewIdMap'][i]['oldId']+'').data('item-id', data['oldToNewIdMap'][i]['newId']);
+                          var oldId = data['oldToNewIdMap'][i]['oldId'];
+                          var newId = data['oldToNewIdMap'][i]['newId'];
+
+                          $('input.spin-counter[data-item-id]=' + oldId ).data('item-id', newId);
+                          $('button.btn-remove[data-item-id]=' + oldId ).data('item-id', newId);
                       }
                       if(isbusinessType){
                           $( "div[name='payment']").addClass('hidden');
@@ -381,8 +450,9 @@ from django.utils.translation import ugettext as _
   function updateTextFieldQty(event){
 
       if(isSpinnerBtnEnabled){
-          var itemId = event.currentTarget.id;
-          var prevQty = $("#"+itemId).data('qty');
+          var el_id = event.currentTarget.id;
+          var itemId = $("#"+el_id).data('item-id');
+          var prevQty = $("#"+el_id).data('qty');
           var newQty = event.currentTarget.value;
           var unitCost = event.currentTarget.dataset.unitCost;
           var isBusinessType = getBusinessType();
@@ -390,7 +460,7 @@ from django.utils.translation import ugettext as _
           var wasBusinessType = !isBusinessType;
           isSpinnerBtnEnabled = false;
           update_user_cart(itemId, newQty, prevQty, unitCost, wasBusinessType, isBusinessType);
-          $("#"+itemId).data('qty', newQty);
+          $("#"+el_id).data('qty', newQty);
 
       }
   }

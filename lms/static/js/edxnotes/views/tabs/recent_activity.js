@@ -3,15 +3,16 @@
 define([
     'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view'
 ], function (gettext, TabPanelView, TabView) {
+    var view = 'Recent Activity';
     var RecentActivityView = TabView.extend({
         PanelConstructor: TabPanelView.extend({
             id: 'recent-panel',
-            title: 'Recent Activity',
+            title: view,
             className: function () {
                 return [
                     TabPanelView.prototype.className,
                     'note-group'
-                ].join(' ')
+                ].join(' ');
             },
             renderContent: function () {
                 this.$el.append(this.getNotes(this.collection.toArray()));
@@ -22,7 +23,8 @@ define([
         tabInfo: {
             identifier: 'view-recent-activity',
             name: gettext('Recent Activity'),
-            icon: 'fa fa-clock-o'
+            icon: 'fa fa-clock-o',
+            view: view
         }
     });
 

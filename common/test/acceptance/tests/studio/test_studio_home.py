@@ -3,9 +3,10 @@ Acceptance tests for Home Page (My Courses / My Libraries).
 """
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import LibraryLocator
+from unittest import skip
 
 from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.library import LibraryPage
+from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.index import DashboardPage
 
 
@@ -49,7 +50,7 @@ class CreateLibraryTest(WebAppTest):
         self.dashboard_page.submit_new_library_form()
 
         # The next page is the library edit view; make sure it loads:
-        lib_page = LibraryPage(self.browser, LibraryLocator(org, number))
+        lib_page = LibraryEditPage(self.browser, LibraryLocator(org, number))
         lib_page.wait_for_page()
 
         # Then go back to the home page and make sure the new library is listed there:

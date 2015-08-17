@@ -31,6 +31,8 @@ class StaticContentServer(object):
             request.path.startswith('/' + XASSET_LOCATION_TAG + '/') or
             request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
         ):
+            if AssetLocator.CANONICAL_NAMESPACE in request.path:
+                request.path = request.path.replace('block/', 'block@', 1)
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except (InvalidLocationError, InvalidKeyError):

@@ -4,6 +4,7 @@ import random
 
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
+import unittest
 
 
 # Allow tests access to protected methods (or module-protected methods) under
@@ -34,9 +35,11 @@ class MakeRandomPasswordTest(testutil.TestCase):
         self.assertEqual(expected, pipeline.make_random_password(choice_fn=random_instance.choice))
 
 
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
 class ProviderUserStateTestCase(testutil.TestCase):
     """Tests ProviderUserState behavior."""
 
     def test_get_unlink_form_name(self):
-        state = pipeline.ProviderUserState(provider.GoogleOauth2, object(), False)
-        self.assertEqual(provider.GoogleOauth2.NAME + '_unlink_form', state.get_unlink_form_name())
+        google_provider = self.configure_google_provider(enabled=True)
+        state = pipeline.ProviderUserState(google_provider, object(), 1000)
+        self.assertEqual(google_provider.provider_id + '_unlink_form', state.get_unlink_form_name())

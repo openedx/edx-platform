@@ -8,12 +8,13 @@ from django.http import HttpResponseNotFound
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
+from xmodule.tabs import CourseTabList, CourseTab, InvalidTabsException, StaticTab
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from ..utils import get_lms_link_for_item
@@ -61,10 +62,7 @@ def tabs_handler(request, course_key_string):
         # present in the same order they are displayed in LMS
 
         tabs_to_render = []
-        for tab in CourseTabList.iterate_displayable_cms(
-                course_item,
-                settings,
-        ):
+        for tab in CourseTabList.iterate_displayable(course_item, inline_collections=False):
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
                 static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)

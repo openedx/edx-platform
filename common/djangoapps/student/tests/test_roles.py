@@ -20,6 +20,7 @@ class RolesTestCase(TestCase):
     """
 
     def setUp(self):
+        super(RolesTestCase, self).setUp()
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.course_loc = self.course_key.make_usage_key('course', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
@@ -171,6 +172,7 @@ class RoleCacheTestCase(TestCase):
     )
 
     def setUp(self):
+        super(RoleCacheTestCase, self).setUp()
         self.user = UserFactory()
 
     @ddt.data(*ROLES)

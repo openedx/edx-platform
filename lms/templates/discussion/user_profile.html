@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template.defaultfilters import escapejs %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+%>
+
 <%block name="bodyclass">discussion</%block>
 <%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
 
@@ -22,8 +24,8 @@
 
 <section class="container">
   <div class="course-wrapper">
-    <section aria-label="${_('User Profile')}" class="user-profile">
-      <nav>
+    <section class="user-profile">
+      <nav aria-label="${_('User Profile')}">
 
         <article class="sidebar-module discussion-sidebar">
           <%include file="_user_profile.html" />

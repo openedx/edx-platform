@@ -98,7 +98,7 @@ define([
             var args = this.prepareData(data);
             if (args) {
                 this.options.search.apply(this, args);
-                this.logger.emit('edx.student_notes.searched', {
+                this.logger.emit('edx.course.student_notes.searched', {
                     'number_of_results': args[1],
                     'search_string': args[2]
                 });

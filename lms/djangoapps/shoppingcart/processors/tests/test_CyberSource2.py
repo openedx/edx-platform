@@ -41,6 +41,8 @@ class CyberSource2Test(TestCase):
 
     def setUp(self):
         """ Create a user and an order. """
+        super(CyberSource2Test, self).setUp()
+
         self.user = UserFactory()
         self.order = Order.get_cart_for_user(self.user)
         self.order_item = OrderItem.objects.create(

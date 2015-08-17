@@ -5,6 +5,6 @@
     },
     "invalid_tags": {
         "test_string": "The user with id %%user-id%% is named %%USER_FULLNAME%% and is in %%COURSE_DISPLAY_NAME",
-        "expected": "The user with id %%user-id%% is named Test User and is in test_course"
+        "expected": "The user with id %%user-id%% is named Test User and is in %%COURSE_DISPLAY_NAME"
     }
 }

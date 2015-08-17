@@ -7,10 +7,8 @@ import textwrap
 import mock
 import requests
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -46,7 +44,6 @@ HTML_BOOK = {
 }
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class StaticBookTest(ModuleStoreTestCase):
     """
     Helpers for the static book tests.

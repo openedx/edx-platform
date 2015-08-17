@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
 'use strict';
-define(['gettext', 'underscore', 'backbone', 'js/edxnotes/utils/template'],
-function (gettext, _, Backbone, templateUtils) {
+define(['gettext', 'underscore', 'jquery', 'backbone', 'js/edxnotes/utils/template'],
+function (gettext, _, $, Backbone, templateUtils) {
     var TabItemView = Backbone.View.extend({
         tagName: 'li',
         className: 'tab',

@@ -42,6 +42,10 @@ class StudioCourseTest(UniqueCourseTest):
         Log in as the user that created the course. The user will be given instructor access
         to the course and enrolled in it. By default the user will not have staff access unless
         is_staff is passed as True.
+
+        Args:
+            user(dict): dictionary containing user data: {'username': ..., 'email': ..., 'password': ...}
+            is_staff(bool): register this user as staff
         """
         self.auth_page = AutoAuthPage(
             self.browser,
@@ -89,7 +93,7 @@ class ContainerBase(StudioCourseTest):
         """
         self.outline.visit()
         subsection = self.outline.section(section_name).subsection(subsection_name)
-        return subsection.toggle_expand().unit(unit_name).go_to()
+        return subsection.expand_subsection().unit(unit_name).go_to()
 
     def do_action_and_verify(self, action, expected_ordering):
         """

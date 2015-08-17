@@ -166,13 +166,13 @@ def payment_accepted(params):
                           ('decision', str)]:
         if key not in params:
             raise CCProcessorDataException(
-                _("The payment processor did not return a required parameter: {0}".format(key))
+                _("The payment processor did not return a required parameter: {0}").format(key)
             )
         try:
             valid_params[key] = key_type(params[key])
         except ValueError:
             raise CCProcessorDataException(
-                _("The payment processor returned a badly-typed value {0} for param {1}.".format(params[key], key))
+                _("The payment processor returned a badly-typed value {0} for param {1}.").format(params[key], key)
             )
 
     try:
@@ -187,8 +187,9 @@ def payment_accepted(params):
             charged_amt = Decimal(params['ccAuthReply_amount'])
         except InvalidOperation:
             raise CCProcessorDataException(
-                _("The payment processor returned a badly-typed value {0} for param {1}.".format(
-                    params['ccAuthReply_amount'], 'ccAuthReply_amount'))
+                _("The payment processor returned a badly-typed value {0} for param {1}.").format(
+                    params['ccAuthReply_amount'], 'ccAuthReply_amount'
+                )
             )
 
         if charged_amt == order.total_cost and valid_params['orderCurrency'] == order.currency:
@@ -198,9 +199,13 @@ def payment_accepted(params):
                     'order': order}
         else:
             raise CCProcessorWrongAmountException(
-                _("The amount charged by the processor {0} {1} is different than the total cost of the order {2} {3}."
-                    .format(charged_amt, valid_params['orderCurrency'],
-                            order.total_cost, order.currency))
+                _("The amount charged by the processor {0} {1} is different than the total cost of the order {2} {3}.")
+                .format(
+                    charged_amt,
+                    valid_params['orderCurrency'],
+                    order.total_cost,
+                    order.currency
+                )
             )
     else:
         return {'accepted': False,
@@ -400,10 +405,9 @@ REASONCODE_MAP.update(
             Possible fix: retry with another form of payment
             """)),
         '233': _('General decline by the processor.  Possible fix: retry with another form of payment'),
-        '234': dedent(_(
-            """
-            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}
-            """.format(settings.PAYMENT_SUPPORT_EMAIL))),
+        '234': _(
+            "There is a problem with our CyberSource merchant configuration.  Please let us know at {0}"
+        ).format(settings.PAYMENT_SUPPORT_EMAIL),
         # reason code 235 only applies if we are processing a capture through the API. so we should never see it
         '235': _('The requested amount exceeds the originally authorized amount.'),
         '236': _('Processor Failure.  Possible fix: retry the payment'),

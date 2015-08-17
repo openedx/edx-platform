@@ -64,6 +64,7 @@ class InheritingFieldDataTest(unittest.TestCase):
         not_inherited = String(scope=Scope.settings, default="nothing")
 
     def setUp(self):
+        super(InheritingFieldDataTest, self).setUp()
         self.system = get_test_descriptor_system()
         self.all_blocks = {}
         self.system.get_block = self.all_blocks.get

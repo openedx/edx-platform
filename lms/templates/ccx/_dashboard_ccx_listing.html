@@ -1,0 +1,80 @@
+<%page args="ccx, membership, course, show_courseware_link, is_course_blocked" />
+
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
+from ccx_keys.locator import CCXLocator
+%>
+<%
+  ccx_target = reverse('info', args=[CCXLocator.from_course_locator(course.id, ccx.id)])
+%>
+<li class="course-item">
+  <article class="course">
+    <section class="details">
+      <div class="wrapper-course-image" aria-hidden="true">
+        % if show_courseware_link:
+          % if not is_course_blocked:
+              <a href="${ccx_target}" class="cover">
+                <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+              </a>
+          % else:
+              <a class="fade-cover">
+                <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+              </a>
+          % endif
+        % else:
+          <a class="cover">
+            <img src="${course_image_url(course)}" class="course-image" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+          </a>
+        % endif
+      </div>
+      <div class="wrapper-course-details">
+        <h3 class="course-title">
+          % if show_courseware_link:
+            % if not is_course_blocked:
+              <a href="${ccx_target}">${ccx.display_name}</a>
+            % else:
+              <a class="disable-look">${ccx.display_name}</a>
+            % endif
+          % else:
+            <span>${ccx.display_name}</span>
+          % endif
+        </h3>
+        <div class="course-info">
+          <span class="info-university">${get_course_about_section(course, 'university')} - </span>
+          <span class="info-course-id">${course.display_number_with_default | h}</span>
+          <span class="info-date-block" data-tooltip="Hi">
+          % if ccx.has_ended():
+            ${_("Ended - {end_date}").format(end_date=ccx.end_datetime_text("SHORT_DATE"))}
+          % elif ccx.has_started():
+            ${_("Started - {start_date}").format(start_date=ccx.start_datetime_text("SHORT_DATE"))}
+          % else:   # hasn't started yet
+            ${_("Starts - {start_date}").format(start_date=ccx.start_datetime_text("SHORT_DATE"))}
+          % endif
+          </span>
+        </div>
+        % if show_courseware_link:
+          <div class="wrapper-course-actions">
+            <div class="course-actions">
+              % if ccx.has_ended():
+                % if not is_course_blocked:
+                  <a href="${ccx_target}" class="enter-course archived">${_('View Archived Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
+                % else:
+                  <a class="enter-course-blocked archived">${_('View Archived Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
+                % endif
+              % else:
+                % if not is_course_blocked:
+                  <a href="${ccx_target}" class="enter-course">${_('View Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
+                % else:
+                  <a class="enter-course-blocked">${_('View Custom Course')}<span class="sr">&nbsp;${ccx.display_name}</span></a>
+                % endif
+              % endif
+
+            </div>
+          </div>
+        % endif
+      </div>
+    </section>
+  </article>
+</li>

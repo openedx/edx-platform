@@ -1,336 +1,183 @@
 // lms - views - shopping cart
 // ====================
 
+$enrollment-details-width-difference: $baseline*11.85;
+$data-input-width-difference: $baseline*12.25;
+$date-span-width-difference: $baseline*35;
+$cart-list-border: 1px solid $border-color-1;
+$hr-border: 1px solid $dark-gray2;
+$input-border: 2px solid $dark-gray2;
+$discount-border: 2px solid $light-gray1;
+$steps-border: 3px solid $light-gray1;
+$light-border: 1px solid $gray-l5;
+
+.pull-right {
+  @include float(right);
+}
+
+.fa-caret-right {
+  // flip the icon for RTL
+  &:before {
+    @include rtl {
+      content: "\f0d9"; // FA icon arrow to the right
+    }
+  }
+}
+
 .notification {
   padding: ($baseline*1.5) ($baseline*1.5) 0 ($baseline*1.5);
 }
 
 .error_msg {
   margin: $baseline;
+  border: 1px solid $red;
   padding: ($baseline/4);
   color: $red;
-  border: 1px solid $red;
-
 }
 
-.cart-errors{
-  background: #FFEEF5;
-  color:#B72667;
-  text-align: center;
-  padding: ($baseline/2) 0;
-  font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-  font-size: 15px;
-  border-bottom: 1px solid #B72667;
-  margin-bottom: $baseline;
+.cart-errors {
+  @include text-align(center);
+  @extend %t-copy-base;
   display: none;
-}
-
-.cart-list {
-  padding: ($baseline*1.5);
-  margin-top: ($baseline*2);
-  border-radius: 3px;
-  border: 1px solid $border-color-1;
-  background-color: $action-primary-fg;
-
-  > h2 {
-    font-size: 1.5em;
-    color: $base-font-color;
-  }
-
-  .cart-table {
-    width: 100%;
-
-    tr:nth-child(even) {
-      background-color: $gray-l6;
-      border-bottom: 1px solid $gray-l5;
-    }
-
-    tr.always-gray{
-      background: #eee !important;
-      border-top: 2px solid $white;
-    }
-
-    tr.always-white {
-      background: $white !important;
-
-      td {
-        padding: ($baseline*1.5) 0 ($baseline/2);
-      }
-    }
-
-    tr td.cart-total {
-      padding: ($baseline/2) 0;
-
-      span {
-        display: inline-block;
-        margin-right: ($baseline*0.75);
-        margin-left: ($baseline*0.75);
-        font-weight: bold;
-      }
-    }
-
-    .cart-headings {
-      height: 35px;
-      border-bottom: 1px solid #BEBEBE;
-
-      th {
-        text-align: left;
-        border-bottom: 1px solid $border-color-1;
-
-        &.qty {
-          width: 100px;
-        }
-
-        &.u-pr {
-          width: 70px;
-        }
-
-        &.prc {
-          width: 150px;
-        }
-
-        &.cur {
-          width: 100px;
-          text-align: center;
-        }
-
-        &.dsc{
-          width: 640px;
-          padding-right: 50px;
-          text-align: left;
-        }
-      }
-    }
-
-    .cart-items {
-      td {
-        padding: ($baseline/2) 0;
-        position: relative;
-        line-height: normal;
-
-        span.old-price {
-          position: relative;
-          text-decoration: line-through;
-          color: red;
-          font-size: 12px;
-          top: -1px;
-          margin-left: 3px;
-        }
-      }
-
-      td:nth-child(3) {
-        text-align: center;
-      }
-
-      td:last-child {
-        width: 50px;
-        text-align: center;
-      }
-
-      td:nth-child(1) {
-        line-height: 22px;
-        text-align: left;
-        padding-right: $baseline;
-      }
-    }
-
-    .cart-totals {
-      td {
-        &.cart-total-cost {
-          font-size: 1.25em;
-          font-weight: bold;
-          padding: ($baseline/2) 25px;
-        }
-      }
-    }
-  }
-
-  table.order-receipt {
-    width: 100%;
-
-    .order-number {
-      font-weight: bold;
-    }
-    .order-date {
-      text-align: right;
-    }
-    .items-ordered {
-      padding-top: ($baseline*2.5);
-    }
-
-    tr {
-    }
-
-    th {
-      text-align: left;
-      padding: 25px 0 15px 0;
-
-      &.qty {
-        width: 50px;
-      }
-
-      &.u-pr {
-        width: 100px;
-      }
-
-      &.pri {
-        width: 125px;
-      }
-
-      &.curr {
-        width: 75px;
-      }
-    }
-
-    tr.order-item {
-      td {
-        padding-bottom: ($baseline/2);
-
-        span.old-price {
-          text-decoration: line-through !important;
-        }
-      }
-    }
-  }
+  margin-bottom: $baseline;
+  border-bottom: 1px solid $pink;
+  padding: ($baseline/2) 0;
+  background: $pink-l5;
+  color: $pink;
 }
 
 #expiry-msg {
-  padding: 15px;
+  @extend %t-copy-sub1;
+  margin-top: ($baseline*0.15);
+  border-top: $light-border;
   background-color: $gray-l5;
-  margin-top: 3px;
-  font-family: $sans-serif;
-  font-size: 14px;
+  padding: ($baseline*0.75);
   text-shadow: 0px 1px 1px $white;
-  border-top: 1px solid #f0f0f0;
 }
-.confirm-enrollment {
 
+.confirm-enrollment {
   .title {
-    font-size:24px;
-    border-bottom:1px solid $gray-l5;
-    text-align: left;
-    line-height:70px;
+    @include text-align(left);
+    @extend %t-title4;
+    border-bottom: $light-border;
   }
 
   .course-image {
-    float: left;
-    width: 223px;
-    margin-right: ($baseline/2);
+    @include float(left);
+    @include margin-right($baseline/2);
+    width: ($baseline*11.15);
     vertical-align: top;
   }
 
   .enrollment-details {
-    margin-bottom: $baseline;
-    float: left;
-    width: calc(100% - 237px);
+    @include float(left);
+    margin-bottom: ($baseline);
+    width: calc(100% - #{$enrollment-details-width-difference});
 
     .sub-title {
-      font-size: 18px;
+      @extend %t-title5;
       text-transform: uppercase;
-      color: #9b9b93;
+      color: $gray-l1;
     }
 
     .course-date-label {
-      float: right;
-      color: #9b9b93;
+      @include float(right);
+      color: $gray-l1;
     }
 
     .course-dates {
-      float: right;
-      font-size: 18px;
+      @include float(right);
+      @extend %t-copy-lead1;
     }
 
-    .course-title {
-      h1 {
-        color: #4a4a46;
-        font-size: 26px;
-        text-align: left;
-        font-weight: 600;
-      }
+    .course-title h1 {
+      @include text-align(left);
+      @extend %t-title4;
+      @extend %t-strong;
+      color: $black-t3;
     }
 
     .enrollment-text {
-      color: #9b9b93;
-      font-family: 'Open Sans',Verdana,Geneva,sans;
+      @extend %t-copy-base;
       line-height: normal;
-      a {
-        font-family: 'Open Sans',Verdana,Geneva,sans;
-      }
+      color: $gray-l1;
     }
   }
 
   a.contact-support-bg-color {
-    background-color: #9b9b9b;
-    background-image: linear-gradient(#9b9b9b, #9b9b9b);
-    border: 16px solid #9b9b9b;
-    box-shadow: 0 1px 0 0 #9b9b9b inset;
-    text-shadow: 0 1px 0 #9b9b9b;
+    box-shadow: 0 1px 0 0 $gray-l1 inset;
+    border: 16px solid $gray-l1;
+    background-color: $gray-l1;
+    background-image: linear-gradient($gray-l1, $gray-l1);
+    text-shadow: 0 1px 0 $gray-l1;
   }
 
   a.course-link-bg-color {
-    background-color: #00A1E5;
-    border: 16px solid #00A1E5;
-    box-shadow: 0 1px 0 0 #00A1E5 inset;
-    text-shadow: 0 1px 0 #00A1E5;
+    box-shadow: 0 1px 0 0 $blue2 inset;
+    border: 16px solid $blue2;
+    background-color: $blue2;
+    text-shadow: 0 1px 0 $blue2;
   }
 
   a.link-button {
-    text-transform: none;
-    width: 250px;
-    background-clip: padding-box;
-    float: right;
-    border-radius: 3px;
-    color: $white;
+    @include float(right);
+    @include border-radius(3px);
+    @include text-align(center);
+    @extend %t-copy-lead2;
     display: inline-block;
-    padding: 6px 18px;
+    background-clip: padding-box;
+    padding: ($baseline*0.3) ($baseline*0.9);
+    width: ($baseline*12.5);
+    text-transform: none;
     text-decoration: none;
-    font-size: 24px;
-    text-align: center;
+    color: $white;
 
+    // STATE: hover
     &:hover {
-      background: $m-blue-d2;
-      border: 16px solid  $m-blue-d2;
-      box-shadow: 0 1px 0 0 $m-blue-d2 inset;
+      box-shadow: 0 1px 0 0 $blue inset;
+      border: 16px solid $blue;
+      background: $blue;
     }
   }
 
-  input[type="submit"], button {
-    text-transform: none;
-    width: 450px;
-    height: 70px;
-    background-clip: padding-box;
-    background-color: #00a1e5;
-    background-image: linear-gradient(#00A1E5,#00A1E5);
-    float: right;
-    border: 1px solid #00A1E5;
-    border-radius: 3px;
-    box-shadow: 0 1px 0 0 #00A1E5 inset;
-    color: $white;
+  button[type="submit"] {
+    @include float(right);
+    @include border-radius(3px);
+    @extend %t-copy-lead2;
     display: inline-block;
-    padding: 7px 18px;
+    box-shadow: 0 1px 0 0 $blue2 inset;
+    border: 1px solid $blue2;
+    background-color: $blue2;
+    background-image: linear-gradient($blue2, $blue2);
+    background-clip: padding-box;
+    padding: ($baseline*0.35) ($baseline*0.9);
+    width: ($baseline*22.5);
+    height: ($baseline*3.5);
+    text-shadow: 0 1px 0 $blue2;
+    text-transform: none;
     text-decoration: none;
-    text-shadow: 0 1px 0 #00A1E5;
-    font-size: 24px;
+    color: $white;
 
+    // STATE: hover
     &:hover {
-      background: $m-blue-d2;
       box-shadow: none;
+      background: $blue;
     }
   }
 }
 
 .shopping-cart {
-
   a.blue {
+    @include border-radius(3px);
+    @extend %t-copy-lead2;
+    @extend %t-regular;
     display: inline-block;
+    margin: ($baseline/2) 0 $baseline 0;
     background: $blue2;
-    color: white;
     padding: $baseline ($baseline*2);
-    border-radius: 3px;
-    font-size: 24px;
-    font-weight: 400;
-    margin: ($baseline/2) 0 $baseline;
+    color: white;
 
+    // STATE: hover
     &:hover {
       text-decoration: none;
     }
@@ -341,21 +188,21 @@
   }
 
   input[type="text"], input[type="email"], select {
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-    font-style: normal;
-    border: 2px solid $dark-gray2;
+    @extend %t-action2;
+    @extend %t-strong;
+    border: $input-border;
+    padding: ($baseline*0.4) ($baseline*0.6);
+    width: ($baseline*13);
     height: auto;
-    padding: 8px 12px;
-    font-weight: 600;
-    width: 260px;
-    font-size: 16px;
+    font-style: normal;
 
+    // STATE: focus
     &:focus {
-      border-color: $dark-gray2;
       box-shadow: none;
-      outline: none;
+      border-color: $dark-gray2;
     }
 
+    // CASE: has class error
     &.error {
       border-color: $red1;
     }
@@ -370,125 +217,172 @@
   }
 
   h1 {
-    font-size: 24px;
-    color: $dark-gray1;
-    text-align: left;
-    padding: ($baseline*1.5) 0;
+    @include text-align(left);
+    @extend %t-title4;
     margin: ($baseline/2) 0 0 0;
-    letter-spacing: 0px;
+    padding: ($baseline*1.5) 0;
+    letter-spacing: 0;
+    color: $dark-gray1;
   }
 
-  ul.steps{
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    border-top: 3px solid $light-gray1;
-    border-bottom: 3px solid $light-gray1;
+  .steps {
+    @extend %ui-no-list;
+    border-top: $steps-border;
+    border-bottom: $steps-border;
 
     li {
+      @include font-size(20);
       display: inline-block;
-      padding: 26px ($baseline*1.5);
-      margin: 0 ($baseline*1.5);
-      font-size: 20px;
-      font-weight: 100;
       position: relative;
+      margin: 0 ($baseline*1.5);
+      padding: ($baseline*1.3) ($baseline*1.5);
       color: $dark-gray1;
+      font-weight: 100;
 
+      //STATE: active
       &.active {
-        font-weight: 400;
-        border-bottom: 3px solid $light-gray1;
+        @extend %t-regular;
+        border-bottom: $steps-border;
       }
 
+      //CASE: is first child
       &:first-child {
-        padding-left: ($baseline*1.5);
-        margin-left: 0;
+        @include margin-left(0);
+        @include padding-left($baseline*1.5);
       }
+
+      //CASE: is last child
       &:last-child {
-        padding-right: 30px;margin-right: 0;
-        &:after{display: none;}
+        @include margin-right(0);
+        @include padding-right($baseline*1.5);
+
+        &:after {
+          display: none;
+        }
       }
+
       &:after {
-        content: "\f178";
+        @include ltr {
+          right: -($baseline*2);
+          content: "\f178";
+        }
+
+        @include rtl {
+          left: -($baseline*2);
+          content: "\f177";
+        }
         position: absolute;
+        top: ($baseline*1.3);
+        color: $light-gray;
         font-family: FontAwesome;
-        right: -40px;
-        color: #ddd;
         font-weight: 100;
       }
     }
   }
 
   hr {
-    border-top: 1px solid $dark-gray2;
+    border-top: $hr-border;
   }
 
   .user-data {
     margin: $baseline 0;
 
     .image {
-      width: 220px;
-      float: left;
-
-      img {
-        width: 100%;
-        height: auto;
-      }
+      @include float(left);
+      width: ($baseline*11);
     }
 
     .data-input {
-      width: calc(100% - 245px);
-      float: left;
-      margin-left: 25px;
+      @include float(left);
+      @include margin-left($baseline*1.25);
+      width: calc(100% - #{$data-input-width-difference});
 
       h3, h3 span {
-        font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-        font-size: 16px;
+        @extend %t-title6;
+        padding: 0;
         text-transform: uppercase;
         color: $light-gray2;
+      }
+
+      .course-title-info {
+        display: inline-block;
+        width: 60%;
+      }
+
+      .course-meta-info {
+        @include float(right);
+        @include text-align(right);
+        display: inline-block;
+        width: 35%;
+      }
+
+      .course-registration-title,
+      .course-dates-title {
+        @extend %t-title6;
+        display: block;
         padding: 0;
-        line-height: 20px;
+        text-transform: uppercase;
+        color: $light-gray2;
+      }
+
+      .course-display-name,
+      .course-display-dates {
+        @extend %t-title4;
+        display: block;
+        color: $dark-gray2;
+      }
+
+      .course-display-dates {
+        @include clearfix();
       }
 
       h1 {
-        font-size: 24px;
-        color: $dark-gray1;
+        @include float(left);
+        @extend %t-title4;
         padding: 0 0 ($baseline/2) 0;
+        width: ($baseline*35);
         text-transform: capitalize;
+        color: $dark-gray1;
+
+        // Adding this content to ensure proper display of closing parentheses
+        &:after {
+          content: "\200E‎";
+        }
 
         span {
-          font-size: 16px;
+          @extend %t-copy-base;
         }
-        width: 700px;
-        float: left;
       }
 
       span.date {
-        width: calc(100% - 700px);
-        float: right;
-        text-align: right;
+        @include float(right);
+        @include text-align(right);
+        width: calc(100% - #{$date-span-width-difference});
       }
 
       hr {
-        border-top: 1px solid $dark-gray2;
         clear: both;
+        border-top: $hr-border;
       }
 
       .three-col {
         .col-1 {
-          width: 450px;
-          float: left;
-          font-size: 16px;
+          @include float(left);
+          @extend %t-copy-base;
+          @extend %t-regular;
+          padding-top: ($baseline*0.55);
+          width: ($baseline*22.5);
           text-transform: uppercase;
           color: $light-gray2;
-          padding-top: 11px;
-          font-weight: 400;
+
           .price {
             span {
+              @include padding-left($baseline);
+              @extend %t-copy-lead2;
               color: $dark-gray1;
-              font-size: 24px;
-              padding-left: $baseline;
             }
 
+            // CASE: has class green
             &.green {
               color: $green1;
             }
@@ -500,79 +394,92 @@
         }
 
         .col-2 {
-          width: 350px;
-          float: left;
-          line-height: 44px;
+          @include float(left);
+          @include line-height(29.73);
+          margin-top: ($baseline*0.15);
+          width: ($baseline*17.5);
           text-transform: uppercase;
           color: $light-gray2;
-          margin-top: 3px;
 
           .numbers-row {
             position: relative;
-            label{
-              font-size: 16px;
+
+            label {
+              @extend %t-copy-base;
+              @extend %t-strong;
+              cursor: text;
               text-transform: uppercase;
               color: $light-gray2;
-              font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-              font-weight: 400;
               font-style: normal;
             }
+
             .counter {
-              margin-left: 25px;
-              border-radius: 3px;
-              padding: 6px ($baseline*1.5) 6px ($baseline/2);
+              @include margin-left($baseline*1.25);
+              @include border-radius(3px);
+              @include padding($baseline*0.3, $baseline*1.5, $baseline*0.3, $baseline/2);
               display: inline-block;
-              border: 2px solid $dark-gray2;
+              border: $input-border;
 
               input[type="text"] {
-                width: 75px;
-                border: none;
+                @include text-align(center);
+                @extend %t-copy-lead2;
+                @extend %t-strong;
                 box-shadow: none;
-                color: #666;
-                font-size: 25px;
-                font-style: normal;
-                font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-                font-weight: 600;
-                padding: 8px 0;
+                border: none;
+                padding: ($baseline*0.4) 0;
+                width: ($baseline*3.75);
                 height: auto;
-                text-align: center;
+                color: $black-t2;
+                font-style: normal;
 
+                //STATE: focus
                 &:focus {
-                  outline: none;
+                  @extend %no-outline;
                 }
               }
             }
 
-            .button {
+            button {
+              @include margin-left(-$baseline*1.5);
               position: absolute;
-              background: none;
-              margin-left: -($baseline*1.5);
-              padding: 0;
-              border: none;
               box-shadow: none;
+              border: none;
+              background: none;
+              padding: 0;
+              height: ($baseline*0.85);
               text-shadow: none;
-              height: 17px;
 
               i {
+                @extend %t-icon3;
                 color: $dark-gray2;
-                font-size: 24px;
-                span{display: none;}
+
+                span {
+                  display: none;
+                }
               }
 
+              //CASE: has class inc
               &.inc {
-                top: 9px;
+                @extend %no-outline;
+                top: ($baseline*0.45);
+                width: auto;
               }
 
+              //CASE: has class dec
               &.dec {
-                top: 30px;
-                height: 22px;
+                @extend %no-outline;
+                top: ($baseline*1.5);
+                width: auto;
+                height: ($baseline*1.1);
               }
             }
 
+            //STATE: is disabled
             &.disabled {
               .counter {
                 border: 2px solid $gray;
 
+                //STATE: hover
                 &:hover {
                   cursor: not-allowed;
                 }
@@ -582,21 +489,20 @@
                 }
               }
 
-              .button {
-                i {
-                  color: $gray-l3;
-                }
+              .button i {
+                color: $gray-l3;
               }
             }
 
             .updateBtn {
+              @include float(right);
+              @include padding($baseline*1.25, $baseline*1.75, $baseline*1.25, 0);
+              @extend %t-action2;
               display: inline-block;
-              float: right;
-              font-size: 15px;
-              padding: 25px 35px 25px 0;
 
+              // STATE: focus
               &:focus {
-                outline: none;
+                @extend %no-outline;
               }
             }
 
@@ -606,29 +512,36 @@
             }
           }
 
-          .disable-numeric-counter{
+          .disable-numeric-counter {
             pointer-events: none;
           }
         }
 
         .col-3 {
-          width: 40px;
-          float: right;
-          padding-top: 13px;
+          @include float(right);
+          padding-top: ($baseline*0.65);
+          width: ($baseline*2);
 
-          a.btn-remove {
-            float: right;
+          button.btn-remove {
+            @include float(right);
             opacity: 0.8;
+            box-shadow: none;
+            border: none;
+            background: none;
+            width: auto;
+            height: auto;
+            text-shadow: none;
 
             i {
+              @include line-height(27.02);
+              @extend %t-icon3;
               color: $dark-gray2;
-              font-size: 24px;
-              line-height: 40px;
             }
 
+            //STATE: hover
             &:hover {
-              text-decoration: none;
               opacity: 1;
+              text-decoration: none;
             }
           }
         }
@@ -637,390 +550,469 @@
   }
 
   .discount {
-      border-bottom: 2px solid $light-gray1;
-      border-top: 2px solid $light-gray1;
-      margin: $baseline 0;
-      padding: 17px $baseline 15px;
-      min-height: 45px;
+    margin: $baseline 0;
+    border-top: $discount-border;
+    border-bottom: $discount-border;
+    padding: ($baseline*0.85) ($baseline) ($baseline*0.75) ($baseline);
+    min-height: ($baseline*2.25);
 
-      .code-text {
+    .code-text {
+      @include clearfix();
 
-        a {
-          color: $blue1;
-          font-size: 18px;
-          text-transform: lowercase;
-          font-weight: 600;
-          display: inline-block;
-          padding: ($baseline/2) 0;
-          cursor: pointer;
-        }
-
-        span{
-          display: inline-block;
-          padding: 9px 0;
-          margin-right: -($baseline);
-
-          b{
-            font-weight: 600;
-            font-size: 24px;
-            padding-left: $baseline;
-            letter-spacing: 0;
-          }
-        }
+      a {
+        @extend %t-copy-lead1;
+        @extend %t-strong;
+        display: inline-block;
+        cursor: pointer;
+        padding: ($baseline/2) 0;
+        color: $blue1;
+        text-transform: lowercase;
       }
 
+      span {
+        @include margin-right(-$baseline);
+        display: inline-block;
+        padding: ($baseline*0.45) 0;
+
+        b {
+          @include padding-left($baseline);
+          @extend %t-copy-lead2;
+          @extend %t-strong;
+          letter-spacing: 0;
+        }
+      }
+    }
+
     .code-input {
+      @include float(left);
       display: inline-block;
 
       input[type="text"] {
-        font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-        font-style: normal;
-        border: 2px solid $dark-gray2;
+        @extend %t-copy-base;
+        @extend %t-strong;
+        border: $input-border;
+        padding: ($baseline*0.4) ($baseline*0.6);
+        width: ($baseline*13);
         height: auto;
-        padding: 8px 12px;
-        font-weight: 600;
-        width: 260px;
+        font-style: normal;
 
+        // STATE: focus
         &:focus {
-          border-color: $dark-gray2;
           box-shadow: none;
+          border-color: $dark-gray2;
         }
 
+        // CASE: has class error
         &.error {
           border-color: $red1;
         }
       }
 
       .error-text {
-        color: $red1;
-        font-size: 12px;
+        @extend %t-copy-sub2;
         display: block;
         padding-bottom: 0;
+        color: $red1;
       }
 
-    input[type="submit"] {
-      padding: 9px 35px;
+      button[type="submit"] {
+        padding: ($baseline*0.45) ($baseline*1.75);
+        width: auto;
+        height: ($baseline*2.25);
+      }
     }
-    }
-    .code-applied{
+
+    .code-applied {
       display: inline-block;
-      .green{
+
+      .green {
+        @include margin-right($baseline);
+        @extend %t-strong;
         color: $green1;
-        font-weight: 600;
-        margin-right: $baseline;
       }
-      input[type="submit"]{
-        padding: 9px 35px;
-        background: white;
-        border: 2px solid $dark-gray2;
-        color: $dark-gray2;
+
+      button[type="submit"] {
         box-shadow: none;
+        border: $input-border;
+        background: $white;
+        padding: ($baseline*0.45) ($baseline*1.75);
         text-shadow: none;
-        &:hover{
-          background: white;
+        color: $dark-gray2;
+
+        // STATE: hover
+        &:hover {
+          border: $input-border;
+          background: $white;
           color: $dark-gray1;
-          border: 2px solid $dark-gray2;
         }
       }
     }
-    input[type="submit"]{
-      width: auto;
-      padding: 7px $baseline;
-      height: auto;
+
+    button[type="submit"] {
+      @extend %t-action2;
+      @extend %t-strong;
       float: none;
-      font-size: 16px;
+      padding: ($baseline*0.35) $baseline;
+      width: auto;
+      height: auto;
       letter-spacing: 0;
-      font-weight: 600;
-      &:hover{
-        background: #1F8FC2;
-        border: 1px solid transparent;
+
+      // STATE: hover
+      &:hover {
         box-shadow: none;
+        border: 1px solid transparent;
+        background: $blue;
       }
     }
-    }
-    .col-two{
-      overflow: hidden;
-      padding-bottom: $baseline;
-      border-bottom: 2px solid $gray-l5;
-      .row-inside {
-        float: left;
-        width: 50%;
-        padding: ($baseline/2) 0;
-        b{
-          font-size: 14px;
-          width: 190px;
-          display: inline-block;
-          margin-right: $baseline;
-          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-          vertical-align: top;
-        }
-        label{
-          width: 300px;
-          margin: 0;
-          display: inline-block;
-          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-          font-style: normal;
-          font-size: 14px;
-          word-wrap: break-word;
-        }
+  }
+
+  .col-two {
+    border-bottom: 2px solid $gray-l5;
+    padding-bottom: $baseline;
+    overflow: hidden;
+
+    .row-inside {
+      @include float(left);
+      padding: ($baseline/2) 0;
+      width: 50%;
+
+      .billing-detail-label {
+        @include margin-right($baseline);
+        @extend %t-copy-sub1;
+        display: inline-block;
+        width: ($baseline*9.5);
+        vertical-align: top;
       }
 
-      .col-1 {
-        width: 35%;
-        float: left;
+      .billing-detail-value {
+        @extend %t-copy-sub1;
+        display: inline-block;
+        margin: 0;
+        cursor: text;
+        width: ($baseline*60);
+        word-wrap: break-word;
+        color: $gray-d3;
+        font-style: normal;
+      }
+    }
 
-        span.radio-group {
-          display: inline-block;
-          border: 2px solid #979797;
-          border-radius: 3px;
-          margin: ($baseline/2) 0;
-          margin-left: ($baseline/4);
+    .col-1 {
+      @include float(left);
+      width: 35%;
 
-          &:first-child {
-            margin-left: ($baseline*0.75);
-          }
+      span.radio-group {
+        @include margin($baseline/2, 0, $baseline/2, $baseline/4);
+        @include border-radius(3px);
+        display: inline-block;
+        border: $input-border;
 
-          &.blue {
-            border-color: $blue2;
+        // CASE: is first child
+        &:first-child {
+          @include margin-left($baseline*0.75);
+        }
 
-            label {
-              color: $blue2;
-            }
-          }
+        // CASE: has class blue
+        &.blue {
+          border-color: $blue2;
 
           label {
-            font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-            font-size: 16px;
-            font-style: normal;
-            color: $dark-gray2;
-            font-weight: 400;
-            padding: 8px 15px 8px 6px;
-            display: inline-block;
-            margin-bottom: 0;
-          }
-          }
-          input[type="radio"]{
-            margin-left: ($baseline/2);
+            color: $blue2;
           }
         }
 
-      .col-2{
-        width: 65%;
-        float: right;
-        input[type="submit"]{
-          width: auto;
-          padding: 18px 60px 22px 30px;
-          height: auto;
-          font-size: 24px;
-          letter-spacing: 0;
-          font-weight: 600;
-          margin-left: ($baseline*0.75);
-          &#register{
-            padding: 18px 30px;
-          }
-          &:hover{background: $m-blue-d2;box-shadow: none;}
-         }
-        p{
-          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-          padding: 13px 0;
-          text-align: right;
-        }
-        form{
-          position: relative;
-        }
-          .fa-caret-right {
-            position: absolute;
-            right: 30px;
-            top: 22px;
-            color: white;
-            font-size: 24px;
-          }
-
-        label.pull-right{
-          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-          font-style: normal;
-          text-align: right;
-          padding: 10px 25px 10px;
+        label {
+          @include padding($baseline*0.4, $baseline*0.75, $baseline*0.4, $baseline*0.3);
+          @extend %t-copy-base;
+          @extend %t-regular;
           display: inline-block;
-          float: right;
-          line-height: 20px;
-          color: $dark-gray1;
+          margin-bottom: 0;
+          color: $dark-gray2;
+          font-style: normal;
         }
       }
+
+      input[type="radio"] {
+        @include margin-left($baseline/2);
+      }
     }
-  .disclaimer{
-    color: $light-gray2;
-    padding: ($baseline/2) 0;
-    text-align: right;
-    font-weight: 300;
+
+    .col-2 {
+      @include float(right);
+      width: 65%;
+
+      button[type="submit"] {
+        @include float(right);
+        @include margin-left($baseline*0.75);
+        @include padding($baseline*0.75, $baseline*3, $baseline*1.1, $baseline*1.5);
+        @extend %t-copy-lead2;
+        @extend %t-strong;
+        width: auto;
+        height: ($baseline*3.35);
+        letter-spacing: 0;
+
+        // CASE: has id register
+        &#register {
+          padding: ($baseline*0.9) ($baseline*1.5);
+        }
+
+        // STATE: hover
+        &:hover {
+          box-shadow: none;
+          background: $blue;
+        }
+      }
+
+      p {
+        @include text-align(right);
+        @extend %t-copy-base;
+        padding: ($baseline*0.65) 0;
+      }
+
+      form {
+        position: relative;
+      }
+
+      .fa-caret-right {
+        @include right($baseline*1.5);
+        @extend %t-icon3;
+        position: absolute;
+        top: ($baseline*1.1);
+        color: $white;
+      }
+    }
   }
-  h3{
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    padding: 30px 20px;
+
+  .disclaimer {
+    @include text-align(right);
+    @extend %t-light;
+    padding: ($baseline/2) 0;
+    color: $light-gray2;
+  }
+
+  h3 {
+    @extend %t-title6;
+    @extend %t-regular;
+    padding: ($baseline*1.5) $baseline;
     color: $dark-gray1;
   }
-  .billing-data{
+
+  .billing-data {
     display: table;
     width: 100%;
-    h3{
-      padding: 12px 0px;
-      color: $dark-gray1;
-      font-size: 17px;
+
+    h3 {
+      @extend %t-title5;
       margin-bottom: ($baseline/4);
+      padding: ($baseline*0.6) 0;
+      color: $dark-gray1;
     }
-    .row{
+
+    .row {
       display: table-row;
     }
-    .col-half{
-      width: 45%;
-      float: left;
+
+    .col-half {
+      @include float(left);
+      @include border-radius(4px);
+      margin-bottom: ($baseline*0.75);
       background: $light-gray1;
-      padding: 20px;
-      border-radius: 4px;
-      margin-bottom: ($baseline*0.75);
-      min-height: 240px;
-      &:nth-child(even){
-        margin-left: 30px;
+      padding: $baseline;
+      width: 45%;
+      min-height: ($baseline*12);
+
+      // CASE: index of child is even
+      &:nth-child(even) {
+        @include margin-left($baseline*1.5);
       }
-      .data-group{
-      margin-bottom: ($baseline*0.75);
-        label{
-        display: block;
-        font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 400;
-        color: $dark-gray2;
-      }
-      input{width: 100%;margin-bottom: ($baseline/4);}
-      &:nth-child(4n){
-        margin-right: 0;
-      }
-    }
-    }
-  }
-  .error-text{
-    color: $red1;
-    font-size: 12px;
-    display: block;
-    padding-bottom: 0;
-  }
-  .gray-bg{
-    background: $light-gray1;
-    border-radius: 3px;
-    padding: 20px 20px 20px 30px;
-    margin: 20px 0;
-    overflow: hidden;
-    .message-left{
-      width: 100%;
-      float: left;
-      line-height: 24px;
-      color: $dark-gray1;
-      b{
-        text-transform: capitalize;
-      }
-      a.blue{
-        margin:0 0 0 20px;
-        i{
-          margin-left: ($baseline/2);
+
+      .data-group {
+        margin-bottom: ($baseline*0.75);
+
+        label {
+          @extend %t-copy-base;
+          @extend %t-regular;
+          display: block;
+          color: $dark-gray2;
+          font-style: normal;
+        }
+
+        input {
+          @extend %t-copy-base;
+          margin-bottom: ($baseline/4);
+          width: 100%;
+        }
+
+        // CASE: index of child is a multiple of 4
+        &:nth-child(4n) {
+          @include margin-right(0);
         }
       }
+    }
+  }
+
+  .error-text{
+    @extend %t-copy-sub2;
+    display: block;
+    padding-bottom: 0;
+    color: $red1;
+  }
+
+  .gray-bg {
+    @include border-radius(3px);
+    @include padding($baseline, $baseline, $baseline, $baseline*1.5);
+    margin: $baseline 0;
+    background: $light-gray1;
+    overflow: hidden;
+
+    .message-left {
+      @include float(left);
+      @include line-height(16.22);
+      width: 100%;
+      color: $dark-gray1;
+
+      b {
+        text-transform: capitalize;
+      }
+
+      a.blue {
+        @include margin(0, 0, 0, $baseline);
+
+        i {
+          @include margin-left($baseline/2);
+        }
+      }
+
       .mt-7 {
         display: block;
-        margin-top: 7px;
+        margin-top: ($baseline*0.35);
       }
     }
   }
-  .bordered-bar{
-    border-bottom: 2px solid $light-gray1;
-    border-top: 2px solid $light-gray1;
+
+  .bordered-bar {
     margin-bottom: $baseline;
-    padding: 20px;
-    h2{
-      color: $dark-gray1;
-      font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-      font-weight: bold;
+    border-top: $discount-border;
+    border-bottom: $discount-border;
+    padding: $baseline;
+
+    h2 {
+      @xtend %t-title5;
+      @extend %t-strong;
       margin-bottom: 0;
-      font-size: 17px;
-      span{
-        padding-left: 60px;
+      color: $dark-gray1;
+
+      span {
+        @include padding-left($baseline*3);
         text-transform: capitalize;
-        .blue-link{
+        letter-spacing: 0;
+
+        .blue-link {
+          @extend %t-copy-sub1;
           color: $blue2;
-          font-size: 14px;
-          &:hover{
+
+          // STATE: hover
+          &:hover {
             text-decoration: none;
           }
         }
       }
     }
   }
-  .pattern{
+
+  .pattern {
     margin-top: ($baseline/2);
     margin-bottom: $baseline;
-    padding:20px;
+    padding: $baseline;
     color: $dark-gray1;
+
     h2 {
-      font-family: $sans-serif;
+      @extend %t-title5;
     }
   }
-  hr.border{
-    border-top: 2px solid $light-gray1;
+
+  hr.border {
+    border-top: $discount-border;
   }
-  .no-border{border: none !important; }
-  table.course-receipt{
-    width: 94%;
+
+  .no-border {
+    border: none !important;
+  }
+
+  table.course-receipt {
     margin: auto;
-    margin-bottom: 27px;
-    thead{
-      th{
-        color: $light-gray2;
-        font-weight: normal;
-        text-align: center;
-        text-transform: uppercase;
-        padding: 8px 0;
-        border-bottom: 1px solid $dark-gray2;
-        &:first-child{
-          text-align: left;
-        }
-        &:last-child{
-          text-align: center;
-        }
+    margin-bottom: ($baseline*1.35);
+    width: 94%;
+
+    thead th {
+      @include text-align(center);
+      border-bottom: $hr-border;
+      padding: ($baseline*0.4) 0;
+      text-transform: uppercase;
+      color: $light-gray2;
+      font-weight: normal;
+
+      // CASE: has first child
+      &:first-child {
+        @include text-align(left);
+      }
+
+      // CASE: has last child
+      &:last-child {
+        @include text-align(center);
       }
     }
-    tr{
+
+    tr {
       border-bottom: 1px solid $light-gray1;
-      &:last-child{
+
+      // CASE: has last child
+      &:last-child  {
         border-bottom: none;
       }
-      td{
-        padding: 15px 0;
-        text-align: center;
-        color: $dark-gray1;
+
+      td {
+        @include text-align(center);
+        padding: ($baseline*0.75) 0;
         width: 30%;
-        &:nth-child(2){width: 20%;}
-        &:nth-child(3){width: 40%;}
-        &:first-child{
-          text-align: left;
-          font-size: 18px;
+        color: $dark-gray1;
+
+        // CASE: index of child is a multiple of 2
+        &:nth-child(2) {
+          width: 20%;
+        }
+
+        // CASE: index of child is a multiple of 3
+        &:nth-child(3) {
+          width: 40%;
+        }
+
+        // CASE: has first child
+        &:first-child {
+          @extend %t-copy-lead1;
+          @include text-align(left);
           text-transform: capitalize;
         }
-        &:last-child{
-          text-align: center;
-          span{
-            padding: 2px 10px;
-            font-size: 13px;
-            color: #fff;
+
+        // CASE: has last child
+        &:last-child {
+          @include text-align(center);
+
+          span {
+            @include border-radius(3px);
+            @include text-align(center);
+            @extend %t-copy-sub1;
             display: inline-block;
-            border-radius: 3px;
-            min-width: 55px;
-            text-align: center;
-            &.red{
+            padding: ($baseline/10) ($baseline/2);
+            min-width: ($baseline*2.75);
+            color: $white;
+
+            // CASE: has class red
+            &.red {
               background: rgb(231, 92, 92);
             }
-            &.green{
+
+            // CASE: has class green
+            &.green {
               background: rgb(108, 204, 108);
             }
           }
@@ -1030,43 +1022,49 @@
   }
 }
 
+.course-image, .image {
+  .item-image {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .empty-cart {
-  padding: $baseline 0;
-  background: $light-gray1;
-  text-align: center;
-  border-radius: 3px;
+  @include border-radius(3px);
+  @include text-align(center);
   margin: $baseline 0;
+  background: $light-gray1;
+  padding: $baseline 0;
 
   h2 {
-    font-size: 24px;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-    font-weight: 600;
-    letter-spacing: 0;
-    color: #9b9b9b;
-    text-align: center;
+    @include text-align(center);
+    @extend %t-title5;
+    @extend %t-strong;
     margin-top: $baseline;
-    text-transform: initial;
     margin-bottom: ($baseline/4);
+    text-transform: initial;
+    letter-spacing: 0;
+    color: $gray-l1;
   }
 
   p {
-    font-size: 14px;
-    font-family: $sans-serif;
-    color: #9d9d9d;
-    text-align: center;
+    @include text-align(center);
+    @extend %t-copy-sub1;
     text-shadow: 0 1px 1px $white;
+    color: $gray-l1;
   }
 
   a.blue {
+    @include border-radius(3px);
+    @extend %t-copy-lead2;
+    @extend %t-regular;
     display: inline-block;
+    margin: ($baseline/2) 0 $baseline 0;
     background: $blue2;
-    color: white;
     padding: $baseline ($baseline*2);
-    border-radius: 3px;
-    font-size: 24px;
-    font-weight: 400;
-    margin: ($baseline/2) 0 $baseline;
+    color: white;
 
+    // STATE: hover
     &:hover {
       text-decoration: none;
     }
@@ -1081,18 +1079,18 @@
     content: none !important;
   }
 
-  ul.steps, a.blue.pull-right, .bordered-bar span.pull-right, .left.nav-global.authenticated {
+  .steps, .blue.pull-right, .bordered-bar .pull-right, .left.nav-global.authenticated {
     display: none;
   }
 
   .shopping-cart {
-    font-size:  14px;
-    padding-right: ($baseline*2);
+    @include padding-right($baseline*2);
+    font-size: 14px;
 
     .gray-bg {
       margin: 0;
-      padding: ($baseline/2) 0 $baseline 0;
       background: none;
+      padding: ($baseline/2) 0 $baseline 0;
 
       .message-left {
         width: 100%;
@@ -1100,37 +1098,24 @@
     }
 
     .bordered-bar {
-
       h2 {
         font-size: 14px;
       }
 
       span {
-        float: right;
+        @include float(right);
       }
     }
-    .user-data {
 
-      .data-input {
-
-        h1 {
-          font-size: 18px;
-        }
-      }
+    .user-data .data-input h1 {
+      font-size: 18px;
     }
 
     table.course-receipt {
-
-      tr {
-
-        td {
-
-          a {
-
-            &:before {
-              content:" " attr(data-base-url) " ";
-              display: inline-block;}
-          }
+      .redemption-url {
+        &:before {
+          display: inline-block;
+          content:" " attr(data-base-url) " ";
         }
       }
 

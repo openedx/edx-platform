@@ -1,0 +1,10 @@
+// Footer for edx.org (right-to-left)
+// ==================================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+@import 'base/variables-rtl';
+
+// Import shared build for the edx.org footer
+@import 'build-footer-edx'

@@ -1,6 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_course_syllabus_section
+%>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -10,9 +13,6 @@
 <%block name="pagetitle">${_("{course.display_number_with_default} Course Info").format(course=course) | h}</%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='syllabus'" />
-<%!
-  from courseware.courses import get_course_syllabus_section
-%>
 
 <section class="container">
   <div class="syllabus_wrapper">

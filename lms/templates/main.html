@@ -1,25 +1,22 @@
-<!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
-<!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-<%
-    # set doc language direction
-    from django.utils.translation import get_language_bidi
-    dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+## coding=utf-8
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+from branding import api as branding_api
 %>
-<head dir="${dir_rtl}">
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
+<head dir="${static.dir_rtl()}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     % if responsive:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     % endif
-<%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
-
-<%namespace name='static' file='static_content.html'/>
-<%! from django.utils.http import urlquote_plus %>
 
 ## Define a couple of helper functions to make life easier when
 ## embedding theme conditionals into templates. All inheriting
@@ -49,23 +46,23 @@
       </title>
   </%block>
 
-  <script type="text/javascript">
-    /* immediately break out of an iframe if coming from the marketing website */
-    (function(window) {
-      if (window.location !== window.top.location) {
-        window.top.location = window.location;
-      }
-    })(this);
-  </script>
+  % if not allow_iframing:
+      <script type="text/javascript">
+        /* immediately break out of an iframe if coming from the marketing website */
+        (function(window) {
+          if (window.location !== window.top.location) {
+            window.top.location = window.location;
+          }
+        })(this);
+      </script>
+  % endif
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
+  <%static:css group='style-main'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -117,10 +114,6 @@
     <%include file="${header_extra_file}" />
   % endif
 
-  <!--[if lt IE 9]>
-    <script src="${static.url('js/html5shiv.js')}"></script>
-  <![endif]-->
-
   <%include file="widgets/optimizely.html" />
   <%include file="widgets/segment-io.html" />
 
@@ -135,33 +128,37 @@
 
 </head>
 
-<body class="${dir_rtl} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <div class="window-wrap" dir="${dir_rtl}">
-    <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
+<body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+% if not disable_window_wrap:
+  <div class="window-wrap" dir="${static.dir_rtl()}">
+% endif
+    <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
 
-    <%include file="mathjax_accessible.html" />
-
-    <%include file="${header_file}" />
+    % if not disable_header:
+        <%include file="${header_file}" />
+    % endif
 
     <div class="content-wrapper" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
 
-    <%block name="footer">
-      ## Can be overridden by child templates wanting to hide the footer. 
-      <%
-        if theme_enabled() and not is_microsite():
-          footer_file = 'theme-footer.html'
-        elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-          footer_file = microsite.get_template_path('footer-edx-new.html')
-        else:
-          footer_file = microsite.get_template_path('footer.html')
-      %>
-      <%include file="${footer_file}" />
-    </%block>
+    % if not disable_footer:
+        <%block name="footer">
+          ## Can be overridden by child templates wanting to hide the footer.
+          % if theme_enabled() and not is_microsite():
+            <%include file="theme-footer.html" />
+          % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
+              <%include file="footer-edx-v3.html" />
+          % else:
+            <%include file="${microsite.get_template_path('footer.html')}" />
+          % endif
+        </%block>
+    % endif
 
+% if not disable_window_wrap:
   </div>
+% endif
 
   % if not disable_courseware_js:
     <%static:js group='application'/>
@@ -169,16 +166,40 @@
   % endif
 
   <%block name="js_extra"/>
+  <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
 </body>
 </html>
 
 <%def name="login_query()">${
-  u"?course_id={0}&enrollment_action={1}{email_opt_in}".format(
-    urlquote_plus(course_id),
-    urlquote_plus(enrollment_action),
-    email_opt_in=(
-      u"&email_opt_in=" + urlquote_plus(email_opt_in)
-      if email_opt_in else ""
-    )
-  ) if course_id and enrollment_action else ""
+  u"?next={0}".format(urlquote_plus(login_redirect_url)) if login_redirect_url else ""
 }</%def>
+
+<!-- Performance beacon for onload times -->
+% if settings.FEATURES.get('ENABLE_ONLOAD_BEACON', False):
+<script>
+  (function () {
+    var sample_rate = ${settings.ONLOAD_BEACON_SAMPLE_RATE};
+    var roll = Math.floor(Math.random() * 100)/100;
+    var onloadBeaconSent = false;
+
+    if(roll < sample_rate){
+      $(window).load(function() {
+        setTimeout(function(){
+          var t = window.performance.timing;
+
+          var data = {
+            event: "onload",
+            value: t.loadEventEnd - t.navigationStart,
+            page: window.location.href,
+          };
+
+          if (!onloadBeaconSent) {
+            $.ajax({method: "POST", url: "/performance", data: data});
+          }
+          onloadBeaconSent = true;
+        }, 0);
+      });
+    }
+  }());
+</script>
+% endif

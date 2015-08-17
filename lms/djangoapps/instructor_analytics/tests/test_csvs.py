@@ -96,6 +96,7 @@ class TestAnalyticsFormatInstances(TestCase):
             return 'dval'
 
     def setUp(self):
+        super(TestAnalyticsFormatInstances, self).setUp()
         self.instances = [self.TestDataClass() for _ in xrange(5)]
 
     def test_format_instances_response(self):

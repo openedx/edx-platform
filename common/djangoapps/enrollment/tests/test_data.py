@@ -7,25 +7,19 @@ from mock import patch
 from nose.tools import raises
 import unittest
 
-from django.test.utils import override_settings
 from django.conf import settings
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from enrollment.errors import CourseNotFoundError, UserNotFoundError, CourseEnrollmentClosedError, \
-    CourseEnrollmentFullError, CourseEnrollmentExistsError
+from enrollment.errors import (
+    CourseNotFoundError, UserNotFoundError, CourseEnrollmentClosedError,
+    CourseEnrollmentFullError, CourseEnrollmentExistsError,
+)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, AlreadyEnrolledError
 from enrollment import data
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
 
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentDataTest(ModuleStoreTestCase):
     """
@@ -132,6 +126,19 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         # from the get enrollments request.
         results = data.get_course_enrollments(self.user.username)
         self.assertEqual(results, created_enrollments)
+
+        # Now create a course enrollment with some invalid course (does
+        # not exist in database) for the user and check that the method
+        # 'get_course_enrollments' ignores course enrollments for invalid
+        # or deleted courses
+        CourseEnrollment.objects.create(
+            user=self.user,
+            course_id='InvalidOrg/InvalidCourse/InvalidRun',
+            mode='honor',
+            is_active=True
+        )
+        updated_results = data.get_course_enrollments(self.user.username)
+        self.assertEqual(results, updated_results)
 
     @ddt.data(
         # Default (no course modes in the database)

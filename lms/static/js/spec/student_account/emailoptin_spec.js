@@ -1,4 +1,4 @@
-define(['js/common_helpers/ajax_helpers', 'js/student_account/emailoptin'],
+define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/emailoptin'],
     function( AjaxHelpers, EmailOptInInterface ) {
         'use strict';
 

@@ -1,13 +1,11 @@
 from django.test import TestCase
-from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
-
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestDraftModuleStore(TestCase):
     """
     Test the draft modulestore

@@ -31,6 +31,10 @@
 
     <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
 
+    <p>${_("Click to generate a CSV file that lists learners who can enroll in the course but have not yet done so.")}</p>
+
+    <p><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true"></p>
+
   % if not disable_buttons:
     <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
     <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
@@ -41,6 +45,8 @@
     <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
 
     <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
+
+    <p><input type="button" name="problem-grade-report" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/></p>
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>

@@ -5,13 +5,14 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
+  import json
+  import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
-  import urllib
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -27,9 +28,10 @@ CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
   </script>
 </%block>
+
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory("${details_url}");
+        SettingsFactory("${details_url}", ${json.dumps(show_min_grade_warning)});
     });
 </%block>
 
@@ -110,20 +112,62 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <p>${_(
                 'Your course summary page will not be viewable until your course '
                 'has been announced. To provide content for the page and preview '
-                'it, follow the instructions provided by your {manager}.').format(
-                  manager='<abbr title="{program_manager}">{pm}</abbr>'.format(
-                    ## Translators: This is a job title
-                    program_manager=_("Program Manager"),
-                    ## Translators: This is an abbreviation for "Program Manager", which is a job title
-                    pm=_("PM"),
-                  )
-              )}</p>
+                'it, follow the instructions provided by your Program Manager.')
+              }</p>
             </div>
           </div>
           % endif
         </section>
-
         <hr class="divide" />
+
+        % if credit_eligibility_enabled and is_credit_course:
+          <section class="group-settings basic">
+            <header>
+              <h2 class="title-2">${_("Credit Eligibility Requirements")}</h2>
+              <span class="tip">${_("Steps needed for credit eligibility")}</span>
+            </header>
+              % if credit_requirements:
+                <ol class="list-input">
+                  % if 'grade' in credit_requirements:
+                    <li class="field text is-not-editable" id="credit-minimum-passing-grade">
+                      <label>${_("Minimum Passing Grade")}</label>
+                        % for requirement in credit_requirements['grade']:
+                          <label for="${requirement['name']}" class="sr">${_("Minimum Passing Grade")}</label>
+                          <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                              class="long" id="${requirement['name']}" value="${'{0:.0f}%'.format(float(requirement['criteria']['min_grade'] or 0)*100)}" readonly />
+                        % endfor
+                    </li>
+                  % endif
+
+                  % if 'proctored_exam' in credit_requirements:
+                    <li class="field text is-not-editable" id="credit-proctoring-requirements">
+                      <label>${_("Successful Proctored Exam")}</label>
+                        % for requirement in credit_requirements['proctored_exam']:
+                          <label for="${requirement['name']}" class="sr">${_('Proctored Exam {number}').format(number=loop.index+1)}</label>
+                          <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                              class="long" id="${requirement['name']}" value="${requirement['display_name']}" readonly />
+                        % endfor
+                    </li>
+                  % endif
+
+                  % if 'reverification' in credit_requirements:
+                    <li class="field text is-not-editable" id="credit-reverification-requirements">
+                      <label>${_("Successful In-Course Reverification")}</label>
+                        % for requirement in credit_requirements['reverification']:
+                          ## Translators: 'Access to Assessment 1' means the access for a requirement with name 'Assessment 1'
+                          <label for="${requirement['name']}" class="sr">${_('In-Course Reverification {number}').format(number=loop.index+1)}</label>
+                          <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                              class="long" id="${requirement['name']}" value="${_('Access to {display_name}').format(display_name=requirement['display_name'])}" readonly />
+                        % endfor
+                    </li>
+                  % endif
+                </ol>
+              % else:
+                <p>No credit requirements found.</p>
+              % endif
+          </section>
+          <hr class="divide" />
+        % endif
 
         <section class="group-settings schedule">
           <header>
@@ -205,6 +249,28 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           </div>
           % endif
         </section>
+
+        % if about_page_editable:
+        <section class="group-settings course_details">
+          <header>
+            <h2 class="title-2">${_('Course Details')}</h2>
+            <span class="tip">${_('Provide useful information about your course')}</span>
+          </header>
+          <ol class="list-input">
+            <li class="field" id="field-course-language">
+              <label for="course-language">${_("Course Language")}</label>
+              <select id="course-language">
+                <option value="" selected> - </option>
+                % for lang, label in language_options:
+                  <option value="${lang}">${label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language.")}</span>
+            </li>
+          </ol>
+        </section>
+        % endif
+
         <hr class="divide" />
             <section class="group-settings marketing">
               <header>
@@ -269,7 +335,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   <label for="course-overview">${_("Course Introduction Video")}</label>
                   <div class="input input-existing">
                     <div class="current current-course-introduction-video">
-                      <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
+                      <iframe width="618" height="350" title="${_('Course Introduction Video')}" src="" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div class="actions">
                       <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_("Delete Current Video")}</a>
@@ -303,7 +369,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 </li>
                 % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
                 <li class="field field-select" id="field-pre-requisite-course">
-                  <form action="#" class="pre-requisite-course-form" method="post">
                     <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
                     <select class="input" id="pre-requisite-course">
                         <option value="">${_("None")}</option>
@@ -313,7 +378,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     </select>
                     <span class="tip tip-inline">${_("Course that students must complete before beginning this course")}</span>
                     <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
-                   </form>
                 </li>
                 % endif
                 % if settings.FEATURES.get('ENTRANCE_EXAMS'):
@@ -325,7 +389,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                             <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
                         </div>
                          <div class="div-grade-requirements" hidden="hidden">
-                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a></span></p>
+                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the {link_start}Course Outline{link_end}.").format(link_start="<a href='{}'>".format(course_handler_url), link_end="</a>")}</span></p>
                           <p><h3>${_("Grade Requirements")}</h3></p>
                           <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
                           <p><span class="tip tip-inline">${_("The score student must meet in order to successfully complete the entrance exam. ")}</span></p>
@@ -333,6 +397,26 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     </div>
                 </li>
                 % endif
+              </ol>
+            </section>
+          % endif
+
+          % if settings.FEATURES.get("LICENSING", False):
+            <hr class="divide" />
+
+            <section class="group-settings license">
+              <header>
+                <h2 class="title-2">${_("Course Content License")}</h2>
+                ## Translators: At the course settings, the editor is able to select the default course content license.
+                ## The course content will have this license set, some assets can override the license with their own.
+                ## In the form, the license selector for course content is described using the following string:
+                <span class="tip">${_("Select the default license for course content")}</span>
+              </header>
+
+              <ol class="list-input">
+                <li class="field text" id="field-course-license">
+                  <div id="course-license-selector"></div>
+                </li>
               </ol>
             </section>
           % endif
@@ -354,7 +438,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             advanced_config_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
           %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
-        <nav class="nav-related">
+        <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>

@@ -2,36 +2,30 @@
 import urllib
 import unittest
 from collections import OrderedDict
+
+import ddt
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
-import ddt
-from django.test.utils import override_settings
+
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import CourseModeFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-# This relies on third party auth being enabled and configured
-# in the test settings.  See the setting `THIRD_PARTY_AUTH`
-# and the feature flag `ENABLE_THIRD_PARTY_AUTH`
+# This relies on third party auth being enabled in the test
+# settings with the feature flag `ENABLE_THIRD_PARTY_AUTH`
 THIRD_PARTY_AUTH_BACKENDS = ["google-oauth2", "facebook"]
 THIRD_PARTY_AUTH_PROVIDERS = ["Google", "Facebook"]
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-
-def _third_party_login_url(backend_name, auth_entry, course_id=None, redirect_url=None):
+def _third_party_login_url(backend_name, auth_entry, redirect_url=None):
     """Construct the login URL to start third party authentication. """
     params = [("auth_entry", auth_entry)]
     if redirect_url:
         params.append(("next", redirect_url))
-    if course_id:
-        params.append(("enroll_course_id", course_id))
 
     return u"{url}?{params}".format(
         url=reverse("social:begin", kwargs={"backend": backend_name}),
@@ -39,18 +33,25 @@ def _third_party_login_url(backend_name, auth_entry, course_id=None, redirect_ur
     )
 
 
-@ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class LoginFormTest(ModuleStoreTestCase):
-    """Test rendering of the login form. """
+def _finish_auth_url(params):
+    """ Construct the URL that follows login/registration if we are doing auto-enrollment """
+    return u"{}?{}".format(reverse('finish_auth'), urllib.urlencode(params))
 
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
+    """Test rendering of the login form. """
+    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
+        super(LoginFormTest, self).setUp('lms.urls')
+
         self.url = reverse("signin_user")
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)
-        self.course_modes_url = reverse("course_modes_choose", kwargs={"course_id": self.course_id})
         self.courseware_url = reverse("courseware", args=[self.course_id])
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
     @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data(THIRD_PARTY_AUTH_PROVIDERS)
@@ -68,7 +69,8 @@ class LoginFormTest(ModuleStoreTestCase):
     def test_third_party_auth_with_course_id(self, backend_name):
         # Provide a course ID to the login page, simulating what happens
         # when a user tries to enroll in a course without being logged in
-        response = self.client.get(self.url, {"course_id": self.course_id})
+        params = [('course_id', self.course_id)]
+        response = self.client.get(self.url, params)
 
         # Expect that the course ID is added to the third party auth entry
         # point, so that the pipeline will enroll the student and
@@ -76,42 +78,19 @@ class LoginFormTest(ModuleStoreTestCase):
         expected_url = _third_party_login_url(
             backend_name,
             "login",
-            course_id=self.course_id,
-            redirect_url=self.course_modes_url
+            redirect_url=_finish_auth_url(params),
         )
         self.assertContains(response, expected_url)
 
     @ddt.data(*THIRD_PARTY_AUTH_BACKENDS)
-    def test_third_party_auth_with_white_label_course(self, backend_name):
-        # Set the course mode to honor with a min price,
-        # indicating that the course is behind a paywall.
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug="honor",
-            mode_display_name="Honor",
-            min_price=100
-        )
-
-        # Expect that we're redirected to the shopping cart
-        # instead of to the track selection page.
-        response = self.client.get(self.url, {"course_id": self.course_id})
-        expected_url = _third_party_login_url(
-            backend_name,
-            "login",
-            course_id=self.course_id,
-            redirect_url=reverse("shoppingcart.views.show_cart")
-        )
-        self.assertContains(response, expected_url)
-
-    @ddt.data(*THIRD_PARTY_AUTH_BACKENDS)
-    def test_third_party_auth_with_redirect_url(self, backend_name):
+    def test_courseware_redirect(self, backend_name):
         # Try to access courseware while logged out, expecting to be
         # redirected to the login page.
         response = self.client.get(self.courseware_url, follow=True)
         self.assertRedirects(
             response,
             u"{url}?next={redirect_url}".format(
-                url=reverse("accounts_login"),
+                url=reverse("signin_user"),
                 redirect_url=self.courseware_url
             )
         )
@@ -126,41 +105,62 @@ class LoginFormTest(ModuleStoreTestCase):
         )
         self.assertContains(response, expected_url)
 
-    @ddt.data(None, "true", "false")
-    def test_email_opt_in(self, opt_in_value):
-        params = {
-            'course_id': self.course_id,
-            'enrollment_action': 'enroll'
-        }
+    @ddt.data(*THIRD_PARTY_AUTH_BACKENDS)
+    def test_third_party_auth_with_params(self, backend_name):
+        params = [
+            ('course_id', self.course_id),
+            ('enrollment_action', 'enroll'),
+            ('course_mode', 'honor'),
+            ('email_opt_in', 'true'),
+            ('next', '/custom/final/destination'),
+        ]
+        response = self.client.get(self.url, params)
+        expected_url = _third_party_login_url(
+            backend_name,
+            "login",
+            redirect_url=_finish_auth_url(params),
+        )
+        self.assertContains(response, expected_url)
 
-        if opt_in_value is not None:
-            params['email_opt_in'] = opt_in_value
+    @ddt.data(None, "true", "false")
+    def test_params(self, opt_in_value):
+        params = [
+            ('course_id', self.course_id),
+            ('enrollment_action', 'enroll'),
+            ('course_mode', 'honor'),
+            ('email_opt_in', opt_in_value),
+            ('next', '/custom/final/destination'),
+        ]
 
         # Get the login page
         response = self.client.get(self.url, params)
 
-        # Verify that the hidden parameter is set correctly
-        hidden_param = '<input type="hidden" name="email_opt_in" value="{val}"'.format(
-            val=opt_in_value
-        )
+        # Verify that the parameters are sent on to the next page correctly
+        post_login_handler = _finish_auth_url(params)
+        js_success_var = 'var nextUrl = "{}";'.format(post_login_handler)
+        self.assertContains(response, js_success_var)
 
-        if opt_in_value is not None:
-            self.assertContains(response, hidden_param)
-        else:
-            self.assertNotContains(response, hidden_param)
+        # Verify that the login link preserves the querystring params
+        login_link = u"{url}?{params}".format(
+            url=reverse('signin_user'),
+            params=urllib.urlencode([('next', post_login_handler)])
+        )
+        self.assertContains(response, login_link)
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegisterFormTest(ModuleStoreTestCase):
+class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test rendering of the registration form. """
-
+    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
+        super(RegisterFormTest, self).setUp('lms.urls')
+
         self.url = reverse("register_user")
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)
-        self.course_modes_url = reverse("course_modes_choose", kwargs={"course_id": self.course_id})
+        self.configure_google_provider(enabled=True)
+        self.configure_facebook_provider(enabled=True)
 
     @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data(*THIRD_PARTY_AUTH_PROVIDERS)
@@ -175,63 +175,43 @@ class RegisterFormTest(ModuleStoreTestCase):
         self.assertContains(response, expected_url)
 
     @ddt.data(*THIRD_PARTY_AUTH_BACKENDS)
-    def test_register_third_party_auth_with_course_id(self, backend_name):
-        response = self.client.get(self.url, {"course_id": self.course_id})
+    def test_register_third_party_auth_with_params(self, backend_name):
+        params = [
+            ('course_id', self.course_id),
+            ('enrollment_action', 'enroll'),
+            ('course_mode', 'honor'),
+            ('email_opt_in', 'true'),
+            ('next', '/custom/final/destination'),
+        ]
+        response = self.client.get(self.url, params)
         expected_url = _third_party_login_url(
             backend_name,
             "register",
-            course_id=self.course_id,
-            redirect_url=self.course_modes_url
-        )
-        self.assertContains(response, expected_url)
-
-    @ddt.data(*THIRD_PARTY_AUTH_BACKENDS)
-    def test_third_party_auth_with_white_label_course(self, backend_name):
-        # Set the course mode to honor with a min price,
-        # indicating that the course is behind a paywall.
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug="honor",
-            mode_display_name="Honor",
-            min_price=100
-        )
-
-        # Expect that we're redirected to the shopping cart
-        # instead of to the track selection page.
-        response = self.client.get(self.url, {"course_id": self.course_id})
-        expected_url = _third_party_login_url(
-            backend_name,
-            "register",
-            course_id=self.course_id,
-            redirect_url=reverse("shoppingcart.views.show_cart")
+            redirect_url=_finish_auth_url(params),
         )
         self.assertContains(response, expected_url)
 
     @ddt.data(None, "true", "false")
-    def test_email_opt_in(self, opt_in_value):
-        params = OrderedDict()
-        params['course_id'] = self.course_id
-        params['enrollment_action'] = 'enroll'
-
-        if opt_in_value is not None:
-            params['email_opt_in'] = opt_in_value
+    def test_params(self, opt_in_value):
+        params = [
+            ('course_id', self.course_id),
+            ('enrollment_action', 'enroll'),
+            ('course_mode', 'honor'),
+            ('email_opt_in', opt_in_value),
+            ('next', '/custom/final/destination'),
+        ]
 
         # Get the login page
         response = self.client.get(self.url, params)
 
-        # Verify that the hidden parameter is set correctly
-        hidden_param = '<input type="hidden" name="email_opt_in" value="{val}"'.format(
-            val=opt_in_value
-        )
-
-        if opt_in_value is not None:
-            self.assertContains(response, hidden_param)
-        else:
-            self.assertNotContains(response, hidden_param)
+        # Verify that the parameters are sent on to the next page correctly
+        post_login_handler = _finish_auth_url(params)
+        js_success_var = 'var nextUrl = "{}";'.format(post_login_handler)
+        self.assertContains(response, js_success_var)
 
         # Verify that the login link preserves the querystring params
         login_link = u"{url}?{params}".format(
             url=reverse('signin_user'),
-            params=urllib.urlencode(params)
+            params=urllib.urlencode([('next', post_login_handler)])
         )
         self.assertContains(response, login_link)

@@ -4,149 +4,57 @@ Unit tests for embargo app admin forms.
 """
 
 from django.test import TestCase
-from django.test.utils import override_settings
+
+from opaque_keys.edx.locator import CourseLocator
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
-from embargo.forms import EmbargoedCourseForm, EmbargoedStateForm, IPFilterForm
-from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
+from embargo.models import IPFilter
+from embargo.forms import RestrictedCourseForm, IPFilterForm
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class EmbargoCourseFormTest(ModuleStoreTestCase):
+class RestrictedCourseFormTest(ModuleStoreTestCase):
     """Test the course form properly validates course IDs"""
 
-    def setUp(self):
-        self.course = CourseFactory.create()
-        self.true_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': True}
-        self.false_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': False}
-
-    def test_embargo_course(self):
-        self.assertFalse(EmbargoedCourse.is_embargoed(self.course.id))
-        # Test adding embargo to this course
-        form = EmbargoedCourseForm(data=self.true_form_data)
-        # Validation should work
+    def test_save_valid_data(self):
+        course = CourseFactory.create()
+        data = {
+            'course_key': unicode(course.id),
+            'enroll_msg_key': 'default',
+            'access_msg_key': 'default'
+        }
+        form = RestrictedCourseForm(data=data)
         self.assertTrue(form.is_valid())
-        form.save()
-        # Check that this course is embargoed
-        self.assertTrue(EmbargoedCourse.is_embargoed(self.course.id))
 
-    def test_repeat_course(self):
-        # Initially course shouldn't be authorized
-        self.assertFalse(EmbargoedCourse.is_embargoed(self.course.id))
-        # Test authorizing the course, which should totally work
-        form = EmbargoedCourseForm(data=self.true_form_data)
-        # Validation should work
-        self.assertTrue(form.is_valid())
-        form.save()
-        # Check that this course is authorized
-        self.assertTrue(EmbargoedCourse.is_embargoed(self.course.id))
+    def test_invalid_course_key(self):
+        # Invalid format for the course key
+        form = RestrictedCourseForm(data={'course_key': 'not/valid'})
+        self._assert_course_field_error(form)
 
-        # Now make a new course authorization with the same course id that tries to turn email off
-        form = EmbargoedCourseForm(data=self.false_form_data)
-        # Validation should not work because course_id field is unique
-        self.assertFalse(form.is_valid())
-        self.assertEquals(
-            "Embargoed course with this Course id already exists.",
-            form._errors['course_id'][0]  # pylint: disable=protected-access
-        )
-        with self.assertRaisesRegexp(ValueError, "The EmbargoedCourse could not be created because the data didn't validate."):
-            form.save()
+    def test_course_not_found(self):
+        course_key = CourseLocator(org='test', course='test', run='test')
+        form = RestrictedCourseForm(data={'course_key': course_key})
+        self._assert_course_field_error(form)
 
-        # Course should still be authorized (invalid attempt had no effect)
-        self.assertTrue(EmbargoedCourse.is_embargoed(self.course.id))
-
-    def test_form_typo(self):
-        # Munge course id
-        bad_id = self.course.id.to_deprecated_string() + '_typo'
-
-        form_data = {'course_id': bad_id, 'embargoed': True}
-        form = EmbargoedCourseForm(data=form_data)
+    def _assert_course_field_error(self, form):
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
         msg = 'COURSE NOT FOUND'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
-        msg += 'Please recheck that you have supplied a valid course id.'
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        self.assertIn(msg, form._errors['course_key'][0])  # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(ValueError, "The EmbargoedCourse could not be created because the data didn't validate."):
+        with self.assertRaisesRegexp(ValueError, "The RestrictedCourse could not be created because the data didn't validate."):
             form.save()
-
-    def test_invalid_location(self):
-        # Munge course id
-        bad_id = self.course.id.to_deprecated_string().split('/')[-1]
-
-        form_data = {'course_id': bad_id, 'embargoed': True}
-        form = EmbargoedCourseForm(data=form_data)
-        # Validation shouldn't work
-        self.assertFalse(form.is_valid())
-
-        msg = 'COURSE NOT FOUND'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
-        msg += 'Please recheck that you have supplied a valid course id.'
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
-
-        with self.assertRaisesRegexp(ValueError, "The EmbargoedCourse could not be created because the data didn't validate."):
-            form.save()
-
-
-class EmbargoedStateFormTest(TestCase):
-    """Test form for adding new states"""
-
-    def setUp(self):
-        # Explicitly clear the cache, since ConfigurationModel relies on the cache
-        cache.clear()
-
-    def tearDown(self):
-        # Explicitly clear ConfigurationModel's cache so tests have a clear cache
-        # and don't interfere with each other
-        cache.clear()
-
-    def test_add_valid_states(self):
-        # test adding valid two letter states
-        # case and spacing should not matter
-        form_data = {'embargoed_countries': 'cu, Sy ,      US'}
-        form = EmbargoedStateForm(data=form_data)
-        self.assertTrue(form.is_valid())
-        form.save()
-        current_embargoes = EmbargoedState.current().embargoed_countries_list
-        for country in ["CU", "SY", "US"]:
-            self.assertIn(country, current_embargoes)
-        # Test clearing by adding an empty list is OK too
-        form_data = {'embargoed_countries': ''}
-        form = EmbargoedStateForm(data=form_data)
-        self.assertTrue(form.is_valid())
-        form.save()
-        self.assertTrue(len(EmbargoedState.current().embargoed_countries_list) == 0)
-
-    def test_add_invalid_states(self):
-        # test adding invalid codes
-        # xx is not valid
-        # usa is not valid
-        form_data = {'embargoed_countries': 'usa, xx'}
-        form = EmbargoedStateForm(data=form_data)
-        self.assertFalse(form.is_valid())
-
-        msg = 'COULD NOT PARSE COUNTRY CODE(S) FOR: {0}'.format([u'USA', u'XX'])
-        msg += ' Please check the list of country codes and verify your entries.'
-        self.assertEquals(msg, form._errors['embargoed_countries'][0])  # pylint: disable=protected-access
-
-        with self.assertRaisesRegexp(ValueError, "The EmbargoedState could not be created because the data didn't validate."):
-            form.save()
-
-        self.assertFalse('USA' in EmbargoedState.current().embargoed_countries_list)
-        self.assertFalse('XX' in EmbargoedState.current().embargoed_countries_list)
 
 
 class IPFilterFormTest(TestCase):
     """Test form for adding [black|white]list IP addresses"""
 
     def tearDown(self):
+        super(IPFilterFormTest, self).tearDown()
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache
         # and don't interfere with each other
         cache.clear()

@@ -5,6 +5,7 @@ Does not include any access control, be sure to check access before calling.
 """
 
 import json
+import logging
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -21,6 +22,11 @@ from student.models import anonymous_id_for_user
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 from microsite_configuration import microsite
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+
+log = logging.getLogger(__name__)
 
 
 class EmailEnrollmentState(object):
@@ -79,7 +85,9 @@ def get_user_email_language(user):
     Return the language most appropriate for writing emails to user. Returns
     None if the preference has not been set, or if the user does not exist.
     """
-    return UserPreference.get_preference(user, LANGUAGE_KEY)
+    # Calling UserPreference directly instead of get_user_preference because the user requesting the
+    # information is not "user" and also may not have is_staff access.
+    return UserPreference.get_value(user, LANGUAGE_KEY)
 
 
 def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None, language=None):
@@ -98,7 +106,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         representing state before and after the action.
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
-
+    enrollment_obj = None
     if previous_state.user:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
@@ -106,7 +114,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if previous_state.enrollment:
             course_mode = previous_state.mode
 
-        CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
+        enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
         if email_students:
             email_params['message'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
@@ -123,7 +131,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
-    return previous_state, after_state
+    return previous_state, after_state, enrollment_obj
 
 
 def unenroll_email(course_id, student_email, email_students=False, email_params=None, language=None):
@@ -139,7 +147,6 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
         representing state before and after the action.
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
-
     if previous_state.enrollment:
         CourseEnrollment.unenroll_by_email(student_email, course_id)
         if email_students:
@@ -202,6 +209,19 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
         submissions.SubmissionError: unexpected error occurred while resetting the score in the submissions API.
 
     """
+    try:
+        # A block may have children. Clear state on children first.
+        block = modulestore().get_item(module_state_key)
+        if block.has_children:
+            for child in block.children:
+                try:
+                    reset_student_attempts(course_id, student, child, delete_module=delete_module)
+                except StudentModule.DoesNotExist:
+                    # If a particular child doesn't have any state, no big deal, as long as the parent does.
+                    pass
+    except ItemNotFoundError:
+        log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
+
     # Reset the student's score in the submissions API
     # Currently this is used only by open assessment (ORA 2)
     # We need to do this *before* retrieving the `StudentModule` model,
@@ -260,7 +280,7 @@ def get_email_params(course, auto_enroll, secure=True):
     registration_url = u'{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
-        path=reverse('student.views.register_user')
+        path=reverse('register_user')
     )
     course_url = u'{proto}://{site}{path}'.format(
         proto=protocol,

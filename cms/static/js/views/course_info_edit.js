@@ -15,7 +15,8 @@ var CourseInfoEdit = BaseView.extend({
     new CourseInfoUpdateView({
         el: $('body.updates'),
         collection: this.model.get('updates'),
-        base_asset_url: this.model.get('base_asset_url')
+        base_asset_url: this.model.get('base_asset_url'),
+        push_notification_enabled: this.options.push_notification_enabled
     });
 
     new CourseInfoHandoutView({

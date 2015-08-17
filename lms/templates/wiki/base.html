@@ -3,12 +3,14 @@
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
 
+{% block bodyclass %}view-incourse view-wiki{% endblock %}
+
 {% block headextra %}
   {% compressed_css 'course' %}
-  
+
   <script type="text/javascript">
     function ajaxError(){}
-    
+
     $.ajaxSetup({
       timeout: 7000,
       cache: false,
@@ -58,7 +60,7 @@
   <section class="container wiki {{ selected_tab }}" id="wiki-content">
     <div class="wiki-wrapper">
       {% block wiki_body %}
-        
+
         {% block wiki_breadcrumbs %}{% endblock %}
 
         {% if messages %}

@@ -158,7 +158,7 @@ class CertificateStatusReport(Report):
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
             course = cur_course.number + " " + cur_course.display_name_with_default  # TODO add term (i.e. Fall 2013)?
-            counts = CourseEnrollment.enrollment_counts(course_id)
+            counts = CourseEnrollment.objects.enrollment_counts(course_id)
             total_enrolled = counts['total']
             audit_enrolled = counts['audit']
             honor_enrolled = counts['honor']

@@ -1,182 +1,99 @@
 """ Views for a student's profile information. """
 
-import json
-
-from django.http import (
-    QueryDict, HttpResponse,
-    HttpResponseBadRequest, HttpResponseServerError
-)
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
-from django_future.csrf import ensure_csrf_cookie
+from django.core.exceptions import ObjectDoesNotExist
+from django_countries import countries
+
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
+from django.views.decorators.http import require_http_methods
+
 from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.user_api.api import profile as profile_api
-from lang_pref import LANGUAGE_KEY, api as language_api
-import third_party_auth
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
+from openedx.core.djangoapps.user_api.accounts.serializers import PROFILE_IMAGE_KEY_PREFIX
+from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthorized
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+from student.models import User
+from microsite_configuration import microsite
 
-
-@login_required
-def index(request):
-    """View or modify the student's profile.
-
-    GET: Retrieve the user's profile information.
-    PUT: Update the user's profile information.  Currently the only accept param is "fullName".
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse: 200 if successful on GET
-        HttpResponse: 204 if successful on PUT
-        HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 400 if the updated information is invalid
-        HttpResponse: 405 if using an unsupported HTTP method
-        HttpResponse: 500 if an unexpected error occurs.
-
-    """
-    if request.method == "GET":
-        return _get_profile(request)
-    elif request.method == "PUT":
-        return _update_profile(request)
-    else:
-        return HttpResponse(status=405)
-
-
-def _get_profile(request):
-    """Retrieve the user's profile information, including an HTML form
-    that students can use to update the information.
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse
-
-    """
-    user = request.user
-
-    context = {
-        'disable_courseware_js': True
-    }
-
-    if third_party_auth.is_enabled():
-        context['provider_user_states'] = third_party_auth.pipeline.get_provider_user_states(user)
-
-    return render_to_response('student_profile/index.html', context)
-
-
-@ensure_csrf_cookie
-def _update_profile(request):
-    """Update a user's profile information.
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse
-
-    """
-    put = QueryDict(request.body)
-
-    username = request.user.username
-    new_name = put.get('fullName')
-
-    if new_name is None:
-        return HttpResponseBadRequest("Missing param 'fullName'")
-
-    try:
-        profile_api.update_profile(username, full_name=new_name)
-    except profile_api.ProfileInvalidField:
-        return HttpResponseBadRequest()
-    except profile_api.ProfileUserNotFound:
-        return HttpResponseServerError()
-
-    # A 204 is intended to allow input for actions to take place
-    # without causing a change to the user agent's active document view.
-    return HttpResponse(status=204)
+from django.utils.translation import ugettext as _
 
 
 @login_required
 @require_http_methods(['GET'])
-def language_info(request):
-    """Retrieve information about languages.
-
-    Gets the user's preferred language and the list of released
-    languages, encoding the information as JSON.
+def learner_profile(request, username):
+    """Render the profile page for the specified username.
 
     Args:
         request (HttpRequest)
+        username (str): username of user whose profile is requested.
 
     Returns:
-        HttpResponse: 200 if successful on GET
+        HttpResponse: 200 if the page was sent successfully
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 405 if using an unsupported HTTP method
-        HttpResponse: 500 if an unexpected error occurs
+    Raises:
+        Http404: 404 if the specified user is not authorized or does not exist
 
-    Example:
-
-        GET /profile/preferences/languages
-
+    Example usage:
+        GET /account/profile
     """
-    user = request.user
-
-    preferred_language_code = profile_api.preference_info(user.username).get(LANGUAGE_KEY)
-    preferred_language = language_api.preferred_language(preferred_language_code)
-    response_data = {'preferredLanguage': {'code': preferred_language.code, 'name': preferred_language.name}}
-
-    languages = language_api.released_languages()
-    response_data['languages'] = [{'code': language.code, 'name': language.name} for language in languages]
-
-    return HttpResponse(json.dumps(response_data), content_type='application/json')
-
-
-@login_required
-@require_http_methods(['PUT'])
-@ensure_csrf_cookie
-def preference_handler(request):
-    """Change the user's preferences.
-
-    At the moment, the only supported preference is the user's
-    language choice.
-
-    Args:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse: 204 if successful
-        HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 400 if no language is provided, or an unreleased
-            language is provided
-        HttpResponse: 405 if using an unsupported HTTP method
-        HttpResponse: 500 if an unexpected error occurs.
-
-    Example:
-
-        PUT /profile/preferences
-
-    """
-    put = QueryDict(request.body)
-
-    username = request.user.username
-    new_language = put.get('language')
-
-    if new_language is None:
-        return HttpResponseBadRequest("Missing param 'language'")
-
-    # Check that the provided language code corresponds to a released language
-    released_languages = language_api.released_languages()
-    if new_language in [language.code for language in released_languages]:
-        try:
-            profile_api.update_preferences(username, **{LANGUAGE_KEY: new_language})
-            request.session['django_language'] = new_language
-        except profile_api.ProfileUserNotFound:
-            return HttpResponseServerError()
-    else:
-        return HttpResponseBadRequest(
-            "Provided language code corresponds to an unreleased language"
+    try:
+        return render_to_response(
+            'student_profile/learner_profile.html',
+            learner_profile_context(request.user, username, request.user.is_staff, request.build_absolute_uri)
         )
+    except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
+        raise Http404
 
-    # A 204 is intended to allow input for actions to take place
-    # without causing a change to the user agent's active document view.
-    return HttpResponse(status=204)
+
+def learner_profile_context(logged_in_user, profile_username, user_is_staff, build_absolute_uri_func):
+    """Context for the learner profile page.
+
+    Args:
+        logged_in_user (object): Logged In user.
+        profile_username (str): username of user whose profile is requested.
+        user_is_staff (bool): Logged In user has staff access.
+        build_absolute_uri_func ():
+
+    Returns:
+        dict
+
+    Raises:
+        ObjectDoesNotExist: the specified profile_username does not exist.
+    """
+    profile_user = User.objects.get(username=profile_username)
+
+    own_profile = (logged_in_user.username == profile_username)
+
+    account_settings_data = get_account_settings(logged_in_user, profile_username)
+    # Account for possibly relative URLs.
+    for key, value in account_settings_data['profile_image'].items():
+        if key.startswith(PROFILE_IMAGE_KEY_PREFIX):
+            account_settings_data['profile_image'][key] = build_absolute_uri_func(value)
+
+    preferences_data = get_user_preferences(profile_user, profile_username)
+
+    context = {
+        'data': {
+            'profile_user_id': profile_user.id,
+            'default_public_account_fields': settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields'],
+            'default_visibility': settings.ACCOUNT_VISIBILITY_CONFIGURATION['default_visibility'],
+            'accounts_api_url': reverse("accounts_api", kwargs={'username': profile_username}),
+            'preferences_api_url': reverse('preferences_api', kwargs={'username': profile_username}),
+            'preferences_data': preferences_data,
+            'account_settings_data': account_settings_data,
+            'profile_image_upload_url': reverse('profile_image_upload', kwargs={'username': profile_username}),
+            'profile_image_remove_url': reverse('profile_image_remove', kwargs={'username': profile_username}),
+            'profile_image_max_bytes': settings.PROFILE_IMAGE_MAX_BYTES,
+            'profile_image_min_bytes': settings.PROFILE_IMAGE_MIN_BYTES,
+            'account_settings_page_url': reverse('account_settings'),
+            'has_preferences_access': (logged_in_user.username == profile_username or user_is_staff),
+            'own_profile': own_profile,
+            'country_options': list(countries),
+            'language_options': settings.ALL_LANGUAGES,
+            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+        }
+    }
+    return context

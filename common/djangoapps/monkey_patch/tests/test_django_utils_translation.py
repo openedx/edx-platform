@@ -78,6 +78,7 @@ class MonkeyPatchTest(TestCase):
         """
         Remember the current state, then reset
         """
+        super(MonkeyPatchTest, self).setUp()
         self.was_patched = unpatch()
         self.unpatch_all()
         self.addCleanup(self.cleanup)

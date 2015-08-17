@@ -1,18 +1,36 @@
 """
 Test helper functions and base classes.
 """
+import inspect
 import json
 import unittest
 import functools
+import operator
+import pprint
 import requests
 import os
+import urlparse
+from contextlib import contextmanager
+from datetime import datetime
 from path import path
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
+from bok_choy.promise import EmptyPromise, Promise
 from opaque_keys.edx.locator import CourseLocator
+from pymongo import MongoClient, ASCENDING
+from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
 from xmodule.partitions.partitions import UserPartition
 from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from unittest import TestCase
+
+
+from ..pages.common import BASE_URL
+
+
+MAX_EVENTS_IN_FAILURE_OUTPUT = 20
 
 
 def skip_if_browser(browser):
@@ -52,7 +70,7 @@ def is_youtube_available():
         'player': 'https://www.youtube.com/iframe_api',
         # For transcripts, you need to check an actual video, so we will
         # just specify our default video and see if that one is available.
-        'transcript': 'http://video.google.com/timedtext?lang=en&v=OEoXaMPEzfM',
+        'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
     for url in youtube_api_urls.itervalues():
@@ -75,6 +93,14 @@ def load_data_str(rel_path):
     full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
     with open(full_path) as data_file:
         return data_file.read()
+
+
+def remove_file(filename):
+    """
+    Remove a file if it exists
+    """
+    if os.path.exists(filename):
+        os.remove(filename)
 
 
 def disable_animations(page):
@@ -210,6 +236,28 @@ def select_option_by_value(browser_query, value):
     select = Select(browser_query.first.results[0])
     select.select_by_value(value)
 
+    def options_selected():
+        """
+        Returns True if all options in select element where value attribute
+        matches `value`. if any option is not selected then returns False
+        and select it. if value is not an option choice then it returns False.
+        """
+        all_options_selected = True
+        has_option = False
+        for opt in select.options:
+            if opt.get_attribute('value') == value:
+                has_option = True
+                if not opt.is_selected():
+                    all_options_selected = False
+                    opt.click()
+        # if value is not an option choice then it should return false
+        if all_options_selected and not has_option:
+            all_options_selected = False
+        return all_options_selected
+
+    # Make sure specified option is actually selected
+    EmptyPromise(options_selected, "Option is selected").fulfill()
+
 
 def is_option_value_selected(browser_query, value):
     """
@@ -231,6 +279,276 @@ def element_has_text(page, css_selector, text):
         text_present = True
 
     return text_present
+
+
+def get_modal_alert(browser):
+    """
+    Returns instance of modal alert box shown in browser after waiting
+    for 6 seconds
+    """
+    WebDriverWait(browser, 6).until(EC.alert_is_present())
+    return browser.switch_to.alert
+
+
+class EventsTestMixin(TestCase):
+    """
+    Helpers and setup for running tests that evaluate events emitted
+    """
+    def setUp(self):
+        super(EventsTestMixin, self).setUp()
+        self.event_collection = MongoClient()["test"]["events"]
+        self.reset_event_tracking()
+
+    def reset_event_tracking(self):
+        """Drop any events that have been collected thus far and start collecting again from scratch."""
+        self.event_collection.drop()
+        self.start_time = datetime.now()
+
+    @contextmanager
+    def capture_events(self, event_filter=None, number_of_matches=1, captured_events=None):
+        """
+        Context manager that captures all events emitted while executing a particular block.
+
+        All captured events are stored in the list referenced by `captured_events`. Note that this list is appended to
+        *in place*. The events will be appended to the list in the order they are emitted.
+
+        The `event_filter` is expected to be a callable that allows you to filter the event stream and select particular
+        events of interest. A dictionary `event_filter` is also supported, which simply indicates that the event should
+        match that provided expectation.
+
+        `number_of_matches` tells this context manager when enough events have been found and it can move on. The
+        context manager will not exit until this many events have passed the filter. If not enough events are found
+        before a timeout expires, then this will raise a `BrokenPromise` error. Note that this simply states that
+        *at least* this many events have been emitted, so `number_of_matches` is simply a lower bound for the size of
+        `captured_events`.
+        """
+        start_time = datetime.utcnow()
+
+        yield
+
+        events = self.wait_for_events(
+            start_time=start_time, event_filter=event_filter, number_of_matches=number_of_matches)
+
+        if captured_events is not None and hasattr(captured_events, 'append') and callable(captured_events.append):
+            for event in events:
+                captured_events.append(event)
+
+    @contextmanager
+    def assert_events_match_during(self, event_filter=None, expected_events=None):
+        """
+        Context manager that ensures that events matching the `event_filter` and `expected_events` are emitted.
+
+        This context manager will filter out the event stream using the `event_filter` and wait for
+        `len(expected_events)` to match the filter.
+
+        It will then compare the events in order with their counterpart in `expected_events` to ensure they match the
+        more detailed assertion.
+
+        Typically `event_filter` will be an `event_type` filter and the `expected_events` list will contain more
+        detailed assertions.
+        """
+        captured_events = []
+        with self.capture_events(event_filter, len(expected_events), captured_events):
+            yield
+
+        self.assert_events_match(expected_events, captured_events)
+
+    def wait_for_events(self, start_time=None, event_filter=None, number_of_matches=1, timeout=None):
+        """
+        Wait for `number_of_matches` events to pass the `event_filter`.
+
+        By default, this will look at all events that have been emitted since the beginning of the setup of this mixin.
+        A custom `start_time` can be specified which will limit the events searched to only those emitted after that
+        time.
+
+        The `event_filter` is expected to be a callable that allows you to filter the event stream and select particular
+        events of interest. A dictionary `event_filter` is also supported, which simply indicates that the event should
+        match that provided expectation.
+
+        `number_of_matches` lets us know when enough events have been found and it can move on. The function will not
+        return until this many events have passed the filter. If not enough events are found before a timeout expires,
+        then this will raise a `BrokenPromise` error. Note that this simply states that *at least* this many events have
+        been emitted, so `number_of_matches` is simply a lower bound for the size of `captured_events`.
+
+        Specifying a custom `timeout` can allow you to extend the default 30 second timeout if necessary.
+        """
+        if start_time is None:
+            start_time = self.start_time
+
+        if timeout is None:
+            timeout = 30
+
+        def check_for_matching_events():
+            """Gather any events that have been emitted since `start_time`"""
+            return self.matching_events_were_emitted(
+                start_time=start_time,
+                event_filter=event_filter,
+                number_of_matches=number_of_matches
+            )
+
+        return Promise(
+            check_for_matching_events,
+            # This is a bit of a hack, Promise calls str(description), so I set the description to an object with a
+            # custom __str__ and have it do some intelligent stuff to generate a helpful error message.
+            CollectedEventsDescription(
+                'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
+                    number_of_matches=number_of_matches,
+                    event_filter=self.event_filter_to_descriptive_string(event_filter),
+                ),
+                functools.partial(self.get_matching_events_from_time, start_time=start_time, event_filter={})
+            ),
+            timeout=timeout
+        ).fulfill()
+
+    def matching_events_were_emitted(self, start_time=None, event_filter=None, number_of_matches=1):
+        """Return True if enough events have been emitted that pass the `event_filter` since `start_time`."""
+        matching_events = self.get_matching_events_from_time(start_time=start_time, event_filter=event_filter)
+        return len(matching_events) >= number_of_matches, matching_events
+
+    def get_matching_events_from_time(self, start_time=None, event_filter=None):
+        """
+        Return a list of events that pass the `event_filter` and were emitted after `start_time`.
+
+        This function is used internally by most of the other assertions and convenience methods in this class.
+
+        The `event_filter` is expected to be a callable that allows you to filter the event stream and select particular
+        events of interest. A dictionary `event_filter` is also supported, which simply indicates that the event should
+        match that provided expectation.
+        """
+        if start_time is None:
+            start_time = self.start_time
+
+        if isinstance(event_filter, dict):
+            event_filter = functools.partial(is_matching_event, event_filter)
+        elif not callable(event_filter):
+            raise ValueError(
+                'event_filter must either be a dict or a callable function with as single "event" parameter that '
+                'returns a boolean value.'
+            )
+
+        matching_events = []
+        cursor = self.event_collection.find(
+            {
+                "time": {
+                    "$gte": start_time
+                }
+            }
+        ).sort("time", ASCENDING)
+        for event in cursor:
+            matches = False
+            try:
+                # Mongo automatically assigns an _id to all events inserted into it. We strip it out here, since
+                # we don't care about it.
+                del event['_id']
+                if event_filter is not None:
+                    # Typically we will be grabbing all events of a particular type, however, you can use arbitrary
+                    # logic to identify the events that are of interest.
+                    matches = event_filter(event)
+            except AssertionError:
+                # allow the filters to use "assert" to filter out events
+                continue
+            else:
+                if matches is None or matches:
+                    matching_events.append(event)
+        return matching_events
+
+    def assert_matching_events_were_emitted(self, start_time=None, event_filter=None, number_of_matches=1):
+        """Assert that at least `number_of_matches` events have passed the filter since `start_time`."""
+        description = CollectedEventsDescription(
+            'Not enough events match the filter:\n' + self.event_filter_to_descriptive_string(event_filter),
+            functools.partial(self.get_matching_events_from_time, start_time=start_time, event_filter={})
+        )
+
+        self.assertTrue(
+            self.matching_events_were_emitted(
+                start_time=start_time, event_filter=event_filter, number_of_matches=number_of_matches
+            ),
+            description
+        )
+
+    def assert_no_matching_events_were_emitted(self, event_filter, start_time=None):
+        """Assert that no events have passed the filter since `start_time`."""
+        matching_events = self.get_matching_events_from_time(start_time=start_time, event_filter=event_filter)
+
+        description = CollectedEventsDescription(
+            'Events unexpected matched the filter:\n' + self.event_filter_to_descriptive_string(event_filter),
+            lambda: matching_events
+        )
+
+        self.assertEquals(len(matching_events), 0, description)
+
+    def assert_events_match(self, expected_events, actual_events):
+        """
+        Assert that each item in the expected events sequence matches its counterpart at the same index in the actual
+        events sequence.
+        """
+        for expected_event, actual_event in zip(expected_events, actual_events):
+            assert_event_matches(
+                expected_event,
+                actual_event,
+                tolerate=EventMatchTolerates.lenient()
+            )
+
+    def relative_path_to_absolute_uri(self, relative_path):
+        """Return an aboslute URI given a relative path taking into account the test context."""
+        return urlparse.urljoin(BASE_URL, relative_path)
+
+    def event_filter_to_descriptive_string(self, event_filter):
+        """Find the source code of the callable or pretty-print the dictionary"""
+        message = ''
+        if callable(event_filter):
+            file_name = '(unknown)'
+            try:
+                file_name = inspect.getsourcefile(event_filter)
+            except TypeError:
+                pass
+
+            try:
+                list_of_source_lines, line_no = inspect.getsourcelines(event_filter)
+            except IOError:
+                pass
+            else:
+                message = '{file_name}:{line_no}\n{hr}\n{event_filter}\n{hr}'.format(
+                    event_filter=''.join(list_of_source_lines).rstrip(),
+                    file_name=file_name,
+                    line_no=line_no,
+                    hr='-' * 20,
+                )
+
+        if not message:
+            message = '{hr}\n{event_filter}\n{hr}'.format(
+                event_filter=pprint.pformat(event_filter),
+                hr='-' * 20,
+            )
+
+        return message
+
+
+class CollectedEventsDescription(object):
+    """
+    Produce a clear error message when tests fail.
+
+    This class calls the provided `get_events_func` when converted to a string, and pretty prints the returned events.
+    """
+
+    def __init__(self, description, get_events_func):
+        self.description = description
+        self.get_events_func = get_events_func
+
+    def __str__(self):
+        message_lines = [
+            self.description,
+            'Events:'
+        ]
+        events = self.get_events_func()
+        events.sort(key=operator.itemgetter('time'), reverse=True)
+        for event in events[:MAX_EVENTS_IN_FAILURE_OUTPUT]:
+            message_lines.append(pprint.pformat(event))
+        if len(events) > MAX_EVENTS_IN_FAILURE_OUTPUT:
+            message_lines.append(
+                'Too many events to display, the remaining events were omitted. Run locally to diagnose.')
+
+        return '\n\n'.join(message_lines)
 
 
 class UniqueCourseTest(WebAppTest):
@@ -351,3 +669,17 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     return UserPartition(
         partition_id, name, description, groups, MockUserPartitionScheme(scheme)
     ).to_json()
+
+
+class TestWithSearchIndexMixin(object):
+    """ Mixin encapsulating search index creation """
+    TEST_INDEX_FILENAME = "test_root/index_file.dat"
+
+    def _create_search_index(self):
+        """ Creates search index backing file """
+        with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
+            json.dump({}, index_file)
+
+    def _cleanup_index_file(self):
+        """ Removes search index backing file """
+        remove_file(self.TEST_INDEX_FILENAME)

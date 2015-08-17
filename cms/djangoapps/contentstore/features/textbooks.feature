@@ -6,21 +6,19 @@ Feature: CMS.Textbooks
     When I go to the textbooks page
     Then I should see a message telling me to create a new textbook
 
-  # IE and Safari on sauce labs will not upload the textbook correctly resulting in an error
-  @skip_internetexplorer
-  @skip_safari
-  Scenario: Create a textbook
-    Given I have opened a new course in Studio
-    And I go to the textbooks page
-    When I click on the New Textbook button
-    And I name my textbook "Economics"
-    And I name the first chapter "Chapter 1"
-    And I click the Upload Asset link for the first chapter
-    And I upload the textbook "textbook.pdf"
-    And I save the textbook
-    Then I should see a textbook named "Economics" with a chapter path containing "/static/textbook.pdf"
-    And I reload the page
-    Then I should see a textbook named "Economics" with a chapter path containing "/static/textbook.pdf"
+# Flaky test, disabled 03/13/2015. TNL-1679.
+#  Scenario: Create a textbook
+#    Given I have opened a new course in Studio
+#    And I go to the textbooks page
+#    When I click on the New Textbook button
+#    And I name my textbook "Economics"
+#    And I name the first chapter "Chapter 1"
+#    And I click the Upload Asset link for the first chapter
+#    And I upload the textbook "textbook.pdf"
+#    And I save the textbook
+#    Then I should see a textbook named "Economics" with a chapter path containing "/static/textbook.pdf"
+#    And I reload the page
+#    Then I should see a textbook named "Economics" with a chapter path containing "/static/textbook.pdf"
 
   Scenario: Create a textbook with multiple chapters
     Given I have opened a new course in Studio

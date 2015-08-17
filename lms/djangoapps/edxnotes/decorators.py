@@ -4,7 +4,7 @@ Decorators related to edXNotes.
 from django.conf import settings
 import json
 from edxnotes.helpers import (
-    get_endpoint,
+    get_public_endpoint,
     get_id_token,
     get_token_url,
     generate_uid,
@@ -45,8 +45,9 @@ def edxnotes(cls):
                     "courseId": unicode(self.runtime.course_id).encode("utf-8"),
                     "token": get_id_token(self.runtime.get_real_user(self.runtime.anonymous_student_id)),
                     "tokenUrl": get_token_url(self.runtime.course_id),
-                    "endpoint": get_endpoint(),
+                    "endpoint": get_public_endpoint(),
                     "debug": settings.DEBUG,
+                    "eventStringLimit": settings.TRACK_MAX_EVENT / 6,
                 },
             })
 

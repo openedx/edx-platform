@@ -4,13 +4,16 @@ from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
+
 from courseware.courses import get_course_with_access
+from courseware.access import has_access
+from courseware.tabs import EnrolledTab
 
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
 from student.models import unique_id_for_user
 
-import open_ended_notifications
+from open_ended_grading import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
@@ -23,6 +26,7 @@ from django.utils.translation import ugettext as _
 from open_ended_grading.utils import (
     STAFF_ERROR_MESSAGE, StudentProblemList, generate_problem_url, create_controller_query_service
 )
+from xblock_django.models import XBlockDisableConfig
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +64,61 @@ ALERT_DICT = {
     'Problems you have submitted': _("New grades have been returned"),
     'Flagged Submissions': _("Submissions have been flagged for review"),
 }
+
+
+class StaffGradingTab(EnrolledTab):
+    """
+    A tab for staff grading.
+    """
+    type = 'staff_grading'
+    title = _("Staff grading")
+    view_name = "staff_grading"
+
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
+            return False
+        if user and not has_access(user, 'staff', course, course.id):
+            return False
+        return "combinedopenended" in course.advanced_modules
+
+
+class PeerGradingTab(EnrolledTab):
+    """
+    A tab for peer grading.
+    """
+    type = 'peer_grading'
+    # Translators: "Peer grading" appears on a tab that allows
+    # students to view open-ended problems that require grading
+    title = _("Peer grading")
+    view_name = "peer_grading"
+
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
+            return False
+        if not super(PeerGradingTab, cls).is_enabled(course, user=user):
+            return False
+        return "combinedopenended" in course.advanced_modules
+
+
+class OpenEndedGradingTab(EnrolledTab):
+    """
+    A tab for open ended grading.
+    """
+    type = 'open_ended'
+    # Translators: "Open Ended Panel" appears on a tab that, when clicked, opens up a panel that
+    # displays information about open-ended problems that a user has submitted or needs to grade
+    title = _("Open Ended Panel")
+    view_name = "open_ended_notifications"
+
+    @classmethod
+    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+        if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
+            return False
+        if not super(OpenEndedGradingTab, cls).is_enabled(course, user=user):
+            return False
+        return "combinedopenended" in course.advanced_modules
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -247,7 +306,7 @@ def combined_notifications(request, course_id):
     notification_tuples = open_ended_notifications.NOTIFICATION_TYPES
 
     notification_list = []
-    for response_num in xrange(0, len(notification_tuples)):
+    for response_num in xrange(len(notification_tuples)):
         tag = notification_tuples[response_num][0]
         if tag in response:
             url_name = notification_tuples[response_num][1]

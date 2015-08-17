@@ -1,0 +1,72 @@
+// ------------------------------
+// // Open edX Certificates: Utilities
+
+// About: configuration, functions, variables, mixins, and general helpers for rendering.
+
+// #VARIABLES
+// #FUNCTIONS
+// #MIXINS
+// #HELPERS
+
+// ------------------------------
+// #VARIABLES
+// ------------------------------
+$em-base:       16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
+
+// certificate characteristics
+$cert-base-color: palette(grayscale-cool, dark);
+$cert-distinguished-color: palette(primary, accent);
+
+$cert-decorative-color: palette(grayscale-cool, light);
+$cert-decorative-color-de-emphasized: palette(grayscale-cool, x-trans);
+$cert-decorative-color-emphasized: palette(grayscale-cool, mid-light);
+
+// typography: config
+@include font-face(
+    'Domine',
+    '../../certificates/fonts/Domine/Domine-Regular-webfont',
+    400,
+    $file-formats: woff woff2 ttf
+);
+
+@include font-face(
+    'Domine',
+    '../../certificates/fonts/Domine/Domine-Bold-webfont',
+    700,
+    $file-formats: woff woff2 ttf
+);
+
+// typography: config - stacks
+$font-family-serif: 'Domine', serif;
+
+// ------------------------------
+// #FUNCTIONS
+// ------------------------------
+
+// ------------------------------
+// #MIXINS
+// ------------------------------
+
+// ------------------------------
+// #HELPERS
+// ------------------------------
+// don't link style me, bro!
+%reset-link {
+    border-bottom: none;
+    padding: 0;
+
+    &:hover, &:focus, &:active {
+        border-bottom: 0;
+    }
+}
+
+// visual dividers
+%divider-1 {
+    border-bottom-width: rem(4);
+    border-bottom-style: solid;
+}
+
+%divider-2 {
+    border-bottom-width: rem(2);
+    border-bottom-style: solid;
+}

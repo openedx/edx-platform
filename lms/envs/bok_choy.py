@@ -55,8 +55,7 @@ MEDIA_URL = "/static/uploads/"
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'cache'
-BROKER_TRANSPORT = 'memory'
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
@@ -72,10 +71,11 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
 # Configure the LMS to use our stub EdxNotes implementation
-EDXNOTES_INTERFACE['url'] = 'http://localhost:8042/api/v1'
+EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
+EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
 # Enable django-pipeline and staticfiles
-STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
+STATIC_ROOT = (TEST_ROOT / "staticfiles" / "lms").abspath()
 
 # Silence noisy logs
 import logging
@@ -93,6 +93,18 @@ FEATURES['MILESTONES_APP'] = True
 
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
+# Enable Course Discovery
+FEATURES['ENABLE_COURSE_DISCOVERY'] = True
+
+# Enable student notes
+FEATURES['ENABLE_EDXNOTES'] = True
+
+# Enable teams feature
+FEATURES['ENABLE_TEAMS'] = True
+
+# Enable custom content licensing
+FEATURES['LICENSING'] = True
 
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
@@ -115,9 +127,39 @@ FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
 FEATURES['ADVANCED_SECURITY'] = False
+
+FEATURES['ENABLE_MOBILE_REST_API'] = True  # Show video bumper in LMS
+FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Show video bumper in LMS
+FEATURES['SHOW_BUMPER_PERIODICITY'] = 1
+
 PASSWORD_MIN_LENGTH = None
 PASSWORD_COMPLEXITY = {}
 
+# Enable courseware search for tests
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+
+# Enable dashboard search for tests
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+
+# Use MockSearchEngine as the search engine for test scenario
+SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+# Path at which to store the mock index
+MOCK_SEARCH_BACKING_FILE = (
+    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
+).abspath()
+
+# Generate a random UUID so that different runs of acceptance tests don't break each other
+import uuid
+SECRET_KEY = uuid.uuid4().hex
+
+# Set dummy values for profile image settings.
+PROFILE_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
+        'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
+    },
+}
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

@@ -15,7 +15,7 @@
 </%block>
 
 <%block name="header_extras">
-    % for template_name in ["account", "access", "form_field", "login", "register", "password_reset"]:
+    % for template_name in ["account", "access", "form_field", "login", "register", "institution_login", "institution_register", "password_reset", "hinted_login"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="student_account/${template_name}.underscore" />
         </script>
@@ -27,6 +27,8 @@
         class="login-register"
         data-initial-mode="${initial_mode}"
         data-third-party-auth='${third_party_auth|h}'
+        data-third-party-auth-hint='${third_party_auth_hint}'
+        data-next-url='${login_redirect_url|h}'
         data-platform-name='${platform_name}'
         data-login-form-desc='${login_form_desc|h}'
         data-registration-form-desc='${registration_form_desc|h}'

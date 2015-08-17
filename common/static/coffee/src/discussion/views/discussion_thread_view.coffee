@@ -118,6 +118,12 @@ if Backbone?
         @responsesRequest.abort()
 
     loadResponses: (responseLimit, elem, firstLoad) ->
+      # takeFocus take the page focus to response loading element while responses are being fetched.
+      # - When viewing in the Discussions tab, responses are loaded automatically, Do not scroll to the
+      # element(TNL-1530)
+      # - When viewing inline in courseware, user clicks 'expand' to open responses, Its ok to scroll to the
+      # element (Default)
+      takeFocus = if @mode == "tab" then false else true
       @responsesRequest = DiscussionUtil.safeAjax
         url: DiscussionUtil.urlFor('retrieve_single_thread', @model.get('commentable_id'), @model.id)
         data:
@@ -125,9 +131,9 @@ if Backbone?
           resp_limit: responseLimit if responseLimit
         $elem: elem
         $loading: elem
-        takeFocus: true
+        takeFocus: takeFocus
         complete: =>
-          @responseRequest = null
+          @responsesRequest = null
         success: (data, textStatus, xhr) =>
           Content.loadContentInfos(data['annotated_content_info'])
           if @isQuestion()

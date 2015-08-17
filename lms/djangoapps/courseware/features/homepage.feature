@@ -18,6 +18,6 @@ Feature: LMS.Homepage for web users
     | id      | Link   |
     | about   | About  |
     | jobs    | Jobs   |
-    | faq     | FAQ    |
+    | faq     | FAQs   |
     | contact | Contact|
     | news    | News   |

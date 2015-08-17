@@ -69,7 +69,7 @@ $white-t1: rgba($white, 0.25);
 $white-t2: rgba($white, 0.5);
 $white-t3: rgba($white, 0.75);
 
-$gray: rgb(127,127,127);    // #7f7f7f
+$gray: rgb(118,118,118);    // #767676 AA compliant
 $gray-l1: tint($gray,20%);  // #989898
 $gray-l2: tint($gray,40%);  // #b2b2b2
 $gray-l3: tint($gray,60%);  // #cbcbcb
@@ -133,8 +133,13 @@ $green-u1: desaturate($green,15%);
 $green-u2: desaturate($green,30%);
 $green-u3: desaturate($green,45%);
 
+// COLORS: social platforms
+$twitter-blue: #55ACEE;
+$facebook-blue: #3B5998;
+$linkedin-blue: #0077B5;
+
 // TODO: both blue and yellow variables differ from CMS rgb value, need to confirm change to CMS variable is ok in current platform uses before switching.
-$blue: rgb(29,157,217);
+$blue: rgb(0, 120, 176);
 $yellow: rgb(255, 252, 221);
 
 // COLORS: old variables
@@ -161,7 +166,7 @@ $m-gray-l1: rgb(151,153,155); // #97999B
 $m-gray-l2: rgb(164,166,168); // #A4A6A8
 $m-gray-l3: rgb(177,178,180); // #B1B2B4
 $m-gray-l4: rgb(245,245,245); // #F5F5F5
-$m-gray-d1: rgb(125,127,131); // #7D7F83
+$m-gray-d1: rgb(111, 112, 116); // #6f7074
 $m-gray-d2: rgb(112,114,118); // #707276
 $m-gray-d3: rgb(100,102,104); // #646668
 $m-gray-d4: rgb(5,5,5); // #050505
@@ -178,7 +183,7 @@ $m-blue-l4: tint($m-blue,90%);
 $m-blue-l5: tint($m-blue,95%);
 $m-blue-l6: #4bb4fb;
 $m-blue-d1: rgb(23,144,199); // #1790C7
-$m-blue-d2: rgb(21,128,176); // #1580B0
+$m-blue-d2: $blue;
 $m-blue-d3: rgb(18,111,154); // #126F9A
 $m-blue-d4: rgb(10,74,103); // #0A4A67
 $m-blue-d5: rgb(0,158,231); // #009EE7
@@ -247,7 +252,7 @@ $courseware-footer-margin: 0px;
 $courseware-border-bottom-color: rgb(68,162,222); // #44a2de
 $courseware-button-border-color: rgb(230,230,230); // #e6e6e6
 $courseware-hover-color: rgb(51,52,53); // #333435
-$courseware-navigation-color: rgb(0,158,231); // #009ee7
+$courseware-navigation-color: $blue;
 
 // ====================
 
@@ -273,6 +278,8 @@ $honorcode-color-lvl2: tint($honorcode-color-lvl1, 33%);
 $audit-color-lvl1: $light-gray;
 $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 
+// STATE: credit
+$credit-color-base: rgb(244,195,0); // accessible with black text
 
 // ====================
 
@@ -381,7 +388,7 @@ $border-color-l4: $m-gray-l4;
 
 // MISC: links and buttons
 $link-color: $blue;
-$link-color-d1: $m-blue-d2;
+$link-color-d1: $blue;
 $link-hover: $pink;
 $site-status-color: $pink;
 $button-color: $blue;
@@ -393,9 +400,9 @@ $form-bg-color: $white;
 $modal-bg-color: rgb(245,245,245);
 
 // MISC: sidebar
-$sidebar-chapter-bg-top: rgba(255, 255, 255, .6);
+$sidebar-chapter-bg-top: rgba(255, 255, 255, .5);
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
-$sidebar-chapter-bg: rgb(238,238,238); // #eeeeee
+$sidebar-chapter-bg: rgb(246,246,246); // #f6f6f6
 $sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214));
 
 // TOP HEADER IMAGE MARGIN
@@ -410,6 +417,12 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 $homepage__header--gradient__color--alpha: lighten($gray, 15%);
 $homepage__header--gradient__color--bravo: saturate($gray, 30%);
 $homepage__header--background: lighten($gray, 15%);
+
+// VIEWS: homepage and courses
+$course-card-height: ($baseline*18);
+$course-image-height: ($baseline*8);
+$course-info-height: ($baseline*10);
+$course-title-height: ($baseline*3.6);
 
 // ====================
 

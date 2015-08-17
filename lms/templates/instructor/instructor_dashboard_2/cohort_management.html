@@ -1,0 +1,47 @@
+<%page args="section_data"/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_studio_url
+from microsite_configuration import microsite
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+%>
+
+
+<div class="cohort-management"
+     data-cohorts_url="${section_data['cohorts_url']}"
+     data-upload_cohorts_csv_url="${section_data['upload_cohorts_csv_url']}"
+     data-course_cohort_settings_url="${section_data['course_cohort_settings_url']}"
+     data-discussion-topics-url="${section_data['discussion_topics_url']}"
+>
+</div>
+
+
+<%block name="headextra">
+    <%
+    cohorted_user_partition = get_cohorted_user_partition(course.id)
+    content_groups = cohorted_user_partition.groups if cohorted_user_partition else []
+    %>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            var cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
+                contentGroups = [
+                    % for content_group in content_groups:
+                        new edx.groups.ContentGroupModel({
+                            id: ${content_group.id},
+                            name: "${content_group.name | h}",
+                            user_partition_id: cohortUserPartitionId
+                        }),
+                    % endfor
+                ];
+
+            (function (require) {
+                require(['js/groups/views/cohorts_dashboard_factory'], function (CohortsFactory) {
+                    CohortsFactory(contentGroups, '${get_studio_url(course, 'group_configurations') | h}');
+                });
+            }).call(this, require || RequireJS.require);
+        });
+    </script>
+
+</%block>
+<div class="cohort-state-message"></div>

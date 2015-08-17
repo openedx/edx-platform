@@ -6,14 +6,15 @@ defuse_xml_libs()
 import contracts
 contracts.disable_all()
 
-import os
+import openedx.core.operations
+openedx.core.operations.install_memory_dumper()
 
+import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.aws")
 
 import lms.startup as startup
 startup.run()
 
-from django.conf import settings
 from xmodule.modulestore.django import modulestore
 
 # Trigger a forced initialization of our modulestores since this can take a

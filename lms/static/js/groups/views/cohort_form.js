@@ -35,10 +35,20 @@ var edx = edx || {};
         render: function() {
             this.$el.html(this.template({
                 cohort: this.model,
+                isDefaultCohort: this.isDefault(this.model.get('name')),
                 contentGroups: this.contentGroups,
                 studioGroupConfigurationsUrl: this.context.studioGroupConfigurationsUrl
             }));
             return this;
+        },
+
+        isDefault: function(name) {
+            var cohorts = this.model.collection;
+            if (_.isUndefined(cohorts)) {
+                return false;
+            }
+            var randomModels = cohorts.where({assignment_type:'random'});
+            return (randomModels.length === 1) && (randomModels[0].get('name') === name);
         },
 
         onRadioButtonChange: function(event) {
@@ -77,7 +87,11 @@ var edx = edx || {};
 
         getUpdatedCohortName: function() {
             var cohortName = this.$('.cohort-name').val();
-            return cohortName ? cohortName.trim() : this.model.get('name');
+            return cohortName ? cohortName.trim() : '';
+        },
+
+        getAssignmentType: function() {
+            return this.$('input[name="cohort-assignment-type"]:checked').val();
         },
 
         showMessage: function(message, type, details) {
@@ -109,18 +123,21 @@ var edx = edx || {};
                 cohort = this.model,
                 saveOperation = $.Deferred(),
                 isUpdate = !_.isUndefined(this.model.id),
-                fieldData, selectedContentGroup, errorMessages, showErrorMessage;
+                fieldData, selectedContentGroup, selectedAssignmentType, errorMessages, showErrorMessage;
             showErrorMessage = function(message, details) {
                 self.showMessage(message, 'error', details);
             };
             this.removeNotification();
             selectedContentGroup = this.getSelectedContentGroup();
+            selectedAssignmentType = this.getAssignmentType();
             fieldData = {
                 name: this.getUpdatedCohortName(),
                 group_id: selectedContentGroup ? selectedContentGroup.id : null,
-                user_partition_id: selectedContentGroup ? selectedContentGroup.get('user_partition_id') : null
+                user_partition_id: selectedContentGroup ? selectedContentGroup.get('user_partition_id') : null,
+                assignment_type: selectedAssignmentType
             };
             errorMessages = this.validate(fieldData);
+
             if (errorMessages.length > 0) {
                 showErrorMessage(
                     isUpdate ? gettext("The cohort cannot be saved") : gettext("The cohort cannot be added"),
@@ -129,7 +146,7 @@ var edx = edx || {};
                 saveOperation.reject();
             } else {
                 cohort.save(
-                    fieldData, {patch: isUpdate}
+                    fieldData, {patch: isUpdate, wait: true}
                 ).done(function(result) {
                     cohort.id = result.id;
                     self.render();    // re-render to remove any now invalid error messages

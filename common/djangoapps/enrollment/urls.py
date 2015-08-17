@@ -11,12 +11,13 @@ from .views import (
     EnrollmentCourseDetailView
 )
 
-USER_PATTERN = '(?P<user>[\w.@+-]+)'
+USERNAME_PATTERN = '(?P<username>[\w.@+-]+)'
 
 urlpatterns = patterns(
     'enrollment.views',
     url(
-        r'^enrollment/{user},{course_key}$'.format(user=USER_PATTERN, course_key=settings.COURSE_ID_PATTERN),
+        r'^enrollment/{username},{course_key}$'.format(username=USERNAME_PATTERN,
+                                                       course_key=settings.COURSE_ID_PATTERN),
         EnrollmentView.as_view(),
         name='courseenrollment'
     ),

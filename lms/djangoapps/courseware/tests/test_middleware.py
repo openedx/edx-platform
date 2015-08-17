@@ -3,23 +3,24 @@ Tests for courseware middleware
 """
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.http import Http404
 from mock import patch
+from nose.plugins.attrib import attr
 
 import courseware.courses as courses
 from courseware.middleware import RedirectUnenrolledMiddleware
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class CoursewareMiddlewareTestCase(ModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
 
     def setUp(self):
+        super(CoursewareMiddlewareTestCase, self).setUp()
+
         self.course = CourseFactory.create()
 
     def check_user_not_enrolled_redirect(self):

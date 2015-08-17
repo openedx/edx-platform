@@ -8,9 +8,10 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from django.conf import settings
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -22,15 +23,18 @@ class ExportAllCourses(ModuleStoreTestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ExportAllCourses, self).setUp()
+
         self.content_store = contentstore()
-        self.module_store = modulestore()
+        # pylint: disable=protected-access
+        self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
     def test_export_all_courses(self):
         """
         This test validates that redundant Mac metadata files ('._example.txt', '.DS_Store') are
         cleaned up on import
         """
-        import_from_xml(
+        import_course_from_xml(
             self.module_store,
             '**replace_user**',
             TEST_DATA_DIR,

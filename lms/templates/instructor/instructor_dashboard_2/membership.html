@@ -1,8 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
-<%! from courseware.courses import get_studio_url %>
-<%! from microsite_configuration import microsite %>
-<%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_studio_url
+from microsite_configuration import microsite
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+%>
 
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
@@ -37,7 +39,16 @@
       ${_("You will not get notification for emails that bounce, so please double-check spelling.")} </label>
     <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
   </p>
-
+  <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
+  % if section_data['is_white_label']:
+  <p>
+    <label for="reason-field-id">
+      ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+      ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+      ${_("Therefore, please give enough detail to account for this action.")} </label>
+    <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+  </p>
+  %endif
   <div class="enroll-option">
     <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
     <label for="auto-enroll">${_("Auto Enroll")}</label>
@@ -244,54 +255,17 @@
     ></div>
   %endif
 
+  %if section_data['access']['instructor'] and section_data['ccx_is_enabled']:
+    <div class="auth-list-container"
+      data-rolename="ccx_coach"
+      data-display-name="${_("CCX Coaches")}"
+      data-info-text="
+        ${_("CCX Coaches are able to create their own Custom Courses "
+            "based on this course, which they can use to provide personalized "
+            "instruction to their own students based in this course material.")}"
+      data-list-endpoint="${section_data['list_course_role_members_url']}"
+      data-modify-endpoint="${section_data['modify_access_url']}"
+      data-add-button-label="${_("Add CCX Coach")}"
+    ></div>
+  %endif
 </div>
-
-% if course.is_cohorted:
-    <hr class="divider" />
-    <div class="cohort-management membership-section"
-         data-ajax_url="${section_data['cohorts_ajax_url']}"
-         data-advanced-settings-url="${section_data['advanced_settings_url']}"
-         data-upload_cohorts_csv_url="${section_data['upload_cohorts_csv_url']}"
-    >
-    </div>
-
-    <%block name="headextra">
-        <%
-        cohorted_user_partition = get_cohorted_user_partition(course.id)
-        content_groups = cohorted_user_partition.groups if cohorted_user_partition else []
-        %>
-        <script>
-        $(document).ready(function() {
-            var cohortManagementElement = $('.cohort-management');
-            if (cohortManagementElement.length > 0) {
-                var cohorts = new edx.groups.CohortCollection(),
-                    cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
-                    contentGroups = [
-                        % for content_group in content_groups:
-                            new edx.groups.ContentGroupModel({
-                                id: ${content_group.id},
-                                name: "${content_group.name | h}",
-                                user_partition_id: cohortUserPartitionId
-                            }),
-                        % endfor
-                    ];
-                cohorts.url = cohortManagementElement.data('ajax_url');
-                var cohortsView = new edx.groups.CohortsView({
-                    el: cohortManagementElement,
-                    model: cohorts,
-                    contentGroups: contentGroups,
-                    context: {
-                        uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
-                        studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
-                        studioGroupConfigurationsUrl: '${get_studio_url(course, 'group_configurations') | h}'
-                    }
-                });
-                cohorts.fetch().done(function() {
-                    cohortsView.render();
-                });
-            }
-        });
-        </script>
-
-    </%block>
-% endif

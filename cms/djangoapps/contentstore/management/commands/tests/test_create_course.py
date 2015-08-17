@@ -16,6 +16,8 @@ class TestArgParsing(unittest.TestCase):
     Tests for parsing arguments for the `create_course` management command
     """
     def setUp(self):
+        super(TestArgParsing, self).setUp()
+
         self.command = Command()
 
     def test_no_args(self):

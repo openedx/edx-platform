@@ -187,6 +187,8 @@ if submission[0] == '':
 class CapaModuleTest(unittest.TestCase):
 
     def setUp(self):
+        super(CapaModuleTest, self).setUp()
+
         now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
@@ -427,13 +429,6 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(max_attempts="1", attempts="0",
                                     due=self.yesterday_str)
         self.assertTrue(module.closed())
-
-    def test_due_date_extension(self):
-
-        module = CapaFactory.create(
-            max_attempts="1", attempts="0", due=self.yesterday_str,
-            extended_due=self.tomorrow_str)
-        self.assertFalse(module.closed())
 
     def test_parse_get_params(self):
 
@@ -1270,6 +1265,54 @@ class CapaModuleTest(unittest.TestCase):
         # Assert that the encapsulated html contains the original html
         self.assertTrue(html in html_encapsulated)
 
+    demand_xml = """
+        <problem>
+        <p>That is the question</p>
+        <multiplechoiceresponse>
+          <choicegroup type="MultipleChoice">
+            <choice correct="false">Alpha <choicehint>A hint</choicehint>
+            </choice>
+            <choice correct="true">Beta</choice>
+          </choicegroup>
+        </multiplechoiceresponse>
+        <demandhint>
+          <hint>Demand 1</hint>
+          <hint>Demand 2</hint>
+        </demandhint>
+        </problem>"""
+
+    def test_demand_hint(self):
+        # HTML generation is mocked out to be meaningless here, so instead we check
+        # the context dict passed into HTML generation.
+        module = CapaFactory.create(xml=self.demand_xml)
+        module.get_problem_html()  # ignoring html result
+        context = module.system.render_template.call_args[0][1]
+        self.assertEqual(context['demand_hint_possible'], True)
+
+        # Check the AJAX call that gets the hint by index
+        result = module.get_demand_hint(0)
+        self.assertEqual(result['contents'], u'Hint (1 of 2): Demand 1')
+        self.assertEqual(result['hint_index'], 0)
+        result = module.get_demand_hint(1)
+        self.assertEqual(result['contents'], u'Hint (2 of 2): Demand 2')
+        self.assertEqual(result['hint_index'], 1)
+        result = module.get_demand_hint(2)  # here the server wraps around to index 0
+        self.assertEqual(result['contents'], u'Hint (1 of 2): Demand 1')
+        self.assertEqual(result['hint_index'], 0)
+
+    def test_demand_hint_logging(self):
+        module = CapaFactory.create(xml=self.demand_xml)
+        # Re-mock the module_id to a fixed string, so we can check the logging
+        module.location = Mock(module.location)
+        module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
+        module.get_problem_html()
+        module.get_demand_hint(0)
+        module.runtime.track_function.assert_called_with(
+            'edx.problem.hint.demandhint_displayed',
+            {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
+             'hint_text': 'Demand 1', 'hint_len': 2}
+        )
+
     def test_input_state_consistency(self):
         module1 = CapaFactory.create()
         module2 = CapaFactory.create()
@@ -1664,18 +1707,26 @@ class CapaModuleTest(unittest.TestCase):
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
-    def _create_descriptor(self, xml):
+    def _create_descriptor(self, xml, name=None):
         """ Creates a CapaDescriptor to run test against """
         descriptor = CapaDescriptor(get_test_system(), scope_ids=1)
         descriptor.data = xml
+        if name:
+            descriptor.display_name = name
         return descriptor
 
     @ddt.data(*responsetypes.registry.registered_tags())
     def test_all_response_types(self, response_tag):
         """ Tests that every registered response tag is correctly returned """
         xml = "<problem><{response_tag}></{response_tag}></problem>".format(response_tag=response_tag)
-        descriptor = self._create_descriptor(xml)
+        name = "Some Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {response_tag})
+        self.assertEquals(descriptor.index_dictionary(), {
+            'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+            'display_name': name,
+            'problem_types': [response_tag]
+        })
 
     def test_response_types_ignores_non_response_tags(self):
         xml = textwrap.dedent("""
@@ -1692,8 +1743,14 @@ class CapaDescriptorTest(unittest.TestCase):
             </multiplechoiceresponse>
             </problem>
         """)
-        descriptor = self._create_descriptor(xml)
+        name = "Test Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEquals(descriptor.index_dictionary(), {
+            'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+            'display_name': name,
+            'problem_types': ["multiplechoiceresponse"]
+        })
 
     def test_response_types_multiple_tags(self):
         xml = textwrap.dedent("""
@@ -1715,8 +1772,16 @@ class CapaDescriptorTest(unittest.TestCase):
                 </optionresponse>
             </problem>
         """)
-        descriptor = self._create_descriptor(xml)
+        name = "Other Test Capa Problem"
+        descriptor = self._create_descriptor(xml, name=name)
         self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
+        self.assertEquals(
+            descriptor.index_dictionary(), {
+                'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
+                'display_name': name,
+                'problem_types': ["optionresponse", "multiplechoiceresponse"]
+            }
+        )
 
 
 class ComplexEncoderTest(unittest.TestCase):
@@ -1736,10 +1801,11 @@ class TestProblemCheckTracking(unittest.TestCase):
     """
 
     def setUp(self):
+        super(TestProblemCheckTracking, self).setUp()
         self.maxDiff = None
 
     def test_choice_answer_text(self):
-        factory = self.capa_factory_for_problem_xml("""\
+        xml = """\
             <problem display_name="Multiple Choice Questions">
               <p>What color is the open ocean on a sunny day?</p>
               <optionresponse>
@@ -1764,7 +1830,11 @@ class TestProblemCheckTracking(unittest.TestCase):
                 </checkboxgroup>
               </choiceresponse>
             </problem>
-            """)
+            """
+
+        # Whitespace screws up comparisons
+        xml = ''.join(line.strip() for line in xml.split('\n'))
+        factory = self.capa_factory_for_problem_xml(xml)
         module = factory.create()
 
         answer_input_dict = {
@@ -1772,7 +1842,6 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.input_key(3): 'choice_0',
             factory.input_key(4): ['choice_0', 'choice_1'],
         }
-
         event = self.get_event_for_answers(module, answer_input_dict)
 
         self.assertEquals(event['submission'], {
@@ -1815,8 +1884,9 @@ class TestProblemCheckTracking(unittest.TestCase):
         with patch.object(module.runtime, 'track_function') as mock_track_function:
             module.check_problem(answer_input_dict)
 
-            self.assertEquals(len(mock_track_function.mock_calls), 1)
-            mock_call = mock_track_function.mock_calls[0]
+            self.assertGreaterEqual(len(mock_track_function.mock_calls), 1)
+            # There are potentially 2 track logs: answers and hint. [-1]=answers.
+            mock_call = mock_track_function.mock_calls[-1]
             event = mock_call[1][1]
 
             return event
@@ -1873,6 +1943,71 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.answer_key(2, 2): {
                 'question': '',
                 'answer': 'yellow',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': False,
+                'variant': '',
+            },
+        })
+
+    def test_optioninput_extended_xml(self):
+        """Test the new XML form of writing with <option> tag instead of options= attribute."""
+        factory = self.capa_factory_for_problem_xml("""\
+            <problem display_name="Woo Hoo">
+              <p>Are you the Gatekeeper?</p>
+                <optionresponse>
+                   <optioninput>
+                       <option correct="True" label="Good Job">
+                           apple
+                           <optionhint>
+                               banana
+                           </optionhint>
+                       </option>
+                       <option correct="False" label="blorp">
+                           cucumber
+                           <optionhint>
+                               donut
+                           </optionhint>
+                       </option>
+                   </optioninput>
+
+                   <optioninput>
+                       <option correct="True">
+                           apple
+                           <optionhint>
+                               banana
+                           </optionhint>
+                       </option>
+                       <option correct="False">
+                           cucumber
+                           <optionhint>
+                               donut
+                           </optionhint>
+                       </option>
+                   </optioninput>
+                 </optionresponse>
+            </problem>
+            """)
+        module = factory.create()
+
+        answer_input_dict = {
+            factory.input_key(2, 1): 'apple',
+            factory.input_key(2, 2): 'cucumber',
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2, 1): {
+                'question': '',
+                'answer': 'apple',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(2, 2): {
+                'question': '',
+                'answer': 'cucumber',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
                 'correct': False,

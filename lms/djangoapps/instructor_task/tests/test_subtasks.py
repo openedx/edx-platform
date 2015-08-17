@@ -38,7 +38,7 @@ class TestSubtasks(InstructorTaskCourseTestCase):
         )
 
         self._enroll_students_in_course(self.course.id, initial_count)
-        task_queryset = CourseEnrollment.objects.filter(course_id=self.course.id)
+        task_querysets = [CourseEnrollment.objects.filter(course_id=self.course.id)]
 
         def initialize_subtask_info(*args):  # pylint: disable=unused-argument
             """Instead of initializing subtask info enroll some more students into course."""
@@ -51,9 +51,10 @@ class TestSubtasks(InstructorTaskCourseTestCase):
                 entry=instructor_task,
                 action_name='action_name',
                 create_subtask_fcn=create_subtask_fcn,
-                item_queryset=task_queryset,
+                item_querysets=task_querysets,
                 item_fields=[],
                 items_per_task=items_per_task,
+                total_num_items=initial_count,
             )
 
     def test_queue_subtasks_for_query1(self):

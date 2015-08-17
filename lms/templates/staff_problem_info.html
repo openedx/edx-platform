@@ -1,6 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template.defaultfilters import escapejs %>
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+%>
 
 ## The JS for this is defined in xqa_interface.html
 ${block_content}
@@ -18,7 +20,8 @@ ${block_content}
       % endif
   </div>
 %  endif
-<div aria-hidden="true" class="wrap-instructor-info">
+%  if not disable_staff_debug_info:
+<div class="wrap-instructor-info" aria-hidden="true">
   <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
@@ -26,6 +29,7 @@ ${block_content}
     <a class="instructor-info-action" href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a>
   %  endif
 </div>
+%  endif
 
 <section aria-hidden="true" id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">

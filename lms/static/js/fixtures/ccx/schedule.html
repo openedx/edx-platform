@@ -1,0 +1,83 @@
+<div class="ccx-schedule-container">
+  <div id="ccx-schedule"></div>
+  <div id="new-ccx-schedule"></div>
+</div>
+
+<section id="enter-date-modal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog">
+    <button class="close-modal">
+      <i class="fa-remove"></i>
+      <span class="sr">
+        Close
+      </span>
+    </button>
+    <header>
+      <h2></h2>
+    </header>
+    <form role="form">
+      <div class="field datepair">
+        <label></label>
+        <input placeholder="Date" class="date" type="text" name="date"/ size="11">
+        <input placeholder="Time" class="time" type="text" name="time"/ size="6">
+      </div>
+      <div class="field">
+        <button type="submit" class="btn btn-primary">Set date</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div class="ccx-schedule-sidebar">
+  <div class="ccx-sidebar-panel" id="dirty-schedule">
+    <h2>Save changes</h2>
+    <form role="form">
+      <p>You have unsaved changes.</p>
+      <div class="field">
+        <br/>
+        <button id="save-changes">Save changes</button>
+      </div>
+    </form>
+  </div>
+  <div class="ccx-sidebar-panel" id="ajax-error">
+    <h2>Error</h2>
+    <p>There was an error saving changes.</p>
+  </div>
+  <div class="ccx-sidebar-panel">
+    <h2>Schedule a Unit</h2>
+    <form role="form" id="add-unit" name="add-unit" class="ccx-form">
+      <div class="field">
+        <b>Section</b><br/>
+        <select name="chapter"></select>
+      </div>
+      <div class="field">
+        <b>Subsection</b><br/>
+        <select name="sequential"></select>
+      </div>
+      <div class="field">
+        <b>Unit</b><br/>
+        <select name="vertical"></select>
+      </div>
+      <div class="field datepair">
+        <b>Start Date</b><br/>
+        <input placeholder="Date" type="date" class="date" name="start_date"/>
+        <input placeholder="time" type="time" class="time" name="start_time"/>
+      </div>
+      <div class="field datepair">
+        <b>Due Date</b> (Optional)<br/>
+        <input placeholder="Date" type="date" class="date" name="due_date"/>
+        <input placeholder="time" type="time" class="time" name="due_time"/>
+      </div>
+      <div class="field">
+        <br/>
+        <button id="add-unit-button">Add Unit</button>
+      </div>
+      <div class="field">
+        <br/>
+        <button id="add-all">Add All Units</button>
+      </div>
+    </form>
+    <div id="all-units-added">
+      All units have been added.
+    </div>
+  </div>
+</div>

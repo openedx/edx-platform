@@ -1,146 +1,60 @@
-<div class="wrapper-mast wrapper">
-  <header class="mast has-actions has-subtitle">
-    <h1 class="page-header">
-      <small class="subtitle">Settings</small>
-      <span class="sr">&gt; </span>Instructor Access
-    </h1>
+<div id='page-alert'></div>
+<div id='page-prompt'></div>
 
-    <nav class="nav-actions">
-      <h3 class="sr">Page Actions</h3>
-      <ul>
-        <li class="nav-item">
-          <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> Add Instructor</a>
-        </li>
-      </ul>
-    </nav>
-  </header>
-</div>
+<div id="content">
+    <div class="wrapper-mast wrapper">
+      <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+          <small class="subtitle">Settings</small>
+          <span class="sr">&gt; </span>Instructor Access
+        </h1>
 
-<div class="wrapper-content wrapper">
-  <section class="content">
-    <article class="content-primary" role="main">
-      <div class="wrapper-create-element animate wrapper-create-user">
-        <form class="form-create create-user" id="create-user-form" name="create-user-form">
-          <div class="wrapper-form">
-            <h3 class="title">Grant Instructor Access to This Library</h3>
-
-            <fieldset class="form-fields">
-              <legend class="sr">New Instructor Information</legend>
-
-                <ol class="list-input">
-                  <li class="field text required create-user-email">
-                    <label for="user-email-input">User's Email Address</label>
-                    <input id="user-email-input" class="user-email-input" name="user-email" type="text" placeholder="example: username@domain.com" value="">
-                    <span class="tip tip-stacked">Please provide the email address of the instructor you'd like to add</span>
-                  </li>
-                </ol>
-            </fieldset>
-          </div>
-
-          <div class="actions">
-            <button class="action action-primary" type="submit">Add User</button>
-            <button class="action action-secondary action-cancel">Cancel</button>
-          </div>
-        </form>
-      </div>
-
-      <ol class="user-list">
-
-        <li class="user-item" data-email="honor@example.com">
-
-          <span class="wrapper-ui-badge">
-            <span class="flag flag-role flag-role-staff is-hanging">
-              <span class="label sr">Current Role:</span>
-              <span class="value">
-                Staff
-              </span>
-            </span>
-          </span>
-
-          <div class="item-metadata">
-            <h3 class="user-name">
-              <span class="user-username">honor</span>
-              <span class="user-email">
-                <a class="action action-email" href="mailto:honor@example.com" title="send an email message to honor@example.com">honor@example.com</a>
-              </span>
-            </h3>
-          </div>
-
-          <ul class="item-actions user-actions">
-              <li class="action action-role">
-                <a href="#" class="make-instructor admin-role add-admin-role">Add Admin Access</span></a>
-                <a href="#" class="make-user admin-role remove-admin-role">Remove Staff Access</span></a>
-              </li>
-            <li class="action action-delete ">
-                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon fa fa-trash-o"></i><span class="sr">Delete the user, honor</span></a>
+        <nav class="nav-actions">
+          <h3 class="sr">Page Actions</h3>
+          <ul>
+            <li class="nav-item">
+              <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> Add Instructor</a>
             </li>
           </ul>
+        </nav>
+      </header>
+    </div>
 
-        </li>
+    <div class="wrapper-content wrapper">
+      <section class="content">
+        <article class="content-primary" role="main">
+          <div class="wrapper-create-element animate wrapper-create-user">
+            <form class="form-create create-user" id="create-user-form" name="create-user-form">
+              <div class="wrapper-form">
+                <h3 class="title">Grant Instructor Access to This Library</h3>
 
-        <li class="user-item" data-email="audit@example.com">
+                <fieldset class="form-fields">
+                  <legend class="sr">New Instructor Information</legend>
 
-          <span class="wrapper-ui-badge">
-            <span class="flag flag-role flag-role-admin is-hanging">
-              <span class="label sr">Current Role:</span>
-              <span class="value">
-                Admin
-              </span>
-            </span>
-          </span>
+                    <ol class="list-input">
+                      <li class="field text required create-user-email">
+                        <label for="user-email-input">User's Email Address</label>
+                        <input id="user-email-input" class="user-email-input" name="user-email" type="text" placeholder="example: username@domain.com" value="">
+                        <span class="tip tip-stacked">Please provide the email address of the instructor you'd like to add</span>
+                      </li>
+                    </ol>
+                </fieldset>
+              </div>
 
-          <div class="item-metadata">
-            <h3 class="user-name">
-              <span class="user-username">audit</span>
-              <span class="user-email">
-                <a class="action action-email" href="mailto:audit@example.com" title="send an email message to audit@example.com">audit@example.com</a>
-              </span>
-            </h3>
+              <div class="actions">
+                <button class="action action-primary" type="submit">Add User</button>
+                <button class="action action-secondary action-cancel">Cancel</button>
+              </div>
+            </form>
           </div>
 
-          <ul class="item-actions user-actions">
-                <li class="action action-role">
-                  <a href="#" class="make-staff admin-role remove-admin-role">Remove Admin Access</span></a>
-                </li>
-            <li class="action action-delete ">
-                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon fa fa-trash-o"></i><span class="sr">Delete the user, audit</span></a>
-            </li>
-          </ul>
+          <ol id="user-list" class="user-list">
+            <div class="ui-loading">
+              <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+            </div>
+          </ol>
 
-        </li>
-
-        <li class="user-item" data-email="staff@example.com">
-
-          <span class="wrapper-ui-badge">
-            <span class="flag flag-role flag-role-user is-hanging">
-              <span class="label sr">Current Role:</span>
-              <span class="value">
-                User
-              </span>
-            </span>
-          </span>
-
-          <div class="item-metadata">
-            <h3 class="user-name">
-              <span class="user-username">staff</span>
-              <span class="user-email">
-                <a class="action action-email" href="mailto:staff@example.com" title="send an email message to staff@example.com">staff@example.com</a>
-              </span>
-            </h3>
-          </div>
-
-          <ul class="item-actions user-actions">
-              <li class="action action-role">
-                <a href="#" class="make-staff admin-role add-admin-role">Add Staff Access</span></a>
-              </li>
-            <li class="action action-delete ">
-                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon fa fa-trash-o"></i><span class="sr">Delete the user, staff</span></a>
-            </li>
-          </ul>
-
-        </li>
-      </ol>
-
-    </article>
-  </section>
+        </article>
+      </section>
+    </div>
 </div>

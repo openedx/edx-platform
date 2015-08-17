@@ -1,0 +1,36 @@
+<% if (title) { %>
+    <label class="u-field-title" for="u-field-select-<%- id %>">
+        <%- title %>
+    </label>
+<% } %>
+
+<% if (!titleVisible) { %>
+    <label class="sr" for="u-field-select-<%- id %>">
+        <%- screenReaderTitle %>
+    </label>
+<% } %>
+
+<% if (iconName) { %>
+    <i class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true"></i>
+<% } %>
+
+<span class="u-field-value">
+    <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+        <% if (showBlankOption) { %>
+            <option value=""></option>
+        <% } %>
+        <% _.each(selectOptions, function(selectOption) { %>
+            <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
+        <% }); %>
+    </select>
+    <button class="u-field-value-display">
+        <span class="sr"><%- screenReaderTitle %> &nbsp;</span>
+        <span class="u-field-value-readonly"></span>
+        <span class="sr">&nbsp; <%- gettext('Click to edit') %></span>
+    </button>
+</span>
+
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- message %></span>
+</span>

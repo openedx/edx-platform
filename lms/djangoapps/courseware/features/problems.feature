@@ -119,7 +119,8 @@ Feature: LMS.Answer problems
         #| string            | incorrect     | never           |
         | numerical         | incorrect     | never           |
         | formula           | incorrect     | never           |
-        | script            | incorrect     | never           |
+        # TE-572 failing intermittently
+        #| script            | incorrect     | never           |
         | radio_text        | incorrect     | never           |
         | checkbox_text     | incorrect     | never           |
         | image             | incorrect     | never           |
@@ -175,11 +176,11 @@ Feature: LMS.Answer problems
 
     Scenario: I can view and hide the answer if the problem has it:
         Given I am viewing a "numerical" that shows the answer "always"
-        When I press the button with the label "Show Answer"
-        Then the Show/Hide button label is "Hide Answer"
+        When I press the button with the label "SHOW ANSWER"
+        Then the Show/Hide button label is "HIDE ANSWER"
         And I should see "4.14159" somewhere in the page
-        When I press the button with the label "Hide Answer"
-        Then the Show/Hide button label is "Show Answer"
+        When I press the button with the label "HIDE ANSWER"
+        Then the Show/Hide button label is "SHOW ANSWER"
         And I should not see "4.14159" anywhere on the page
 
     Scenario: I can see my score on a problem when I answer it and after I reset it

@@ -1,0 +1,83 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+<div class="certificates-wrapper">
+
+    <div class="example-certificates">
+        <h2>${_('Example Certificates')}</h2>
+
+        <div class="generate-example-certificates-wrapper">
+            <p>${_('Generate example certificates for the course.')}</p>
+
+            <form id="generate-example-certificates-form" method="post" action="${section_data['urls']['generate_example_certificates']}">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+                <input type="submit" id="generate-example-certificates-submit" value="${_('Generate Example Certificates')}"/>
+            </form>
+        </div>
+
+        % if section_data['example_certificate_status'] is not None:
+        <div class="example-certificate-status-wrapper">
+            <p>${_("Status:")}</p>
+            <ul>
+            % for cert_status in section_data['example_certificate_status']:
+                % if cert_status['status'] == 'started':
+                    <li>${_('Generating example {name} certificate').format(name=cert_status['description'])}</li>
+                % elif cert_status['status'] == 'error':
+                    <li>${_('Error generating example {name} certificate: {error}').format(name=cert_status['description'], error=cert_status['error_reason'])}</li>
+                % elif cert_status['status'] == 'success':
+                    <li><a href="${cert_status['download_url']}">${_('View {name} certificate').format(name=cert_status['description'])}</a></li>
+                </li>
+                % endif
+            % endfor
+            </ul>
+            <button id="refresh-example-certificate-status">${_("Refresh Status")}</button>
+        </div>
+        % endif
+    </div>
+
+    <hr />
+
+    <div class="enable-certificates">
+        <h2>${_("Student-Generated Certificates")}</h2>
+        % if section_data['enabled_for_course']:
+            <form id="enable-certificates-form" method="post" action="${section_data['urls']['enable_certificate_generation']}">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+                <input type="hidden" id="certificates-enabled" name="certificates-enabled" value="false" />
+                <input type="submit" id="disable-certificates-submit" value="${_('Disable Student-Generated Certificates')}"/>
+            </form>
+        % elif section_data['can_enable_for_course']:
+            <form id="enable-certificates-form" method="post" action="${section_data['urls']['enable_certificate_generation']}">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+                <input type="hidden" id="certificates-enabled" name="certificates-enabled" value="true" />
+                <input type="submit" id="enable-certificates-submit" value="${_('Enable Student-Generated Certificates')}"/>
+            </form>
+        % else:
+            <p>${_("You must successfully generate example certificates before you enable student-generated certificates.")}</p>
+            <button class="is-disabled" disabled>${_('Enable Student-Generated Certificates')}</button>
+        % endif
+    </div>
+
+    % if section_data['instructor_generation_enabled']:
+        <hr />
+
+        <div class="start-certificate-generation">
+            <h2>${_("Generate Certificates")}</h2>
+            <form id="certificates-generating-form" method="post" action="${section_data['urls']['start_certificate_generation']}">
+                <input type="button" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+            </form>
+            <div class="certificate-generation-status"></div>
+        </div>
+
+        %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+            <div class="running-tasks-container action-type-container">
+                <hr>
+                <h2> ${_("Pending Tasks")} </h2>
+                <div class="running-tasks-section">
+                    <p>${_("The status for any active tasks appears in a table below.")} </p>
+                    <br />
+                    <div class="running-tasks-table" data-endpoint="${ section_data['urls']['list_instructor_tasks_url'] }"></div>
+                </div>
+                <div class="no-pending-tasks-message"></div>
+            </div>
+        %endif
+    % endif
+</div>

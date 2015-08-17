@@ -5,10 +5,11 @@ End-to-end tests for LibraryContent block in LMS
 import ddt
 import textwrap
 
-from ..helpers import UniqueCourseTest
+from nose.plugins.attrib import attr
+from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.library import StudioLibraryContentXBlockEditModal, StudioLibraryContainerXBlockWrapper
+from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.library import LibraryContentXBlockWrapper
 from ...pages.common.logout import LogoutPage
@@ -20,6 +21,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
+@attr('shard_3')
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -63,7 +65,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         )
 
         library_content_metadata = {
-            'source_libraries': [self.library_key],
+            'source_library_id': unicode(self.library_key),
             'mode': 'random',
             'max_count': 1,
             'has_score': False
@@ -88,12 +90,13 @@ class LibraryContentTestBase(UniqueCourseTest):
         Performs library block refresh in Studio, configuring it to show {count} children
         """
         unit_page = self._go_to_unit_page(True)
-        library_container_block = StudioLibraryContainerXBlockWrapper.from_xblock_wrapper(unit_page.xblocks[0])
-        modal = StudioLibraryContentXBlockEditModal(library_container_block.edit())
-        modal.count = count
+        library_container_block = StudioLibraryContainerXBlockWrapper.from_xblock_wrapper(unit_page.xblocks[1])
+        library_container_block.edit()
+        editor = StudioLibraryContentEditor(self.browser, library_container_block.locator)
+        editor.count = count
         if capa_type is not None:
-            modal.capa_type = capa_type
-        library_container_block.save_settings()
+            editor.capa_type = capa_type
+        editor.save()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
         unit_page.publish_action.click()
@@ -116,7 +119,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
         subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
-        return subsection.toggle_expand().unit(UNIT_NAME).go_to()
+        return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
     def _goto_library_block_page(self, block_id=None):
         """
@@ -140,6 +143,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
+@attr('shard_3')
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
@@ -191,10 +195,20 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
+@attr('shard_3')
+class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    def setUp(self):
+        """ SetUp method """
+        self._create_search_index()
+        super(StudioLibraryContainerCapaFilterTest, self).setUp()
+
+    def tearDown(self):
+        self._cleanup_index_file()
+        super(StudioLibraryContainerCapaFilterTest, self).tearDown()
+
     def _get_problem_choice_group_text(self, name, items):
         """ Generates Choice Group CAPA problem XML """
         items_text = "\n".join([
@@ -226,7 +240,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         """
         Populates library fixture with XBlock Fixtures
         """
-        library_fixture.add_children(
+        items = (
             XBlockFixtureDesc(
                 "problem", "Problem Choice Group 1",
                 data=self._get_problem_choice_group_text("Problem Choice Group 1 Text", [("1", False), ('2', True)])
@@ -244,6 +258,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
                 data=self._get_problem_select_text("Problem Select 2 Text", ["Option 3", "Option 4"], "Option 4")
             ),
         )
+        library_fixture.add_children(*items)
 
     @property
     def _problem_headers(self):

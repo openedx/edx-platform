@@ -16,10 +16,10 @@ class Command(BaseCommand):
 
         data_dir = args[0]
         if len(args) > 1:
-            course_dirs = args[1:]
+            source_dirs = args[1:]
         else:
-            course_dirs = None
-        print("Importing.  Data_dir={data}, course_dirs={courses}".format(
+            source_dirs = None
+        print("Importing.  Data_dir={data}, source_dirs={courses}".format(
             data=data_dir,
-            courses=course_dirs))
-        perform_xlint(data_dir, course_dirs, load_error_modules=False)
+            courses=source_dirs))
+        perform_xlint(data_dir, source_dirs, load_error_modules=False)

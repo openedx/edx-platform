@@ -1,4 +1,4 @@
-// studio - utilities - mixins and extends
+// common - utilities - mixins and extends
 // ====================
 
 // Table of Contents 
@@ -23,6 +23,7 @@
 // * +Content - Screenreader Text - Extend
 // * +Content - Text Wrap - Extend
 // * +Content - Text Truncate - Extend
+// * +Icon - Font-Awesome  - Extend
 
 // +Font Sizing - Mixin
 // ==================== 
@@ -426,4 +427,13 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+// * +Icon - Font-Awesome  - Extend
+// ==================== 
+%use-font-awesome {
+  display: inline-block;
+  font-family: FontAwesome;
+  -webkit-font-smoothing: antialiased;
+  speak: none;
 }

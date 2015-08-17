@@ -1,12 +1,14 @@
 import logging
-from lxml import etree
 
+from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule, module_attr
 from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from xmodule.validation import StudioValidation, StudioValidationMessage
+
 from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
@@ -23,7 +25,6 @@ V1_SETTINGS_ATTRIBUTES = [
     "accept_file_upload",
     "skip_spelling_checks",
     "due",
-    "extended_due",
     "graceperiod",
     "weight",
     "min_to_calibrate",
@@ -258,16 +259,6 @@ class CombinedOpenEndedFields(object):
         help=_("Date that this problem is due by"),
         scope=Scope.settings
     )
-    extended_due = Date(
-        help=_(
-            "Date that this problem is due by for a particular student. This "
-            "can be set by an instructor, and will override the global due "
-            "date if it is set to a date that is later than the global due "
-            "date."
-        ),
-        default=None,
-        scope=Scope.user_state,
-    )
     graceperiod = Timedelta(
         help=_("Amount of time after the due date that submissions will be accepted"),
         scope=Scope.settings
@@ -483,6 +474,14 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         for attribute in self.student_attributes:
             setattr(self, attribute, getattr(self.child_module, attribute))
 
+    def validate(self):
+        """
+        Message for either error or warning validation message/s.
+
+        Returns message and type. Priority given to error type message.
+        """
+        return self.descriptor.validate()
+
 
 class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     """
@@ -526,3 +525,22 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     # Proxy to CombinedOpenEndedModule so that external callers don't have to know if they're working
     # with a module or a descriptor
     child_module = module_attr('child_module')
+
+    def validate(self):
+        """
+        Validates the state of this instance. This is the override of the general XBlock method,
+        and it will also ask its superclass to validate.
+        """
+        validation = super(CombinedOpenEndedDescriptor, self).validate()
+        validation = StudioValidation.copy(validation)
+
+        i18n_service = self.runtime.service(self, "i18n")
+
+        validation.summary = StudioValidationMessage(
+            StudioValidationMessage.ERROR,
+            i18n_service.ugettext(
+                "ORA1 is no longer supported. To use this assessment, "
+                "replace this ORA1 component with an ORA2 component."
+            )
+        )
+        return validation

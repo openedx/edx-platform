@@ -9,7 +9,7 @@ xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
-label = xblock.display_name or xblock.scope_ids.block_type
+label = xblock.display_name_with_default or xblock.scope_ids.block_type
 messages = json.dumps(xblock.validate().to_json())
 %>
 
@@ -47,7 +47,11 @@ messages = json.dumps(xblock.validate().to_json())
 % endif
 
 <header class="xblock-header xblock-header-${xblock.category}">
-    <div class="xblock-header-primary">
+    <div class="xblock-header-primary
+    % if not show_preview:
+        is-collapsed
+    % endif
+    ">
         <div class="header-details">
             % if show_inline:
             <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
@@ -76,19 +80,24 @@ messages = json.dumps(xblock.validate().to_json())
                                     </a>
                                 </li>
                             % endif
-                            <li class="action-item action-duplicate">
-                                <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                                <i class="icon fa fa-copy"></i>
-                                <span class="sr">${_("Duplicate")}</span>
+                            % if can_add:
+                                <li class="action-item action-duplicate">
+                                    <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+                                    <i class="icon fa fa-copy"></i>
+                                    <span class="sr">${_("Duplicate")}</span>
+                                    </a>
+                                </li>
+                            % endif
+                        % endif
+                        % if can_add:
+                            <!-- If we can add, we can delete. -->
+                            <li class="action-item action-delete">
+                                <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+                                <i class="icon fa fa-trash-o"></i>
+                                <span class="sr">${_("Delete")}</span>
                                 </a>
                             </li>
                         % endif
-                        <li class="action-item action-delete">
-                            <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                            <i class="icon fa fa-trash-o"></i>
-                            <span class="sr">${_("Delete")}</span>
-                            </a>
-                        </li>
                         % if is_reorderable:
                             <li class="action-item action-drag">
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
@@ -128,14 +137,17 @@ messages = json.dumps(xblock.validate().to_json())
     <div class="wrapper-xblock-message xblock-validation-messages" data-locator="${xblock.location | h}"/>
 % endif
 
-% if is_root or not xblock_url:
-    <article class="xblock-render">
-    ${content}
-    </article>
-% else:
-    <div class="xblock-message-area">
-    ${content}
-% endif
+% if show_preview:
+    % if is_root or not xblock_url:
+        <article class="xblock-render">
+        ${content}
+        </article>
+    % else:
+        <div class="xblock-message-area">
+        ${content}
+        </div>
+    % endif
+ % endif   
 
 % if not is_root:
     </section>

@@ -1,0 +1,9 @@
+<div class="wrapper-msg urgency-high">
+    <div class="msg">
+        <div class="msg-content">
+            <div class="copy">
+                <p><%-message%></p>
+            </div>
+        </div>
+    </div>
+</div>

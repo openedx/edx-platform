@@ -6,7 +6,9 @@ from django.conf.urls import patterns, url
 from django.conf import settings
 COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN
 
-urlpatterns = patterns('',  # nopep8
+urlpatterns = patterns(
+    '',
+
     # Json request data for metrics for entire course
     url(r'^{}/all_sequential_open_distrib$'.format(settings.COURSE_ID_PATTERN),
         'class_dashboard.views.all_sequential_open_distrib', name="all_sequential_open_distrib"),

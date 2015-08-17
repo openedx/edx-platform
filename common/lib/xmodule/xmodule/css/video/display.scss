@@ -27,6 +27,23 @@ div.video {
     }
   }
 
+  // CASE: video pre-roll state
+  &.is-pre-roll {
+    .slider {
+      visibility: hidden;
+    }
+
+    .video-player {
+      position: relative;
+      &:before {
+        display: block;
+        content: "";
+        width: 100%;
+        padding-top: 55%;
+      }
+    }
+  }
+
   div.tc-wrapper {
     @include clearfix();
     position: relative;
@@ -70,6 +87,31 @@ div.video {
       }
       > a.external-track {
         border-radius: 3px;
+      }
+    }
+
+    .branding {
+      display: inline-block;
+      float: right;
+      margin: 15px 0 0 10px;
+      vertical-align: top;
+
+      .host-tag {
+        @include margin-right($baseline/2);
+        position: absolute;
+        left: -9999em;
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 70%;
+        color: #777;
+      }
+
+      .brand-logo {
+        display: inline-block;
+        max-width: 100%;
+        max-height: ($baseline*2);
+        padding: ($baseline/4) 0;
+        vertical-align: middle;
       }
     }
   }
@@ -144,6 +186,7 @@ div.video {
       }
 
       object, iframe, video {
+        display: block;
         border: none;
         width: 100%;
       }
@@ -257,7 +300,7 @@ div.video {
         }
       }
 
-      ul.vcr {
+      .vcr {
         float: left;
         list-style: none;
         margin: 0 lh() 0 0;
@@ -268,49 +311,52 @@ div.video {
           font-size: em(14);
         }
 
-        li {
+        .video_control {
+          @extend %video-button;
           float: left;
-          margin-bottom: 0;
+          background-image: url('../images/vcr.png');
+          background-position: 15px 15px ;
+          background-repeat: no-repeat;
+          border-left: none;
+          padding: 0 lh(.75);
+          width: 14px;
 
-          a {
-            @extend %video-button;
-            background-image: url('../images/vcr.png');
-            background-position: 15px 15px ;
-            background-repeat: no-repeat;
-            border-left: none;
-            box-shadow: 1px 0 0 #555;
-            padding: 0 lh(.75);
-            width: 14px;
-
-            &:focus {
-              @extend %ui-depth4;
-              position: relative;
-              outline: $white dotted thin;
-              outline-offset: -2px;
-            }
-
-            &:empty {
-              height: 46px;
-              background-position: 15px 15px;
-            }
-
-            &.play {
-              background-position: 17px -114px;
-            }
-
-            &.pause {
-              background-position: 16px -50px;
-            }
+          &:focus {
+            @extend %ui-depth4;
+            position: relative;
+            outline: $white dotted thin;
+            outline-offset: -2px;
           }
 
-          div.vidtime {
-            font-weight: bold;
-            line-height: 46px; //height of play pause buttons
-            -webkit-font-smoothing: antialiased;
-            padding-left: lh(.75);
-            @media (max-width: 1120px) {
-              padding-left: lh(0.5);
-            }
+          &:empty {
+            height: 46px;
+            background-position: 15px 15px;
+          }
+
+          &.play {
+            background-position: 17px -114px;
+          }
+
+          &.pause {
+            background-position: 16px -50px;
+          }
+
+          &.skip {
+            background-image: none;
+            text-indent: 0;
+            width: initial;
+            white-space: nowrap;
+          }
+        }
+
+        div.vidtime {
+          @extend %t-strong;
+          float: left;
+          line-height: 46px; //height of play pause buttons
+          -webkit-font-smoothing: antialiased;
+          padding-left: lh(.75);
+          @media (max-width: 1120px) {
+            padding-left: lh(0.5);
           }
         }
       }
@@ -479,9 +525,12 @@ div.video {
             background-image: url('../images/volume.png');
             background-position: 10px center;
             background-repeat: no-repeat;
-            border-left: none;
             width: 30px;
             height: 46px;
+          }
+
+          &:not(:first-child) > a {
+            border-left: none;
           }
 
           .volume-slider-container {
@@ -661,8 +710,7 @@ div.video {
     }
 
     ol.subtitles {
-        width: 0;
-        height: 0;
+        @extend .is-hidden;
     }
 
     ol.subtitles.html5 {
@@ -741,7 +789,7 @@ div.video {
         bottom: 0;
         left: 0;
         position: absolute;
-        width: 100%; 
+        width: 100%;
       }
     }
 
@@ -767,11 +815,36 @@ div.video {
   &.is-touch {
     div.tc-wrapper {
       article.video-wrapper {
-        object, iframe, video{
+        object, iframe, video {
           width: 100%;
           height: 100%;
         }
       }
+    }
+  }
+
+  .video-pre-roll {
+    @extend %ui-depth3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-color: $black;
+
+    &.is-html5 {
+      background-size: 15%;
+    }
+
+    .btn-play {
+      text-indent: -999px;
+      overflow: hidden;
+      border: none;
+      box-shadow: none;
+      line-height: 0;
     }
   }
 }

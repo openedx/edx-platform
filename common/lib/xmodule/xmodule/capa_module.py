@@ -6,10 +6,11 @@ from lxml import etree
 
 from pkg_resources import resource_string
 
+import dogstats_wrapper as dog_stats_api
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
-from xmodule.x_module import XModule, module_attr
+from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 
@@ -58,6 +59,7 @@ class CapaModule(CapaMixin, XModule):
           <other request-specific values here > }
         """
         handlers = {
+            'hint_button': self.hint_button,
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
             'problem_reset': self.reset_problem,
@@ -112,6 +114,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     Module implementing problems in the LON-CAPA format,
     as implemented by capa.capa_problem
     """
+    INDEX_CONTENT_TYPE = 'CAPA'
 
     module_class = CapaModule
 
@@ -156,6 +159,10 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
+        dog_stats_api.increment(
+            DEPRECATION_VSCOMPAT_EVENT,
+            tags=["location:capa_descriptor_backcompat_paths"]
+        )
         return [
             'problems/' + path[8:],
             path[8:],
@@ -181,6 +188,28 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
+    @property
+    def has_responsive_ui(self):
+        """
+        Returns whether this module has support for responsive UI.
+        """
+        return self.lcp.has_responsive_ui
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        result = super(CapaDescriptor, self).index_dictionary()
+        if not result:
+            result = {}
+        index = {
+            'content_type': self.INDEX_CONTENT_TYPE,
+            'problem_types': list(self.problem_types),
+            "display_name": self.display_name
+        }
+        result.update(index)
+        return result
+
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
     check_button_name = module_attr('check_button_name')
@@ -193,6 +222,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     get_problem_html = module_attr('get_problem_html')
     get_state_for_lcp = module_attr('get_state_for_lcp')
     handle_input_ajax = module_attr('handle_input_ajax')
+    hint_button = module_attr('hint_button')
     handle_problem_html_error = module_attr('handle_problem_html_error')
     handle_ungraded_response = module_attr('handle_ungraded_response')
     is_attempted = module_attr('is_attempted')

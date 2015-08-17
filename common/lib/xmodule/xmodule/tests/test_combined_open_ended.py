@@ -25,7 +25,9 @@ from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from opaque_keys.edx.locations import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.progress import Progress
+from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import STUDENT_VIEW
+
 from xmodule.tests.test_util_open_ended import (
     DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
@@ -85,6 +87,7 @@ class OpenEndedChildTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
+        super(OpenEndedChildTest, self).setUp()
         self.test_system = get_test_system()
         self.test_system.open_ended_grading_interface = None
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
@@ -249,6 +252,7 @@ class OpenEndedModuleTest(unittest.TestCase):
     }
 
     def setUp(self):
+        super(OpenEndedModuleTest, self).setUp()
         self.test_system = get_test_system()
         self.test_system.open_ended_grading_interface = None
         self.test_system.location = self.location
@@ -529,6 +533,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     )
 
     def setUp(self):
+        super(CombinedOpenEndedModuleTest, self).setUp()
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -792,6 +797,23 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     def test_state_pe_single(self):
         self.ai_state_success(TEST_STATE_PE_SINGLE, iscore=0, tasks=[self.task_xml2])
 
+    def test_deprecation_message(self):
+        """
+        Test the validation message produced for deprecation.
+        """
+        # pylint: disable=no-member
+        validation = self.combinedoe_container.validate()
+        deprecation_msg = "ORA1 is no longer supported. To use this assessment, " \
+                          "replace this ORA1 component with an ORA2 component."
+        validation.summary.text = deprecation_msg
+        validation.summary.type = 'error'
+
+        self.assertEqual(
+            validation.summary.text,
+            deprecation_msg
+        )
+        self.assertEqual(validation.summary.type, StudioValidationMessage.ERROR)
+
 
 class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     """
@@ -885,6 +907,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     )
 
     def setUp(self):
+        super(CombinedOpenEndedModuleConsistencyTest, self).setUp()
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -987,6 +1010,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         return test_system
 
     def setUp(self):
+        super(OpenEndedModuleXmlTest, self).setUp()
         self.setup_modulestore(COURSE)
 
     def _handle_ajax(self, dispatch, content):
@@ -1229,6 +1253,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         return test_system
 
     def setUp(self):
+        super(OpenEndedModuleXmlAttemptTest, self).setUp()
         self.setup_modulestore(COURSE)
 
     def _handle_ajax(self, dispatch, content):
@@ -1304,6 +1329,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         return test_system
 
     def setUp(self):
+        super(OpenEndedModuleXmlImageUploadTest, self).setUp()
         self.setup_modulestore(COURSE)
 
     def test_file_upload_fail(self):

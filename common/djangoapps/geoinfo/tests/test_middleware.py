@@ -6,20 +6,18 @@ import pygeoip
 
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from geoinfo.middleware import CountryMiddleware
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CountryMiddlewareTests(TestCase):
     """
     Tests of CountryMiddleware.
     """
     def setUp(self):
+        super(CountryMiddlewareTests, self).setUp()
         self.country_middleware = CountryMiddleware()
         self.session_middleware = SessionMiddleware()
         self.authenticated_user = UserFactory.create()
@@ -27,9 +25,7 @@ class CountryMiddlewareTests(TestCase):
         self.request_factory = RequestFactory()
         self.patcher = patch.object(pygeoip.GeoIP, 'country_code_by_addr', self.mock_country_code_by_addr)
         self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
+        self.addCleanup(self.patcher.stop)
 
     def mock_country_code_by_addr(self, ip_addr):
         """

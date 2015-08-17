@@ -55,13 +55,13 @@ def see_a_multi_step_component(step, category):
         if category == 'HTML':
             html_matcher = {
                 'Text': '\n    \n',
-                'Announcement': '<p> Words of encouragement! This is a short note that most students will read. </p>',
-                'Zooming Image': '<h2>ZOOMING DIAGRAMS</h2>',
-                'E-text Written in LaTeX': '<h2>Example: E-text page</h2>',
+                'Announcement': '<h3>Announcement Date</h3>',
+                'Zooming Image Tool': '<h2>Zooming Image Tool</h2>',
+                'E-text Written in LaTeX': '<h3>Example: E-text page</h3>',
                 'Raw HTML': '<p>This template is similar to the Text template. The only difference is',
             }
             actual_html = world.css_html(selector, index=idx)
-            assert_in(html_matcher[step_hash['Component']], actual_html)
+            assert_in(html_matcher[step_hash['Component']].strip(), actual_html.strip())
         else:
             actual_text = world.css_text(selector, index=idx)
             assert_in(step_hash['Component'].upper(), actual_text)
@@ -74,8 +74,9 @@ def see_a_problem_component(step, category):
                 'No problem was added to the unit.')
 
     problem_css = 'li.studio-xblock-wrapper div.xblock-student_view'
-    actual_text = world.css_text(problem_css)
-    assert_in(category.upper(), actual_text)
+    # This view presents the given problem component in uppercase. Assert that the text matches
+    # the component selected (in uppercase)
+    assert_true(world.css_contains_text(problem_css, category.upper()))  # pylint: disable=no-value-for-parameter
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')

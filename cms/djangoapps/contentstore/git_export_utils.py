@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 
 log = logging.getLogger(__name__)
 
@@ -30,9 +30,13 @@ class GitExportError(Exception):
     Convenience exception class for git export error conditions.
     """
 
+    def __init__(self, message):
+        # Force the lazy i18n values to turn into actual unicode objects
+        super(GitExportError, self).__init__(unicode(message))
+
     NO_EXPORT_DIR = _("GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
-                      "GIT_REPO_EXPORT_DIR".format(GIT_REPO_EXPORT_DIR))
+                      "GIT_REPO_EXPORT_DIR").format(GIT_REPO_EXPORT_DIR)
     URL_BAD = _('Non writable git url provided. Expecting something like:'
                 ' git@github.com:mitocw/edx4edx_lite.git')
     URL_NO_AUTH = _('If using http urls, you must provide the username '
@@ -129,8 +133,8 @@ def export_to_git(course_id, repo, user='', rdir=None):
     root_dir = os.path.dirname(rdirp)
     course_dir = os.path.basename(rdirp).rsplit('.git', 1)[0]
     try:
-        export_to_xml(modulestore(), contentstore(), course_id,
-                      root_dir, course_dir)
+        export_course_to_xml(modulestore(), contentstore(), course_id,
+                             root_dir, course_dir)
     except (EnvironmentError, AttributeError):
         log.exception('Failed export to xml')
         raise GitExportError(GitExportError.XML_EXPORT_FAIL)
@@ -157,7 +161,9 @@ def export_to_git(course_id, repo, user='', rdir=None):
         ident = GIT_EXPORT_DEFAULT_IDENT
     time_stamp = timezone.now()
     cwd = os.path.abspath(rdirp)
-    commit_msg = 'Export from Studio at {1}'.format(user, time_stamp)
+    commit_msg = "Export from Studio at {time_stamp}".format(
+        time_stamp=time_stamp,
+    )
     try:
         cmd_log(['git', 'config', 'user.email', ident['email']], cwd)
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)

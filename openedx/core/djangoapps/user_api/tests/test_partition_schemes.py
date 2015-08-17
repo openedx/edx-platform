@@ -42,19 +42,17 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
             'openedx.core.djangoapps.user_api.partition_schemes.course_tag_api', course_tag_api
         )
         self.user_service_patcher.start()
+        self.addCleanup(self.user_service_patcher.stop)
 
         # Create a test user
         self.user = UserFactory.create()
-
-    def tearDown(self):
-        self.user_service_patcher.stop()
 
     def test_get_group_for_user(self):
         # get a group assigned to the user
         group1_id = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
 
         # make sure we get the same group back out every time
-        for __ in range(0, 10):
+        for __ in range(10):
             group2_id = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
             self.assertEqual(group1_id, group2_id)
 

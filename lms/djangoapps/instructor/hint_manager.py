@@ -11,7 +11,7 @@ import json
 import re
 
 from django.http import HttpResponse, Http404
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response, render_to_string
 
@@ -31,7 +31,7 @@ def hint_manager(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        get_course_with_access(request.user, 'staff', course_key, depth=None)
+        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
     except Http404:
         out = 'Sorry, but students are not allowed to access the hint manager!'
         return HttpResponse(out)
@@ -57,13 +57,13 @@ def hint_manager(request, course_id):
     error_text = switch_dict[request.POST['op']](request, course_key, field)
     if error_text is None:
         error_text = ''
-    render_dict = get_hints(request, course_key, field)
+    render_dict = get_hints(request, course_key, field, course=course)
     render_dict.update({'error': error_text})
     rendered_html = render_to_string('instructor/hint_manager_inner.html', render_dict)
     return HttpResponse(json.dumps({'success': True, 'contents': rendered_html}))
 
 
-def get_hints(request, course_id, field):
+def get_hints(request, course_id, field, course=None):  # pylint: disable=unused-argument
     """
     Load all of the hints submitted to the course.
 
@@ -148,7 +148,7 @@ def location_to_problem_name(course_id, loc):
         return None
 
 
-def delete_hints(request, course_id, field):
+def delete_hints(request, course_id, field, course=None):  # pylint: disable=unused-argument
     """
     Deletes the hints specified.
 
@@ -176,7 +176,7 @@ def delete_hints(request, course_id, field):
         this_problem.save()
 
 
-def change_votes(request, course_id, field):
+def change_votes(request, course_id, field, course=None):  # pylint: disable=unused-argument
     """
     Updates the number of votes.
 
@@ -203,7 +203,7 @@ def change_votes(request, course_id, field):
         this_problem.save()
 
 
-def add_hint(request, course_id, field):
+def add_hint(request, course_id, field, course=None):
     """
     Add a new hint.  `request.POST`:
     op
@@ -226,7 +226,14 @@ def add_hint(request, course_id, field):
     except ItemNotFoundError:
         descriptors = []
     field_data_cache = model_data.FieldDataCache(descriptors, course_id, request.user)
-    hinter_module = module_render.get_module(request.user, request, problem_key, field_data_cache, course_id)
+    hinter_module = module_render.get_module(
+        request.user,
+        request,
+        problem_key,
+        field_data_cache,
+        course_id,
+        course=course
+    )
     if not hinter_module.validate_answer(answer):
         # Invalid answer.  Don't add it to the database, or else the
         # hinter will crash when we encounter it.
@@ -247,7 +254,7 @@ def add_hint(request, course_id, field):
     this_problem.save()
 
 
-def approve(request, course_id, field):
+def approve(request, course_id, field, course=None):  # pylint: disable=unused-argument
     """
     Approve a list of hints, moving them from the mod_queue to the real
     hint list.  POST:

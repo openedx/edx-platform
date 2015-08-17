@@ -11,22 +11,24 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
-
+from xmodule import course_metadata_utils
+from xmodule.course_metadata_utils import DEFAULT_START_DATE
+from xmodule.exceptions import UndefinedContext
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
+from xmodule.mixin import LicenseMixin
 import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
 
+
 log = logging.getLogger(__name__)
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
-
-DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
@@ -173,16 +175,30 @@ class CourseFields(object):
         help=_('Enter the passports for course LTI tools in the following format: "id:client_key:client_secret".'),
         scope=Scope.settings
     )
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
-                             default=[], scope=Scope.content)
+    textbooks = TextbookList(
+        help=_("List of pairs of (title, url) for textbooks used in this course"),
+        default=[],
+        scope=Scope.content
+    )
 
-    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
-    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
-    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible",
-                 default=DEFAULT_START_DATE,
-                 scope=Scope.settings)
-    end = Date(help="Date that this class ends", scope=Scope.settings)
+    wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
+    enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
+    enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
+    start = Date(
+        help=_("Start time when this module is visible"),
+        default=DEFAULT_START_DATE,
+        scope=Scope.settings
+    )
+    end = Date(help=_("Date that this class ends"), scope=Scope.settings)
+    cosmetic_display_price = Integer(
+        display_name=_("Cosmetic Course Display Price"),
+        help=_(
+            "The cost displayed to students for enrolling in the course. If a paid course registration price is "
+            "set by an administrator in the database, that price will be displayed instead of this one."
+        ),
+        default=0,
+        scope=Scope.settings,
+    )
     advertised_start = String(
         display_name=_("Course Advertised Start Date"),
         help=_(
@@ -197,7 +213,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     grading_policy = Dict(
-        help="Grading policy definition for this class",
+        help=_("Grading policy definition for this class"),
         default={
             "GRADER": [
                 {
@@ -268,11 +284,12 @@ class CourseFields(object):
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
         help=_(
-            'Enter pairs of dates between which students cannot post to discussion forums. Each pair should be '
-            'formatted as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, format each pair '
-            'as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"] (be sure to include the "T" between the date and '
-            'time). An entry defining more than one blackout period might look like this: '
-            '[["2014-09-15", "2014-09-21"], ["2014-10-01", "2014-10-08"]]'
+            'Enter pairs of dates between which students cannot post to discussion forums. Inside the provided '
+            'brackets, enter an additional set of square brackets surrounding each pair of dates you add. '
+            'Format each pair of dates as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, '
+            'format each pair as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"]. Be sure to include the "T" between '
+            'the date and time. For example, an entry defining two blackout periods looks like this, including '
+            'the outer pair of square brackets: [["2015-09-15", "2015-09-21"], ["2015-10-01", "2015-10-08"]] '
         ),
         scope=Scope.settings
     )
@@ -281,8 +298,9 @@ class CourseFields(object):
         help=_(
             'Enter discussion categories in the following format: "CategoryName": '
             '{"id": "i4x-InstitutionName-CourseNumber-course-CourseRun"}. For example, one discussion '
-            'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2014_T1"}. The "id" '
-            'value for each category must be unique.'
+            'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2015_T1"}. The "id" '
+            'value for each category must be unique. In "id" values, the only special characters that are '
+            'supported are underscore, hyphen, and period.'
         ),
         scope=Scope.settings
     )
@@ -326,6 +344,15 @@ class CourseFields(object):
         help=_("Enter the unique identifier for your course's video files provided by edX."),
         scope=Scope.settings
     )
+    facebook_url = String(
+        help=_(
+            "Enter the URL for the official course Facebook group. "
+            "If you provide a URL, the mobile app includes a button that students can tap to access the group."
+        ),
+        default=None,
+        display_name=_("Facebook URL"),
+        scope=Scope.settings
+    )
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),
@@ -356,6 +383,21 @@ class CourseFields(object):
             "Enter the remote gradebook mapping. Only use this setting when "
             "REMOTE_GRADEBOOK_URL has been specified."
         ),
+        scope=Scope.settings
+    )
+    enable_ccx = Boolean(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+        # his students.
+        display_name=_("Enable CCX"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+        # his students.
+        help=_(
+            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
+            " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
+        ),
+        default=False,
         scope=Scope.settings
     )
     allow_anonymous = Boolean(
@@ -597,8 +639,8 @@ class CourseFields(object):
     due_date_display_format = String(
         display_name=_("Due Date Display Format"),
         help=_(
-            "Enter the format due dates are displayed in. Due dates must be in MM-DD-YYYY, DD-MM-YYYY, YYYY-MM-DD, "
-            "or YYYY-DD-MM format."
+            "Enter the format for due dates. The default is Mon DD, YYYY. Enter \"%m-%d-%Y\" for MM-DD-YYYY, "
+            "\"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
         ),
         scope=Scope.settings, default=None
     )
@@ -621,10 +663,12 @@ class CourseFields(object):
     certificates_display_behavior = String(
         display_name=_("Certificates Display Behavior"),
         help=_(
-            "Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' is the default behavior, "
-            "where certificates will only appear after a course has ended. 'early_with_info' will display all "
-            "certificate information before a course has ended. 'early_no_info' will hide all certificate "
-            "information unless a student has earned a certificate."
+            "Enter end, early_with_info, or early_no_info. After certificate generation, students who passed see a "
+            "link to their certificates on the dashboard and students who did not pass see information about the "
+            "grading configuration. The default is end, which displays this certificate information to all students "
+            "after the course end date. To display this certificate information to all students as soon as "
+            "certificates are generated, enter early_with_info. To display only the links to passing students as "
+            "soon as certificates are generated, enter early_no_info."
         ),
         scope=Scope.settings,
         default="end"
@@ -639,10 +683,18 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
-
+    issue_badges = Boolean(
+        display_name=_("Issue Open Badges"),
+        help=_(
+            "Issue Open Badges badges for this course. Badges are generated when certificates are created."
+        ),
+        scope=Scope.settings,
+        default=True
+    )
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the short name of the course to use on the certificate that "
             "students receive when they complete the course."
         ),
@@ -652,12 +704,29 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
+            "Use this setting only when generating PDF certificates. "
             "Between quotation marks, enter the long name of the course to use on the certificate that students "
             "receive when they complete the course."
         ),
         display_name=_("Certificate Name (Long)"),
         scope=Scope.settings,
         default=""
+    )
+    cert_html_view_overrides = Dict(
+        # Translators: This field is the container for course-specific certifcate configuration values
+        display_name=_("Certificate Web/HTML View Overrides"),
+        # Translators: These overrides allow for an alternative configuration of the certificate web view
+        help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
+        scope=Scope.settings,
+    )
+
+    # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
+    certificates = Dict(
+        # Translators: This field is the container for course-specific certifcate configuration values
+        display_name=_("Certificate Configuration"),
+        # Translators: These overrides allow for an alternative configuration of the certificate web view
+        help=_("Enter course-specific configuration information here (JSON format)"),
+        scope=Scope.settings,
     )
 
     # An extra property is used rather than the wiki_slug/number because
@@ -781,7 +850,7 @@ class CourseFields(object):
     entrance_exam_enabled = Boolean(
         display_name=_("Entrance Exam Enabled"),
         help=_(
-            "Specify whether students must complete an entrance exam before they can view your course content."
+            "Specify whether students must complete an entrance exam before they can view your course content. "
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=False,
@@ -791,7 +860,7 @@ class CourseFields(object):
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
-            "Specify a minimum percentage score for an entrance exam before students can view your course content."
+            "Specify a minimum percentage score for an entrance exam before students can view your course content. "
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=65,
@@ -805,9 +874,56 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    social_sharing_url = String(
+        display_name=_("Social Media Sharing URL"),
+        help=_(
+            "If dashboard social sharing and custom course URLs are enabled, you can provide a URL "
+            "(such as the URL to a course About page) that social media sites can link to. URLs must "
+            "be fully qualified. For example: http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
+        ),
+        default=None,
+        scope=Scope.settings,
+    )
+    language = String(
+        display_name=_("Course Language"),
+        help=_("Specify the language of your course."),
+        default=None,
+        scope=Scope.settings
+    )
 
-class CourseDescriptor(CourseFields, SequenceDescriptor):
-    module_class = SequenceModule
+    teams_configuration = Dict(
+        display_name=_("Teams Configuration"),
+        help=_(
+            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
+            "topics is a list of topics."
+        ),
+        scope=Scope.settings
+    )
+
+    minimum_grade_credit = Float(
+        display_name=_("Minimum Grade for Credit"),
+        help=_(
+            "The minimum grade that a learner must earn to receive credit in the course, "
+            "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+        ),
+        default=0.8,
+        scope=Scope.settings,
+    )
+
+
+class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
+    """
+    The CourseDescriptor needs its module_class to be a SequenceModule, but some code that
+    expects a CourseDescriptor to have all its fields can fail if it gets a SequenceModule instead.
+    This class is to make sure that all the fields are present in all cases.
+    """
+
+
+class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
+    """
+    The descriptor for the course XModule
+    """
+    module_class = CourseModule
 
     def __init__(self, *args, **kwargs):
         """
@@ -937,9 +1053,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             xml_object.remove(wiki_tag)
 
         definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
-
         definition['textbooks'] = textbooks
         definition['wiki_slug'] = wiki_slug
+
+        # load license if it exists
+        definition = LicenseMixin.parse_license_from_xml(definition, xml_object)
 
         return definition, children
 
@@ -959,6 +1077,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             wiki_xml_object.set('slug', self.wiki_slug)
             xml_object.append(wiki_xml_object)
 
+        # handle license specifically. Default the course to have a license
+        # of "All Rights Reserved", if a license is not explicitly set.
+        self.add_license_to_xml(xml_object, default="all-rights-reserved")
+
         return xml_object
 
     def has_ended(self):
@@ -966,20 +1088,20 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns True if the current time is after the specified course end date.
         Returns False if there is no end date specified.
         """
-        if self.end is None:
-            return False
-
-        return datetime.now(UTC()) > self.end
+        return course_metadata_utils.has_course_ended(self.end)
 
     def may_certify(self):
         """
-        Return True if it is acceptable to show the student a certificate download link
+        Return whether it is acceptable to show the student a certificate download link.
         """
-        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
-        return show_early or self.has_ended()
+        return course_metadata_utils.may_certify_for_course(
+            self.certificates_display_behavior,
+            self.certificates_show_before_end,
+            self.has_ended()
+        )
 
     def has_started(self):
-        return datetime.now(UTC()) > self.start
+        return course_metadata_utils.has_course_started(self.start)
 
     @property
     def grader(self):
@@ -1019,6 +1141,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def is_cohorted(self):
         """
         Return whether the course is cohorted.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
@@ -1030,6 +1154,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def auto_cohort(self):
         """
         Return whether the course is auto-cohorted.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         if not self.is_cohorted:
             return False
@@ -1043,6 +1169,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Return the list of groups to put students into.  Returns [] if not
         specified. Returns specified list even if is_cohorted and/or auto_cohort are
         false.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         if self.cohort_config is None:
             return []
@@ -1063,6 +1191,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Return the set of discussions that is explicitly cohorted.  It may be
         the empty set.  Note that all inline discussions are automatically
         cohorted based on the course's is_cohorted setting.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
@@ -1076,6 +1206,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         This allow to change the default behavior of inline discussions cohorting. By
         setting this to False, all inline discussions are non-cohorted unless their
         ids are specified in cohorted_discussions.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
@@ -1174,6 +1306,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
 
         """
+        # If this descriptor has been bound to a student, return the corresponding
+        # XModule. If not, just use the descriptor itself
+        try:
+            module = getattr(self, '_xmodule', None)
+            if not module:
+                module = self
+        except UndefinedContext:
+            module = self
 
         all_descriptors = []
         graded_sections = {}
@@ -1184,23 +1324,23 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 for module_descriptor in yield_descriptor_descendents(child):
                     yield module_descriptor
 
-        for c in self.get_children():
-            for s in c.get_children():
-                if s.graded:
-                    xmoduledescriptors = list(yield_descriptor_descendents(s))
-                    xmoduledescriptors.append(s)
+        for chapter in self.get_children():
+            for section in chapter.get_children():
+                if section.graded:
+                    xmoduledescriptors = list(yield_descriptor_descendents(section))
+                    xmoduledescriptors.append(section)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = {
-                        'section_descriptor': s,
-                        'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)
+                        'section_descriptor': section,
+                        'xmoduledescriptors': [child for child in xmoduledescriptors if child.has_score]
                     }
 
-                    section_format = s.format if s.format is not None else ''
+                    section_format = section.format if section.format is not None else ''
                     graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
-                    all_descriptors.append(s)
+                    all_descriptors.append(section)
 
         return {'graded_sections': graded_sections,
                 'all_descriptors': all_descriptors, }
@@ -1220,36 +1360,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
-        _ = i18n.ugettext
-        strftime = i18n.strftime
-
-        def try_parse_iso_8601(text):
-            try:
-                result = Date().from_json(text)
-                if result is None:
-                    result = text.title()
-                else:
-                    result = strftime(result, format_string)
-                    if format_string == "DATE_TIME":
-                        result = self._add_timezone_string(result)
-            except ValueError:
-                result = text.title()
-
-            return result
-
-        if isinstance(self.advertised_start, basestring):
-            return try_parse_iso_8601(self.advertised_start)
-        elif self.start_date_is_still_default:
-            # Translators: TBD stands for 'To Be Determined' and is used when a course
-            # does not yet have an announced start date.
-            return _('TBD')
-        else:
-            when = self.advertised_start or self.start
-
-            if format_string == "DATE_TIME":
-                return self._add_timezone_string(strftime(when, format_string))
-
-            return strftime(when, format_string)
+        return course_metadata_utils.course_start_datetime_text(
+            self.start,
+            self.advertised_start,
+            format_string,
+            i18n.ugettext,
+            i18n.strftime
+        )
 
     @property
     def start_date_is_still_default(self):
@@ -1257,47 +1374,69 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Checks if the start date set for the course is still default, i.e. .start has not been modified,
         and .advertised_start has not been set.
         """
-        return self.advertised_start is None and self.start == CourseFields.start.default
+        return course_metadata_utils.course_start_date_is_default(
+            self.start,
+            self.advertised_start
+        )
 
     def end_datetime_text(self, format_string="SHORT_DATE"):
         """
         Returns the end date or date_time for the course formatted as a string.
+        """
+        return course_metadata_utils.course_end_datetime_text(
+            self.end,
+            format_string,
+            self.runtime.service(self, "i18n").strftime
+        )
 
-        If the course does not have an end date set (course.end is None), an empty string will be returned.
+    def get_discussion_blackout_datetimes(self):
         """
-        if self.end is None:
-            return ''
-        else:
-            strftime = self.runtime.service(self, "i18n").strftime
-            date_time = strftime(self.end, format_string)
-            return date_time if format_string == "SHORT_DATE" else self._add_timezone_string(date_time)
-
-    def _add_timezone_string(self, date_time):
+        Get a list of dicts with start and end fields with datetime values from
+        the discussion_blackouts setting
         """
-        Adds 'UTC' string to the end of start/end date and time texts.
-        """
-        return date_time + u" UTC"
+        date_proxy = Date()
+        try:
+            ret = [
+                {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
+                for start, end
+                in filter(None, self.discussion_blackouts)
+            ]
+            for blackout in ret:
+                if not blackout["start"] or not blackout["end"]:
+                    raise ValueError
+            return ret
+        except (TypeError, ValueError):
+            log.exception(
+                "Error parsing discussion_blackouts %s for course %s",
+                self.discussion_blackouts,
+                self.id
+            )
+            return []
 
     @property
     def forum_posts_allowed(self):
-        date_proxy = Date()
-        try:
-            blackout_periods = [(date_proxy.from_json(start),
-                                 date_proxy.from_json(end))
-                                for start, end
-                                in self.discussion_blackouts]
-            now = datetime.now(UTC())
-            for start, end in blackout_periods:
-                if start <= now <= end:
-                    return False
-        except:
-            log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-
+        """
+        Return whether forum posts are allowed by the discussion_blackouts
+        setting
+        """
+        blackouts = self.get_discussion_blackout_datetimes()
+        now = datetime.now(UTC())
+        for blackout in blackouts:
+            if blackout["start"] <= now <= blackout["end"]:
+                return False
         return True
 
     @property
     def number(self):
-        return self.location.course
+        """
+        Returns this course's number.
+
+        This is a "number" in the sense of the "course numbers" that you see at
+        lots of universities. For example, given a course
+        "Intro to Computer Science" with the course key "edX/CS-101/2014", the
+        course number would be "CS-101"
+        """
+        return course_metadata_utils.number_for_course_location(self.location)
 
     @property
     def display_number_with_default(self):
@@ -1332,3 +1471,35 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             self.video_upload_pipeline is not None and
             'course_video_upload_token' in self.video_upload_pipeline
         )
+
+    def clean_id(self, padding_char='='):
+        """
+        Returns a unique deterministic base32-encoded ID for the course.
+        The optional padding_char parameter allows you to override the "=" character used for padding.
+        """
+        return course_metadata_utils.clean_course_key(self.location.course_key, padding_char)
+
+    @property
+    def teams_enabled(self):
+        """
+        Returns whether or not teams has been enabled for this course.
+
+        Currently, teams are considered enabled when at least one topic has been configured for the course.
+        """
+        if self.teams_configuration:
+            return len(self.teams_configuration.get('topics', [])) > 0
+        return False
+
+    @property
+    def teams_max_size(self):
+        """
+        Returns the max size for teams if teams has been configured, else None.
+        """
+        return self.teams_configuration.get('max_team_size', None)
+
+    @property
+    def teams_topics(self):
+        """
+        Returns the topics that have been configured for teams for this course, else None.
+        """
+        return self.teams_configuration.get('topics', None)

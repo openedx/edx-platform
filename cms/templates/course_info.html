@@ -1,10 +1,11 @@
-<%!
-    from django.utils.translation import ugettext as _
-    from django.template.defaultfilters import escapejs
-%>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "updates" %></%def>
 <%namespace name='static' file='static_content.html'/>
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+%>
 
 <!-- TODO decode course # from context_course into title -->
 <%block name="title">${_("Course Updates")}</%block>
@@ -21,7 +22,12 @@
 
 <%block name="requirejs">
   require(["js/factories/course_info"], function(CourseInfoFactory) {
-      CourseInfoFactory("${updates_url}", "${handouts_locator | escapejs}", "${base_asset_url}");
+      CourseInfoFactory(
+        "${updates_url}",
+        "${handouts_locator | escapejs}",
+        "${base_asset_url}",
+        ${json.dumps(push_notification_enabled)}
+       );
   });
 </%block>
 
@@ -33,7 +39,7 @@
         <span class="sr">&gt; </span>${_("Course Updates")}
       </h1>
 
-      <nav class="nav-actions">
+      <nav class="nav-actions" aria-label="${_('Page Actions')}">
         <h3 class="sr">${_('Page Actions')}</h3>
         <ul>
           <li class="nav-item">

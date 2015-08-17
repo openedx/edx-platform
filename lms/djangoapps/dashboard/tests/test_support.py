@@ -5,9 +5,8 @@ import datetime
 
 from django.contrib.auth.models import Permission
 from django.test.client import Client
-from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
@@ -16,12 +15,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page
     """
     def setUp(self):
+        super(RefundTests, self).setUp()
+
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='refundable course'
         )
@@ -46,6 +47,7 @@ class RefundTests(ModuleStoreTestCase):
     def tearDown(self):
         self.course_mode.delete()
         Order.objects.filter(user=self.student).delete()
+        super(RefundTests, self).tearDown()
 
     def _enroll(self, purchase=True):
         # pylint: disable=missing-docstring

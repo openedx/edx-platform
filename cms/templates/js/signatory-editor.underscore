@@ -1,0 +1,61 @@
+     <div class="signatory-panel-default">
+
+       <% if (!is_editing_all_collections) { %>
+       <a class="signatory-panel-close" href="javascript:void(0);" data-tooltip="Close">
+          <i class="icon fa fa-close" aria-hidden="true"></i>
+          <span class="sr action-button-text"><%= gettext("Close") %></span>
+       </a>
+       <a class="signatory-panel-save"  href="javascript:void(0);" data-tooltip="Save">
+          <i class="icon fa fa-save" aria-hidden="true"></i>
+          <span class="sr action-button-text"><%= gettext("Save") %></span>
+       </a>
+       <% } else if (signatories_count > 1 && (total_saved_signatories > 1 || isNew) ) { %>
+       <a class="signatory-panel-delete" href="#" data-tooltip="Delete">
+          <i class="icon fa fa-trash-o" aria-hidden="true"></i>
+          <span class="sr action-button-text"><%= gettext("Delete") %></span>
+       </a>
+       <% } %>
+       <div class="signatory-panel-header">Signatory <%= signatory_number %></div>
+       <div class="signatory-panel-body">
+         <fieldset class="collection-fields signatory-fields">
+            <legend class="sr"><%= gettext("Certificate Signatory Configuration") %></legend>
+            <div class="input-wrap field text add-signatory-name <% if(error && error.name) { print('error'); } %>">
+                <label for="signatory-name-<%= signatory_number %>"><%= gettext("Name ") %></label>
+                <input id="signatory-name-<%= signatory_number %>" class="collection-name-input input-text signatory-name-input" name="signatory-name" type="text" placeholder="<%= gettext("Name of the signatory") %>" value="<%= name %>"  aria-describedby="signatory-name-<%= signatory_number %>-tip" maxlength="40" />
+                <span id="signatory-name-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 40 characters") %></span>
+                <% if(error && error.name) { %>
+                  <span class="message-error"><%= error.name %></span>
+                <% } %>
+            </div>
+            <div class="input-wrap field text add-signatory-title <% if(error && error.title) { print('error'); } %>">
+                <label for="signatory-title-<%= signatory_number %>"><%= gettext("Title ") %></label>
+                <textarea id="signatory-title-<%= signatory_number %>" class="collection-name-input text input-text signatory-title-input" name="signatory-title" cols="40" rows="2" placeholder="<%= gettext("Title of the signatory") %>"  aria-describedby="signatory-title-<%= signatory_number %>-tip" maxlength="80"><%= title %></textarea>
+                <span id="signatory-title-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("2 Lines, 40 characters each") %></span>
+                <% if(error && error.title) { %>
+                  <span class="message-error"><%= error.title %></span>
+                <% } %>
+            </div>
+            <div class="input-wrap field text add-signatory-organization <% if(error && error.organization) { print('error'); } %>">
+                <label for="signatory-organization-<%= signatory_number %>"><%= gettext("Organization ") %></label>
+                <input id="signatory-organization-<%= signatory_number %>" class="collection-name-input input-text signatory-organization-input" name="signatory-organization" type="text" placeholder="<%= gettext("Organization of the signatory") %>" value="<%= organization %>"  aria-describedby="signatory-organization-<%= signatory_number %>-tip" maxlength="40" />
+                <span id="signatory-organization-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Maximum 40 characters") %></span>
+                <% if(error && error.organization) { %>
+                  <span class="message-error"><%= error.organization %></span>
+                <% } %>
+            </div>
+            <div class="input-wrap field text add-signatory-signature">
+                <label for="signatory-signature-<%= signatory_number %>"><%= gettext("Signature Image") %></label>
+                <% if (signature_image_path != "") { %>
+                    <div class="current-signature-image"><span class="wrapper-signature-image"><img class="signature-image" src="<%= signature_image_path %>" alt="Signature Image"></span></div>
+                <% } %>
+                <div class="signature-upload-wrapper">
+                  <div class="signature-upload-input-wrapper">
+                    <input id="signatory-signature-<%= signatory_number %>" class="collection-name-input input-text signatory-signature-input" name="signatory-signature-url" type="text" placeholder="<%= gettext("Path to Signature Image") %>" value="<%= signature_image_path %>"  aria-describedby="signatory-signature-<%= signatory_number %>-tip" readonly />
+                    <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be 450px X 150px transparent PNG") %></span>
+                  </div>
+                  <button type="button" class="action action-upload-signature">Upload Signature Image</button>
+                </div>               
+            </div>
+         </fieldset>
+       </div>
+     </div>

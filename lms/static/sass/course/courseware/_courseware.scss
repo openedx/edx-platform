@@ -12,6 +12,8 @@ html.video-fullscreen{
 }
 
 .wrap-instructor-info {
+  @extend %ui-print-excluded;
+
   margin: ($baseline/2) ($baseline/4) 0 0;
   overflow: hidden;
 
@@ -39,12 +41,62 @@ html.video-fullscreen{
   }
 }
 
+.content-wrapper {
+
+  .container-footer {
+    margin: 0 auto;
+    max-width: grid-width(12);
+    min-width: 760px;
+    color: $gray;
+    text-align: $bi-app-right;
+  }
+}
+
+.content-wrapper {
+
+  .course-license, .xblock-license {
+    @include text-align(right);
+    @extend %t-title7;
+    display: block;
+    width: auto;
+    padding: ($baseline/4) 0;
+
+    span {
+      color: inherit;
+    }
+
+    a:link, a:visited {
+      color: $gray;
+    }
+    a:active, a:hover {
+      color: $link-hover;
+    }
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    i {
+      font-style: normal;
+    }
+
+    img {
+      display: inline;
+    }
+  }
+}
+
+// TO-DO should this be content wrapper?
 div.course-wrapper {
   position: relative;
 
   section.course-content {
     @extend .content;
-    padding: 40px;
+    padding: ($baseline*2);
     line-height: 1.6;
 
     h1 {
@@ -58,6 +110,14 @@ div.course-wrapper {
         display: none;
         margin-bottom: 0;
       }
+    }
+
+    .sequential-status-message {
+      margin-bottom: $baseline;
+      background-color: $gray-l5;
+      padding: ($baseline * 0.75);
+      border-radius: 3px;
+      @include font-size(13);
     }
 
     ul {
@@ -82,11 +142,6 @@ div.course-wrapper {
       list-style: none;
 
       > div {
-        @extend .clearfix;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: ($baseline*0.75);
-        padding: 0 0 15px;
-
         .collapsible {
           header {
             margin-bottom: 0;
@@ -152,9 +207,22 @@ div.course-wrapper {
           }
         }
       }
+
+      .vert > .xblock-student_view {
+        @extend .clearfix;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: ($baseline*0.75);
+        padding: 0 0 15px;
+      }
+
+      .vert > .xblock-student_view.is-hidden {
+          display: none;
+          border-bottom: 0px;
+          margin-bottom: 0px;
+      }
     }
 
-    section.xmodule_WrapperModule div.vert-mod > div {
+    section.xblock-student_view-wrapper div.vert-mod > div {
       border-bottom: none;
     }
 
@@ -232,6 +300,11 @@ div.course-wrapper {
         padding: 0;
       }
     }
+
+    @media print {
+      padding: 0 2mm;
+      background: transparent !important;
+    }
   }
 
   &.closed {
@@ -265,6 +338,11 @@ div.course-wrapper {
     section.course-content {
       width: flex-grid(11.5) + flex-gutter();
     }
+  }
+
+  @media print {
+    border: 0;
+    background: transparent !important;
   }
 }
 

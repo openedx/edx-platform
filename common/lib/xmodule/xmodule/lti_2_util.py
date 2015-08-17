@@ -321,8 +321,8 @@ class LTI20ModuleMixin(object):
 
         # the standard supports a list of objects, who knows why. It must contain at least 1 element, and the
         # first element must be a dict
-        if type(json_obj) != dict:
-            if type(json_obj) == list and len(json_obj) >= 1 and type(json_obj[0]) == dict:
+        if not isinstance(json_obj, dict):
+            if isinstance(json_obj, list) and len(json_obj) >= 1 and isinstance(json_obj[0], dict):
                 json_obj = json_obj[0]
             else:
                 msg = ("Supplied JSON string is a list that does not contain an object as the first element. {}"

@@ -1,8 +1,8 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
-    'js/common_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers',
+    'common/js/spec_helpers/ajax_helpers',
     'js/student_account/models/LoginModel',
     'js/student_account/views/LoginView',
     'js/student_account/models/PasswordResetModel'
@@ -25,12 +25,14 @@ define([
                 currentProvider: null,
                 providers: [
                     {
+                        id: 'oa2-google-oauth2',
                         name: 'Google',
                         iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
+                        id: 'oa2-facebook',
                         name: 'Facebook',
                         iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
@@ -43,16 +45,17 @@ define([
                 submit_url: '/user_api/v1/account/login_session/',
                 fields: [
                     {
+                        placeholder: 'username@domain.com',
                         name: 'email',
                         label: 'Email',
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
                         instructions: 'Enter your email.',
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'password',
                         label: 'Password',
                         defaultValue: '',
@@ -62,6 +65,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'remember',
                         label: 'Remember me',
                         defaultValue: '',
@@ -150,7 +154,7 @@ define([
             AjaxHelpers.expectRequest(
                 requests, 'POST',
                 FORM_DESCRIPTION.submit_url,
-                $.param( USER_DATA )
+                $.param(USER_DATA)
             );
 
             // Respond with status code 200
@@ -161,7 +165,7 @@ define([
         });
 
         it('sends analytics info containing the enrolled course ID', function() {
-            createLoginView( this );
+            createLoginView(this);
 
             // Simulate that the user is attempting to enroll in a course
             // by setting the course_id query string param.
@@ -193,8 +197,8 @@ define([
             createLoginView(this);
 
             // Verify that Google and Facebook registration buttons are displayed
-            expect($('.button-Google')).toBeVisible();
-            expect($('.button-Facebook')).toBeVisible();
+            expect($('.button-oa2-google-oauth2')).toBeVisible();
+            expect($('.button-oa2-facebook')).toBeVisible();
         });
 
         it('displays a link to the password reset form', function() {

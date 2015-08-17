@@ -8,6 +8,7 @@ import mock
 
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
@@ -16,7 +17,7 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Memor
 
 
 @attr('mongo')
-class SplitWMongoCourseBoostrapper(unittest.TestCase):
+class SplitWMongoCourseBootstrapper(unittest.TestCase):
     """
     Helper for tests which need to construct split mongo & old mongo based courses to get interesting internal structure.
     Override _create_course and after invoking the super() _create_course, have it call _create_item for
@@ -41,7 +42,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
-        'xblock_mixins': (InheritanceMixin,)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin)
     }
 
     split_course_key = CourseLocator('test_org', 'test_course', 'runid', branch=ModuleStoreEnum.BranchName.draft)
@@ -50,7 +51,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
 
         self.user_id = random.getrandbits(32)
-        super(SplitWMongoCourseBoostrapper, self).setUp()
+        super(SplitWMongoCourseBootstrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
             None,
             self.db_config,

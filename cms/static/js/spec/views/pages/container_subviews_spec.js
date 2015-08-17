@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers",
-        "js/common_helpers/template_helpers", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
+        "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
         "js/models/xblock_info", "js/views/utils/xblock_utils"],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
@@ -78,15 +78,16 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 respondWithJson(json);
             };
 
-            describe("PreviewActionController", function () {
+            describe("ViewLiveButtonController", function () {
                 var viewPublishedCss = '.button-view',
-                    previewCss = '.button-preview',
                     visibilityNoteCss = '.note-visibility';
 
                 it('renders correctly for unscheduled unit', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
-                    expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
+                    expect(containerPage.$(viewPublishedCss).attr('title')).toBe("Open the courseware in the LMS");
+                    expect(containerPage.$('.button-preview')).not.toHaveClass(disabledCss);
+                    expect(containerPage.$('.button-preview').attr('title')).toBe("Preview the courseware in the LMS");
                 });
 
                 it('updates when publish state changes', function () {
@@ -96,19 +97,6 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
 
                     fetch({published: false});
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
-                });
-
-                it('updates when has_changes attribute changes', function () {
-                    renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({has_changes: true});
-                    expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
-
-                    fetch({published: true, has_changes: false});
-                    expect(containerPage.$(previewCss)).toHaveClass(disabledCss);
-
-                    // If published is false, preview is always enabled.
-                    fetch({published: false, has_changes: false});
-                    expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
                 });
 
                 it('updates when has_content_group_components attribute changes', function () {

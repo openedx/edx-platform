@@ -49,6 +49,7 @@ section.wiki {
         height: 100%;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: $link-color;
       }
 
       &:after {

@@ -122,13 +122,17 @@ a:focus {
   margin: 0 auto;
   background: $content-wrapper-bg;
   padding-bottom: ($baseline*2);
+
+  @media print {
+    padding-bottom: 0;
+  }
 }
 
 .container {
   @include clearfix();
   @include box-sizing(border-box);
   margin: 0 auto 0;
-  padding: 0 ($baseline*1.5);
+  padding: ($baseline*2) 0;
   max-width: grid-width(12);
   min-width: 760px;
   width: flex-grid(12);
@@ -246,6 +250,7 @@ mark {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
   @extend %ui-depth2;
+  @extend %ui-print-excluded;
   top: 250px;
   left: 0;
   position: fixed;
@@ -337,6 +342,8 @@ mark {
 
 // UI - skipnav
 .nav-skip {
+  @extend %ui-print-excluded;
+
   display: block;
   position: absolute;
   left: 0;

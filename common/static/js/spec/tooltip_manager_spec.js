@@ -70,6 +70,17 @@ describe('TooltipManager', function () {
         expect($('.tooltip')).toBeHidden();
     });
 
+    it('can be configured to show when user clicks on the element', function () {
+        this.element.attr('data-tooltip-show-on-click', true);
+        this.element.trigger($.Event("click"));
+        expect($('.tooltip')).toBeVisible();
+    });
+
+    it('can be be triggered manually', function () {
+        this.tooltip.openTooltip(this.element);
+        expect($('.tooltip')).toBeVisible();
+    });
+
     it('should moves correctly', function () {
         showTooltip(this.element);
         expect($('.tooltip')).toBeVisible();

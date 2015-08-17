@@ -21,6 +21,7 @@ class SurveyModelsTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
+        super(SurveyModelsTests, self).setUp()
         self.client = Client()
 
         # Create two accounts

@@ -26,6 +26,10 @@ class MongoContentStore(ContentStore):
         :param collection: ignores but provided for consistency w/ other doc_store_config patterns
         """
         logging.debug('Using MongoDB for static content serving at host={0} port={1} db={2}'.format(host, port, db))
+
+        # Remove the replicaSet parameter.
+        kwargs.pop('replicaSet', None)
+
         _db = pymongo.database.Database(
             pymongo.MongoClient(
                 host=host,

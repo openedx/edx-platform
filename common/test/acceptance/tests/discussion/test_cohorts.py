@@ -3,7 +3,7 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from .helpers import BaseDiscussionMixin
+from .helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -57,20 +57,17 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
-class DiscussionTabSingleThreadTest(UniqueCourseTest):
+class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page displaying a single thread.
     """
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        # Create a course to register for
-        self.course_fixture = CourseFixture(**self.course_info).install()
         self.setup_cohorts()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
     def setup_thread_page(self, thread_id):
-        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint: disable=attribute-defined-outside-init
+        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, self.discussion_id, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
     # pylint: disable=unused-argument
@@ -79,7 +76,7 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest):
         self.thread_page.wait_for_page()
 
 
-@attr('shard_1')
+@attr('shard_5')
 class CohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, CohortedDiscussionTestMixin):
     """
     Tests for the discussion page displaying a single cohorted thread.
@@ -88,7 +85,7 @@ class CohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, Cohor
     pass
 
 
-@attr('shard_1')
+@attr('shard_5')
 class NonCohortedDiscussionTabSingleThreadTest(DiscussionTabSingleThreadTest, NonCohortedDiscussionTestMixin):
     """
     Tests for the discussion page displaying a single non-cohorted thread.
@@ -137,7 +134,7 @@ class InlineDiscussionTest(UniqueCourseTest):
         self.show_thread(thread_id)
 
 
-@attr('shard_1')
+@attr('shard_5')
 class CohortedInlineDiscussionTest(InlineDiscussionTest, CohortedDiscussionTestMixin):
     """
     Tests for cohorted inline discussions.
@@ -146,7 +143,7 @@ class CohortedInlineDiscussionTest(InlineDiscussionTest, CohortedDiscussionTestM
     pass
 
 
-@attr('shard_1')
+@attr('shard_5')
 class NonCohortedInlineDiscussionTest(InlineDiscussionTest, NonCohortedDiscussionTestMixin):
     """
     Tests for non-cohorted inline discussions.

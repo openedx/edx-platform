@@ -5,6 +5,7 @@ from importlib import import_module
 from opaque_keys.edx.keys import UsageKey
 from unittest import TestCase
 from xblock.fields import XBlockMixin
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -34,7 +35,8 @@ def create_modulestore_instance(
         options,
         i18n_service=None,
         fs_service=None,
-        user_service=None
+        user_service=None,
+        signal_handler=None,
 ):
     """
     This will return a new instance of a modulestore given an engine and options
@@ -47,8 +49,17 @@ def create_modulestore_instance(
     return class_(
         doc_store_config=doc_store_config,
         contentstore=contentstore,
+        signal_handler=signal_handler,
         **options
     )
+
+
+def mock_tab_from_json(tab_dict):
+    """
+    Mocks out the CourseTab.from_json to just return the tab_dict itself so that we don't have to deal
+    with plugin errors.
+    """
+    return tab_dict
 
 
 class LocationMixin(XBlockMixin):
@@ -82,7 +93,7 @@ class MixedSplitTestCase(TestCase):
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin),
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
     }
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
@@ -132,3 +143,33 @@ class MixedSplitTestCase(TestCase):
             modulestore=self.store,
             **extra
         )
+
+
+class ProceduralCourseTestMixin(object):
+    """
+    Contains methods for testing courses generated procedurally
+    """
+    def populate_course(self, branching=2):
+        """
+        Add k chapters, k^2 sections, k^3 verticals, k^4 problems to self.course (where k = branching)
+        """
+        user_id = self.user.id
+        self.populated_usage_keys = {}  # pylint: disable=attribute-defined-outside-init
+
+        def descend(parent, stack):  # pylint: disable=missing-docstring
+            if not stack:
+                return
+
+            xblock_type = stack[0]
+            for _ in range(branching):
+                child = ItemFactory.create(
+                    category=xblock_type,
+                    parent_location=parent.location,
+                    user_id=user_id
+                )
+                self.populated_usage_keys.setdefault(xblock_type, []).append(
+                    child.location
+                )
+                descend(child, stack[1:])
+
+        descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])

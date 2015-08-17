@@ -1,0 +1,616 @@
+// ------------------------------
+// // Open edX Certificates: Components
+
+// About: styling for specific UI components ranging from global to modular.
+
+// #HEADINGS
+// #DEPTH
+// #MESSAGES
+// #IMAGES
+
+// #HEADER APP
+// #BANNER
+// #INTRODUCTION
+// #ACCOMPLISHMENT
+// #RENDERING
+// #ACCOMPLISHMENT RELATED
+// #CERTIFICATE
+// #ABOUT
+
+// ------------------------------
+// #HEADINGS
+// ------------------------------
+%hd-subsection {
+    margin-bottom: spacing-vertical(mid-small);
+    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    padding-bottom: spacing-vertical(x-small);
+}
+
+// ------------------------------
+// #DEPTH
+// ------------------------------
+%depth-base-focus {
+    background: palette(grayscale, white-t);
+    padding: spacing-vertical(small) spacing-horizontal(base);
+}
+
+%depth-well {
+    box-shadow: 0 rem(1) rem(3) 0 palette(grayscale-cool, light) inset;
+    padding: spacing-vertical(small) spacing-horizontal(base);
+    background: palette(grayscale, x-light);
+}
+
+%depth-card {
+    box-shadow: 0 rem(1) rem(2) 0 palette(grayscale-cool, light);
+    padding: spacing-vertical(small) spacing-horizontal(base);
+    background: palette(grayscale, white-t);
+}
+
+.depth-base-focus {
+    @extend %depth-base-focus;
+}
+
+.depth-well {
+    @extend %depth-well;
+}
+
+.depth-card {
+    @extend %depth-card;
+}
+
+// ------------------------------
+// #IMAGES
+// ------------------------------
+// circular cropped
+%img-cropped {
+
+    .src {
+        display: block;
+        width: 100%;
+        border-radius: 50%;
+    }
+}
+
+// ------------------------------
+// #HEADER APP
+// ------------------------------
+.wrapper-header {
+    @extend %divider-2;
+    border-bottom-color: palette(grayscale, xx-trans);
+    background: palette(grayscale, white-t);
+}
+
+.header-app {
+
+    .logo {
+        @extend %reset-link;
+    }
+}
+
+// ------------------------------
+// #BANNER
+// ------------------------------
+.banner {
+
+    .message-copy {
+        margin-bottom: 0;
+    }
+}
+
+// message to user-centric banner
+.wrapper-banner-user {
+    box-shadow: inset 0 rem(2) rem(2) 0 palette(grayscale, black-t);
+    background: palette(grayscale-cool, x-dark);
+}
+
+.banner-user {
+
+    .message-title {
+        color: palette(grayscale, white-t);
+        font-weight: font-weight(semi-bold);
+    }
+
+    .message-copy {
+        color: palette(grayscale, white);
+    }
+
+    .message-actions .action {
+
+        .icon {
+            @include margin-right(spacing-horizontal(x-small));
+            font-size: font-size(mid-large);
+        }
+
+        // CASE: icon display only
+        &.icon-only {
+
+            .action-label {
+                @extend %a11y-hide;
+            }
+        }
+
+        // CASE mozilla open badges logo
+        .icon-mozillaopenbadges {
+            width: rem(18);
+        }
+    }
+}
+
+// ------------------------------
+// #INTRODUCTION
+// ------------------------------
+.introduction {
+    margin-bottom: spacing-vertical(base);
+    @include text-align(center);
+}
+
+// ------------------------------
+// #ACCOMPLISHMENTS
+// ------------------------------
+// base accomplishment
+.accomplishment {
+
+    .accomplishment-type-symbol .src {
+        display: block;
+        width: 100%;
+    }
+}
+
+// main accomplishment
+.accomplishment-main {
+    background: palette(grayscale-cool, x-trans);
+}
+
+// brief accomplishment
+.accomplishment-brief {
+    @extend %depth-card;
+
+    .accomplishment-type-symbol, .accomplishment-details {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .accomplishment-type-symbol {
+        @include size(20%);
+    }
+
+    .accomplishment-details {
+        width: 70%;
+    }
+
+
+    .accomplishment-summary {
+        margin-bottom: 0;
+    }
+}
+
+// ------------------------------
+// #RENDERING
+// ------------------------------
+%rendering-accomplishment-line {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+%rendering-section {
+    margin-bottom: spacing-vertical(base);
+    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    padding-bottom: spacing-vertical(base);
+}
+
+%rendering-hd-section {
+    margin-bottom: spacing-vertical(mid-small);
+    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+    padding-bottom: spacing-vertical(x-small);
+    color: $cert-base-color;
+    @include text-align(center);
+}
+
+.accomplishment-rendering {
+    @extend %depth-card;
+    position: relative;
+    top: -(spacing-vertical(base));
+    border-top: rem(4) solid $cert-base-color;
+
+    // type
+    .accomplishment-type {
+        @include text-align(center);
+        margin-top: -(spacing-vertical(large));
+        margin-bottom: spacing-vertical(base);
+    }
+
+    .accomplishment-type-label, .accomplishment-type-symbol {
+        display: block;
+    }
+
+    .accomplishment-type-label {
+        width: span(10);
+        margin: 0 auto;
+        font-weight: font-weight(semi-bold);
+    }
+
+    .accomplishment-type-symbol {
+        @include size(rem(100));
+        margin: 0 auto spacing-vertical(small) auto;
+    }
+
+    // statement
+    .accomplishment-statement {
+        @extend %rendering-section;
+        @include text-align(center);
+    }
+
+    .accomplishment-statement-lead {
+        @extend .hd-2;
+    }
+
+    .accomplishment-recipient {
+        @extend %rendering-accomplishment-line;
+    }
+
+    .accomplishment-summary {
+        @extend %rendering-accomplishment-line;
+        margin-bottom: spacing-vertical(mid-small);
+    }
+
+    .accomplishment-course {
+        @extend %rendering-accomplishment-line;
+    }
+
+    .accomplishment-course-org {
+    }
+
+    .accomplishment-course-name {
+    }
+
+    .accomplishment-course-description {
+        @extend %rendering-accomplishment-line;
+    }
+
+    .accomplishment-statement-detail {
+        @extend %rendering-accomplishment-line;
+    }
+
+    // organizations
+    .accomplishment-orgs {
+        margin-bottom: spacing-vertical(base);
+
+        .list-orgs {
+            @extend %list-unstyled;
+        }
+    }
+
+    .accomplishment-orgs-title {
+        @extend %rendering-hd-section;
+    }
+
+    // signatories
+    .accomplishment-signatories {
+        @extend %rendering-section;
+
+        .list-signatories {
+            @extend %list-unstyled;
+        }
+
+        .signatory-signature {
+            display: block;
+            margin: 0 auto spacing-vertical(x-small) auto;
+        }
+
+        .signatory-name, .signatory-credentials {
+            @include text-align(center);
+        }
+
+        .signatory-name {
+            margin-bottom: spacing-vertical(xx-small);
+        }
+
+        .signatory-credentials {
+
+            .role, .organization {
+                display: block;
+            }
+        }
+    }
+
+    .accomplishment-signatories-title {
+        @extend %rendering-hd-section;
+    }
+}
+
+// metadata
+.accomplishment-metadata {
+    margin-bottom: spacing-vertical(base);
+
+    .metadata {
+        @extend %list-unstyled;
+
+        .label {
+            @extend %copy-meta;
+            margin-bottom: spacing-vertical(xx-small);
+        }
+
+        .label-explanation {
+            display: block;
+            font-weight: font-weight(normal);
+            margin-top: spacing-vertical(xx-small);
+        }
+
+        .value {
+            @extend %copy-base;
+            font-weight: font-weight(semi-bold);
+            color: palette(grayscale, x-dark);
+        }
+    }
+
+    .recipient-img, .recipient-details {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .recipient-img {
+        @extend %img-cropped;
+        width: rem(100);
+        @include margin-right(spacing-horizontal(small));
+
+        .src {
+            max-height: 100%;
+            border: rem(4) solid palette(grayscale, white-t);
+        }
+    }
+
+    .recipient-details {
+        @extend %copy-base;
+        font-weight: font-weight(semi-bold);
+    }
+
+    .recipient-name {
+        margin-bottom: spacing-vertical(xx-small);
+    }
+
+    .recipient-username {
+        margin-bottom: 0;
+    }
+
+    .accomplishment-id .value {
+        word-wrap: break-word;
+    }
+}
+
+.accomplishment-metadata-title {
+    @extend %hd-subsection;
+    border-bottom-color: palette(grayscale-cool, light);
+}
+
+// ------------------------------
+// #ACCOMPLISHMENT RELATED
+// ------------------------------
+.accomplishment-related {
+
+}
+
+.accomplishment-related-title {
+    @extend %hd-subsection;
+}
+
+// ------------------------------
+// #CERTIFICATE
+// ------------------------------
+// certficate - default
+.certificate {
+
+    .accomplishment-rendering {
+
+        // decorative corners for certs
+        .deco-corner {
+            position: absolute;
+        }
+
+        .deco-corner-tl {
+            @include triangle(20px, $cert-base-color, up-right);
+            top: 0;
+            right: 0;
+        }
+
+        .deco-corner-tr {
+            @include triangle(20px, $cert-base-color, up-left);
+            top: 0;
+            left: 0;
+        }
+
+        .deco-corner-bl {
+            @include triangle(20px, $cert-base-color, down-right);
+            bottom: 0;
+            right: 0;
+        }
+
+        .deco-corner-br {
+            @include triangle(20px, $cert-base-color, down-left);
+            bottom: 0;
+            left: 0;
+        }
+
+        .accomplishment-type-label {
+            color: $cert-base-color;
+        }
+
+        .accomplishment-signatories-title, .accomplishment-orgs-title {
+            color: $cert-decorative-color;
+        }
+
+        // statement
+        .accomplishment-statement,
+        .accomplishment-statement-lead,
+        .accomplishment-recipient,
+        .accomplishment-course,
+         {
+            font-family: $font-family-serif;
+        }
+
+        .accomplishment-recipient,
+        .accomplishment-course {
+            letter-spacing: rem(1);
+        }
+    }
+}
+
+// certificate - base + honor
+.layout-accomplishment.certificate-honor,
+.layout-accomplishment.certificate-base {
+
+    .introduction {
+        margin-bottom: 0;
+    }
+
+    .accomplishment-main {
+        background: transparentize($cert-base-color, 0.9);
+    }
+
+    .accomplishment-rendering {
+
+        .accomplishment-type {
+            margin-top: 0;
+        }
+
+        // hide the fancy
+        .accomplishment-signatories .signatory-signature,
+        .accomplishment-type-symbol {
+            display: none;
+        }
+    }
+}
+
+// certificate - distinguished + verified
+.layout-accomplishment.certificate-verified,
+.layout-accomplishment.certificate-distinguished {
+
+    .introduction {
+        margin-bottom: spacing-vertical(base);
+    }
+
+    .accomplishment-main {
+        background: transparentize($cert-distinguished-color, 0.9);
+    }
+
+    .accomplishment-rendering {
+        background: palette(grayscale, white-t) url('../images/bg-distinguished.png') center no-repeat;
+        background-size: 65%;
+
+        .deco-corner-tl {
+            @include triangle(20px, $cert-distinguished-color, up-right);
+        }
+
+        .deco-corner-tr {
+            @include triangle(20px, $cert-distinguished-color, up-left);
+        }
+
+        .deco-corner-bl {
+            @include triangle(20px, $cert-distinguished-color, down-right);
+
+        }
+
+        .deco-corner-br {
+            @include triangle(20px, $cert-distinguished-color, down-left);
+        }
+    }
+
+    .accomplishment-rendering {
+        border-color: $cert-distinguished-color;
+
+        .accomplishment-type-label {
+            color: $cert-distinguished-color;
+        }
+    }
+}
+
+// ------------------------------
+// #ABOUT
+// ------------------------------
+.about {
+
+}
+
+// ------------------------------
+// #FOOTER
+// ------------------------------
+.footer-app {
+    border-top: rem(4) solid palette(grayscale, xx-trans);
+    padding-top: spacing-vertical(base);
+}
+
+.footer-app-nav {
+
+    .list {
+        @extend %list-unstyled;
+    }
+}
+
+// ------------------------------
+// #BADGES MODAL
+// ------------------------------
+.badges-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: z-index(front);
+    background-color: palette(grayscale, trans); /* dim the background */
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+
+    .badges-modal {
+        @extend %copy-large;
+        box-sizing: content-box;
+        position: fixed;
+        top: spacing-vertical(large);
+        right: 0;
+        left: 0;
+        z-index: z-index(very-front);
+        max-width: 50%;
+        margin-right: auto;
+        margin-left: auto;
+        border-top: rem(10) solid palette(primary, light);
+        background: palette(grayscale, white);
+        padding-right: spacing-horizontal(large);
+        padding-left: spacing-horizontal(large);
+        overflow-x: hidden;
+        color: palette(grayscale, dark);
+
+        .close {
+            position: absolute;
+            right: spacing-horizontal(mid-small);
+            top: spacing-vertical(small);
+            font-weight: font-weight(bold);
+            cursor: pointer;
+        }
+
+        .badges-steps {
+            display: table;
+        }
+
+        .image-container{
+            // Lines the image up with the content of the above list.
+            @include ltr {
+                @include padding-left(2em);
+            }
+            @include rtl {
+                @include padding-right(1em);
+                float: right;
+            }
+        }
+
+        .backpack-logo {
+            @include float(right);
+            @include margin-left(spacing-horizontal(small));
+        }
+    }
+}
+
+.modal-hr {
+    display: block;
+    border: none;
+    background-color: palette(grayscale, light);
+    height: rem(2);
+    width: 100%;
+}

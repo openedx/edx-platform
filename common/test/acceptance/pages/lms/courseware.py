@@ -87,3 +87,38 @@ class CoursewarePage(CoursePage):
                 return False
 
         return True
+
+    @property
+    def course_license(self):
+        """
+        Returns the course license text, if present. Else returns None.
+        """
+        element = self.q(css="#content .container-footer .course-license")
+        if element.is_present():
+            return element.text[0]
+        return None
+
+    def get_active_subsection_url(self):
+        """
+        return the url of the active subsection in the left nav
+        """
+        return self.q(css='.chapter ul li.active a').attrs('href')[0]
+
+
+class CoursewareSequentialTabPage(CoursePage):
+    """
+    Courseware Sequential page
+    """
+
+    def __init__(self, browser, course_id, chapter, subsection, position):
+        super(CoursewareSequentialTabPage, self).__init__(browser, course_id)
+        self.url_path = "courseware/{}/{}/{}".format(chapter, subsection, position)
+
+    def is_browser_on_page(self):
+        return self.q(css='nav.sequence-list-wrapper').present
+
+    def get_selected_tab_content(self):
+        """
+        return the body of the sequential currently selected
+        """
+        return self.q(css='#seq_content .xblock').text[0]

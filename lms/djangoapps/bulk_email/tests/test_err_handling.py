@@ -5,18 +5,17 @@ Unit tests for handling email sending errors
 from itertools import cycle
 
 from celery.states import SUCCESS, RETRY
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db import DatabaseError
 import json
 from mock import patch, Mock
+from nose.plugins.attrib import attr
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     initialize_subtask_info,
@@ -37,8 +36,8 @@ class EmailTestException(Exception):
     pass
 
 
+@attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailErrors(ModuleStoreTestCase):
     """
@@ -46,6 +45,7 @@ class TestEmailErrors(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(TestEmailErrors, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         self.instructor = AdminFactory.create()
@@ -59,9 +59,6 @@ class TestEmailErrors(ModuleStoreTestCase):
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
-
-    def tearDown(self):
-        patch.stopall()
 
     @patch('bulk_email.tasks.get_connection', autospec=True)
     @patch('bulk_email.tasks.send_course_email.retry')

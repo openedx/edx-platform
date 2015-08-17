@@ -1,14 +1,15 @@
 """
 Acceptance tests for Library Content in LMS
 """
-import textwrap
 import ddt
-from unittest import skip
+from flaky import flaky
+from nose.plugins.attrib import attr
+import textwrap
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import CourseFixture
-from ..helpers import UniqueCourseTest
-from ...pages.studio.library import StudioLibraryContentXBlockEditModal, StudioLibraryContainerXBlockWrapper
+from ..helpers import UniqueCourseTest, TestWithSearchIndexMixin
+from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
 from ...pages.studio.overview import CourseOutlinePage
 from ...fixtures.course import XBlockFixtureDesc
 
@@ -17,8 +18,9 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
+@attr('shard_5')
 @ddt.ddt
-class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
+class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
@@ -26,6 +28,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         """
         Install library with some content and a course using fixtures
         """
+        self._create_search_index()
         super(StudioLibraryContainerTest, self).setUp()
         # Also create a course:
         self.course_fixture = CourseFixture(
@@ -40,7 +43,12 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
         self.outline.visit()
         subsection = self.outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
-        self.unit_page = subsection.toggle_expand().unit(UNIT_NAME).go_to()
+        self.unit_page = subsection.expand_subsection().unit(UNIT_NAME).go_to()
+
+    def tearDown(self):
+        """ Tear down method: remove search index backing file """
+        self._cleanup_index_file()
+        super(StudioLibraryContainerTest, self).tearDown()
 
     def populate_library_fixture(self, library_fixture):
         """
@@ -55,7 +63,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
     def populate_course_fixture(self, course_fixture):
         """ Install a course with sections/problems, tabs, updates, and handouts """
         library_content_metadata = {
-            'source_libraries': [self.library_key],
+            'source_library_id': unicode(self.library_key),
             'mode': 'random',
             'max_count': 1,
             'has_score': False
@@ -78,29 +86,32 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         return StudioLibraryContainerXBlockWrapper.from_xblock_wrapper(xblock)
 
     @ddt.data(
-        ('library-v1:111+111', 1, True),
-        ('library-v1:edX+L104', 2, False),
-        ('library-v1:OtherX+IDDQD', 3, True),
+        (1, True),
+        (2, False),
+        (3, True),
     )
     @ddt.unpack
-    def test_can_edit_metadata(self, library_key, max_count, scored):
+    def test_can_edit_metadata(self, max_count, scored):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
         When I go to studio unit page for library content block
         And I edit library content metadata and save it
         Then I can ensure that data is persisted
         """
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
-        edit_modal.library_key = library_key
+        library_name = self.library_info['display_name']
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
+        library_container.edit()
+        edit_modal = StudioLibraryContentEditor(self.browser, library_container.locator)
+        edit_modal.library_name = library_name
         edit_modal.count = max_count
         edit_modal.scored = scored
 
         library_container.save_settings()  # saving settings
 
         # open edit window again to verify changes are persistent
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
-        self.assertEqual(edit_modal.library_key, library_key)
+        library_container.edit()
+        edit_modal = StudioLibraryContentEditor(self.browser, library_container.locator)
+        self.assertEqual(edit_modal.library_name, library_name)
         self.assertEqual(edit_modal.count, max_count)
         self.assertEqual(edit_modal.scored, scored)
 
@@ -108,47 +119,26 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
         When I go to studio unit page for library content block
-        And I edit set library key to none
+        And I edit to select "No Library"
         Then I can see that library content block is misconfigured
         """
         expected_text = 'A library has not yet been selected.'
         expected_action = 'Select a Library'
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 
         # precondition check - the library block should be configured before we remove the library setting
         self.assertFalse(library_container.has_validation_not_configured_warning)
 
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
-        edit_modal.library_key = None
+        library_container.edit()
+        edit_modal = StudioLibraryContentEditor(self.browser, library_container.locator)
+        edit_modal.library_name = "No Library Selected"
         library_container.save_settings()
 
         self.assertTrue(library_container.has_validation_not_configured_warning)
         self.assertIn(expected_text, library_container.validation_not_configured_warning_text)
         self.assertIn(expected_action, library_container.validation_not_configured_warning_text)
 
-    def test_set_missing_library_shows_correct_label(self):
-        """
-        Scenario: Given I have a library, a course and library content xblock in a course
-        When I go to studio unit page for library content block
-        And I edit set library key to non-existent library
-        Then I can see that library content block is misconfigured
-        """
-        nonexistent_lib_key = 'library-v1:111+111'
-        expected_text = "Library is invalid, corrupt, or has been deleted."
-
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
-
-        # precondition check - assert library is configured before we remove it
-        self.assertFalse(library_container.has_validation_error)
-
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
-        edit_modal.library_key = nonexistent_lib_key
-
-        library_container.save_settings()
-
-        self.assertTrue(library_container.has_validation_error)
-        self.assertIn(expected_text, library_container.validation_error_text)
-
+    @flaky  # TODO fix this, see TE-745
     def test_out_of_date_message(self):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
@@ -160,7 +150,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         Then I can see that the content no longer needs to be updated
         """
         expected_text = "This component is out of date. The library has new content."
-        library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 
         self.assertFalse(library_block.has_validation_warning)
         # Removed this assert until a summary message is added back to the author view (SOL-192)
@@ -176,7 +166,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         library_block.refresh_children()
 
         self.unit_page.wait_for_page()  # Wait for the page to reload
-        library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 
         self.assertFalse(library_block.has_validation_message)
         # Removed this assert until a summary message is added back to the author view (SOL-192)
@@ -204,13 +194,14 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
         expected_text = 'There are no matching problem types in the specified libraries. Select another problem type'
 
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 
         # precondition check - assert library has children matching filter criteria
         self.assertFalse(library_container.has_validation_error)
         self.assertFalse(library_container.has_validation_warning)
 
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        library_container.edit()
+        edit_modal = StudioLibraryContentEditor(self.browser, library_container.locator)
         self.assertEqual(edit_modal.capa_type, "Any Type")  # precondition check
         edit_modal.capa_type = "Custom Evaluated Script"
 
@@ -219,7 +210,8 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         self.assertTrue(library_container.has_validation_warning)
         self.assertIn(expected_text, library_container.validation_warning_text)
 
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        library_container.edit()
+        edit_modal = StudioLibraryContentEditor(self.browser, library_container.locator)
         self.assertEqual(edit_modal.capa_type, "Custom Evaluated Script")  # precondition check
         edit_modal.capa_type = "Dropdown"
         library_container.save_settings()
@@ -235,16 +227,17 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         And I set Problem Type selector so "Any"
         Then I can see that "No matching content" warning is shown
         """
-        expected_tpl = "The specified libraries are configured to fetch {count} problems, " \
+        expected_tpl = "The specified library is configured to fetch {count} problems, " \
                        "but there are only {actual} matching problems."
 
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 
         # precondition check - assert block is configured fine
         self.assertFalse(library_container.has_validation_error)
         self.assertFalse(library_container.has_validation_warning)
 
-        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        library_container.edit()
+        edit_modal = StudioLibraryContentEditor(self.browser, library_container.locator)
         edit_modal.count = 50
         library_container.save_settings()
 
@@ -254,7 +247,6 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
             library_container.validation_warning_text
         )
 
-    @skip("Flaky: 01/16/2015")
     def test_settings_overrides(self):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
@@ -294,6 +286,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
         container_page.visit()  # Reload
         self.assertTrue(library_block.has_validation_warning)
+
         library_block.refresh_children()
         container_page.wait_for_page()  # Wait for the page to reload
 
@@ -305,3 +298,21 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         block.reset_field_val("Display Name")
         block.save_settings()
         self.assertEqual(block.name, name_default)
+
+    def test_cannot_manage(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And when I click the "View" link
+        Then I can see a preview of the blocks drawn from the library.
+
+        And I do not see a duplicate button
+        And I do not see a delete button
+        """
+        block_wrapper_unit_page = self._get_library_xblock_wrapper(self.unit_page.xblocks[0].children[0])
+        container_page = block_wrapper_unit_page.go_to_container()
+
+        for block in container_page.xblocks:
+            self.assertFalse(block.has_duplicate_button)
+            self.assertFalse(block.has_delete_button)
+            self.assertFalse(block.has_edit_visibility_button)

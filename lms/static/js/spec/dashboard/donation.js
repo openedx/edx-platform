@@ -1,4 +1,4 @@
-define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 'js/dashboard/donation'],
+define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_helpers', 'js/dashboard/donation'],
     function(TemplateHelpers, AjaxHelpers) {
         'use strict';
 

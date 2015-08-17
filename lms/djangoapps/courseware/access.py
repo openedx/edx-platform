@@ -1,34 +1,52 @@
-"""This file contains (or should), all access control logic for the courseware.
+"""
+This file contains (or should), all access control logic for the courseware.
 Ideally, it will be the only place that needs to know about any special settings
-like DISABLE_START_DATES"""
+like DISABLE_START_DATES.
+
+Note: The access control logic in this file does NOT check for enrollment in
+  a course.  It is expected that higher layers check for enrollment so we
+  don't have to hit the enrollments table on every module load.
+
+  If enrollment is to be checked, use get_course_with_access in courseware.courses.
+  It is a wrapper around has_access that additionally checks for enrollment.
+"""
 import logging
 from datetime import datetime, timedelta
 import pytz
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.utils.timezone import UTC
+
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from xblock.core import XBlock
 
 from xmodule.course_module import (
     CourseDescriptor, CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
-
-from xblock.core import XBlock
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
-from django.utils.timezone import UTC
 from student import auth
+from student.models import CourseEnrollmentAllowed
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+    any_unfulfilled_milestones,
+)
+from ccx_keys.locator import CCXLocator
+
+import dogstats_wrapper as dog_stats_api
+
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -74,6 +92,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
+    if isinstance(course_key, CCXLocator):
+        course_key = course_key.to_course_locator()
+
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
@@ -89,6 +110,9 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, XBlock):
         return _has_access_descriptor(user, action, obj, course_key)
 
+    if isinstance(obj, CCXLocator):
+        return _has_access_ccx_key(user, action, obj)
+
     if isinstance(obj, CourseKey):
         return _has_access_course_key(user, action, obj)
 
@@ -96,7 +120,7 @@ def has_access(user, action, obj, course_key=None):
         return _has_access_location(user, action, obj, course_key)
 
     if isinstance(obj, basestring):
-        return _has_access_string(user, action, obj, course_key)
+        return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
@@ -114,7 +138,6 @@ def _has_access_course_desc(user, action, course):
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
     'load_mobile' -- can load from a mobile context
-    'load_mobile_no_enrollment_check' -- can load from a mobile context without checking for enrollment
     'enroll' -- enroll.  Checks for enrollment window,
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
@@ -131,42 +154,21 @@ def _has_access_course_desc(user, action, course):
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, 'load', course, course.id)
 
-    def can_load_forum():
-        """
-        Can this user access the forums in this course?
-        """
-        return (
-            can_load() and
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
-
     def can_load_mobile():
         """
         Can this user access this course from a mobile device?
         """
         return (
-            # check mobile requirements
-            can_load_mobile_no_enroll_check() and
-            # check enrollment
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
-
-    def can_load_mobile_no_enroll_check():
-        """
-        Can this enrolled user access this course from a mobile device?
-        Note: does not check for enrollment since it is assumed the caller has done so.
-        """
-        return (
             # check start date
             can_load() and
             # check mobile_available flag
-            is_mobile_available_for_user(user, course)
+            is_mobile_available_for_user(user, course) and
+            (
+                # either is a staff user or
+                _has_staff_access_to_descriptor(user, course, course.id) or
+                # check for unfulfilled milestones
+                not any_unfulfilled_milestones(course.id, user.id)
+            )
         )
 
     def can_enroll():
@@ -232,6 +234,14 @@ def _has_access_course_desc(user, action, course):
         # properly configured enrollment_start times (if course should be
         # staff-only, set enrollment_start far in the future.)
         if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
+            dog_stats_api.increment(
+                DEPRECATION_VSCOMPAT_EVENT,
+                tags=(
+                    "location:has_access_course_desc_see_exists",
+                    u"course:{}".format(course),
+                )
+            )
+
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
             if course.ispublic:
@@ -282,9 +292,7 @@ def _has_access_course_desc(user, action, course):
     checkers = {
         'load': can_load,
         'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
-        'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
-        'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
@@ -422,7 +430,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
                 descriptor,
                 course_key=course_key
             )
-            if now > effective_start:
+            if in_preview_mode() or now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
                 return True
@@ -487,7 +495,17 @@ def _has_access_course_key(user, action, course_key):
     return _dispatch(checkers, action, user, course_key)
 
 
-def _has_access_string(user, action, perm, course_key):
+def _has_access_ccx_key(user, action, ccx_key):
+    """Check if user has access to the course for this ccx_key
+
+    Delegates checking to _has_access_course_key
+    Valid actions: same as for that function
+    """
+    course_key = ccx_key.to_course_locator()
+    return _has_access_course_key(user, action, course_key)
+
+
+def _has_access_string(user, action, perm):
     """
     Check if user has certain special access, specified as string.  Valid strings:
 
@@ -645,17 +663,19 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
-def is_mobile_available_for_user(user, course):
+def is_mobile_available_for_user(user, descriptor):
     """
     Returns whether the given course is mobile_available for the given user.
     Checks:
         mobile_available flag on the course
         Beta User and staff access overrides the mobile_available flag
+    Arguments:
+        descriptor (CourseDescriptor|CourseOverview): course or overview of course in question
     """
     return (
-        course.mobile_available or
-        auth.has_access(user, CourseBetaTesterRole(course.id)) or
-        _has_staff_access_to_descriptor(user, course, course.id)
+        descriptor.mobile_available or
+        auth.has_access(user, CourseBetaTesterRole(descriptor.id)) or
+        _has_staff_access_to_descriptor(user, descriptor, descriptor.id)
     )
 
 
@@ -673,3 +693,11 @@ def get_user_role(user, course_key):
         return 'staff'
     else:
         return 'student'
+
+
+def in_preview_mode():
+    """
+    Returns whether the user is in preview mode or not.
+    """
+    hostname = get_current_request_hostname()
+    return hostname and settings.PREVIEW_DOMAIN in hostname.split('.')

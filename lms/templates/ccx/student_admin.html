@@ -1,0 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<section>
+  <h2>${_('Student Grades')}</h2>
+  <p>
+    <a href="${gradebook_url}">${_('View gradebook')}</a>
+  </p>
+  <p>
+    <a href="${grades_csv_url}">${_('Download student grades')}</a>
+  </p>
+</section>

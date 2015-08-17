@@ -8,12 +8,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from django_future.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from util.json_request import expect_json, JsonResponse
+from util.json_request import expect_json
 
 log = logging.getLogger(__name__)
 

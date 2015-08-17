@@ -3,6 +3,7 @@ Video player in the courseware.
 """
 
 import time
+import json
 import requests
 from selenium.webdriver.common.action_chains import ActionChains
 from bok_choy.page_object import PageObject
@@ -21,10 +22,12 @@ VIDEO_BUTTONS = {
     'download_transcript': '.video-tracks > a',
     'speed': '.speeds',
     'quality': '.quality-control',
+    'do_not_show_again': '.skip-control',
+    'skip_bumper': '.play-skip-control',
 }
 
 CSS_CLASS_NAMES = {
-    'closed_captions': '.closed .subtitles',
+    'closed_captions': '.video.closed',
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
     'captions_text': '.subtitles > li',
@@ -37,7 +40,8 @@ CSS_CLASS_NAMES = {
     'video_time': 'div.vidtime',
     'video_display_name': '.vert h2',
     'captions_lang_list': '.langs-list li',
-    'video_speed': '.speeds .value'
+    'video_speed': '.speeds .value',
+    'poster': '.poster',
 }
 
 VIDEO_MODES = {
@@ -53,7 +57,8 @@ VIDEO_MENUS = {
 }
 
 
-@js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery')
+@js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery',
+            'window.MathJax', 'window.MathJax.isReady')
 class VideoPage(PageObject):
     """
     Video player in the courseware.
@@ -78,7 +83,7 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(video_selector, 'Video is initialized')
 
     @wait_for_js
-    def wait_for_video_player_render(self):
+    def wait_for_video_player_render(self, autoplay=False):
         """
         Wait until Video Player Rendered Completely.
 
@@ -87,7 +92,12 @@ class VideoPage(PageObject):
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
         self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
 
-        video_player_buttons = ['volume', 'play', 'fullscreen', 'speed']
+        video_player_buttons = ['volume', 'fullscreen', 'speed']
+        if autoplay:
+            video_player_buttons.append('pause')
+        else:
+            video_player_buttons.append('play')
+
         for button in video_player_buttons:
             self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
 
@@ -104,6 +114,34 @@ class VideoPage(PageObject):
         EmptyPromise(_is_finished_loading, 'Finished loading the video', timeout=200).fulfill()
 
         self.wait_for_ajax()
+
+    @wait_for_js
+    def wait_for_video_bumper_render(self):
+        """
+        Wait until Poster, Video Pre-Roll and main Video Player are Rendered Completely.
+        """
+        self.wait_for_video_class()
+        self.wait_for_element_presence(CSS_CLASS_NAMES['video_init'], 'Video Player Initialized')
+        self.wait_for_element_presence(CSS_CLASS_NAMES['video_time'], 'Video Player Initialized')
+
+        video_player_buttons = ['do_not_show_again', 'skip_bumper', 'volume']
+        for button in video_player_buttons:
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], '{} button is visible'.format(button.title()))
+
+    @property
+    def is_poster_shown(self):
+        """
+        Check whether a poster is show.
+        """
+        selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
+        return self.q(css=selector).visible
+
+    def click_on_poster(self):
+        """
+        Click on the video poster.
+        """
+        selector = self.get_element_selector(CSS_CLASS_NAMES['poster'])
+        self.q(css=selector).click()
 
     def get_video_vertical_selector(self, video_display_name=None):
         """
@@ -183,19 +221,14 @@ class VideoPage(PageObject):
     @property
     def is_autoplay_enabled(self):
         """
-        Extract `data-autoplay` attribute to check video autoplay is enabled or disabled.
+        Extract autoplay value of `data-metadata` attribute to check video autoplay is enabled or disabled.
 
         Returns:
             bool: Tells if autoplay enabled/disabled.
-
         """
         selector = self.get_element_selector(CSS_CLASS_NAMES['video_container'])
-        auto_play = self.q(css=selector).attrs('data-autoplay')[0]
-
-        if auto_play.lower() == 'false':
-            return False
-
-        return True
+        auto_play = json.loads(self.q(css=selector).attrs('data-metadata')[0])['autoplay']
+        return auto_play
 
     @property
     def is_error_message_shown(self):
@@ -267,6 +300,7 @@ class VideoPage(PageObject):
             bool: True means captions are visible, False means captions are not visible
 
         """
+        self.wait_for_ajax()
         caption_state_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
         return not self.q(css=caption_state_selector).present
 
@@ -355,10 +389,6 @@ class VideoPage(PageObject):
             self.wait_for(lambda: self.state != 'buffering', 'Player is Ready for Pause')
 
         self.q(css=button_selector).first.click()
-
-        button_states = {'play': 'playing', 'pause': 'pause'}
-        if button in button_states:
-            self.wait_for_state(button_states[button])
 
         self.wait_for_ajax()
 
@@ -518,6 +548,7 @@ class VideoPage(PageObject):
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
+
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
         self.q(css=language_selector).first.click()
 
@@ -677,7 +708,7 @@ class VideoPage(PageObject):
         elif 'is-ended' in current_state:
             return 'finished'
 
-    def _wait_for(self, check_func, desc, result=False, timeout=200):
+    def _wait_for(self, check_func, desc, result=False, timeout=200, try_interval=0.2):
         """
         Calls the method provided as an argument until the Promise satisfied or BrokenPromise
 
@@ -689,9 +720,9 @@ class VideoPage(PageObject):
 
         """
         if result:
-            return Promise(check_func, desc, timeout=timeout).fulfill()
+            return Promise(check_func, desc, timeout=timeout, try_interval=try_interval).fulfill()
         else:
-            return EmptyPromise(check_func, desc, timeout=timeout).fulfill()
+            return EmptyPromise(check_func, desc, timeout=timeout, try_interval=try_interval).fulfill()
 
     def wait_for_state(self, state):
         """
@@ -706,20 +737,6 @@ class VideoPage(PageObject):
             'State is {state}'.format(state=state)
         )
 
-    def _parse_time_str(self, time_str):
-        """
-        Parse a string of the form 1:23 into seconds (int).
-
-        Arguments:
-            time_str (str): seek value
-
-        Returns:
-            int: seek value in seconds
-
-        """
-        time_obj = time.strptime(time_str, '%M:%S')
-        return time_obj.tm_min * 60 + time_obj.tm_sec
-
     def seek(self, seek_value):
         """
         Seek the video to position specified by `seek_value`.
@@ -728,7 +745,7 @@ class VideoPage(PageObject):
             seek_value (str): seek value
 
         """
-        seek_time = self._parse_time_str(seek_value)
+        seek_time = _parse_time_str(seek_value)
         seek_selector = self.get_element_selector(' .video')
         js_code = "$('{seek_selector}').data('video-player-state').videoPlayer.onSlideSeek({{time: {seek_time}}})".format(
             seek_selector=seek_selector, seek_time=seek_time)
@@ -814,3 +831,18 @@ class VideoPage(PageObject):
         """
         captions_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_rendered'])
         self.wait_for_element_presence(captions_rendered_selector, 'Captions Rendered')
+
+
+def _parse_time_str(time_str):
+    """
+    Parse a string of the form 1:23 into seconds (int).
+
+    Arguments:
+        time_str (str): seek value
+
+    Returns:
+        int: seek value in seconds
+
+    """
+    time_obj = time.strptime(time_str, '%M:%S')
+    return time_obj.tm_min * 60 + time_obj.tm_sec

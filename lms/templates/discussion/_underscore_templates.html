@@ -1,14 +1,15 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template.defaultfilters import escapejs %>
-<%! from django_comment_client.permissions import has_permission %>
-
 <%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from django_comment_client.permissions import has_permission
+%>
 
 ## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
 ## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
-        <div class="thread-wrapper">
+        <div class="thread-wrapper" tabindex="-1">
             <div class="forum-thread-main-wrapper">
                 <div class="thread-content-wrapper"></div>
                 <div class="post-extended-content">
@@ -49,7 +50,7 @@
 
 % for template_name in ['thread-show']:
 <script aria-hidden="true" type="text/template" id="${template_name}-template">
-    <%static:include path="js/discussion/${template_name}.underscore" />
+    <%static:include path="common/templates/discussion/${template_name}.underscore" />
 </script>
 % endfor
 
@@ -387,18 +388,18 @@
         <ul class="post-errors" style="display: none"></ul>
         <div class="forum-new-post-form-wrapper"></div>
         ${'<% if (cohort_options) { %>'}
-        <div class="post-field">
+        <div class="post-field group-selector-wrapper${'<% if (!is_commentable_cohorted) { %>'} disabled${'<% } %>'}" >
             <label class="field-label">
                 <span class="field-label-text">
                     ## Translators: This labels the selector for which group of students can view a post
                     ${_("Visible To:")}
-                </span><select class="field-input js-group-select" name="group_id" ${'<% if (!is_commentable_cohorted) { %>'}disabled${'<% } %>'}>
+                </span><select aria-describedby="field_help_visible_to" class="field-input js-group-select" name="group_id" ${'<% if (!is_commentable_cohorted) { %>'}disabled${'<% } %>'}>
                     <option value="">${_("All Groups")}</option>
                     ${'<% _.each(cohort_options, function(opt) { %>'}
                     <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
                     ${'<% }); %>'}
                  </select>
-            </label><div class="field-help">
+            </label><div class="field-help" id="field_help_visible_to">
                 ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.")}
             </div>
         </div>
@@ -406,8 +407,8 @@
         <div class="post-field">
             <label class="field-label">
                 <span class="sr">${_("Title:")}</span>
-                <input type="text" class="field-input js-post-title" name="title" placeholder="${_('Title')}">
-            </label><span class="field-help">
+                <input aria-describedby="field_help_title" type="text" class="field-input js-post-title" name="title" placeholder="${_('Title')}">
+            </label><span class="field-help" id="field_help_title">
                 ${_("Add a clear and descriptive title to encourage participation.")}
             </span>
         </div>
@@ -444,21 +445,21 @@
                 ## Translators: This is the label for a control to
                 ## select a forum post type
                 ${_("Post type:")}
-            </span><fieldset class="field-input">
-                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
+            </span><fieldset class="field-input"><legend class="sr">${_("Post type:")}</legend>
+                <input aria-describedby="field_help_post_type" type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
                 <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
                     <i class="icon fa fa-question"></i>
                     ## Translators: This is a forum post type
                     ${_("Question")}
                 </label>
-                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
+                <input aria-describedby="field_help_post_type" type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
                 <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
                     <i class="icon fa fa-comments"></i>
                     ## Translators: This is a forum post type
                     ${_("Discussion")}
                 </label>
             </fieldset>
-        </div><span class="field-help">
+        </div><span class="field-help" id="field_help_post_type">
             ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
         </span>
     </div>
@@ -489,12 +490,12 @@
             <div class="topic-menu-wrapper">
                 <label class="topic-filter-label">
                     <span class="sr">${_("Filter topics")}</span>
-                    <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
+                    <input aria-describedby="field_help_topic_area" type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
                 </label>
                 <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
            </div>
        </div>
-    </div><span class="field-help">
+    </div><span class="field-help" id="field_help_topic_area">
         ${_("Add your post to a relevant topic to help others find it.")}
     </span>
 </script>
@@ -514,8 +515,8 @@
     </script>
 </%def>
 
-${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Unendorse"))}
-${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Unmark as Answer"))}
+${primaryAction("endorse", "check", _("Endorse"), _("Endorse"), _("Unendorse"))}
+${primaryAction("answer", "check", _("Mark as Answer"), _("Mark as Answer"), _("Unmark as Answer"))}
 ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
 
 <script type="text/template" id="forum-action-vote">
@@ -525,7 +526,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
         </span>
         <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
             ## Vote counts are populated by JS
-            <span class="sr">${_("Vote")}</span>
+            <span class="sr">${_("Vote for this post,")}&nbsp;</span>
             <span class="sr js-sr-vote-count"></span>
 
             <span class="action-label" aria-hidden="true">
@@ -571,7 +572,7 @@ ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
     </script>
 </%def>
 
-${secondaryAction("edit", "pencil-square-o", _("Edit"))}
+${secondaryAction("edit", "pencil", _("Edit"))}
 ${secondaryAction("delete", "remove", _("Delete"))}
 
 <script type="text/template" id="forum-actions">

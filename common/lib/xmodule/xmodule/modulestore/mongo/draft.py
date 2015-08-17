@@ -10,6 +10,7 @@ import pymongo
 import logging
 
 from opaque_keys.edx.locations import Location
+from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
@@ -46,7 +47,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-    def get_item(self, usage_key, depth=0, revision=None, **kwargs):
+    def get_item(self, usage_key, depth=0, revision=None, using_descriptor_system=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
 
@@ -69,6 +70,9 @@ class DraftModuleStore(MongoModuleStore):
                 Note: If the item is in DIRECT_ONLY_CATEGORIES, then returns only the PUBLISHED
                 version regardless of the revision.
 
+            using_descriptor_system (CachingDescriptorSystem): The existing CachingDescriptorSystem
+                to add data to, and to load the XBlocks from.
+
         Raises:
             xmodule.modulestore.exceptions.InsufficientSpecificationError
             if any segment of the usage_key is None except revision
@@ -77,10 +81,16 @@ class DraftModuleStore(MongoModuleStore):
             is found at that usage_key
         """
         def get_published():
-            return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(
+                usage_key, depth=depth, using_descriptor_system=using_descriptor_system,
+                for_parent=kwargs.get('for_parent'),
+            ))
 
         def get_draft():
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(
+                as_draft(usage_key), depth=depth, using_descriptor_system=using_descriptor_system,
+                for_parent=kwargs.get('for_parent')
+            ))
 
         # return the published version if ModuleStoreEnum.RevisionOption.published_only is requested
         if revision == ModuleStoreEnum.RevisionOption.published_only:
@@ -166,44 +176,46 @@ class DraftModuleStore(MongoModuleStore):
         if not self.has_course(source_course_id):
             raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
 
-        # verify that the dest_location really is an empty course
-        # b/c we don't want the payload, I'm copying the guts of get_items here
-        query = self._course_key_to_son(dest_course_id)
-        query['_id.category'] = {'$nin': ['course', 'about']}
-        if self.collection.find(query).limit(1).count() > 0:
-            raise DuplicateCourseError(
-                dest_course_id,
-                "Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(
-                    dest_course_id
+        with self.bulk_operations(dest_course_id):
+            # verify that the dest_location really is an empty course
+            # b/c we don't want the payload, I'm copying the guts of get_items here
+            query = self._course_key_to_son(dest_course_id)
+            query['_id.category'] = {'$nin': ['course', 'about']}
+            if self.collection.find(query).limit(1).count() > 0:
+                raise DuplicateCourseError(
+                    dest_course_id,
+                    "Course at destination {0} is not an empty course. "
+                    "You can only clone into an empty course. Aborting...".format(
+                        dest_course_id
+                    )
                 )
-            )
 
-        # clone the assets
-        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
+            # clone the assets
+            super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
 
-        # get the whole old course
-        new_course = self.get_course(dest_course_id)
-        if new_course is None:
-            # create_course creates the about overview
-            new_course = self.create_course(
-                dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields
-            )
-        else:
-            # update fields on existing course
-            for key, value in fields.iteritems():
-                setattr(new_course, key, value)
-            self.update_item(new_course, user_id)
+            # get the whole old course
+            new_course = self.get_course(dest_course_id)
+            if new_course is None:
+                # create_course creates the about overview
+                new_course = self.create_course(
+                    dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields
+                )
+            else:
+                # update fields on existing course
+                for key, value in fields.iteritems():
+                    setattr(new_course, key, value)
+                self.update_item(new_course, user_id)
 
-        # Get all modules under this namespace which is (tag, org, course) tuple
-        modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
-        self._clone_modules(modules, dest_course_id, user_id)
-        course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
-        self.publish(course_location, user_id)
+            # Get all modules under this namespace which is (tag, org, course) tuple
+            modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+            self._clone_modules(modules, dest_course_id, user_id)
+            course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
+            self.publish(course_location, user_id)
 
-        modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
-        self._clone_modules(modules, dest_course_id, user_id)
+            modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
+            self._clone_modules(modules, dest_course_id, user_id)
 
-        return True
+            return True
 
     def _clone_modules(self, modules, dest_course_id, user_id):
         """Clones each module into the given course"""
@@ -436,7 +448,15 @@ class DraftModuleStore(MongoModuleStore):
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
 
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False, **kwargs):
+    def update_item(
+            self,
+            xblock,
+            user_id,
+            allow_not_found=False,
+            force=False,
+            isPublish=False,
+            child_update=False,
+            **kwargs):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
@@ -446,7 +466,11 @@ class DraftModuleStore(MongoModuleStore):
 
         # if the revision is published, defer to base
         if draft_loc.revision == MongoRevisionKey.published:
-            return super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+            item = super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+            course_key = xblock.location.course_key
+            if isPublish or (item.category in DIRECT_ONLY_CATEGORIES and not child_update):
+                self._flag_publish_event(course_key)
+            return item
 
         if not super(DraftModuleStore, self).has_item(draft_loc):
             try:
@@ -509,7 +533,8 @@ class DraftModuleStore(MongoModuleStore):
                 parent_locations = [draft_parent.location]
         # there could be 2 parents if
         #   Case 1: the draft item moved from one parent to another
-        #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
+        # Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single
+        # parent has 2 versions: draft and published
         for parent_location in parent_locations:
             # don't remove from direct_only parent if other versions of this still exists (this code
             # assumes that there's only one parent_location in this case)
@@ -523,7 +548,8 @@ class DraftModuleStore(MongoModuleStore):
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
             parent_block.children.remove(location)
             parent_block.location = parent_location  # ensure the location is with the correct revision
-            self.update_item(parent_block, user_id)
+            self.update_item(parent_block, user_id, child_update=True)
+        self._flag_publish_event(location.course_key)
 
         if is_item_direct_only or revision == ModuleStoreEnum.RevisionOption.all:
             as_functions = [as_draft, as_published]
@@ -611,7 +637,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
-    @MongoModuleStore.memoize_request_cache
+    @memoize_in_request_cache('request_cache')
     def has_changes(self, xblock):
         """
         Check if the subtree rooted at xblock has any drafts and thus may possibly have changes
@@ -709,10 +735,14 @@ class DraftModuleStore(MongoModuleStore):
         _verify_revision_is_published(location)
 
         _internal_depth_first(location, True)
+        course_key = location.course_key
+        bulk_record = self._get_bulk_ops_record(course_key)
         if len(to_be_deleted) > 0:
-            bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
+
+        self._flag_publish_event(course_key)
+
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):
@@ -724,6 +754,9 @@ class DraftModuleStore(MongoModuleStore):
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         self._convert_to_draft(location, user_id, delete_published=True)
+
+        course_key = location.course_key
+        self._flag_publish_event(course_key)
 
     def revert_to_published(self, location, user_id=None):
         """

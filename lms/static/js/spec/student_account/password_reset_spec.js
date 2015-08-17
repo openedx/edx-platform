@@ -1,8 +1,8 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
-    'js/common_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers',
+    'common/js/spec_helpers/ajax_helpers',
     'js/student_account/models/PasswordResetModel',
     'js/student_account/views/PasswordResetView',
 ], function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {

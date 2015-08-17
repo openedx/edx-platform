@@ -3,10 +3,11 @@
 """
 import logging
 
-from xblock.core import XBlock
-from xblock.fields import Scope, String, List
-from xblock.fragment import Fragment
 from xmodule.studio_editable import StudioEditableModule
+
+from xblock.fields import Scope, String, List, Boolean
+from xblock.fragment import Fragment
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +30,14 @@ class LibraryRoot(XBlock):
     advanced_modules = List(
         display_name=_("Advanced Module List"),
         help=_("Enter the names of the advanced components to use in your library."),
-        scope=Scope.settings
+        scope=Scope.settings,
+        xml_node=True,
+    )
+    show_children_previews = Boolean(
+        display_name="Hide children preview",
+        help="Choose if preview of library contents is shown",
+        scope=Scope.user_state,
+        default=True
     )
     has_children = True
     has_author_view = True
@@ -68,10 +76,23 @@ class LibraryRoot(XBlock):
 
         children_to_show = self.children[item_start:item_end]  # pylint: disable=no-member
 
+        force_render = context.get('force_render', None)
+
         for child_key in children_to_show:  # pylint: disable=E1101
+            # Children must have a separate context from the library itself. Make a copy.
+            child_context = context.copy()
+            child_context['show_preview'] = self.show_children_previews
+            child_context['can_edit_visibility'] = False
             child = self.runtime.get_block(child_key)
             child_view_name = StudioEditableModule.get_preview_view_name(child)
-            rendered_child = self.runtime.render_child(child, child_view_name, context)
+
+            if unicode(child.location) == force_render:
+                child_context['show_preview'] = True
+
+            if child_context['show_preview']:
+                rendered_child = self.runtime.render_child(child, child_view_name, child_context)
+            else:
+                rendered_child = self.runtime.render_child_placeholder(child, child_view_name, child_context)
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
@@ -86,7 +107,8 @@ class LibraryRoot(XBlock):
                 'can_add': can_add,
                 'first_displayed': item_start,
                 'total_children': children_count,
-                'displayed_children': len(children_to_show)
+                'displayed_children': len(children_to_show),
+                'previews': self.show_children_previews
             })
         )
 
@@ -106,11 +128,8 @@ class LibraryRoot(XBlock):
         """
         return self.scope_ids.usage_id.course_key.library
 
-    @classmethod
-    def parse_xml(cls, xml_data, system, id_generator, **kwargs):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
-
-    def add_xml_to_node(self, resource_fs):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
+    @XBlock.json_handler
+    def trigger_previews(self, request_body, suffix):  # pylint: disable=unused-argument
+        """ Enable or disable previews in studio for library children. """
+        self.show_children_previews = request_body.get('showChildrenPreviews', self.show_children_previews)
+        return {'showChildrenPreviews': self.show_children_previews}

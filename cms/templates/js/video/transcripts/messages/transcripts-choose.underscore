@@ -18,7 +18,11 @@
     <% _.each(html5_list, function(value, index) {
         var type = grouped_list[value][0].type,
             file_name = value + ((type) ? ('.' + type) : ''),
-            message = gettext("Timed Transcript from ") + file_name;
+            message = interpolate(
+                gettext("Timed Transcript from %(filename)s"),
+                { filename: file_name },
+                true
+            );
     %>
         <button
             class="action setting-choose"

@@ -8,7 +8,8 @@ from django.utils import translation
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.models import CourseEnrollment, Registration, create_comments_service_user
+from student.forms import AccountCreationForm
+from student.models import CourseEnrollment, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
 from track.management.tracked_command import TrackedCommand
 
@@ -80,21 +81,22 @@ class Command(TrackedCommand):
             except InvalidKeyError:
                 course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
 
-        post_data = {
-            'username': username,
-            'email': options['email'],
-            'password': options['password'],
-            'name': name,
-            'honor_code': u'true',
-            'terms_of_service': u'true',
-        }
+        form = AccountCreationForm(
+            data={
+                'username': username,
+                'email': options['email'],
+                'password': options['password'],
+                'name': name,
+            },
+            tos_required=False
+        )
         # django.utils.translation.get_language() will be used to set the new
         # user's preferred language.  This line ensures that the result will
         # match this installation's default locale.  Otherwise, inside a
         # management command, it will always return "en-us".
         translation.activate(settings.LANGUAGE_CODE)
         try:
-            user, profile, reg = _do_create_account(post_data)
+            user, _, reg = _do_create_account(form)
             if options['staff']:
                 user.is_staff = True
                 user.save()

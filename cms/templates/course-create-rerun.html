@@ -1,8 +1,10 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "course_rerun" %></%def>
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.template.defaultfilters import escapejs %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.template.defaultfilters import escapejs
+%>
 
 <%block name="title">${_("Create a Course Rerun of:")}</%block>
 <%block name="bodyclass">is-signedin view-course-create view-course-create-rerun</%block>
@@ -26,7 +28,7 @@
         <span class="page-header-sub">${_("Create a re-run of a course")}</span>
       </h1>
 
-      <nav class="nav-actions">
+      <nav class="nav-actions" aria-label="${_('Page Actions')}">
         <h3 class="sr">Page Actions</h3>
         <ul>
           <li class="nav-item">

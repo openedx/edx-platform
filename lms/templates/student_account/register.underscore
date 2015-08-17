@@ -3,7 +3,15 @@
     <ul class="message-copy"></ul>
 </div>
 
-<form id="register" autocomplete="off">
+<form id="register" class="register-form" autocomplete="off" tabindex="-1">
+
+    <% if (context.errorMessage) { %>
+        <div class="status submission-error">
+            <h4 class="message-title"><%- gettext("An error occurred.") %></h4>
+            <ul class="message-copy"><%- context.errorMessage %></ul>
+        </div>
+    <% } %>
+
     <% if (context.currentProvider) { %>
         <div class="status" aria-hidden="false">
             <p class="message-copy">
@@ -11,7 +19,7 @@
                 <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
             </p>
         </div>
-    <% } else {  %>
+    <% } else if ( context.providers.length > 0 || context.hasSecondaryProviders ) {  %>
         <div class="login-providers">
             <div class="section-title lines">
                 <h2>
@@ -21,20 +29,32 @@
             <%
             _.each( context.providers, function( provider) {
                 if ( provider.registerUrl ) { %>
-                    <button type="button" class="button button-primary button-<%- provider.name %> login-provider register-<%- provider.name %>" data-provider-url="<%- provider.registerUrl %>">
+                    <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
                         <span class="icon fa <%- provider.iconClass %>" aria-hidden="true"></span>
-                        <%- provider.name %>
+                        <span aria-hidden="true"><%- provider.name %></span>
+                        <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
                     </button>
             <%  }
             }); %>
+
+            <% if ( context.hasSecondaryProviders ) { %>
+                <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
+                    <%- gettext("Use my institution/campus credentials") %>
+                </button>
+            <% } %>
+        </div>
+        <div class="section-title lines">
+            <h2>
+                <span class="text"><%- gettext("or create a new one here") %></span>
+            </h2>
+        </div>
+    <% } else { %>
+        <div class="section-title lines">
+            <h2>
+                <span class="text"><%- gettext("Create a new account") %></span>
+            </h2>
         </div>
     <% } %>
-
-    <div class="section-title lines">
-        <h2>
-            <span class="text"><%- gettext("or create a new one here") %></span>
-        </h2>
-    </div>
 
     <%= context.fields %>
 

@@ -49,6 +49,15 @@
         ],
         "port": 27017
     },
+    "TRACKING_BACKENDS": {
+        "mongo": {
+            "ENGINE": "track.backends.mongodb.MongoBackend",
+            "OPTIONS": {
+                "database": "test",
+                "collection": "events"
+            }
+        }
+    },
     "EVENT_TRACKING_BACKENDS": {
         "mongo": {
             "ENGINE": "eventtracking.backends.mongodb.MongoBackend",
@@ -108,16 +117,6 @@
         "username": "lms"
     },
     "SECRET_KEY": "",
-    "THIRD_PARTY_AUTH": {
-        "Google": {
-            "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
-            "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"
-        },
-        "Facebook": {
-            "SOCIAL_AUTH_FACEBOOK_KEY": "test",
-            "SOCIAL_AUTH_FACEBOOK_SECRET": "test"
-        }
-    },
     "DJFS": {
             "type": "s3fs",
             "bucket": "test",

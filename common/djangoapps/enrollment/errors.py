@@ -30,7 +30,11 @@ class CourseEnrollmentFullError(CourseEnrollmentError):
 
 
 class CourseEnrollmentExistsError(CourseEnrollmentError):
-    pass
+    enrollment = None
+
+    def __init__(self, message, enrollment):
+        super(CourseEnrollmentExistsError, self).__init__(message)
+        self.enrollment = enrollment
 
 
 class CourseModeNotFoundError(CourseEnrollmentError):

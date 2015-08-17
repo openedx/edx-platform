@@ -1,7 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 <%page args="section_data"/>
-<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add Coupon')}">
+<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add Coupon Code')}">
   <div class="inner-wrapper">
     <button class="close-modal">
       <i class="icon fa fa-remove"></i>
@@ -13,12 +15,12 @@
 
     <div id="coupon-content">
       <header>
-        <h2>${_("Add Coupon")}</h2>
+        <h2>${_("Add Coupon Code")}</h2>
       </header>
 
       <div class="instructions">
         <p>
-          ${_("Please enter Coupon detail below")}</p>
+          ${_("Enter information about the coupon code below.")}</p>
       </div>
 
       <form id="add_coupon_form">
@@ -28,12 +30,12 @@
 
           <ol class="list-input">
             <li class="field required text" id="add-coupon-modal-field-code">
-              <label for="coupon_code" class="required">${_("Code")}</label>
+              <label for="coupon_code" class="required">${_("Coupon Code")}</label>
               <input class="" id="coupon_code" type="text" name="code" maxlength="16" value="" placeholder="example: A123DS"
                     aria-required="true"/>
             </li>
             <li class="field required text" id="add-coupon-modal-field-discount">
-              <label for="coupon_discount" class="required text">${_("Percentage Discount")}</label>
+              <label for="coupon_discount" class="required text">${_("Discount Percentage")}</label>
               <input class="field required" id="coupon_discount" type="text" name="discount" value="" maxlength="3"
                      aria-required="true"/>
             </li>
@@ -60,7 +62,7 @@
         </fieldset>
 
         <div class="submit">
-          <input name="submit" type="button" id="add_coupon_button" value="${_('Add Coupon')}"/>
+          <input name="submit" type="button" id="add_coupon_button" value="${_('Add Coupon Code')}"/>
         </div>
       </form>
     </div>

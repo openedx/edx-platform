@@ -10,15 +10,15 @@ import unicodecsv
 from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
-from django.test.utils import override_settings
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.tests.tests import LoginEnrollmentTestCase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -50,6 +50,8 @@ class InstructorTaskTestCase(TestCase):
     Tests API and view methods that involve the reporting of status for background tasks.
     """
     def setUp(self):
+        super(InstructorTaskTestCase, self).setUp()
+
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
         self.problem_url = InstructorTaskTestCase.problem_location("test_urlname")
@@ -98,7 +100,6 @@ class InstructorTaskTestCase(TestCase):
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -126,7 +127,12 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         if course_factory_kwargs is not None:
             course_args.update(course_factory_kwargs)
         self.course = CourseFactory.create(**course_args)
+        self.add_course_content()
 
+    def add_course_content(self):
+        """
+        Add a chapter and a sequential to the current course.
+        """
         # Add a chapter to the course
         chapter = ItemFactory.create(parent_location=self.course.location,
                                      display_name=TEST_SECTION_NAME)
@@ -140,29 +146,30 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     @staticmethod
     def get_user_email(username):
         """Generate email address based on username"""
-        return '{0}@test.com'.format(username)
+        return u'{0}@test.com'.format(username)
 
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
-            self.login(InstructorTaskCourseTestCase.get_user_email(username), "test")
+            user_email = User.objects.get(username=username).email
+            self.login(user_email, "test")
             self.current_user = username
 
-    def _create_user(self, username, email=None, is_staff=False):
+    def _create_user(self, username, email=None, is_staff=False, mode='honor'):
         """Creates a user and enrolls them in the test course."""
         if email is None:
             email = InstructorTaskCourseTestCase.get_user_email(username)
         thisuser = UserFactory.create(username=username, email=email, is_staff=is_staff)
-        CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id, mode=mode)
         return thisuser
 
     def create_instructor(self, username, email=None):
         """Creates an instructor for the test course."""
         return self._create_user(username, email, is_staff=True)
 
-    def create_student(self, username, email=None):
+    def create_student(self, username, email=None, mode='honor'):
         """Creates a student for the test course."""
-        return self._create_user(username, email, is_staff=False)
+        return self._create_user(username, email, is_staff=False, mode=mode)
 
     @staticmethod
     def get_task_status(task_id):
@@ -183,23 +190,24 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         return request
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     """
     Base test class for InstructorTask-related tests that require
     the setup of a course and problem in order to access StudentModule state.
     """
     @staticmethod
-    def problem_location(problem_url_name):
+    def problem_location(problem_url_name, course_key=None):
         """
         Create an internal location for a test problem.
         """
         if "i4x:" in problem_url_name:
             return Location.from_deprecated_string(problem_url_name)
+        elif course_key:
+            return course_key.make_usage_key('problem', problem_url_name)
         else:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
 
-    def define_option_problem(self, problem_url_name, parent=None):
+    def define_option_problem(self, problem_url_name, parent=None, **kwargs):
         """Create the problem definition so the answer is Option 1"""
         if parent is None:
             parent = self.problem_section
@@ -212,8 +220,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         ItemFactory.create(parent_location=parent.location,
                            parent=parent,
                            category="problem",
-                           display_name=str(problem_url_name),
-                           data=problem_xml)
+                           display_name=problem_url_name,
+                           data=problem_xml,
+                           **kwargs)
 
     def redefine_option_problem(self, problem_url_name):
         """Change the problem definition so the answer is Option 2"""
@@ -238,6 +247,44 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                                          module_state_key=descriptor.location,
                                          )
 
+    def submit_student_answer(self, username, problem_url_name, responses):
+        """
+        Use ajax interface to submit a student answer.
+
+        Assumes the input list of responses has two values.
+        """
+        def get_input_id(response_id):
+            """Creates input id using information about the test course and the current problem."""
+            # Note that this is a capa-specific convention.  The form is a version of the problem's
+            # URL, modified so that it can be easily stored in html, prepended with "input-" and
+            # appended with a sequence identifier for the particular response the input goes to.
+            course_key = self.course.id
+            return u'input_i4x-{0}-{1}-problem-{2}_{3}'.format(
+                course_key.org.replace(u'.', u'_'),
+                course_key.course.replace(u'.', u'_'),
+                problem_url_name,
+                response_id
+            )
+
+        # make sure that the requested user is logged in, so that the ajax call works
+        # on the right problem:
+        self.login_username(username)
+        # make ajax call:
+        modx_url = reverse('xblock_handler', kwargs={
+            'course_id': self.course.id.to_deprecated_string(),
+            'usage_id': quote_slashes(
+                InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id).to_deprecated_string()
+            ),
+            'handler': 'xmodule_handler',
+            'suffix': 'problem_check',
+        })
+
+        # assign correct identifier to each response.
+        resp = self.client.post(modx_url, {
+            get_input_id(u'{}_1').format(index): response for index, response in enumerate(responses, 2)
+        })
+        return resp
+
 
 class TestReportMixin(object):
     """
@@ -248,7 +295,7 @@ class TestReportMixin(object):
         if os.path.exists(reports_download_path):
             shutil.rmtree(reports_download_path)
 
-    def verify_rows_in_csv(self, expected_rows, verify_order=True):
+    def verify_rows_in_csv(self, expected_rows, file_index=0, verify_order=True, ignore_other_columns=False):
         """
         Verify that the last ReportStore CSV contains the expected content.
 
@@ -257,16 +304,27 @@ class TestReportMixin(object):
                 where each dict represents a row of data in the last
                 ReportStore CSV.  Each dict maps keys from the CSV
                 header to values in that row's corresponding cell.
+            file_index (int): Describes which report store file to
+                open.  Files are ordered by last modified date, and 0
+                corresponds to the most recently modified file.
             verify_order (boolean): When True, we verify that both the
                 content and order of `expected_rows` matches the
                 actual csv rows.  When False (default), we only verify
                 that the content matches.
+            ignore_other_columns (boolean): When True, we verify that `expected_rows`
+                contain data which is the subset of actual csv rows.
         """
-        report_store = ReportStore.from_config()
-        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
         with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+
+            if ignore_other_columns:
+                csv_rows = [
+                    {key: row.get(key) for key in expected_rows[index].keys()} for index, row in enumerate(csv_rows)
+                ]
+
             if verify_order:
                 self.assertEqual(csv_rows, expected_rows)
             else:

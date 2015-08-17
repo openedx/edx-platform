@@ -1,0 +1,95 @@
+// ------------------------------
+// edX Pattern Library: Functions
+
+// About: Sass partial for defining Sass helper functions.
+
+// #FUNCTIONS
+
+
+// ----------------------------
+// FUNCTIONS
+// ----------------------------
+// get colors from defined palettes map values
+@function palette($palette, $tone: 'base') {
+    @return map-get(map-get($palettes, $palette), $tone);
+}
+
+// get font sizes from defined map values
+@function font-size($key) {
+  @if map-has-key($font-sizes, $key) {
+    @return rem(map-get($font-sizes, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $font-sizes.";
+  @return null;
+}
+
+// get line-heights from defined map values
+@function line-height($key) {
+  @if map-has-key($line-heights, $key) {
+    @return map-get($line-heights, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $line-heights.";
+  @return null;
+}
+
+// get font sizes from defined map values
+@function font-weight($key) {
+  @if map-has-key($font-weights, $key) {
+    @return map-get($font-weights, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $font-weights.";
+  @return null;
+}
+
+// get letter spacing from defined map values
+@function letter-spacing($key) {
+  @if map-has-key($letter-spacing, $key) {
+    @return map-get($letter-spacing, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $letter-spacing.";
+  @return null;
+}
+
+// get z-indexes from defined map values
+@function z-index($key) {
+  @if map-has-key($z-depths, $key) {
+    @return map-get($z-depths, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $z-depths.";
+  @return null;
+}
+
+// get timing from defined map values
+@function timing($key) {
+  @if map-has-key($timing, $key) {
+    @return map-get($timing, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $z-depths.";
+  @return null;
+}
+
+// get vertical spacings from defined map values
+@function spacing-vertical($key) {
+  @if map-has-key($spacing-vertical, $key) {
+    @return rem(map-get($spacing-vertical, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $spacing-vertical.";
+  @return null;
+}
+
+// get horizontal spacings from defined map values
+@function spacing-horizontal($key) {
+  @if map-has-key($spacing-horizontal, $key) {
+    @return rem(map-get($spacing-horizontal, $key));
+  }
+
+  @warn "Unknown `#{$key}` in $spacing-horizontal.";
+  @return null;
+}

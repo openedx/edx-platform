@@ -14,33 +14,22 @@ class TrackSelectionPage(PageObject):
 
     This page can be accessed at `/course_modes/choose/{course_id}/`.
     """
-    def __init__(self, browser, course_id, separate_verified=False):
+    def __init__(self, browser, course_id):
         """Initialize the page.
 
         Arguments:
             browser (Browser): The browser instance.
             course_id (unicode): The course in which the user is enrolling.
-
-        Keyword Arguments:
-            separate_verified (Boolean): Whether to use the split payment and
-                verification flow when enrolling as verified.
         """
         super(TrackSelectionPage, self).__init__(browser)
         self._course_id = course_id
-        self._separate_verified = separate_verified
-
-        if self._separate_verified:
-            self._querystring = "?separate-verified=1"
-        else:
-            self._querystring = "?disable-separate-verified=1"
 
     @property
     def url(self):
         """Return the URL corresponding to the track selection page."""
-        url = "{base}/course_modes/choose/{course_id}{querystring}".format(
+        url = "{base}/course_modes/choose/{course_id}/".format(
             base=BASE_URL,
-            course_id=self._course_id,
-            querystring=self._querystring
+            course_id=self._course_id
         )
 
         return url
@@ -61,7 +50,7 @@ class TrackSelectionPage(PageObject):
         if mode == "honor":
             self.q(css="input[name='honor_mode']").click()
 
-            return DashboardPage(self.browser, separate_verified=self._separate_verified).wait_for_page()
+            return DashboardPage(self.browser).wait_for_page()
         elif mode == "verified":
             # Check the first contribution option, then click the enroll button
             self.q(css=".contribution-option > input").first.click()

@@ -1,11 +1,19 @@
-<%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from student.roles import CourseInstructorRole %>
 <%inherit file="base.html" />
-<%def name="online_help_token()"><% return "team" %></%def>
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+<%def name="online_help_token()"><% return "team_course" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+<script type="text/template" id="team-member-tpl">
+    <%static:include path="js/team-member.underscore" />
+</script>
+</%block>
 
 <%block name="content">
 
@@ -16,7 +24,7 @@
       <span class="sr">&gt; </span>${_("Course Team")}
     </h1>
 
-    <nav class="nav-actions">
+    <nav class="nav-actions" aria-label="${_('Page Actions')}">
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         %if allow_actions:
@@ -44,7 +52,7 @@
                 <ol class="list-input">
                   <li class="field text required create-user-email">
                     <label for="user-email-input">${_("User's Email Address")}</label>
-                    <input id="user-email-input" name="user-email" type="text" placeholder="${_('example: username@domain.com')}" value="">
+                    <input id="user-email-input" class="user-email-input" name="user-email" type="text" placeholder="${_('example: username@domain.com')}" value="">
                     <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
                   </li>
                 </ol>
@@ -59,73 +67,13 @@
       </div>
       %endif
 
-      <ol class="user-list">
-        % for user in staff:
-          <% course_team_url = reverse(
-             'contentstore.views.course_team_handler',
-             kwargs={'course_key_string': unicode(context_course.id), 'email': user.email}
-          )
-          %>
-
-        <li class="user-item" data-email="${user.email}" data-url="${course_team_url}">
-
-        <% is_instuctor = CourseInstructorRole(context_course.id).has_user(user) %>
-          % if is_instuctor:
-          <span class="wrapper-ui-badge">
-            <span class="flag flag-role flag-role-admin is-hanging">
-              <span class="label sr">${_("Current Role:")}</span>
-              <span class="value">
-                ${_("Admin")}
-                % if request.user.id == user.id:
-                    <span class="msg-you">${_("You!")}</span>
-                % endif
-              </span>
-            </span>
-          </span>
-          % else:
-          <span class="wrapper-ui-badge">
-            <span class="flag flag-role flag-role-staff is-hanging">
-              <span class="label sr">${_("Current Role:")}</span>
-              <span class="value">
-                ${_("Staff")}
-                % if request.user.id == user.id:
-                    <span class="msg-you">${_("You!")}</span>
-                % endif
-              </span>
-            </span>
-          </span>
-          % endif
-
-          <div class="item-metadata">
-            <h3 class="user-name">
-              <span class="user-username">${user.username}</span>
-              <span class="user-email">
-                <a class="action action-email" href="mailto:${user.email}" title="${_("send an email message to {email}").format(email=user.email)}">${user.email}</a>
-              </span>
-            </h3>
-          </div>
-
-          % if allow_actions:
-          <ul  class="item-actions user-actions">
-            <li class="action action-role">
-              % if is_instuctor and len(instructors) == 1:
-                <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove your admin rights")}</span>
-              % else:
-                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
-              % endif
-            </li>
-            <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}" aria-disabled="${'true' if request.user.id == user.id else 'false'}">
-                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon fa fa-trash-o"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
-            </li>
-          </ul>
-          % endif
-
-        </li>
-        % endfor
+      <ol class="user-list" id="user-list">
+        <div class="ui-loading">
+          <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+        </div>
       </ol>
 
-      <% user_is_instuctor = CourseInstructorRole(context_course.id).has_user(request.user) %>
-      % if user_is_instuctor and len(staff) == 1:
+      % if allow_actions and len(users) == 1:
       <div class="notice notice-incontext notice-create has-actions">
         <div class="msg">
           <h3 class="title">${_('Add Team Members to This Course')}</h3>
@@ -150,7 +98,7 @@
         <p>${_("Admins are course team members who can add and remove other course team members.")}</p>
       </div>
 
-      % if user_is_instuctor and len(instructors) == 1:
+      % if show_transfer_ownership_hint:
       <div class="bit">
         <h3 class="title-3">${_("Transferring Ownership")}</h3>
         <p>${_("Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
@@ -162,7 +110,13 @@
 </%block>
 
 <%block name="requirejs">
-  require(["js/factories/manage_users"], function(ManageUsersFactory) {
-      ManageUsersFactory(${json.dumps([user.email for user in staff])}, "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}");
+  require(["js/factories/manage_users"], function(ManageCourseUsersFactory) {
+      ManageCourseUsersFactory(
+        "${context_course.display_name | h}",
+        ${json.dumps(users)},
+        "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}",
+        ${ request.user.id },
+        ${str(allow_actions).lower()}
+      );
   });
 </%block>

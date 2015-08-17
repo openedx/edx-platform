@@ -14,25 +14,30 @@ from importlib import import_module
 from lxml import etree
 from path import path
 from contextlib import contextmanager
+from lazy import lazy
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XMLParsingSystem, policy_key, OpaqueKeyReader, AsideKeyGenerator
+from xmodule.x_module import (
+    XMLParsingSystem, policy_key,
+    OpaqueKeyReader, AsideKeyGenerator, DEPRECATION_VSCOMPAT_EVENT
+)
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
+from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore
+from xblock.fields import ScopeIds
 
+import dogstats_wrapper as dog_stats_api
 
 from .exceptions import ItemNotFoundError
-from .inheritance import compute_inherited_metadata, inheriting_field_data
+from .inheritance import compute_inherited_metadata, inheriting_field_data, InheritanceKeyValueStore
 
-from xblock.fields import ScopeIds
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -46,15 +51,21 @@ log = logging.getLogger(__name__)
 # TODO (cpennington): Remove this once all fall 2012 courses have been imported
 # into the cms from xml
 def clean_out_mako_templating(xml_string):
+    orig_xml = xml_string
     xml_string = xml_string.replace('%include', 'include')
     xml_string = re.sub(r"(?m)^\s*%.*$", '', xml_string)
+    if orig_xml != xml_string:
+        dog_stats_api.increment(
+            DEPRECATION_VSCOMPAT_EVENT,
+            tags=["location:xml_clean_out_mako_templating"]
+        )
     return xml_string
 
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
                  error_tracker,
-                 load_error_modules=True, **kwargs):
+                 load_error_modules=True, target_course_id=None, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -114,6 +125,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def fallback_name(orig_name=None):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
+                    dog_stats_api.increment(
+                        DEPRECATION_VSCOMPAT_EVENT,
+                        tags=(
+                            "location:import_system_fallback_name",
+                            u"name:{}".format(orig_name),
+                        )
+                    )
+
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
                         orig_name = orig_name[len(tag) + 1:-12]
@@ -231,13 +250,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...
-        def load_item(usage_key):
+        def load_item(usage_key, for_parent=None):
             """Return the XBlock for the specified location"""
-            return xmlstore.get_item(usage_key)
+            return xmlstore.get_item(usage_key, for_parent=for_parent)
 
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
-        id_manager = CourseLocationManager(course_id)
+        id_manager = CourseImportLocationManager(course_id, target_course_id)
 
         super(ImportSystem, self).__init__(
             load_item=load_item,
@@ -288,13 +307,35 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
         return usage_id
 
 
+class CourseImportLocationManager(CourseLocationManager):
+    """
+    IdGenerator for Location-based definition ids and usage ids
+    based within a course, for use during course import.
+
+    In addition to the functionality provided by CourseLocationManager,
+    this class also contains the target_course_id for the course import
+    process.
+
+    Note: This is a temporary solution to workaround the fact that
+    the from_xml method is passed the source course_id instead of the
+    target course_id in the import process. For a more ideal solution,
+    see https://openedx.atlassian.net/browse/MA-417 as a pending TODO.
+    """
+    def __init__(self, course_id, target_course_id):
+        super(CourseImportLocationManager, self).__init__(course_id=course_id)
+        self.target_course_id = target_course_id
+
+
 class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
     """
+    parent_xml = COURSE_ROOT
+
     def __init__(
-            self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, **kwargs
+            self, data_dir, default_class=None, source_dirs=None, course_ids=None,
+            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None,
+            signal_handler=None, target_course_id=None, **kwargs   # pylint: disable=unused-argument
     ):
         """
         Initialize an XMLModuleStore from data_dir
@@ -305,7 +346,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             default_class (str): dot-separated string defining the default descriptor
                 class to use if none is specified in entry_points
 
-            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load.
+            source_dirs or course_ids (list of str): If specified, the list of source_dirs or course_ids to load.
                 Otherwise, load all courses. Note, providing both
         """
         super(XMLModuleStore, self).__init__(**kwargs)
@@ -339,16 +380,17 @@ class XMLModuleStore(ModuleStoreReadBase):
         # that have a course.xml. We sort the dirs in alpha order so we always
         # read things in the same order (OS differences in load order have
         # bitten us in the past.)
-        if course_dirs is None:
-            course_dirs = sorted([d for d in os.listdir(self.data_dir) if
-                                  os.path.exists(self.data_dir / d / "course.xml")])
-        for course_dir in course_dirs:
-            self.try_load_course(course_dir, course_ids)
 
-    def try_load_course(self, course_dir, course_ids=None):
+        if source_dirs is None:
+            source_dirs = sorted([d for d in os.listdir(self.data_dir) if
+                                  os.path.exists(self.data_dir / d / self.parent_xml)])
+        for course_dir in source_dirs:
+            self.try_load_course(course_dir, course_ids, target_course_id)
+
+    def try_load_course(self, course_dir, course_ids=None, target_course_id=None):
         '''
         Load a course, keeping track of errors as we go along. If course_ids is not None,
-        then reject the course unless it's id is in course_ids.
+        then reject the course unless its id is in course_ids.
         '''
         # Special-case code here, since we don't have a location for the
         # course before it loads.
@@ -357,9 +399,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         errorlog = make_error_tracker()
         course_descriptor = None
         try:
-            course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker)
+            course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
-            msg = "ERROR: Failed to load course '{0}': {1}".format(
+            msg = "ERROR: Failed to load courselike '{0}': {1}".format(
                 course_dir.encode("utf-8"), unicode(exc)
             )
             log.exception(msg)
@@ -373,16 +415,24 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.errored_courses[course_dir] = errorlog
         else:
             self.courses[course_dir] = course_descriptor
-            self._course_errors[course_descriptor.id] = errorlog
             course_descriptor.parent = None
+            course_id = self.id_from_descriptor(course_descriptor)
+            self._course_errors[course_id] = errorlog
 
     def __unicode__(self):
         '''
         String representation - for debugging
         '''
-        return '<XMLModuleStore data_dir=%r, %d courses, %d modules>' % (
-            self.data_dir, len(self.courses), len(self.modules)
+        return '<%s data_dir=%r, %d courselikes, %d modules>' % (
+            self.__class__.__name__, self.data_dir, len(self.courses), len(self.modules)
         )
+
+    @staticmethod
+    def id_from_descriptor(descriptor):
+        """
+        Grab the course ID from the descriptor
+        """
+        return descriptor.id
 
     def load_policy(self, policy_path, tracker):
         """
@@ -397,21 +447,20 @@ class XMLModuleStore(ModuleStoreReadBase):
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
-            msg = "ERROR: loading course policy from {0}".format(policy_path)
+            msg = "ERROR: loading courselike policy from {0}".format(policy_path)
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
 
-    def load_course(self, course_dir, course_ids, tracker):
+    def load_course(self, course_dir, course_ids, tracker, target_course_id=None):
         """
         Load a course into this module store
         course_path: Course directory name
 
         returns a CourseDescriptor for the course
         """
-        log.debug('========> Starting course import from {0}'.format(course_dir))
-
-        with open(self.data_dir / course_dir / "course.xml") as course_file:
+        log.debug('========> Starting courselike import from %s', course_dir)
+        with open(self.data_dir / course_dir / self.parent_xml) as course_file:
 
             # VS[compat]
             # TODO (cpennington): Remove this once all fall 2012 courses have
@@ -423,26 +472,32 @@ class XMLModuleStore(ModuleStoreReadBase):
             org = course_data.get('org')
 
             if org is None:
-                msg = ("No 'org' attribute set for course in {dir}. "
+                msg = ("No 'org' attribute set for courselike in {dir}. "
                        "Using default 'edx'".format(dir=course_dir))
                 log.warning(msg)
                 tracker(msg)
                 org = 'edx'
 
-            course = course_data.get('course')
+            # Parent XML should be something like 'library.xml' or 'course.xml'
+            courselike_label = self.parent_xml.split('.')[0]
+
+            course = course_data.get(courselike_label)
 
             if course is None:
-                msg = ("No 'course' attribute set for course in {dir}."
-                       " Using default '{default}'".format(dir=course_dir,
-                                                           default=course_dir
-                                                           )
-                       )
+                msg = (
+                    "No '{courselike_label}' attribute set for course in {dir}."
+                    " Using default '{default}'".format(
+                        courselike_label=courselike_label,
+                        dir=course_dir,
+                        default=course_dir
+                    )
+                )
                 log.warning(msg)
                 tracker(msg)
                 course = course_dir
 
             url_name = course_data.get('url_name', course_data.get('slug'))
-            policy_dir = None
+
             if url_name:
                 policy_dir = self.data_dir / course_dir / 'policies' / url_name
                 policy_path = policy_dir / 'policy.json'
@@ -451,20 +506,40 @@ class XMLModuleStore(ModuleStoreReadBase):
 
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
+
+                    dog_stats_api.increment(
+                        DEPRECATION_VSCOMPAT_EVENT,
+                        tags=(
+                            "location:xml_load_course_policy_dir",
+                            u"course:{}".format(course),
+                        )
+                    )
+
                     old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
                     policy = self.load_policy(old_policy_path, tracker)
             else:
                 policy = {}
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
+
+                    dog_stats_api.increment(
+                        DEPRECATION_VSCOMPAT_EVENT,
+                        tags=(
+                            "location:xml_load_course_course_data_name",
+                            u"course:{}".format(course_data.get('course')),
+                            u"org:{}".format(course_data.get('org')),
+                            u"name:{}".format(course_data.get('name')),
+                        )
+                    )
+
                     url_name = Location.clean(course_data.get('name'))
                     tracker("'name' is deprecated for module xml.  Please use "
                             "display_name and url_name.")
                 else:
-                    raise ValueError("Can't load a course without a 'url_name' "
-                                     "(or 'name') set.  Set url_name.")
+                    url_name = None
 
-            course_id = SlashSeparatedCourseKey(org, course, url_name)
+            course_id = self.get_id(org, course, url_name)
+
             if course_ids is not None and course_id not in course_ids:
                 return None
 
@@ -496,34 +571,67 @@ class XMLModuleStore(ModuleStoreReadBase):
                 select=self.xblock_select,
                 field_data=self.field_data,
                 services=services,
+                target_course_id=target_course_id,
             )
-
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
-
             # If we fail to load the course, then skip the rest of the loading steps
             if isinstance(course_descriptor, ErrorDescriptor):
                 return course_descriptor
 
-            # NOTE: The descriptors end up loading somewhat bottom up, which
-            # breaks metadata inheritance via get_children().  Instead
-            # (actually, in addition to, for now), we do a final inheritance pass
-            # after we have the course descriptor.
-            compute_inherited_metadata(course_descriptor)
+            self.content_importers(system, course_descriptor, course_dir, url_name)
 
-            # now import all pieces of course_info which is expected to be stored
-            # in <content_dir>/info or <content_dir>/info/<url_name>
-            self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
-
-            # now import all static tabs which are expected to be stored in
-            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
-            self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
-
-            self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
-
-            self.load_extra_content(system, course_descriptor, 'about', self.data_dir / course_dir / 'about', course_dir, url_name)
-
-            log.debug('========> Done with course import from {0}'.format(course_dir))
+            log.debug('========> Done with courselike import from %s', course_dir)
             return course_descriptor
+
+    def content_importers(self, system, course_descriptor, course_dir, url_name):
+        """
+        Load all extra non-course content, and calculate metadata inheritance.
+        """
+        # NOTE: The descriptors end up loading somewhat bottom up, which
+        # breaks metadata inheritance via get_children().  Instead
+        # (actually, in addition to, for now), we do a final inheritance pass
+        # after we have the course descriptor.
+        compute_inherited_metadata(course_descriptor)
+
+        # now import all pieces of course_info which is expected to be stored
+        # in <content_dir>/info or <content_dir>/info/<url_name>
+        self.load_extra_content(
+            system, course_descriptor, 'course_info',
+            self.data_dir / course_dir / 'info',
+            course_dir, url_name
+        )
+
+        # now import all static tabs which are expected to be stored in
+        # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
+        self.load_extra_content(
+            system, course_descriptor, 'static_tab',
+            self.data_dir / course_dir / 'tabs',
+            course_dir, url_name
+        )
+
+        self.load_extra_content(
+            system, course_descriptor, 'custom_tag_template',
+            self.data_dir / course_dir / 'custom_tags',
+            course_dir, url_name
+        )
+
+        self.load_extra_content(
+            system, course_descriptor, 'about',
+            self.data_dir / course_dir / 'about',
+            course_dir, url_name
+        )
+
+    @staticmethod
+    def get_id(org, course, url_name):
+        """
+        Validate and return an ID for a course if given org, course, and url_name.
+        """
+        if not url_name:
+            raise ValueError("Can't load a course without a 'url_name' "
+                             "(or 'name') set.  Set url_name.")
+        # Have to use SlashSeparatedCourseKey here because it makes sure the same format is
+        # always used, preventing duplicate keys.
+        return SlashSeparatedCourseKey(org, course, url_name)
 
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
@@ -611,6 +719,14 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
                         if category == "static_tab":
+                            dog_stats_api.increment(
+                                DEPRECATION_VSCOMPAT_EVENT,
+                                tags=(
+                                    "location:xml_load_extra_content_static_tab",
+                                    u"course_dir:{}".format(course_dir),
+                                )
+                            )
+
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
                                 module.display_name = tab.name
@@ -698,14 +814,14 @@ class XMLModuleStore(ModuleStoreReadBase):
 
     def make_course_key(self, org, course, run):
         """
-        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        Return a valid :class:`~opaque_keys.edx.locator.CourseLocator` for this modulestore
         that matches the supplied `org`, `course`, and `run`.
 
         This key may represent a course that doesn't exist in this modulestore.
         """
         return CourseLocator(org, course, run, deprecated=True)
 
-    def get_courses(self, depth=0, **kwargs):
+    def get_courses(self, **kwargs):
         """
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.
@@ -793,3 +909,66 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.warning("get_all_asset_metadata request of XML modulestore - not implemented.")
         return []
+
+
+class LibraryXMLModuleStore(XMLModuleStore):
+    """
+    A modulestore for importing Libraries from XML.
+    """
+    parent_xml = LIBRARY_ROOT
+
+    @staticmethod
+    def get_id(org, library, url_name):
+        """
+        Create a LibraryLocator given an org and library. url_name is ignored, but left in
+        for compatibility with the parent signature.
+        """
+        return LibraryLocator(org=org, library=library)
+
+    @staticmethod
+    def patch_descriptor_kvs(library_descriptor):
+        """
+        Metadata inheritance can be done purely through XBlocks, but in the import phase
+        a root block with an InheritanceKeyValueStore is assumed to be at the top of the hierarchy.
+        This should change in the future, but as XBlocks don't have this KVS, we have to patch it
+        here manually.
+        """
+        init_dict = {key: getattr(library_descriptor, key) for key in library_descriptor.fields.keys()}
+        # if set, invalidate '_unwrapped_field_data' so it will be reset
+        # the next time it will be called
+        lazy.invalidate(library_descriptor, '_unwrapped_field_data')
+        # pylint: disable=protected-access
+        library_descriptor._field_data = inheriting_field_data(InheritanceKeyValueStore(init_dict))
+
+    def content_importers(self, system, course_descriptor, course_dir, url_name):
+        """
+        Handle Metadata inheritance for Libraries.
+        """
+        self.patch_descriptor_kvs(course_descriptor)
+        compute_inherited_metadata(course_descriptor)
+
+    def get_library(self, library_id, depth=0, **kwargs):  # pylint: disable=unused-argument
+        """
+        Get a library from this modulestore or return None if it does not exist.
+        """
+        assert isinstance(library_id, LibraryLocator)
+        for library in self.get_courses(**kwargs):
+            if library.location.library_key == library_id:
+                return library
+        return None
+
+    @staticmethod
+    def id_from_descriptor(descriptor):
+        """
+        Get the Library Key from the Library descriptor.
+        """
+        return descriptor.location.library_key
+
+    def get_orphans(self, course_key, **kwargs):
+        """
+        Get all of the xblocks in the given course which have no parents and are not of types which are
+        usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
+        use children to point to their dependents.
+        """
+        # here just to quell the abstractmethod. someone could write the impl if needed
+        raise NotImplementedError

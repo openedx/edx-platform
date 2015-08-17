@@ -1,10 +1,16 @@
+# -*- coding: utf-8 -*-
 """
 Module contains utils specific for video_module but not for transcripts.
 """
 import json
+from collections import OrderedDict
 import logging
 import urllib
 import requests
+from urllib import urlencode
+from urlparse import parse_qs, urlsplit, urlunsplit
+
+from django.conf import settings
 
 from requests.exceptions import RequestException
 
@@ -33,6 +39,8 @@ def create_youtube_string(module):
     ])
 
 
+# def get_video_from_cdn(cdn_base_url, original_video_url, cdn_branding_logo_url):
+# Not sure if this third variable is necessary...
 def get_video_from_cdn(cdn_base_url, original_video_url):
     """
     Get video URL from CDN.
@@ -46,7 +54,7 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
                     "http://cm12.c110.play.bokecc.com/flvs/ca/QxcVl/u39EQbA0Ra-20.mp4",
                     "http://bm1.42.play.bokecc.com/flvs/ca/QxcVl/u39EQbA0Ra-20.mp4"
                 ],
-            "s3_url": "http://s3.amazonaws.com/BESTech/CS169/download/CS169_v13_w5l2s3.mp4"
+            "s3_url": "http://s3.amazonaws.com/BESTech/CS169/download/CS169_v13_w5l2s3.mp4",
         }
     where `s3_url` is requested original video url and `sources` is the list of
     alternative links.
@@ -68,3 +76,40 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
         return cdn_content['sources'][0]
     else:
         return None
+
+
+def get_poster(video):
+    """
+    Generate poster metadata.
+
+    youtube_streams is string that contains '1.00:youtube_id'
+
+    Poster metadata is dict of youtube url for image thumbnail and edx logo
+    """
+    if not video.bumper.get("enabled"):
+        return
+
+    poster = OrderedDict({"url": "", "type": ""})
+
+    if video.youtube_streams:
+        youtube_id = video.youtube_streams.split('1.00:')[1].split(',')[0]
+        poster["url"] = settings.YOUTUBE['IMAGE_API'].format(youtube_id=youtube_id)
+        poster["type"] = "youtube"
+    else:
+        poster["url"] = "https://www.edx.org/sites/default/files/theme/edx-logo-header.png"
+        poster["type"] = "html5"
+
+    return poster
+
+
+def set_query_parameter(url, param_name, param_value):
+    """
+    Given a URL, set or replace a query parameter and return the
+    modified URL.
+    """
+    scheme, netloc, path, query_string, fragment = urlsplit(url)
+    query_params = parse_qs(query_string)
+    query_params[param_name] = [param_value]
+    new_query_string = urlencode(query_params, doseq=True)
+
+    return urlunsplit((scheme, netloc, path, new_query_string, fragment))

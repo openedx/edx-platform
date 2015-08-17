@@ -12,15 +12,17 @@ define(
 'video/06_video_progress_slider.js',
 [],
 function () {
+    var template = [
+        '<div class="slider" title="', gettext('Video position'), '"></div>'
+    ].join('');
+
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
         var dfd = $.Deferred();
 
         state.videoProgressSlider = {};
-
         _makeFunctionsPublic(state);
         _renderElements(state);
-        // No callbacks to DOM events (click, mousemove, etc.).
 
         dfd.resolve();
         return dfd.promise();
@@ -36,6 +38,7 @@ function () {
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var methodsDict = {
+            destroy: destroy,
             buildSlider: buildSlider,
             getRangeParams: getRangeParams,
             onSlide: onSlide,
@@ -49,6 +52,12 @@ function () {
         state.bindTo(methodsDict, state.videoProgressSlider, state);
     }
 
+    function destroy() {
+        this.videoProgressSlider.el.removeAttr('tabindex').slider('destroy');
+        this.el.off('destroy', this.videoProgressSlider.destroy);
+        delete this.videoProgressSlider;
+    }
+
     // function _renderElements(state)
     //
     //     Create any necessary DOM elements, attach them, and set their
@@ -56,8 +65,9 @@ function () {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _renderElements(state) {
-        state.videoProgressSlider.el = state.videoControl.sliderEl;
+        state.videoProgressSlider.el = $(template);
 
+        state.el.find('.video-controls').prepend(state.videoProgressSlider.el);
         state.videoProgressSlider.buildSlider();
         _buildHandle(state);
     }
@@ -81,6 +91,8 @@ function () {
             'aria-valuemin': '0',
             'aria-valuenow': state.videoPlayer.currentTime
         });
+
+        state.el.on('destroy', state.videoProgressSlider.destroy);
     }
 
     // ***************************************************************
@@ -94,6 +106,8 @@ function () {
         this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
                 range: 'min',
+                min: this.config.startTime,
+                max: this.config.endTime,
                 slide: this.videoProgressSlider.onSlide,
                 stop: this.videoProgressSlider.onStop
             });
@@ -107,7 +121,7 @@ function () {
     // whole slider). Remember that endTime === null means the end-time
     // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end, duration, rangeParams;
+        var start, end, duration, rangeParams;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
@@ -147,25 +161,6 @@ function () {
         // with actual starting and ending point of the video.
 
         rangeParams = getRangeParams(start, end, duration);
-
-        if (!this.videoProgressSlider.sliderRange) {
-            this.videoProgressSlider.sliderRange = $('<div />', {
-                    'class': 'ui-slider-range ' +
-                             'ui-widget-header ' +
-                             'ui-corner-all ' +
-                             'slider-range'
-                })
-                .css({
-                    left: rangeParams.left,
-                    width: rangeParams.width
-                });
-
-            this.videoProgressSlider.sliderProgress
-                .after(this.videoProgressSlider.sliderRange);
-        } else {
-            this.videoProgressSlider.sliderRange
-                .css(rangeParams);
-        }
     }
 
     function getRangeParams(startTime, endTime, duration) {
@@ -181,7 +176,11 @@ function () {
 
     function onSlide(event, ui) {
         var time = ui.value,
-            duration = this.videoPlayer.duration();
+            endTime = this.videoPlayer.duration();
+
+        if (this.config.endTime) {
+            endTime = Math.min(this.config.endTime, endTime);
+        }
 
         this.videoProgressSlider.frozen = true;
 
@@ -193,7 +192,7 @@ function () {
             'videoControl.updateVcrVidTime',
             {
                 time: time,
-                duration: duration
+                duration: endTime
             }
         );
 
@@ -235,21 +234,28 @@ function () {
     }
 
     function updatePlayTime(params) {
-        var time = Math.floor(params.time),
-            duration = Math.floor(params.duration);
+        var time = Math.floor(params.time);
+        // params.duration could accidentally be construed as a floating
+        // point double. Since we're displaying this number, round down
+        // to nearest second
+        var endTime = Math.floor(params.duration);
+
+        if (this.config.endTime !== null) {
+            endTime = Math.min(this.config.endTime, endTime);
+        }
 
         if (
             this.videoProgressSlider.slider &&
             !this.videoProgressSlider.frozen
         ) {
             this.videoProgressSlider.slider
-                .slider('option', 'max', duration)
+                .slider('option', 'max', endTime)
                 .slider('option', 'value', time);
         }
 
         // Update aria values.
         this.videoProgressSlider.handle.attr({
-            'aria-valuemax': duration,
+            'aria-valuemax': endTime,
             'aria-valuenow': time
         });
     }

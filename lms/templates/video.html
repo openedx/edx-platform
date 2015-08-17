@@ -7,43 +7,9 @@
 <div
     id="video_${id}"
     class="video closed"
-
-    data-streams="${youtube_streams}"
-
-    ${'data-sub="{}"'.format(sub) if sub else ''}
-    ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
-
-    data-sources='${sources}'
-    data-save-state-url="${ajax_url}"
-    data-caption-data-dir="${data_dir}"
-    data-show-captions="${show_captions}"
-    data-general-speed="${general_speed}"
-    data-speed="${speed}"
-    data-saved-video-position="${saved_video_position}"
-    data-start="${start}"
-    data-end="${end}"
-    data-transcript-language="${transcript_language}"
-    data-transcript-languages='${transcript_languages}'
-    data-autoplay="${autoplay}"
-    data-yt-test-timeout="${yt_test_timeout}"
-    data-yt-api-url="${yt_api_url}"
-    data-yt-test-url="${yt_test_url}"
-    data-transcript-translation-url="${transcript_translation_url}"
-    data-transcript-available-translations-url="${transcript_available_translations_url}"
-
-    ## For now, the option "data-autohide-html5" is hard coded. This option
-    ## either enables or disables autohiding of controls and captions on mouse
-    ## inactivity. If set to true, controls and captions will autohide for
-    ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
-    ## whole video. When the mouse moves (or a key is pressed while any part of
-    ## the video player is focused), the captions and controls will be shown
-    ## once again.
-    ##
-    ## There is no option in the "Advanced Editor" to set this option. However,
-    ## this option will have an effect if changed to "True". The code on
-    ## front-end exists.
-    data-autohide-html5="False"
-
+    data-metadata='${metadata}'
+    data-bumper-metadata='${bumper_metadata}'
+    data-poster='${poster}'
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
@@ -61,41 +27,13 @@
           </section>
           <div class="video-player-post"></div>
           <section class="video-controls is-hidden">
-              <div class="slider" title="${_('Video position')}"></div>
               <div>
-                  <ul class="vcr">
-                      <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
-                      <li><div class="vidtime">0:00 / 0:00</div></li>
-                  </ul>
-                  <div class="secondary-controls">
-                      <div class="speeds menu-container">
-                          <a class="speed-button" href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
-                              <span class="label">${_('Speed')}</span>
-                              <span class="value"></span>
-                          </a>
-                          <ol class="video-speeds menu" role="menu"></ol>
-                      </div>
-                      <div class="volume">
-                          <a href="#" role="button" aria-disabled="false" title="${_('Volume')}" aria-label="${_('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.')}"></a>
-                          <div role="presentation" class="volume-slider-container">
-                              <div class="volume-slider"></div>
-                          </div>
-                      </div>
-                      <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                      <a href="#" class="quality-control is-hidden" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
-
-                      <div class="lang menu-container">
-                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
-                      </div>
-                  </div>
+                  <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
+                  <div class="secondary-controls"></div>
               </div>
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
-
-      <ol id="transcript-captions" class="subtitles" tabindex="0" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
-        <li></li>
-      </ol>
     </div>
 
     <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
@@ -104,26 +42,25 @@
   <ul class="wrapper-downloads">
     % if download_video_link:
         <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
+            <a href="${download_video_link}">${_('Download video')}</a>
         </li>
     % endif
     % if track:
         <li class="video-tracks video-download-button">
           % if transcript_download_format:
-            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
-            }
+            <a href="${track}">${_('Download transcript')}</a>
             <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
-                <ol class="a11y-menu-list">
+                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}" role="button" aria-disabled="false">${'.' + transcript_download_format}</a>
+                <ol class="a11y-menu-list" role="menu">
                 % for item in transcript_download_formats_list:
                   % if item['value'] == transcript_download_format:
                   <li class="a11y-menu-item active">
                   % else:
                   <li class="a11y-menu-item">
                   % endif
-		      ## This is necessary so we don't scrape 'display_name' as a string.
-		      <% dname = item['display_name'] %>
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
+                  ## This is necessary so we don't scrape 'display_name' as a string.
+                  <% dname = item['display_name'] %>
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}" role="menuitem" aria-disabled="false">
                         ${_(dname)}
                       </a>
                   </li>
@@ -131,15 +68,47 @@
                 </ol>
             </div>
           % else:
-            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
-            }
+            <a href="${track}" class="external-track">${_('Download transcript')}</a>
           % endif
         </li>
     % endif
     % if handout:
         <li class="video-handout video-download-button">
-            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
+            <a href="${handout}" target="_blank">${_('Download Handout')}</a>
         </li>
+    % endif
+
+    % if branding_info:
+      <li id="branding" class="branding">
+        <span class="host-tag">${branding_info['logo_tag']}</span>
+        <a href="${branding_info['url']}" target="_blank" title="${branding_info['logo_tag']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+      </li>
     % endif
   </ul>
 </div>
+% if cdn_eval:
+<script>
+  function sendPerformanceBeacon(id, expgroup, value, event_name) {
+    var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
+    $.ajax({method: "POST", url: "/performance", data: data});
+  }
+  var cdnStartTime;
+  var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  function initializeCDNExperiment() {
+    sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, "", "load");
+    cdnStartTime = Date.now();
+    $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
+                    'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
+                    function(index, eventName) {
+      $("#video_${id}").bind("html5:" + eventName, null, function() {
+        timeElapsed = Date.now() - cdnStartTime;
+        sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
+      });
+    });
+  }
+  $("#video_${id}").bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_${id}").hasClass("is-initialized")) {
+    initializeCDNExperiment();
+  }
+</script>
+% endif;

@@ -14,9 +14,9 @@ from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from openedx.core.djangoapps.util.testing import TestConditionalContent
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
-from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.partitions.partitions import Group, UserPartition
@@ -43,39 +43,6 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
     Base class to provide general methods used for "integration" testing of particular tasks.
     """
 
-    def submit_student_answer(self, username, problem_url_name, responses):
-        """
-        Use ajax interface to submit a student answer.
-
-        Assumes the input list of responses has two values.
-        """
-        def get_input_id(response_id):
-            """Creates input id using information about the test course and the current problem."""
-            # Note that this is a capa-specific convention.  The form is a version of the problem's
-            # URL, modified so that it can be easily stored in html, prepended with "input-" and
-            # appended with a sequence identifier for the particular response the input goes to.
-            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(TEST_COURSE_ORG.lower(),
-                                                              TEST_COURSE_NUMBER.replace('.', '_'),
-                                                              problem_url_name, response_id)
-
-        # make sure that the requested user is logged in, so that the ajax call works
-        # on the right problem:
-        self.login_username(username)
-        # make ajax call:
-        modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
-            'handler': 'xmodule_handler',
-            'suffix': 'problem_check',
-        })
-
-        # we assume we have two responses, so assign them the correct identifiers.
-        resp = self.client.post(modx_url, {
-            get_input_id('2_1'): responses[0],
-            get_input_id('3_1'): responses[1],
-        })
-        return resp
-
     def _assert_task_failure(self, entry_id, task_type, problem_url_name, expected_message):
         """Confirm that expected values are stored in InstructorTask on task failure."""
         instructor_task = InstructorTask.objects.get(id=entry_id)
@@ -101,6 +68,8 @@ class TestRescoringTask(TestIntegrationTask):
     """
 
     def setUp(self):
+        super(TestRescoringTask, self).setUp()
+
         self.initialize_course()
         self.create_instructor('instructor')
         self.create_student('u1')
@@ -374,6 +343,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
+        super(TestResetAttemptsTask, self).setUp()
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -442,6 +412,8 @@ class TestDeleteProblemTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
+        super(TestDeleteProblemTask, self).setUp()
+
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -493,103 +465,10 @@ class TestDeleteProblemTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_state, SUCCESS)
 
 
-class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
+class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent, TestIntegrationTask):
     """
-    Check that grade export works when graded content exists within
-    split modules.
+    Test grade report in cases where there are problems contained within split tests.
     """
-    def setUp(self):
-        """
-        Set up a course with graded problems within a split test.
-
-        Course hierarchy is as follows (modeled after how split tests
-        are created in studio):
-        -> course
-            -> chapter
-                -> sequential (graded)
-                    -> vertical
-                        -> split_test
-                            -> vertical (Group A)
-                                -> problem
-                            -> vertical (Group B)
-                                -> problem
-        """
-        super(TestGradeReportConditionalContent, self).setUp()
-
-        # Create user partitions
-        self.user_partition_group_a = 0
-        self.user_partition_group_b = 1
-        self.partition = UserPartition(
-            0,
-            'first_partition',
-            'First Partition',
-            [
-                Group(self.user_partition_group_a, 'Group A'),
-                Group(self.user_partition_group_b, 'Group B')
-            ]
-        )
-
-        # Create course with group configurations and grading policy
-        self.initialize_course(
-            course_factory_kwargs={
-                'user_partitions': [self.partition],
-                'grading_policy': {
-                    "GRADER": [{
-                        "type": "Homework",
-                        "min_count": 1,
-                        "drop_count": 0,
-                        "short_label": "HW",
-                        "weight": 1.0
-                    }]
-                }
-            }
-        )
-
-        # Create users and partition them
-        self.student_a = self.create_student('student_a')
-        self.student_b = self.create_student('student_b')
-        UserCourseTagFactory(
-            user=self.student_a,
-            course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
-            value=str(self.user_partition_group_a)
-        )
-        UserCourseTagFactory(
-            user=self.student_b,
-            course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
-            value=str(self.user_partition_group_b)
-        )
-
-        # Create a vertical to contain our split test
-        problem_vertical = ItemFactory.create(
-            parent_location=self.problem_section.location,
-            category='vertical',
-            display_name='Problem Unit'
-        )
-
-        # Create the split test and child vertical containers
-        vertical_a_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_a')
-        vertical_b_url = self.course.id.make_usage_key('vertical', 'split_test_vertical_b')
-        self.split_test = ItemFactory.create(
-            parent_location=problem_vertical.location,
-            category='split_test',
-            display_name='Split Test',
-            user_partition_id=self.partition.id,  # pylint: disable=no-member
-            group_id_to_child={str(index): url for index, url in enumerate([vertical_a_url, vertical_b_url])}
-        )
-        self.vertical_a = ItemFactory.create(
-            parent_location=self.split_test.location,
-            category='vertical',
-            display_name='Group A problem container',
-            location=vertical_a_url
-        )
-        self.vertical_b = ItemFactory.create(
-            parent_location=self.split_test.location,
-            category='vertical',
-            display_name='Group B problem container',
-            location=vertical_b_url
-        )
 
     def verify_csv_task_success(self, task_result):
         """
@@ -601,7 +480,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
-    def verify_grades_in_csv(self, students_grades):
+    def verify_grades_in_csv(self, students_grades, ignore_other_columns=False):
         """
         Verify that the grades CSV contains the expected grades data.
 
@@ -637,7 +516,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                     user_partition_group(student)
                 )
                 for student_grades in students_grades for student, grades in student_grades.iteritems()
-            ]
+            ],
+            ignore_other_columns=ignore_other_columns
         )
 
     def test_both_groups_problems(self):
@@ -663,7 +543,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                 [
                     {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
                     {self.student_b: {'grade': '0.5', 'HW': '0.5'}}
-                ]
+                ],
+                ignore_other_columns=True
             )
 
     def test_one_group_problem(self):
@@ -685,5 +566,6 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                 [
                     {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
                     {self.student_b: {'grade': '0.0', 'HW': '0.0'}}
-                ]
+                ],
+                ignore_other_columns=True
             )

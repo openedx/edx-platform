@@ -22,6 +22,15 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
     """
     mako_template = "widgets/raw-edit.html"
 
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        `data` should not be editable in the Studio settings editor.
+        """
+        non_editable_fields = super(EditingDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(self.fields['data'])
+        return non_editable_fields
+
     # cdodge: a little refactoring here, since we're basically doing the same thing
     # here as with our parent class, let's call into it to get the basic fields
     # set and then add our additional fields. Trying to keep it DRY.

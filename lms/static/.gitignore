@@ -4,6 +4,6 @@
 *.swp
 *.orig
 *.DS_Store
-application.css
+style-main.css
 ie.css
 Gemfile.lock

@@ -44,7 +44,7 @@ class MyCompleter(object):  # Custom completer
 
 
 def GenPasswd(length=8, chars=string.letters + string.digits):
-    return ''.join([choice(chars) for i in range(length)])
+    return ''.join([choice(chars) for dummy0 in range(length)])
 
 #-----------------------------------------------------------------------------
 # main command

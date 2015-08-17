@@ -3,12 +3,11 @@ Test instructor.access
 """
 
 from nose.tools import raises
+from nose.plugins.attrib import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from django.test.utils import override_settings
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.roles import CourseBetaTesterRole, CourseStaffRole
 
 from django_comment_common.models import (Role,
@@ -19,10 +18,12 @@ from instructor.access import (allow_access,
                                update_forum_role)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestInstructorAccessList(ModuleStoreTestCase):
     """ Test access listings. """
     def setUp(self):
+        super(TestInstructorAccessList, self).setUp()
+
         self.course = CourseFactory.create()
 
         self.instructors = [UserFactory.create() for _ in xrange(4)]
@@ -41,10 +42,12 @@ class TestInstructorAccessList(ModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestInstructorAccessAllow(ModuleStoreTestCase):
     """ Test access allow. """
     def setUp(self):
+        super(TestInstructorAccessAllow, self).setUp()
+
         self.course = CourseFactory.create()
 
     def test_allow(self):
@@ -75,10 +78,12 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """
     def setUp(self):
+        super(TestInstructorAccessRevoke, self).setUp()
+
         self.course = CourseFactory.create()
 
         self.staff = [UserFactory.create() for _ in xrange(4)]
@@ -109,12 +114,14 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
         revoke_access(self.course, user, 'robot-not-a-level')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestInstructorAccessForum(ModuleStoreTestCase):
     """
     Test forum access control.
     """
     def setUp(self):
+        super(TestInstructorAccessForum, self).setUp()
+
         self.course = CourseFactory.create()
 
         self.mod_role = Role.objects.create(

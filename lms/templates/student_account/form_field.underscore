@@ -1,4 +1,4 @@
-<p class="form-field <%=type%>-<%= name %>">
+<div class="form-field <%=type%>-<%= name %>">
     <% if ( type !== 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>">
             <%= label %>
@@ -40,7 +40,7 @@
            type="<%= type %>"
            name="<%= name %>"
            class="input-block <% if ( type === 'checkbox' ) { %>checkbox<% } %>"
-           aria-describedby="<%= form %>-<%= name %>-desc"
+            <% if ( type !== 'password' ) { %> aria-describedby="<%= form %>-<%= name %>-desc" <% } %>
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( required ) { %> aria-required="true" required<% } %>
@@ -49,8 +49,10 @@
                     data-errormsg-<%= type %>="<%= msg %>"
             <%  });
             } %>
+            <% if ( placeholder ) { %> placeholder="<%= placeholder %>"<% } %>
             value="<%- defaultValue %>"
         />
+        <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
     <% } %>
 
     <% if ( type === 'checkbox' ) { %>
@@ -63,4 +65,4 @@
     <% if( form === 'login' && name === 'password' ) { %>
         <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
     <% } %>
-</p>
+</div>

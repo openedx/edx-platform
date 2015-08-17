@@ -51,7 +51,7 @@ function sendlog(element_id, edit_link, staff_context){
                 $('#' + element_id + '_xqa_log_data').html(result);
         },
         error: function() {
-            alert('Error: cannot connect to XQA server');
+            alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
             console.log('error!');
         }
     });
@@ -78,7 +78,7 @@ function getlog(element_id, staff_context){
             $('#' + element_id + '_xqa_log_data').html(result);
         },
         error: function() {
-            alert('Error: cannot connect to XQA server');
+            alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
         }
     });
 

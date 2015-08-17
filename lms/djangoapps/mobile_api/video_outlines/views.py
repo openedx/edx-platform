@@ -9,6 +9,7 @@ general XBlock representation in this rather specialized formatting.
 from functools import partial
 
 from django.http import Http404, HttpResponse
+from mobile_api.models import MobileApiConfig
 
 from rest_framework import generics
 from rest_framework.response import Response
@@ -78,12 +79,14 @@ class VideoSummaryList(generics.ListAPIView):
 
     @mobile_course_access(depth=None)
     def list(self, request, course, *args, **kwargs):
+        video_profiles = MobileApiConfig.get_video_profiles()
         video_outline = list(
             BlockOutline(
                 course.id,
                 course,
-                {"video": partial(video_summary, course)},
+                {"video": partial(video_summary, video_profiles)},
                 request,
+                video_profiles,
             )
         )
         return Response(video_outline)
@@ -116,11 +119,12 @@ class VideoTranscripts(generics.RetrieveAPIView):
         )
         try:
             video_descriptor = modulestore().get_item(usage_key)
-            content, filename, mimetype = video_descriptor.get_transcript(lang=lang)
+            transcripts = video_descriptor.get_transcripts_info()
+            content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
         except (NotFoundError, ValueError, KeyError):
             raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename.encode('utf-8'))
 
         return response

@@ -59,7 +59,7 @@ textarea.text {
 }
 
 // +Fields - Not Editable
-// ==================== 
+// ====================
 .field.is-not-editable {
 
   & label.is-focused {
@@ -72,7 +72,7 @@ textarea.text {
 }
 
 // +Fields - With Error
-// ==================== 
+// ====================
 .field.error {
 
   input, textarea {
@@ -81,7 +81,7 @@ textarea.text {
 }
 
 // +Forms - Additional UI
-// ==================== 
+// ====================
 form {
 
   // CASE: cosmetic checkbox input
@@ -173,7 +173,7 @@ form {
 }
 
 // +Form - Create New
-// ==================== 
+// ====================
 // form styling for creating a new content item (course, user, textbook)
 // TODO: refactor this into a placeholder to extend.
 .form-create {
@@ -390,8 +390,8 @@ form {
   }
 }
 
-// +Form - Inline Name Edit 
-// ==================== 
+// +Form - Inline Name Edit
+// ====================
 // form - inline xblock name edit on unit, container, outline
 // TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
@@ -431,28 +431,26 @@ form {
   }
 }
 
-// +Form - Create New Wrapper 
-// ==================== 
+// +Form - Create New Wrapper
+// ====================
 .wrapper-create-element {
-  height: 0;
-  opacity: 0.0;
-  pointer-events: none;
+  height: auto;
+  opacity: 1.0;
+  pointer-events: auto;
   overflow: hidden;
+  display: none;
 
   &.animate {
     @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
   }
 
   &.is-shown {
-    height: auto; // define a specific height for the animating version of this UI to work properly
-    margin-bottom: $baseline;
-    opacity: 1.0;
-    pointer-events: auto;
+    display: block;
   }
 }
 
-// +Form - Grandfathered 
-// ==================== 
+// +Form - Grandfathered
+// ====================
 input.search {
   padding: 6px 15px 8px 30px;
   @include box-sizing(border-box);

@@ -17,12 +17,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
+class CourseEmailTemplateForm(forms.ModelForm):
     """Form providing validation of CourseEmail templates."""
 
     name = forms.CharField(required=False)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')
 
@@ -73,10 +73,10 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=incomplete-pr
         return name
 
 
-class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
+class CourseAuthorizationAdminForm(forms.ModelForm):
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseAuthorization
 
     def clean_course_id(self):

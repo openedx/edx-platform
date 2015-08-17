@@ -3,7 +3,7 @@
         "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
         "start": "2015-07-17T12:00",
         "display_name": "Toy Course",
-        "graded": "true",
+        "graded": "true"
     },
     "tabs": [
           {"type": "courseware"},
@@ -19,5 +19,5 @@
     },
     "html/secret:toylab": {
         "display_name": "Toy lab"
-    },
+    }
 }

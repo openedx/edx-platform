@@ -1,25 +1,35 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
+import ddt
 import json
 import lxml
 import datetime
+import mock
+import pytz
 
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.utils.translation import ugettext as _
+
+from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor
-from student.auth import has_course_author_access
-from contentstore.views.course import course_outline_initial_state
+from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
+from contentstore.views.course import (
+    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info
+)
 from contentstore.views.item import create_xblock_info, VisibilityState
+from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
+from opaque_keys.edx.locator import CourseLocator
+from search.api import perform_search
+from student.auth import has_course_author_access
+from student.tests.factories import UserFactory
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from opaque_keys.edx.locator import CourseLocator
-from student.tests.factories import UserFactory
-from course_action_state.managers import CourseRerunUIStateManager
-from django.conf import settings
-import pytz
 
 
 class TestCourseIndex(CourseTestCase):
@@ -217,6 +227,7 @@ class TestCourseIndex(CourseTestCase):
                 self.assert_correct_json_response(child_response)
 
 
+@ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
@@ -226,6 +237,7 @@ class TestCourseOutline(CourseTestCase):
         Set up the for the course outline tests.
         """
         super(TestCourseOutline, self).setUp()
+
         self.chapter = ItemFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
         )
@@ -330,3 +342,450 @@ class TestCourseOutline(CourseTestCase):
 
         self.assertEqual(_get_release_date(response), get_default_time_display(self.course.start))
         _assert_settings_link_present(response)
+
+    def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
+        """
+        Create data for test.
+        """
+        if create_blocks:
+            for block_type in block_types:
+                ItemFactory.create(
+                    parent_location=self.vertical.location,
+                    category=block_type,
+                    display_name='{} Problem'.format(block_type)
+                )
+
+            if not publish:
+                self.store.unpublish(self.vertical.location, self.user.id)
+
+        course_module.advanced_modules.extend(block_types)
+
+    def _verify_deprecated_info(self, course_id, advanced_modules, info, deprecated_block_types):
+        """
+        Verify deprecated info.
+        """
+        expected_blocks = []
+        for block_type in deprecated_block_types:
+            expected_blocks.append(
+                [
+                    reverse_usage_url('container_handler', self.vertical.location),
+                    '{} Problem'.format(block_type)
+                ]
+            )
+
+        self.assertEqual(info['block_types'], deprecated_block_types)
+        self.assertEqual(
+            info['block_types_enabled'],
+            any(component in advanced_modules for component in deprecated_block_types)
+        )
+        self.assertItemsEqual(info['blocks'], expected_blocks)
+        self.assertEqual(
+            info['advance_settings_url'],
+            reverse_course_url('advanced_settings_handler', course_id)
+        )
+
+    @ddt.data(
+        {'publish': True},
+        {'publish': False},
+    )
+    @ddt.unpack
+    def test_verify_deprecated_warning_message_with_single_feature(self, publish):
+        """
+        Verify deprecated warning info for single deprecated feature.
+        """
+        block_types = settings.DEPRECATED_BLOCK_TYPES
+        course_module = modulestore().get_item(self.course.location)
+        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
+        info = _deprecated_blocks_info(course_module, block_types)
+        self._verify_deprecated_info(
+            course_module.id,
+            course_module.advanced_modules,
+            info,
+            block_types
+        )
+
+    def test_verify_deprecated_warning_message_with_multiple_features(self):
+        """
+        Verify deprecated warning info for multiple deprecated features.
+        """
+        block_types = ['peergrading', 'combinedopenended', 'openassessment']
+        course_module = modulestore().get_item(self.course.location)
+        self._create_test_data(course_module, create_blocks=True, block_types=block_types)
+
+        info = _deprecated_blocks_info(course_module, block_types)
+        self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
+
+    @ddt.data(
+        {'delete_vertical': True},
+        {'delete_vertical': False},
+    )
+    @ddt.unpack
+    def test_deprecated_blocks_list_updated_correctly(self, delete_vertical):
+        """
+        Verify that deprecated blocks list shown on banner is updated correctly.
+
+        Here is the scenario:
+            This list of deprecated blocks shown on banner contains published
+            and un-published blocks. That list should be updated when we delete
+            un-published block(s). This behavior should be same if we delete
+            unpublished vertical or problem.
+        """
+        block_types = ['peergrading']
+        course_module = modulestore().get_item(self.course.location)
+
+        vertical1 = ItemFactory.create(
+            parent_location=self.sequential.location, category='vertical', display_name='Vert1 Subsection1'
+        )
+        problem1 = ItemFactory.create(
+            parent_location=vertical1.location,
+            category='peergrading',
+            display_name='peergrading problem in vert1',
+            publish_item=False
+        )
+
+        info = _deprecated_blocks_info(course_module, block_types)
+        # info['blocks'] should be empty here because there is nothing
+        # published or un-published present
+        self.assertEqual(info['blocks'], [])
+
+        vertical2 = ItemFactory.create(
+            parent_location=self.sequential.location, category='vertical', display_name='Vert2 Subsection1'
+        )
+        ItemFactory.create(
+            parent_location=vertical2.location,
+            category='peergrading',
+            display_name='peergrading problem in vert2',
+            pubish_item=True
+        )
+        # At this point CourseStructure will contain both the above
+        # published and un-published verticals
+
+        info = _deprecated_blocks_info(course_module, block_types)
+        self.assertItemsEqual(
+            info['blocks'],
+            [
+                [reverse_usage_url('container_handler', vertical1.location), 'peergrading problem in vert1'],
+                [reverse_usage_url('container_handler', vertical2.location), 'peergrading problem in vert2']
+            ]
+        )
+
+        # Delete the un-published vertical or problem so that CourseStructure updates its data
+        if delete_vertical:
+            self.store.delete_item(vertical1.location, self.user.id)
+        else:
+            self.store.delete_item(problem1.location, self.user.id)
+
+        info = _deprecated_blocks_info(course_module, block_types)
+        # info['blocks'] should only contain the info about vertical2 which is published.
+        # There shouldn't be any info present about un-published vertical1
+        self.assertEqual(
+            info['blocks'],
+            [[reverse_usage_url('container_handler', vertical2.location), 'peergrading problem in vert2']]
+        )
+
+
+class TestCourseReIndex(CourseTestCase):
+    """
+    Unit tests for the course outline.
+    """
+
+    SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
+
+    def setUp(self):
+        """
+        Set up the for the course outline tests.
+        """
+
+        super(TestCourseReIndex, self).setUp()
+
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
+        modulestore().update_item(self.course, self.user.id)
+
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1"
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
+        )
+        self.video = ItemFactory.create(
+            parent_location=self.vertical.location, category="video", display_name="My Video"
+        )
+
+        self.html = ItemFactory.create(
+            parent_location=self.vertical.location, category="html", display_name="My HTML",
+            data="<div>This is my unique HTML content</div>",
+
+        )
+
+    def test_reindex_course(self):
+        """
+        Verify that course gets reindexed.
+        """
+        index_url = reverse_course_url('course_search_index_handler', self.course.id)
+        response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
+
+        # A course with the default release date should display as "Unscheduled"
+        self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.content, '')
+        self.assertEqual(response.status_code, 405)
+
+        self.client.logout()
+        response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 302)
+
+    def test_negative_conditions(self):
+        """
+        Test the error conditions for the access
+        """
+        index_url = reverse_course_url('course_search_index_handler', self.course.id)
+        # register a non-staff member and try to delete the course branch
+        non_staff_client, _ = self.create_non_staff_authed_user_client()
+        response = non_staff_client.get(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_content_type_none(self):
+        """
+        Test json content type is set if none is selected
+        """
+        index_url = reverse_course_url('course_search_index_handler', self.course.id)
+        response = self.client.get(index_url, {}, CONTENT_TYPE=None)
+
+        # A course with the default release date should display as "Unscheduled"
+        self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
+        self.assertEqual(response.status_code, 200)
+
+    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    def test_reindex_course_search_index_error(self, mock_index_dictionary):
+        """
+        Test json response with mocked error data for html
+        """
+
+        # set mocked exception response
+        err = SearchIndexingError
+        mock_index_dictionary.return_value = err
+
+        index_url = reverse_course_url('course_search_index_handler', self.course.id)
+
+        # Start manual reindex and check error in response
+        response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 500)
+
+    def test_reindex_json_responses(self):
+        """
+        Test json response with real data
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # Start manual reindex
+        reindex_course_and_check_access(self.course.id, self.user)
+
+        # Check results remain the same
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    def test_reindex_video_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with mocked error data for video
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # set mocked exception response
+        err = SearchIndexingError
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    def test_reindex_html_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with mocked error data for html
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # set mocked exception response
+        err = SearchIndexingError
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
+    def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with mocked error data for sequence
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    def test_reindex_no_item(self, mock_get_course):
+        """
+        Test system logs an error if no item found.
+        """
+        # set mocked exception response
+        err = ItemNotFoundError
+        mock_get_course.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    def test_reindex_no_permissions(self):
+        # register a non-staff member and try to delete the course branch
+        user2 = UserFactory()
+        with self.assertRaises(PermissionDenied):
+            reindex_course_and_check_access(self.course.id, user2)
+
+    def test_indexing_responses(self):
+        """
+        Test do_course_reindex response with real data
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # Start manual reindex
+        CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+        # Check results are the same following reindex
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    def test_indexing_video_error_responses(self, mock_index_dictionary):
+        """
+        Test do_course_reindex response with mocked error data for video
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    def test_indexing_html_error_responses(self, mock_index_dictionary):
+        """
+        Test do_course_reindex response with mocked error data for html
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
+    def test_indexing_seq_error_responses(self, mock_index_dictionary):
+        """
+        Test do_course_reindex response with mocked error data for sequence
+        """
+        # results are indexed because they are published from ItemFactory
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    def test_indexing_no_item(self, mock_get_course):
+        """
+        Test system logs an error if no item found.
+        """
+        # set mocked exception response
+        err = ItemNotFoundError
+        mock_get_course.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)

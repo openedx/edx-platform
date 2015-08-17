@@ -1,0 +1,163 @@
+"""
+This file contains celery tasks for credit course views.
+"""
+
+from django.conf import settings
+
+from celery import task
+from celery.utils.log import get_task_logger
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from .api import set_credit_requirements
+from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
+from openedx.core.djangoapps.credit.models import CreditCourse
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+LOGGER = get_task_logger(__name__)
+
+
+# XBlocks that can be added as credit requirements
+CREDIT_REQUIREMENT_XBLOCKS = [
+    {
+        "category": "edx-reverification-block",
+        "requirement-namespace": "reverification"
+    }
+]
+
+
+# pylint: disable=not-callable
+@task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
+def update_credit_course_requirements(course_id):   # pylint: disable=invalid-name
+    """
+    Updates course requirements table for a course.
+
+     Args:
+        course_id(str): A string representation of course identifier
+
+    Returns:
+        None
+
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+        is_credit_course = CreditCourse.is_credit_course(course_key)
+        if is_credit_course:
+            requirements = _get_course_credit_requirements(course_key)
+            set_credit_requirements(course_key, requirements)
+    except (InvalidKeyError, ItemNotFoundError, InvalidCreditRequirements) as exc:
+        LOGGER.error('Error on adding the requirements for course %s - %s', course_id, unicode(exc))
+        raise update_credit_course_requirements.retry(args=[course_id], exc=exc)
+    else:
+        LOGGER.info('Requirements added for course %s', course_id)
+
+
+def _get_course_credit_requirements(course_key):
+    """
+    Returns the list of credit requirements for the given course.
+
+    It returns the minimum_grade_credit and also the ICRV checkpoints
+    if any were added in the course
+
+    Args:
+        course_key (CourseKey): Identifier for the course.
+
+    Returns:
+        List of credit requirements (dictionaries)
+
+    """
+    credit_xblock_requirements = _get_credit_course_requirement_xblocks(course_key)
+    min_grade_requirement = _get_min_grade_requirement(course_key)
+    credit_requirements = min_grade_requirement + credit_xblock_requirements
+    return credit_requirements
+
+
+def _get_min_grade_requirement(course_key):
+    """
+    Get list of 'minimum_grade_credit' requirement for the given course.
+
+    Args:
+        course_key (CourseKey): Identifier for the course.
+
+    Returns:
+        The list of minimum_grade_credit requirements
+
+    """
+    course = modulestore().get_course(course_key, depth=0)
+    try:
+        return [
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": getattr(course, "minimum_grade_credit")
+                },
+            }
+        ]
+    except AttributeError:
+        LOGGER.error("The course %s does not has minimum_grade_credit attribute", unicode(course.id))
+    else:
+        return []
+
+
+def _get_credit_course_requirement_xblocks(course_key):  # pylint: disable=invalid-name
+    """Generate a course structure dictionary for the specified course.
+
+    Args:
+        course_key (CourseKey): Identifier for the course.
+
+    Returns:
+        The list of credit requirements xblocks dicts
+
+    """
+    requirements = []
+
+    # Retrieve all XBlocks from the course that we know to be credit requirements.
+    # For performance reasons, we look these up by their "category" to avoid
+    # loading and searching the entire course tree.
+    for desc in CREDIT_REQUIREMENT_XBLOCKS:
+        requirements.extend([
+            {
+                "namespace": desc["requirement-namespace"],
+                "name": block.get_credit_requirement_name(),
+                "display_name": block.get_credit_requirement_display_name(),
+                "criteria": {},
+            }
+            for block in modulestore().get_items(
+                course_key,
+                qualifiers={"category": desc["category"]}
+            )
+            if _is_credit_requirement(block)
+        ])
+
+    return requirements
+
+
+def _is_credit_requirement(xblock):
+    """
+    Check if the given XBlock is a credit requirement.
+
+    Args:
+        xblock(XBlock): The given XBlock object
+
+    Returns:
+        True if XBlock is a credit requirement else False
+
+    """
+    if not callable(getattr(xblock, "get_credit_requirement_namespace", None)):
+        LOGGER.error(
+            "XBlock %s is marked as a credit requirement but does not "
+            "implement get_credit_requirement_namespace()", unicode(xblock)
+        )
+        return False
+
+    if not callable(getattr(xblock, "get_credit_requirement_name", None)):
+        LOGGER.error(
+            "XBlock %s is marked as a credit requirement but does not "
+            "implement get_credit_requirement_name()", unicode(xblock)
+        )
+        return False
+
+    return True

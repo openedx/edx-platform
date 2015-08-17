@@ -1,4 +1,4 @@
-define(['jquery', 'js/factories/xblock_validation', 'js/common_helpers/template_helpers'],
+define(['jquery', 'js/factories/xblock_validation', 'common/js/spec_helpers/template_helpers'],
     function($, XBlockValidationFactory, TemplateHelpers) {
 
         describe('XBlockValidationFactory', function() {

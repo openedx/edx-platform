@@ -6,7 +6,6 @@ from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course_and_groups, reverse_url
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import CourseEnrollment
 
@@ -26,7 +25,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password='test')
 
         # create a course via the view handler to create course
-        self.course_key = SlashSeparatedCourseKey('Org_1', 'Course_1', 'Run_1')
+        self.course_key = self.store.make_course_key('Org_1', 'Course_1', 'Run_1')
         self._create_course_with_given_location(self.course_key)
 
     def _create_course_with_given_location(self, course_key):

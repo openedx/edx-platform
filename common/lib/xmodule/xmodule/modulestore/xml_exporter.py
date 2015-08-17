@@ -3,6 +3,7 @@ Methods for exporting course data to XML
 """
 
 import logging
+from abc import abstractmethod
 import lxml.etree
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
@@ -11,6 +12,7 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+from xmodule.modulestore import LIBRARY_ROOT
 from fs.osfs import OSFS
 from json import dumps
 import json
@@ -18,7 +20,7 @@ import os
 from path import path
 import shutil
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -28,166 +30,331 @@ EXPORT_VERSION_KEY = "export_format"
 DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
 
 
-def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
+def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
     """
-    Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
-
-    `modulestore`: A `ModuleStore` object that is the source of the modules to export
-    `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
-    `course_key`: The `CourseKey` of the `CourseModuleDescriptor` to export
-    `root_dir`: The directory to write the exported xml to
-    `course_dir`: The name of the directory inside `root_dir` to write the course content to
+    Exports course drafts.
     """
+    # NOTE: we need to explicitly implement the logic for setting the vertical's parent
+    # and index here since the XML modulestore cannot load draft modules
+    with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+        draft_modules = modulestore.get_items(
+            course_key,
+            qualifiers={'category': {'$nin': DIRECT_ONLY_CATEGORIES}},
+            revision=ModuleStoreEnum.RevisionOption.draft_only
+        )
+        # Check to see if the returned draft modules have changes w.r.t. the published module.
+        # Only modules with changes will be exported into the /drafts directory.
+        draft_modules = [module for module in draft_modules if modulestore.has_changes(module)]
 
-    with modulestore.bulk_operations(course_key):
+        if draft_modules:
+            draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
 
-        course = modulestore.get_course(course_key, depth=None)  # None means infinite
-        fsm = OSFS(root_dir)
-        export_fs = course.runtime.export_fs = fsm.makeopendir(course_dir)
-        root_course_dir = root_dir + '/' + course_dir
+            # accumulate tuples of draft_modules and their parents in
+            # this list:
+            draft_node_list = []
 
-        root = lxml.etree.Element('unknown')
+            for draft_module in draft_modules:
+                parent_loc = modulestore.get_parent_location(
+                    draft_module.location,
+                    revision=ModuleStoreEnum.RevisionOption.draft_preferred
+                )
 
-        # export only the published content
-        with modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
-            # change all of the references inside the course to use the xml expected key type w/o version & branch
-            xml_centric_course_key = CourseLocator(course_key.org, course_key.course, course_key.run, deprecated=True)
-            adapt_references(course, xml_centric_course_key, export_fs)
+                # if module has no parent, set its parent_url to `None`
+                parent_url = None
+                if parent_loc is not None:
+                    parent_url = parent_loc.to_deprecated_string()
 
-            course.add_xml_to_node(root)
+                draft_node = draft_node_constructor(
+                    draft_module,
+                    location=draft_module.location,
+                    url=draft_module.location.to_deprecated_string(),
+                    parent_location=parent_loc,
+                    parent_url=parent_url,
+                )
 
+                draft_node_list.append(draft_node)
+
+            for draft_node in get_draft_subtree_roots(draft_node_list):
+                # only export the roots of the draft subtrees
+                # since export_from_xml (called by `add_xml_to_node`)
+                # exports a whole tree
+
+                # ensure module has "xml_attributes" attr
+                if not hasattr(draft_node.module, 'xml_attributes'):
+                    draft_node.module.xml_attributes = {}
+
+                # Don't try to export orphaned items
+                # and their descendents
+                if draft_node.parent_location is None:
+                    continue
+
+                logging.debug('parent_loc = %s', draft_node.parent_location)
+
+                draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
+                parent = modulestore.get_item(draft_node.parent_location)
+                index = parent.children.index(draft_node.module.location)
+                draft_node.module.xml_attributes['index_in_children_list'] = str(index)
+
+                draft_node.module.runtime.export_fs = draft_course_dir
+                adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
+                # pylint: disable=no-member
+                node = lxml.etree.Element('unknown')
+
+                draft_node.module.add_xml_to_node(node)
+
+
+class ExportManager(object):
+    """
+    Manages XML exporting for courselike objects.
+    """
+    def __init__(self, modulestore, contentstore, courselike_key, root_dir, target_dir):
+        """
+        Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
+
+        `modulestore`: A `ModuleStore` object that is the source of the modules to export
+        `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
+        `courselike_key`: The Locator of the Descriptor to export
+        `root_dir`: The directory to write the exported xml to
+        `target_dir`: The name of the directory inside `root_dir` to write the content to
+        """
+        self.modulestore = modulestore
+        self.contentstore = contentstore
+        self.courselike_key = courselike_key
+        self.root_dir = root_dir
+        self.target_dir = target_dir
+
+    @abstractmethod
+    def get_key(self):
+        """
+        Get the courselike locator key
+        """
+        raise NotImplementedError
+
+    def process_root(self, root, export_fs):
+        """
+        Perform any additional tasks to the root XML node.
+        """
+
+    def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
+        """
+        Process additional content, like static assets.
+        """
+
+    def post_process(self, root, export_fs):
+        """
+        Perform any final processing after the other export tasks are done.
+        """
+
+    @abstractmethod
+    def get_courselike(self):
+        """
+        Get the target courselike object for this export.
+        """
+
+    def export(self):
+        """
+        Perform the export given the parameters handed to this class at init.
+        """
+        with self.modulestore.bulk_operations(self.courselike_key):
+
+            fsm = OSFS(self.root_dir)
+            root = lxml.etree.Element('unknown')  # pylint: disable=no-member
+
+            # export only the published content
+            with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
+                courselike = self.get_courselike()
+                export_fs = courselike.runtime.export_fs = fsm.makeopendir(self.target_dir)
+
+                # change all of the references inside the course to use the xml expected key type w/o version & branch
+                xml_centric_courselike_key = self.get_key()
+                adapt_references(courselike, xml_centric_courselike_key, export_fs)
+                courselike.add_xml_to_node(root)
+
+            # Make any needed adjustments to the root node.
+            self.process_root(root, export_fs)
+
+            # Process extra items-- drafts, assets, etc
+            root_courselike_dir = self.root_dir + '/' + self.target_dir
+            self.process_extra(root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs)
+
+            # Any last pass adjustments
+            self.post_process(root, export_fs)
+
+
+class CourseExportManager(ExportManager):
+    """
+    Export manager for courses.
+    """
+    def get_key(self):
+        return CourseLocator(
+            self.courselike_key.org, self.courselike_key.course, self.courselike_key.run, deprecated=True
+        )
+
+    def get_courselike(self):
+        # depth = None: Traverses down the entire course structure.
+        # lazy = False: Loads and caches all block definitions during traversal for fast access later
+        #               -and- to eliminate many round-trips to read individual definitions.
+        # Why these parameters? Because a course export needs to access all the course block information
+        # eventually. Accessing it all now at the beginning increases performance of the export.
+        return self.modulestore.get_course(self.courselike_key, depth=None, lazy=False)
+
+    def process_root(self, root, export_fs):
         with export_fs.open('course.xml', 'w') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml)
+            lxml.etree.ElementTree(root).write(course_xml)  # pylint: disable=no-member
 
+    def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
         # Export the modulestore's asset metadata.
-        asset_dir = root_course_dir + '/' + AssetMetadata.EXPORTED_ASSET_DIR + '/'
+        asset_dir = root_courselike_dir + '/' + AssetMetadata.EXPORTED_ASSET_DIR + '/'
         if not os.path.isdir(asset_dir):
             os.makedirs(asset_dir)
         asset_root = lxml.etree.Element(AssetMetadata.ALL_ASSETS_XML_TAG)
-        course_assets = modulestore.get_all_asset_metadata(course_key, None)
+        course_assets = self.modulestore.get_all_asset_metadata(self.courselike_key, None)
         for asset_md in course_assets:
             # All asset types are exported using the "asset" tag - but their asset type is specified in each asset key.
-            asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)
+            asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)  # pylint: disable=no-member
             asset_md.to_xml(asset)
         with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'w') as asset_xml_file:
-            lxml.etree.ElementTree(asset_root).write(asset_xml_file)
+            lxml.etree.ElementTree(asset_root).write(asset_xml_file)  # pylint: disable=no-member
 
         # export the static assets
         policies_dir = export_fs.makeopendir('policies')
-        if contentstore:
-            contentstore.export_all_for_course(
-                course_key,
-                root_course_dir + '/static/',
-                root_course_dir + '/policies/assets.json',
+        if self.contentstore:
+            self.contentstore.export_all_for_course(
+                self.courselike_key,
+                root_courselike_dir + '/static/',
+                root_courselike_dir + '/policies/assets.json',
             )
 
             # If we are using the default course image, export it to the
             # legacy location to support backwards compatibility.
-            if course.course_image == course.fields['course_image'].default:
+            if courselike.course_image == courselike.fields['course_image'].default:
                 try:
-                    course_image = contentstore.find(
+                    course_image = self.contentstore.find(
                         StaticContent.compute_location(
-                            course.id,
-                            course.course_image
+                            courselike.id,
+                            courselike.course_image
                         ),
                     )
                 except NotFoundError:
                     pass
                 else:
-                    output_dir = root_course_dir + '/static/images/'
+                    output_dir = root_courselike_dir + '/static/images/'
                     if not os.path.isdir(output_dir):
                         os.makedirs(output_dir)
                     with OSFS(output_dir).open('course_image.jpg', 'wb') as course_image_file:
                         course_image_file.write(course_image.data)
 
         # export the static tabs
-        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'static_tab', 'tabs', '.html')
+        export_extra_content(
+            export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
+            'static_tab', 'tabs', '.html'
+        )
 
         # export the custom tags
-        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'custom_tag_template', 'custom_tags')
+        export_extra_content(
+            export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
+            'custom_tag_template', 'custom_tags'
+        )
 
         # export the course updates
-        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'course_info', 'info', '.html')
+        export_extra_content(
+            export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
+            'course_info', 'info', '.html'
+        )
 
         # export the 'about' data (e.g. overview, etc.)
-        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'about', 'about', '.html')
+        export_extra_content(
+            export_fs, self.modulestore, self.courselike_key, xml_centric_courselike_key,
+            'about', 'about', '.html'
+        )
+
+        course_policy_dir_name = courselike.location.run
+        if courselike.url_name != courselike.location.run and courselike.url_name == 'course':
+            # Use url_name for split mongo because course_run is not used when loading policies.
+            course_policy_dir_name = courselike.url_name
+
+        course_run_policy_dir = policies_dir.makeopendir(course_policy_dir_name)
 
         # export the grading policy
-        course_run_policy_dir = policies_dir.makeopendir(course.location.name)
         with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
-            grading_policy.write(dumps(course.grading_policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
+            grading_policy.write(dumps(courselike.grading_policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
         # export all of the course metadata in policy.json
         with course_run_policy_dir.open('policy.json', 'w') as course_policy:
-            policy = {'course/' + course.location.name: own_metadata(course)}
+            policy = {'course/' + courselike.location.name: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
-        #### DRAFTS ####
         # xml backed courses don't support drafts!
-        if course.runtime.modulestore.get_modulestore_type() != ModuleStoreEnum.Type.xml:
-            # NOTE: we need to explicitly implement the logic for setting the vertical's parent
-            # and index here since the XML modulestore cannot load draft modules
-            with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
-                draft_modules = modulestore.get_items(
-                    course_key,
-                    qualifiers={'category': {'$nin': DIRECT_ONLY_CATEGORIES}},
-                    revision=ModuleStoreEnum.RevisionOption.draft_only
-                )
+        if courselike.runtime.modulestore.get_modulestore_type() != ModuleStoreEnum.Type.xml:
+            _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
 
-                if draft_modules:
-                    draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
 
-                    # accumulate tuples of draft_modules and their parents in
-                    # this list:
-                    draft_node_list = []
+class LibraryExportManager(ExportManager):
+    """
+    Export manager for Libraries
+    """
+    def get_key(self):
+        """
+        Get the library locator for the current library key.
+        """
+        return LibraryLocator(
+            self.courselike_key.org, self.courselike_key.library
+        )
 
-                    for draft_module in draft_modules:
-                        parent_loc = modulestore.get_parent_location(
-                            draft_module.location,
-                            revision=ModuleStoreEnum.RevisionOption.draft_preferred
-                        )
+    def get_courselike(self):
+        """
+        Get the library from the modulestore.
+        """
+        return self.modulestore.get_library(self.courselike_key, depth=None, lazy=False)
 
-                        # if module has no parent, set its parent_url to `None`
-                        parent_url = None
-                        if parent_loc is not None:
-                            parent_url = parent_loc.to_deprecated_string()
+    def process_root(self, root, export_fs):
+        """
+        Add extra attributes to the root XML file.
+        """
+        root.set('org', self.courselike_key.org)
+        root.set('library', self.courselike_key.library)
 
-                        draft_node = draft_node_constructor(
-                            draft_module,
-                            location=draft_module.location,
-                            url=draft_module.location.to_deprecated_string(),
-                            parent_location=parent_loc,
-                            parent_url=parent_url,
-                        )
+    def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
+        """
+        Notionally, libraries may have assets. This is currently unsupported, but the structure is here
+        to ease in duck typing during import. This may be expanded as a useful feature eventually.
+        """
+        # export the static assets
+        export_fs.makeopendir('policies')
 
-                        draft_node_list.append(draft_node)
+        if self.contentstore:
+            self.contentstore.export_all_for_course(
+                self.courselike_key,
+                self.root_dir + '/' + self.target_dir + '/static/',
+                self.root_dir + '/' + self.target_dir + '/policies/assets.json',
+            )
 
-                    for draft_node in get_draft_subtree_roots(draft_node_list):
-                        # only export the roots of the draft subtrees
-                        # since export_from_xml (called by `add_xml_to_node`)
-                        # exports a whole tree
+    def post_process(self, root, export_fs):
+        """
+        Because Libraries are XBlocks, they aren't exported in the same way Course Modules
+        are, but instead use the standard XBlock serializers. Accordingly, we need to
+        create our own index file to act as the equivalent to the root course.xml file,
+        called library.xml.
+        """
+        # Create the Library.xml file, which acts as the index of all library contents.
+        xml_file = export_fs.open(LIBRARY_ROOT, 'w')
+        # pylint: disable=no-member
+        xml_file.write(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8'))
+        xml_file.close()
 
-                        # ensure module has "xml_attributes" attr
-                        if not hasattr(draft_node.module, 'xml_attributes'):
-                            draft_node.module.xml_attributes = {}
 
-                        # Don't try to export orphaned items
-                        # and their descendents
-                        if draft_node.parent_location is None:
-                            continue
+def export_course_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
+    """
+    Thin wrapper for the Course Export Manager. See ExportManager for details.
+    """
+    CourseExportManager(modulestore, contentstore, course_key, root_dir, course_dir).export()
 
-                        logging.debug('parent_loc = {0}'.format(draft_node.parent_location))
 
-                        draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
-                        parent = modulestore.get_item(draft_node.parent_location)
-                        index = parent.children.index(draft_node.module.location)
-                        draft_node.module.xml_attributes['index_in_children_list'] = str(index)
-
-                        draft_node.module.runtime.export_fs = draft_course_dir
-                        adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
-                        node = lxml.etree.Element('unknown')
-
-                        draft_node.module.add_xml_to_node(node)
+def export_library_to_xml(modulestore, contentstore, library_key, root_dir, library_dir):
+    """
+    Thin wrapper for the Library Export Manager. See ExportManager for details.
+    """
+    LibraryExportManager(modulestore, contentstore, library_key, root_dir, library_dir).export()
 
 
 def adapt_references(subtree, destination_course_key, export_fs):

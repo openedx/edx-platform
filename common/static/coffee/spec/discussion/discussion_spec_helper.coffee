@@ -38,7 +38,7 @@ class @DiscussionSpecHelper
 
     @setUnderscoreFixtures = ->
         for templateName in ['thread-show']
-            templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
+            templateFixture = readFixtures('common/templates/discussion/' + templateName + '.underscore')
             appendSetFixtures($('<script>', { id: templateName + '-template', type: 'text/template' })
                 .text(templateFixture))
         appendSetFixtures("""
@@ -317,7 +317,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <ul class="post-errors" style="display: none"></ul>
         <div class="forum-new-post-form-wrapper"></div>
         <% if (cohort_options) { %>
-        <div class="post-field">
+        <div class="post-field group-selector-wrapper<% if (!is_commentable_cohorted) { %> disabled<% } %>">
             <label class="field-label">
                 <span class="field-label-text">
                     Visible To:
@@ -546,7 +546,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
                 <span class="action-label">Edit</span>
-                <span class="action-icon"><i class="icon fa fa-pencil-square-o"></i></span>
+                <span class="action-icon"><i class="icon fa fa-pencil"></i></span>
             </a>
         </li>
     </script>

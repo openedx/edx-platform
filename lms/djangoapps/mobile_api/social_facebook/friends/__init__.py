@@ -1,0 +1,3 @@
+"""
+Friends API
+"""

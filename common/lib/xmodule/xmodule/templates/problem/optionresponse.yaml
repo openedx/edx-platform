@@ -2,35 +2,35 @@
 metadata:
     display_name: Dropdown
     markdown: |
-        Dropdown problems give a limited set of options for students to respond with, and present those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.
+         Dropdown problems allow learners to select only one option from a list of options.
 
-        The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
+         When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
 
-        >>Translation between Dropdown and __________ is extremely straightforward:<<
+         You can use the following example problem as a model.
 
-        [[(Multiple Choice), Text Input, Numerical Input, External Response, Image Response]]
+          >>Which of the following countries celebrates its independence on August 15?<<
 
-        [explanation]
-        Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Dropdowns also differ slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.
-        [explanation]
+          [[(India), Spain, China, Bermuda]]
+
+          [explanation]
+          India became an independent nation on August 15, 1947.
+          [explanation]
 data: |
   <problem>
-  <p>Dropdown problems give a limited set of options for students to respond with, and present those options
-  in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
-
-  <p>
-  The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag. 
-  </p>
-  <p>Translation between Dropdown and __________ is extremely straightforward:
-      
-  <optionresponse>
-        <optioninput options="('Multiple Choice','Text Input','Numerical Input','External Response','Image Response')" correct="Multiple Choice" label="Translation between Dropdown and __________ is extremely straightforward"></optioninput>
-  </optionresponse>
-  </p>
-      <solution>
-          <div class="detailed-solution">
-              <p>Explanation</p>
-              <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
-          </div>
-      </solution>
+    <p>Dropdown problems allow learners to select only one option from a list of options.</p>
+    <p>When you add the problem, be sure to select <strong>Settings</strong> 
+    to specify a <strong>Display Name</strong> and other values that apply.</p>
+    <p>You can use the following example problem as a model.</p>
+      <p>Which of the following countries celebrates its independence on August 15?</p>
+      <br/>
+      <optionresponse>
+        <optioninput options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
+      </optionresponse>
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>India became an independent nation on August 15, 1947.</p>
+      </div>
+    </solution>
   </problem>
+

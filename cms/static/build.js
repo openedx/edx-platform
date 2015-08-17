@@ -19,6 +19,10 @@
         }));
     };
 
+
+    var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined ?
+        process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
+
     return {
         /**
          * List the modules that will be optimized. All their immediate and deep
@@ -36,8 +40,10 @@
             'js/factories/edit_tabs',
             'js/factories/export',
             'js/factories/group_configurations',
+            'js/certificates/factories/certificates_page_factory',
             'js/factories/import',
             'js/factories/index',
+            'js/factories/library',
             'js/factories/login',
             'js/factories/manage_users',
             'js/factories/outline',
@@ -89,7 +95,7 @@
         shim: {
             'xmodule': {
                 deps: [
-                    'jquery', 'underscore', 'mathjax', 'codemirror', 'tinymce',
+                    'jquery', 'underscore', 'codemirror', 'tinymce',
                     'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',
                     'jquery.cookie', 'utility'
                 ]
@@ -117,7 +123,7 @@
          * As of 1.0.3, this value can also be a string that is converted to a
          * RegExp via new RegExp().
          */
-        fileExclusionRegExp: /^\.|spec/,
+        fileExclusionRegExp: /^\.|spec|spec_helpers/,
         /**
          * Allow CSS optimizations. Allowed values:
          * - "standard": @import inlining and removal of comments, unnecessary
@@ -142,7 +148,7 @@
          * mode to minify the code. Only available if REQUIRE_ENVIRONMENT is "rhino" (the default).
          * - "none": No minification will be done.
          */
-        optimize: 'uglify2',
+        optimize: jsOptimize,
         /**
          * Sets the logging level. It is a number:
          * TRACE: 0,
@@ -152,6 +158,6 @@
          * SILENT: 4
          * Default is 0.
          */
-        logLevel: 4
+        logLevel: 1
     };
 } ())

@@ -7,6 +7,37 @@
 import os
 from path import path
 import sys
+import mock
+
+MOCK_MODULES = [
+    'ipware',
+    'ip',
+    'ipware.ip',
+    'get_ip',
+    'pygeoip',
+    'ipaddr',
+    'django_countries',
+    'fields',
+    'django_countries.fields',
+    'opaque_keys',
+    'opaque_keys.edx',
+    'opaque_keys.edx.keys',
+    'CourseKey',
+    'UsageKey',
+    'BlockTypeKey',
+    'opaque_keys.edx.locations',
+    'SlashSeparatedCourseKey',
+    'Location',
+    'opaque_keys.edx.locator',
+    'Locator',
+    'south',
+    'modelsinspector',
+    'south.modelsinspector',
+    'add_introspection_rules'
+]
+
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -54,8 +85,6 @@ if on_rtd:
 else:
     os.environ['DJANGO_SETTINGS_MODULE'] = 'lms'
 
-
-
 # -- General configuration -----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
@@ -72,5 +101,3 @@ exclude_patterns = ['build', 'links.rst']
 
 project = u'edX Enrollment API Version 1'
 copyright = u'2015, edX'
-
-

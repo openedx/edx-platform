@@ -2,8 +2,11 @@
 Middleware for Language Preferences
 """
 
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
+# TODO PLAT-671 Import from Django 1.8
+# from django.utils.translation import LANGUAGE_SESSION_KEY
+from django_locale.trans_real import LANGUAGE_SESSION_KEY
 
 
 class LanguagePreferenceMiddleware(object):
@@ -16,10 +19,12 @@ class LanguagePreferenceMiddleware(object):
 
     def process_request(self, request):
         """
-        If a user's UserPreference contains a language preference and there is
-        no language set on the session (i.e. from dark language overrides), use the user's preference.
+        If a user's UserPreference contains a language preference, use the user's preference.
         """
-        if request.user.is_authenticated() and 'django_language' not in request.session:
-            user_pref = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+        # If the user is logged in, check for their language preference
+        if request.user.is_authenticated():
+            # Get the user's language preference
+            user_pref = get_user_preference(request.user, LANGUAGE_KEY)
+            # Set it to the LANGUAGE_SESSION_KEY (Django-specific session setting governing language pref)
             if user_pref:
-                request.session['django_language'] = user_pref
+                request.session[LANGUAGE_SESSION_KEY] = user_pref

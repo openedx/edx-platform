@@ -473,7 +473,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         non_editable_fields = super(SplitTestDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
             SplitTestDescriptor.due,
-            SplitTestDescriptor.user_partitions
+            SplitTestDescriptor.user_partitions,
+            SplitTestDescriptor.group_id_to_child,
         ])
         return non_editable_fields
 

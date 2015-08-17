@@ -3,7 +3,10 @@ from opaque_keys.edx.locations import Location
 from django.test import TestCase
 
 
-class Content:
+class Content(object):
+    """
+    Mock cached content
+    """
     def __init__(self, location, content):
         self.location = location
         self.content = content

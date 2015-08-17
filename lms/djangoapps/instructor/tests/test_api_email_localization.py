@@ -5,40 +5,44 @@ Unit tests for the localization of emails sent by instructor.api methods.
 
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from courseware.tests.factories import InstructorFactory
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class TestInstructorAPIEnrollmentEmailLocalization(TestCase):
+@attr('shard_1')
+class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the
     proper language, i.e: the student's language.
     """
 
     def setUp(self):
+        super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()
+
         # Platform language is English, instructor's language is Chinese,
         # student's language is French, so the emails should all be sent in
         # French.
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
-        UserPreference.set_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
+        set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory.create()
-        UserPreference.set_preference(self.student, LANGUAGE_KEY, 'fr')
+        set_user_preference(self.student, LANGUAGE_KEY, 'fr')
 
     def update_enrollement(self, action, student_email):
         """
         Update the current student enrollment status.
         """
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        args = {'identifiers': student_email, 'email_students': 'true', 'action': action}
+        args = {'identifiers': student_email, 'email_students': 'true', 'action': action, 'reason': 'testing'}
         response = self.client.post(url, args)
         return response
 

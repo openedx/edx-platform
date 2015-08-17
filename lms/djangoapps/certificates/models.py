@@ -1,13 +1,4 @@
-from django.contrib.auth.models import User
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.conf import settings
-from datetime import datetime
-from model_utils import Choices
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone
-
+# -*- coding: utf-8 -*-
 """
 Certificates are created for a student and an offering of a course.
 
@@ -54,6 +45,28 @@ Eligibility:
        then the student will be issued a certificate regardless of his grade,
        unless he has allow_certificate set to False.
 """
+from datetime import datetime
+import json
+import logging
+import uuid
+
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db import models, transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.fields.json import JSONField
+from model_utils import Choices
+from model_utils.models import TimeStampedModel
+from xmodule.modulestore.django import modulestore
+from config_models.models import ConfigurationModel
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from util.milestones_helpers import fulfill_course_milestone
+from course_modes.models import CourseMode
+
+LOGGER = logging.getLogger(__name__)
 
 
 class CertificateStatuses(object):
@@ -66,6 +79,15 @@ class CertificateStatuses(object):
     regenerating = 'regenerating'
     restricted = 'restricted'
     unavailable = 'unavailable'
+
+
+class CertificateSocialNetworks(object):
+    """
+    Enum for certificate social networks
+    """
+    linkedin = 'LinkedIn'
+    facebook = 'Facebook'
+    twitter = 'Twitter'
 
 
 class CertificateWhitelist(models.Model):
@@ -105,7 +127,7 @@ class GeneratedCertificate(models.Model):
         auto_now=True, default=datetime.now)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
-    class Meta:
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = (('user', 'course_id'),)
 
     @classmethod
@@ -126,10 +148,11 @@ class GeneratedCertificate(models.Model):
 def handle_post_cert_generated(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
     """
     Handles post_save signal of GeneratedCertificate, and mark user collected
-    course milestone entry if user has passed the course
-    or certificate status is 'generating'.
+    course milestone entry if user has passed the course.
+    User is assumed to have passed the course if certificate status is either 'generating' or 'downloadable'.
     """
-    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status == CertificateStatuses.generating:
+    allowed_cert_states = [CertificateStatuses.generating, CertificateStatuses.downloadable]
+    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES') and instance.status in allowed_cert_states:
         fulfill_course_milestone(instance.course_id, instance.user)
 
 
@@ -176,3 +199,500 @@ def certificate_status_for_student(student, course_id):
     except GeneratedCertificate.DoesNotExist:
         pass
     return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
+
+
+def certificate_info_for_user(user, course_id, grade, user_is_whitelisted=None):
+    """
+    Returns the certificate info for a user for grade report.
+    """
+    if user_is_whitelisted is None:
+        user_is_whitelisted = CertificateWhitelist.objects.filter(
+            user=user, course_id=course_id, whitelist=True
+        ).exists()
+
+    eligible_for_certificate = (user_is_whitelisted or grade is not None) and user.profile.allow_certificate
+
+    if eligible_for_certificate:
+        user_is_eligible = 'Y'
+
+        certificate_status = certificate_status_for_student(user, course_id)
+        certificate_generated = certificate_status['status'] == CertificateStatuses.downloadable
+        certificate_is_delivered = 'Y' if certificate_generated else 'N'
+
+        certificate_type = certificate_status['mode'] if certificate_generated else 'N/A'
+    else:
+        user_is_eligible = 'N'
+        certificate_is_delivered = 'N'
+        certificate_type = 'N/A'
+
+    return [user_is_eligible, certificate_is_delivered, certificate_type]
+
+
+class ExampleCertificateSet(TimeStampedModel):
+    """A set of example certificates.
+
+    Example certificates are used to verify that certificate
+    generation is working for a particular course.
+
+    A particular course may have several kinds of certificates
+    (e.g. honor and verified), in which case we generate
+    multiple example certificates for the course.
+
+    """
+    course_key = CourseKeyField(max_length=255, db_index=True)
+
+    class Meta:  # pylint: disable=missing-docstring, old-style-class
+        get_latest_by = 'created'
+
+    @classmethod
+    @transaction.commit_on_success
+    def create_example_set(cls, course_key):
+        """Create a set of example certificates for a course.
+
+        Arguments:
+            course_key (CourseKey)
+
+        Returns:
+            ExampleCertificateSet
+
+        """
+        cert_set = cls.objects.create(course_key=course_key)
+
+        ExampleCertificate.objects.bulk_create([
+            ExampleCertificate(
+                example_cert_set=cert_set,
+                description=mode.slug,
+                template=cls._template_for_mode(mode.slug, course_key)
+            )
+            for mode in CourseMode.modes_for_course(course_key)
+        ])
+
+        return cert_set
+
+    @classmethod
+    def latest_status(cls, course_key):
+        """Summarize the latest status of example certificates for a course.
+
+        Arguments:
+            course_key (CourseKey)
+
+        Returns:
+            list: List of status dictionaries.  If no example certificates
+                have been started yet, returns None.
+
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return None
+
+        queryset = ExampleCertificate.objects.filter(example_cert_set=latest).order_by('-created')
+        return [cert.status_dict for cert in queryset]
+
+    def __iter__(self):
+        """Iterate through example certificates in the set.
+
+        Yields:
+            ExampleCertificate
+
+        """
+        queryset = (ExampleCertificate.objects).select_related('example_cert_set').filter(example_cert_set=self)
+        for cert in queryset:
+            yield cert
+
+    @staticmethod
+    def _template_for_mode(mode_slug, course_key):
+        """Calculate the template PDF based on the course mode. """
+        return (
+            u"certificate-template-{key.org}-{key.course}-verified.pdf".format(key=course_key)
+            if mode_slug == 'verified'
+            else u"certificate-template-{key.org}-{key.course}.pdf".format(key=course_key)
+        )
+
+
+def _make_uuid():
+    """Return a 32-character UUID. """
+    return uuid.uuid4().hex
+
+
+class ExampleCertificate(TimeStampedModel):
+    """Example certificate.
+
+    Example certificates are used to verify that certificate
+    generation is working for a particular course.
+
+    An example certificate is similar to an ordinary certificate,
+    except that:
+
+    1) Example certificates are not associated with a particular user,
+        and are never displayed to students.
+
+    2) We store the "inputs" for generating the example certificate
+        to make it easier to debug when certificate generation fails.
+
+    3) We use dummy values.
+
+    """
+    # Statuses
+    STATUS_STARTED = 'started'
+    STATUS_SUCCESS = 'success'
+    STATUS_ERROR = 'error'
+
+    # Dummy full name for the generated certificate
+    EXAMPLE_FULL_NAME = u'John Doë'
+
+    example_cert_set = models.ForeignKey(ExampleCertificateSet)
+
+    description = models.CharField(
+        max_length=255,
+        help_text=_(
+            u"A human-readable description of the example certificate.  "
+            u"For example, 'verified' or 'honor' to differentiate between "
+            u"two types of certificates."
+        )
+    )
+
+    # Inputs to certificate generation
+    # We store this for auditing purposes if certificate
+    # generation fails.
+    uuid = models.CharField(
+        max_length=255,
+        default=_make_uuid,
+        db_index=True,
+        unique=True,
+        help_text=_(
+            u"A unique identifier for the example certificate.  "
+            u"This is used when we receive a response from the queue "
+            u"to determine which example certificate was processed."
+        )
+    )
+
+    access_key = models.CharField(
+        max_length=255,
+        default=_make_uuid,
+        db_index=True,
+        help_text=_(
+            u"An access key for the example certificate.  "
+            u"This is used when we receive a response from the queue "
+            u"to validate that the sender is the same entity we asked "
+            u"to generate the certificate."
+        )
+    )
+
+    full_name = models.CharField(
+        max_length=255,
+        default=EXAMPLE_FULL_NAME,
+        help_text=_(u"The full name that will appear on the certificate.")
+    )
+
+    template = models.CharField(
+        max_length=255,
+        help_text=_(u"The template file to use when generating the certificate.")
+    )
+
+    # Outputs from certificate generation
+    status = models.CharField(
+        max_length=255,
+        default=STATUS_STARTED,
+        choices=(
+            (STATUS_STARTED, 'Started'),
+            (STATUS_SUCCESS, 'Success'),
+            (STATUS_ERROR, 'Error')
+        ),
+        help_text=_(u"The status of the example certificate.")
+    )
+
+    error_reason = models.TextField(
+        null=True,
+        default=None,
+        help_text=_(u"The reason an error occurred during certificate generation.")
+    )
+
+    download_url = models.CharField(
+        max_length=255,
+        null=True,
+        default=None,
+        help_text=_(u"The download URL for the generated certificate.")
+    )
+
+    def update_status(self, status, error_reason=None, download_url=None):
+        """Update the status of the example certificate.
+
+        This will usually be called either:
+        1) When an error occurs adding the certificate to the queue.
+        2) When we receieve a response from the queue (either error or success).
+
+        If an error occurs, we store the error message;
+        if certificate generation is successful, we store the URL
+        for the generated certificate.
+
+        Arguments:
+            status (str): Either `STATUS_SUCCESS` or `STATUS_ERROR`
+
+        Keyword Arguments:
+            error_reason (unicode): A description of the error that occurred.
+            download_url (unicode): The URL for the generated certificate.
+
+        Raises:
+            ValueError: The status is not a valid value.
+
+        """
+        if status not in [self.STATUS_SUCCESS, self.STATUS_ERROR]:
+            msg = u"Invalid status: must be either '{success}' or '{error}'.".format(
+                success=self.STATUS_SUCCESS,
+                error=self.STATUS_ERROR
+            )
+            raise ValueError(msg)
+
+        self.status = status
+
+        if status == self.STATUS_ERROR and error_reason:
+            self.error_reason = error_reason
+
+        if status == self.STATUS_SUCCESS and download_url:
+            self.download_url = download_url
+
+        self.save()
+
+    @property
+    def status_dict(self):
+        """Summarize the status of the example certificate.
+
+        Returns:
+            dict
+
+        """
+        result = {
+            'description': self.description,
+            'status': self.status,
+        }
+
+        if self.error_reason:
+            result['error_reason'] = self.error_reason
+
+        if self.download_url:
+            result['download_url'] = self.download_url
+
+        return result
+
+    @property
+    def course_key(self):
+        """The course key associated with the example certificate. """
+        return self.example_cert_set.course_key
+
+
+class CertificateGenerationCourseSetting(TimeStampedModel):
+    """Enable or disable certificate generation for a particular course.
+
+    This controls whether students are allowed to "self-generate"
+    certificates for a course.  It does NOT prevent us from
+    batch-generating certificates for a course using management
+    commands.
+
+    In general, we should only enable self-generated certificates
+    for a course once we successfully generate example certificates
+    for the course.  This is enforced in the UI layer, but
+    not in the data layer.
+
+    """
+    course_key = CourseKeyField(max_length=255, db_index=True)
+    enabled = models.BooleanField(default=False)
+
+    class Meta:  # pylint: disable=missing-docstring, old-style-class
+        get_latest_by = 'created'
+
+    @classmethod
+    def is_enabled_for_course(cls, course_key):
+        """Check whether self-generated certificates are enabled for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+
+        Returns:
+            boolean
+
+        """
+        try:
+            latest = cls.objects.filter(course_key=course_key).latest()
+        except cls.DoesNotExist:
+            return False
+        else:
+            return latest.enabled
+
+    @classmethod
+    def set_enabled_for_course(cls, course_key, is_enabled):
+        """Enable or disable self-generated certificates for a course.
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course.
+            is_enabled (boolean): Whether to enable or disable self-generated certificates.
+
+        """
+        CertificateGenerationCourseSetting.objects.create(
+            course_key=course_key,
+            enabled=is_enabled
+        )
+
+
+class CertificateGenerationConfiguration(ConfigurationModel):
+    """Configure certificate generation.
+
+    Enable or disable the self-generated certificates feature.
+    When this flag is disabled, the "generate certificate" button
+    will be hidden on the progress page.
+
+    When the feature is enabled, the "generate certificate" button
+    will appear for courses that have enabled self-generated
+    certificates.
+
+    """
+    pass
+
+
+class CertificateHtmlViewConfiguration(ConfigurationModel):
+    """
+    Static values for certificate HTML view context parameters.
+    Default values will be applied across all certificate types (course modes)
+    Matching 'mode' overrides will be used instead of defaults, where applicable
+    Example configuration :
+        {
+            "default": {
+                "url": "http://www.edx.org",
+                "logo_src": "http://www.edx.org/static/images/logo.png"
+            },
+            "honor": {
+                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
+            }
+        }
+    """
+    configuration = models.TextField(
+        help_text="Certificate HTML View Parameters (JSON)"
+    )
+
+    def clean(self):
+        """
+        Ensures configuration field contains valid JSON.
+        """
+        try:
+            json.loads(self.configuration)
+        except ValueError:
+            raise ValidationError('Must be valid JSON string.')
+
+    @classmethod
+    def get_config(cls):
+        """
+        Retrieves the configuration field value from the database
+        """
+        instance = cls.current()
+        json_data = json.loads(instance.configuration) if instance.enabled else {}
+        return json_data
+
+
+class BadgeAssertion(models.Model):
+    """
+    Tracks badges on our side of the badge baking transaction
+    """
+    user = models.ForeignKey(User)
+    course_id = CourseKeyField(max_length=255, blank=True, default=None)
+    # Mode a badge was awarded for.
+    mode = models.CharField(max_length=100)
+    data = JSONField()
+
+    @property
+    def image_url(self):
+        """
+        Get the image for this assertion.
+        """
+
+        return self.data['image']
+
+    @property
+    def assertion_url(self):
+        """
+        Get the public URL for the assertion.
+        """
+        return self.data['json']['id']
+
+    class Meta(object):
+        """
+        Meta information for Django's construction of the model.
+        """
+        unique_together = (('course_id', 'user', 'mode'),)
+
+
+def validate_badge_image(image):
+    """
+    Validates that a particular image is small enough, of the right type, and square to be a badge.
+    """
+    if image.width != image.height:
+        raise ValidationError(_(u"The badge image must be square."))
+    if not image.size < (250 * 1024):
+        raise ValidationError(_(u"The badge image file size must be less than 250KB."))
+
+
+class BadgeImageConfiguration(models.Model):
+    """
+    Contains the configuration for badges for a specific mode. The mode
+    """
+    mode = models.CharField(
+        max_length=125,
+        help_text=_(u'The course mode for this badge image. For example, "verified" or "honor".'),
+        unique=True,
+    )
+    icon = models.ImageField(
+        # Actual max is 256KB, but need overhead for badge baking. This should be more than enough.
+        help_text=_(
+            u"Badge images must be square PNG files. The file size should be under 250KB."
+        ),
+        upload_to='badges',
+        validators=[validate_badge_image]
+    )
+    default = models.BooleanField(
+        help_text=_(
+            u"Set this value to True if you want this image to be the default image for any course modes "
+            u"that do not have a specified badge image. You can have only one default image."
+        )
+    )
+
+    def clean(self):
+        """
+        Make sure there's not more than one default.
+        """
+        # pylint: disable=no-member
+        if self.default and BadgeImageConfiguration.objects.filter(default=True).exclude(id=self.id):
+            raise ValidationError(_(u"There can be only one default image."))
+
+    @classmethod
+    def image_for_mode(cls, mode):
+        """
+        Get the image for a particular mode.
+        """
+        try:
+            return cls.objects.get(mode=mode).icon
+        except cls.DoesNotExist:
+            # Fall back to default, if there is one.
+            return cls.objects.get(default=True).icon
+
+
+@receiver(post_save, sender=GeneratedCertificate)
+#pylint: disable=unused-argument
+def create_badge(sender, instance, **kwargs):
+    """
+    Standard signal hook to create badges when a certificate has been generated.
+    """
+    if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
+        return
+    if not modulestore().get_course(instance.course_id).issue_badges:
+        LOGGER.info("Course is not configured to issue badges.")
+        return
+    if BadgeAssertion.objects.filter(user=instance.user, course_id=instance.course_id):
+        LOGGER.info("Badge already exists for this user on this course.")
+        # Badge already exists. Skip.
+        return
+    # Don't bake a badge until the certificate is available. Prevents user-facing requests from being paused for this
+    # by making sure it only gets run on the callback during normal workflow.
+    if not instance.status == CertificateStatuses.downloadable:
+        return
+    from .badge_handler import BadgeHandler
+    handler = BadgeHandler(instance.course_id)
+    handler.award(instance.user)

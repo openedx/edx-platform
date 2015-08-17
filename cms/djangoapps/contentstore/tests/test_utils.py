@@ -12,10 +12,10 @@ from contentstore import utils
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locator import CourseLocator
 
 
 class LMSLinksTestCase(TestCase):
@@ -108,97 +108,55 @@ class ExtraPanelTabTestCase(TestCase):
             course.tabs = tabs
         return course
 
-    def test_add_extra_panel_tab(self):
-        """ Tests if a tab can be added to a course tab list. """
-        for tab_type in utils.EXTRA_TAB_PANELS.keys():
-            tab = utils.EXTRA_TAB_PANELS.get(tab_type)
 
-            # test adding with changed = True
-            for tab_setup in ['', 'x', 'x,y,z']:
-                course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = copy.copy(course.tabs)
-                expected_tabs.append(tab)
-                changed, actual_tabs = utils.add_extra_panel_tab(tab_type, course)
-                self.assertTrue(changed)
-                self.assertEqual(actual_tabs, expected_tabs)
-
-            # test adding with changed = False
-            tab_test_setup = [
-                [tab],
-                [tab, self.get_tab_type_dicts('x,y,z')],
-                [self.get_tab_type_dicts('x,y'), tab, self.get_tab_type_dicts('z')],
-                [self.get_tab_type_dicts('x,y,z'), tab]]
-
-            for tab_setup in tab_test_setup:
-                course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = copy.copy(course.tabs)
-                changed, actual_tabs = utils.add_extra_panel_tab(tab_type, course)
-                self.assertFalse(changed)
-                self.assertEqual(actual_tabs, expected_tabs)
-
-    def test_remove_extra_panel_tab(self):
-        """ Tests if a tab can be removed from a course tab list. """
-        for tab_type in utils.EXTRA_TAB_PANELS.keys():
-            tab = utils.EXTRA_TAB_PANELS.get(tab_type)
-
-            # test removing with changed = True
-            tab_test_setup = [
-                [tab],
-                [tab, self.get_tab_type_dicts('x,y,z')],
-                [self.get_tab_type_dicts('x,y'), tab, self.get_tab_type_dicts('z')],
-                [self.get_tab_type_dicts('x,y,z'), tab]]
-
-            for tab_setup in tab_test_setup:
-                course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = [t for t in course.tabs if t != utils.EXTRA_TAB_PANELS.get(tab_type)]
-                changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
-                self.assertTrue(changed)
-                self.assertEqual(actual_tabs, expected_tabs)
-
-            # test removing with changed = False
-            for tab_setup in ['', 'x', 'x,y,z']:
-                course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = copy.copy(course.tabs)
-                changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
-                self.assertFalse(changed)
-                self.assertEqual(actual_tabs, expected_tabs)
-
-
-class CourseImageTestCase(TestCase):
+class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
+
+    def verify_url(self, expected_url, actual_url):
+        """
+        Helper method for verifying the URL is as expected.
+        """
+        if not expected_url.startswith("/"):
+            expected_url = "/" + expected_url
+        self.assertEquals(expected_url, actual_url)
 
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create()
-        url = utils.course_image_url(course)
-        self.assertEquals(url, unicode(course.id.make_asset_key('asset', course.course_image)))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course.course_image)),
+            utils.course_image_url(course)
+        )
 
     def test_non_ascii_image_name(self):
         """ Verify that non-ascii image names are cleaned """
         course_image = u'before_\N{SNOWMAN}_after.jpg'
         course = CourseFactory.create(course_image=course_image)
-        self.assertEquals(
-            utils.course_image_url(course),
-            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_')))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
+            utils.course_image_url(course)
         )
 
     def test_spaces_in_image_name(self):
         """ Verify that image names with spaces in them are cleaned """
         course_image = u'before after.jpg'
         course = CourseFactory.create(course_image=u'before after.jpg')
-        self.assertEquals(
-            utils.course_image_url(course),
-            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_")))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
+            utils.course_image_url(course)
         )
 
 
-class XBlockVisibilityTestCase(TestCase):
+class XBlockVisibilityTestCase(ModuleStoreTestCase):
     """Tests for xblock visibility for students."""
 
     def setUp(self):
+        super(XBlockVisibilityTestCase, self).setUp()
+
         self.dummy_user = ModuleStoreEnum.UserID.test
-        self.past = datetime(1970, 1, 1)
+        self.past = datetime(1970, 1, 1, tzinfo=UTC)
         self.future = datetime.now(UTC) + timedelta(days=1)
+        self.course = CourseFactory.create()
 
     def test_private_unreleased_xblock(self):
         """Verifies that a private unreleased xblock is not visible"""
@@ -250,10 +208,9 @@ class XBlockVisibilityTestCase(TestCase):
 
     def _create_xblock_with_start_date(self, name, start_date, publish=False, visible_to_staff_only=False):
         """Helper to create an xblock with a start date, optionally publishing it"""
-        course_key = CourseLocator('edX', 'visibility', '2012_Fall')
 
         vertical = modulestore().create_item(
-            self.dummy_user, course_key, 'vertical', name,
+            self.dummy_user, self.course.location.course_key, 'vertical', name,
             fields={'start': start_date, 'visible_to_staff_only': visible_to_staff_only}
         )
 

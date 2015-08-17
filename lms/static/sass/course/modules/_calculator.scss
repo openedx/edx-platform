@@ -2,6 +2,8 @@
 // ====================
 
 div.calc-main {
+  @extend %ui-print-excluded;
+
   bottom: -126px;
   left: 0;
   position: fixed;
@@ -60,7 +62,7 @@ div.calc-main {
       @include box-sizing(border-box);
       padding: lh();
 
-      input#calculator_button {
+      button#calculator_button {
         background: #111;
         border: 1px solid $black;
         border-radius: 0;
@@ -129,9 +131,12 @@ div.calc-main {
             @include hide-text;
             width: 35px;
             display: block;
+            border: none;
 
             &:focus {
               outline: 5px auto #5b9dd9;
+              box-shadow: none;
+              border: none;
             }
           }
 

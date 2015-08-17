@@ -1,0 +1,21 @@
+<h3 class="group-header-title" tabindex="-1">
+    <span class="title-value"><%- cohort.get('name') %></span>
+    <span class="group-count"><%-
+        interpolate(
+            ngettext('(contains %(student_count)s student)', '(contains %(student_count)s students)', cohort.get('user_count')),
+            { student_count: cohort.get('user_count') },
+            true
+        )
+    %></span>
+</h3>
+<div class="cohort-management-group-setup">
+    <div class="setup-value">
+        <% if (cohort.get('assignment_type') == "manual") { %>
+            <%- gettext("Students are added to this cohort only when you provide their email addresses or usernames on this page.") %>
+            <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/cohorts/cohort_config.html#assign-students-to-cohort-groups-manually" class="incontext-help action-secondary action-help"><%= gettext("What does this mean?") %></a>
+        <% } else { %>
+            <%- gettext("Students are added to this cohort automatically.") %>
+            <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/cohorts/cohorts_overview.html#all-automated-assignment" class="incontext-help action-secondary action-help"><%- gettext("What does this mean?") %></a>
+        <% } %>
+    </div>
+</div>

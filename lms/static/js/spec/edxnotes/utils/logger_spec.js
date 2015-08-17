@@ -92,16 +92,13 @@ define([
         });
 
         it('can use timers', function() {
-            var logger = getLogger('id', 1),
-                now, t0, logs, log;
+            var logger = getLogger('id', 1), logs, log;
 
-            now = function () {
-                return (new Date()).getTime();
-            };
-
-            t0 = now();
+            spyOn(performance, 'now').andReturn(1);
+            spyOn(Date, 'now').andReturn(1);
             logger.time('timer');
-            while (now() - t0 < 200) {}
+            performance.now.andReturn(201);
+            Date.now.andReturn(201);
             logger.timeEnd('timer');
 
             logs = logger.getHistory();
@@ -109,13 +106,13 @@ define([
             expect(log[0]).toBe('log');
             expect(log[1][0]).toBe('id');
             expect(log[1][1]).toBe('timer');
-            expect(log[1][2]).toBeInRange(180, 220);
+            expect(log[1][2]).toBe(200);
             expect(log[1][3]).toBe('ms');
         });
 
         it('can emit an event properly', function () {
             var logger = getLogger('id', 0);
-            logger.emit('event_name', {id: 'some_id'})
+            logger.emit('event_name', {id: 'some_id'});
             expect(Logger.log).toHaveBeenCalledWith('event_name', {
                 id: 'some_id'
             });

@@ -10,27 +10,29 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
     CodeResponseXMLFactory,
 )
 from courseware import grades
-from courseware.models import StudentModule
+from courseware.models import StudentModule, StudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.djangoapps.credit.api import (
+    set_credit_requirements, get_credit_requirement_status
+)
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that a course gets graded properly.
@@ -240,6 +242,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
         )
 
+        fake_request.user = self.student_user
         return grades.grade(self.student_user, fake_request, self.course)
 
     def get_progress_summary(self):
@@ -296,6 +299,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return [s.earned for s in hw_section['scores']]
 
 
+@attr('shard_1')
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
@@ -426,6 +430,32 @@ class TestCourseGrader(TestSubmittingProblems):
             "Please refresh your page."
         )
         self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    def test_show_answer_doesnt_write_to_csm(self):
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': u'Correct'})
+
+        # Now fetch the state entry for that problem.
+        student_module = StudentModule.objects.get(
+            course_id=self.course.id,
+            student=self.student_user
+        )
+        # count how many state history entries there are
+        baseline = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        )
+        baseline_count = baseline.count()
+        self.assertEqual(baseline_count, 3)
+
+        # now click "show answer"
+        self.show_question_answer('p1')
+
+        # check that we don't have more state history entries
+        csmh = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        )
+        current_count = csmh.count()
+        self.assertEqual(current_count, 3)
 
     def test_none_grade(self):
         """
@@ -595,7 +625,43 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
 
+    def test_min_grade_credit_requirements_status(self):
+        """
+        Test for credit course. If user passes minimum grade requirement then
+        status will be updated as satisfied in requirement status table.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
 
+        # Enable the course for credit
+        credit_course = CreditCourse.objects.create(
+            course_key=self.course.id,
+            enabled=True,
+        )
+
+        # Configure a credit provider for the course
+        CreditProvider.objects.create(
+            provider_id="ASU",
+            enable_integration=True,
+            provider_url="https://credit.example.com/request",
+        )
+
+        requirements = [{
+            "namespace": "grade",
+            "name": "grade",
+            "display_name": "Grade",
+            "criteria": {"min_grade": 0.52},
+        }]
+        # Add a single credit requirement (final grade)
+        set_credit_requirements(self.course.id, requirements)
+
+        self.get_grade_summary()
+        req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
+        self.assertEqual(req_status[0]["status"], 'satisfied')
+
+
+@attr('shard_1')
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
 
@@ -648,7 +714,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -897,6 +963,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self._check_ireset(name)
 
 
+@attr('shard_1')
 class TestAnswerDistributions(TestSubmittingProblems):
     """Check that we can pull answer distributions for problems."""
 
@@ -1052,6 +1119,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
             )
 
 
+@attr('shard_1')
 class TestConditionalContent(TestSubmittingProblems):
     """
     Check that conditional content works correctly with grading.

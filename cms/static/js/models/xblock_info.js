@@ -133,9 +133,19 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'has_content_group_components': null,
             /**
-             * Indicate the type of xblock
+             * actions defines the state of delete, drag and child add functionality for a xblock.
+             * currently, each xblock has default value of 'True' for keys: deletable, draggable and childAddable.
              */
-            'override_type': null
+            'actions': null,
+            /**
+             * Header visible to UI.
+             */
+            'is_header_visible': null,
+            /**
+             * Optional explanatory message about the xblock.
+             */
+            'explanatory_message': null
+
         },
 
         initialize: function () {
@@ -172,13 +182,33 @@ function(Backbone, _, str, ModuleUtils) {
             return !this.get('published') || this.get('has_changes');
         },
 
-        canBeDeleted: function(){
-            //get the type of xblock
-            if(this.get('override_type') != null) {
-                var type = this.get('override_type');
+        isDeletable: function() {
+            return this.isActionRequired('deletable');
+        },
 
-                //hide/remove the delete trash icon if type is entrance exam.
-                if (_.has(type, 'is_entrance_exam') && type['is_entrance_exam']) {
+        isDraggable: function() {
+            return this.isActionRequired('draggable');
+        },
+
+        isChildAddable: function(){
+            return this.isActionRequired('childAddable');
+        },
+
+        isHeaderVisible: function(){
+            if(this.get('is_header_visible') !== null) {
+              return this.get('is_header_visible');
+            }
+            return true;
+        },
+
+        /**
+         * Return true if action is required e.g. delete, drag, add new child etc or if given key is not present.
+         * @return {boolean}
+        */
+        isActionRequired: function(actionName) {
+            var actions = this.get('actions');
+            if(actions !== null) {
+                if (_.has(actions, actionName) && !actions[actionName]) {
                     return false;
                 }
             }
@@ -188,8 +218,8 @@ function(Backbone, _, str, ModuleUtils) {
         /**
          * Return a list of convenience methods to check affiliation to the category.
          * @return {Array}
-         */
-        getCategoryHelpers: function () {
+        */
+       getCategoryHelpers: function () {
             var categories = ['course', 'chapter', 'sequential', 'vertical'],
                 helpers = {};
 
@@ -200,15 +230,15 @@ function(Backbone, _, str, ModuleUtils) {
             }, this);
 
             return helpers;
-        },
+       },
 
-        /**
-         * Check if we can edit current XBlock or not on Course Outline page.
-         * @return {Boolean}
-         */
-        isEditableOnCourseOutline: function() {
-            return this.isSequential() || this.isChapter() || this.isVertical();
-        }
+       /**
+        * Check if we can edit current XBlock or not on Course Outline page.
+        * @return {Boolean}
+        */
+       isEditableOnCourseOutline: function() {
+           return this.isSequential() || this.isChapter() || this.isVertical();
+       }
     });
     return XBlockInfo;
 });

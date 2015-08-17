@@ -7,8 +7,6 @@ from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 
-from xmodule.modulestore.django import ModuleI18nService
-
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user

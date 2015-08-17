@@ -16,13 +16,13 @@
                 <ul>
                     % if is_unit_page:
                         <li class="action-item action-view nav-item">
-                            <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true">
+                            <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" title="Open the courseware in the LMS">
                                 <span class="action-button-text">View Live Version</span>
                             </a>
                         </li>
                         <li class="action-item action-preview nav-item">
-                            <a href="${draft_preview_link}" class="button button-preview action-button is-disabled" aria-disabled="true">
-                                <span class="action-button-text">Preview Changes</span>
+                            <a href="${draft_preview_link}" class="button button-preview action-button" title="Preview the courseware in the LMS">
+                                <span class="action-button-text">Preview</span>
                             </a>
                         </li>
                     % else:
@@ -38,6 +38,12 @@
                             <i class="icon fa fa-plus icon-inline"></i>
                             <span class="action-button-text">Add Component</span>
                         </a>
+                   </li>
+                   <li class="action-item action-toggle-preview nav-item">
+                       <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
+                           <i class="icon fa fa-refresh"></i>
+                           <span class="action-button-text preview-text"></span>
+                       </a>
                    </li>
                 </ul>
             </nav>
@@ -61,12 +67,12 @@
                     <div id="publish-history"></div>
                 </aside>
                 <div class="unit-location">
-                        <h4 class="header">${_("Unit Location")}</h4>
+                        <h4 class="header">Unit Location</h4>
                         <div class="wrapper-unit-id content-bit">
                             <h5 class="title">Unit Location ID</h5>
                             <p class="unit-id">
                                 <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
-                                <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
+                                <span class="tip"><span class="sr">Tip: </span>Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.</span>
                             </p>
                         </div>
                         <div class="wrapper-unit-tree-location bar-mod-content">

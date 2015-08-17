@@ -114,8 +114,8 @@ class LoncapaProblem(object):
     """
     Main class for capa Problems.
     """
-
-    def __init__(self, problem_text, id, capa_system, state=None, seed=None):
+    def __init__(self, problem_text, id, capa_system, capa_module,  # pylint: disable=redefined-builtin
+                 state=None, seed=None):
         """
         Initializes capa Problem.
 
@@ -125,6 +125,7 @@ class LoncapaProblem(object):
             id (string): identifier for this problem, often a filename (no spaces).
             capa_system (LoncapaSystem): LoncapaSystem instance which provides OS,
                 rendering, user context, and other resources.
+            capa_module: instance needed to access runtime/logging
             state (dict): containing the following keys:
                 - `seed` (int) random number generator seed
                 - `student_answers` (dict) maps input id to the stored answer for that input
@@ -139,6 +140,7 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.capa_system = capa_system
+        self.capa_module = capa_module
 
         state = state or {}
 
@@ -161,6 +163,8 @@ class LoncapaProblem(object):
 
         # parse problem XML file into an element tree
         self.tree = etree.XML(problem_text)
+
+        self.make_xml_compatible(self.tree)
 
         # handle any <include file="foo"> tags
         self._process_includes()
@@ -190,6 +194,49 @@ class LoncapaProblem(object):
                 response.late_transforms(self)
 
         self.extracted_tree = self._extract_html(self.tree)
+
+    def make_xml_compatible(self, tree):
+        """
+        Adjust tree xml in-place for compatibility before creating
+        a problem from it.
+        The idea here is to provide a central point for XML translation,
+        for example, supporting an old XML format. At present, there just two translations.
+
+        1. <additional_answer> compatibility translation:
+        old:    <additional_answer>ANSWER</additional_answer>
+        convert to
+        new:    <additional_answer answer="ANSWER">OPTIONAL-HINT</addional_answer>
+
+        2. <optioninput> compatibility translation:
+        optioninput works like this internally:
+            <optioninput options="('yellow','blue','green')" correct="blue" />
+        With extended hints there is a new <option> tag, like this
+            <option correct="True">blue <optionhint>sky color</optionhint> </option>
+        This translation takes in the new format and synthesizes the old option= attribute
+        so all downstream logic works unchanged with the new <option> tag format.
+        """
+        additionals = tree.xpath('//stringresponse/additional_answer')
+        for additional in additionals:
+            answer = additional.get('answer')
+            text = additional.text
+            if not answer and text:  # trigger of old->new conversion
+                additional.set('answer', text)
+                additional.text = ''
+
+        for optioninput in tree.xpath('//optioninput'):
+            correct_option = None
+            child_options = []
+            for option_element in optioninput.findall('./option'):
+                option_name = option_element.text.strip()
+                if option_element.get('correct').upper() == 'TRUE':
+                    correct_option = option_name
+                child_options.append("'" + option_name + "'")
+
+            if len(child_options) > 0:
+                options_string = '(' + ','.join(child_options) + ')'
+                optioninput.attrib.update({'options': options_string})
+                if correct_option:
+                    optioninput.attrib.update({'correct': correct_option})
 
     def do_reset(self):
         """
@@ -527,6 +574,13 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s", input_id)
             return {}
 
+    @property
+    def has_responsive_ui(self):
+        """
+        Returns whether this capa problem has support for responsive UI.
+        """
+        return all(responder.has_responsive_ui for responder in self.responders.values())
+
     # ======= Private Methods Below ========
 
     def _process_includes(self):
@@ -710,12 +764,14 @@ class LoncapaProblem(object):
             hint = ''
             hintmode = None
             input_id = problemtree.get('id')
+            answervariable = None
             if problemid in self.correct_map:
                 pid = input_id
                 status = self.correct_map.get_correctness(pid)
                 msg = self.correct_map.get_msg(pid)
                 hint = self.correct_map.get_hint(pid)
                 hintmode = self.correct_map.get_hintmode(pid)
+                answervariable = self.correct_map.get_property(pid, 'answervariable')
 
             value = ""
             if self.student_answers and problemid in self.student_answers:
@@ -730,6 +786,7 @@ class LoncapaProblem(object):
                 'status': status,
                 'id': input_id,
                 'input_state': self.input_state[input_id],
+                'answervariable': answervariable,
                 'feedback': {
                     'message': msg,
                     'hint': hint,
@@ -809,7 +866,7 @@ class LoncapaProblem(object):
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
-            responder = responsetype_cls(response, inputfields, self.context, self.capa_system)
+            responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
             # save in list in self
             self.responders[response] = responder
 

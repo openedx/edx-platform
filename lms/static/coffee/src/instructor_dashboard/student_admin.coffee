@@ -22,7 +22,7 @@ find_and_assert = ($root, selector) ->
     item
 
 
-class StudentAdmin
+class @StudentAdmin
   constructor: (@$section) ->
     # attach self to html so that instructor_dashboard.coffee can find
     #  this object to call event handlers like 'onClickTitle'
@@ -41,6 +41,15 @@ class StudentAdmin
     @$btn_task_history_single     = @$section.find "input[name='task-history-single']"
     @$table_task_history_single   = @$section.find ".task-history-single-table"
 
+    # entrance-exam-specific
+    @$field_entrance_exam_student_select_grade  = @$section.find "input[name='entrance-exam-student-select-grade']"
+    @$btn_reset_entrance_exam_attempts   = @$section.find "input[name='reset-entrance-exam-attempts']"
+    @$btn_delete_entrance_exam_state     = @$section.find "input[name='delete-entrance-exam-state']"
+    @$btn_rescore_entrance_exam          = @$section.find "input[name='rescore-entrance-exam']"
+    @$btn_skip_entrance_exam             = @$section.find "input[name='skip-entrance-exam']"
+    @$btn_entrance_exam_task_history     = @$section.find "input[name='entrance-exam-task-history']"
+    @$table_entrance_exam_task_history   = @$section.find ".entrance-exam-task-history-table"
+
     # course-specific
     @$field_problem_select_all    = @$section.find "input[name='problem-select-all']"
     @$btn_reset_attempts_all      = @$section.find "input[name='reset-attempts-all']"
@@ -52,6 +61,7 @@ class StudentAdmin
     # response areas
     @$request_response_error_progress = find_and_assert @$section, ".student-specific-container .request-response-error"
     @$request_response_error_grade = find_and_assert @$section, ".student-grade-container .request-response-error"
+    @$request_response_error_ee       = @$section.find ".entrance-exam-grade-container .request-response-error"
     @$request_response_error_all    = @$section.find ".course-specific-container .request-response-error"
 
     # attach click handlers
@@ -171,6 +181,112 @@ class StudentAdmin
           create_task_list_table @$table_task_history_single, data.tasks
         error: std_ajax_err => @$request_response_error_grade.text full_error_message
 
+   # reset entrance exam attempts for student
+    @$btn_reset_entrance_exam_attempts.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+        delete_module: false
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_reset_entrance_exam_attempts.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then ->
+          success_message = gettext("Entrance exam attempts is being reset for student '{student_id}'.")
+          full_success_message = interpolate_text(success_message, {student_id: unique_student_identifier})
+          alert full_success_message
+        error: std_ajax_err =>
+          error_message = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct.")
+          full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
+          @$request_response_error_ee.text full_error_message
+
+   # start task to rescore entrance exam for student
+    @$btn_rescore_entrance_exam.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_rescore_entrance_exam.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then ->
+          success_message = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Background Task History for Student' button to see the status of the task.")
+          full_success_message = interpolate_text(success_message, {student_id: unique_student_identifier})
+          alert full_success_message
+        error: std_ajax_err =>
+          error_message = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct.")
+          full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
+          @$request_response_error_ee.text full_error_message
+
+  # Mark a student to skip entrance exam
+    @$btn_skip_entrance_exam.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Enter a student's username or email address.")
+      confirm_message = gettext("Do you want to allow this student ('{student_id}') to skip the entrance exam?")
+      full_confirm_message = interpolate_text(confirm_message, {student_id: unique_student_identifier})
+      if window.confirm full_confirm_message
+        send_data =
+          unique_student_identifier: unique_student_identifier
+
+        $.ajax
+          dataType: 'json'
+          url: @$btn_skip_entrance_exam.data 'endpoint'
+          data: send_data
+          type: 'POST'
+          success: @clear_errors_then (data) ->
+            alert data.message
+          error: std_ajax_err =>
+            error_message = gettext("An error occurred. Make sure that the student's username or email address is correct and try again.")
+            @$request_response_error_ee.text error_message
+
+   # delete student state for entrance exam
+    @$btn_delete_entrance_exam_state.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+        delete_module: true
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_delete_entrance_exam_state.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then ->
+          success_message = gettext("Entrance exam state is being deleted for student '{student_id}'.")
+          full_success_message = interpolate_text(success_message, {student_id: unique_student_identifier})
+          alert full_success_message
+        error: std_ajax_err =>
+          error_message = gettext("Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct.")
+          full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
+          @$request_response_error_ee.text full_error_message
+
+    # list entrance exam task history for student
+    @$btn_entrance_exam_task_history.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Enter a student's username or email address.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_entrance_exam_task_history.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then (data) =>
+          create_task_list_table @$table_entrance_exam_task_history, data.tasks
+        error: std_ajax_err =>
+          error_message = gettext("Error getting entrance exam task history for student '{student_id}'. Make sure student identifier is correct.")
+          full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
+          @$request_response_error_ee.text full_error_message
+
     # start task to reset attempts on problem for all students
     @$btn_reset_attempts_all.click =>
       problem_to_reset = @$field_problem_select_all.val()
@@ -243,6 +359,7 @@ class StudentAdmin
   clear_errors_then: (cb) ->
     @$request_response_error_progress.empty()
     @$request_response_error_grade.empty()
+    @$request_response_error_ee.empty()
     @$request_response_error_all.empty()
     ->
       cb?.apply this, arguments
@@ -251,6 +368,7 @@ class StudentAdmin
   clear_errors: ->
     @$request_response_error_progress.empty()
     @$request_response_error_grade.empty()
+    @$request_response_error_ee.empty()
     @$request_response_error_all.empty()
 
   # handler for when the section title is clicked.

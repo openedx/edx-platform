@@ -126,6 +126,7 @@ def _set_current_microsite(microsite_config_key, subdomain, domain):
     """
     config = settings.MICROSITE_CONFIGURATION[microsite_config_key].copy()
     config['subdomain'] = subdomain
+    config['microsite_config_key'] = microsite_config_key
     config['site_domain'] = domain
     CURRENT_REQUEST_CONFIGURATION.data = config
 

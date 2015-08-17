@@ -1,16 +1,21 @@
 """
 Tests for the certificates models.
 """
-
+from ddt import ddt, data, unpack
 from mock import patch
 from django.conf import settings
-from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from student.tests.factories import UserFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate, certificate_status_for_student
+from certificates.models import (
+    CertificateStatuses,
+    GeneratedCertificate,
+    certificate_status_for_student,
+    certificate_info_for_user
+)
 from certificates.tests.factories import GeneratedCertificateFactory
 
 from util.milestones_helpers import (
@@ -20,6 +25,8 @@ from util.milestones_helpers import (
 )
 
 
+@attr('shard_1')
+@ddt
 class CertificatesModelTest(ModuleStoreTestCase):
     """
     Tests for the GeneratedCertificate model
@@ -32,6 +39,26 @@ class CertificatesModelTest(ModuleStoreTestCase):
         certificate_status = certificate_status_for_student(student, course.id)
         self.assertEqual(certificate_status['status'], CertificateStatuses.unavailable)
         self.assertEqual(certificate_status['mode'], GeneratedCertificate.MODES.honor)
+
+    @unpack
+    @data(
+        {'allow_certificate': False, 'whitelisted': False, 'grade': None, 'output': ['N', 'N', 'N/A']},
+        {'allow_certificate': True, 'whitelisted': True, 'grade': None, 'output': ['Y', 'N', 'N/A']},
+        {'allow_certificate': True, 'whitelisted': False, 'grade': 0.9, 'output': ['Y', 'N', 'N/A']},
+        {'allow_certificate': False, 'whitelisted': True, 'grade': 0.8, 'output': ['N', 'N', 'N/A']},
+        {'allow_certificate': False, 'whitelisted': None, 'grade': 0.8, 'output': ['N', 'N', 'N/A']}
+    )
+    def test_certificate_info_for_user(self, allow_certificate, whitelisted, grade, output):
+        """
+        Verify that certificate_info_for_user works.
+        """
+        student = UserFactory()
+        course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
+        student.profile.allow_certificate = allow_certificate
+        student.profile.save()
+
+        certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
+        self.assertEqual(certificate_info, output)
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_course_milestone_collected(self):
@@ -55,3 +82,20 @@ class CertificatesModelTest(ModuleStoreTestCase):
         completed_milestones = milestones_achieved_by_user(student, unicode(pre_requisite_course.id))
         self.assertEqual(len(completed_milestones), 1)
         self.assertEqual(completed_milestones[0]['namespace'], unicode(pre_requisite_course.id))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    @patch('certificates.badge_handler.BadgeHandler', spec=True)
+    def test_badge_callback(self, handler):
+        student = UserFactory()
+        course = CourseFactory.create(org='edx', number='998', display_name='Test Course', issue_badges=True)
+        cert = GeneratedCertificateFactory.create(
+            user=student,
+            course_id=course.id,
+            status=CertificateStatuses.generating,
+            mode='verified'
+        )
+        # Check return value since class instance will be stored there.
+        self.assertFalse(handler.return_value.award.called)
+        cert.status = CertificateStatuses.downloadable
+        cert.save()
+        self.assertTrue(handler.return_value.award.called)

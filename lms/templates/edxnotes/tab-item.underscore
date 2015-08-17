@@ -1,7 +1,7 @@
 <% var hasIcon = icon ? 1 : 0; %>
 
 <a class="tab-label <% if (hasIcon) { print('has-icon') } %>" href="#">
-  <% if (hasIcon) { %><i class="icon <%= icon %>"></i> <% } %><%- gettext(name) %>
+  <% if (hasIcon) { %><i class="icon <%= icon %>" aria-hidden="true"></i> <% } %><%- gettext(name) %>
 </a>
 
 <% if (is_closable) { %>

@@ -1,0 +1,142 @@
+// lms - shared - fields
+// ====================
+
+
+.u-field {
+    padding: $baseline 0;
+    border-bottom: 1px solid $gray-l5;
+    border: 1px dashed transparent;
+
+    &.mode-placeholder {
+        border: 2px dashed transparent;
+        border-radius: 3px;
+
+        span {
+            color: $gray-l1;
+        }
+
+        &:hover {
+            border: 2px dashed $link-color;
+
+            span {
+                color: $link-color;
+            }
+        }
+    }
+
+    &.editable-toggle.mode-display:hover {
+        background-color: $m-blue-l4;
+        border-radius: 3px;
+
+        .message-can-edit {
+            display: inline-block;
+            color: $link-color;
+        }
+
+    }
+
+    &.mode-hidden {
+        display: none;
+    }
+
+    i {
+      color: $gray-l2;
+      vertical-align:text-bottom;
+      @include margin-right(5px);
+    }
+
+    .message-can-edit {
+        display: none;
+    }
+
+    .message-error {
+        color: $alert-color;
+    }
+
+    .message-validation-error {
+        color: $warning-color;
+    }
+
+    .message-in-progress {
+        color: $gray-d2;
+    }
+
+    .message-success {
+        color: $success-color;
+    }
+}
+
+.u-field-readonly {
+    input[type="text"],
+    input[type="text"]:focus {
+        background-color: transparent;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+    }
+}
+
+.u-field-icon {
+    width: $baseline;
+    color: $gray-l2;
+}
+
+.u-field-title {
+    width: flex-grid(3, 12);
+    display: inline-block;
+    color: $gray;
+    vertical-align: top;
+    margin-bottom: 0;
+    -webkit-font-smoothing: antialiased;
+
+    label, span {
+        @include margin-left($baseline/2);
+    }
+}
+
+.u-field-value {
+    width: flex-grid(3, 12);
+    display: inline-block;
+    vertical-align: top;
+
+    select, input {
+        width: 100%;
+    }
+}
+
+.u-field-message {
+    @extend %t-copy-sub1;
+    @include padding-left($baseline/2);
+    width: flex-grid(6, 12);
+    display: inline-block;
+    vertical-align: top;
+    color: $gray-l1;
+
+    i {
+        @include margin-right($baseline/4);
+    }
+
+    .u-field-message-help,
+    .u-field-message-notification {
+        color: $gray-l1;
+    }
+}
+
+.u-field-dropdown {
+    &.mode-display select, &.mode-placeholder select {
+        display: none;
+    }
+
+    button.u-field-value-display, button.u-field-value-display:active, button.u-field-value-display:focus, button.u-field-value-display:hover{
+        border-color: transparent;
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+        font-size: inherit;
+    }
+
+
+    &.mode-edit button.u-field-value-display {
+        display: none;
+    }
+}

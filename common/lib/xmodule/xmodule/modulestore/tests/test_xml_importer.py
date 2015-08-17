@@ -2,14 +2,15 @@
 Tests for XML importer.
 """
 import mock
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.core import XBlock
-from xblock.fields import String, Scope, ScopeIds
+from xblock.fields import String, Scope, ScopeIds, List
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import _import_module_and_update_references
+from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.tests import DATA_DIR
@@ -28,7 +29,7 @@ class ModuleStoreNoSettings(unittest.TestCase):
     COLLECTION = 'modulestore'
     FS_ROOT = DATA_DIR
     DEFAULT_CLASS = 'xmodule.modulestore.tests.test_xml_importer.StubXBlock'
-    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
     modulestore_options = {
         'default_class': DEFAULT_CLASS,
@@ -100,7 +101,7 @@ def render_to_template_mock(*args):
     pass
 
 
-class StubXBlock(XBlock, XModuleMixin, InheritanceMixin):
+class StubXBlock(XModuleMixin, InheritanceMixin):
     """
     Stub XBlock used for testing.
     """
@@ -144,7 +145,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Move to different runtime w/ different course id
         target_location_namespace = SlashSeparatedCourseKey("org", "course", "run")
-        new_version = _import_module_and_update_references(
+        new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
             999,
@@ -181,7 +182,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
-        new_version = _import_module_and_update_references(
+        new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
             999,
@@ -213,7 +214,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
-        new_version = _import_module_and_update_references(
+        new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
             999,
@@ -229,3 +230,90 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         self.assertNotIn(
             'graded', new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
         )
+
+
+class StubXBlockWithMutableFields(StubXBlock):
+    """
+    Stub XBlock used for testing mutable fields and children
+    """
+    has_children = True
+
+    test_mutable_content_field = List(
+        help="A mutable content field that will be explicitly set",
+        scope=Scope.content,
+    )
+
+    test_mutable_settings_field = List(
+        help="A mutable settings field that will be explicitly set",
+        scope=Scope.settings,
+    )
+
+
+class UpdateLocationTest(ModuleStoreNoSettings):
+    """
+    Test that updating location preserves "is_set_on" status on fields
+    """
+    CONTENT_FIELDS = ['test_content_field', 'test_mutable_content_field']
+    SETTINGS_FIELDS = ['test_settings_field', 'test_mutable_settings_field']
+    CHILDREN_FIELDS = ['children']
+
+    def setUp(self):
+        """
+        Create a stub XBlock backed by in-memory storage.
+        """
+        self.runtime = mock.MagicMock(Runtime)
+        self.field_data = KvsFieldData(kvs=DictKeyValueStore())
+        self.scope_ids = ScopeIds('Bob', 'mutablestubxblock', '123', 'import')
+        self.xblock = StubXBlockWithMutableFields(self.runtime, self.field_data, self.scope_ids)
+
+        self.fake_children_locations = [
+            BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'mutablestubxblock', 'child1'),
+            BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'mutablestubxblock', 'child2'),
+        ]
+
+        super(UpdateLocationTest, self).setUp()
+
+    def _check_explicitly_set(self, block, scope, expected_explicitly_set_fields, should_be_set=False):
+        """ Gets fields that are explicitly set on block and checks if they are marked as explicitly set or not """
+        actual_explicitly_set_fields = block.get_explicitly_set_fields_by_scope(scope=scope)
+        assertion = self.assertIn if should_be_set else self.assertNotIn
+        for field in expected_explicitly_set_fields:
+            assertion(field, actual_explicitly_set_fields)
+
+    def test_update_locations_native_xblock(self):
+        """ Update locations updates location and keeps values and "is_set_on" status """
+        # Set the XBlock's location
+        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+
+        # Explicitly set the content, settings and children fields
+        self.xblock.test_content_field = 'Explicitly set'
+        self.xblock.test_settings_field = 'Explicitly set'
+        self.xblock.test_mutable_content_field = [1, 2, 3]
+        self.xblock.test_mutable_settings_field = ["a", "s", "d"]
+        self.xblock.children = self.fake_children_locations  # pylint:disable=attribute-defined-outside-init
+        self.xblock.save()
+
+        # Update location
+        target_location = self.xblock.location.replace(revision='draft')
+        _update_module_location(self.xblock, target_location)
+        new_version = self.xblock  # _update_module_location updates in-place
+
+        # Check the XBlock's location
+        self.assertEqual(new_version.location, target_location)
+
+        # Check the values of the fields.
+        # The content, settings and children fields should be preserved
+        self.assertEqual(new_version.test_content_field, 'Explicitly set')
+        self.assertEqual(new_version.test_settings_field, 'Explicitly set')
+        self.assertEqual(new_version.test_mutable_content_field, [1, 2, 3])
+        self.assertEqual(new_version.test_mutable_settings_field, ["a", "s", "d"])
+        self.assertEqual(new_version.children, self.fake_children_locations)
+
+        # Expect that these fields are marked explicitly set
+        self._check_explicitly_set(new_version, Scope.content, self.CONTENT_FIELDS, should_be_set=True)
+        self._check_explicitly_set(new_version, Scope.settings, self.SETTINGS_FIELDS, should_be_set=True)
+        self._check_explicitly_set(new_version, Scope.children, self.CHILDREN_FIELDS, should_be_set=True)
+
+        # Expect these fields pass "is_set_on" test
+        for field in self.CONTENT_FIELDS + self.SETTINGS_FIELDS + self.CHILDREN_FIELDS:
+            self.assertTrue(new_version.fields[field].is_set_on(new_version))

@@ -5,26 +5,30 @@ Unit tests for the notes app.
 from mock import patch, Mock
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-import collections
 import json
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+from courseware.tabs import get_course_tab_list, CourseTab
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from notes import utils, api, models
 
 
-class UtilsTest(TestCase):
+class UtilsTest(ModuleStoreTestCase):
+    """ Tests for the notes utils. """
     def setUp(self):
         '''
         Setup a dummy course-like object with a tabs field that can be
         accessed via attribute lookup.
         '''
-        self.course = collections.namedtuple('DummyCourse', ['tabs'])
-        self.course.tabs = []
+        super(UtilsTest, self).setUp()
+        self.course = CourseFactory.create()
 
     def test_notes_not_enabled(self):
         '''
@@ -38,16 +42,60 @@ class UtilsTest(TestCase):
         Tests that notes are enabled when the course tab configuration contains
         a tab with type "notes."
         '''
-        self.course.tabs = [{'type': 'foo'},
-                            {'name': 'My Notes', 'type': 'notes'},
-                            {'type': 'bar'}]
+        with self.settings(FEATURES={'ENABLE_STUDENT_NOTES': True}):
+            self.course.advanced_modules = ["notes"]
+            self.assertTrue(utils.notes_enabled_for_course(self.course))
 
-        self.assertTrue(utils.notes_enabled_for_course(self.course))
+
+class CourseTabTest(ModuleStoreTestCase):
+    """
+    Test that the course tab shows up the way we expect.
+    """
+    def setUp(self):
+        '''
+        Setup a dummy course-like object with a tabs field that can be
+        accessed via attribute lookup.
+        '''
+        super(CourseTabTest, self).setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def enable_notes(self):
+        """Enable notes and add the tab to the course."""
+        self.course.tabs.append(CourseTab.load("notes"))
+        self.course.advanced_modules = ["notes"]
+
+    def has_notes_tab(self, course, user):
+        """ Returns true if the current course and user have a notes tab, false otherwise. """
+        request = RequestFactory().request()
+        request.user = user
+        all_tabs = get_course_tab_list(request, course)
+        return any([tab.name == u'My Notes' for tab in all_tabs])
+
+    def test_course_tab_not_visible(self):
+        # module not enabled in the course
+        self.assertFalse(self.has_notes_tab(self.course, self.user))
+
+        with self.settings(FEATURES={'ENABLE_STUDENT_NOTES': False}):
+            # setting not enabled and the module is not enabled
+            self.assertFalse(self.has_notes_tab(self.course, self.user))
+
+            # module is enabled and the setting is not enabled
+            self.course.advanced_modules = ["notes"]
+            self.assertFalse(self.has_notes_tab(self.course, self.user))
+
+    def test_course_tab_visible(self):
+        self.enable_notes()
+        self.assertTrue(self.has_notes_tab(self.course, self.user))
+        self.course.advanced_modules = []
+        self.assertFalse(self.has_notes_tab(self.course, self.user))
 
 
 class ApiTest(TestCase):
 
     def setUp(self):
+        super(ApiTest, self).setUp()
         self.client = Client()
 
         # Mocks
@@ -343,6 +391,8 @@ class ApiTest(TestCase):
 
 class NoteTest(TestCase):
     def setUp(self):
+        super(NoteTest, self).setUp()
+
         self.password = 'abc'
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
         self.course_key = SlashSeparatedCourseKey('HarvardX', 'CB22x', 'The_Ancient_Greek_Hero')

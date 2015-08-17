@@ -14,11 +14,10 @@ You can then use the CourseFactory and XModuleItemFactory as defined in
 common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
+from nose.plugins.attrib import attr
 
 from xmodule.video_module import VideoDescriptor
-from xmodule.tests import get_test_system, LogicTest, get_test_descriptor_system
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
+from xmodule.tests import LogicTest
 
 
 SOURCE_XML = """
@@ -36,6 +35,7 @@ SOURCE_XML = """
 """
 
 
+@attr('shard_1')
 class VideoModuleLogicTest(LogicTest):
     """Tests for logic of Video Xmodule."""
 

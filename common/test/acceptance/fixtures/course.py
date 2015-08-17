@@ -102,7 +102,7 @@ class CourseFixture(XBlockContainerFixture):
     between tests, you should use unique course identifiers for each fixture.
     """
 
-    def __init__(self, org, number, run, display_name, start_date=None, end_date=None):
+    def __init__(self, org, number, run, display_name, start_date=None, end_date=None, settings=None):
         """
         Configure the course fixture to create a course with
 
@@ -112,6 +112,8 @@ class CourseFixture(XBlockContainerFixture):
         The default is for the course to have started in the distant past, which is generally what
         we want for testing so students can enroll.
 
+        `settings` can be any additional course settings needs to be enabled. for example
+        to enable entrance exam settings would be a dict like this {"entrance_exam_enabled": "true"}
         These have the same meaning as in the Studio restful API /course end-point.
         """
         super(CourseFixture, self).__init__()
@@ -133,6 +135,9 @@ class CourseFixture(XBlockContainerFixture):
 
         if end_date is not None:
             self._course_details['end_date'] = end_date.isoformat()
+
+        if settings is not None:
+            self._course_details.update(settings)
 
         self._updates = []
         self._handouts = []

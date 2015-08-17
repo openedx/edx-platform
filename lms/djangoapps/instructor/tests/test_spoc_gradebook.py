@@ -2,12 +2,11 @@
 Tests of the instructor dashboard spoc gradebook
 """
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from xmodule.modulestore.django import modulestore
@@ -16,7 +15,7 @@ from xmodule.modulestore.django import modulestore
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestGradebook(ModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and
@@ -26,6 +25,8 @@ class TestGradebook(ModuleStoreTestCase):
     grading_policy = None
 
     def setUp(self):
+        super(TestGradebook, self).setUp()
+
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
 
@@ -80,6 +81,7 @@ class TestGradebook(ModuleStoreTestCase):
         self.assertEquals(self.response.status_code, 200)
 
 
+@attr('shard_1')
 class TestDefaultGradingPolicy(TestGradebook):
     """
     Tests that the grading policy is properly applied for all users in the course
@@ -105,6 +107,7 @@ class TestDefaultGradingPolicy(TestGradebook):
         self.assertEquals(293, self.response.content.count('grade_None'))
 
 
+@attr('shard_1')
 class TestLetterCutoffPolicy(TestGradebook):
     """
     Tests advanced grading policy (with letter grade cutoffs). Includes tests of

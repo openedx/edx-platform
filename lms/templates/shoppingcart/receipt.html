@@ -4,8 +4,8 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
+from microsite_configuration import microsite
 %>
-<%! from microsite_configuration import microsite %>
 
 <%block name="billing_details_highlight">
 % if order_type == 'business':
@@ -79,11 +79,13 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             % if reg_code_info['is_redeemed']:
             <td>${reg_code_info['redemption_url']}</td>
             % else:
-            <td><a href="${reg_code_info['redemption_url']}" data-base-url="${site_name}">${reg_code_info['redemption_url']}</a></td>
+            <td><a class="redemption-url" href="${reg_code_info['redemption_url']}" data-base-url="${site_name}">${reg_code_info['redemption_url']}</a></td>
             % endif
             <td>
               % if reg_code_info['is_redeemed']:
                 <span class="red"></M>${_("Used")}</span>
+              % elif not reg_code_info['is_valid']:
+                <span class="red"></M>${_("Invalid")}</span>
               % else:
                 <span class="green"></M>${_("Available")}</span>
               % endif
@@ -107,74 +109,74 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             <div class="row">
               <div class="row-inside">
                 <p>
-                  <b>${_('Company Name')}:</b>
-                  <label>
+                  <b class="billing-detail-label">${_('Company Name')}:</b>
+                  <span class="billing-detail-value">
                     % if order.company_name:
                       ${order.company_name}
                     % else:
-                      N/A
+                      ${_('N/A')}
                     % endif
-                  </label>
+                  </span>
                 </p>
               </div>
               <div class="row-inside">
                 <p>
-                  <b>${_('Purchase Order Number')}:</b>
-                  <label>
+                  <b class="billing-detail-label">${_('Purchase Order Number')}:</b>
+                  <span class="billing-detail-value">
                     % if order.customer_reference_number:
                       ${order.customer_reference_number}
                     % else:
-                      N/A
+                      ${_('N/A')}
                     % endif
-                  </label>
+                  </span>
                 </p>
               </div>
               <div class="row-inside">
                 <p>
-                  <b>${_('Company Contact Name')}:</b>
-                  <label>
+                  <b class="billing-detail-label">${_('Company Contact Name')}:</b>
+                  <span class="billing-detail-value">
                     % if order.company_contact_name:
                       ${order.company_contact_name}
                     % else:
-                      N/A
+                      ${_('N/A')}
                     % endif
-                  </label>
+                  </span>
                 </p>
               </div>
               <div class="row-inside">
                 <p>
-                  <b>${_('Company Contact Email')}:</b>
-                  <label>
+                  <b class="billing-detail-label">${_('Company Contact Email')}:</b>
+                  <span class="billing-detail-value">
                     % if order.company_contact_email:
                       ${order.company_contact_email}
                     % else:
-                      N/A
+                      ${_('N/A')}
                     % endif
-                  </label>
+                  </span>
                 </p>
               </div>
               <div class="row-inside">
                 <p>
-                  <b>${_('Recipient Name')}:</b>
-                  <label>
+                  <b class="billing-detail-label">${_('Recipient Name')}:</b>
+                  <span class="billing-detail-value">
                     % if order.recipient_name:
                       ${order.recipient_name}
                     % else:
-                      N/A
+                      ${_('N/A')}
                     % endif
-                  </label>
+                  </span>
                 </p>
               </div>
               <div class="row-inside">
                 <p>
-                  <b>${_('Recipient Email')}:</b>
-                  <label>
+                  <b class="billing-detail-label">${_('Recipient Email')}:</b>
+                  <span class="billing-detail-value">
                     % if order.recipient_email:
                       ${order.recipient_email}
                     % else:
-                      N/A
+                      ${_('N/A')}
                     % endif
-                  </label>
+                  </span>
                 </p>
               </div>
             </div>
@@ -182,105 +184,105 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           <div class="row">
             <div class="row-inside">
               <p>
-                <b>${_('Card Type')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('Card Type')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_cardtype:
                     ${order.bill_to_cardtype}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('Credit Card Number')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('Credit Card Number')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_ccnum:
                     ${order.bill_to_ccnum}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('Name')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('Name')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_first or order.bill_to_last:
                     ${order.bill_to_first} ${order.bill_to_last}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('Address 1')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('Address 1')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_street1:
                     ${order.bill_to_street1}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('Address 2')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('Address 2')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_street2:
                     ${order.bill_to_street2}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('City')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('City')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_city:
                     ${order.bill_to_city}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('State')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('State')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_state:
                     ${order.bill_to_state}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
             <div class="row-inside">
               <p>
-                <b>${_('Country')}:</b>
-                <label>
+                <b class="billing-detail-label">${_('Country')}:</b>
+                <span class="billing-detail-value">
                   % if order.bill_to_country:
-                    ${order.bill_to_country.upper()}
+                    ${order.bill_to_country}
                   % else:
-                    N/A
+                    ${_('N/A')}
                   % endif
-                </label>
+                </span>
               </p>
             </div>
           </div>
         </div>
       </div>
     % endif
-    <hr class="border"/>
+
     % for item, course in shoppingcart_items:
       % if loop.index > 0 :
         <hr>
@@ -288,12 +290,17 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
       <div class="user-data">
         <div class="clearfix">
           <div class="image">
-            <img style="width: 100%; height: 100%;" src="${course_image_url(course)}"
+            <img class="item-image" src="${course_image_url(course)}"
                  alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Image"/>
           </div>
           <div class="data-input">
-            <h3>${_("Registration for")}:
-              <span class="pull-right">
+
+            <h3 class="course-title-info" id="course-title">
+              <span class="course-registration-title">${_('Registration for:')}</span>
+              <span class="course-display-name">${ course.display_name }</span>
+            </h3>
+            <p class="course-meta-info" aria-describedby="course-title">
+              <span class="course-dates-title">
                 <%
                     course_start_time = course.start_datetime_text()
                     course_end_time = course.end_datetime_text()
@@ -302,10 +309,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   ${_("Course Dates")}:
                 %endif
               </span>
-            </h3>
-
-            <h1>${_(" {course_name} ").format(course_name=course.display_name)}
-              <span class="pull-right">
+              <span class="course-display-dates">
                 % if course_start_time:
                   ${course_start_time}
                 %endif
@@ -314,12 +318,12 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   ${course_end_time}
                 %endif
               </span>
-            </h1>
-            <hr/>
+            </p>
+            <hr>
             <div class="three-col">
               % if item.status == "purchased":
                 <div class="col-1">
-                  % if item.list_price != None:
+                  % if item.is_discounted:
                     <div class="price">${_('Price per student:')} <span class="line-through">  ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
                     <div class="price green">${_('Discount Applied:')} <span>   ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)} </span></div>
@@ -337,7 +341,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                 </div>
               % elif item.status == "refunded":
                 <div class="col-1">
-                  % if item.list_price != None:
+                  % if item.is_discounted:
                     <div class="price">${_('Price per student:')} <span class="line-through">   ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
                     <div class="price green">${_('Discount Applied:')} <span><del>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}

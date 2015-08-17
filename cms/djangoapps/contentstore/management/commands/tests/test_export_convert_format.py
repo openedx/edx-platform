@@ -20,6 +20,7 @@ class ConvertExportFormat(TestCase):
         super(ConvertExportFormat, self).setUp()
 
         self.temp_dir = mkdtemp(dir=settings.DATA_DIR)
+        self.addCleanup(shutil.rmtree, self.temp_dir)
         self.data_dir = path(__file__).realpath().parent / 'data'
         self.version0 = self.data_dir / "Version0_drafts.tar.gz"
         self.version1 = self.data_dir / "Version1_drafts.tar.gz"

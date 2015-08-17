@@ -31,6 +31,8 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         """
             Makes sure that the Module is declared and mocked with the sample xml above.
         """
+        super(TextAnnotationModuleTestCase, self).setUp()
+
         # return anything except None to test LMS
         def test_real_user(useless):
             useless_user = Mock(email='fake@fake.com', id=useless)

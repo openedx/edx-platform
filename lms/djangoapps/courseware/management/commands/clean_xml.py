@@ -45,21 +45,21 @@ def export(course, export_dir):
     return False
 
 
-def import_with_checks(course_dir, verbose=True):
+def import_with_checks(course_dir):
     all_ok = True
 
     print "Attempting to load '{0}'".format(course_dir)
 
     course_dir = path(course_dir)
     data_dir = course_dir.dirname()
-    course_dirs = [course_dir.basename()]
+    source_dirs = [course_dir.basename()]
 
     # No default class--want to complain if it doesn't find plugins for any
     # module.
     modulestore = XMLModuleStore(
         data_dir,
         default_class=None,
-        course_dirs=course_dirs
+        source_dirs=source_dirs
     )
 
     def str_of_err(tpl):

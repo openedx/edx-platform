@@ -94,6 +94,7 @@
         &.action-visible .toggle-checkbox ~ .action-button {
           .fa-eye {
             display: inline-block;
+            pointer-events: none;
           }
 
           .fa-eye-slash {
@@ -111,6 +112,7 @@
 
           .fa-eye-slash {
             display: inline-block;
+            pointer-events: none;
           }
         }
       }

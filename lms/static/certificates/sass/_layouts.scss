@@ -1,0 +1,352 @@
+// ------------------------------
+// // Open edX Certificates: Layouts
+
+// About: styling for generic layouts and responsive support.
+
+// #BASE
+// #ACCOMPLISHMENT
+
+// ------------------------------
+// #BASE
+// ------------------------------
+%layout-wrapper {
+    margin-bottom: spacing-vertical(base);
+    padding: 0 (gutter()*2);
+
+    @include susy-breakpoint($bp-medium, $susy) {
+        padding: 0 gutter();
+    }
+}
+
+%layout {
+    @include container();
+}
+
+// app header
+.wrapper-header {
+    @extend %layout-wrapper;
+    padding-top: spacing-vertical(small);
+    padding-bottom: spacing-vertical(small);
+}
+
+.header-app {
+    @extend %layout;
+
+    .logo {
+        display: block;
+        @include size(rem(100) auto);
+        margin: 0 auto;
+    }
+
+    .logo-img {
+        display: block;
+        width: 100%;
+    }
+}
+
+.header-app-title {
+    margin: 0;
+    @include text-align(center);
+}
+
+// banner
+.wrapper-banner {
+    @extend %layout-wrapper;
+    padding-top: spacing-vertical(small);
+    padding-bottom: spacing-vertical(small);
+
+    .banner {
+        @extend %layout;
+    }
+}
+
+// message to user-centric banner
+.wrapper-banner-user {
+    margin-top: -(spacing-vertical(base)); // abut the global header, plz
+}
+
+.banner-user {
+    @include text-align(center);
+
+    @include susy-breakpoint($bp-large, $susy) {
+        @include text-align(left);
+    }
+
+    .wrapper-copy-and-actions {
+        @include container();
+
+        .message-copy {
+            margin-bottom: spacing-vertical(small);
+        }
+
+        .message-actions .action {
+            display: block;
+            width: 100%;
+            margin: 0 auto spacing-vertical(small) auto;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            // CASE: icon display only
+            &.icon-only {
+
+                @include susy-breakpoint($bp-medium, $susy) {
+                    padding: spacing-vertical(x-small) spacing-horizontal(base);
+
+                    .icon {
+                        @include margin-right(0);
+                    }
+                }
+            }
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                display: inline-block;
+                vertical-align: middle;
+                width: auto;
+                margin-bottom: 0;
+                margin-right: spacing-horizontal(mid-small);
+
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
+
+// app footer
+.wrapper-footer {
+    @extend %layout-wrapper;
+}
+
+.footer-app {
+    @extend %layout;
+}
+
+.footer-app-copyright {
+
+    @include susy-breakpoint($bp-medium, $susy) {
+        @include span(6 first);
+        margin-bottom: 0;
+    }
+}
+
+.footer-app-nav {
+
+    @include susy-breakpoint($bp-medium, $susy) {
+        @include span(6 last);
+    }
+
+    .list {
+
+        .nav-item {
+            display: block;
+            margin-bottom: spacing-vertical(x-small);
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                display: inline-block;
+                vertical-align: middle;
+                @include margin-right(spacing-horizontal(base));
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .list-legal {
+
+        @include susy-breakpoint($bp-medium, $susy) {
+            @include text-align(right);
+        }
+    }
+}
+
+// ------------------------------
+// #ACCOMPLISHMENT
+// ------------------------------
+.layout-accomplishment {
+
+    .wrapper-introduction {
+        @extend %layout-wrapper;
+        margin-bottom: spacing-vertical(large);
+
+        .introduction {
+            @extend %layout;
+        }
+    }
+
+    .wrapper-accomplishment-rendering {
+        @extend %layout-wrapper;
+        margin-bottom: spacing-vertical(small);
+    }
+
+    .accomplishment-rendering {
+        @extend %layout;
+        position: relative;
+        top: -(spacing-vertical(base));
+
+        .accomplishment-course,
+        .accomplishment-recipient {
+            width: span(12);
+
+            @include susy-breakpoint($bp-large, $susy) {
+                width: span(10);
+            }
+        }
+
+        .accomplishment-summary,
+        .accomplishment-statement-detail {
+           width: span(12);
+
+           @include susy-breakpoint($bp-large, $susy) {
+               width: span(8);
+           }
+        }
+    }
+
+    .accomplishment-orgs {
+
+        .wrapper-orgs {
+            @include text-align(center);
+        }
+
+        .wrapper-organization {
+            display: inline-block;
+            vertical-align: middle;
+            width: span(6);
+            height: rem(100);
+            @include margin-right(spacing-horizontal(base));
+            margin-bottom: spacing-vertical(small);
+
+            &:last-child {
+                @include margin-right(0);
+            }
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                width: span(3);
+            }
+
+            @include susy-breakpoint($bp-large, $susy) {
+                width: span(2);
+            }
+
+            @include susy-breakpoint($bp-huge, $susy) {
+                width: span(2);
+            }
+        }
+
+        .organization {
+            @include size(100%);
+            position: relative;
+
+        }
+
+        .organization-logo {
+            max-width: 80%;
+            position: absolute;
+            top: 50%;
+            @include left(50%);
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .accomplishment-signatories {
+
+        .wrapper-signatories {
+            @include text-align(center);
+        }
+
+        .signatory {
+            display: inline-block;
+            vertical-align: middle;
+            width: span(12);
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                width: span(4);
+            }
+
+            @include susy-breakpoint($bp-large, $susy) {
+                width: span(3);
+            }
+
+            @include susy-breakpoint($bp-huge, $susy) {
+                width: span(3);
+            }
+
+            .signatory-signature {
+                display: block;
+                max-width: 100%;
+                height: rem(100);
+                padding: spacing-vertical(small) spacing-horizontal(small);
+            }
+        }
+    }
+
+    .wrapper-accomplishment-metadata {
+        @extend %layout-wrapper;
+
+        .accomplishment-metadata {
+            @extend %layout;
+        }
+
+        .wrapper-metadata .metadata {
+            @extend %divider-2;
+            margin-bottom: spacing-vertical(small);
+            border-bottom-color: palette(grayscale, x-light);
+            padding-bottom: spacing-vertical(small);
+
+            &:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(4);
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+        }
+    }
+
+    .wrapper-accomplishment-related {
+        @extend %layout-wrapper;
+
+        .accomplishment-related {
+            @extend %layout;
+        }
+
+        .accomplishment-brief {
+            margin-bottom: spacing-vertical(small);
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(6);
+            }
+
+            .accomplishment-type-symbol {
+                @include size(rem(50));
+                @include margin-right(spacing-horizontal(base));
+            }
+        }
+    }
+
+    .wrapper-about {
+        @extend %layout-wrapper;
+
+        .about {
+            @extend %layout;
+        }
+
+        .about-item {
+            margin-bottom: spacing-vertical(base);
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            @include susy-breakpoint($bp-medium, $susy) {
+                @include gallery(6);
+                margin-bottom: 0;
+            }
+        }
+    }
+}

@@ -5,17 +5,15 @@
 
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 $shadow-l1;
-  border-top: 1px solid tint($m-gray,50%);
+  border-top: 1px solid tint($m-gray, 50%);
   padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
   background: $footer-bg;
   clear: both;
 
-  footer {
+  footer#footer-openedx {
     @include clearfix();
     @include box-sizing(border-box);
-    max-width: grid-width(12);
-    min-width: 760px;
-    width: flex-grid(12);
+    @include outer-container;
     margin: 0 auto;
 
     p, ol, ul {
@@ -35,15 +33,21 @@
 
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
-        color: $link-color;
       }
     }
 
     // colophon
     .colophon {
-      @include margin-right(flex-gutter());
-      width: flex-grid(8,12);
-      @include float(left);
+      @include span-columns(8);
+
+      @include media($bp-small) {
+        @include fill-parent();
+      }
+
+      @include media($bp-tiny) {
+        @include fill-parent();
+      }
+
 
       .nav-colophon {
         @include clearfix();
@@ -159,14 +163,21 @@
     }
 
     // platform Open edX logo and link
-    .powered-by {
-      @include float(right);
-      width: flex-grid(3,12);
-      display: inline-block;
-      vertical-align: bottom;
+    .footer-about-openedx {
+      @include span-columns(4);
       @include text-align(right);
+      vertical-align: bottom;
+
+      @include media($bp-small) {
+        @include fill-parent();
+      }
+
+      @include media($bp-tiny) {
+        @include fill-parent();
+      }
 
       a {
+        @include float(right);
         display: inline-block;
 
         &:hover {
@@ -208,7 +219,7 @@
 // edX theme: LMS Footer
 // ====================
 $edx-footer-spacing: ($baseline*0.75);
-$edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-link-color: $link-color;
 $edx-footer-bg-color: rgb(252,252,252);
 
 %edx-footer-reset {
@@ -216,17 +227,17 @@ $edx-footer-bg-color: rgb(252,252,252);
 }
 
 %edx-footer-section {
-  float: left;
+  @include float(left);
   min-height: ($baseline*17.5);
-  margin-right: flex-gutter();
-  border-right: 1px solid rgb(230, 230, 230);
-  padding-right: ($baseline*1.5);
+  @include margin-right(flex-gutter());
+  @include border-right(1px solid rgb(230, 230, 230));
+  @include padding-right($baseline*1.5);
 
   // CASE: last child
   &:last-child {
-    margin-right: 0;
+    @include margin-right(0);
     border: none;
-    padding-right: 0;
+    @include padding-right(0);
   }
 }
 
@@ -283,188 +294,6 @@ $edx-footer-bg-color: rgb(252,252,252);
 
     .copy {
       @extend %t-weight4;
-    }
-  }
-}
-
-.edx-footer-new {
-  background: $edx-footer-bg-color;
-
-  // NOTE: resetting older footer styles - can be removed once not needed
-  box-shadow: none;
-  border-top: none;
-  padding: ($baseline*2) $baseline;
-
-  // about
-  // --------------------
-  .footer-about {
-    @extend %edx-footer-reset;
-    @extend %edx-footer-section;
-    width: flex-grid(6,12);
-  }
-
-  .footer-about-title {
-    @extend %edx-footer-title;
-  }
-
-  .footer-about-logo {
-    margin-bottom: $edx-footer-spacing;
-  }
-
-  .footer-about-copy {
-    @extend %t-copy-sub1;
-    margin-bottom: $edx-footer-spacing;
-    color: rgb(61, 62, 63);
-
-    p {
-      // NOTE: needed for poor LMS span styling
-      color: inherit;
-    }
-  }
-
-  .footer-about-copyright {
-    @extend %t-copy-sub1;
-    margin-bottom: $edx-footer-spacing;
-    color: rgb(138, 140, 143);
-
-    p {
-      // NOTE: needed for poor LMS span styling
-      color: inherit;
-    }
-
-    a {
-      @extend %edx-footer-link;
-      display: inline-block;
-      margin-bottom: ($edx-footer-spacing/2);
-    }
-  }
-
-  .footer-about-links {
-
-    a {
-      @extend %edx-footer-link;
-      margin-bottom: ($edx-footer-spacing/2);
-    }
-
-    .note {
-      color: rgb(138, 140, 143);
-    }
-  }
-
-  // nav (learn more links)
-  // --------------------
-  .footer-nav {
-    @extend %edx-footer-reset;
-    @extend %edx-footer-section;
-    width: flex-grid(3,12);
-  }
-
-  .footer-nav-title {
-    @extend %edx-footer-title;
-    margin-top: $baseline;
-  }
-
-  .footer-nav-links {
-    margin-bottom: ($edx-footer-spacing*2.25);
-
-    a {
-      @extend %edx-footer-link;
-    }
-  }
-
-  // follow (social media)
-  // --------------------
-  .footer-follow {
-    @extend %edx-footer-reset;
-    @extend %edx-footer-section;
-    width: flex-grid(3,12);
-
-  }
-
-  .footer-follow-title {
-    @extend %edx-footer-title;
-    margin-top: $baseline;
-  }
-
-  .footer-follow-links {
-
-    a {
-      @extend %edx-footer-link;
-      margin-top: $baseline;
-
-      .icon, .copy {
-        display: inline-block;
-        vertical-align: middle;
-      }
-
-      .icon {
-        @extend %t-icon3;
-        margin-right: ($baseline/4);
-        text-align: center;
-        min-width: ($baseline*1.5);
-      }
-
-      .copy {
-        // NOTE: needed for poor LMS span styling
-        color: inherit;
-      }
-    }
-  }
-
-  &.rwd {
-    @include box-sizing(border-box);
-    @include outer-container;
-
-    &.wrapper-footer footer {
-      min-width: 0;
-    }
-
-    .footer-about,
-    .footer-nav,
-    .footer-follow {
-      @include span-columns(12);
-    }
-
-    @include media( $tablet ) {
-    }
-
-    @include media( $desktop ) {
-      .footer-about {
-        @include span-columns(6);
-      }
-
-      .footer-nav,
-      .footer-follow {
-        @include span-columns(3);
-      }
-    }
-  }
-
-  // App links
-  // --------------------
-  .footer-mobile-apps {
-    padding-top: 20px;
-
-    .mobile-app-wrapper {
-      margin: 0 0 10px 0;
-    }
-
-    a {
-      display: inline-block;
-
-      &:hover {
-        border: none;
-      }
-    }
-
-    .app-store {
-      height: auto;
-      width: 129px;
-    }
-
-    .google-play {
-      height: auto;
-      width: 129px;
     }
   }
 }

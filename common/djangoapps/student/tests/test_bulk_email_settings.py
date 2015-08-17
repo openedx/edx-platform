@@ -8,15 +8,12 @@ import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
 # This import is for an lms djangoapp.
@@ -24,13 +21,15 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import CourseAuthorization  # pylint: disable=import-error
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestStudentDashboardEmailView(ModuleStoreTestCase):
     """
     Check for email view displayed with flag
     """
+
     def setUp(self):
+        super(TestStudentDashboardEmailView, self).setUp()
+
         self.course = CourseFactory.create()
 
         # Create student account
@@ -41,20 +40,14 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         self.url = reverse('dashboard')
         # URL for email settings modal
         self.email_modal_link = (
-            '<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
+            '<a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" '
             'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
-            'data-optout="False">Email Settings</a>'
+            'data-dashboard-index="0" data-optout="False">Email Settings</a>'
         ).format(
             org=self.course.org,
             num=self.course.number,
             name=self.course.display_name.replace(' ', '_'),
         )
-
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
@@ -90,13 +83,15 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         self.assertTrue(self.email_modal_link in response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     """
     Check for email view on student dashboard, with XML backed course.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
+        super(TestStudentDashboardEmailViewXMLBacked, self).setUp()
         self.course_name = 'edX/toy/2012_Fall'
 
         # Create student account
@@ -111,9 +106,9 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
 
         # URL for email settings modal
         self.email_modal_link = (
-            '<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
+            '<a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" '
             'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
-            'data-optout="False">Email Settings</a>'
+            'data-dashboard-index="0" data-optout="False">Email Settings</a>'
         ).format(
             org='edX',
             num='toy',

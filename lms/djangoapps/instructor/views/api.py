@@ -12,7 +12,7 @@ import re
 import time
 import requests
 from django.conf import settings
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -23,15 +23,18 @@ from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
+from django.shortcuts import redirect
 import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
+import decimal
 from student import auth
-from student.roles import CourseSalesAdminRole
-from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
-import datetime
-import pytz
+from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
+from util.file import (
+    store_uploaded_file, course_and_time_based_filename_generator,
+    FileValidationException, UniversalNewlineIterator
+)
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -49,8 +52,21 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
-from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    RegistrationCodeRedemption,
+    Invoice,
+    CourseMode,
+    CourseRegistrationCodeInvoiceItem,
+)
+from student.models import (
+    CourseEnrollment, unique_id_for_user, anonymous_id_for_user,
+    UserProfile, Registration, EntranceExamConfiguration,
+    ManualEnrollmentAudit, UNENROLLED_TO_ALLOWEDTOENROLL, ALLOWEDTOENROLL_TO_ENROLLED,
+    ENROLLED_TO_ENROLLED, ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_UNENROLLED, ALLOWEDTOENROLL_TO_UNENROLLED, DEFAULT_TRANSITION_STATE
+)
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
@@ -63,16 +79,18 @@ from instructor.enrollment import (
     send_beta_role_email,
     unenroll_email,
 )
-from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
+from instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
 from instructor.offline_gradecalc import student_grades
 import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
+
+from certificates import api as certs_api
 
 from bulk_email.models import CourseEmail
 
@@ -92,7 +110,7 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
-from student.models import UserProfile, Registration
+from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 
 log = logging.getLogger(__name__)
 
@@ -226,6 +244,20 @@ def require_level(level):
     return decorator
 
 
+def require_global_staff(func):
+    """View decorator that requires that the user have global staff permissions. """
+    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
+        if GlobalStaff().has_user(request.user):
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden(
+                u"Must be {platform_name} staff to perform this action.".format(
+                    platform_name=settings.PLATFORM_NAME
+                )
+            )
+    return wrapped
+
+
 def require_sales_admin(func):
     """
     Decorator for checking sales administrator access before executing an HTTP endpoint. This decorator
@@ -243,6 +275,31 @@ def require_sales_admin(func):
             return HttpResponseNotFound()
 
         access = auth.has_access(request.user, CourseSalesAdminRole(course_key))
+
+        if access:
+            return func(request, course_id)
+        else:
+            return HttpResponseForbidden()
+    return wrapped
+
+
+def require_finance_admin(func):
+    """
+    Decorator for checking finance administrator access before executing an HTTP endpoint. This decorator
+    is designed to be used for a request based action on a course. It assumes that there will be a
+    request object as well as a course_id attribute to leverage to check course level privileges.
+
+    If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
+    """
+    def wrapped(request, course_id):  # pylint: disable=missing-docstring
+
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            log.error(u"Unable to find course with course key %s", course_id)
+            return HttpResponseNotFound()
+
+        access = auth.has_access(request.user, CourseFinanceAdminRole(course_key))
 
         if access:
             return func(request, course_id)
@@ -350,15 +407,28 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         ).format(email=email, username=username)
 
                         warnings.append({
-                            'username': username, 'email': email, 'response': warning_message})
-                        log.warning('email {email} already exist'.format(email=email))
+                            'username': username, 'email': email, 'response': warning_message
+                        })
+                        log.warning(u'email %s already exist', email)
                     else:
-                        log.info("user already exists with username '{username}' and email '{email}'".format(email=email, username=username))
+                        log.info(
+                            u"user already exists with username '%s' and email '%s'",
+                            username,
+                            email
+                        )
 
                     # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
-                        CourseEnrollment.enroll(user, course_id)
-                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        enrollment_obj = CourseEnrollment.enroll(user, course_id)
+                        reason = 'Enrolling via csv upload'
+                        ManualEnrollmentAudit.create_manual_enrollment_audit(
+                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
+                        )
+                        log.info(
+                            u'user %s enrolled in the course %s',
+                            username,
+                            course.id,
+                        )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
                 else:
                     # This email does not yet exist, so we need to create a new account
@@ -367,14 +437,18 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     password = generate_unique_password(generated_passwords)
 
                     try:
-                        create_and_enroll_user(email, username, name, country, password, course_id)
+                        enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
+                        reason = 'Enrolling via csv upload'
+                        ManualEnrollmentAudit.create_manual_enrollment_audit(
+                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
+                        )
                     except IntegrityError:
                         row_errors.append({
                             'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
                     except Exception as ex:
                         log.exception(type(ex).__name__)
                         row_errors.append({
-                            'username': username, 'email': email, 'response': _(type(ex).__name__)})
+                            'username': username, 'email': email, 'response': type(ex).__name__})
                     else:
                         # It's a new user, an email will be sent to each newly created user.
                         email_params['message'] = 'account_creation_and_enrollment'
@@ -382,7 +456,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         email_params['password'] = password
                         email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
                         send_mail_to_student(email, email_params)
-                        log.info('email sent to new created user at {email}'.format(email=email))
+                        log.info(u'email sent to new created user at %s', email)
 
     else:
         general_errors.append({
@@ -436,7 +510,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id):
     profile.save()
 
     # try to enroll the user in this course
-    CourseEnrollment.enroll(user, course_id)
+    return CourseEnrollment.enroll(user, course_id)
 
 
 @ensure_csrf_cookie
@@ -486,6 +560,18 @@ def students_update_enrollment(request, course_id):
     identifiers = _split_input_list(identifiers_raw)
     auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
     email_students = request.POST.get('email_students') in ['true', 'True', True]
+    is_white_label = CourseMode.is_white_label(course_id)
+    reason = request.POST.get('reason')
+    if is_white_label:
+        if not reason:
+            return JsonResponse(
+                {
+                    'action': action,
+                    'results': [{'error': True}],
+                    'auto_enroll': auto_enroll,
+                }, status=400)
+    enrollment_obj = None
+    state_transition = DEFAULT_TRANSITION_STATE
 
     email_params = {}
     if email_students:
@@ -511,15 +597,44 @@ def students_update_enrollment(request, course_id):
             # validity (obviously, cannot check if email actually /exists/,
             # simply that it is plausibly valid)
             validate_email(email)  # Raises ValidationError if invalid
-
             if action == 'enroll':
-                before, after = enroll_email(
+                before, after, enrollment_obj = enroll_email(
                     course_id, email, auto_enroll, email_students, email_params, language=language
                 )
+                before_enrollment = before.to_dict()['enrollment']
+                before_user_registered = before.to_dict()['user']
+                before_allowed = before.to_dict()['allowed']
+                after_enrollment = after.to_dict()['enrollment']
+                after_allowed = after.to_dict()['allowed']
+
+                if before_user_registered:
+                    if after_enrollment:
+                        if before_enrollment:
+                            state_transition = ENROLLED_TO_ENROLLED
+                        else:
+                            if before_allowed:
+                                state_transition = ALLOWEDTOENROLL_TO_ENROLLED
+                            else:
+                                state_transition = UNENROLLED_TO_ENROLLED
+                else:
+                    if after_allowed:
+                        state_transition = UNENROLLED_TO_ALLOWEDTOENROLL
+
             elif action == 'unenroll':
                 before, after = unenroll_email(
                     course_id, email, email_students, email_params, language=language
                 )
+                before_enrollment = before.to_dict()['enrollment']
+                before_allowed = before.to_dict()['allowed']
+
+                if before_enrollment:
+                    state_transition = ENROLLED_TO_UNENROLLED
+                else:
+                    if before_allowed:
+                        state_transition = ALLOWEDTOENROLL_TO_UNENROLLED
+                    else:
+                        state_transition = UNENROLLED_TO_UNENROLLED
+
             else:
                 return HttpResponseBadRequest(strip_tags(
                     "Unrecognized action '{}'".format(action)
@@ -536,7 +651,7 @@ def students_update_enrollment(request, course_id):
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception("Error while #{}ing student")
+            log.exception(u"Error while #{}ing student")
             log.exception(exc)
             results.append({
                 'identifier': identifier,
@@ -544,6 +659,9 @@ def students_update_enrollment(request, course_id):
             })
 
         else:
+            ManualEnrollmentAudit.create_manual_enrollment_audit(
+                request.user, email, state_transition, reason, enrollment_obj
+            )
             results.append({
                 'identifier': identifier,
                 'before': before.to_dict(),
@@ -610,7 +728,7 @@ def bulk_beta_modify_access(request, course_id):
         # catch and log any unexpected exceptions
         # so that one error doesn't cause a 500.
         except Exception as exc:  # pylint: disable=broad-except
-            log.exception("Error while #{}ing student")
+            log.exception(u"Error while #{}ing student")
             log.exception(exc)
             error = True
         else:
@@ -644,7 +762,7 @@ def bulk_beta_modify_access(request, course_id):
 @common_exceptions_400
 @require_query_params(
     unique_student_identifier="email or username of user to change access",
-    rolename="'instructor', 'staff', or 'beta'",
+    rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
     action="'allow' or 'revoke'"
 )
 def modify_access(request, course_id):
@@ -656,7 +774,7 @@ def modify_access(request, course_id):
 
     Query parameters:
     unique_student_identifer is the target user's username or email
-    rolename is one of ['instructor', 'staff', 'beta']
+    rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
     action is one of ['allow', 'revoke']
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
@@ -685,10 +803,10 @@ def modify_access(request, course_id):
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
-    if rolename not in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest(strip_tags(
-            "unknown rolename '{}'".format(rolename)
-        ))
+    if rolename not in ROLES:
+        error = strip_tags("unknown rolename '{}'".format(rolename))
+        log.error(error)
+        return HttpResponseBadRequest(error)
 
     # disallow instructors from removing their own instructor access.
     if rolename == 'instructor' and user == request.user and action != 'allow':
@@ -727,7 +845,7 @@ def list_course_role_members(request, course_id):
     List instructors and staff.
     Requires instructor access.
 
-    rolename is one of ['instructor', 'staff', 'beta']
+    rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
 
     Returns JSON of the form {
         "course_id": "some/course/id",
@@ -748,7 +866,7 @@ def list_course_role_members(request, course_id):
 
     rolename = request.GET.get('rolename')
 
-    if rolename not in ['instructor', 'staff', 'beta']:
+    if rolename not in ROLES:
         return HttpResponseBadRequest()
 
     def extract_user_info(user):
@@ -833,7 +951,6 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
         ('company_name', 'Company Name'),
         ('company_contact_name', 'Company Contact Name'),
         ('company_contact_email', 'Company Contact Email'),
-        ('total_amount', 'Total Amount'),
         ('logged_in_username', 'Login Username'),
         ('logged_in_email', 'Login User Email'),
         ('purchase_time', 'Date of Sale'),
@@ -849,8 +966,11 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
         ('order_type', 'Order Type'),
         ('status', 'Order Item Status'),
         ('coupon_code', 'Coupon Code'),
-        ('unit_cost', 'Unit Price'),
         ('list_price', 'List Price'),
+        ('unit_cost', 'Unit Price'),
+        ('quantity', 'Quantity'),
+        ('total_discount', 'Total Discount'),
+        ('total_amount', 'Total Amount Paid'),
     ]
 
     db_columns = [x[0] for x in query_features]
@@ -885,9 +1005,13 @@ def sale_validation(request, course_id):
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        obj_invoice = Invoice.objects.select_related('is_valid').get(id=invoice_number, course_id=course_id)
-    except Invoice.DoesNotExist:
-        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
+        obj_invoice = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').get(
+            invoice_id=invoice_number,
+            course_id=course_id
+        )
+        obj_invoice = obj_invoice.invoice
+    except CourseRegistrationCodeInvoiceItem.DoesNotExist:  # Check for old type invoices
+        return HttpResponseNotFound(_("Invoice number '{num}' does not exist.").format(num=invoice_number))
 
     if event_type == "invalidate":
         return invalidate_invoice(obj_invoice)
@@ -964,7 +1088,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'goals': _('Goals'),
     }
 
-    if course.is_cohorted:
+    if is_course_cohorted(course.id):
         # Translators: 'Cohort' refers to a group of students within a course.
         query_features.append('cohort')
         query_features_names['cohort'] = _('Cohort')
@@ -988,6 +1112,36 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         except AlreadyRunningError:
             already_running_status = _("An enrolled student profile report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
             return JsonResponse({"status": already_running_status})
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_students_who_may_enroll(request, course_id):
+    """
+    Initiate generation of a CSV file containing information about
+    students who may enroll in a course.
+
+    Responds with JSON
+        {"status": "... status message ..."}
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    query_features = ['email']
+    try:
+        instructor_task.api.submit_calculate_may_enroll_csv(request, course_key, query_features)
+        success_status = _(
+            "Your students who may enroll report is being generated! "
+            "You can view the status of the generation task in the 'Pending Instructor Tasks' section."
+        )
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A students who may enroll report generation task is already in progress. "
+            "Check the 'Pending Instructor Tasks' table for the status of the task. "
+            "When completed, the report will be available for download in the table below."
+        )
+        return JsonResponse({"status": already_running_status})
 
 
 @ensure_csrf_cookie
@@ -1046,14 +1200,73 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     coupons = Coupon.objects.filter(course_id=course_id)
 
     query_features = [
-        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date', 'is_active'
+        ('code', _('Coupon Code')),
+        ('course_id', _('Course Id')),
+        ('percentage_discount', _('% Discount')),
+        ('description', _('Description')),
+        ('expiration_date', _('Expiration Date')),
+        ('is_active', _('Is Active')),
+        ('code_redeemed_count', _('Code Redeemed Count')),
+        ('total_discounted_seats', _('Total Discounted Seats')),
+        ('total_discounted_amount', _('Total Discounted Amount')),
     ]
-    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, coupons)
-    header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
-    return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
+    db_columns = [x[0] for x in query_features]
+    csv_columns = [x[1] for x in query_features]
+
+    coupons_list = instructor_analytics.basic.coupon_codes_features(db_columns, coupons, course_id)
+    __, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, db_columns)
+    return instructor_analytics.csvs.create_csv_response('Coupons.csv', csv_columns, data_rows)
 
 
-def save_registration_code(user, course_id, mode_slug, invoice=None, order=None):
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_finance_admin
+def get_enrollment_report(request, course_id):
+    """
+    get the enrollment report for the particular course.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_detailed_enrollment_features_csv(request, course_key)
+        success_status = _("Your detailed enrollment report is being generated! "
+                           "You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A detailed enrollment report generation task is already in progress. "
+                                   "Check the 'Pending Instructor Tasks' table for the status of the task. "
+                                   "When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_finance_admin
+def get_exec_summary_report(request, course_id):
+    """
+    get the executive summary report for the particular course.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_executive_summary_report(request, course_key)
+        status_response = _("Your executive summary report is being created. "
+                            "To view the status of the report, see the 'Pending Instructor Tasks' section.")
+    except AlreadyRunningError:
+        status_response = _(
+            "An executive summary report is currently in progress. "
+            "To view the status of the report, see the 'Pending Instructor Tasks' section. "
+            "When completed, the report will be available for download in the table below. "
+            "You will be able to download the report when it is complete."
+        )
+    return JsonResponse({
+        "status": status_response
+    })
+
+
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -1064,6 +1277,7 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         mode_slug (str): The Course Mode Slug associated with any enrollment made by these codes.
         invoice (Invoice): (Optional) The associated invoice for this code.
         order (Order): (Optional) The associated order for this code.
+        invoice_item (CourseRegistrationCodeInvoiceItem) : (Optional) The associated CourseRegistrationCodeInvoiceItem
 
     Returns:
         The newly created CourseRegistrationCode.
@@ -1074,7 +1288,9 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
     course_registration = CourseRegistrationCode(
         code=code,
@@ -1082,13 +1298,16 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         created_by=user,
         invoice=invoice,
         order=order,
-        mode_slug=mode_slug
+        mode_slug=mode_slug,
+        invoice_item=invoice_item
     )
     try:
         course_registration.save()
         return course_registration
     except IntegrityError:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -1102,7 +1321,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     # csv headers
     query_features = [
         'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
-        'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
+        'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference', 'is_valid'
     ]
 
     registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
@@ -1130,11 +1349,13 @@ def get_registration_codes(request, course_id):  # pylint: disable=unused-argume
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     #filter all the  course registration codes
-    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
+    registration_codes = CourseRegistrationCode.objects.filter(
+        course_id=course_id
+    ).order_by('invoice_item__invoice__company_name')
 
     company_name = request.POST['download_company_name']
     if company_name:
-        registration_codes = registration_codes.filter(invoice__company_name=company_name)
+        registration_codes = registration_codes.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'download'
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
@@ -1160,7 +1381,21 @@ def generate_registration_codes(request, course_id):
     company_name = request.POST['company_name']
     company_contact_name = request.POST['company_contact_name']
     company_contact_email = request.POST['company_contact_email']
-    sale_price = request.POST['sale_price']
+    unit_price = request.POST['unit_price']
+
+    try:
+        unit_price = (
+            decimal.Decimal(unit_price)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+    except decimal.InvalidOperation:
+        return HttpResponse(
+            status=400,
+            content=_(u"Could not parse amount as a decimal")
+        )
+
     recipient_name = request.POST['recipient_name']
     recipient_email = request.POST['recipient_email']
     address_line_1 = request.POST['address_line_1']
@@ -1177,7 +1412,8 @@ def generate_registration_codes(request, course_id):
         recipient_list.append(request.user.email)
         invoice_copy = True
 
-    UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
+    sale_price = unit_price * course_code_number
+    set_user_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price,
         company_name=company_name,
@@ -1195,6 +1431,13 @@ def generate_registration_codes(request, course_id):
         country=country,
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
+    )
+
+    invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+        invoice=sale_invoice,
+        qty=course_code_number,
+        unit_price=unit_price,
+        course_id=course_id
     )
 
     course = get_course_by_id(course_id, depth=0)
@@ -1217,7 +1460,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, sale_invoice, order=None
+            request.user, course_id, course_mode.slug, invoice=sale_invoice, order=None, invoice_item=invoice_item
         )
         registration_codes.append(generated_registration_code)
 
@@ -1309,13 +1552,17 @@ def active_registration_codes(request, course_id):  # pylint: disable=unused-arg
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # find all the registration codes in this course
-    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
+    registration_codes_list = CourseRegistrationCode.objects.filter(
+        course_id=course_id
+    ).order_by('invoice_item__invoice__company_name')
 
     company_name = request.POST['active_company_name']
     if company_name:
-        registration_codes_list = registration_codes_list.filter(invoice__company_name=company_name)
+        registration_codes_list = registration_codes_list.filter(invoice_item__invoice__company_name=company_name)
     # find the redeemed registration codes if any exist in the db
-    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related(
+        'registration_code', 'registration_code__invoice_item__invoice'
+    ).filter(registration_code__course_id=course_id)
     if code_redemption_set.exists():
         redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
         # exclude the redeemed registration codes from the registration codes list and you will get
@@ -1346,11 +1593,11 @@ def spent_registration_codes(request, course_id):  # pylint: disable=unused-argu
         # you will get a list of all the spent(Redeemed) Registration Codes
         spent_codes_list = CourseRegistrationCode.objects.filter(
             course_id=course_id, code__in=redeemed_registration_codes
-        ).order_by('invoice__company_name')
+        ).order_by('invoice_item__invoice__company_name').select_related('invoice_item__invoice')
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint: disable=maybe-no-member
+            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)  # pylint: disable=maybe-no-member
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -1552,6 +1799,71 @@ def reset_student_attempts(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@common_exceptions_400
+def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+    """
+
+    Resets a students attempts counter or starts a task to reset all students
+    attempts counters for entrance exam. Optionally deletes student state for
+    entrance exam. Limited to staff access. Some sub-methods limited to instructor access.
+
+    Following are possible query parameters
+        - unique_student_identifier is an email or username
+        - all_students is a boolean
+            requires instructor access
+            mutually exclusive with delete_module
+        - delete_module is a boolean
+            requires instructor access
+            mutually exclusive with all_students
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(
+        request.user, 'staff', course_id, depth=None
+    )
+
+    if not course.entrance_exam_id:
+        return HttpResponseBadRequest(
+            _("Course has no entrance exam section.")
+        )
+
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
+    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
+    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+
+    # parameter combinations
+    if all_students and student:
+        return HttpResponseBadRequest(
+            _("all_students and unique_student_identifier are mutually exclusive.")
+        )
+    if all_students and delete_module:
+        return HttpResponseBadRequest(
+            _("all_students and delete_module are mutually exclusive.")
+        )
+
+    # instructor authorization
+    if all_students or delete_module:
+        if not has_access(request.user, 'instructor', course):
+            return HttpResponseForbidden(_("Requires instructor access."))
+
+    try:
+        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+        if delete_module:
+            instructor_task.api.submit_delete_entrance_exam_state_for_student(request, entrance_exam_key, student)
+        else:
+            instructor_task.api.submit_reset_problem_attempts_in_entrance_exam(request, entrance_exam_key, student)
+    except InvalidKeyError:
+        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+
+    response_payload = {'student': student_identifier or _('All Students'), 'task': 'created'}
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(problem_to_reset="problem urlname to reset")
 @common_exceptions_400
@@ -1602,6 +1914,58 @@ def rescore_problem(request, course_id):
     else:
         return HttpResponseBadRequest()
 
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@common_exceptions_400
+def rescore_entrance_exam(request, course_id):
+    """
+    Starts a background process a students attempts counter for entrance exam.
+    Optionally deletes student state for a problem. Limited to instructor access.
+
+    Takes either of the following query parameters
+        - unique_student_identifier is an email or username
+        - all_students is a boolean
+
+    all_students and unique_student_identifier cannot both be present.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(
+        request.user, 'staff', course_id, depth=None
+    )
+
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
+
+    all_students = request.GET.get('all_students') in ['true', 'True', True]
+
+    if not course.entrance_exam_id:
+        return HttpResponseBadRequest(
+            _("Course has no entrance exam section.")
+        )
+
+    if all_students and student:
+        return HttpResponseBadRequest(
+            _("Cannot rescore with all_students and unique_student_identifier.")
+        )
+
+    try:
+        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+    except InvalidKeyError:
+        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+
+    response_payload = {}
+    if student:
+        response_payload['student'] = student_identifier
+    else:
+        response_payload['student'] = _("All Students")
+    instructor_task.api.submit_rescore_entrance_exam_for_student(request, entrance_exam_key, student)
+    response_payload['task'] = 'created'
     return JsonResponse(response_payload)
 
 
@@ -1689,12 +2053,66 @@ def list_instructor_tasks(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=invalid-name
+    """
+    List entrance exam related instructor tasks.
+
+    Takes either of the following query parameters
+        - unique_student_identifier is an email or username
+        - all_students is a boolean
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_id)
+    student = request.GET.get('unique_student_identifier', None)
+    if student is not None:
+        student = get_student_from_identifier(student)
+
+    try:
+        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+    except InvalidKeyError:
+        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+    if student:
+        # Specifying for a single student's entrance exam history
+        tasks = instructor_task.api.get_entrance_exam_instructor_task_history(course_id, entrance_exam_key, student)
+    else:
+        # Specifying for all student's entrance exam history
+        tasks = instructor_task.api.get_entrance_exam_instructor_task_history(course_id, entrance_exam_key)
+
+    response_payload = {
+        'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def list_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+
+    response_payload = {
+        'downloads': [
+            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            for name, url in report_store.links_for(course_id)
+        ]
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_finance_admin
+def list_financial_report_downloads(_request, course_id):
+    """
+    List grade CSV files that are available for download for this course.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
 
     response_payload = {
         'downloads': [
@@ -1715,10 +2133,39 @@ def calculate_grades_csv(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         instructor_task.api.submit_calculate_grades_csv(request, course_key)
-        success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        success_status = _("Your grade report is being generated! "
+                           "You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
-        already_running_status = _("A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+        already_running_status = _("A grade report generation task is already in progress. "
+                                   "Check the 'Pending Instructor Tasks' table for the status of the task. "
+                                   "When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def problem_grade_report(request, course_id):
+    """
+    Request a CSV showing students' grades for all problems in the
+    course.
+
+    AlreadyRunningError is raised if the course's grades are already being
+    updated.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_problem_grade_report(request, course_key)
+        success_status = _("Your problem grade report is being generated! "
+                           "You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A problem grade report is already being generated. "
+                                   "Check the 'Pending Instructor Tasks' table for the status of the task. "
+                                   "When completed, the report will be available for download in the table below.")
         return JsonResponse({
             "status": already_running_status
         })
@@ -1934,7 +2381,7 @@ def proxy_legacy_analytics(request, course_id):
     try:
         res = requests.get(url)
     except Exception:  # pylint: disable=broad-except
-        log.exception("Error requesting from analytics server at %s", url)
+        log.exception(u"Error requesting from analytics server at %s", url)
         return HttpResponse("Error requesting from analytics server.", status=500)
 
     if res.status_code is 200:
@@ -1949,9 +2396,8 @@ def proxy_legacy_analytics(request, course_id):
     else:
         # 500 on all other unexpected status codes.
         log.error(
-            "Error fetching {}, code: {}, msg: {}".format(
-                url, res.status_code, res.content
-            )
+            u"Error fetching %s, code: %s, msg: %s",
+            url, res.status_code, res.content
         )
         return HttpResponse(
             "Error from analytics server ({}).".format(res.status_code),
@@ -1965,8 +2411,9 @@ def get_user_invoice_preference(request, course_id):  # pylint: disable=unused-a
     Gets invoice copy user's preferences.
     """
     invoice_copy_preference = True
-    if UserPreference.get_preference(request.user, INVOICE_KEY) is not None:
-        invoice_copy_preference = UserPreference.get_preference(request.user, INVOICE_KEY) == 'True'
+    invoice_preference_value = get_user_preference(request.user, INVOICE_KEY)
+    if invoice_preference_value is not None:
+        invoice_copy_preference = invoice_preference_value == 'True'
 
     return JsonResponse({
         'invoice_copy': invoice_copy_preference
@@ -2079,6 +2526,60 @@ def _split_input_list(str_list):
     return new_list
 
 
+def _instructor_dash_url(course_key, section=None):
+    """Return the URL for a section in the instructor dashboard.
+
+    Arguments:
+        course_key (CourseKey)
+
+    Keyword Arguments:
+        section (str): The name of the section to load.
+
+    Returns:
+        unicode: The URL of a section in the instructor dashboard.
+
+    """
+    url = reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)})
+    if section is not None:
+        url += u'#view-{section}'.format(section=section)
+    return url
+
+
+@require_global_staff
+@require_POST
+def generate_example_certificates(request, course_id=None):  # pylint: disable=unused-argument
+    """Start generating a set of example certificates.
+
+    Example certificates are used to verify that certificates have
+    been configured correctly for the course.
+
+    Redirects back to the intructor dashboard once certificate
+    generation has begun.
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    certs_api.generate_example_certificates(course_key)
+    return redirect(_instructor_dash_url(course_key, section='certificates'))
+
+
+@require_global_staff
+@require_POST
+def enable_certificate_generation(request, course_id=None):
+    """Enable/disable self-generated certificates for a course.
+
+    Once self-generated certificates have been enabled, students
+    who have passed the course will be able to generate certificates.
+
+    Redirects back to the intructor dashboard once the
+    setting has been updated.
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    is_enabled = (request.POST.get('certificates-enabled', 'false') == 'true')
+    certs_api.set_cert_generation_enabled(course_key, is_enabled)
+    return redirect(_instructor_dash_url(course_key, section='certificates'))
+
+
 #---- Gradebook (shown to small courses only) ----
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2117,3 +2618,46 @@ def spoc_gradebook(request, course_id):
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+    """
+    Mark a student to skip entrance exam.
+    Takes `unique_student_identifier` as required POST parameter.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    student_identifier = request.POST.get('unique_student_identifier')
+    student = get_student_from_identifier(student_identifier)
+
+    __, created = EntranceExamConfiguration.objects.get_or_create(user=student, course_id=course_id)
+    if created:
+        message = _('This student (%s) will skip the entrance exam.') % student_identifier
+    else:
+        message = _('This student (%s) is already allowed to skip the entrance exam.') % student_identifier
+    response_payload = {
+        'message': message,
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def start_certificate_generation(request, course_id):
+    """
+    Start generating certificates for all students enrolled in given course.
+    """
+    course_key = CourseKey.from_string(course_id)
+    task = instructor_task.api.generate_certificates_for_all_students(request, course_key)
+    message = _('Certificate generation task for all students of this course has been started. '
+                'You can view the status of the generation task in the "Pending Tasks" section.')
+    response_payload = {
+        'message': message,
+        'task_id': task.task_id
+    }
+    return JsonResponse(response_payload)

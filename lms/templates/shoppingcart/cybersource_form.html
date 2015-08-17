@@ -1,7 +1,8 @@
-        <form action="${action}" method="post">
-            % for pk, pv in params.iteritems():
-                <input type="hidden" name="${pk}" value="${pv}" />
-            % endfor
+<%! from django.utils.translation import ugettext as _ %>
+    <form action="${action}" method="post">
+        % for pk, pv in params.iteritems():
+            <input type="hidden" name="${pk}" value="${pv}" />
+        % endfor
 
-                <i class="icon fa fa-caret-right"></i><input type="submit" value="Payment"/>
-        </form>
+        <button type="submit">${_('Payment')}<i class="icon fa fa-caret-right" aria-hidden="true"></i></button>
+    </form>

@@ -49,9 +49,8 @@
   </div>
   %endif
 
-  <script>
+  <script type="text/javascript">
     $(function(){
-      var IntervalManager, PendingMatlabResult;
       var gentle_alert = function (parent_elt, msg) {
           if($(parent_elt).find('.capa_alert').length) {
               $(parent_elt).find('.capa_alert').remove();
@@ -63,7 +62,6 @@
 
       // hook up the plot button
       var plot = function(event) {
-          var matlab_result_task;
           var problem_elt = $(event.target).closest('.problems-wrapper');
           url = $(event.target).closest('.problems-wrapper').data('url');
           input_id = "${id}";
@@ -82,28 +80,38 @@
           answer = input.serialize();
 
           // a chain of callbacks, each querying the server on success of the previous one
-
-          var get_callback = function(response) {
-              var new_result_elem = $(response.html).find(".ungraded-matlab-result").html();
-              var external_grader_msg = $(response.html).find(".external-grader-message").html();
-              result_elem = $(problem_elt).find(".ungraded-matlab-result");
-              result_elem.addClass("is-fading-in");
-              result_elem.html(new_result_elem);
-              external_grader_msg_elem = $(problem_elt).find(".external-grader-message");
-              external_grader_msg_elem.addClass("is-fading-in");
-              external_grader_msg_elem.html(external_grader_msg);
-              if (!external_grader_msg.trim()) {
-                  matlab_result_task.task_poller.stop();
-              } else {
-                  result_elem.html('');
-              }
+          var poll = function(prev_timeout) {
+              $.postWithPrefix(url + "/problem_get", function(response) {
+                   var new_result_elem = $(response.html).find(".ungraded-matlab-result").html();
+                   var external_grader_msg = $(response.html).find(".external-grader-message").html();
+                   var result_elem = $(problem_elt).find(".ungraded-matlab-result");
+                   result_elem.addClass("is-fading-in");
+                   result_elem.html(new_result_elem);
+                   var external_grader_msg_elem = $(problem_elt).find(".external-grader-message");
+                   external_grader_msg_elem.addClass("is-fading-in");
+                   external_grader_msg_elem.html(external_grader_msg);
+                   // If we have a message about waiting for the external grader.
+                   if (external_grader_msg.trim()) {
+                        result_elem.html('');
+                        // Setup the polling for the next round
+                        var next_timeout = prev_timeout * 2;
+                        // The XML parsing that capa uses doesn't handle the greater-than symbol properly here, so we are forced to work around it.
+                        // The backend MatlabInput code will also terminate after 35 seconds, so this is mostly a protective measure.
+                        if (next_timeout === 64000) {
+                            gentle_alert(problem_elt, gettext("Your code is still being run. Refresh the page to see updates."));
+                        }
+                        window.setTimeout(function(){ poll(next_timeout); }, next_timeout);
+                   }
+              });
           };
 
           var plot_callback = function(response) {
               if(response.success) {
-                  matlab_result_task = new PendingMatlabResult(get_callback);
-                  matlab_result_task.task_poller.start();
+                  // If successful, start polling.
+                  // If we change the initial polling value, we will also need to change the check within poll (next_time === 64000) to match it.
+                  poll(1000);
               } else {
+                  // Used response.message because input_ajax is returning "message"
                   gentle_alert(problem_elt, response.message);
               }
           };
@@ -115,7 +123,8 @@
                       {'submission': submission}, plot_callback);
               }
               else {
-                  gentle_alert(problem_elt, response.message);
+                  // Used response.msg because problem_save is returning "msg" instead of "message"
+                  gentle_alert(problem_elt, response.msg);
               }
           };
 
@@ -124,55 +133,6 @@
       };
       $('#plot_${id}').click(plot);
 
-      // Copied from lms/static/coffee/src/instructor_dashboard/util.js
-      IntervalManager = (function() {
-
-        function IntervalManager(ms, fn) {
-          this.ms = ms;
-          this.fn = fn;
-          this.intervalID = null;
-        }
-
-        IntervalManager.prototype.start = function() {
-          this.fn();
-          if (this.intervalID === null) {
-            return this.intervalID = setInterval(this.fn, this.ms);
-          }
-        };
-
-        IntervalManager.prototype.stop = function() {
-          clearInterval(this.intervalID);
-          return this.intervalID = null;
-        };
-
-        return IntervalManager;
-
-      })();
-
-      PendingMatlabResult = (function() {
-        /* Pending Matlab Result Section
-        */
-
-        function PendingMatlabResult(get_callback) {
-          var MATLAB_RESULT_POLL_INTERVAL,
-            _this = this;
-          this.reload_matlab_result = function(get_callback) {
-            return PendingMatlabResult.prototype.reload_matlab_result.apply(_this, arguments);
-          };
-          MATLAB_RESULT_POLL_INTERVAL = 1000;
-          this.reload_matlab_result(get_callback);
-          this.task_poller = new IntervalManager(MATLAB_RESULT_POLL_INTERVAL, function() {
-            return _this.reload_matlab_result(get_callback);
-          });
-        }
-
-        PendingMatlabResult.prototype.reload_matlab_result = function(get_callback) {
-          return $.postWithPrefix(url + "/problem_get", get_callback)
-        };
-
-        return PendingMatlabResult;
-
-        })();
     });
   </script>
 </section>

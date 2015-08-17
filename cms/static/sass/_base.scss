@@ -666,67 +666,63 @@ hr.divider {
   }
 }
 
-// +JS Dependent
-// ==================== 
-body.js {
+// lean/simple modal window
+.content-modal {
+  @include border-bottom-radius(2px);
+  @include box-sizing(border-box);
+  position: relative;
+  display: none;
+  width: 700px;
+  padding: ($baseline);
+  border: 1px solid $gray-d1;
+  background: $white;
+  box-shadow: 0 2px 4px $shadow-d1;
+  overflow: hidden;
 
-  // lean/simple modal window
-  .content-modal {
-    @include border-bottom-radius(2px);
-    @include box-sizing(border-box);
-    box-shadow: 0 2px 4px $shadow-d1;
-    position: relative;
-    display: none;
-    width: 700px;
-    overflow: hidden;
-    border: 1px solid $gray-d1;
-    padding: ($baseline);
-    background: $white;
+  .action-modal-close {
+    @include transition(top $tmg-f3 ease-in-out 0s);
+    @include border-bottom-radius(3px);
+    position: absolute;
+    top: -3px;
+    right: $baseline;
+    padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+    background: $gray-l3;
+    text-align: center;
 
-    .action-modal-close {
-      @include transition(top $tmg-f3 ease-in-out 0s);
-      @include border-bottom-radius(3px);
-      position: absolute;
-      top: -3px;
-      right: $baseline;
-      padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
-      background: $gray-l3;
-      text-align: center;
-
-      .label {
-        @extend %cont-text-sr;
-      }
-
-      .icon {
-        @extend %t-action1;
-        color: $white;
-      }
-
-      &:hover {
-        background: $blue;
-        top: 0;
-      }
+    .label {
+      @extend %cont-text-sr;
     }
 
-    img {
-      @include box-sizing(border-box);
-      width: 100%;
-      overflow-y: scroll;
-      padding: ($baseline/10);
-      border: 1px solid $gray-l4;
+    .icon {
+      @extend %t-action1;
+      color: $white;
     }
 
-    .title {
-      @extend %t-title5;
-      @extend %t-strong;
-      margin: 0 0 ($baseline/2) 0;
-      color: $gray-d3;
-    }
-
-    .description {
-      @extend %t-copy-sub2;
-      margin-top: ($baseline/2);
-      color: $gray-l1;
+    &:hover {
+      top: 0;
+      background: $blue;
     }
   }
+
+  img {
+    @include box-sizing(border-box);
+    width: 100%;
+    overflow-y: scroll;
+    padding: ($baseline/10);
+    border: 1px solid $gray-l4;
+  }
+
+  .title {
+    @extend %t-title5;
+    @extend %t-strong;
+    margin: 0 0 ($baseline/2) 0;
+    color: $gray-d3;
+  }
+
+  .description {
+    @extend %t-copy-sub2;
+    margin-top: ($baseline/2);
+    color: $gray-l1;
+  }
 }
+

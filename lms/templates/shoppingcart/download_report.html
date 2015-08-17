@@ -1,7 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.conf import settings %>
 <%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.conf import settings
+%>
 
 <%block name="pagetitle">${_("Download CSV Reports")}</%block>
 
@@ -34,7 +36,7 @@
 
     <br/>
   %endif
-  
+
   %if ("certificate_status" or "university_revenue_share") in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
     <p>${_("These reports are delimited alphabetically by university name.  i.e., generating a report with 'Start Letter' A and 'End Letter' C will generate reports for all universities starting with A, B, and C.")}</p>
     <label for="start_letter">${_("Start Letter: ")}</label>

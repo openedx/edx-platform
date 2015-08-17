@@ -7,23 +7,19 @@ import itertools
 import StringIO
 from ddt import ddt, data
 from copy import deepcopy
+from nose.plugins.attrib import attr
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly
@@ -35,6 +31,8 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
     XBLOCK_NAMES = ['recommender', 'recommender_second']
 
     def setUp(self):
+        super(TestRecommender, self).setUp()
+
         self.course = CourseFactory.create(
             display_name='Recommender_Test_Course'
         )
@@ -150,7 +148,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
         url = self.get_handler_url(handler, xblock_name)
-        for _ in range(0, times):
+        for _ in range(times):
             self.client.post(url, json.dumps({'id': resource_id}), '')
 
     def call_event(self, handler, resource, xblock_name=None):
@@ -186,6 +184,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
+@attr('shard_1')
 class TestRecommenderCreateFromEmpty(TestRecommender):
     """
     Check whether we can add resources to an empty database correctly
@@ -212,6 +211,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
                 self.assert_request_status_code(200, self.course_url)
 
 
+@attr('shard_1')
 class TestRecommenderWithResources(TestRecommender):
     """
     Check whether we can add/edit/flag/export resources correctly
@@ -406,6 +406,7 @@ class TestRecommenderWithResources(TestRecommender):
         self.assert_request_status_code(200, self.course_url)
 
 
+@attr('shard_1')
 @ddt
 class TestRecommenderVoteWithResources(TestRecommenderWithResources):
     """
@@ -459,7 +460,7 @@ class TestRecommenderVoteWithResources(TestRecommenderWithResources):
         Vote a resource thrice
         """
         resource = {"id": self.resource_id, 'event': test_case['event']}
-        for _ in range(0, 2):
+        for _ in range(2):
             self.call_event('handle_vote', resource)
         # Test
         self.check_event_response_by_key('handle_vote', resource, 'newVotes', test_case['new_votes'])
@@ -523,6 +524,7 @@ class TestRecommenderVoteWithResources(TestRecommenderWithResources):
         self.check_event_response_by_key('handle_vote', resource, 'newVotes', test_case['new_votes'])
 
 
+@attr('shard_1')
 @ddt
 class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
     """
@@ -550,7 +552,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
         Endorse a resource once/twice/thrice
         """
         resource = {"id": self.resource_id, 'reason': ''}
-        for _ in range(0, test_case['times'] - 1):
+        for _ in range(test_case['times'] - 1):
             self.call_event('endorse_resource', resource)
         # Test
         self.check_event_response_by_key('endorse_resource', resource, test_case['key'], test_case['val'])
@@ -565,7 +567,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
         Remove a resource once/twice/thrice
         """
         resource = {"id": self.resource_id, 'reason': ''}
-        for _ in range(0, test_case['times'] - 1):
+        for _ in range(test_case['times'] - 1):
             self.call_event('remove_resource', resource)
         # Test
         self.check_event_response_by_http_status('remove_resource', resource, test_case['status'])
@@ -621,6 +623,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
         self.check_event_response_by_http_status(test_case['handler'], resource, test_case['status'])
 
 
+@attr('shard_1')
 @ddt
 class TestRecommenderFileUploading(TestRecommender):
     """

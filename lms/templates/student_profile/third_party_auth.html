@@ -1,5 +1,7 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from third_party_auth import pipeline %>
+<%!
+from django.utils.translation import ugettext as _
+from third_party_auth import pipeline
+%>
 
 <li class="controls--account">
     <span class="title">
@@ -17,10 +19,10 @@
                         <i class="icon fa fa-unlink"></i><span class="copy">${_('Not Linked')}</span>
                     % endif
                 </div>
-                <span class="provider">${state.provider.NAME}</span>
+                <span class="provider">${state.provider.name}</span>
                 <span class="control">
                     <form
-                        action="${pipeline.get_disconnect_url(state.provider.NAME)}"
+                        action="${pipeline.get_disconnect_url(state.provider.provider_id, state.association_id)}"
                         method="post"
                         name="${state.get_unlink_form_name()}">
                         % if state.has_account:
@@ -31,7 +33,7 @@
                                 ${_("Unlink")}
                             </a>
                         % else:
-                            <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_PROFILE)}">
+                            <a href="${pipeline.get_login_url(state.provider.provider_id, pipeline.AUTH_ENTRY_PROFILE)}">
                                 ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
                                 ${_("Link")}
                             </a>

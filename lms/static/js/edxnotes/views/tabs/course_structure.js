@@ -1,41 +1,42 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'gettext', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
+    'gettext', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
     'js/edxnotes/views/tab_view'
-], function (gettext, NoteGroupView, TabPanelView, TabView) {
+], function (gettext, _, NoteGroupView, TabPanelView, TabView) {
+    var view = "Location in Course";
     var CourseStructureView = TabView.extend({
         PanelConstructor: TabPanelView.extend({
             id: 'structure-panel',
-            title: 'Location in Course',
+            title: view,
 
             renderContent: function () {
                 var courseStructure = this.collection.getCourseStructure(),
                     container = document.createDocumentFragment();
 
                 _.each(courseStructure.chapters, function (chapterInfo) {
-                    var group = this.getGroup(chapterInfo);
+                    var chapterView = this.getChapterGroupView(chapterInfo);
                     _.each(chapterInfo.children, function (location) {
                         var sectionInfo = courseStructure.sections[location],
-                            section;
+                            sectionView;
                         if (sectionInfo) {
-                            section = group.addChild(sectionInfo);
+                            sectionView = chapterView.addChild(sectionInfo);
                             _.each(sectionInfo.children, function (location) {
                                 var notes = courseStructure.units[location];
                                 if (notes) {
-                                    section.addChild(this.getNotes(notes))
+                                    sectionView.addChild(this.getNotes(notes));
                                 }
                             }, this);
                         }
                     }, this);
-                    container.appendChild(group.render().el);
+                    container.appendChild(chapterView.render().el);
                 }, this);
                 this.$el.append(container);
                 return this;
             },
 
-            getGroup: function (chapter, section) {
-                var group = new NoteGroupView({
+            getChapterGroupView: function (chapter, section) {
+                var group = new NoteGroupView.ChapterView({
                     chapter: chapter,
                     section: section
                 });
@@ -47,7 +48,8 @@ define([
         tabInfo: {
             name: gettext('Location in Course'),
             identifier: 'view-course-structure',
-            icon: 'fa fa-list-ul'
+            icon: 'fa fa-list-ul',
+            view: view
         }
     });
 

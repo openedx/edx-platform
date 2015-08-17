@@ -12,10 +12,12 @@ from util.request import course_id_from_url, safe_get_host
 class ResponseTestCase(unittest.TestCase):
     """ Tests for response-related utility functions """
     def setUp(self):
+        super(ResponseTestCase, self).setUp()
         self.old_site_name = settings.SITE_NAME
         self.old_allowed_hosts = settings.ALLOWED_HOSTS
 
     def tearDown(self):
+        super(ResponseTestCase, self).tearDown()
         settings.SITE_NAME = self.old_site_name
         settings.ALLOWED_HOSTS = self.old_allowed_hosts
 

@@ -16,8 +16,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 
-from html_to_text import html_to_text
-from mail_utils import wrap_message
+from openedx.core.lib.html_to_text import html_to_text
+from openedx.core.lib.mail_utils import wrap_message
 
 from xmodule_django.models import CourseKeyField
 from util.keyword_substitution import substitute_keywords_with_data
@@ -44,7 +44,7 @@ class Email(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         abstract = True
 
 
@@ -142,7 +142,7 @@ class Optout(models.Model):
     user = models.ForeignKey(User, db_index=True, null=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         unique_together = ('user', 'course_id')
 
 
@@ -197,7 +197,7 @@ class CourseEmailTemplate(models.Model):
 
         # Substitute all %%-encoded keywords in the message body
         if 'user_id' in context and 'course_id' in context:
-            message_body = substitute_keywords_with_data(message_body, context['user_id'], context['course_id'])
+            message_body = substitute_keywords_with_data(message_body, context)
 
         result = format_string.format(**context)
 

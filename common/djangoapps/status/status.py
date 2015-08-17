@@ -3,6 +3,7 @@ A tiny app that checks for a status message.
 """
 
 from django.conf import settings
+from django.core.cache import cache
 import json
 import logging
 import os
@@ -25,6 +26,11 @@ def get_site_status_msg(course_id):
     not allowed to break the entire site).
     """
     try:
+        # first check for msg in cache
+        msg = cache.get('site_status_msg')
+        if msg is not None:
+            return msg
+
         if os.path.isfile(settings.STATUS_MESSAGE_PATH):
             with open(settings.STATUS_MESSAGE_PATH) as f:
                 content = f.read()
@@ -37,6 +43,8 @@ def get_site_status_msg(course_id):
             msg = msg + "<br>" if msg else ''
             msg += status_dict[course_id]
 
+        # set msg to cache, with expiry 5 mins
+        cache.set('site_status_msg', msg, 60 * 5)
         return msg
     except:
         log.exception("Error while getting a status message.")

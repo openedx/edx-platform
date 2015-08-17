@@ -10,7 +10,8 @@ if Backbone?
       @$el.html(Mustache.render(@template, params))
       @$("span.timeago").timeago()
       element = @$(".post-body")
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
+      if MathJax?
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
       @
 
     convertMath: ->

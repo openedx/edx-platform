@@ -1,8 +1,8 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
-    "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification",
-    "js/common_helpers/ajax_helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
-(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, AjaxHelpers, modal_helpers) ->
+    "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/utils/view_utils",
+    "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
+(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 
     beforeEach ->
@@ -194,6 +194,38 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 @view.$(".action-cancel").click()
                 expect(chapters.length).toEqual(1)
 
+    describe "ListTextbooks", ->
+        noTextbooksTpl = readFixtures("no-textbooks.underscore")
+        editTextbooktpl = readFixtures('edit-textbook.underscore')
+
+        beforeEach ->
+            appendSetFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
+            appendSetFixtures($("<script>", {id: "edit-textbook-tpl", type: "text/template"}).text(editTextbooktpl))
+            @collection = new TextbookSet
+            @view = new ListTextbooks({collection: @collection})
+            @view.render()
+
+        it "should scroll to newly added textbook", ->
+            spyOn(ViewUtils, 'setScrollOffset')
+            @view.$(".new-button").click()
+            $sectionEl = @view.$el.find('section:last')
+            expect($sectionEl.length).toEqual(1)
+            expect(ViewUtils.setScrollOffset).toHaveBeenCalledWith($sectionEl, 0)
+
+        it "should focus first input element of newly added textbook", ->
+            spyOn(jQuery.fn, 'focus').andCallThrough()
+            @addMatchers
+                toHaveBeenCalledOnJQueryObject: (actual, expected) ->
+                        pass: actual.calls && actual.calls.mostRecent() && actual.calls.mostRecent().object[0] == expected[0]
+            @view.$(".new-button").click()
+            $inputEl = @view.$el.find('section:last input:first')
+            expect($inputEl.length).toEqual(1)
+            # testing for element focused seems to be tricky
+            # (see http://stackoverflow.com/questions/967096)
+            # and the following doesn't seem to work
+#           expect($inputEl).toBeFocused()
+#           expect($inputEl.find(':focus').length).toEqual(1)
+            expect(jQuery.fn.focus).toHaveBeenCalledOnJQueryObject($inputEl)
 
 #    describe "ListTextbooks", ->
 #        noTextbooksTpl = readFixtures("no-textbooks.underscore")

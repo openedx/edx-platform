@@ -1,3 +1,8 @@
+"""
+Django models related to course groups functionality.
+"""
+
+import json
 import logging
 
 from django.contrib.auth.models import User
@@ -36,9 +41,26 @@ class CourseUserGroup(models.Model):
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
 
+    @classmethod
+    def create(cls, name, course_id, group_type=COHORT):
+        """
+        Create a new course user group.
+
+        Args:
+            name: Name of group
+            course_id: course id
+            group_type: group type
+        """
+        return cls.objects.get_or_create(
+            course_id=course_id,
+            group_type=group_type,
+            name=name
+        )
+
 
 class CourseUserGroupPartitionGroup(models.Model):
     """
+    Create User Partition Info.
     """
     course_user_group = models.OneToOneField(CourseUserGroup)
     partition_id = models.IntegerField(
@@ -49,3 +71,65 @@ class CourseUserGroupPartitionGroup(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class CourseCohortsSettings(models.Model):
+    """
+    This model represents cohort settings for courses.
+    """
+    is_cohorted = models.BooleanField(default=False)
+
+    course_id = CourseKeyField(
+        unique=True,
+        max_length=255,
+        db_index=True,
+        help_text="Which course are these settings associated with?",
+    )
+
+    _cohorted_discussions = models.TextField(db_column='cohorted_discussions', null=True, blank=True)  # JSON list
+
+    # pylint: disable=invalid-name
+    always_cohort_inline_discussions = models.BooleanField(default=True)
+
+    @property
+    def cohorted_discussions(self):
+        """Jsonify the cohorted_discussions"""
+        return json.loads(self._cohorted_discussions)
+
+    @cohorted_discussions.setter
+    def cohorted_discussions(self, value):
+        """Un-Jsonify the cohorted_discussions"""
+        self._cohorted_discussions = json.dumps(value)
+
+
+class CourseCohort(models.Model):
+    """
+    This model represents cohort related info.
+    """
+    course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort')
+
+    RANDOM = 'random'
+    MANUAL = 'manual'
+    ASSIGNMENT_TYPE_CHOICES = ((RANDOM, 'Random'), (MANUAL, 'Manual'),)
+    assignment_type = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES, default=MANUAL)
+
+    @classmethod
+    def create(cls, cohort_name=None, course_id=None, course_user_group=None, assignment_type=MANUAL):
+        """
+        Create a complete(CourseUserGroup + CourseCohort) object.
+
+        Args:
+            cohort_name: Name of the cohort to be created
+            course_id: Course Id
+            course_user_group: CourseUserGroup
+            assignment_type: 'random' or 'manual'
+        """
+        if course_user_group is None:
+            course_user_group, __ = CourseUserGroup.create(cohort_name, course_id)
+
+        course_cohort, __ = cls.objects.get_or_create(
+            course_user_group=course_user_group,
+            defaults={'assignment_type': assignment_type}
+        )
+
+        return course_cohort

@@ -125,7 +125,7 @@ def get_or_create_root():
         pass
 
     starting_content = "\n".join((
-        _("Welcome to the edX Wiki"),
+        _("Welcome to the {platform_name} Wiki").format(platform_name=settings.PLATFORM_NAME),
         "===",
         _("Visit a course wiki to add an article."),
     ))

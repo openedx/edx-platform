@@ -1,8 +1,10 @@
 """
 Content library unit tests that require the CMS runtime.
 """
+from django.test.utils import override_settings
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_url, reverse_usage_url, reverse_library_url
+from contentstore.views.item import _duplicate_item
 from contentstore.views.preview import _load_preview_module
 from contentstore.views.tests.test_library import LIBRARY_REST_URL
 import ddt
@@ -12,13 +14,14 @@ from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
-from xmodule.library_content_module import LibraryVersionReference
+from xblock.reference.user_service import XBlockUser
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -63,7 +66,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             parent_location=course.location,
             user_id=self.user.id,
             publish_item=False,
-            source_libraries=[LibraryVersionReference(library_key)],
+            source_library_id=unicode(library_key),
             **(other_settings or {})
         )
 
@@ -80,7 +83,10 @@ class LibraryTestCase(ModuleStoreTestCase):
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            lib_content_block.runtime._services['user'] = Mock(user_id=self.user.id)  # pylint: disable=protected-access
+            mocked_user_service = Mock(user_id=self.user.id)
+            mocked_user_service.get_current_user.return_value = XBlockUser(is_current_user=True)
+            lib_content_block.runtime._services['user'] = mocked_user_service  # pylint: disable=protected-access
+
         handler_url = reverse_usage_url(
             'component_handler',
             lib_content_block.location,
@@ -138,7 +144,7 @@ class TestLibraries(LibraryTestCase):
         """
         Test the 'max_count' property of LibraryContent blocks.
         """
-        for _ in range(0, num_to_create):
+        for _ in range(num_to_create):
             self._add_simple_content_block()
 
         with modulestore().default_store(ModuleStoreEnum.Type.split):
@@ -162,7 +168,7 @@ class TestLibraries(LibraryTestCase):
         Test that the same student will always see the same selected child block
         """
         # Create many blocks in the library and add them to a course:
-        for num in range(0, 8):
+        for num in range(8):
             ItemFactory.create(
                 data="This is #{}".format(num + 1),
                 category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False
@@ -196,7 +202,7 @@ class TestLibraries(LibraryTestCase):
             """
             Confirm that chosen_child is still the child seen by the test student
             """
-            for _ in range(0, 6):  # Repeat many times b/c blocks are randomized
+            for _ in range(6):  # Repeat many times b/c blocks are randomized
                 lc_block = modulestore().get_item(lc_block_key)  # Reload block from the database
                 self._bind_module(lc_block)
                 current_child = get_child_of_lc_block(lc_block)
@@ -329,7 +335,7 @@ class TestLibraries(LibraryTestCase):
         # Now, change the block settings to have an invalid library key:
         resp = self._update_item(
             lc_block.location,
-            {"source_libraries": [["library-v1:NOT+FOUND", None]]},
+            {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
@@ -372,7 +378,7 @@ class TestLibraries(LibraryTestCase):
         # Now, change the block settings to have an invalid library key:
         resp = self._update_item(
             lc_block.location,
-            {"source_libraries": [[str(library2key)]]},
+            {"source_library_id": str(library2key)},
         )
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
@@ -381,6 +387,7 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data2)
 
+    @patch("xmodule.library_tools.SearchEngine.get_search_engine", Mock(return_value=None))
     def test_refreshes_children_if_capa_type_change(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
@@ -446,7 +453,7 @@ class TestLibraries(LibraryTestCase):
         # Now, change the block settings to have an invalid library key:
         resp = self._update_item(
             lc_block.location,
-            {"source_libraries": [["library-v1:NOT+FOUND", None]]},
+            {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
         with self.assertRaises(ValueError):
@@ -454,7 +461,8 @@ class TestLibraries(LibraryTestCase):
 
 
 @ddt.ddt
-class TestLibraryAccess(LibraryTestCase):
+@patch('django.conf.settings.SEARCH_ENGINE', None)
+class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     """
     Test Roles and Permissions related to Content Libraries
     """
@@ -515,13 +523,13 @@ class TestLibraryAccess(LibraryTestCase):
         self.client.logout()
         self._assert_cannot_create_library(expected_code=302)  # 302 redirect to login expected
 
-        # Now create a non-staff user with no permissions:
+        # Now check that logged-in users without CourseCreator role can still create libraries
         self._login_as_non_staff_user(logout_first=False)
         self.assertFalse(CourseCreatorRole().has_user(self.non_staff_user))
-
-        # Now check that logged-in users without any permissions cannot create libraries
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
-            self._assert_cannot_create_library()
+            lib_key2 = self._create_library(library="lib2", display_name="Test Library 2")
+            library2 = modulestore().get_library(lib_key2)
+            self.assertIsNotNone(library2)
 
     @ddt.data(
         CourseInstructorRole,
@@ -722,6 +730,8 @@ class TestLibraryAccess(LibraryTestCase):
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
 
+@ddt.ddt
+@override_settings(SEARCH_ENGINE=None)
 class TestOverrides(LibraryTestCase):
     """
     Test that overriding block Scope.settings fields from a library in a specific course works
@@ -740,6 +750,9 @@ class TestOverrides(LibraryTestCase):
             user_id=self.user.id,
             publish_item=False,
         )
+
+        # Refresh library now that we've added something.
+        self.library = modulestore().get_library(self.lib_key)
 
         # Also create a course:
         with modulestore().default_store(ModuleStoreEnum.Type.split):
@@ -818,7 +831,8 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(self.problem.definition_locator.definition_id, definition_id)
         self.assertEqual(self.problem_in_course.definition_locator.definition_id, definition_id)
 
-    def test_persistent_overrides(self):
+    @ddt.data(False, True)
+    def test_persistent_overrides(self, duplicate):
         """
         Test that when we override Scope.settings values in a course,
         the override values persist even when the block is refreshed
@@ -830,7 +844,14 @@ class TestOverrides(LibraryTestCase):
         self.problem_in_course.weight = new_weight
 
         modulestore().update_item(self.problem_in_course, self.user.id)
-        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+        if duplicate:
+            # Check that this also works when the RCB is duplicated.
+            self.lc_block = modulestore().get_item(
+                _duplicate_item(self.course.location, self.lc_block.location, self.user)
+            )
+            self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
+        else:
+            self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
         self.assertEqual(self.problem_in_course.weight, new_weight)
 
@@ -847,6 +868,52 @@ class TestOverrides(LibraryTestCase):
         self.assertEqual(self.problem_in_course.display_name, new_display_name)
         self.assertEqual(self.problem_in_course.weight, new_weight)
         self.assertEqual(self.problem_in_course.data, new_data_value)
+
+    def test_duplicated_version(self):
+        """
+        Test that if a library is updated, and the content block is duplicated,
+        the new block will use the old library version and not the new one.
+        """
+        store = modulestore()
+        self.assertEqual(len(self.library.children), 1)
+        self.assertEqual(len(self.lc_block.children), 1)
+
+        # Edit the only problem in the library:
+        self.problem.display_name = "--changed in library--"
+        store.update_item(self.problem, self.user.id)
+        # Create an additional problem block in the library:
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+        )
+
+        # Refresh our reference to the library
+        self.library = store.get_library(self.lib_key)
+
+        # Refresh our reference to the block
+        self.lc_block = store.get_item(self.lc_block.location)
+        self.problem_in_course = store.get_item(self.problem_in_course.location)
+
+        # The library has changed...
+        self.assertEqual(len(self.library.children), 2)
+
+        # But the block hasn't.
+        self.assertEqual(len(self.lc_block.children), 1)
+        self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
+        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
+
+        # Duplicate self.lc_block:
+        duplicate = store.get_item(
+            _duplicate_item(self.course.location, self.lc_block.location, self.user)
+        )
+        # The duplicate should have identical children to the original:
+        self.assertEqual(len(duplicate.children), 1)
+        self.assertTrue(self.lc_block.source_library_version)
+        self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
+        problem2_in_course = store.get_item(duplicate.children[0])
+        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):

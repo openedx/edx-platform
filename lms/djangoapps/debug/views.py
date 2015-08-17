@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.utils.html import escape
 
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from codejail.safe_exec import safe_exec

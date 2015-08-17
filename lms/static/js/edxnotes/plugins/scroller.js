@@ -1,6 +1,6 @@
 ;(function (define, undefined) {
 'use strict';
-define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
+define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
     /**
      * Adds the Scroller Plugin which scrolls to a note with a certain id and
      * opens it.
@@ -51,6 +51,8 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                         top: offset.top + 0.5 * highlight.height(),
                         left: offset.left + 0.5 * highlight.width()
                     });
+                    // Freeze the viewer
+                    this.annotator.freezeAll();
                     // Scroll to highlight
                     this.scrollIntoView(highlight);
                 }

@@ -17,6 +17,9 @@ from django.utils.translation import ugettext as _
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
+<script type="text/template" id="image-modal-tpl">
+    <%static:include path="common/templates/image-modal.underscore" />
+</script>
 </%block>
 
 <%block name="requirejs">
@@ -27,7 +30,8 @@ from django.utils.translation import ugettext as _
             {
                 isUnitPage: false,
                 page_size: 10,
-                canEdit: ${"true" if can_edit else "false"}
+                canEdit: ${"true" if can_edit else "false"},
+                showChildrenPreviews: ${'true' if show_children_previews else 'false'}
             }
         );
     });
@@ -46,14 +50,20 @@ from django.utils.translation import ugettext as _
             </div>
         </div>
 
-        <nav class="nav-actions">
+        <nav class="nav-actions" aria-label="${_('Page Actions')}">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
                     <a href="#" class="button new-button new-component-button">
                         <i class="icon fa fa-plus icon-inline"></i> <span class="action-button-text">${_("Add Component")}</span>
                     </a>
-              </li>
+                </li>
+                <li class="action-item action-toggle-preview nav-item">
+                    <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
+                        <i class="icon fa fa-refresh"></i>
+                        <span class="action-button-text preview-text"></span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -72,27 +82,17 @@ from django.utils.translation import ugettext as _
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary">
-                <div class="library-location">
-                    <h4 class="bar-mod-title">${_("Library ID")}</h4>
-                    <div class="wrapper-library-id bar-mod-content">
-                        <h5 class="title">${_("Library ID")}</h5>
-                        <p class="library-id">
-                            <span class="library-id-value">${context_library.location.library_key | h}</span>
-                            <span class="tip"><span class="sr">${_("Tip:")}</span> ${_("To add content from this library to a course that uses a Randomized Content Block, copy this ID and enter it in the Libraries field in the Randomized Content Block settings.")}</span>
-                        </p>
-                    </div>
-                </div>
                 % if can_edit:
                 <div class="bit">
                     <h3 class="title-3">${_("Adding content to your library")}</h3>
                     <p>${_("Add components to your library for use in courses, using Add New Component at the bottom of this page.")}</p>
                     <p>${_("Components are listed in the order in which they are added, with the most recently added at the bottom. Use the pagination arrows to navigate from page to page if you have more than one page of components in your library.")}</p>
                     <h3 class="title-3">${_("Using library content in courses")}</h3>
-                    <p>${_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, enter the Library ID for each library from which you want to draw content, and specify the number of problems to be randomly selected and displayed to each student.").format(em_start='<strong>', em_end="</strong>")}</p>
+                    <p>${_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to the Advanced Module List in the course's Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, select this library as the source library, and specify the number of problems to be randomly selected and displayed to each student.").format(em_start='<strong>', em_end="</strong>")}</p>
                 </div>
                 % endif
                 <div class="bit external-help">
-                    <a href="${get_online_help_info('library')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
+                    <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
                 </div>
             </aside>
         </section>

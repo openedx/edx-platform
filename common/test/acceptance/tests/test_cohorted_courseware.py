@@ -2,18 +2,17 @@
 End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
-from nose.plugins.attrib import attr
 import json
+from nose.plugins.attrib import attr
 
 from studio.base_studio_test import ContainerBase
 
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from ..fixtures.course import XBlockFixtureDesc
+from ..fixtures import LMS_BASE_URL
 from ..pages.studio.component_editor import ComponentVisibilityEditorView
 from ..pages.lms.instructor_dashboard import InstructorDashboardPage
-from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
@@ -21,7 +20,7 @@ from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 from bok_choy.promise import EmptyPromise
 
 
-@attr('shard_1')
+@attr('shard_5')
 class EndToEndCohortedCoursewareTest(ContainerBase):
 
     def setUp(self, is_staff=True):
@@ -47,7 +46,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         ).visit()
 
         # Create a student who will end up in the default cohort group
-        self.cohort_default_student_username = "cohort default student"
+        self.cohort_default_student_username = "cohort_default_student"
         self.cohort_default_student_email = "cohort_default_student@example.com"
         StudioAutoAuthPage(
             self.browser, username=self.cohort_default_student_username,
@@ -80,28 +79,14 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
             )
         )
 
-    def enable_cohorts_in_course(self):
+    def enable_cohorting(self, course_fixture):
         """
-        This turns on cohorts for the course. Currently this is still done through Advanced
-        Settings. Eventually it will be done in the LMS Instructor Dashboard.
+        Enables cohorting for the current course.
         """
-        advanced_settings = AdvancedSettingsPage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-        advanced_settings.visit()
-        cohort_config = '{"cohorted": true}'
-        advanced_settings.set('Cohort Configuration', cohort_config)
-        advanced_settings.refresh_and_wait_for_load()
-
-        self.assertEquals(
-            json.loads(cohort_config),
-            json.loads(advanced_settings.get('Cohort Configuration')),
-            'Wrong input for Cohort Configuration'
-        )
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
+        data = json.dumps({'is_cohorted': True})
+        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
+        self.assertTrue(response.ok, "Failed to enable cohorts")
 
     def create_content_groups(self):
         """
@@ -154,8 +139,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         instructor_dashboard_page.visit()
-        membership_page = instructor_dashboard_page.select_membership()
-        cohort_management_page = membership_page.select_cohort_management_section()
+        cohort_management_page = instructor_dashboard_page.select_cohort_management()
 
         def add_cohort_with_student(cohort_name, content_group, student):
             cohort_management_page.add_cohort(cohort_name, content_group=content_group)
@@ -220,7 +204,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
           And the student in Cohort B can see all the problems except the one linked to Content Group A
           And the student in the default cohort can ony see the problem that is unlinked to any Content Group
         """
-        self.enable_cohorts_in_course()
+        self.enable_cohorting(self.course_fixture)
         self.create_content_groups()
         self.link_problems_to_content_groups_and_publish()
         self.create_cohorts_and_assign_students()

@@ -14,6 +14,7 @@ from track.middleware import TrackMiddleware
 class TrackMiddlewareTestCase(TestCase):
 
     def setUp(self):
+        super(TrackMiddlewareTestCase, self).setUp()
         self.track_middleware = TrackMiddleware()
         self.request_factory = RequestFactory()
 
@@ -53,6 +54,8 @@ class TrackMiddlewareTestCase(TestCase):
     def test_default_request_context(self):
         context = self.get_context_for_path('/courses/')
         self.assertEquals(context, {
+            'accept_language': '',
+            'referer': '',
             'user_id': '',
             'session': '',
             'username': '',

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
@@ -16,6 +17,7 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
+from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
@@ -56,12 +58,12 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
 
-CONTAINER_TEMPATES = [
+CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
-    "editor-mode-button", "upload-dialog", "image-modal",
+    "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message"
+    "unit-outline", "container-message", "license-selector",
 ]
 
 
@@ -154,7 +156,10 @@ def container_handler(request, usage_key_string):
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
 
-        usage_key = UsageKey.from_string(usage_key_string)
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
+            raise Http404
         with modulestore().bulk_operations(usage_key.course_key):
             try:
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
@@ -212,7 +217,7 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPATES
+                'templates': CONTAINER_TEMPLATES
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
@@ -222,7 +227,7 @@ def get_component_templates(courselike, library=False):
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
-    def create_template_dict(name, cat, boilerplate_name=None, is_common=False):
+    def create_template_dict(name, cat, boilerplate_name=None, tab="common"):
         """
         Creates a component template dict.
 
@@ -230,14 +235,14 @@ def get_component_templates(courselike, library=False):
             display_name: the user-visible name of the component
             category: the type of component (problem, html, etc.)
             boilerplate_name: name of boilerplate for filling in default values. May be None.
-            is_common: True if "common" problem, False if "advanced". May be None, as it is only used for problems.
+            tab: common(default)/advanced/hint, which tab it goes in
 
         """
         return {
             "display_name": name,
             "category": cat,
             "boilerplate_name": boilerplate_name,
-            "is_common": is_common
+            "tab": tab
         }
 
     component_display_names = {
@@ -263,8 +268,8 @@ def get_component_templates(courselike, library=False):
         # add the default template with localized display name
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
-        display_name = xblock_type_display_name(category, _('Blank'))
-        templates_for_category.append(create_template_dict(display_name, category))
+        display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+        templates_for_category.append(create_template_dict(display_name, category, None, 'advanced'))
         categories.add(category)
 
         # add boilerplates
@@ -272,12 +277,20 @@ def get_component_templates(courselike, library=False):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, courselike):
+                    # Tab can be 'common' 'advanced' 'hint'
+                    # Default setting is common/advanced depending on the presence of markdown
+                    tab = 'common'
+                    if template['metadata'].get('markdown') is None:
+                        tab = 'advanced'
+                    # Then the problem can override that with a tab: attribute (note: not nested in metadata)
+                    tab = template.get('tab', tab)
+
                     templates_for_category.append(
                         create_template_dict(
-                            _(template['metadata'].get('display_name')),
+                            _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
                             category,
                             template.get('template_id'),
-                            template['metadata'].get('markdown') is not None
+                            tab
                         )
                     )
 
@@ -286,9 +299,15 @@ def get_component_templates(courselike, library=False):
             for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
                 component = advanced_problem_type['component']
                 boilerplate_name = advanced_problem_type['boilerplate_name']
-                component_display_name = xblock_type_display_name(component)
-                templates_for_category.append(create_template_dict(component_display_name, component, boilerplate_name))
-                categories.add(component)
+                try:
+                    component_display_name = xblock_type_display_name(component)
+                except PluginMissingError:
+                    log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
+                else:
+                    templates_for_category.append(
+                        create_template_dict(component_display_name, component, boilerplate_name, 'advanced')
+                    )
+                    categories.add(component)
 
         component_templates.append({
             "type": category,
@@ -331,7 +350,6 @@ def get_component_templates(courselike, library=False):
                         "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
                         category
                     )
-                    pass
     else:
         log.error(
             "Improper format for course advanced keys! %s",

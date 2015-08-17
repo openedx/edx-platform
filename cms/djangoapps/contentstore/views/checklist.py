@@ -5,7 +5,7 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
@@ -132,12 +132,12 @@ def localize_checklist_text(checklist):
     The method does an in-place operation so the input checklist is modified directly.
     """
     # Localize checklist name
-    checklist['short_description'] = ugettext(checklist['short_description'])
+    checklist['short_description'] = ugettext(checklist['short_description'])    # pylint: disable=translation-of-non-string
 
     # Localize checklist items
     for item in checklist.get('items'):
-        item['short_description'] = ugettext(item['short_description'])
-        item['long_description'] = ugettext(item['long_description']) if item['long_description'] != '' else u''
-        item['action_text'] = ugettext(item['action_text']) if item['action_text'] != "" else u""
+        item['short_description'] = ugettext(item['short_description'])    # pylint: disable=translation-of-non-string
+        item['long_description'] = ugettext(item['long_description'])      # pylint: disable=translation-of-non-string
+        item['action_text'] = ugettext(item['action_text'])                # pylint: disable=translation-of-non-string
 
     return checklist

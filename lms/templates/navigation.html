@@ -5,19 +5,20 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from microsite_configuration import microsite
+from microsite_configuration.templatetags.microsite import platform_name
+from ccx.overrides import get_current_ccx
+
 # App that handles subdomain specific branding
 import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
 %>
 
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration.templatetags.microsite import platform_name %>
-
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
 
-<%block cached="False">
+<%block>
 <%
 try:
     course_id = course.id.to_deprecated_string()
@@ -36,8 +37,8 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-  <header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
-    <nav>
+  <header id="global-navigation" class="global ${"slim" if course else ""}" >
+    <nav class="nav-wrapper" aria-label="${_('Global')}">
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
@@ -47,7 +48,16 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span>
+      ${course.display_number_with_default | h}
+      <%
+        display_name = course.display_name_with_default
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+          ccx = get_current_ccx(course.id)
+          if ccx:
+            display_name = ccx.display_name
+      %>
+      ${display_name}</h2>
     % endif
 
     % if user.is_authenticated():
@@ -60,7 +70,8 @@ site_status_msg = get_site_status_msg(course_id)
         % endif
         %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
           <li>
-            <a href="${reverse('sysadmin')}">Sysadmin</a>
+            ## Translators: This is short for "System administration".
+            <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
           </li>
         %endif
       </%block>
@@ -68,19 +79,21 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
-          <span class="avatar"></span>
-          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
+          <i class="icon fa fa-home" aria-hidden="true"></i>
+          <span class="sr">${_("Dashboard for:")}</span>
+          <div>
+          ${user.username}
+          </div>
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
-            % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-              <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
-            % endif
+            <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
+            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("My Profile")}</a></li>
           </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign out")}</a></li>
+          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
         </ul>
       </li>
     </ol>
@@ -100,9 +113,11 @@ site_status_msg = get_site_status_msg(course_id)
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
-          <li class="nav-global-02">
-            <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
-          </li>
+          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+            <li class="nav-global-02">
+              <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+            </li>
+          % endif
           <li class="nav-global-03">
             <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
           </li>
@@ -115,7 +130,7 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
           % else:
           <li class="nav-global-04">
-            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
+            <a class="cta cta-register" href="/register${login_query()}">${_("Register Now")}</a>
           </li>
           % endif
       % endif
@@ -136,13 +151,9 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<!--[if lte IE 8]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
+<!--[if lte IE 9]>
+<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/chrome" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>')}</div>
 <![endif]-->
 % endif
-
-%if not user.is_authenticated():
-  <%include file="forgot_password_modal.html" />
-%endif
 
 <%include file="help_modal.html"/>

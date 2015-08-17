@@ -4,6 +4,8 @@ Mixin class that provides authoring capabilities for XBlocks.
 
 import logging
 
+from django.conf import settings
+
 from xblock.core import XBlock
 from xblock.fields import XBlockMixin
 from xblock.fragment import Fragment
@@ -26,9 +28,7 @@ class AuthoringMixin(XBlockMixin):
         """
         Returns the Studio URL to a static resource.
         """
-        # TODO: is there a cleaner way to do this?
-        from cms.envs.common import STATIC_URL
-        return STATIC_URL + relative_url
+        return settings.STATIC_URL + relative_url
 
     def visibility_view(self, _context=None):
         """

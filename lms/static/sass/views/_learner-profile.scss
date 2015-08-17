@@ -1,0 +1,283 @@
+// lms - application - learner profile
+// ====================
+
+// Table of Contents
+// * +Container - Learner Profile
+// * +Main - Header
+// * +Settings Section
+
+.view-profile {
+    $profile-image-dimension: 120px;
+
+    .content-wrapper {
+        background-color: $white;
+    }
+
+    .ui-loading-indicator {
+        @extend .ui-loading-base;
+        padding-bottom: $baseline;
+
+        // center horizontally
+        @include margin-left(auto);
+        @include margin-right(auto);
+        width: ($baseline*5);
+    }
+
+    .profile-image-field {
+        @include float(left);
+
+        button {
+            background: transparent !important;
+            border: none !important;
+            padding: 0;
+        }
+
+        .u-field-image {
+            padding-top: 0;
+        }
+
+        .image-wrapper {
+            width: $profile-image-dimension;
+            position: relative;
+
+            .image-frame {
+                position: relative;
+                width: $profile-image-dimension;
+                height: $profile-image-dimension;
+                border-radius: ($baseline/4);
+            }
+
+            .u-field-upload-button {
+                width: $profile-image-dimension;
+                height: $profile-image-dimension;
+                position: absolute;
+                top: 0;
+                opacity: 0;
+                @include transition(all $tmg-f1 ease-in-out 0s);
+
+                i {
+                    color: $white;
+                }
+
+                &:focus {
+                    @include show-hover-state();
+                }
+            }
+
+            .button-visible {
+                @include show-hover-state();
+            }
+
+            .upload-button-icon, .upload-button-title {
+                text-align: center;
+                transform: translateY(35px);
+                -webkit-transform: translateY(35px);
+                display: block;
+                color: $white;
+                margin-bottom: ($baseline/4);
+                line-height: 1.3em;
+            }
+
+            .upload-button-input {
+                width: $profile-image-dimension;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                @include left(0);
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .u-field-remove-button {
+                width: $profile-image-dimension;
+                height: $baseline;
+                opacity: 0;
+                position: relative;
+                margin-top: 2px;
+                text-align: center;
+
+                &:active {
+                    box-shadow: none;
+                    outline: 0;
+                }
+                &:focus {
+                    @include show-hover-state();
+                    box-shadow: none;
+                    outline: 0;
+                    border: 2px dashed $link-color !important;
+                }
+            }
+
+            &:hover, &:focus {
+                .u-field-upload-button, .u-field-remove-button {
+                    @include show-hover-state();
+                }
+            }
+        }
+    }
+
+    .wrapper-profile {
+        min-height: 200px;
+
+        .ui-loading-indicator {
+            margin-top: 100px;
+        }
+    }
+
+    .profile-self {
+        .wrapper-profile-field-account-privacy {
+            @include clearfix();
+            @include box-sizing(border-box);
+            margin: 0 auto 0;
+            padding: ($baseline*0.75) 0;
+            width: 100%;
+            background-color: $gray-l3;
+
+            .u-field-account_privacy {
+                @extend .container;
+                border: none;
+                box-shadow: none;
+                padding: 0 ($baseline*1.5);
+            }
+
+            .u-field-title {
+                width: auto;
+                color: $base-font-color;
+                font-weight: $font-bold;
+                cursor: text;
+            }
+
+            .u-field-value {
+                width: auto;
+                @include margin-left($baseline/2);
+            }
+
+            .u-field-message {
+                @include float(left);
+                width: 100%;
+                padding: 0;
+                color: $base-font-color;
+            }
+        }
+    }
+
+    .wrapper-profile-sections {
+        @extend .container;
+        padding: 0 ($baseline*1.5);
+    }
+
+    .wrapper-profile-section-one {
+        width: 100%;
+        display: inline-block;
+        margin-top: ($baseline*1.5);
+    }
+
+    .profile-section-one-fields {
+        @include float(left);
+        width: flex-grid(4, 12);
+        @include margin-left($baseline*1.5);
+
+        .u-field {
+            margin-bottom: ($baseline/4);
+            padding-top: 0;
+            padding-bottom: 0;
+            @include padding-left(3px);
+        }
+
+        .u-field-username {
+            margin-bottom: ($baseline/2);
+
+            input[type="text"] {
+              font-weight: 600;
+            }
+
+            .u-field-value {
+                width: 350px;
+                @extend %t-title4;
+            }
+        }
+
+        .u-field-title {
+            width: 0;
+        }
+
+        .u-field-value {
+            width: 200px;
+        }
+
+        select {
+            width: 100%
+        }
+
+        .u-field-message {
+            @include float(right);
+            width: 20px;
+            margin-top: 2px;
+        }
+    }
+
+    .wrapper-profile-section-two {
+        width: flex-grid(8, 12);
+    }
+
+    .profile-section-two-fields {
+
+        .u-field-textarea {
+            margin-bottom: ($baseline/2);
+            padding: ($baseline/4) ($baseline/2) ($baseline/2);
+        }
+
+        .u-field-title {
+            font-size: 1.1em;
+            @extend %t-weight4;
+            margin-bottom: ($baseline/4);
+        }
+
+        .u-field-value {
+            width: 100%;
+            white-space: pre-line;
+            line-height: 1.5em;
+
+            textarea {
+              width: 100%;
+              background-color: transparent;
+            }
+        }
+
+        .u-field-message {
+            @include float(right);
+            width: auto;
+            padding-top: ($baseline/4);
+        }
+
+        .u-field.mode-placeholder {
+            padding: $baseline;
+            border: 2px dashed $gray-l3;
+            i {
+              font-size: 12px;
+              @include padding-right(5px);
+              vertical-align: middle;
+              color: $gray;
+            }
+            .u-field-title {
+                width: 100%;
+                text-align: center;
+            }
+
+            .u-field-value {
+                text-align: center;
+                line-height: 1.5em;
+                @extend %t-copy-sub1;
+                color: $gray;
+            }
+        }
+
+        .u-field.mode-placeholder:hover {
+            border: 2px dashed $link-color;
+            .u-field-title,
+            i {
+              color:  $link-color;
+            }
+        }
+    }
+}

@@ -6,7 +6,9 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
+from flaky import flaky
 
+from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
@@ -18,6 +20,8 @@ from ...pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionSortPreferencePage,
 )
+from ...pages.lms.learner_profile import LearnerProfilePage
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...fixtures.discussion import (
     SingleThreadViewFixture,
@@ -27,9 +31,71 @@ from ...fixtures.discussion import (
     Response,
     Comment,
     SearchResult,
-)
+    MultipleThreadFixture)
 
 from .helpers import BaseDiscussionMixin
+
+
+THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               \n\n----------\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur. (b).\n\n
+                               **(a)** $H_1(e^{j\\omega}) = \\sum_{n=-\\infty}^{\\infty}h_1[n]e^{-j\\omega n} =
+                               \\sum_{n=-\\infty} ^{\\infty}h[n]e^{-j\\omega n}+\\delta_2e^{-j\\omega n_0}$
+                               $= H(e^{j\\omega})+\\delta_2e^{-j\\omega n_0}=A_e (e^{j\\omega}) e^{-j\\omega n_0}
+                               +\\delta_2e^{-j\\omega n_0}=e^{-j\\omega n_0} (A_e(e^{j\\omega})+\\delta_2)
+                               $H_3(e^{j\\omega})=A_e(e^{j\\omega})+\\delta_2$. Dummy $A_e(e^{j\\omega})$ dummy post $.
+                               $A_e(e^{j\\omega}) \\ge -\\delta_2$, it follows that $H_3(e^{j\\omega})$ is real and
+                               $H_3(e^{j\\omega})\\ge 0$.\n\n**(b)** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.\n\n
+                               **Case 1:** If $re^{j\\theta}$ is a Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               \n\n**Case 3:** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem $H_3(e^{j\\omega}) = P(cos\\omega)(cos\\omega - cos\\theta)^k$,
+                               Lorem Lorem Lorem Lorem Lorem Lorem $P(cos\\omega)$ has no
+                               $(cos\\omega - cos\\theta)$ factor.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               $P(cos\\theta) \\neq 0$. Since $P(cos\\omega)$ this is a dummy data post $\\omega$,
+                               dummy $\\delta > 0$ such that for all $\\omega$ dummy $|\\omega - \\theta|
+                               < \\delta$, $P(cos\\omega)$ Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+                               veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                               consequat. Duis aute irure dolor in reprehenderit in voluptate velit sse cillum dolore
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                               ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                               ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                               reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
+                               """
 
 
 class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
@@ -111,7 +177,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionHomePageTest(UniqueCourseTest):
     """
     Tests for the discussion home page.
@@ -138,24 +204,37 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.assertIsNotNone(self.page.new_post_form)
 
 
-@attr('shard_1')
-class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+@attr('shard_2')
+class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
     """
 
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
-
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
     def setup_thread_page(self, thread_id):
-        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint: disable=attribute-defined-outside-init
+        self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
+
+    @flaky  # TODO fix this, see TNL-2419
+    def test_mathjax_rendering(self):
+        thread_id = "test_thread_{}".format(uuid4().hex)
+
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=THREAD_CONTENT_WITH_LATEX,
+                commentable_id=self.discussion_id,
+                thread_type="discussion"
+            )
+        )
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+        self.assertTrue(self.thread_page.is_discussion_body_visible())
+        self.assertTrue(self.thread_page.is_mathjax_preview_available())
+        self.assertTrue(self.thread_page.is_mathjax_rendered())
 
     def test_marked_answer_comments(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
@@ -179,8 +258,63 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
 
 
-@attr('shard_1')
-class DiscussionOpenClosedThreadTest(UniqueCourseTest):
+@attr('shard_2')
+class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
+    """
+    Tests for the discussion page with multiple threads
+    """
+    def setUp(self):
+        super(DiscussionTabMultipleThreadTest, self).setUp()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.thread_count = 2
+        self.thread_ids = []
+        self.setup_multiple_threads(thread_count=self.thread_count)
+
+        self.thread_page_1 = DiscussionTabSingleThreadPage(
+            self.browser,
+            self.course_id,
+            self.discussion_id,
+            self.thread_ids[0]
+        )
+        self.thread_page_2 = DiscussionTabSingleThreadPage(
+            self.browser,
+            self.course_id,
+            self.discussion_id,
+            self.thread_ids[1]
+        )
+        self.thread_page_1.visit()
+
+    def setup_multiple_threads(self, thread_count):
+        threads = []
+        for i in range(thread_count):
+            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
+            thread_body = "Dummy Long text body." * 50
+            threads.append(
+                Thread(id=thread_id, commentable_id=self.discussion_id, body=thread_body),
+            )
+            self.thread_ids.append(thread_id)
+        view = MultipleThreadFixture(threads)
+        view.push()
+
+    def test_page_scroll_on_thread_change_view(self):
+        """
+        Check switching between threads changes the page to scroll to bottom
+        """
+        # verify threads are rendered on the page
+        self.assertTrue(
+            self.thread_page_1.check_threads_rendered_successfully(thread_count=self.thread_count)
+        )
+
+        # From the thread_page_1 open & verify next thread
+        self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
+        self.assertTrue(self.thread_page_2.is_browser_on_page())
+
+        # Verify that window is on top of page.
+        self.thread_page_2.check_window_is_on_top()
+
+
+@attr('shard_2')
+class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
     Tests for checking the display of attributes on open and closed threads
     """
@@ -188,8 +322,6 @@ class DiscussionOpenClosedThreadTest(UniqueCourseTest):
     def setUp(self):
         super(DiscussionOpenClosedThreadTest, self).setUp()
 
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
         self.thread_id = "test_thread_{}".format(uuid4().hex)
 
     def setup_user(self, roles=[]):
@@ -197,6 +329,7 @@ class DiscussionOpenClosedThreadTest(UniqueCourseTest):
         self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
     def setup_view(self, **thread_kwargs):
+        thread_kwargs.update({'commentable_id': self.discussion_id})
         view = SingleThreadViewFixture(
             Thread(id=self.thread_id, **thread_kwargs)
         )
@@ -209,7 +342,7 @@ class DiscussionOpenClosedThreadTest(UniqueCourseTest):
             self.setup_view(closed=True)
         else:
             self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, self.thread_id)
+        page = self.create_single_thread_page(self.thread_id)
         page.visit()
         page.close_open_thread()
         return page
@@ -229,24 +362,17 @@ class DiscussionOpenClosedThreadTest(UniqueCourseTest):
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
 
-@attr('shard_1')
-class DiscussionCommentDeletionTest(UniqueCourseTest):
+@attr('shard_2')
+class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
     """
-
-    def setUp(self):
-        super(DiscussionCommentDeletionTest, self).setUp()
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
-
     def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
         self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
     def setup_view(self):
-        view = SingleThreadViewFixture(Thread(id="comment_deletion_test_thread"))
+        view = SingleThreadViewFixture(Thread(id="comment_deletion_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
             Response(id="response1"),
             [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
@@ -255,7 +381,7 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
     def test_comment_deletion_as_student(self):
         self.setup_user()
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_deletion_test_thread")
+        page = self.create_single_thread_page("comment_deletion_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_deletable("comment_self_author"))
         self.assertTrue(page.is_comment_visible("comment_other_author"))
@@ -265,7 +391,7 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
     def test_comment_deletion_as_moderator(self):
         self.setup_user(roles=['Moderator'])
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_deletion_test_thread")
+        page = self.create_single_thread_page("comment_deletion_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_deletable("comment_self_author"))
         self.assertTrue(page.is_comment_deletable("comment_other_author"))
@@ -273,24 +399,17 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
         page.delete_comment("comment_other_author")
 
 
-@attr('shard_1')
-class DiscussionResponseEditTest(UniqueCourseTest):
+@attr('shard_2')
+class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
     """
-
-    def setUp(self):
-        super(DiscussionResponseEditTest, self).setUp()
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
-
     def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
         self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
     def setup_view(self):
-        view = SingleThreadViewFixture(Thread(id="response_edit_test_thread"))
+        view = SingleThreadViewFixture(Thread(id="response_edit_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
             Response(id="response_other_author", user_id="other", thread_id="response_edit_test_thread"),
         )
@@ -317,7 +436,7 @@ class DiscussionResponseEditTest(UniqueCourseTest):
         """
         self.setup_user()
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page = self.create_single_thread_page("response_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_response_visible("response_other_author"))
         self.assertFalse(page.is_response_editable("response_other_author"))
@@ -334,7 +453,7 @@ class DiscussionResponseEditTest(UniqueCourseTest):
         """
         self.setup_user(roles=["Moderator"])
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page = self.create_single_thread_page("response_edit_test_thread")
         page.visit()
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
@@ -362,7 +481,7 @@ class DiscussionResponseEditTest(UniqueCourseTest):
         """
         self.setup_user(roles=["Moderator"])
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page = self.create_single_thread_page("response_edit_test_thread")
         page.visit()
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
@@ -374,24 +493,17 @@ class DiscussionResponseEditTest(UniqueCourseTest):
         page.endorse_response('response_other_author')
 
 
-@attr('shard_1')
-class DiscussionCommentEditTest(UniqueCourseTest):
+@attr('shard_2')
+class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
     """
-
-    def setUp(self):
-        super(DiscussionCommentEditTest, self).setUp()
-
-        # Create a course to register for
-        CourseFixture(**self.course_info).install()
-
     def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
         self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
     def setup_view(self):
-        view = SingleThreadViewFixture(Thread(id="comment_edit_test_thread"))
+        view = SingleThreadViewFixture(Thread(id="comment_edit_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
             Response(id="response1"),
             [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
@@ -406,7 +518,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     def test_edit_comment_as_student(self):
         self.setup_user()
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = self.create_single_thread_page("comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         self.assertTrue(page.is_comment_visible("comment_other_author"))
@@ -416,7 +528,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     def test_edit_comment_as_moderator(self):
         self.setup_user(roles=["Moderator"])
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = self.create_single_thread_page("comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         self.assertTrue(page.is_comment_editable("comment_other_author"))
@@ -426,7 +538,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = self.create_single_thread_page("comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         original_body = page.get_comment_body("comment_self_author")
@@ -438,7 +550,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         """Only one editor should be visible at a time within a single response"""
         self.setup_user(roles=["Moderator"])
         self.setup_view()
-        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "comment_edit_test_thread")
+        page = self.create_single_thread_page("comment_edit_test_thread")
         page.visit()
         self.assertTrue(page.is_comment_editable("comment_self_author"))
         self.assertTrue(page.is_comment_editable("comment_other_author"))
@@ -464,7 +576,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
@@ -472,6 +584,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
+        self.thread_ids = []
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fix = CourseFixture(**self.course_info).add_children(
@@ -505,6 +618,38 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.expand()
+
+    def setup_multiple_inline_threads(self, thread_count):
+        """
+        Set up multiple treads on the page by passing 'thread_count'
+        """
+        threads = []
+        for i in range(thread_count):
+            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
+            threads.append(
+                Thread(id=thread_id, commentable_id=self.discussion_id),
+            )
+            self.thread_ids.append(thread_id)
+        thread_fixture = MultipleThreadFixture(threads)
+        thread_fixture.add_response(
+            Response(id="response1"),
+            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)],
+            threads[0]
+        )
+        thread_fixture.push()
+
+    def test_page_while_expanding_inline_discussion(self):
+        """
+        Tests for the Inline Discussion page with multiple treads. Page should not focus 'thread-wrapper'
+        after loading responses.
+        """
+        self.setup_multiple_inline_threads(thread_count=3)
+        self.discussion_page.expand_discussion()
+        thread_page = InlineDiscussionThreadPage(self.browser, self.thread_ids[0])
+        thread_page.expand()
+
+        # Check if 'thread-wrapper' is focused after expanding thread
+        self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
 
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
@@ -590,7 +735,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionUserProfileTest(UniqueCourseTest):
     """
     Tests for user profile page in discussion tab.
@@ -700,8 +845,26 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         page.wait_for_ajax()
         self.assertTrue(page.is_window_on_top())
 
+    def test_redirects_to_learner_profile(self):
+        """
+        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
 
-@attr('shard_1')
+        Given that I am on discussion forum user's profile page.
+        And I can see a username on left sidebar
+        When I click on my username.
+        Then I will be navigated to Learner Profile page.
+        And I can my username on Learner Profile page
+        """
+        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
+
+        page = self.check_pages(1)
+        page.click_on_sidebar_username()
+
+        learner_profile_page.wait_for_page()
+        self.assertTrue(learner_profile_page.field_is_visible('username'))
+
+
+@attr('shard_2')
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -775,7 +938,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         ).wait_for_page()
 
 
-@attr('shard_1')
+@attr('shard_2')
 class DiscussionSortPreferenceTest(UniqueCourseTest):
     """
     Tests for the discussion page displaying a single thread.

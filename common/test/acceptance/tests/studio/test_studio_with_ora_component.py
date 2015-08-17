@@ -3,7 +3,7 @@ Acceptance tests for Studio related to edit/save peer grading interface.
 """
 
 from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.export import ExportPage
+from ...pages.studio.import_export import ExportCoursePage
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.overview import CourseOutlinePage
 from base_studio_test import StudioCourseTest
@@ -22,7 +22,10 @@ class ORAComponentTest(StudioCourseTest):
         self.course_outline_page = CourseOutlinePage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
-        self.export_page = ExportPage(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+        self.export_page = ExportCoursePage(
+            self.browser,
+            self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -50,7 +53,7 @@ class ORAComponentTest(StudioCourseTest):
     def _go_to_unit_page(self, section_name='Test Section', subsection_name='Test Subsection', unit_name='Test Unit'):
         self.course_outline_page.visit()
         subsection = self.course_outline_page.section(section_name).subsection(subsection_name)
-        return subsection.toggle_expand().unit(unit_name).go_to()
+        return subsection.expand_subsection().unit(unit_name).go_to()
 
     def test_edit_save_and_export(self):
         """
@@ -78,3 +81,22 @@ class ORAComponentTest(StudioCourseTest):
             location_input_element.get_attribute('value'),
             peer_problem_location
         )
+
+    def test_verify_ora1_deprecation_message(self):
+        """
+        Scenario: Verifies the ora1 deprecation message on ora components.
+
+        Given I have a course with ora 1 components
+        When I go to the unit page
+        Then I see a deprecation error message in ora 1 components.
+        """
+        self.course_outline_page.visit()
+        unit = self._go_to_unit_page()
+
+        for xblock in unit.xblocks:
+            self.assertTrue(xblock.has_validation_error)
+            self.assertEqual(
+                xblock.validation_error_text,
+                "ORA1 is no longer supported. To use this assessment, "
+                "replace this ORA1 component with an ORA2 component."
+            )

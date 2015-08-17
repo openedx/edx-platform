@@ -285,6 +285,73 @@
   }
 }
 
+// imitating the pattern library
+// starts with overrides
+%btn-pl-default-base {
+  @include box-sizing(border-box);
+  @extend %t-copy-base;
+  letter-spacing: 0; // reset letterspacing from elsewhere
+  @extend %btn-primary;
+  border: 1px solid darken($action-primary-bg,10%);
+  border-radius: 3px;
+  padding: 8px $baseline;
+  background-color: transparent;
+  color: darken($action-primary-bg,10%);
+  text-align: center;
+
+  &:hover,
+  &:focus {
+    border: 1px solid transparent;
+    background-color: $action-primary-bg;
+    color: $action-primary-fg;
+    text-decoration: none;
+  }
+}
+
+%btn-pl-primary-base {
+  @extend %btn-pl-default-base;
+  background-color: darken($action-primary-bg,10%);
+  color: $action-primary-fg;
+}
+
+%btn-pl-green-base {
+  @extend %btn-pl-default-base;
+  background-color: darken($green-d1,10%);
+  color: $action-primary-fg;
+
+  &:hover,
+  &:focus {
+    border: 1px solid transparent;
+    background-color: $green-d1;
+  }
+}
+
+%btn-pl-yellow-base {
+  @extend %btn-pl-default-base;
+  border: 1px solid transparent;
+  background-color: $credit-color-base;
+  color: $base-font-color;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($credit-color-base,10%);
+    background-color: lighten($credit-color-base,20%);
+  }
+}
+
+%btn-pl-secondary-base {
+  @extend %btn-pl-default-base;
+  @include transition(border $tmg-f2 ease-in-out);
+  border: 1px solid transparent;
+  color: $action-primary-bg;
+
+  &:hover {
+    border: 1px solid $gray-l2;
+    background-color: transparent;
+    color: $action-primary-bg;
+  }
+}
+
 // ====================
 
   // application: canned actions

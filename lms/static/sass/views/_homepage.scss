@@ -1,0 +1,168 @@
+// lms - views - homepage view
+// ====================
+
+$learn-more-horizontal-position: calc(50% - 100px); // calculate the left position for "LEARN MORE" content
+
+.courses-container {
+  @include outer-container;
+  padding: ($baseline*0.9) ($baseline/2) 0 ($baseline/2);
+
+  .courses {
+    @include row();
+    @include float(left);
+    width:100%;
+
+    .courses-listing {
+      @extend %ui-no-list;
+
+      .courses-listing-item {
+        margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+        max-height: $course-card-height;
+      }
+    }
+
+    .course {
+      @include box-sizing(border-box);
+      @include transition(all $tmg-f3 linear 0s);
+      position: relative;
+      border-bottom: 3px solid $action-primary-bg;
+      box-shadow: 0 1px 10px 0 $black-t0, inset 0 0 0 1px $white-t3;
+      background: $body-bg;
+      width: 100%;
+
+      .course-image .cover-image {
+        height: $course-image-height;
+        overflow: hidden;
+
+        // places the shadow on top of the course image while hovering over the course card
+        &:before {
+          @include left(0);
+          @extend %ui-depth1;
+          position: absolute;
+          top: 0;
+          opacity: 0;
+          background: $black;
+          width: 100%;
+          height: $course-image-height;
+          content: '';
+        }
+
+        img {
+          width: 100%;
+          height: auto;
+        }
+
+        .learn-more {
+          @include left($learn-more-horizontal-position);
+          @include box-sizing(border-box);
+          @include line-height(28);
+          @extend %ui-depth2;
+          position: absolute;
+          top: ($baseline*2.75);
+          opacity: 0;
+          border: 3px solid $white;
+          border-radius: 3px;
+          padding: 0 $baseline;
+          width: ($baseline*10);
+          height: ($baseline*2.5);
+          text-align: center;
+          color: $white;
+        }
+      }
+
+      .course-info {
+        height: $course-info-height;
+
+        .course-organization, .course-code, .course-date {
+          @extend %t-icon6;
+          color: $black;
+        }
+
+        .course-organization, .course-code, .course-title {
+          display: block;
+        }
+
+        .course-organization {
+          @include line-height(11);
+          padding: ($baseline/2) ($baseline*0.75) ($baseline/10) ($baseline*0.75);
+        }
+
+        .course-code {
+          @include line-height(16);
+          padding: 0 ($baseline*0.75);
+        }
+
+        .course-title {
+          @include line-height(16);
+          @extend %t-icon4;
+          margin: ($baseline*0.25) 0 ($baseline*1.75) 0;
+          padding: 0 ($baseline*0.75);
+          height: $course-title-height;
+          color: $link-color;
+        }
+
+        .course-date {
+          @include line-height(14);
+          padding: ($baseline/10) ($baseline*0.75);
+        }
+      }
+
+      // STATE: hover and focus
+      &:hover,
+      &:focus {
+        .cover-image {
+          &:before {
+            @include transition(opacity $tmg-f2 ease-out $tmg-f2);
+            opacity: 0.6;
+          }
+
+          .learn-more {
+            @include transition(opacity $tmg-f2 ease-out $tmg-f2);
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .courses-more {
+    @include margin-right(0);
+    text-align: center;
+
+    @include media($large-min-width) {
+      @include margin-right($baseline*0.5);
+      @include text-align(right);
+    }
+
+    .courses-more-cta {
+      font-weight: $font-semibold;
+
+      &:after {
+        content: " ›";
+      }
+    }
+  }
+}
+
+/* Set homepage specific media queries */
+.home .courses-container .courses .courses-listing .courses-listing-item {
+
+  @include rtl() { $layout-direction: "RTL"; }
+  @include fill-parent();
+
+  @include media($bp-medium) {
+    @include span-columns(4); // 4 of 8
+    @include omega(2n);
+  }
+
+  @include media($bp-large) {
+    @include span-columns(4); // 4 of 12
+    @include omega(3n);
+  }
+
+  @include media($bp-huge) {
+    @include span-columns(3); // 3 of 12
+    @include omega(4n);
+  }
+}
+

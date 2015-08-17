@@ -1,9 +1,11 @@
 # Requirements for edx.org that aren't necessarily needed for Open edX.
 
+# For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
+-e git+https://github.com/open-craft/problem-builder.git@86d0611bd6384a69b416a8b4b43dbe422a2de7cb#egg=xblock-problem-builder
 
-# Prototype XBlocks from edX learning sciences limited roll-outs and user testing. 
-# Concept XBlock, in particular, is nowhere near finished and an early prototype. 
+# Prototype XBlocks from edX learning sciences limited roll-outs and user testing.
+# Concept XBlock, in particular, is nowhere near finished and an early prototype.
 # Profile XBlock is there so we can play with XBlock arguments in the platform, but isn't ready for use outside of
 # edX.
 
@@ -15,4 +17,4 @@
 
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.
--e git+https://github.com/schoolyourself/schoolyourself-xblock.git@fc0867263ce763f626c1c9754820e2954f6395e1#egg=schoolyourself-xblock
+-e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock

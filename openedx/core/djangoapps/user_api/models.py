@@ -1,8 +1,11 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
+from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
+from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
 from xmodule_django.models import CourseKeyField
 
 # Currently, the "student" app is responsible for
@@ -25,27 +28,59 @@ class UserPreference(models.Model):
         unique_together = ("user", "key")
 
     @classmethod
-    def set_preference(cls, user, preference_key, preference_value):
-        """
-        Sets the user preference for a given key
-        """
-        user_pref, _ = cls.objects.get_or_create(user=user, key=preference_key)
-        user_pref.value = preference_value
-        user_pref.save()
+    def get_value(cls, user, preference_key):
+        """Gets the user preference value for a given key.
 
-    @classmethod
-    def get_preference(cls, user, preference_key, default=None):
-        """
-        Gets the user preference value for a given key
+        Note:
+            This method provides no authorization of access to the user preference.
+            Consider using user_api.preferences.api.get_user_preference instead if
+            this is part of a REST API request.
 
-        Returns the given default if there isn't a preference for the given key
-        """
+        Arguments:
+            user (User): The user whose preference should be set.
+            preference_key (str): The key for the user preference.
 
+        Returns:
+            The user preference value, or None if one is not set.
+        """
         try:
-            user_pref = cls.objects.get(user=user, key=preference_key)
-            return user_pref.value
+            user_preference = cls.objects.get(user=user, key=preference_key)
+            return user_preference.value
         except cls.DoesNotExist:
-            return default
+            return None
+
+
+@receiver(pre_save, sender=UserPreference)
+def pre_save_callback(sender, **kwargs):
+    """
+    Event changes to user preferences.
+    """
+    user_preference = kwargs["instance"]
+    user_preference._old_value = get_changed_fields_dict(user_preference, sender).get("value", None)
+
+
+@receiver(post_save, sender=UserPreference)
+def post_save_callback(sender, **kwargs):
+    """
+    Event changes to user preferences.
+    """
+    user_preference = kwargs["instance"]
+    emit_setting_changed_event(
+        user_preference.user, sender._meta.db_table, user_preference.key,
+        user_preference._old_value, user_preference.value
+    )
+    user_preference._old_value = None
+
+
+@receiver(post_delete, sender=UserPreference)
+def post_delete_callback(sender, **kwargs):
+    """
+    Event changes to user preferences.
+    """
+    user_preference = kwargs["instance"]
+    emit_setting_changed_event(
+        user_preference.user, sender._meta.db_table, user_preference.key, user_preference.value, None
+    )
 
 
 class UserCourseTag(models.Model):

@@ -24,7 +24,6 @@ logging.getLogger().setLevel(logging.ERROR)
 
 import os
 from random import choice
-import string
 
 
 def seed():
@@ -81,7 +80,7 @@ TRACKING_BACKENDS.update({
     }
 })
 
-EVENT_TRACKING_BACKENDS.update({
+EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update({
     'mongo': {
         'ENGINE': 'eventtracking.backends.mongodb.MongoBackend',
         'OPTIONS': {
@@ -179,3 +178,13 @@ XQUEUE_INTERFACE = {
 YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+
+if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
+   FEATURES.get('ENABLE_DASHBOARD_SEARCH') or \
+   FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+    # Use MockSearchEngine as the search engine for test scenario
+    SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
+# Generate a random UUID so that different runs of acceptance tests don't break each other
+import uuid
+SECRET_KEY = uuid.uuid4().hex

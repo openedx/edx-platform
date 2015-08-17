@@ -26,6 +26,7 @@
         afterEach(function () {
             // Turn jQuery animations back on.
             jQuery.fx.off = true;
+            state.videoPlayer.destroy();
         });
 
         it(

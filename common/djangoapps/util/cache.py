@@ -8,6 +8,7 @@ not migrating so as not to inconvenience users by logging them all out.
 import urllib
 from functools import wraps
 
+from django.conf import settings
 from django.core import cache
 
 
@@ -49,7 +50,14 @@ def cache_if_anonymous(*get_parameters):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             """The inner wrapper, which wraps the view function."""
-            if not request.user.is_authenticated():
+            # Certificate authentication uses anonymous pages,
+            # specifically the branding index, to do authentication.
+            # If that page is cached the authentication doesn't
+            # happen, so we disable the cache when that feature is enabled.
+            if (
+                not request.user.is_authenticated() and
+                not settings.FEATURES['AUTH_USE_CERTIFICATES']
+            ):
                 # Use the cache. The same view accessed through different domain names may
                 # return different things, so include the domain name in the key.
                 domain = str(request.META.get('HTTP_HOST')) + '.'

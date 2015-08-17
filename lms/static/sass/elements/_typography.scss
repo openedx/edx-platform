@@ -41,6 +41,7 @@
 }
 
 %t-title3 {
+  @extend %t-title;
   @include font-size(36);
   @include line-height(36);
 }

@@ -2,25 +2,31 @@
 """
 Tests for course access
 """
+import ddt
+import itertools
+import mock
+from nose.plugins.attrib import attr
+
 from django.conf import settings
 from django.test.utils import override_settings
-import mock
+from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import (
     get_course_by_id, get_cms_course_link, course_image_url,
     get_course_info_section, get_course_about_section, get_cms_block_link
 )
+from courseware.module_render import get_module_for_descriptor
 from courseware.tests.helpers import get_request_for_user
+from courseware.model_data import FieldDataCache
 from student.tests.factories import UserFactory
-import xmodule.modulestore.django as store_django
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
-)
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
@@ -29,12 +35,11 @@ CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
+@attr('shard_1')
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
 
-    @override_settings(
-        MODULESTORE=TEST_DATA_MOCK_MODULESTORE, CMS_BASE=CMS_BASE_TEST
-    )
+    @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_block_link(self):
         """
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
@@ -43,12 +48,13 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/org/num/name".format(CMS_BASE_TEST)
+        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.id))
         self.assertEqual(cms_url, get_cms_course_link(self.course))
-        cms_url = u"//{}/course/i4x://org/num/course/name".format(CMS_BASE_TEST)
+        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.location))
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
 
+@attr('shard_1')
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
     """Test methods related to the modulestore branch setting."""
     @mock.patch(
@@ -60,7 +66,7 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         MODULESTORE_BRANCH='fake_default_branch',
     )
     def test_default_modulestore_preview_mapping(self):
-        self.assertEqual(store_django._get_modulestore_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
+        self.assertEqual(_get_modulestore_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
 
     @mock.patch(
         'xmodule.modulestore.django.get_current_request_hostname',
@@ -71,12 +77,11 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         MODULESTORE_BRANCH='fake_default_branch',
     )
     def test_default_modulestore_branch_mapping(self):
-        self.assertEqual(store_django._get_modulestore_branch_setting(), 'fake_default_branch')
+        self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-@override_settings(
-    MODULESTORE=TEST_DATA_MOCK_MODULESTORE, CMS_BASE=CMS_BASE_TEST
-)
+@attr('shard_1')
+@override_settings(CMS_BASE=CMS_BASE_TEST)
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
 
@@ -131,6 +136,7 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         )
 
 
+@attr('shard_1')
 class XmlCourseImageTestCase(XModuleXmlImportTest):
     """Tests for course image URLs when using an xml modulestore."""
 
@@ -148,7 +154,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
 
@@ -160,8 +166,8 @@ class CoursesRenderTest(ModuleStoreTestCase):
         """
         super(CoursesRenderTest, self).setUp()
 
-        store = store_django.modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
+        store = modulestore()
+        course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         self.course = get_course_by_id(course_key)
         self.request = get_request_for_user(UserFactory.create())
@@ -196,9 +202,11 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
+@attr('shard_1')
 class XmlCoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content for an XML course."""
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_get_course_info_section_render(self):
@@ -216,3 +224,48 @@ class XmlCoursesRenderTest(ModuleStoreTestCase):
             )
             course_info = get_course_info_section(request, course, 'handouts')
             self.assertIn("this module is temporarily unavailable", course_info)
+
+
+@attr('shard_1')
+@ddt.ddt
+class CourseInstantiationTests(ModuleStoreTestCase):
+    """
+    Tests around instantiating a course multiple times in the same request.
+    """
+    def setUp(self):
+        super(CourseInstantiationTests, self).setUp()
+
+        self.factory = RequestFactory()
+
+    @ddt.data(*itertools.product(xrange(5), [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split], [None, 0, 5]))
+    @ddt.unpack
+    def test_repeated_course_module_instantiation(self, loops, default_store, course_depth):
+
+        with modulestore().default_store(default_store):
+            course = CourseFactory.create()
+            chapter = ItemFactory(parent=course, category='chapter', graded=True)
+            section = ItemFactory(parent=chapter, category='sequential')
+            __ = ItemFactory(parent=section, category='problem')
+
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': unicode(course.id)})
+        )
+
+        course = modulestore().get_course(course.id, depth=course_depth)
+
+        for _ in xrange(loops):
+            field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                course.id, self.user, course, depth=course_depth
+            )
+            course_module = get_module_for_descriptor(
+                self.user,
+                fake_request,
+                course,
+                field_data_cache,
+                course.id,
+                course=course
+            )
+            for chapter in course_module.get_children():
+                for section in chapter.get_children():
+                    for item in section.get_children():
+                        self.assertTrue(item.graded)

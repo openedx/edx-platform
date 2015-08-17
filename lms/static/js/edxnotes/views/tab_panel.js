@@ -26,9 +26,9 @@ function (gettext, _, Backbone, NoteItemView) {
         },
 
         getNotes: function (collection) {
-            var container = document.createDocumentFragment(),
+            var container = document.createDocumentFragment(), scrollToTag = this.options.scrollToTag, view = this.title,
                 notes = _.map(collection, function (model) {
-                    var note = new NoteItemView({model: model});
+                    var note = new NoteItemView({model: model, scrollToTag: scrollToTag, view: view});
                     container.appendChild(note.render().el);
                     return note;
                 });

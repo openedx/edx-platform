@@ -2,66 +2,59 @@
 metadata:
     display_name: Numerical Input
     markdown: |
-       A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
+        In a numerical input problem, learners enter numbers or a specific and relatively simple mathematical expression. Learners enter the response in plain text, and the system then converts the text to a symbolic expression that learners can see below the response field.
 
-       The answer is correct if it is within a specified numerical tolerance of the expected answer.
+        The system can handle several types of characters, including basic operators, fractions, exponents, and common constants such as "i". You can refer learners to "Entering Mathematical and Scientific Expressions" in the edX Guide for Students for more information.
 
-       >>Enter the numerical value of Pi:<<
-       = 3.14159 +- .02
-       
-       >>Enter the approximate value of 502*9:<<
-       = 4518 +- 15%
+        When you add the problem, be sure to select Settings to specify a Display Name and other values that apply.
 
-       >>Enter the number of fingers on a human hand<<
-       = 5
+        You can use the following example problems as models.
 
-       [explanation]
-       Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.
+        >>How many miles away from Earth is the sun? Use scientific notation to answer.<<
 
-       Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.
+        = 9.3*10^7 
+        or= 9.296*10^7 
 
-       If you look at your hand, you can count that you have five fingers.
-       [explanation]
+        >>The square of what number is -100?<<
+
+        = 10*i 
+
+        [explanation]
+        The sun is 93,000,000, or 9.3*10^7, miles away from Earth.
+        -100 is the square of 10 times the imaginary number, i.
+        [explanation]
 data: |
-   <problem>
-   <p>
-   A numerical input problem accepts a line of text input from the
-   student, and evaluates the input for correctness based on its
-   numerical value.  
-   </p>
+    <problem>
 
-   <p>
-   The answer is correct if it is within a specified numerical tolerance
-   of the expected answer.
-   </p>
-   <script type="loncapa/python">
-   computed_response = 502*9
-   </script>
+    <p>In a numerical input problem, learners enter numbers or a specific and
+    relatively simple mathematical expression. Learners enter the response in
+    plain text, and the system then converts the text to a symbolic expression
+    that learners can see below the response field.</p>
 
-   <p>Enter the numerical value of Pi:
-       <numericalresponse answer="3.14159">
-           <responseparam type="tolerance" default=".02" />
-           <formulaequationinput label="Enter the numerical value of Pi" />
-       </numericalresponse>
-   </p>
-   <p>Enter the approximate value of 502*9:
-       <numericalresponse answer="$computed_response">
-           <responseparam type="tolerance" default="15%"/>
-           <formulaequationinput label="Enter the approximate value of 502 times 9"/>
-       </numericalresponse>
-   </p>
+    <p>The system can handle several types of characters, including basic
+    operators, fractions, exponents, and common constants such as i. You can 
+    refer learners to 
+    <a href="http://edx.readthedocs.org/projects/edx-guide-for-students/en/latest/SFD_mathformatting.html" target="_blank">
+    Entering Mathematical and Scientific Expressions</a> in the <i>edX Guide for
+    Students</i> for information about how to enter text into the field.</p>
+    <p>When you add the problem, be sure to select <strong>Settings</strong> 
+    to specify a <strong>Display Name</strong> and other values that apply.</p>
 
-   <p>Enter the number of fingers on a human hand:
-       <numericalresponse answer="5">
-           <formulaequationinput label="Enter the number of fingers on a human hand"/>
-       </numericalresponse>
-   </p>
-       <solution>
-           <div class="detailed-solution">
-               <p>Explanation</p>
-               <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-               <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-               <p>If you look at your hand, you can count that you have five fingers.</p>
-           </div>
-       </solution>
-   </problem>
+    <p>You can use the following example problems as models.</p>
+      <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
+      <numericalresponse answer="9.3*10^7">
+        <formulaequationinput label="How many million miles are between Earth and the sun? Use scientific notation to answer." />
+      </numericalresponse>
+
+      <p>The square of what number is -100?</p>
+      <numericalresponse answer="10*i">
+        <formulaequationinput label="The square of what number is -100?" />
+      </numericalresponse>
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
+        <p>-100 is the square of 10 times the imaginary number, i.</p>
+      </div>
+    </solution>
+    </problem>

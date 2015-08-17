@@ -1,35 +1,41 @@
 """
 Tests for the EdxNotes app.
 """
+from contextlib import contextmanager
+import ddt
 import json
 import jwt
 from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
+
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from django.conf import settings
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
-from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from student.tests.factories import UserFactory
+from courseware.tabs import get_course_tab_list
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 def enable_edxnotes_for_the_course(course, user_id):
     """
     Enable EdxNotes for the course.
     """
-    course.tabs.append(EdxNotesTab())
+    course.tabs.append(CourseTab.load("edxnotes"))
     modulestore().update_item(course, user_id)
 
 
@@ -56,20 +62,24 @@ class TestProblem(object):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesDecoratorTest(TestCase):
+class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
     Tests for edxnotes decorator.
     """
 
     def setUp(self):
+        super(EdxNotesDecoratorTest, self).setUp()
+
         ClientFactory(name="edx-notes")
-        self.course = CourseFactory.create(edxnotes=True)
+        # Using old mongo because of locator comparison issues (see longer
+        # note below in EdxNotesHelpersTest setUp.
+        self.course = CourseFactory.create(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
         self.problem = TestProblem(self.course)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
-    @patch("edxnotes.decorators.get_endpoint")
+    @patch("edxnotes.decorators.get_public_endpoint")
     @patch("edxnotes.decorators.get_token_url")
     @patch("edxnotes.decorators.get_id_token")
     @patch("edxnotes.decorators.generate_uid")
@@ -94,6 +104,7 @@ class EdxNotesDecoratorTest(TestCase):
                 "tokenUrl": "/tokenUrl",
                 "endpoint": "/endpoint",
                 "debug": settings.DEBUG,
+                "eventStringLimit": settings.TRACK_MAX_EVENT / 6,
             },
         }
         self.assertEqual(
@@ -133,6 +144,7 @@ class EdxNotesDecoratorTest(TestCase):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
+@ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
     """
     Tests for EdxNotes helpers.
@@ -142,34 +154,42 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Setup a dummy course content.
         """
         super(EdxNotesHelpersTest, self).setUp()
-        ClientFactory(name="edx-notes")
-        self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
-        self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
-        self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
-        self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-        self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-        self.vertical_with_container = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-        self.child_container = ItemFactory.create(
-            category='split_test', parent_location=self.vertical_with_container.location)
-        self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
-        self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
-        # Read again so that children lists are accurate
-        self.course = self.store.get_item(self.course.location)
-        self.chapter = self.store.get_item(self.chapter.location)
-        self.chapter_2 = self.store.get_item(self.chapter_2.location)
-        self.sequential = self.store.get_item(self.sequential.location)
-        self.vertical = self.store.get_item(self.vertical.location)
+        # There are many tests that are comparing locators as returned from helper methods. When using
+        # the split modulestore, some of those locators have version and branch information, but the
+        # comparison values do not. This needs further investigation in order to enable these tests
+        # with the split modulestore.
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            ClientFactory(name="edx-notes")
+            self.course = CourseFactory.create()
+            self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+            self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
+            self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
+            self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
+            self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+            self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+            self.vertical_with_container = ItemFactory.create(
+                category='vertical', parent_location=self.sequential.location
+            )
+            self.child_container = ItemFactory.create(
+                category='split_test', parent_location=self.vertical_with_container.location)
+            self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
+            self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
-        self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
-        self.child_container = self.store.get_item(self.child_container.location)
-        self.child_vertical = self.store.get_item(self.child_vertical.location)
-        self.child_html_module = self.store.get_item(self.child_html_module.location)
+            # Read again so that children lists are accurate
+            self.course = self.store.get_item(self.course.location)
+            self.chapter = self.store.get_item(self.chapter.location)
+            self.chapter_2 = self.store.get_item(self.chapter_2.location)
+            self.sequential = self.store.get_item(self.sequential.location)
+            self.vertical = self.store.get_item(self.vertical.location)
 
-        self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
-        self.client.login(username=self.user.username, password="edx")
+            self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
+            self.child_container = self.store.get_item(self.child_container.location)
+            self.child_vertical = self.store.get_item(self.child_vertical.location)
+            self.child_html_module = self.store.get_item(self.child_html_module.location)
+
+            self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
+            self.client.login(username=self.user.username, password="edx")
 
     def _get_unit_url(self, course, chapter, section, position=1):
         """
@@ -216,29 +236,44 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             {"type": "bar"}]
         self.assertTrue(helpers.is_feature_enabled(self.course))
 
-    def test_get_endpoint(self):
+    @ddt.data(
+        helpers.get_public_endpoint,
+        helpers.get_internal_endpoint,
+    )
+    def test_get_endpoints(self, get_endpoint_function):
         """
-        Tests that storage_url method returns appropriate values.
+        Test that the get_public_endpoint and get_internal_endpoint functions
+        return appropriate values.
         """
+        @contextmanager
+        def patch_edxnotes_api_settings(url):
+            """
+            Convenience function for patching both EDXNOTES_PUBLIC_API and
+            EDXNOTES_INTERNAL_API.
+            """
+            with override_settings(EDXNOTES_PUBLIC_API=url):
+                with override_settings(EDXNOTES_INTERNAL_API=url):
+                    yield
+
         # url ends with "/"
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com/"}):
-            self.assertEqual("http://example.com/", helpers.get_endpoint())
+        with patch_edxnotes_api_settings("http://example.com/"):
+            self.assertEqual("http://example.com/", get_endpoint_function())
 
         # url doesn't have "/" at the end
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/", helpers.get_endpoint())
+        with patch_edxnotes_api_settings("http://example.com"):
+            self.assertEqual("http://example.com/", get_endpoint_function())
 
         # url with path that starts with "/"
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/some_path/", helpers.get_endpoint("/some_path"))
+        with patch_edxnotes_api_settings("http://example.com"):
+            self.assertEqual("http://example.com/some_path/", get_endpoint_function("/some_path"))
 
         # url with path without "/"
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/some_path/", helpers.get_endpoint("some_path/"))
+        with patch_edxnotes_api_settings("http://example.com"):
+            self.assertEqual("http://example.com/some_path/", get_endpoint_function("some_path/"))
 
         # url is not configured
-        with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": None}):
-            self.assertRaises(ImproperlyConfigured, helpers.get_endpoint)
+        with patch_edxnotes_api_settings(None):
+            self.assertRaises(ImproperlyConfigured, get_endpoint_function)
 
     @patch("edxnotes.helpers.requests.get")
     def test_get_notes_correct_data(self, mock_get):
@@ -653,7 +688,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             helpers.get_module_context(self.course, self.chapter_2)
         )
 
-    @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
+    @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
+    @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user")
     @patch("edxnotes.helpers.get_id_token")
     @patch("edxnotes.helpers.requests.get")
@@ -681,7 +717,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             }
         )
 
-    @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
+    @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
+    @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user")
     @patch("edxnotes.helpers.get_id_token")
     @patch("edxnotes.helpers.requests.get")
@@ -773,7 +810,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesViewsTest(TestCase):
+class EdxNotesViewsTest(ModuleStoreTestCase):
     """
     Tests for EdxNotes views.
     """
@@ -782,6 +819,7 @@ class EdxNotesViewsTest(TestCase):
         super(EdxNotesViewsTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.client.login(username=self.user.username, password="edx")
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
         self.search_url = reverse("search_notes", args=[unicode(self.course.id)])
@@ -793,7 +831,30 @@ class EdxNotesViewsTest(TestCase):
         Returns the course module.
         """
         field_data_cache = FieldDataCache([self.course], self.course.id, self.user)
-        return get_module_for_descriptor(self.user, MagicMock(), self.course, field_data_cache, self.course.id)
+        return get_module_for_descriptor(
+            self.user, MagicMock(), self.course, field_data_cache, self.course.id, course=self.course
+        )
+
+    def test_edxnotes_tab(self):
+        """
+        Tests that edxnotes tab is shown only when the feature is enabled.
+        """
+        def has_notes_tab(user, course):
+            """Returns true if the "Notes" tab is shown."""
+            request = RequestFactory().request()
+            request.user = user
+            tabs = get_course_tab_list(request, course)
+            return len([tab for tab in tabs if tab.type == 'edxnotes']) == 1
+
+        self.assertFalse(has_notes_tab(self.user, self.course))
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        # disable course.edxnotes
+        self.course.edxnotes = False
+        self.assertFalse(has_notes_tab(self.user, self.course))
+
+        # reenable course.edxnotes
+        self.course.edxnotes = True
+        self.assertTrue(has_notes_tab(self.user, self.course))
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -903,7 +964,7 @@ class EdxNotesViewsTest(TestCase):
         response = self.client.get(self.get_token_url)
         self.assertEqual(response.status_code, 200)
         client = Client.objects.get(name='edx-notes')
-        jwt.decode(response.content, client.client_secret)
+        jwt.decode(response.content, client.client_secret, audience=client.client_id)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_get_id_token_anonymous(self):

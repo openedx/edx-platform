@@ -19,7 +19,8 @@ Mode = namedtuple('Mode',
                       'suggested_prices',
                       'currency',
                       'expiration_datetime',
-                      'description'
+                      'description',
+                      'sku',
                   ])
 
 
@@ -56,11 +57,30 @@ class CourseMode(models.Model):
     # WARNING: will not be localized
     description = models.TextField(null=True, blank=True)
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None)
-    DEFAULT_MODE_SLUG = 'honor'
+    # Optional SKU for integration with the ecommerce service
+    sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="SKU",
+        help_text="This is the SKU (stock keeping unit) of this mode in the external ecommerce service."
+    )
+
+    HONOR = 'honor'
+    PROFESSIONAL = 'professional'
+    VERIFIED = "verified"
+    AUDIT = "audit"
+    NO_ID_PROFESSIONAL_MODE = "no-id-professional"
+    CREDIT_MODE = "credit"
+
+    DEFAULT_MODE = Mode(HONOR, _('Honor Code Certificate'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE_SLUG = HONOR
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = ["verified", "professional"]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
+
+    # Modes that allow a student to earn credit with a university partner
+    CREDIT_MODES = [CREDIT_MODE]
 
     class Meta:
         """ meta attributes of this model """
@@ -146,23 +166,53 @@ class CourseMode(models.Model):
         return [mode.to_tuple() for mode in found_course_modes]
 
     @classmethod
-    def modes_for_course(cls, course_id):
+    def modes_for_course(cls, course_id, include_expired=False, only_selectable=True):
         """
         Returns a list of the non-expired modes for a given course id
 
         If no modes have been set in the table, returns the default mode
+
+        Arguments:
+            course_id (CourseKey): Search for course modes for this course.
+
+        Keyword Arguments:
+            include_expired (bool): If True, expired course modes will be included
+            in the returned JSON data. If False, these modes will be omitted.
+
+            only_selectable (bool): If True, include only modes that are shown
+                to users on the track selection page.  (Currently, "credit" modes
+                aren't available to users until they complete the course, so
+                they are hidden in track selection.)
+
+        Returns:
+            list of `Mode` tuples
+
         """
         now = datetime.now(pytz.UTC)
-        found_course_modes = cls.objects.filter(Q(course_id=course_id) &
-                                                (Q(expiration_datetime__isnull=True) |
-                                                Q(expiration_datetime__gte=now)))
+
+        found_course_modes = cls.objects.filter(course_id=course_id)
+
+        # Filter out expired course modes if include_expired is not set
+        if not include_expired:
+            found_course_modes = found_course_modes.filter(
+                Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=now)
+            )
+
+        # Credit course modes are currently not shown on the track selection page;
+        # they're available only when students complete a course.  For this reason,
+        # we exclude them from the list if we're only looking for selectable modes
+        # (e.g. on the track selection page or in the payment/verification flows).
+        if only_selectable:
+            found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
+
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
+
         return modes
 
     @classmethod
-    def modes_for_course_dict(cls, course_id, modes=None):
+    def modes_for_course_dict(cls, course_id, modes=None, only_selectable=True):
         """Returns the non-expired modes for a particular course.
 
         Arguments:
@@ -173,12 +223,18 @@ class CourseMode(models.Model):
                 of course modes.  This can be used to avoid an additional
                 database query if you have already loaded the modes list.
 
+            only_selectable (bool): If True, include only modes that are shown
+                to users on the track selection page.  (Currently, "credit" modes
+                aren't available to users until they complete the course, so
+                they are hidden in track selection.)
+
         Returns:
             dict: Keys are mode slugs, values are lists of `Mode` namedtuples.
 
         """
         if modes is None:
-            modes = cls.modes_for_course(course_id)
+            modes = cls.modes_for_course(course_id, only_selectable=only_selectable)
+
         return {mode.slug: mode for mode in modes}
 
     @classmethod
@@ -240,6 +296,23 @@ class CourseMode(models.Model):
         return professional_mode if professional_mode else verified_mode
 
     @classmethod
+    def min_course_price_for_verified_for_currency(cls, course_id, currency):  # pylint: disable=invalid-name
+        """
+        Returns the minimum price of the course int he appropriate currency over all the
+        course's *verified*, non-expired modes.
+
+        Assuming all verified courses have a minimum price of >0, this value should always
+        be >0.
+
+        If no verified mode is found, 0 is returned.
+        """
+        modes = cls.modes_for_course(course_id)
+        for mode in modes:
+            if (mode.currency == currency) and (mode.slug == 'verified'):
+                return mode.min_price
+        return 0
+
+    @classmethod
     def has_verified_mode(cls, course_mode_dict):
         """Check whether the modes for a course allow a student to pursue a verfied certificate.
 
@@ -256,21 +329,74 @@ class CourseMode(models.Model):
         return False
 
     @classmethod
-    def min_course_price_for_verified_for_currency(cls, course_id, currency):
+    def has_professional_mode(cls, modes_dict):
         """
-        Returns the minimum price of the course int he appropriate currency over all the
-        course's *verified*, non-expired modes.
+        check the course mode is profession or no-id-professional
 
-        Assuming all verified courses have a minimum price of >0, this value should always
-        be >0.
+        Args:
+            modes_dict (dict): course modes.
 
-        If no verified mode is found, 0 is returned.
+        Returns:
+            bool
         """
-        modes = cls.modes_for_course(course_id)
-        for mode in modes:
-            if (mode.currency == currency) and (mode.slug == 'verified'):
-                return mode.min_price
-        return 0
+        return cls.PROFESSIONAL in modes_dict or cls.NO_ID_PROFESSIONAL_MODE in modes_dict
+
+    @classmethod
+    def is_professional_mode(cls, course_mode_tuple):
+        """
+        checking that tuple is professional mode.
+        Args:
+            course_mode_tuple (tuple) : course mode tuple
+
+        Returns:
+            bool
+        """
+        return course_mode_tuple.slug in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE] if course_mode_tuple else False
+
+    @classmethod
+    def is_professional_slug(cls, slug):
+        """checking slug is professional
+        Args:
+            slug (str) : course mode string
+        Return:
+            bool
+        """
+        return slug in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE]
+
+    @classmethod
+    def is_verified_mode(cls, course_mode_tuple):
+        """Check whether the given modes is_verified or not.
+
+        Args:
+            course_mode_tuple(Mode): Mode tuple
+
+        Returns:
+            bool: True iff the course modes is verified else False.
+
+        """
+        return course_mode_tuple.slug in cls.VERIFIED_MODES
+
+    @classmethod
+    def is_verified_slug(cls, mode_slug):
+        """Check whether the given mode_slug is_verified or not.
+
+        Args:
+            mode_slug(str): Mode Slug
+
+        Returns:
+            bool: True iff the course mode slug is verified else False.
+
+        """
+        return mode_slug in cls.VERIFIED_MODES
+
+    @classmethod
+    def is_credit_mode(cls, course_mode_tuple):
+        """Check whether this is a credit mode.
+
+        Students enrolled in a credit mode are eligible to
+        receive university credit upon completion of a course.
+        """
+        return course_mode_tuple.slug in cls.CREDIT_MODES
 
     @classmethod
     def has_payment_options(cls, course_id):
@@ -316,8 +442,8 @@ class CourseMode(models.Model):
         if modes_dict is None:
             modes_dict = cls.modes_for_course_dict(course_id)
 
-        # Professional mode courses are always behind a paywall
-        if "professional" in modes_dict:
+        # Professional and no-id-professional mode courses are always behind a paywall
+        if cls.has_professional_mode(modes_dict):
             return False
 
         # White-label uses course mode honor with a price
@@ -326,7 +452,7 @@ class CourseMode(models.Model):
             return False
 
         # Check that the default mode is available.
-        return ("honor" in modes_dict)
+        return (cls.HONOR in modes_dict)
 
     @classmethod
     def is_white_label(cls, course_id, modes_dict=None):
@@ -351,13 +477,13 @@ class CourseMode(models.Model):
 
         # White-label uses course mode honor with a price
         # to indicate that the course is behind a paywall.
-        if "honor" in modes_dict and len(modes_dict) == 1:
+        if cls.HONOR in modes_dict and len(modes_dict) == 1:
             if modes_dict["honor"].min_price > 0 or modes_dict["honor"].suggested_prices != '':
                 return True
         return False
 
     @classmethod
-    def min_course_price_for_currency(cls, course_id, currency):
+    def min_course_price_for_currency(cls, course_id, currency):  # pylint: disable=invalid-name
         """
         Returns the minimum price of the course in the appropriate currency over all the course's
         non-expired modes.
@@ -365,6 +491,96 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency == currency)
+
+    @classmethod
+    def enrollment_mode_display(cls, mode, verification_status):
+        """ Select appropriate display strings and CSS classes.
+
+            Uses mode and verification status to select appropriate display strings and CSS classes
+            for certificate display.
+
+            Args:
+                mode (str): enrollment mode.
+                verification_status (str) : verification status of student
+
+            Returns:
+                dictionary:
+        """
+
+        # import inside the function to avoid the circular import
+        from student.helpers import (
+            VERIFY_STATUS_NEED_TO_VERIFY,
+            VERIFY_STATUS_SUBMITTED,
+            VERIFY_STATUS_APPROVED
+        )
+
+        show_image = False
+        image_alt = ''
+
+        if mode == cls.VERIFIED:
+            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
+                enrollment_title = _("Your verification is pending")
+                enrollment_value = _("Verified: Pending Verification")
+                show_image = True
+                image_alt = _("ID verification pending")
+            elif verification_status == VERIFY_STATUS_APPROVED:
+                enrollment_title = _("You're enrolled as a verified student")
+                enrollment_value = _("Verified")
+                show_image = True
+                image_alt = _("ID Verified Ribbon/Badge")
+            else:
+                enrollment_title = _("You're enrolled as an honor code student")
+                enrollment_value = _("Honor Code")
+        elif mode == cls.HONOR:
+            enrollment_title = _("You're enrolled as an honor code student")
+            enrollment_value = _("Honor Code")
+        elif mode == cls.AUDIT:
+            enrollment_title = _("You're auditing this course")
+            enrollment_value = _("Auditing")
+        elif mode in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE]:
+            enrollment_title = _("You're enrolled as a professional education student")
+            enrollment_value = _("Professional Ed")
+        else:
+            enrollment_title = ''
+            enrollment_value = ''
+
+        return {
+            'enrollment_title': unicode(enrollment_title),
+            'enrollment_value': unicode(enrollment_value),
+            'show_image': show_image,
+            'image_alt': unicode(image_alt),
+            'display_mode': cls._enrollment_mode_display(mode, verification_status)
+        }
+
+    @staticmethod
+    def _enrollment_mode_display(enrollment_mode, verification_status):
+        """Checking enrollment mode and status and returns the display mode
+         Args:
+            enrollment_mode (str): enrollment mode.
+            verification_status (str) : verification status of student
+
+        Returns:
+            display_mode (str) : display mode for certs
+        """
+
+        # import inside the function to avoid the circular import
+        from student.helpers import (
+            VERIFY_STATUS_NEED_TO_VERIFY,
+            VERIFY_STATUS_SUBMITTED,
+            VERIFY_STATUS_APPROVED
+        )
+
+        if enrollment_mode == CourseMode.VERIFIED:
+            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
+                display_mode = "verified"
+            else:
+                display_mode = "honor"
+        elif enrollment_mode in [CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE]:
+            display_mode = "professional"
+        else:
+            display_mode = enrollment_mode
+
+        return display_mode
 
     def to_tuple(self):
         """
@@ -381,12 +597,13 @@ class CourseMode(models.Model):
             self.suggested_prices,
             self.currency,
             self.expiration_datetime,
-            self.description
+            self.description,
+            self.sku
         )
 
     def __unicode__(self):
-        return u"{} : {}, min={}, prices={}".format(
-            self.course_id.to_deprecated_string(), self.mode_slug, self.min_price, self.suggested_prices
+        return u"{} : {}, min={}".format(
+            self.course_id, self.mode_slug, self.min_price
         )
 
 

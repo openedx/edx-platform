@@ -32,6 +32,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     '''
 
     def setUp(self):
+        super(AnnotatableModuleTestCase, self).setUp()
         self.annotatable = AnnotatableModule(
             Mock(),
             get_test_system(),

@@ -5,6 +5,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
+  import json
   from contentstore import utils
   from django.utils.translation import ugettext as _
 %>
@@ -22,7 +23,7 @@
 </%block>
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
-        SettingsGradersFactory(${course_details|n}, "${grading_url}");
+        SettingsGradersFactory(_.extend(${course_details|n}, {is_credit_course: ${json.dumps(is_credit_course)}}), "${grading_url}");
     });
 </%block>
 
@@ -73,8 +74,25 @@
             </li>
           </ol>
         </section>
-
         <hr class="divide" />
+
+        % if settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course:
+          <section class="group-settings grade-rules">
+            <header>
+              <h2 class="title-2">${_("Credit Grade &amp; Eligibility")}</h2>
+              <span class="tip">${_("Settings for credit eligibility")}</span>
+            </header>
+
+            <ol class="list-input">
+              <li class="field text" id="field-course-minimum_grade_credit">
+                <label for="course-minimum_grade_credit">${_("Minimum Passing Grade to Earn Credit:")}</label>
+                <input type="text" class="short time" id="course-minimum_grade_credit" value="0" placeholder="80%" autocomplete="off" aria-describedby="minimum_grade_description"/>
+                <span class="tip tip-inline" id="minimum_grade_description">${_("Must be greater than or equal to passing grade")}</span>
+              </li>
+            </ol>
+          </section>
+          <hr class="divide" />
+        % endif
 
         <section class="group-settings grade-rules">
           <header>
@@ -90,7 +108,6 @@
             </li>
           </ol>
         </section>
-
         <hr class="divide" />
 
         <section class="group-settings assignment-types">
@@ -130,7 +147,7 @@
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
-        <nav class="nav-related">
+        <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
             <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>

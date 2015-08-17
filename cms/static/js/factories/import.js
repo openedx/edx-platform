@@ -1,24 +1,52 @@
 define([
-    'js/views/import', 'jquery', 'gettext', 'jquery.fileupload', 'jquery.cookie'
-], function(CourseImport, $, gettext) {
+    'domReady', 'js/views/import', 'jquery', 'gettext', 'jquery.fileupload', 'jquery.cookie'
+], function(domReady, Import, $, gettext) {
+
     'use strict';
-    return function (feedbackUrl) {
+
+    return function (feedbackUrl, library) {
+        var dbError;
+
+        if (library) {
+            dbError = gettext('There was an error while importing the new library to our database.');
+        } else {
+            dbError = gettext('There was an error while importing the new course to our database.');
+        }
+
         var bar = $('.progress-bar'),
             fill = $('.progress-fill'),
             submitBtn = $('.submit-button'),
-            chooseBtn = $('.choose-file-button'),
+            chooseBtn = $('.view-import .choose-file-button'),
             defaults = [
                 gettext('There was an error during the upload process.') + '\n',
                 gettext('There was an error while unpacking the file.') + '\n',
                 gettext('There was an error while verifying the file you submitted.') + '\n',
-                gettext('There was an error while importing the new course to our database.') + '\n'
+                dbError + '\n'
             ],
-            // Display the status of last file upload on page load
-            lastFileUpload = $.cookie('lastfileupload'),
+            unloading = false,
+            previousImport = Import.storedImport(),
             file;
 
-        if (lastFileUpload){
-            CourseImport.getAndStartUploadFeedback(feedbackUrl.replace('fillerName', lastFileUpload), lastFileUpload);
+        var onComplete = function () {
+            bar.hide();
+            chooseBtn
+                .find('.copy').html(gettext("Choose new file")).end()
+                .show();
+        }
+
+        $(window).on('beforeunload', function (event) { unloading = true; });
+
+        // Display the status of last file upload on page load
+        if (previousImport) {
+            $('.file-name-block')
+                .find('.file-name').html(previousImport.file.name).end()
+                .show();
+
+            if (previousImport.completed !== true) {
+                chooseBtn.hide();
+            }
+
+            Import.resume().then(onComplete);
         }
 
         $('#fileupload').fileupload({
@@ -27,39 +55,48 @@ define([
             maxChunkSize: 20 * 1000000, // 20 MB
             autoUpload: false,
             add: function(e, data) {
-                CourseImport.clearImportDisplay();
-                CourseImport.okayToNavigateAway = false;
+                Import.reset();
                 submitBtn.unbind('click');
+
                 file = data.files[0];
+
                 if (file.name.match(/tar\.gz$/)) {
-                    submitBtn.click(function(event){
+                    submitBtn.click(function(event) {
                         event.preventDefault();
-                        $.cookie('lastfileupload', file.name);
+
+                        Import.start(
+                            file.name,
+                            feedbackUrl.replace('fillerName', file.name)
+                        ).then(onComplete);
+
                         submitBtn.hide();
-                        CourseImport.startUploadFeedback();
-                        data.submit().complete(function(result, textStatus, xhr) {
-                            window.onbeforeunload = null;
-                            if (xhr.status != 200) {
+                        data.submit().complete(function (result, textStatus, xhr) {
+                            if (xhr.status !== 200) {
                                 var serverMsg, errMsg, stage;
+
                                 try{
-                                    serverMsg = $.parseJSON(result.responseText);
+                                    serverMsg = $.parseJSON(result.responseText) || {};
                                 } catch (e) {
                                     return;
                                 }
-                                errMsg = serverMsg.hasOwnProperty('ErrMsg') ?  serverMsg.ErrMsg : '' ;
+
+                                errMsg = serverMsg.hasOwnProperty('ErrMsg') ? serverMsg.ErrMsg : '';
+
                                 if (serverMsg.hasOwnProperty('Stage')) {
                                     stage = Math.abs(serverMsg.Stage);
-                                    CourseImport.stageError(stage, defaults[stage] + errMsg);
+                                    Import.cancel(defaults[stage] + errMsg, stage);
                                 }
-                                else {
+                                // It could be that the user is simply refreshing the page
+                                // so we need to be sure this is an actual error from the server
+                                else if (!unloading) {
+                                    $(window).off('beforeunload.import');
+
+                                    Import.reset();
+                                    onComplete();
+
                                     alert(gettext('Your import has failed.') + '\n\n' + errMsg);
                                 }
-                                chooseBtn.html(gettext('Choose new file')).show();
-                                bar.hide();
                             }
-                            CourseImport.stopGetStatus = true;
-                            chooseBtn.html(gettext('Choose new file')).show();
-                            bar.hide();
                         });
                     });
                 } else {
@@ -81,30 +118,45 @@ define([
                 }
                 if (percentInt >= doneAt) {
                     bar.hide();
-                    // Start feedback with delay so that current stage of import properly updates in session
-                    setTimeout(
-                        function () { CourseImport.startServerFeedback(feedbackUrl.replace('fillerName', file.name));},
-                        3000
-                    );
+
+                    // Start feedback with delay so that current stage of
+                    // import properly updates in session
+                    setTimeout(function () { Import.pollStatus(); }, 3000);
                 } else {
                     bar.show();
                     fill.width(percentVal).html(percentVal);
                 }
             },
-            done: function(event, data){
-                bar.hide();
-                window.onbeforeunload = null;
-                CourseImport.displayFinishedImport();
-            },
-            start: function(event) {
-                window.onbeforeunload = function() {
-                    if (!CourseImport.okayToNavigateAway) {
-                        return "${_('Your import is in progress; navigating away will abort it.')}";
-                    }
-                };
-            },
             sequentialUploads: true,
             notifyOnError: false
+        });
+
+
+        var showImportSubmit = function (e) {
+            var filepath = $(this).val();
+
+            if (filepath.substr(filepath.length - 6, 6) === 'tar.gz') {
+                $('.error-block').hide();
+                $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
+                $('.file-name-block').show();
+                chooseBtn.hide();
+                submitBtn.show();
+                $('.progress').show();
+            } else {
+                var msg = gettext('File format not supported. Please upload a file with a {file_extension} extension.')
+                    .replace('{file_extension}', '<code>tar.gz</code>');
+
+                $('.error-block').html(msg).show();
+            }
+        };
+
+        domReady(function () {
+            // import form setup
+            $('.view-import .file-input').bind('change', showImportSubmit);
+            $('.view-import .choose-file-button, .view-import .choose-file-button-inline').bind('click', function (e) {
+                e.preventDefault();
+                $('.view-import .file-input').click();
+            });
         });
     };
 });

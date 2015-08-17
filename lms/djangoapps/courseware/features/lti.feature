@@ -65,6 +65,7 @@ Feature: LMS.LTI component
   And I view the LTI and it is rendered in iframe
   And I see in iframe that LTI role is Instructor
   And I switch to student
+  And I view the LTI and it is rendered in iframe
   Then I see in iframe that LTI role is Student
 
   #8

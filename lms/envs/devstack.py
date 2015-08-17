@@ -13,6 +13,7 @@ DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = True
 SITE_NAME = 'localhost:8000'
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
@@ -45,32 +46,36 @@ ANALYTICS_DASHBOARD_URL = None
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
-MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
-                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE_CLASSES += (
+    'django_comment_client.utils.QueryCountDebugMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
-    'debug_toolbar.panels.version.VersionDebugPanel',
-    'debug_toolbar.panels.timer.TimerDebugPanel',
-    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar.panels.headers.HeaderDebugPanel',
-    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-    'debug_toolbar.panels.sql.SQLDebugPanel',
-    'debug_toolbar.panels.signals.SignalDebugPanel',
-    'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar_mongo.panel.MongoDebugPanel',
-
-    #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
-    #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
-    #  hit twice). So you can uncomment when you need to diagnose performance
-    #  problems, but you shouldn't leave it on.
-    #'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    # ProfilingPanel has been intentionally removed for default devstack.py
+    # runtimes for performance reasons. If you wish to re-enable it in your
+    # local development environment, please create a new settings file
+    # that imports and extends devstack.py.
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-    'SHOW_TOOLBAR_CALLBACK': lambda _: True,
+    'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar'
 }
+
+
+def should_show_debug_toolbar(_):
+    return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
+
 
 ########################### PIPELINE #################################
 
@@ -92,6 +97,8 @@ CC_PROCESSOR = {
 }
 
 ########################### External REST APIs #################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
@@ -112,14 +119,77 @@ FEATURES['MILESTONES_APP'] = True
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
+################################ COURSE LICENSES ################################
+FEATURES['LICENSING'] = True
+
+
+########################## Courseware Search #######################
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = False
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+
+########################## Dashboard Search #######################
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+
+
+########################## Certificates Web/HTML View #######################
+FEATURES['CERTIFICATES_HTML_VIEW'] = True
+
+
+########################## Course Discovery #######################
+from django.utils.translation import ugettext as _
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
+COURSE_DISCOVERY_MEANINGS = {
+    'org': {
+        'name': _('Organization'),
+    },
+    'modes': {
+        'name': _('Course Type'),
+        'terms': {
+            'honor': _('Honor'),
+            'verified': _('Verified'),
+        },
+    },
+    'language': LANGUAGE_MAP,
+}
+
+FEATURES['ENABLE_COURSE_DISCOVERY'] = False
+FEATURES['COURSES_ARE_BROWSEABLE'] = True
+HOMEPAGE_COURSE_MAX = 9
+
+# Software secure fake page feature flag
+FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
+
+# Setting for the testing of Software Secure Result Callback
+VERIFY_STUDENT["SOFTWARE_SECURE"] = {
+    "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+    "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+}
+
+# Skip enrollment start date filtering
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
+
+
+########################## Shopping cart ##########################
+FEATURES['ENABLE_SHOPPING_CART'] = True
+FEATURES['STORE_BILLING_INFO'] = True
+FEATURES['ENABLE_PAID_COURSE_REGISTRATION'] = True
+FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
+
+########################## Third Party Auth #######################
+
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
+    AUTHENTICATION_BACKENDS = ['third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
 #####################################################################
 # See if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=import-error
+    from .private import *      # pylint: disable=wildcard-import
 except ImportError:
     pass
 
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
+
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

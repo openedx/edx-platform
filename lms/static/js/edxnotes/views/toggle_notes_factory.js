@@ -2,7 +2,7 @@
 'use strict';
 define([
     'jquery', 'underscore', 'backbone', 'gettext',
-    'annotator', 'js/edxnotes/views/visibility_decorator'
+    'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation'
 ], function($, _, Backbone, gettext, Annotator, EdxnotesVisibilityDecorator) {
     var ToggleNotesView = Backbone.View.extend({
         events: {
@@ -12,7 +12,7 @@ define([
         errorMessage: gettext("An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."),
 
         initialize: function (options) {
-            _.bindAll(this, 'onSuccess', 'onError');
+            _.bindAll(this, 'onSuccess', 'onError', 'keyDownToggleHandler');
             this.visibility = options.visibility;
             this.visibilityUrl = options.visibilityUrl;
             this.label = this.$('.utility-control-label');
@@ -20,13 +20,26 @@ define([
             this.actionLink.removeClass('is-disabled');
             this.actionToggleMessage = this.$('.action-toggle-message');
             this.notification = new Annotator.Notification();
+            $(document).on('keydown.edxnotes:togglenotes', this.keyDownToggleHandler);
+        },
+
+        remove: function() {
+            $(document).off('keydown.edxnotes:togglenotes');
+            Backbone.View.prototype.remove.call(this);
         },
 
         toggleHandler: function (event) {
             event.preventDefault();
             this.visibility = !this.visibility;
-            this.showActionMessage();
+            AnimationUtil.triggerAnimation(this.actionToggleMessage);
             this.toggleNotes(this.visibility);
+        },
+
+        keyDownToggleHandler: function (event) {
+            // Character '[' has keyCode 219
+            if (event.keyCode === 219 && event.ctrlKey && event.shiftKey) {
+                this.toggleHandler(event);
+            }
         },
 
         toggleNotes: function (visibility) {
@@ -38,25 +51,18 @@ define([
             this.sendRequest();
         },
 
-        showActionMessage: function () {
-            // The following lines are necessary to re-trigger the CSS animation on span.action-toggle-message
-            this.actionToggleMessage.removeClass('is-fleeting');
-            this.actionToggleMessage.offset().width = this.actionToggleMessage.offset().width;
-            this.actionToggleMessage.addClass('is-fleeting');
-        },
-
         enableNotes: function () {
             _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
-            this.actionLink.addClass('is-active').attr('aria-pressed', true);
+            this.actionLink.addClass('is-active');
             this.label.text(gettext('Hide notes'));
-            this.actionToggleMessage.text(gettext('Showing notes'));
+            this.actionToggleMessage.text(gettext('Notes visible'));
         },
 
         disableNotes: function () {
             EdxnotesVisibilityDecorator.disableNotes();
-            this.actionLink.removeClass('is-active').attr('aria-pressed', false);
+            this.actionLink.removeClass('is-active');
             this.label.text(gettext('Show notes'));
-            this.actionToggleMessage.text(gettext('Hiding notes'));
+            this.actionToggleMessage.text(gettext('Notes hidden'));
         },
 
         hideErrorMessage: function() {

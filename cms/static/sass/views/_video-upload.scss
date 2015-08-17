@@ -68,19 +68,61 @@
         .video-detail-status {
           @include font-size(12);
           @include line-height(12);
+        }
 
-          &.error {
-            color: $color-error;
-          }
+        .video-detail-progress {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          margin-bottom: ($baseline/2);
+          border: none;
+          width: 100%;
+          height: ($baseline/4);
+        }
 
-          &.success {
-            color: $color-ready;
-          }
+        .video-detail-progress::-webkit-progress-bar {
+          background-color: $white;
+        }
+
+        // Sadly, these rules must be separate or both Chrome and Firefox break
+        .video-detail-progress::-webkit-progress-value {
+          background-color: $color-ready;
+        }
+
+        .video-detail-progress::-moz-progress-bar {
+          background-color: $color-ready;
         }
 
         &:hover {
           @include transition(all $tmg-f3);
           background: $white;
+        }
+
+        &.queued {
+          .video-detail-progress {
+            visibility: hidden;
+          }
+        }
+
+        &.error {
+          .video-detail-status {
+            color: $color-error;
+          }
+
+          // Sadly, these rules must be separate or both Chrome and Firefox break
+          .video-detail-progress::-webkit-progress-value {
+            background-color: $color-error;
+          }
+
+          .video-detail-progress::-moz-progress-bar {
+            background-color: $color-error;
+          }
+        }
+
+        &.success {
+          .video-detail-status {
+            color: $color-ready;
+          }
         }
       }
     }

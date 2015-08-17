@@ -57,7 +57,7 @@ class @MathJaxDelayRenderer
         @$buffer.html(text)
         curTime = getTime()
         @elapsedTime = curTime - prevTime
-        if MathJax
+        if MathJax?
           prevTime = getTime()
           @mathjaxRunning = true
           MathJax.Hub.Queue ["Typeset", MathJax.Hub, @$buffer.attr("id")], =>

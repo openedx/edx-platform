@@ -9,6 +9,7 @@ from factory import Factory, lazy_attribute, post_generation, Sequence
 from lxml import etree
 
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import only_xmodules
 
 
@@ -66,7 +67,7 @@ class XmlImportFactory(Factory):
     FACTORY_FOR = XmlImportData
 
     filesystem = MemoryFS()
-    xblock_mixins = (InheritanceMixin,)
+    xblock_mixins = (InheritanceMixin, XModuleMixin)
     xblock_select = only_xmodules
     url_name = Sequence(str)
     attribs = {}

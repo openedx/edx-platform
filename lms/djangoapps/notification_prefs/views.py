@@ -13,6 +13,7 @@ from django.views.decorators.http import require_GET, require_POST
 from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 
 
 class UsernameDecryptionException(Exception):
@@ -90,6 +91,22 @@ class UsernameCipher(object):
         return UsernameCipher._remove_padding(decrypted)
 
 
+def enable_notifications(user):
+    """
+    Enable notifications for a user.
+    Currently only used for daily forum digests.
+    """
+    # Calling UserPreference directly because this method is called from a couple of places,
+    # and it is not clear that user is always the user initiating the request.
+    UserPreference.objects.get_or_create(
+        user=user,
+        key=NOTIFICATION_PREF_KEY,
+        defaults={
+            "value": UsernameCipher.encrypt(user.username)
+        }
+    )
+
+
 @require_POST
 def ajax_enable(request):
     """
@@ -98,18 +115,12 @@ def ajax_enable(request):
     This view should be invoked by an AJAX POST call. It returns status 204
     (no content) or an error. If notifications were already enabled for this
     user, this has no effect. Otherwise, a preference is created with the
-    unsubscribe token (an ecnryption of the username) as the value.unsernam
+    unsubscribe token (an encryption of the username) as the value.username
     """
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    UserPreference.objects.get_or_create(
-        user=request.user,
-        key=NOTIFICATION_PREF_KEY,
-        defaults={
-            "value": UsernameCipher.encrypt(request.user.username)
-        }
-    )
+    enable_notifications(request.user)
 
     return HttpResponse(status=204)
 
@@ -125,10 +136,7 @@ def ajax_disable(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    UserPreference.objects.filter(
-        user=request.user,
-        key=NOTIFICATION_PREF_KEY
-    ).delete()
+    delete_user_preference(request.user, NOTIFICATION_PREF_KEY)
 
     return HttpResponse(status=204)
 
@@ -176,6 +184,8 @@ def set_subscription(request, token, subscribe):  # pylint: disable=unused-argum
     except User.DoesNotExist:
         raise Http404("username")
 
+    # Calling UserPreference directly because the fact that the user is passed in the token implies
+    # that it may not match request.user.
     if subscribe:
         UserPreference.objects.get_or_create(user=user,
                                              key=NOTIFICATION_PREF_KEY,

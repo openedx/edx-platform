@@ -62,7 +62,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
                 showServerError = function (response) {
                     var errorMessage = response.status ||
-                        'Error: Connection with server failed.';
+                        gettext('Error: Connection with server failed.');
 
                     self.messenger
                         .render('not_found')
@@ -78,7 +78,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                 this.messenger
                     .render('not_found')
                     .showError(
-                        'No sources',
+                        gettext('No sources'),
                         true // hide buttons
                     );
 
@@ -366,7 +366,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
          */
         checkIsUniqVideoTypes: function (list) {
             return this.checkIsValid(
-                this.isUniqVideoTypes, list, 'Link types should be unique.'
+                this.isUniqVideoTypes, list, gettext('Link types should be unique.')
             );
         },
 
@@ -379,7 +379,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
          */
         checkIsUniqOtherVideos: function (list) {
             return this.checkIsValid(
-                this.isUniqOtherVideos, list, 'Links should be unique.'
+                this.isUniqOtherVideos, list, gettext('Links should be unique.')
             );
         },
 
@@ -401,7 +401,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             }
 
             if (data.mode === 'incorrect' && showErrorModeMessage) {
-                this.messenger.showError('Incorrect url format.', true);
+                this.messenger.showError(gettext('Incorrect url format.'), true);
 
                 return false;
             }

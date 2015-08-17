@@ -15,6 +15,7 @@ class CeleryConfigTest(unittest.TestCase):
         """
         Create a django test client
         """
+        super(CeleryConfigTest, self).setUp()
         self.client = Client()
         self.ping_url = reverse('status.service.celery.ping')
 

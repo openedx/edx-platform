@@ -16,23 +16,30 @@
     <% if (text) { %>
     <ol class="note-comments" role="region" aria-label="<%- gettext('Note') %>">
         <li class="note-comment">
-            <h3 class="note-comment-title"><%- gettext("You commented...") %></h3>
+            <p class="note-comment-title"><%- gettext("You commented...") %></p>
             <p class="note-comment-p"><%= text %></p>
         </li>
     </ol>
     <% } %>
 </div>
 
-<footer class="reference" role="complementary" aria-label="<%- gettext('References') %>">
+<footer class="reference">
     <div class="wrapper-reference-content">
-        <h3 class="reference-title"><%- gettext("Noted in:") %></h3>
+        <p class="reference-title"><%- gettext("Noted in:") %></p>
         <% if (unit.url) { %>
           <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
         <% } else { %>
           <span class="reference-meta"><%- unit.display_name %></span>
         <% } %>
 
-        <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
+        <p class="reference-title"><%- gettext("Last Edited:") %></p>
         <span class="reference-meta reference-updated-date"><%- updated %></span>
+
+        <% if (tags.length > 0) { %>
+            <p class="reference-title"><%- gettext("Tags:") %></p>
+            <% for (var i = 0; i < tags.length; i++) { %>
+                <a class="reference-meta reference-tags" href="#"><%= tags[i] %></a>
+            <% } %>
+        <% } %>
     </div>
 </footer>

@@ -1,0 +1,53 @@
+// ------------------------------
+// Open edX Certificates: Shared Build Compile
+
+// About: Sass compile for Open edX Certificates elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the main-*.scss files.
+
+// ------------------------------
+// #UTILITIES
+// ------------------------------
+@import '../../../../static/pattern-library/sass/utilities/functions';
+@import '../../../../static/pattern-library/sass/utilities/variables';
+@import '../../../../static/pattern-library/sass/utilities/mixins';
+@import '../../../../static/pattern-library/sass/utilities/helpers';
+
+@import 'utilities';
+
+// ------------------------------
+// #BASE
+// ------------------------------
+@import '../../../../static/pattern-library/sass/base/normalize';
+@import '../../../../static/pattern-library/sass/base/reset';
+@import '../../../../static/pattern-library/sass/base/typography';
+
+@import 'base';
+
+// ------------------------------
+// #COMPONENTS
+// ------------------------------
+@import '../../../../static/pattern-library/sass/components/colors';
+@import '../../../../static/pattern-library/sass/components/buttons';
+@import '../../../../static/pattern-library/sass/components/headings';
+@import '../../../../static/pattern-library/sass/components/copy';
+
+@import 'components';
+
+// ------------------------------
+// #LAYOUTS
+// ------------------------------
+@import 'layouts';
+
+// ------------------------------
+// #VIEWS
+// ------------------------------
+@import 'views';
+
+// ------------------------------
+// #CONTEXTS
+// ------------------------------
+@import 'print';
+
+// ------------------------------
+// #SHAME
+// ------------------------------
+@import 'overrides';

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator', 'js/edxnotes/views/notes_factory',
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory',
     'js/spec/edxnotes/custom_matchers'
 ], function($, _, Annotator, NotesFactory, customMatchers) {
     'use strict';

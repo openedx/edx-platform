@@ -1,8 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from courseware.courses import get_course_info_section %>
-
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_course_info_section
+%>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
 
@@ -11,7 +12,6 @@
 <%static:css group='style-course'/>
 </%block>
 
-<%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 
 % if show_enroll_banner:
   <div class="wrapper-msg urgency-low" id="failed-verification-banner">
@@ -42,7 +42,7 @@ $(document).ready(function(){
   </script>
 </%block>
 
-<%block name="bodyclass">${course.css_class or ''}</%block>
+<%block name="bodyclass">view-incourse view-course-info ${course.css_class or ''}</%block>
 <section class="container">
   <div class="info-wrapper">
     % if user.is_authenticated():

@@ -1,0 +1,49 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+import json
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.lib.json_utils import EscapedEdxJSONEncoder
+%>
+
+<%block name="pagetitle">${_("Learner Profile")}</%block>
+<%block name="nav_skip">#u-field-select-account_privacy</%block>
+
+<%block name="bodyclass">view-profile</%block>
+
+<%block name="header_extras">
+    % for template_name in ["field_dropdown", "field_image", "field_textarea", "field_readonly", "message_banner"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="fields/${template_name}.underscore" />
+        </script>
+    % endfor
+
+    % for template_name in ["learner_profile"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_profile/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>
+
+<div class="message-banner" aria-live="polite"></div>
+<div class="wrapper-profile">
+    <div class="ui-loading-indicator">
+        <p><span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_("Loading")}</span></p>
+    </div>
+</div>
+<%block name="headextra">
+    <%static:css group='style-course'/>
+
+    <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
+
+    <script>
+          (function (require) {
+            require(['js/student_profile/views/learner_profile_factory'], function(setupLearnerProfile) {
+                var options = ${ json.dumps(data, cls=EscapedEdxJSONEncoder) };
+                setupLearnerProfile(options);
+            });
+          }).call(this, require || RequireJS.require);
+    </script>
+
+</%block>

@@ -1,14 +1,16 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template.defaultfilters import escapejs %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
-<%! from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from microsite_configuration import page_title_breadcrumbs
+from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+%>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">courseware ${course.css_class or ''}</%block>
+<%block name="bodyclass">view-incourse view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
@@ -20,11 +22,17 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="header_extras">
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
-    <%static:include path="js/${template_name}.underscore" />
+    <%static:include path="common/templates/${template_name}.underscore" />
 </script>
 % endfor
+% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="search/${template_name}.underscore" />
+    </script>
+% endfor
+% endif
 </%block>
-
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -57,6 +65,9 @@ ${page_title_breadcrumbs(course_name())}
 
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
+  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    <%static:js group='courseware_search'/>
+  % endif
 
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:
@@ -87,54 +98,6 @@ ${page_title_breadcrumbs(course_name())}
         });
       });
   </script>
-
-% if timer_expiration_duration:
-  <script type="text/javascript">
-    var timer = {
-      timer_inst : null,
-      end_time : null,
-      get_remaining_secs : function(endTime) {
-        var currentTime = new Date();
-        var remaining_secs = Math.floor((endTime - currentTime)/1000);
-        return remaining_secs;
-      },
-      get_time_string : function() {
-        function pretty_time_string(num) {
-          return ( num < 10 ? "0" : "" ) + num;
-        }
-        // count down in terms of hours, minutes, and seconds:
-        var hours = pretty_time_string(Math.floor(remaining_secs / 3600));
-        remaining_secs = remaining_secs % 3600;
-        var minutes = pretty_time_string(Math.floor(remaining_secs / 60));
-        remaining_secs = remaining_secs % 60;
-        var seconds = pretty_time_string(Math.floor(remaining_secs));
-
-        var remainingTimeString = hours + ":" + minutes + ":" + seconds;
-        return remainingTimeString;
-      },
-      update_time : function(self) {
-        remaining_secs = self.get_remaining_secs(self.end_time);
-        if (remaining_secs <= 0) {
-          self.end(self);
-        }
-        $('#exam_timer').text(self.get_time_string(remaining_secs));
-      },
-      start : function() { var that = this;
-        // set the end time when the template is rendered.
-        // This value should be UTC time as number of milliseconds since epoch.
-        this.end_time = new Date((new Date()).getTime() + ${timer_expiration_duration});
-        this.timer_inst = setInterval(function(){ that.update_time(that); }, 1000);
-      },
-      end : function(self) {
-        clearInterval(self.timer_inst);
-        // redirect to specified URL:
-        window.location = "${time_expired_redirect_url}";
-      }
-    }
-    // start timer right away:
-    timer.start();
-  </script>
-% endif
 
 % if show_chat:
   <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
@@ -174,18 +137,6 @@ ${fragment.foot_html()}
 
 </%block>
 
-% if timer_expiration_duration:
-<div class="timer-main">
-  <div id="timer_wrapper">
-    % if timer_navigation_return_url:
-    <a href="${timer_navigation_return_url}" class="timer_return_url">${_("Return to Exam")}</a>
-    % endif
-    <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
-  </div>
-</div>
-% endif
-
-<%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
 % else:
@@ -201,6 +152,23 @@ ${fragment.foot_html()}
         <a href="#">${_("close")}</a>
       </header>
 
+      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+        <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+          <form>
+            <label for="course-search-input" class="sr">${_('Course Search')}</label>
+            <div class="search-field-wrapper">
+              <input id="course-search-input" type="text" class="search-field"/>
+              <button type="submit" class="search-button">
+                ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                <i class="icon fa fa-remove" aria-hidden="true"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      % endif
+
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
@@ -210,18 +178,52 @@ ${fragment.foot_html()}
           % endif
         </nav>
       </div>
+
     </div>
 % endif
+    <section class="course-content" id="course-content" role="main" aria-label=“Content”>
+        % if getattr(course, 'entrance_exam_enabled') and \
+           getattr(course, 'entrance_exam_minimum_score_pct') and \
+           entrance_exam_current_score is not UNDEFINED:
+            % if not entrance_exam_passed:
+            <p class="sequential-status-message">
+                ${_('To access course materials, you must score {required_score}% or higher on this \
+                exam. Your current score is {current_score}%.').format(
+                    required_score=int(course.entrance_exam_minimum_score_pct * 100),
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % else:
+              <p class="sequential-status-message">
+                ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % endif
+      % endif
 
-    <section class="course-content" id="course-content">
       ${fragment.body_html()}
     </section>
+    % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+      <section id="courseware-search-results" class="search-results courseware-search-results" data-course-id="${course.id}">
+      </section>
+    % endif
   </div>
 </div>
+<div class="container-footer">
+  % if settings.FEATURES.get("LICENSING", False):
+    <div class="course-license">
+    % if getattr(course, "license", None):
+      <%include file="../license.html" args="license=course.license" />
+    % else:
+      ## Default course license: All Rights Reserved, if none is explicitly set.
+      <%include file="../license.html" args="license='all-rights-reserved'" />
+    % endif
+    </div>
+  % endif
+</div>
 
-<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}">
-  <h2 class="sr nav-utilities-title">${_('Course Utilities Navigation')}</h2>
-
+<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
   ## Utility: Chat
   % if show_chat:
     <%include file="/chat/toggle_chat.html" />

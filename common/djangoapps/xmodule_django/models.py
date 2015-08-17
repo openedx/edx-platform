@@ -6,9 +6,7 @@ import warnings
 
 from django.db import models
 from django.core.exceptions import ValidationError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
-from opaque_keys.edx.locator import Locator
 
 from south.modelsinspector import add_introspection_rules
 
@@ -99,7 +97,8 @@ class OpaqueKeyField(models.CharField):
         if value is self.Empty or value is None:
             return None
 
-        assert isinstance(value, (basestring, self.KEY_CLASS))
+        assert isinstance(value, (basestring, self.KEY_CLASS)), \
+            "%s is not an instance of basestring or %s" % (value, self.KEY_CLASS)
         if value == '':
             # handle empty string for models being created w/o fields populated
             return None
@@ -123,7 +122,7 @@ class OpaqueKeyField(models.CharField):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
 
-        assert isinstance(value, self.KEY_CLASS)
+        assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
         return unicode(_strip_value(value))
 
     def validate(self, value, model_instance):
@@ -178,3 +177,4 @@ class BlockTypeKeyField(OpaqueKeyField):
 add_introspection_rules([], [r"^xmodule_django\.models\.CourseKeyField"])
 add_introspection_rules([], [r"^xmodule_django\.models\.LocationKeyField"])
 add_introspection_rules([], [r"^xmodule_django\.models\.UsageKeyField"])
+add_introspection_rules([], [r"^xmodule_django\.models\.BlockTypeKeyField"])

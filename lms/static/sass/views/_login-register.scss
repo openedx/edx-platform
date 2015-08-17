@@ -3,41 +3,28 @@
 @import '../base/grid-settings';
 @import "neat/neat"; // lib - Neat
 
-%heading-4 {
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0 !important;
-    color: $m-gray-d2;
-}
-
-%body-text {
-    font-size: 15px;
-    margin: 0 0 $baseline 0;
-    color: $base-font-color;
-    line-height: lh(1);
-}
-
 $sm-btn-google: #dd4b39;
 $sm-btn-facebook: #3b5998;
 $sm-btn-linkedin: #0077b5;
-
-.section-bkg-wrapper {
-    background: $m-gray-l4;
-}
 
 .login-register {
     @include box-sizing(border-box);
     @include outer-container;
     $grid-columns: 12;
-    background: white;
+    background: $white;
     min-height: 100%;
     width: 100%;
+    $third-party-button-height: ($baseline*1.75);
 
     h2 {
-        line-height: 16px;
+        @extend %t-title5;
         margin: 0;
+        letter-spacing: normal;
         font-family: $sans-serif;
+    }
+
+    .instructions {
+        @extend %t-copy-base;
     }
 
     /* Temp. fix until applied globally */
@@ -85,82 +72,78 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
-    form {
+    form,
+    .wrapper-other-login {
         border: 1px solid $gray-l4;
-        border-radius: 5px;
-        padding: 0 25px;
+        border-radius: ($baseline/4);
+        padding: 0 ($baseline*1.25) $baseline ($baseline*1.25);
     }
 
     .section-title {
         position: relative;
-        height: 16px;
         margin: 20px 0 10px;
 
         &.lines {
             margin-bottom: 20px;
 
             &:after {
-                content: '';
-                width: 100%;
-                height: 1px;
-                background: $gray-l4;
                 position: absolute;
                 left: 0;
                 top: 12px;
+                width: 100%;
+                height: 1px;
+                background: $gray-l4;
+                content: '';
                 z-index: 5;
+            }
+
+            .text {
+                position: relative;
+                top: -2px; // Aligns center of text with center of line (CR)
+                z-index: 6;
+                padding: 0 $baseline;
+                background: $white;
             }
         }
 
         h2 {
             text-align: center;
-
-            .text {
-                position: relative;
-                background: white;
-                padding: 0 10px;
-                z-index: 6;
-                text-transform: none;
-                font-size: 0.7em;
-                font-weight: 600;
-            }
+            text-transform: none;
         }
+    }
+
+    %nav-btn-base {
+        @extend %btn-secondary-blue-outline;
+        width: 100%;
+        height: ($baseline*2);
+        text-transform: none;
+        text-shadow: none;
+        letter-spacing: normal;
     }
 
     .nav-btn {
-        margin: 0 28px;
-        padding: 7px 0;
-        width: calc( 100% - 56px );
-        border: 3px solid $m-blue-d5;
-        border-radius: 5px;
-        color: $m-blue-d5;
-        box-shadow: none;
-        text-shadow: none;
-        text-transform: none;
-        background: white;
-
-        &:hover {
-            background: white;
-            border-color: $m-blue-d6;
-            color: $m-blue-d6;
-        }
-
-        &:active {
-            box-shadow: none;
-        }
+        @extend %nav-btn-base;
+        @extend %t-strong;
     }
 
-    .form-type {
+    .form-type,
+    .toggle-form {
         @include box-sizing(border-box);
-        width: 330px;
+        max-width: 650px;
+        min-width: 400px;
         margin: 0 auto;
+        padding-left: $baseline; // Don't want to override any top or bottom (CR)
+        padding-right: $baseline // Don't want to override any top or bottom (CR)
+    }
+
+    .toggle-form {
+        text-align: center // Centers the text and buttons
     }
 
     .note {
         @extend %t-copy-sub2;
         display: block;
-        font-weight: normal;
-        color: $gray;
-        margin: 10px;
+        margin: ($baseline/2) ($baseline/2) 0 ($baseline/2);
         color: $m-gray-l1;
         text-align: center;
     }
@@ -168,42 +151,54 @@ $sm-btn-linkedin: #0077b5;
 
     /** The forms **/
     .form-wrapper {
-        padding-top: 25px;
+        padding-top: ($baseline + 5);
 
         form {
             @include clearfix();
             clear: both;
         }
+
+        .login-providers {
+            text-align: center;
+        }
     }
 
     .login-form {
         margin-bottom: $baseline;
+
+        &:focus {
+            outline: none;
+        }
     }
 
     .password-reset-form {
-        padding-bottom: 25px;
+        padding-bottom: ($baseline + 5);
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .register-form {
+        &:focus {
+            outline: none;
+        }
     }
 
     %bold-label {
         @include font-size(16);
         font-family: $sans-serif;
         font-weight: $font-semibold;
-        font-style: normal;
-        text-transform: none;
     }
 
     .form-label {
         @extend %bold-label;
-        padding: 0 0 0 5px;
-        letter-spacing: 1px;
+        padding: 0 0 0 ($baseline/4);
     }
 
     .action-label {
         @include font-size(13);
         font-family: $sans-serif;
-        font-weight: regular;
-        font-style: normal;
-        text-transform: none;
     }
 
     .form-field {
@@ -211,38 +206,38 @@ $sm-btn-linkedin: #0077b5;
         clear: both;
         position: relative;
         width: 100%;
-        margin: 0 0 5px 0;
+        margin: ($baseline/2) 0 ($baseline/4) 0;
 
-        &.select-gender {
-            margin-right: 20px;
+        &.select-year_of_birth {
+            @include margin-left(15px);
         }
 
         &.select-gender,
         &.select-year_of_birth {
+            display: inline-block;
             width: calc( 50% - 10px );
-            float: left;
-            clear: none;
         }
 
         /** FROM _accounts.scss - start **/
         label,
         input,
         textarea {
-            border-radius: 0;
             height: auto;
+            line-height: 1.5em;
+            border-radius: 0;
             font-family: $sans-serif;
             font-style: normal;
             font-weight: 500;
-            font-size: 0.8em;
-            line-height: 1.5em;
-            color: $base-font-color;
+        }
+
+        #login-remember {
+            line-height: 0;
+            height: auto;
         }
 
         label {
-            @include transition(color 0.15s ease-in-out 0s);
+            display: block;
             margin: 0 0 6px 0;
-            color: tint($black, 20%);
-            font-weight: $font-semibold;
 
             &.inline {
                 display: inline;
@@ -253,10 +248,14 @@ $sm-btn-linkedin: #0077b5;
             }
 
             &[for="register-honor_code"] {
-                display: block;
-                margin: -30px 5% 15px;
+                display: inline-block;
+                margin: 5px 5px 0 0;
                 width: 90%;
-                text-align: center;
+                vertical-align: top;
+            }
+
+            &[for="login-remember"] {
+                display: inline-block;
             }
 
             a {
@@ -265,18 +264,18 @@ $sm-btn-linkedin: #0077b5;
         }
 
         .field-link {
-            position: absolute;
-            top: 0;
-            right: 0;
+            @extend %t-copy-sub2;
+            display: block;
+            margin-bottom: ($baseline/2);
+            margin-top: ($baseline/4);
             color: $m-blue-d5;
             font-weight: $font-regular;
             text-decoration: none !important; // needed but nasty
             font-family: $sans-serif;
-            font-size: 0.8em;
-            padding-top: 7px;
         }
 
         input,
+        select,
         textarea {
             display: block;
             width: 100%;
@@ -321,6 +320,13 @@ $sm-btn-linkedin: #0077b5;
                 border-color: tint($red,50%);
             }
         }
+
+        .tip {
+            @extend %t-copy-sub2;
+            display: block;
+            margin: 0 0 ($baseline/2) 0;
+            color: $m-gray-l1;
+        }
         /** FROM _accounts.scss - end **/
     }
 
@@ -341,68 +347,60 @@ $sm-btn-linkedin: #0077b5;
     }
 
     .action-primary {
+        @extend %btn-primary-blue;
         width: 100%;
-        height: 38px;
+        margin-top: 1em;
+        padding: ($baseline/2);
         text-transform: none;
-        color: white;
-        background: $m-blue-d5;
-        border: 3px solid $m-blue-d6;
-        border-radius: 5px;
-        box-shadow: none;
         font-weight: 600;
-        text-shadow: none;
-
-        &:hover,
-        &:focus {
-            background: $m-blue-l6;
-        }
-
-        &:active {
-            box-shadow: none;
-        }
+        letter-spacing: normal;
     }
 
     .login-provider {
         @extend %btn-secondary-grey-outline;
-        width: 130px;
-        padding: 0 0 0 ($baseline*2);
-        height: 34px;
-        text-align: left;
+        @extend %t-action4;
+
+        @include padding(0, 0, 0, $baseline*2);
+        @include text-align(left);
+
+        position: relative;
+        margin-right: ($baseline/4);
+        margin-bottom: $baseline;
+        border-color: $lightGrey1;
+        width: $baseline*6.5;
+        height: $third-party-button-height;
         text-shadow: none;
         text-transform: none;
-        position: relative;
-        font-size: 0.8em;
-        border-color: $lightGrey1;
-
-        &:nth-of-type(odd) {
-            margin-right: 13px;
-        }
 
         .icon {
-            color: white;
+            @include left(0);
+
             position: absolute;
             top: -1px;
-            left: 0;
             width: 30px;
-            height: 34px;
-            line-height: 34px;
+            bottom: -1px;
+            background: $m-blue-d3;
+            line-height: $third-party-button-height;
             text-align: center;
+            color: $white;
+        }
+
+        span {
+            color: inherit;
         }
 
         &:hover,
         &:focus {
+            background-image: none;
+
             .icon {
-                height: 32px;
-                line-height: 32px;
                 top: 0;
+                bottom: 0;
+                line-height: ($third-party-button-height - 2px);
             }
         }
 
-        &:last-child {
-            margin-bottom: $baseline;
-        }
-
-        &.button-Google {
+        &.button-oa2-google-oauth2 {
             color: $sm-btn-google;
 
             .icon {
@@ -421,7 +419,7 @@ $sm-btn-linkedin: #0077b5;
             }
         }
 
-        &.button-Facebook {
+        &.button-oa2-facebook {
             color: $sm-btn-facebook;
 
             .icon {
@@ -440,7 +438,7 @@ $sm-btn-linkedin: #0077b5;
             }
         }
 
-        &.button-LinkedIn {
+        &.button-oa2-linkedin-oauth2 {
             color: $sm-btn-linkedin;
 
             .icon {
@@ -461,6 +459,19 @@ $sm-btn-linkedin: #0077b5;
 
     }
 
+    .button-secondary-login {
+        @extend %nav-btn-base;
+        @extend %t-action4;
+        @extend %t-regular;
+        border-color: $lightGrey1;
+        padding: 0;
+        height: $third-party-button-height;
+
+        &:hover {
+            border-color: $m-blue-d3;
+        }
+    }
+
     /** Error Container - from _account.scss **/
     .status {
         @include box-sizing(border-box);
@@ -470,16 +481,15 @@ $sm-btn-linkedin: #0077b5;
         background: tint($yellow,20%);
 
         .message-title {
-            @extend %heading-4;
+            @extend %t-title5;
             font-family: $sans-serif;
             margin: 0 0 ($baseline/4) 0;
-            font-size: em(14);
             font-weight: 600;
         }
 
         .message-copy,
         .message-copy p {
-            @extend %body-text;
+            @extend %t-copy-base;
             font-family: $sans-serif;
             margin: 0 !important;
             padding: 0;
@@ -518,6 +528,13 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
+    .institution-list {
+
+        .institution {
+            @extend %t-copy-base;
+        }
+    }
+
     @include media( max-width 330px) {
         .form-type {
             width: 98%;
@@ -528,5 +545,28 @@ $sm-btn-linkedin: #0077b5;
             width: 100%;
             margin: 10px 0;
         }
+    }
+}
+
+.finish-auth {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    width: 100%;
+
+    .finish-auth-inner {
+        @include box-sizing(border-box);
+        max-width: 650px;
+        margin: 1em auto;
+    }
+
+    #finish-auth-status {
+        padding-top: 30px; // Make room for the absolutely positioned loading animation
+    }
+
+    #finish-auth-status li:last-child {
+        font-weight: bold;
     }
 }

@@ -27,14 +27,13 @@ class TestTransferStudents(ModuleStoreTestCase):
 
     def setUp(self, **kwargs):
         """Connect a stub receiver, and analytics event tracking."""
+        super(TestTransferStudents, self).setUp()
+
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
-
-    def tearDown(self):
-        """Disconnects the UNENROLL stub receiver."""
-        UNENROLL_DONE.disconnect(self.assert_unenroll_signal)
+        self.addCleanup(UNENROLL_DONE.disconnect, self.assert_unenroll_signal)
 
     def assert_unenroll_signal(self, skip_refund=False, **kwargs):   # pylint: disable=unused-argument
         """ Signal Receiver stub for testing that the unenroll signal was fired. """

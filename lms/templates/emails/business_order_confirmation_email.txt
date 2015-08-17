@@ -46,11 +46,11 @@ ${_('Company Contact Name:')} ${order.company_contact_name}<br>
 ${_('Company Contact Email:')} ${order.company_contact_email}<br>
 %endif
 % if order.recipient_name:
-# Translators: this will be the name of a person receiving an email
+## Translators: this will be the name of a person receiving an email
 ${_('Recipient Name:')} ${order.recipient_name}<br>
  %endif
 % if order.recipient_email:
-# Translators: this will be the email address of a person receiving an email
+## Translators: this will be the email address of a person receiving an email
 ${_('Recipient Email:')} ${order.recipient_email}<br>
  %endif
 
@@ -68,11 +68,11 @@ ${order.bill_to_country.upper()}
 <p><b>${_("A CSV file of your registration URLs is attached. Please distribute registration URLs to each student planning to enroll using the email template below.")}</b></p>
 
 % if payment_email_signature:
-# Translators: This is followed by the instructor or course team name (so could be singular or plural)
+## Translators: This is followed by the instructor or course team name (so could be singular or plural)
 <p>${_("Warm regards,")}<br>
 ${payment_email_signature}
 % else:
-# Translators: The <br> is a line break (empty line), please keep this html in the string after the sign off.
+## Translators: The <br> is a line break (empty line), please keep this html in the string after the sign off.
 <p>${_("Warm regards,<br>"
 "The {platform_name} Team").format(platform_name=platform_name)}
 %endif
@@ -82,12 +82,12 @@ ${payment_email_signature}
 ———————————————————————————————————————————
 
 
-# Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
 <p>${_("Dear [[Name]]")}</p>
 
-<p>${_("To enroll in ${course_names} we have provided a registration URL for you.  Please follow the instructions below to claim your access.")}</p>
+<p>${_("To enroll in {course_names} we have provided a registration URL for you.  Please follow the instructions below to claim your access.").format(course_names=course_names)}</p>
 
-# Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
 <p>${_("Your redeem url is: [[Enter Redeem URL here from the attached CSV]]")}</p>
 
 <p>${_("(1) Register for an account at {site_name}").format(site_name=u"<a href='https://{sn}'>https://{sn}</a>".format(sn=site_name))}<br>
@@ -98,6 +98,6 @@ ${_("(4) You should be able to click on 'view course' button or see your course 
 )}<br>
 ${_("(5) Course materials will not be available until the course start date.")}</p>
 
-# Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use. Please also keep the <p> and </p> HTML tags in place.
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use. Please also keep the <p> and </p> HTML tags in place.
 ${_("<p>Sincerely,</p>"
 "<p>[[Your Signature]]</p>")}

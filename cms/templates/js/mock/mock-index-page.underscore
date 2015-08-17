@@ -209,8 +209,8 @@
       </div>
 
       <ul id="course-index-tabs">
-        <li class="courses-tab active"><a>${_("Courses")}</a></li>
-        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+        <li class="courses-tab active"><a>Courses</a></li>
+        <li class="libraries-tab"><a>Libraries</a></li>
       </ul>
 
       <div class="courses courses-tab active">

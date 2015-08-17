@@ -1,51 +1,42 @@
 """HTTP end-points for the User API. """
 import copy
-import third_party_auth
-
+from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
 from opaque_keys.edx import locator
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
-from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
 from django_countries import countries
-from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from edxmako.shortcuts import marketing_link
 
-from util.authentication import SessionAuthenticationAllowInactiveUser
-from .api import account as account_api, profile as profile_api
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+import third_party_auth
+from django_comment_common.models import Role
+from edxmako.shortcuts import marketing_link
+from student.views import create_account_with_params
+from student.cookies import set_logged_in_cookies
+from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from util.json_request import JsonResponse
+from .preferences.api import update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
+from .accounts import (
+    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
+    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+)
+from .accounts.api import check_account_exists
 from .serializers import UserSerializer, UserPreferenceSerializer
-
-
-class ApiKeyHeaderPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        """
-        Check for permissions by matching the configured API key and header
-
-        If settings.DEBUG is True and settings.EDX_API_KEY is not set or None,
-        then allow the request. Otherwise, allow the request if and only if
-        settings.EDX_API_KEY is set and the X-Edx-Api-Key HTTP header is
-        present in the request and matches the setting.
-        """
-        api_key = getattr(settings, "EDX_API_KEY", None)
-        return (
-            (settings.DEBUG and api_key is None) or
-            (api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key)
-        )
 
 
 class LoginSessionView(APIView):
@@ -93,8 +84,8 @@ class LoginSessionView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": account_api.EMAIL_MIN_LENGTH,
-                "max_length": account_api.EMAIL_MAX_LENGTH,
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
             }
         )
 
@@ -107,9 +98,17 @@ class LoginSessionView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": account_api.PASSWORD_MIN_LENGTH,
-                "max_length": account_api.PASSWORD_MAX_LENGTH,
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
             }
+        )
+
+        form_desc.add_field(
+            "remember",
+            field_type="checkbox",
+            label=_("Remember me"),
+            default=False,
+            required=False,
         )
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
@@ -241,17 +240,14 @@ class RegistrationView(APIView):
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
-    @method_decorator(require_post_params(DEFAULT_FIELDS))
-    @method_decorator(csrf_protect)
+    @method_decorator(csrf_exempt)
     def post(self, request):
         """Create the user's account.
 
         You must send all required form fields with the request.
 
-        You can optionally send an `analytics` param with a JSON-encoded
-        object with additional info to include in the registration analytics event.
-        Currently, the only supported field is "enroll_course_id" to indicate
-        that the user registered while enrolling in a particular course.
+        You can optionally send a "course_id" param to indicate in analytics
+        events that the user registered while enrolling in a particular course.
 
         Arguments:
             request (HTTPRequest)
@@ -259,45 +255,60 @@ class RegistrationView(APIView):
         Returns:
             HttpResponse: 200 on success
             HttpResponse: 400 if the request is not valid.
-            HttpResponse: 302 if redirecting to another page.
-
+            HttpResponse: 409 if an account with the given username or email
+                address already exists
         """
-        email = request.POST.get('email')
-        username = request.POST.get('username')
+        data = request.POST.copy()
+
+        email = data.get('email')
+        username = data.get('username')
 
         # Handle duplicate email/username
-        conflicts = account_api.check_account_exists(email=email, username=username)
+        conflicts = check_account_exists(email=email, username=username)
         if conflicts:
-            if all(conflict in conflicts for conflict in ['email', 'username']):
-                # Translators: This message is shown to users who attempt to create a new
-                # account using both an email address and a username associated with an
-                # existing account.
-                error_msg = _(
-                    u"It looks like {email_address} and {username} belong to an existing account. Try again with a different email address and username."
-                ).format(email_address=email, username=username)
-            elif 'email' in conflicts:
+            conflict_messages = {
                 # Translators: This message is shown to users who attempt to create a new
                 # account using an email address associated with an existing account.
-                error_msg = _(
+                "email": _(
                     u"It looks like {email_address} belongs to an existing account. Try again with a different email address."
-                ).format(email_address=email)
-            else:
+                ).format(email_address=email),
                 # Translators: This message is shown to users who attempt to create a new
                 # account using a username associated with an existing account.
-                error_msg = _(
+                "username": _(
                     u"It looks like {username} belongs to an existing account. Try again with a different username."
-                ).format(username=username)
+                ).format(username=username),
+            }
+            errors = {
+                field: [{"user_message": conflict_messages[field]}]
+                for field in conflicts
+            }
+            return JsonResponse(errors, status=409)
 
-            return HttpResponse(
-                status=409,
-                content=error_msg,
-                content_type="text/plain"
-            )
+        # Backwards compatibility: the student view expects both
+        # terms of service and honor code values.  Since we're combining
+        # these into a single checkbox, the only value we may get
+        # from the new view is "honor_code".
+        # Longer term, we will need to make this more flexible to support
+        # open source installations that may have separate checkboxes
+        # for TOS, privacy policy, etc.
+        if data.get("honor_code") and "terms_of_service" not in data:
+            data["terms_of_service"] = data["honor_code"]
 
-        # For the initial implementation, shim the existing login view
-        # from the student Django app.
-        from student.views import create_account
-        return shim_student_view(create_account)(request)
+        try:
+            user = create_account_with_params(request, data)
+        except ValidationError as err:
+            # Should only get non-field errors from this function
+            assert NON_FIELD_ERRORS not in err.message_dict
+            # Only return first error for each field
+            errors = {
+                field: [{"user_message": error} for error in error_list]
+                for field, error_list in err.message_dict.items()
+            }
+            return JsonResponse(errors, status=400)
+
+        response = JsonResponse({"success": True})
+        set_logged_in_cookies(request, response, user)
+        return response
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
@@ -306,7 +317,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -323,8 +334,8 @@ class RegistrationView(APIView):
             label=email_label,
             placeholder=email_placeholder,
             restrictions={
-                "min_length": account_api.EMAIL_MIN_LENGTH,
-                "max_length": account_api.EMAIL_MAX_LENGTH,
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
             },
             required=required
         )
@@ -336,23 +347,28 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
         name_label = _(u"Full name")
 
+        # Translators: This example name is used as a placeholder in
+        # a field on the registration form meant to hold the user's name.
+        name_placeholder = _(u"Jane Doe")
+
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"The name that will appear on your certificates")
+        name_instructions = _(u"Needed for any certificates you may earn")
 
         form_desc.add_field(
             "name",
             label=name_label,
+            placeholder=name_placeholder,
             instructions=name_instructions,
             restrictions={
-                "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                "max_length": NAME_MAX_LENGTH,
             },
             required=required
         )
@@ -364,7 +380,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -374,16 +390,22 @@ class RegistrationView(APIView):
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's public username.
         username_instructions = _(
-            u"The name that will identify you in your courses"
-        )
+            u"The name that will identify you in your courses - "
+            "{bold_start}(cannot be changed later){bold_end}"
+        ).format(bold_start=u'<strong>', bold_end=u'</strong>')
+
+        # Translators: This example username is used as a placeholder in
+        # a field on the registration form meant to hold the user's username.
+        username_placeholder = _(u"JaneDoe")
 
         form_desc.add_field(
             "username",
             label=username_label,
             instructions=username_instructions,
+            placeholder=username_placeholder,
             restrictions={
-                "min_length": account_api.USERNAME_MIN_LENGTH,
-                "max_length": account_api.USERNAME_MAX_LENGTH,
+                "min_length": USERNAME_MIN_LENGTH,
+                "max_length": USERNAME_MAX_LENGTH,
             },
             required=required
         )
@@ -395,7 +417,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -407,8 +429,8 @@ class RegistrationView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": account_api.PASSWORD_MIN_LENGTH,
-                "max_length": account_api.PASSWORD_MAX_LENGTH,
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
             },
             required=required
         )
@@ -420,7 +442,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -443,7 +465,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -466,7 +488,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
@@ -490,7 +512,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -511,7 +533,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This phrase appears above a field on the registration form
@@ -534,7 +556,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a field on the registration form
@@ -554,28 +576,19 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the country in which the user lives.
         country_label = _(u"Country")
-
-        sorted_countries = sorted(
-            countries.countries, key=lambda(__, name): unicode(name)
-        )
-        options = [
-            (country_code, unicode(country_name))
-            for country_code, country_name in sorted_countries
-        ]
-
         error_msg = _(u"Please select your Country.")
 
         form_desc.add_field(
             "country",
             label=country_label,
             field_type="select",
-            options=options,
+            options=list(countries),
             include_default_option=True,
             required=required,
             error_messages={
@@ -590,7 +603,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Separate terms of service and honor code checkboxes
@@ -644,7 +657,7 @@ class RegistrationView(APIView):
             form_desc: A form description
 
         Keyword Arguments:
-            required (Boolean): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to True
 
         """
         # Translators: This is a legal document users must agree to
@@ -707,7 +720,7 @@ class RegistrationView(APIView):
         if third_party_auth.is_enabled():
             running_pipeline = third_party_auth.pipeline.get(request)
             if running_pipeline:
-                current_provider = third_party_auth.provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+                current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
 
                 # Override username / email / full name
                 field_overrides = current_provider.get_register_form_data(
@@ -777,8 +790,8 @@ class PasswordResetView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": account_api.EMAIL_MIN_LENGTH,
-                "max_length": account_api.EMAIL_MAX_LENGTH,
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
             }
         )
 
@@ -862,8 +875,15 @@ class UpdateEmailOptInPreference(APIView):
 
         """
         course_id = request.DATA['course_id']
-        org = locator.CourseLocator.from_string(course_id).org
+        try:
+            org = locator.CourseLocator.from_string(course_id).org
+        except InvalidKeyError:
+            return HttpResponse(
+                status=400,
+                content="No course '{course_id}' found".format(course_id=course_id),
+                content_type="text/plain"
+            )
         # Only check for true. All other values are False.
         email_opt_in = request.DATA['email_opt_in'].lower() == 'true'
-        profile_api.update_email_opt_in(request.user, org, email_opt_in)
+        update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)

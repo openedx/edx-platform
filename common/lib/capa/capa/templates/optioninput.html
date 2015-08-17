@@ -5,7 +5,7 @@
       <option value="option_${id}_dummy_default">  </option>
       % for option_id, option_description in options:
           <option value="${option_id}"
-          % if (option_id==value):
+          % if (option_id==value or option_id==answervariable):
         	selected="true"
           % endif
           > ${option_description}</option>
@@ -13,12 +13,13 @@
     </select>
 
   <span id="answer_${id}"></span>  
-  <span class="status ${status.classname}"
-      id="status_${id}"
-      aria-describedby="input_${id}">
-    <span class="sr">${value|h} - ${status.display_name}</span>
-  </span>
-
+  <div class="indicator-container">
+    <span class="status ${status.classname}"
+        id="status_${id}"
+        aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
+      <span class="sr">${value|h} - ${status.display_name}</span>
+    </span>
+  </div>
   % if msg:
       <span class="message">${msg|n}</span>
   % endif

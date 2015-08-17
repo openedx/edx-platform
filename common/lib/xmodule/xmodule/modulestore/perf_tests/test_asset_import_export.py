@@ -14,13 +14,12 @@ import ddt
 from nose.plugins.skip import SkipTest
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
     MODULESTORE_SETUPS,
     SHORT_NAME_MAP,
     TEST_DATA_DIR,
-    MongoContentstoreBuilder,
 )
 from xmodule.modulestore.perf_tests.generate_asset_xml import make_asset_xml, validate_xml, ASSET_XSD_FILE
 
@@ -105,49 +104,43 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                 make_asset_xml(num_assets, ASSET_XML_PATH)
                 validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
 
-            # Construct the contentstore for storing the first import
-            with MongoContentstoreBuilder().build() as source_content:
-                # Construct the modulestore for storing the first import (using the previously created contentstore)
-                with source_ms.build(source_content) as source_store:
-                    # Construct the contentstore for storing the second import
-                    with MongoContentstoreBuilder().build() as dest_content:
-                        # Construct the modulestore for storing the second import (using the second contentstore)
-                        with dest_ms.build(dest_content) as dest_store:
-                            source_course_key = source_store.make_course_key('a', 'course', 'course')
-                            dest_course_key = dest_store.make_course_key('a', 'course', 'course')
+            with source_ms.build() as (source_content, source_store):
+                with dest_ms.build() as (dest_content, dest_store):
+                    source_course_key = source_store.make_course_key('a', 'course', 'course')
+                    dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
-                            with CodeBlockTimer("initial_import"):
-                                import_from_xml(
-                                    source_store,
-                                    'test_user',
-                                    TEST_DATA_ROOT,
-                                    course_dirs=TEST_COURSE,
-                                    static_content_store=source_content,
-                                    target_course_id=source_course_key,
-                                    create_course_if_not_present=True,
-                                    raise_on_failure=True,
-                                )
+                    with CodeBlockTimer("initial_import"):
+                        import_course_from_xml(
+                            source_store,
+                            'test_user',
+                            TEST_DATA_ROOT,
+                            source_dirs=TEST_COURSE,
+                            static_content_store=source_content,
+                            target_id=source_course_key,
+                            create_if_not_present=True,
+                            raise_on_failure=True,
+                        )
 
-                            with CodeBlockTimer("export"):
-                                export_to_xml(
-                                    source_store,
-                                    source_content,
-                                    source_course_key,
-                                    self.export_dir,
-                                    'exported_source_course',
-                                )
+                    with CodeBlockTimer("export"):
+                        export_course_to_xml(
+                            source_store,
+                            source_content,
+                            source_course_key,
+                            self.export_dir,
+                            'exported_source_course',
+                        )
 
-                            with CodeBlockTimer("second_import"):
-                                import_from_xml(
-                                    dest_store,
-                                    'test_user',
-                                    self.export_dir,
-                                    course_dirs=['exported_source_course'],
-                                    static_content_store=dest_content,
-                                    target_course_id=dest_course_key,
-                                    create_course_if_not_present=True,
-                                    raise_on_failure=True,
-                                )
+                    with CodeBlockTimer("second_import"):
+                        import_course_from_xml(
+                            dest_store,
+                            'test_user',
+                            self.export_dir,
+                            source_dirs=['exported_source_course'],
+                            static_content_store=dest_content,
+                            target_id=dest_course_key,
+                            create_if_not_present=True,
+                            raise_on_failure=True,
+                        )
 
 
 @ddt.ddt
@@ -193,47 +186,44 @@ class FindAssetTest(unittest.TestCase):
                 make_asset_xml(num_assets, ASSET_XML_PATH)
                 validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
 
-            # Construct the contentstore for storing the first import
-            with MongoContentstoreBuilder().build() as source_content:
-                # Construct the modulestore for storing the first import (using the previously created contentstore)
-                with source_ms.build(source_content) as source_store:
-                    source_course_key = source_store.make_course_key('a', 'course', 'course')
-                    asset_key = source_course_key.make_asset_key(
-                        AssetMetadata.GENERAL_ASSET_TYPE, 'silly_cat_picture.gif'
+            with source_ms.build() as (source_content, source_store):
+                source_course_key = source_store.make_course_key('a', 'course', 'course')
+                asset_key = source_course_key.make_asset_key(
+                    AssetMetadata.GENERAL_ASSET_TYPE, 'silly_cat_picture.gif'
+                )
+
+                with CodeBlockTimer("initial_import"):
+                    import_course_from_xml(
+                        source_store,
+                        'test_user',
+                        TEST_DATA_ROOT,
+                        source_dirs=TEST_COURSE,
+                        static_content_store=source_content,
+                        target_id=source_course_key,
+                        create_if_not_present=True,
+                        raise_on_failure=True,
                     )
 
-                    with CodeBlockTimer("initial_import"):
-                        import_from_xml(
-                            source_store,
-                            'test_user',
-                            TEST_DATA_ROOT,
-                            course_dirs=TEST_COURSE,
-                            static_content_store=source_content,
-                            target_course_id=source_course_key,
-                            create_course_if_not_present=True,
-                            raise_on_failure=True,
+                with CodeBlockTimer("find_nonexistent_asset"):
+                    # More correct would be using the AssetManager.find() - but since the test
+                    # has created its own test modulestore, the AssetManager can't be used.
+                    __ = source_store.find_asset_metadata(asset_key)
+
+                # Perform get_all_asset_metadata for each sort.
+                for sort in ALL_SORTS:
+                    with CodeBlockTimer("get_asset_list:{}-{}".format(
+                        sort[0],
+                        'asc' if sort[1] == ModuleStoreEnum.SortOrder.ascending else 'desc'
+                    )):
+                        # Grab two ranges of 50 assets using different sorts.
+                        # Why 50? That's how many are displayed on the current Studio "Files & Uploads" page.
+                        start_middle = num_assets / 2
+                        __ = source_store.get_all_asset_metadata(
+                            source_course_key, 'asset', start=0, sort=sort, maxresults=50
                         )
-
-                    with CodeBlockTimer("find_nonexistent_asset"):
-                        # More correct would be using the AssetManager.find() - but since the test
-                        # has created its own test modulestore, the AssetManager can't be used.
-                        __ = source_store.find_asset_metadata(asset_key)
-
-                    # Perform get_all_asset_metadata for each sort.
-                    for sort in ALL_SORTS:
-                        with CodeBlockTimer("get_asset_list:{}-{}".format(
-                            sort[0],
-                            'asc' if sort[1] == ModuleStoreEnum.SortOrder.ascending else 'desc'
-                        )):
-                            # Grab two ranges of 50 assets using different sorts.
-                            # Why 50? That's how many are displayed on the current Studio "Files & Uploads" page.
-                            start_middle = num_assets / 2
-                            __ = source_store.get_all_asset_metadata(
-                                source_course_key, 'asset', start=0, sort=sort, maxresults=50
-                            )
-                            __ = source_store.get_all_asset_metadata(
-                                source_course_key, 'asset', start=start_middle, sort=sort, maxresults=50
-                            )
+                        __ = source_store.get_all_asset_metadata(
+                            source_course_key, 'asset', start=start_middle, sort=sort, maxresults=50
+                        )
 
 
 @ddt.ddt
@@ -265,48 +255,45 @@ class TestModulestoreAssetSize(unittest.TestCase):
         make_asset_xml(num_assets, ASSET_XML_PATH)
         validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
 
-        # Construct the contentstore for storing the first import
-        with MongoContentstoreBuilder().build() as source_content:
-            # Construct the modulestore for storing the first import (using the previously created contentstore)
-            with source_ms.build(source_content) as source_store:
-                source_course_key = source_store.make_course_key('a', 'course', 'course')
+        with source_ms.build() as (source_content, source_store):
+            source_course_key = source_store.make_course_key('a', 'course', 'course')
 
-                import_from_xml(
-                    source_store,
-                    'test_user',
-                    TEST_DATA_ROOT,
-                    course_dirs=TEST_COURSE,
-                    static_content_store=source_content,
-                    target_course_id=source_course_key,
-                    create_course_if_not_present=True,
-                    raise_on_failure=True,
-                )
+            import_course_from_xml(
+                source_store,
+                'test_user',
+                TEST_DATA_ROOT,
+                source_dirs=TEST_COURSE,
+                static_content_store=source_content,
+                target_id=source_course_key,
+                create_if_not_present=True,
+                raise_on_failure=True,
+            )
 
-                asset_collection = source_ms.asset_collection()
-                # Ensure the asset collection exists.
-                if asset_collection.name in asset_collection.database.collection_names():
+            asset_collection = source_ms.asset_collection()
+            # Ensure the asset collection exists.
+            if asset_collection.name in asset_collection.database.collection_names():
 
-                    # Map gets the size of each structure.
-                    mapper = Code("""
-                        function() { emit("size", (this == null) ? 0 : Object.bsonsize(this)) }
-                        """)
-
-                    # Reduce finds the largest structure size and returns only it.
-                    reducer = Code("""
-                        function(key, values) {
-                            var max_size = 0;
-                            for (var i=0; i < values.length; i++) {
-                                if (values[i] > max_size) {
-                                    max_size = values[i];
-                                }
-                            }
-                            return max_size;
-                        }
+                # Map gets the size of each structure.
+                mapper = Code("""
+                    function() { emit("size", (this == null) ? 0 : Object.bsonsize(this)) }
                     """)
 
-                    results = asset_collection.map_reduce(mapper, reducer, "size_results")
-                    result_str = "{} - Store: {:<15} - Num Assets: {:>6} - Result: {}\n".format(
-                        self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]
-                    )
-                    with open("bson_sizes.txt", "a") as f:
-                        f.write(result_str)
+                # Reduce finds the largest structure size and returns only it.
+                reducer = Code("""
+                    function(key, values) {
+                        var max_size = 0;
+                        for (var i=0; i < values.length; i++) {
+                            if (values[i] > max_size) {
+                                max_size = values[i];
+                            }
+                        }
+                        return max_size;
+                    }
+                """)
+
+                results = asset_collection.map_reduce(mapper, reducer, "size_results")
+                result_str = "{} - Store: {:<15} - Num Assets: {:>6} - Result: {}\n".format(
+                    self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]
+                )
+                with open("bson_sizes.txt", "a") as f:
+                    f.write(result_str)

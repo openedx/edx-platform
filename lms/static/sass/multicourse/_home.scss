@@ -1,3 +1,10 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+$title-left-margin: grid-width(2) + $gw-gutter;
+$button-size: ($baseline*2.75);
+$course-search-input-height: ($button-size);
+
 .home {
   padding: 0;
 
@@ -20,56 +27,120 @@
     width: flex-grid(12);
 
     .outer-wrapper {
-      @extend .animation-home-header-pop-up;
-      margin: 0 auto;
-      padding: 240px ($baseline/2) 0;
-      position: relative;
-      max-width: 1200px;
-      min-width: 760px;
       @include clearfix();
+      @extend .animation-home-header-pop-up;
+      position: relative;
+      margin: 0 auto ($baseline);
+      padding: ($baseline*5) ($baseline/2);
+      max-width: ($baseline*60);
     }
 
     .title {
-      background: $white;
-      background: $course-header-bg;
-      border: 1px solid $border-color-3;
-      box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
+      @include span-columns(8);
+      @include shift(2);
       @include box-sizing(border-box);
-      min-height: 120px;
-      margin-left: grid-width(2) + $gw-gutter;
-      width: flex-grid(6);
-      float: left;
-      position: relative;
       @include transition(all 0.2s linear 0s);
+      position: relative;
+      border: 1px solid $border-color-3;
+      box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+      background: $white;
+      padding: ($baseline) ($baseline*1.5);
+      min-height: ($baseline*6);
       vertical-align: top;
 
+      // STATE: hover and focus
       &:hover, &:focus {
         .actions {
           display: none;
         }
       }
 
+      // 8 column layout
+      @include media($bp-medium) {
+        @include span-columns(6);
+        @include shift(1);
+      }
+
+      // 4 column layout
+      @include media($bp-small) {
+        @include fill-parent();
+        @include shift(0);
+      }
+
+      // 4 column layout
+      @include media($bp-tiny) {
+        @include fill-parent();
+        @include shift(0);
+      }
+
       > hgroup {
+        @include left(0);
         @include box-sizing(border-box);
-        display: inline-block;
-        left: 0px;
-        opacity: 1.0;
-        padding: 20px 30px;
-        top: 0px;
         @include transition(all 0.2s linear 0s);
-        text-align: left;
+        @include text-align(left);
+        display: inline-block;
+        top: 0;
+        opacity: 1.0;
+        padding-bottom: ($baseline);
 
         h1 {
-          margin-bottom: 0px;
-          text-align: left;
+          @include text-align(left);
+          margin-bottom: 0;
           text-shadow: 0 1px rgba(255,255,255, 0.6);
           text-transform: none;
         }
 
         h2 {
-          font-style: italic;
-          margin-bottom: 0px;
+          margin-bottom: 0;
           text-transform: lowercase;
+          font-style: italic;
+        }
+      }
+
+      .course-search {
+        padding: ($baseline) 0;
+
+        .search-input {
+          @include float(left);
+          @include padding-right($button-size);
+          @include padding-left($baseline*0.5);
+          @extend %ui-depth1;
+          @extend %t-icon4;
+          @extend %t-demi-strong;
+          border: 2px solid $gray-l3;
+          border-radius: 3px;
+          box-shadow: none;
+          width: 100%;
+          height: $course-search-input-height;
+          color: $black;
+          font-style: $sans-serif;
+
+          // STATE: focus
+          &:focus {
+            @extend %no-outline;
+            border-color: $m-blue-d1;
+          }
+        }
+
+        .search-button {
+          @include right($baseline*1.5);
+          @include border-radius(1px, 3px, 3px, 1px);
+          @extend %ui-depth2;
+          @extend %t-icon3;
+          @extend %t-strong;
+          position: absolute;
+          border: 2px solid $m-blue-d1;
+          box-shadow: none;
+          background: $m-blue-d5;
+          padding: 0 ($baseline*0.7);
+          height: $course-search-input-height;
+          color: $white;
+          text-shadow: none;
+
+          // STATE: hover and focus
+          &:hover, &:focus {
+            background: $m-blue-l1;
+          }
         }
       }
     }

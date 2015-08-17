@@ -2,6 +2,7 @@
 Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
+import copy
 import unittest
 
 from django.conf import settings
@@ -21,7 +22,6 @@ from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
@@ -32,9 +32,12 @@ FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE = FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP.c
 FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 FEATURES_WITHOUT_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_CERTIFICATES'] = False
+CACHES_ENABLE_GENERAL = copy.deepcopy(settings.CACHES)
+CACHES_ENABLE_GENERAL['general']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
 
 
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
+@override_settings(CACHES=CACHES_ENABLE_GENERAL)
 class SSLClientTest(ModuleStoreTestCase):
     """
     Tests SSL Authentication code sections of external_auth
@@ -167,7 +170,7 @@ class SSLClientTest(ModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'), follows=True)
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('accounts_login'), response['location'])
+        self.assertIn(reverse('signin_user'), response['location'])
 
         response = self.client.get(
             reverse('dashboard'), follow=True,
@@ -220,8 +223,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Test that they do signin if they don't have a cert
         response = self.client.get(reverse('signin_user'))
         self.assertEqual(200, response.status_code)
-        self.assertTrue('login_form' in response.content
-                        or 'login-form' in response.content)
+        self.assertTrue('login-and-registration-container' in response.content)
 
         # And get directly logged in otherwise
         response = self.client.get(
@@ -320,8 +322,7 @@ class SSLClientTest(ModuleStoreTestCase):
         self.assertTrue(self.mock.called)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE,
-                       MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
     def test_ssl_lms_redirection(self):
         """
         Auto signup auth user and ensure they return to the original

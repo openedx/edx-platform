@@ -23,10 +23,7 @@
      *     Specifically:
      *         - dashboard
      *         - signInUser
-     *         - passwordReset
-     *         - changeEmail
      *         - changeEmailSettings
-     *         - changeName
      *         - verifyToggleBannerFailedOff
      */
     edx.dashboard.legacy.init = function(urls) {
@@ -40,7 +37,7 @@
             notifications.focus();
         }
 
-        $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+        $('.action-more').bind('click', toggleCourseActionsDropdown);
 
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
         // a `track` call whenever a bound link is clicked. Usually the page would change before
@@ -50,6 +47,21 @@
 
         // Track clicks of the "verify now" button.
         window.analytics.trackLink(verifyButtonLinks, 'edx.bi.user.verification.resumed', generateProperties);
+
+        // Track clicks of the LinkedIn "Add to Profile" button
+        window.analytics.trackLink(
+            $('.action-linkedin-profile'),
+            'edx.bi.user.linkedin_add_to_profile',
+            function( element ) {
+                var $el = $( element );
+                return {
+                    category: 'linkedin',
+                    label: $el.data('course-id'),
+                    mode: $el.data('certificate-mode')
+                };
+            }
+        );
+
 
         // Generate the properties object to be passed along with business intelligence events.
         function generateProperties(element) {
@@ -67,17 +79,27 @@
             return properties;
         }
 
-        function toggleExpandMessage(event) {
-            var course = $(event.target).closest('.message-upsell').find('.action-upgrade').data('course-id');
+        function toggleCourseActionsDropdown(event) {
+            var dashboard_index = $(this).data('dashboard-index');
 
+            // Toggle the visibility control for the selected element and set the focus
+            var dropdown_selector = 'div#actions-dropdown-' + dashboard_index;
+            var dropdown = $(dropdown_selector);
+            dropdown.toggleClass('is-visible');
+            if (dropdown.hasClass('is-visible')) {
+                dropdown.attr('tabindex', -1);
+            } else {
+                dropdown.removeAttr('tabindex');
+            }
+
+            // Inform the ARIA framework that the dropdown has been expanded
+            var anchor_selector = 'a#actions-dropdown-link-' + dashboard_index;
+            var anchor = $(anchor_selector);
+            var aria_expanded_state = (anchor.attr('aria-expanded') === 'true');
+            anchor.attr('aria-expanded', !aria_expanded_state);
+
+            // Suppress the actual click event from the browser
             event.preventDefault();
-
-            $(this).closest('.message.is-expandable').toggleClass('is-expanded');
-
-            window.analytics.track('edx.bi.dashboard.upgrade_copy.expanded', {
-                category: 'upgrade',
-                label: course
-            });
         }
 
         $("#failed-verification-button-dismiss").click(function() {
@@ -95,7 +117,7 @@
             Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
         });
 
-        $(".email-settings").click(function(event) {
+        $(".action-email-settings").click(function(event) {
             $("#email_settings_course_id").val( $(event.target).data("course-id") );
             $("#email_settings_course_number").text( $(event.target).data("course-number") );
             if($(event.target).data("optout") === "False") {
@@ -103,7 +125,7 @@
             }
         });
 
-        $(".unenroll").click(function(event) {
+        $(".action-unenroll").click(function(event) {
             $("#unenroll_course_id").val( $(event.target).data("course-id") );
             $("#unenroll_course_number").text( $(event.target).data("course-number") );
         });
@@ -119,67 +141,6 @@
                     xhr.responseText ? xhr.responseText : gettext("An error occurred. Please try again later.")
                 ).stop().css("display", "block");
             }
-        });
-
-        $('#pwd_reset_button').click(function() {
-            $.post(
-                urls.passwordReset,
-                {"email"  : $('#id_email').val()},
-                function() {
-                    $("#password_reset_complete_link").click();
-                }
-            );
-        });
-
-        $("#submit-lang").click(function(event) {
-            event.preventDefault();
-            $.post('/lang_pref/setlang/',
-                {language: $('#settings-language-value').val()}
-            ).done(function() {
-                // submit form as normal
-                $('.settings-language-form').submit();
-            });
-        });
-
-        $("#change_email_form").submit(function(){
-            var new_email = $('#new_email_field').val();
-            var new_password = $('#new_email_password').val();
-
-            $.post(
-                urls.changeEmail,
-                {"new_email" : new_email, "password" : new_password},
-                function(data) {
-                    if (data.success) {
-                        $("#change_email_title").html(gettext("Please verify your new email address"));
-                        $("#change_email_form").html(
-                            "<p>" +
-                            gettext("You'll receive a confirmation in your inbox. Please follow the link in the email to confirm your email address change.") +
-                            "</p>"
-                        );
-                    } else {
-                        $("#change_email_error").html(data.error).stop().css("display", "block");
-                    }
-                }
-            );
-            return false;
-        });
-
-        $("#change_name_form").submit(function(){
-            var new_name = $('#new_name_field').val();
-            var rationale = $('#name_rationale_field').val();
-
-            $.post(
-                urls.changeName,
-                {"new_name":new_name, "rationale":rationale},
-                function(data) {
-                    if(data.success) {
-                        location.reload();
-                    } else {
-                        $("#change_name_error").html(data.error).stop().css("display", "block");
-                    }
-                }
-            );
-            return false;
         });
 
         $("#email_settings_form").submit(function(){
@@ -201,27 +162,9 @@
             return false;
         });
 
-        accessibleModal(
-            ".edit-name",
-            "#apply_name_change .close-modal",
-            "#apply_name_change",
-            "#dashboard-main"
-        );
-        accessibleModal(
-            ".edit-email",
-            "#change_email .close-modal",
-            "#change_email",
-            "#dashboard-main"
-        );
-        accessibleModal(
-            "#pwd_reset_button",
-            "#password_reset_complete .close-modal",
-            "#password_reset_complete",
-            "#dashboard-main"
-        );
 
-        $(".email-settings").each(function(index){
-            $(this).attr("id", "unenroll-" + index);
+        $(".action-email-settings").each(function(index){
+            $(this).attr("id", "email-settings-" + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
             var trigger = "#" + $(this).attr("id");
             accessibleModal(
@@ -232,8 +175,8 @@
             );
         });
 
-        $(".unenroll").each(function(index){
-            $(this).attr("id", "email-settings-" + index);
+        $(".action-unenroll").each(function(index){
+            $(this).attr("id", "unenroll-" + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
             var trigger = "#" + $(this).attr("id");
             accessibleModal(

@@ -6,8 +6,6 @@ from xmodule.modulestore.mongoengine_fields import CourseKeyField
 
 class CourseImportLog(mongoengine.Document):
     """Mongoengine model for git log"""
-    # pylint: disable=incomplete-protocol
-
     course_id = CourseKeyField(max_length=128)
     # NOTE: this location is not a Location object but a pathname
     location = mongoengine.StringField(max_length=168)

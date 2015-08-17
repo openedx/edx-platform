@@ -193,24 +193,26 @@ class PDFInvoice(object):
         )
 
         # Left-Aligned cobrand logo
-        cobrand_img = self.load_image(self.cobrand_logo_path)
-        if cobrand_img:
-            img_width = float(cobrand_img.size[0]) / (float(cobrand_img.size[1]) / self.cobrand_logo_height)
-            self.pdf.drawImage(cobrand_img.filename, horizontal_padding_from_border, img_y_pos, img_width,
-                               self.cobrand_logo_height, mask='auto')
+        if self.cobrand_logo_path:
+            cobrand_img = self.load_image(self.cobrand_logo_path)
+            if cobrand_img:
+                img_width = float(cobrand_img.size[0]) / (float(cobrand_img.size[1]) / self.cobrand_logo_height)
+                self.pdf.drawImage(cobrand_img.filename, horizontal_padding_from_border, img_y_pos, img_width,
+                                   self.cobrand_logo_height, mask='auto')
 
         # Right aligned brand logo
-        logo_img = self.load_image(self.logo_path)
-        if logo_img:
-            img_width = float(logo_img.size[0]) / (float(logo_img.size[1]) / self.brand_logo_height)
-            self.pdf.drawImage(
-                logo_img.filename,
-                self.page_width - (horizontal_padding_from_border + img_width),
-                img_y_pos,
-                img_width,
-                self.brand_logo_height,
-                mask='auto'
-            )
+        if self.logo_path:
+            logo_img = self.load_image(self.logo_path)
+            if logo_img:
+                img_width = float(logo_img.size[0]) / (float(logo_img.size[1]) / self.brand_logo_height)
+                self.pdf.drawImage(
+                    logo_img.filename,
+                    self.page_width - (horizontal_padding_from_border + img_width),
+                    img_y_pos,
+                    img_width,
+                    self.brand_logo_height,
+                    mask='auto'
+                )
 
         return img_y_pos - self.min_clearance
 
@@ -239,7 +241,7 @@ class PDFInvoice(object):
         y_pos = y_pos - font_size / 2 - vertical_padding
         # Draw Order/Invoice No.
         self.pdf.drawString(horizontal_padding_from_border, y_pos,
-                            _(u'{id_label} # {item_id}'.format(id_label=id_label, item_id=self.item_id)))
+                            _(u'{id_label} # {item_id}').format(id_label=id_label, item_id=self.item_id))
         y_pos = y_pos - font_size / 2 - vertical_padding
         # Draw Date
         self.pdf.drawString(
@@ -391,9 +393,9 @@ class PDFInvoice(object):
             # NOTE: since we are not printing the TaxID for Credit Card
             # based receipts, we need to change the cell range for
             # these formatting rules
-            ('RIGHTPADDING', (-1, 0), (-1, -2 if self.is_invoice else -1), 7 * mm),
-            ('GRID', (-1, 0), (-1, -2 if self.is_invoice else -1), 3.0, colors.white),
-            ('BACKGROUND', (-1, 0), (-1, -2 if self.is_invoice else -1), '#EEEEEE'),
+            ('RIGHTPADDING', (-1, 0), (-1, 2), 7 * mm),
+            ('GRID', (-1, 0), (-1, 2), 3.0, colors.white),
+            ('BACKGROUND', (-1, 0), (-1, 2), '#EEEEEE'),
         ]
 
         totals_table.setStyle(TableStyle(styles))

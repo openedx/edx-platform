@@ -2,8 +2,8 @@ define([
         'jquery',
         'underscore',
         'backbone',
-        'js/common_helpers/ajax_helpers',
-        'js/common_helpers/template_helpers',
+        'common/js/spec_helpers/ajax_helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/verify_student/views/review_photos_step_view',
         'js/verify_student/models/verification_model'
     ],
@@ -21,7 +21,6 @@ define([
             var createView = function() {
                 return new ReviewPhotosStepView({
                     el: $( '#current-step-container' ),
-                    templateName: 'review_photos_step',
                     stepData: STEP_DATA,
                     model: new VerificationModel({
                         faceImage: FACE_IMAGE,

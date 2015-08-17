@@ -5,7 +5,7 @@ Unit tests for stub ORA implementation.
 import unittest
 import requests
 import json
-from ..ora import StubOraService, StubOraHandler, StudentState
+from ..ora import StubOraService, StudentState
 
 
 class StubOraServiceTest(unittest.TestCase):
@@ -14,6 +14,7 @@ class StubOraServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
+        super(StubOraServiceTest, self).setUp()
         self.server = StubOraService()
         self.addCleanup(self.server.shutdown)
 

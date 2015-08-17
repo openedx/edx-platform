@@ -15,6 +15,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
+from .bumper_utils import get_bumper_settings
+
 
 log = logging.getLogger(__name__)
 
@@ -92,7 +94,32 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     return save_to_store(filedata, filename, 'application/json', item.location)
 
 
-def get_transcripts_from_youtube(youtube_id, settings, i18n):
+def youtube_video_transcript_name(youtube_text_api):
+    """
+    Get the transcript name from available transcripts of video
+    with respect to language from youtube server
+    """
+    # pylint: disable=no-member
+    utf8_parser = etree.XMLParser(encoding='utf-8')
+
+    transcripts_param = {'type': 'list', 'v': youtube_text_api['params']['v']}
+    lang = youtube_text_api['params']['lang']
+    # get list of transcripts of specific video
+    # url-form
+    # http://video.google.com/timedtext?type=list&v={VideoId}
+    youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
+    if youtube_response.status_code == 200 and youtube_response.text:
+        # pylint: disable=no-member
+        youtube_data = etree.fromstring(youtube_response.content, parser=utf8_parser)
+        # iterate all transcripts information from youtube server
+        for element in youtube_data:
+            # search specific language code such as 'en' in transcripts info list
+            if element.tag == 'track' and element.get('lang_code', '') == lang:
+                return element.get('name')
+    return None
+
+
+def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):
     """
     Gets transcripts from youtube for youtube_id.
 
@@ -107,6 +134,12 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n):
 
     youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
     youtube_text_api['params']['v'] = youtube_id
+    # if the transcript name is not empty on youtube server we have to pass
+    # name param in url in order to get transcript
+    # example http://video.google.com/timedtext?lang=en&v={VideoId}&name={transcript_name}
+    youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
+    if youtube_transcript_name:
+        youtube_text_api['params']['name'] = youtube_transcript_name
     data = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
     if data.status_code != 200 or not data.text:
@@ -398,21 +431,25 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     if not lang:
         lang = item.transcript_language
 
+    # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
     generate_subs_from_source(
         result_subs_dict,
         os.path.splitext(user_filename)[1][1:],
-        srt_transcripts.data.decode('utf8'),
+        srt_transcripts.data.decode('utf-8-sig'),
         item,
         lang
     )
 
 
-def get_or_create_sjson(item):
+def get_or_create_sjson(item, transcripts):
     """
     Get sjson if already exists, otherwise generate it.
 
     Generate sjson with subs_id name, from user uploaded srt.
     Subs_id is extracted from srt filename, which was set by user.
+
+    Args:
+        transcipts (dict): dictionary of (language: file) pairs.
 
     Raises:
         TranscriptException: when srt subtitles do not exist,
@@ -420,7 +457,7 @@ def get_or_create_sjson(item):
 
     `item` is module object.
     """
-    user_filename = item.transcripts[item.transcript_language]
+    user_filename = transcripts[item.transcript_language]
     user_subs_id = os.path.splitext(user_filename)[0]
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
@@ -516,7 +553,7 @@ class VideoTranscriptsMixin(object):
     This is necessary for both VideoModule and VideoDescriptor.
     """
 
-    def available_translations(self, verify_assets=True):
+    def available_translations(self, transcripts, verify_assets=True):
         """Return a list of language codes for which we have transcripts.
 
         Args:
@@ -527,38 +564,50 @@ class VideoTranscriptsMixin(object):
                 when trying to make a listing of videos and their languages.
 
                 Defaults to True.
+
+            transcripts (dict): A dict with all transcripts and a sub.
+
+                Defaults to False
         """
         translations = []
+        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
         # If we're not verifying the assets, we just trust our field values
         if not verify_assets:
-            translations = list(self.transcripts)
-            if not translations or self.sub:
+            translations = list(other_lang)
+            if not translations or sub:
                 translations += ['en']
             return set(translations)
 
         # If we've gotten this far, we're going to verify that the transcripts
         # being referenced are actually in the contentstore.
-        if self.sub:  # check if sjson exists for 'en'.
+        if sub:  # check if sjson exists for 'en'.
             try:
-                Transcript.asset(self.location, self.sub, 'en')
+                Transcript.asset(self.location, sub, 'en')
             except NotFoundError:
-                pass
+                try:
+                    Transcript.asset(self.location, None, None, sub)
+                except NotFoundError:
+                    pass
+                else:
+                    translations = ['en']
             else:
                 translations = ['en']
 
-        for lang in self.transcripts:
+        for lang in other_lang:
             try:
-                Transcript.asset(self.location, None, None, self.transcripts[lang])
+                Transcript.asset(self.location, None, None, other_lang[lang])
             except NotFoundError:
                 continue
             translations.append(lang)
 
         return translations
 
-    def get_transcript(self, transcript_format='srt', lang=None):
+    def get_transcript(self, transcripts, transcript_format='srt', lang=None):
         """
         Returns transcript, filename and MIME type.
+
+        transcripts (dict): A dict with all transcripts and a sub.
 
         Raises:
             - NotFoundError if cannot find transcript file in storage.
@@ -571,11 +620,12 @@ class VideoTranscriptsMixin(object):
         If language is not 'en', give back transcript in proper language and format.
         """
         if not lang:
-            lang = self.transcript_language
+            lang = self.get_default_transcript_language(transcripts)
 
+        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
         if lang == 'en':
-            if self.sub:  # HTML5 case and (Youtube case for new style videos)
-                transcript_name = self.sub
+            if sub:  # HTML5 case and (Youtube case for new style videos)
+                transcript_name = sub
             elif self.youtube_id_1_0:  # old courses
                 transcript_name = self.youtube_id_1_0
             else:
@@ -586,8 +636,8 @@ class VideoTranscriptsMixin(object):
             filename = u'{}.{}'.format(transcript_name, transcript_format)
             content = Transcript.convert(data, 'sjson', transcript_format)
         else:
-            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            data = Transcript.asset(self.location, None, None, other_lang[lang]).data
+            filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
             content = Transcript.convert(data, 'srt', transcript_format)
 
         if not content:
@@ -596,16 +646,36 @@ class VideoTranscriptsMixin(object):
 
         return content, filename, Transcript.mime_types[transcript_format]
 
-    def get_default_transcript_language(self):
+    def get_default_transcript_language(self, transcripts):
         """
         Returns the default transcript language for this video module.
+
+        Args:
+            transcripts (dict): A dict with all transcripts and a sub.
         """
-        if self.transcript_language in self.transcripts:
+        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
+        if self.transcript_language in other_lang:
             transcript_language = self.transcript_language
-        elif self.sub:
+        elif sub:
             transcript_language = u'en'
-        elif len(self.transcripts) > 0:
-            transcript_language = sorted(self.transcripts)[0]
+        elif len(other_lang) > 0:
+            transcript_language = sorted(other_lang)[0]
         else:
             transcript_language = u'en'
         return transcript_language
+
+    def get_transcripts_info(self, is_bumper=False):
+        """
+        Returns a transcript dictionary for the video.
+        """
+        if is_bumper:
+            transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
+            return {
+                "sub": transcripts.pop("en", ""),
+                "transcripts": transcripts,
+            }
+        else:
+            return {
+                "sub": self.sub,
+                "transcripts": self.transcripts,
+            }

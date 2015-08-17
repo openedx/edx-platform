@@ -1,18 +1,10 @@
 var edx = edx || {};
 
-(function($, _, _s, Backbone, gettext) {
+(function($, _, _s, Backbone, History) {
     'use strict';
 
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
-
-    // Bind to StateChange Event
-    History.Adapter.bind( window, 'statechange', function() {
-        /* Note: We are using History.getState() for legacy browser (IE) support
-         * using History.js plugin instead of the native event.state
-         */
-        var State = History.getState();
-    });
 
     edx.student.account.AccessView = Backbone.View.extend({
         el: '#login-and-registration-container',
@@ -26,8 +18,12 @@ var edx = edx || {};
         subview: {
             login: {},
             register: {},
-            passwordHelp: {}
+            passwordHelp: {},
+            institutionLogin: {},
+            hintedLogin: {}
         },
+
+        nextUrl: '/dashboard',
 
         // The form currently loaded
         activeForm: '',
@@ -48,10 +44,21 @@ var edx = edx || {};
                 providers: []
             };
 
+            this.thirdPartyAuthHint = obj.thirdPartyAuthHint || null;
+
+            if (obj.nextUrl) {
+                // Ensure that the next URL is internal for security reasons
+                if ( ! window.isExternal( obj.nextUrl ) ) {
+                    this.nextUrl = obj.nextUrl;
+                }
+            }
+
             this.formDescriptions = {
                 login: obj.loginFormDesc,
                 register: obj.registrationFormDesc,
-                reset: obj.passwordResetFormDesc
+                reset: obj.passwordResetFormDesc,
+                institution_login: null,
+                hinted_login: null
             };
 
             this.platformName = obj.platformName;
@@ -63,6 +70,10 @@ var edx = edx || {};
             });
 
             this.render();
+
+            // Once the third party error message has been shown once,
+            // there is no need to show it again, if the user changes mode:
+            this.thirdPartyAuth.errorMessage = null;
         },
 
         render: function() {
@@ -76,8 +87,12 @@ var edx = edx || {};
         },
 
         postRender: function() {
-            // Load the default form
-            this.loadForm( this.activeForm );
+            //get & check current url hash part & load form accordingly
+            if (Backbone.history.getHash() === "forgot-password-modal") {
+                this.resetPassword();
+            } else {
+                this.loadForm(this.activeForm);
+            }
         },
 
         loadForm: function( type ) {
@@ -119,6 +134,9 @@ var edx = edx || {};
 
                 // Listen for 'password-email-sent' event to toggle sub-views
                 this.listenTo( this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent );
+
+                // Focus on the form
+                $('.password-reset-form').focus();
             },
 
             register: function( data ) {
@@ -136,6 +154,26 @@ var edx = edx || {};
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
                 this.listenTo( this.subview.register, 'auth-complete', this.authComplete );
+            },
+
+            institution_login: function ( unused ) {
+                this.subview.institutionLogin =  new edx.student.account.InstitutionLoginView({
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName,
+                    mode: this.activeForm
+                });
+
+                this.subview.institutionLogin.render();
+            },
+
+            hinted_login: function ( unused ) {
+                this.subview.hintedLogin =  new edx.student.account.HintedLoginView({
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    hintedProvider: this.thirdPartyAuthHint,
+                    platformName: this.platformName
+                });
+
+                this.subview.hintedLogin.render();
             }
         },
 
@@ -168,9 +206,11 @@ var edx = edx || {};
                 category: 'user-engagement'
             });
 
-            if ( !this.form.isLoaded( $form ) ) {
+            // Load the form. Institution login is always refreshed since it changes based on the previous form.
+            if ( !this.form.isLoaded( $form ) || type == "institution_login") {
                 this.loadForm( type );
             }
+            this.activeForm = type;
 
             this.element.hide( $(this.el).find('.submission-success') );
             this.element.hide( $(this.el).find('.form-wrapper') );
@@ -178,96 +218,28 @@ var edx = edx || {};
             this.element.scrollTop( $anchor );
 
             // Update url without reloading page
-            History.pushState( null, document.title, '/account/' + type + '/' + queryStr );
+            if (type != "institution_login") {
+                History.pushState( null, document.title, '/' + type + queryStr );
+            }
             analytics.page( 'login_and_registration', type );
+
+            // Focus on the form
+            $("#" + type).focus();
         },
 
         /**
-         * Once authentication has completed successfully, a user may need to:
+         * Once authentication has completed successfully:
          *
-         * - Enroll in a course.
-         * - Update email opt-in preferences
-         *
-         * These actions are delegated from the authComplete function to additional
-         * functions requiring authentication.
+         * If we're in a third party auth pipeline, we must complete the pipeline.
+         * Otherwise, redirect to the specified next step.
          *
          */
         authComplete: function() {
-            var emailOptIn = edx.student.account.EmailOptInInterface,
-                queryParams = this.queryParams();
-
-            // Set the email opt in preference.
-            if (!_.isUndefined(queryParams.emailOptIn) && queryParams.enrollmentAction) {
-                emailOptIn.setPreference(
-                    decodeURIComponent(queryParams.courseId),
-                    queryParams.emailOptIn,
-                    this
-                ).always(this.enrollment);
+            if (this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl) {
+                this.redirect(this.thirdPartyAuth.finishAuthUrl);
+                // Note: the third party auth URL likely contains another redirect URL embedded inside
             } else {
-                this.enrollment();
-            }
-        },
-
-        /**
-         * Designed to be invoked after authentication has completed. This function enrolls
-         * the student as requested.
-         *
-         * - Enroll in a course.
-         * - Add a course to the shopping cart.
-         * - Be redirected to the dashboard / track selection page / shopping cart.
-         *
-         * This handler is triggered upon successful authentication,
-         * either from the login or registration form.  It checks
-         * query string params, performs enrollment/shopping cart actions,
-         * then redirects the user to the next page.
-         *
-         * The optional query string params are:
-         *
-         * ?next: If provided, redirect to this page upon successful auth.
-         *   Django uses this when an unauthenticated user accesses a view
-         *   decorated with @login_required.
-         *
-         * ?enrollment_action: Can be either "enroll" or "add_to_cart".
-         *   If you provide this param, you must also provide a `course_id` param;
-         *   otherwise, no action will be taken.
-         *
-         * ?course_id: The slash-separated course ID to enroll in or add to the cart.
-         *
-         */
-        enrollment: function() {
-            var enrollment = edx.student.account.EnrollmentInterface,
-                shoppingcart = edx.student.account.ShoppingCartInterface,
-                redirectUrl = '/dashboard',
-                queryParams = this.queryParams();
-
-            if ( queryParams.enrollmentAction === 'enroll' && queryParams.courseId) {
-                /*
-                If we need to enroll in a course, mark as enrolled.
-                The enrollment interface will redirect the student once enrollment completes.
-                */
-                enrollment.enroll( decodeURIComponent( queryParams.courseId ) );
-            } else if ( queryParams.enrollmentAction === 'add_to_cart' && queryParams.courseId) {
-                /*
-                If this is a paid course, add it to the shopping cart and redirect
-                the user to the "view cart" page.
-                */
-                shoppingcart.addCourseToCart( decodeURIComponent( queryParams.courseId ) );
-            } else {
-                /*
-                Otherwise, redirect the user to the next page
-                Check for forwarding url and ensure that it isn't external.
-                If not, use the default forwarding URL.
-                */
-                if ( !_.isNull( queryParams.next ) ) {
-                    var next = decodeURIComponent( queryParams.next );
-
-                    // Ensure that the URL is internal for security reasons
-                    if ( !window.isExternal( next ) ) {
-                        redirectUrl = next;
-                    }
-                }
-
-                this.redirect( redirectUrl );
+                this.redirect(this.nextUrl);
             }
         },
 
@@ -276,24 +248,7 @@ var edx = edx || {};
          * @param  {string} url The URL to redirect to.
          */
         redirect: function( url ) {
-            window.location.href = url;
-        },
-
-        /**
-         * Retrieve query params that we use post-authentication
-         * to decide whether to enroll a student in a course, add
-         * an item to the cart, or redirect.
-         *
-         * @return {object} The query params.  If any param is not
-         * provided, it will default to null.
-         */
-        queryParams: function() {
-            return {
-                next: $.url( '?next' ),
-                enrollmentAction: $.url( '?enrollment_action' ),
-                courseId: $.url( '?course_id' ),
-                emailOptIn: $.url( '?email_opt_in')
-            };
+            window.location.replace(url);
         },
 
         form: {
@@ -322,4 +277,4 @@ var edx = edx || {};
             }
         }
     });
-})(jQuery, _, _.str, Backbone, gettext);
+})(jQuery, _, _.str, Backbone, History);

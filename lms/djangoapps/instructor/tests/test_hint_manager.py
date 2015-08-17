@@ -1,12 +1,11 @@
 import json
 
 from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 
 from courseware.models import XModuleUserStateSummaryField
 from courseware.tests.factories import UserStateSummaryFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -15,7 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 # pylint: disable=missing-docstring
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
@@ -23,6 +22,8 @@ class HintManagerTest(ModuleStoreTestCase):
         Makes a course, which will be the same for all tests.
         Set up mako middleware, which is necessary for template rendering to happen.
         """
+        super(HintManagerTest, self).setUp()
+
         self.course = CourseFactory.create(org='Me', number='19.002', display_name='test_course')
         self.url = '/courses/Me/19.002/test_course/hint_manager'
         self.user = UserFactory.create(username='robot', email='robot@edx.org', password='test', is_staff=True)

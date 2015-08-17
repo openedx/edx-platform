@@ -1,5 +1,5 @@
 define([
-    'jquery', 'annotator', 'js/common_helpers/ajax_helpers', 'js/edxnotes/views/visibility_decorator',
+    'jquery', 'annotator_1.2.9', 'common/js/spec_helpers/ajax_helpers', 'js/edxnotes/views/visibility_decorator',
     'js/edxnotes/views/toggle_notes_factory', 'js/spec/edxnotes/helpers',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(
@@ -33,6 +33,7 @@ define([
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
+            spyOn(this.toggleNotes, 'toggleHandler').andCallThrough();
         });
 
         afterEach(function () {
@@ -49,14 +50,13 @@ define([
             expect(this.button).toHaveClass('is-active');
             expect(this.button).toHaveAttr('aria-pressed', 'true');
             expect(this.toggleMessage).not.toHaveClass('is-fleeting');
-            expect(this.toggleMessage).toContainText('Hiding notes');
+            expect(this.toggleMessage).toContainText('Notes visible');
 
             this.button.click();
             expect(this.label).toContainText('Show notes');
             expect(this.button).not.toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'false');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
-            expect(this.toggleMessage).toContainText('Hiding notes');
+            expect(this.toggleMessage).toContainText('Notes hidden');
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -67,9 +67,8 @@ define([
             this.button.click();
             expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'true');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
-            expect(this.toggleMessage).toContainText('Showing notes');
+            expect(this.toggleMessage).toContainText('Notes visible');
             expect(Annotator._instances).toHaveLength(2);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -94,6 +93,12 @@ define([
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
             expect(errorContainer).not.toHaveClass('annotator-notice-show');
+        });
+
+        it('toggles notes when CTRL + SHIFT + [ keydown on document', function () {
+            // Character '[' has keyCode 219
+            $(document).trigger($.Event('keydown', {keyCode: 219, ctrlKey: true, shiftKey: true}));
+            expect(this.toggleNotes.toggleHandler).toHaveBeenCalled();
         });
     });
 });

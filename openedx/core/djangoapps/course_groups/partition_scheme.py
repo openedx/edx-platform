@@ -22,7 +22,7 @@ class CohortPartitionScheme(object):
 
     # pylint: disable=unused-argument
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition, track_function=None):
+    def get_group_for_user(cls, course_key, user, user_partition, track_function=None, use_cached=True):
         """
         Returns the Group from the specified user partition to which the user
         is assigned, via their cohort membership and any mappings from cohorts
@@ -36,22 +36,24 @@ class CohortPartitionScheme(object):
         If the user has no cohort mapping, or there is no (valid) cohort ->
         partition group mapping found, the function returns None.
         """
-        # If the current user is masquerading as being in a group belonging to the
-        # specified user partition then return the masquerading group.
+        # If the current user is masquerading as being in a group
+        # belonging to the specified user partition, return the
+        # masquerading group or None if the group can't be found.
         group_id, user_partition_id = get_masquerading_group_info(user, course_key)
-        if group_id is not None and user_partition_id == user_partition.id:
-            try:
-                return user_partition.get_group(group_id)
-            except NoSuchUserPartitionGroupError:
-                # If the group no longer exists then the masquerade is not in effect
-                pass
+        if user_partition_id == user_partition.id:
+            if group_id is not None:
+                try:
+                    return user_partition.get_group(group_id)
+                except NoSuchUserPartitionGroupError:
+                    return None
+            return None
 
-        cohort = get_cohort(user, course_key)
+        cohort = get_cohort(user, course_key, use_cached=use_cached)
         if cohort is None:
             # student doesn't have a cohort
             return None
 
-        group_id, partition_id = get_group_info_for_cohort(cohort)
+        group_id, partition_id = get_group_info_for_cohort(cohort, use_cached=use_cached)
         if partition_id is None:
             # cohort isn't mapped to any partition group.
             return None

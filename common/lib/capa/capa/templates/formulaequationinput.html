@@ -4,28 +4,21 @@
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value|h}"
         aria-label="${label}"
+        aria-describedby="${id}_status"
         % if size:
         size="${size}"
         % endif
         />
 
-      <p class="status" 
-         %if status != 'unsubmitted':
-         aria-hidden="true"
-         %endif
-         >
-          <span class="sr equation">
-              %if value:
-              ${value|h}
-              % else:
-              ${label}
-              %endif
-          </span> - ${status.display_name}
-      </p>
+      <span class="status" id="${id}_status" data-tooltip="${status.display_tooltip}">
+        <span class="sr">
+          ${status.display_name}
+        </span>
+      </span>
 
       <div id="input_${id}_preview" class="equation">
         \[\]
-        <img src="${STATIC_URL}images/spinner.gif" class="loading"/>
+        <img src="${STATIC_URL}images/spinner.gif" class="loading" alt="Loading"/>
       </div>
     <p id="answer_${id}" class="answer"></p>
   </div>

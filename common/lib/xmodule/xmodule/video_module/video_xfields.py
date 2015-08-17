@@ -3,9 +3,10 @@ XFields for video module.
 """
 import datetime
 
-from xblock.fields import Scope, String, Float, Boolean, List, Dict
+from xblock.fields import Scope, String, Float, Boolean, List, Dict, DateTime
 
 from xmodule.fields import RelativeTime
+from xmodule.mixin import LicenseMixin
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
@@ -31,7 +32,7 @@ class VideoFields(object):
         help=_("Optional, for older browsers: the YouTube ID for the normal speed video."),
         display_name=_("YouTube ID"),
         scope=Scope.settings,
-        default="OEoXaMPEzfM"
+        default="3_yD_cEKoCk"
     )
     youtube_id_0_75 = String(
         help=_("Optional, for older browsers: the YouTube ID for the .75x speed video."),
@@ -52,13 +53,21 @@ class VideoFields(object):
         default=""
     )
     start_time = RelativeTime(  # datetime.timedelta object
-        help=_("Time you want the video to start if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59."),
+        help=_(
+            "Time you want the video to start if you don't want the entire video to play. "
+            "Not supported in the native mobile app: the full video file will play. "
+            "Formatted as HH:MM:SS. The maximum value is 23:59:59."
+        ),
         display_name=_("Video Start Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
     )
     end_time = RelativeTime(  # datetime.timedelta object
-        help=_("Time you want the video to stop if you don't want the entire video to play. Formatted as HH:MM:SS. The maximum value is 23:59:59."),
+        help=_(
+            "Time you want the video to stop if you don't want the entire video to play. "
+            "Not supported in the native mobile app: the full video file will play. "
+            "Formatted as HH:MM:SS. The maximum value is 23:59:59."
+        ),
         display_name=_("Video Stop Time"),
         scope=Scope.settings,
         default=datetime.timedelta(seconds=0)
@@ -133,7 +142,7 @@ class VideoFields(object):
     )
     speed = Float(
         help=_("The last speed that the user specified for the video."),
-        scope=Scope.user_state,
+        scope=Scope.user_state
     )
     global_speed = Float(
         help=_("The default speed for the video."),
@@ -150,9 +159,27 @@ class VideoFields(object):
         display_name=_("Upload Handout"),
         scope=Scope.settings,
     )
+    only_on_web = Boolean(
+        help=_(
+            "Specify whether access to this video is limited to browsers only, or if it can be "
+            "accessed from other applications including mobile apps."
+        ),
+        display_name="Video Available on Web Only",
+        scope=Scope.settings,
+        default=False
+    )
     edx_video_id = String(
-        help=_("If you were assigned a Video ID by edX for the video to play in this component, enter the ID here. In this case, do not enter values in the Default Video URL, the Video File URLs, and the YouTube ID fields. If you were not assigned an edX Video ID, enter values in those other fields and ignore this field."),
-        display_name=_("EdX Video ID"),
+        help=_("If you were assigned a Video ID by edX for the video to play in this component, enter the ID here. In this case, do not enter values in the Default Video URL, the Video File URLs, and the YouTube ID fields. If you were not assigned a Video ID, enter values in those other fields and ignore this field."),  # pylint: disable=line-too-long
+        display_name=_("Video ID"),
         scope=Scope.settings,
         default="",
+    )
+    bumper_last_view_date = DateTime(
+        display_name=_("Date of the last view of the bumper"),
+        scope=Scope.preferences,
+    )
+    bumper_do_not_show_again = Boolean(
+        display_name=_("Do not show bumper again"),
+        scope=Scope.preferences,
+        default=False,
     )

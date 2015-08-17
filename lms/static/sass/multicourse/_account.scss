@@ -98,7 +98,6 @@
 
   // layout
   .content-wrapper {
-    background: $account-content-wrapper-bg;
     padding-bottom: 0;
   }
 
@@ -533,30 +532,30 @@
         margin-right: 0;
       }
 
-      &.button-Google:hover, &.button-Google:focus {
+      &.button-oa2-google-oauth2:hover, &.button-oa2-google-oauth2:focus {
         background-color: #dd4b39;
         border: 1px solid #A5382B;
       }
 
-      &.button-Google:hover {
+      &.button-oa2-google-oauth2:hover {
         box-shadow: 0 2px 1px 0 #8D3024;
       }
 
-      &.button-Facebook:hover, &.button-Facebook:focus {
+      &.button-oa2-facebook:hover, &.button-oa2-facebook:focus {
         background-color: #3b5998;
         border: 1px solid #263A62;
       }
 
-      &.button-Facebook:hover {
+      &.button-oa2-facebook:hover {
         box-shadow: 0 2px 1px 0 #30487C;
       }
 
-      &.button-LinkedIn:hover , &.button-LinkedIn:focus {
+      &.button-oa2-linkedin-oauth2:hover , &.button-oa2-linkedin-oauth2:focus {
         background-color: #0077b5;
         border: 1px solid #06527D;
       }
 
-      &.button-LinkedIn:hover {
+      &.button-oa2-linkedin-oauth2:hover {
         box-shadow: 0 2px 1px 0 #005D8E;
       }
 

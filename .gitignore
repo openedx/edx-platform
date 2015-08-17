@@ -33,6 +33,7 @@ codekit-config.json
 *.mo
 *.po
 *.prob
+*.dup
 !django.po
 !django.mo
 !djangojs.po
@@ -58,7 +59,6 @@ jscover.log.*
 .tddium*
 common/test/data/test_unicode/static/
 django-pyfs
-test_root/uploads/*.txt
 
 ### Installation artifacts
 *.egg-info
@@ -72,20 +72,16 @@ bin/
 ### Static assets pipeline artifacts
 *.scssc
 lms/static/css/
-lms/static/sass/*.css
-lms/static/sass/*.css.map
-lms/static/sass/application.scss
-lms/static/sass/application-rtl.scss
-lms/static/sass/application-extend1.scss
-lms/static/sass/application-extend1-rtl.scss
-lms/static/sass/application-extend2.scss
-lms/static/sass/application-extend2-rtl.scss
-lms/static/sass/course.scss
-lms/static/sass/course-rtl.scss
+lms/static/certificates/css/
 cms/static/css/
-cms/static/sass/*.css
-cms/static/sass/*.css.map
 
+### Styling generated from templates
+lms/static/sass/lms-main.scss
+lms/static/sass/lms-main-rtl.scss
+lms/static/sass/lms-course.scss
+lms/static/sass/lms-course-rtl.scss
+lms/static/sass/lms-footer.scss
+lms/static/sass/lms-footer-rtl.scss
 
 
 ### Logging artifacts
@@ -93,6 +89,9 @@ log/
 logs
 chromedriver.log
 ghostdriver.log
+
+### Celery artifacts ###
+celerybeat-schedule
 
 ### Unknown artifacts
 database.sqlite

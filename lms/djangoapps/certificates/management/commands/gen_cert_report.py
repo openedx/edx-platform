@@ -6,12 +6,9 @@ from django.core.management.base import BaseCommand, CommandError
 from certificates.models import GeneratedCertificate
 from django.contrib.auth.models import User
 from optparse import make_option
-from django.conf import settings
 from opaque_keys import InvalidKeyError
-from xmodule.course_module import CourseDescriptor
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
 from django.db.models import Count
 
 

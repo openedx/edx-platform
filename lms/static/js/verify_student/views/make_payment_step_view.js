@@ -3,12 +3,14 @@
  */
 var edx = edx || {};
 
-(function( $, _, gettext ) {
+(function( $, _, gettext, interpolate_text ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
 
     edx.verify_student.MakePaymentStepView = edx.verify_student.StepView.extend({
+
+        templateName: "make_payment_step",
 
         defaultContext: function() {
             return {
@@ -21,8 +23,45 @@ var edx = edx || {};
                 courseName: '',
                 requirements: {},
                 hasVisibleReqs: false,
-                platformName: ''
+                platformName: '',
+                alreadyVerified: false,
+                courseModeSlug: 'honor',
+                verificationGoodUntil: ''
             };
+        },
+
+        _getProductText: function( modeSlug, isUpgrade ) {
+            switch ( modeSlug ) {
+                case "professional":
+                    return gettext( "Professional Education Verified Certificate" );
+                case "no-id-professional":
+                    return gettext( "Professional Education" );
+                default:
+                    if ( isUpgrade ) {
+                        return gettext( "Verified Certificate upgrade" );
+                    } else {
+                        return gettext( "Verified Certificate" );
+                    }
+            }
+        },
+
+        _getPaymentButtonText: function(processorName) {
+            if (processorName.toLowerCase().substr(0, 11)=='cybersource') {
+                return gettext('Checkout');
+            } else if (processorName.toLowerCase()=='paypal') {
+                return gettext('Checkout with PayPal');
+            } else {
+                // This is mainly for testing as no other processors are supported right now.
+                // Translators: 'processor' is the name of a third-party payment processing vendor (example: "PayPal")
+                return interpolate_text(gettext('Checkout with {processor}'), {processor: processorName});
+            }
+        },
+
+        _getPaymentButtonHtml: function(processorName) {
+            var self = this;
+            return _.template(
+                '<button class="next action-primary payment-button" id="<%- name %>" ><%- text %></button> '
+            )({name: processorName, text: self._getPaymentButtonText(processorName)});
         },
 
         postRender: function() {
@@ -30,19 +69,14 @@ var edx = edx || {};
                 hasVisibleReqs = _.some(
                     templateContext.requirements,
                     function( isVisible ) { return isVisible; }
-                );
+                ),
+                // This a hack to appease /lms/static/js/spec/verify_student/pay_and_verify_view_spec.js,
+                // which does not load an actual template context.
+                processors = templateContext.processors || [],
+                self = this;
 
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'payment', this.templateName );
-
-            // Set the payment button to disabled by default
-            this.setPaymentEnabled( false );
-
-            // Update the contribution amount with the amount the user
-            // selected in a previous screen.
-            if ( templateContext.contributionAmount ) {
-                this.selectPaymentAmount( templateContext.contributionAmount );
-            }
 
             // The contribution section is hidden by default
             // Display it if the user hasn't already selected an amount
@@ -65,29 +99,47 @@ var edx = edx || {};
                 this.setPaymentEnabled( true );
             }
 
+            // render the name of the product being paid for
+            $( 'div.payment-buttons span.product-name').append(
+                self._getProductText( templateContext.courseModeSlug, templateContext.upgrade )
+            );
+
+            // create a button for each payment processor
+            _.each(processors.reverse(), function(processorName) {
+                $( 'div.payment-buttons' ).append( self._getPaymentButtonHtml(processorName) );
+            });
+
             // Handle payment submission
-            $( '#pay_button' ).on( 'click', _.bind( this.createOrder, this ) );
+            $( '.payment-button' ).on( 'click', _.bind( this.createOrder, this ) );
         },
 
         setPaymentEnabled: function( isEnabled ) {
             if ( _.isUndefined( isEnabled ) ) {
                 isEnabled = true;
             }
-            $( '#pay_button' )
+            $( '.payment-button' )
                 .toggleClass( 'is-disabled', !isEnabled )
                 .prop( 'disabled', !isEnabled )
                 .attr('aria-disabled', !isEnabled);
         },
 
-        createOrder: function() {
+        // This function invokes the create_order endpoint.  It will either create an order in
+        // the lms' shoppingcart or a basket in Otto, depending on which backend the request course
+        // mode is configured to use.  In either case, the checkout process will be triggered,
+        // and the expected response will consist of an appropriate payment processor endpoint for
+        // redirection, along with parameters to be passed along in the request.
+        createOrder: function(event) {
             var paymentAmount = this.getPaymentAmount(),
                 postData = {
+                    'processor': event.target.id,
                     'contribution': paymentAmount,
-                    'course_id': this.stepData.courseKey,
+                    'course_id': this.stepData.courseKey
                 };
 
             // Disable the payment button to prevent multiple submissions
             this.setPaymentEnabled( false );
+
+            $( event.target ).toggleClass( 'is-selected' );
 
             // Create the order for the amount
             $.ajax({
@@ -104,21 +156,21 @@ var edx = edx || {};
 
         },
 
-        handleCreateOrderResponse: function( paymentParams ) {
-            // At this point, the order has been created on the server,
+        handleCreateOrderResponse: function( paymentData ) {
+            // At this point, the basket has been created on the server,
             // and we've received signed payment parameters.
             // We need to dynamically construct a form using
             // these parameters, then submit it to the payment processor.
-            // This will send the user to a hosted order page,
-            // where she can enter credit card information.
+            // This will send the user to an externally-hosted page
+            // where she can proceed with payment.
             var form = $( '#payment-processor-form' );
 
             $( 'input', form ).remove();
 
-            form.attr( 'action', this.stepData.purchaseEndpoint );
+            form.attr( 'action', paymentData.payment_page_url );
             form.attr( 'method', 'POST' );
 
-            _.each( paymentParams, function( value, key ) {
+            _.each( paymentData.payment_form_data, function( value, key ) {
                 $('<input>').attr({
                     type: 'hidden',
                     name: key,
@@ -149,6 +201,8 @@ var edx = edx || {};
 
             // Re-enable the button so the user can re-try
             this.setPaymentEnabled( true );
+
+            $( '.payment-button' ).toggleClass( 'is-selected', false );
         },
 
         getPaymentAmount: function() {
@@ -206,4 +260,4 @@ var edx = edx || {};
 
     });
 
-})( jQuery, _, gettext );
+})( jQuery, _, gettext, interpolate_text );

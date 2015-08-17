@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'underscore', 'annotator', 'underscore.string'
+    'underscore', 'annotator_1.2.9', 'underscore.string'
 ], function (_, Annotator) {
     /**
      * Modifies Annotator.Plugin.Store.annotationCreated to make it trigger a new
@@ -85,18 +85,22 @@ define([
 
         annotationEditorShown: function (editor, annotation) {
             this.oldNoteText = annotation.text || '';
+            this.oldTags = annotation.tags || [];
         },
 
         annotationEditorHidden: function () {
             this.oldNoteText = null;
+            this.oldTags = null;
         },
 
         annotationUpdated: function (annotation) {
-            var data;
+            var data, defaultData;
             if (!this.isNew(annotation)) {
+                defaultData = this.getDefaultData(annotation);
                 data = _.extend(
-                    this.getDefaultData(annotation),
-                    this.getText('old_note_text', this.oldNoteText)
+                    defaultData,
+                    this.getText('old_note_text', this.oldNoteText, defaultData.truncated),
+                    this.getTextArray('old_tags', this.oldTags, defaultData.truncated)
                 );
                 this.log('edx.course.student_notes.edited', data);
             }
@@ -113,28 +117,51 @@ define([
         },
 
         getDefaultData: function (annotation) {
+            var truncated = [];
             return _.extend(
                 {
                     'note_id': annotation.id,
-                    'component_usage_id': annotation.usage_id
+                    'component_usage_id': annotation.usage_id,
+                    'truncated': truncated
                 },
-                this.getText('note_text', annotation.text),
-                this.getText('highlighted_content', annotation.quote)
+                this.getText('note_text', annotation.text, truncated),
+                this.getText('highlighted_content', annotation.quote, truncated),
+                this.getTextArray('tags', annotation.tags, truncated)
             );
         },
 
-        getText: function (fieldName, text) {
+        getText: function (fieldName, text, truncated) {
             var info = {},
-                truncated = false,
                 limit = this.options.stringLimit;
 
             if (_.isNumber(limit) && _.isString(text) && text.length > limit) {
                 text = String(text).slice(0, limit);
-                truncated = true;
+                truncated.push(fieldName);
             }
 
             info[fieldName] = text;
-            info[fieldName + '_truncated'] = truncated;
+
+            return info;
+        },
+
+        getTextArray: function (fieldName, textArray, truncated) {
+            var info = {}, limit = this.options.stringLimit, totalLength=0, returnArray=[], i;
+
+            if (_.isNumber(limit) && _.isArray(textArray)) {
+                for (i=0; i < textArray.length; i++) {
+                    if (_.isString(textArray[i]) && totalLength + textArray[i].length > limit) {
+                        truncated.push(fieldName);
+                        break;
+                    }
+                    totalLength += textArray[i].length;
+                    returnArray[i] = textArray[i];
+                }
+            }
+            else {
+                returnArray = textArray;
+            }
+
+            info[fieldName] = returnArray;
 
             return info;
         },

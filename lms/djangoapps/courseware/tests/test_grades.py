@@ -2,12 +2,11 @@
 Test grade calculation.
 """
 from django.http import Http404
-from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.grades import grade, iterate_grades_for
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -27,7 +26,7 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     return grade(student, request, course, keep_raw_scores=keep_raw_scores)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestGradeIteration(ModuleStoreTestCase):
     """
     Test iteration through student gradesets.
@@ -39,6 +38,8 @@ class TestGradeIteration(ModuleStoreTestCase):
         """
         Create a course and a handful of users to assign grades
         """
+        super(TestGradeIteration, self).setUp()
+
         self.course = CourseFactory.create(
             display_name=self.COURSE_NAME,
             number=self.COURSE_NUM

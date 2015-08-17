@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_noop
+
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
@@ -84,15 +85,14 @@ class Role(models.Model):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
     def has_permission(self, permission):
+        """Returns True if this role has the given permission, False otherwise."""
         course = modulestore().get_course(self.course_id)
         if course is None:
             raise ItemNotFoundError(self.course_id)
-        if self.name == FORUM_ROLE_STUDENT and \
-           (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
-           (not course.forum_posts_allowed):
+        if permission_blacked_out(course, {self.name}, permission):
             return False
 
-        return self.permissions.filter(name=permission).exists()
+        return self.permissions.filter(name=permission).exists()  # pylint: disable=no-member
 
 
 class Permission(models.Model):
@@ -105,3 +105,35 @@ class Permission(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+def permission_blacked_out(course, role_names, permission_name):
+    """Returns true if a user in course with the given roles would have permission_name blacked out.
+
+    This will return true if it is a permission that the user might have normally had for the course, but does not have
+    right this moment because we are in a discussion blackout period (as defined by the settings on the course module).
+    Namely, they can still view, but they can't edit, update, or create anything. This only applies to students, as
+    moderators of any kind still have posting privileges during discussion blackouts.
+    """
+    return (
+        not course.forum_posts_allowed and
+        role_names == {FORUM_ROLE_STUDENT} and
+        any([permission_name.startswith(prefix) for prefix in ['edit', 'update', 'create']])
+    )
+
+
+def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=invalid-name
+    """Returns all the permissions the user has in the given course."""
+    course = modulestore().get_course(course_id)
+    if course is None:
+        raise ItemNotFoundError(course_id)
+
+    all_roles = {role.name for role in Role.objects.filter(users=user, course_id=course_id)}
+
+    permissions = {
+        permission.name
+        for permission
+        in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
+        if not permission_blacked_out(course, all_roles, permission.name)
+    }
+    return permissions

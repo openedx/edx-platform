@@ -1,0 +1,76 @@
+---
+# Common JavaScript tests, using RequireJS.
+#
+#
+# To run all the tests and print results to the console:
+#
+#   js-test-tool run TEST_SUITE --use-firefox
+#
+# where `TEST_SUITE` is this file.
+#
+#
+# To run the tests in your default browser ("dev mode"):
+#
+#   js-test-tool dev TEST_SUITE
+#
+
+test_suite_name: common-requirejs
+
+test_runner: jasmine_requirejs
+
+# Path prepended to source files in the coverage report (optional)
+# For example, if the source path
+# is "src/source.js" (relative to this YAML file)
+# and the prepend path is "base/dir"
+# then the coverage report will show
+# "base/dir/src/source.js"
+prepend_path: common/static
+
+# Paths to library JavaScript files (optional)
+lib_paths:
+    - js/vendor/jquery.min.js
+    - js/vendor/jasmine-jquery.js
+    - js/vendor/jasmine-imagediff.js
+    - js/vendor/jquery.truncate.js
+    - js/vendor/underscore-min.js
+    - js/vendor/underscore.string.min.js
+    - js/vendor/backbone-min.js
+    - js/vendor/backbone.paginator.min.js
+    - js/vendor/jquery.timeago.js
+    - js/vendor/URI.min.js
+    - coffee/src/ajax_prefix.js
+    - js/test/add_ajax_prefix.js
+    - js/test/i18n.js
+    - coffee/src/jquery.immediateDescendents.js
+    - js/vendor/requirejs/text.js
+    - js/vendor/sinon-1.7.1.js
+
+# Paths to source JavaScript files
+src_paths:
+    - common/js
+
+# Paths to spec (test) JavaScript files
+spec_paths:
+    - common/js/spec
+    - js/spec/main_requirejs.js
+
+# Paths to fixture files (optional)
+# The fixture path will be set automatically when using jasmine-jquery.
+# (https://github.com/velesin/jasmine-jquery)
+#
+# You can then access fixtures using paths relative to
+# the test suite description:
+#
+#   loadFixtures('path/to/fixture/fixture.html');
+#
+fixture_paths:
+    - common/templates
+
+requirejs:
+  paths:
+    main: js/spec/main_requirejs
+
+# Because require.js is responsible for loading all dependencies, we exclude
+# all files from being included in <script> tags
+exclude_from_page:
+    - .*

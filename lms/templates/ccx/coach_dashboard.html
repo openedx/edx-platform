@@ -1,0 +1,154 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="pagetitle">${_("CCX Coach Dashboard")}</%block>
+<%block name="nav_skip">#ccx-coach-dashboard-content</%block>
+
+<%block name="headextra">
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
+  <%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='ccx_coach'" />
+
+<section class="container">
+  <div class="instructor-dashboard-wrapper-2">
+    <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content">
+      <h1>${_("CCX Coach Dashboard")}</h1>
+
+      % if messages:
+      <ul class="messages">
+        % for message in messages:
+          % if message.tags:
+          <li class="${message.tags}">${message}</li>
+          % else:
+          <li>${message}</li>
+          % endif
+        % endfor
+        </ul>
+      % endif
+
+      %if not ccx:
+      <section>
+        <form action="${create_ccx_url}" method="POST">
+          <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+          <input name="name" placeholder="Name your CCX"/><br/>
+          <button id="create-ccx">Coach a new Custom Course for EdX</button>
+        </form>
+      </section>
+      %endif
+
+      %if ccx:
+      <ul class="instructor-nav">
+        <li class="nav-item">
+          <a href="#" data-section="membership">${_("Enrollment")}</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" data-section="schedule">${_("Schedule")}</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" data-section="student_admin">${_("Student Admin")}</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" data-section="grading_policy">${_("Grading Policy")}</a>
+        </li>
+      </ul>
+      <section id="membership" class="idash-section">
+        <%include file="enrollment.html" args="" />
+      </section>
+      <section id="schedule" class="idash-section">
+        <%include file="schedule.html" args="" />
+      </section>
+      <section id="student_admin" class="idash-section">
+        <%include file="student_admin.html" args="" />
+      </section>
+      <section id="grading_policy" class="idash-section">
+        <%include file="grading_policy.html" args="" />
+      </section>
+      %endif
+
+    </section>
+  </div>
+</section>
+
+<script>
+  function setup_tabs() {
+    $(".instructor-nav a").on("click", function(event) {
+        event.preventDefault();
+        $(".instructor-nav a").removeClass("active-section");
+        var section_sel = "#" + $(this).attr("data-section");
+        $("section.idash-section").hide();
+        $(section_sel).show();
+        $(this).addClass("active-section");
+    });
+
+    var url = document.URL,
+        hashbang = url.indexOf('#!');
+    if (hashbang != -1) {
+      var selector = '.instructor-nav a[data-section=' +
+        url.substr(hashbang + 2) + ']';
+      $(selector).click();
+    }
+    else {
+      $(".instructor-nav a").first().click();
+    }
+  }
+
+  function setup_management_form() {
+
+    $(".member-lists-management form").on("submit", function (event) {
+      var target, action;
+      target = $(event.target);
+      if (target.serialize().indexOf('student-action') < 0) {
+        action = $('<input />', {
+          type: 'hidden',
+          name: 'student-action',
+          value: 'add'
+        });
+        target.append(action);
+      }
+    });
+
+    $(".member-lists-management form .add, .member-lists-management form .revoke").on("click", function(event) {
+        var target, form, action, studentId, selectedStudent;
+        event.preventDefault();
+        target = $(event.target);
+        form = target.parents('form').first();
+        if (target.hasClass('add')) {
+          // adding a new student, add the student-action input and submit
+          action = $('<input />', {
+            type: 'hidden',
+            name: 'student-action',
+            // this is untenable, tied to a translated value.  Fix it.
+            value: 'add'
+          });
+          form.append(action).submit();
+        } else if (target.hasClass('revoke')) {
+          // revoking access for a student, get set form values and submit
+          // get the email address of the student, since they might not be 'enrolled' yet.
+          selectedStudent = target.parent('td').siblings().last().text();
+          action = $('<input />', {
+            type: 'hidden',
+            name: 'student-action',
+            value: 'revoke'
+          });
+          studentId = $('<input />', {
+            type: 'hidden',
+            name: 'student-id',
+            value: selectedStudent
+          });
+          form.append(action, studentId).submit();
+        }
+    });
+  }
+
+  $(setup_tabs);
+  $(setup_management_form)
+
+</script>

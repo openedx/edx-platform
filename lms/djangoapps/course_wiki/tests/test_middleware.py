@@ -3,23 +3,24 @@ Tests for wiki middleware.
 """
 
 from django.test.client import Client
-from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 from wiki.models import URLPath
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from courseware.tests.factories import InstructorFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from course_wiki.views import get_or_create_root
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
 
     def setUp(self):
         """Test setup."""
+        super(TestWikiAccessMiddleware, self).setUp()
+
         self.wiki = get_or_create_root()
 
         self.course_math101 = CourseFactory.create(org='edx', number='math101', display_name='2014', metadata={'use_unique_wiki_id': 'false'})

@@ -6,6 +6,7 @@ var CourseDetails = Backbone.Model.extend({
         org : '',
         course_id: '',
         run: '',
+        language: '',
         start_date: null,	// maps to 'start'
         end_date: null,		// maps to 'end'
         enrollment_start: null,
@@ -15,6 +16,7 @@ var CourseDetails = Backbone.Model.extend({
         overview: "",
         intro_video: null,
         effort: null,	// an int or null,
+        license: null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
         pre_requisite_courses: [],
@@ -53,8 +55,7 @@ var CourseDetails = Backbone.Model.extend({
                 max: 100
             };
             if(!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)){
-                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between "
-                    + range.min +" and "+ range.max +".");
+                errors.entrance_exam_minimum_score_pct = interpolate(gettext("Please enter an integer between %(min)s and %(max)s."), range, true);
             }
         }
         if (!_.isEmpty(errors)) return errors;

@@ -20,7 +20,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
@@ -56,6 +56,8 @@ from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import i4xEncoder
+from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
+
 
 log = logging.getLogger(__name__)
 
@@ -100,7 +102,7 @@ def instructor_dashboard(request, course_id):
     else:
         idash_mode = request.session.get(idash_mode_key, 'Grades')
 
-    enrollment_number = CourseEnrollment.num_enrolled_in(course_key)
+    enrollment_number = CourseEnrollment.objects.num_enrolled_in(course_key)
 
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
@@ -252,9 +254,11 @@ def instructor_dashboard(request, course_id):
                     try:
                         ddata.append([student.email, student.grades[aidx]])
                     except IndexError:
-                        log.debug('No grade for assignment {idx} ({name}) for student {email}'.format(
-                            idx=aidx, name=aname, email=student.email)
-                        )
+                        log.debug(u'No grade for assignment %(idx)s (%(name)s) for student %(email)s', {
+                            "idx": aidx,
+                            "name": aname,
+                            "email": student.email,
+                        })
                 datatable['data'] = ddata
 
                 datatable['title'] = _('Grades for assignment "{name}"').format(name=aname)
@@ -302,12 +306,6 @@ def instructor_dashboard(request, course_id):
 
     #----------------------------------------
     # enrollment
-
-    elif action == 'List students who may enroll but may not have yet signed up':
-        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
-        datatable = {'header': ['StudentEmail']}
-        datatable['data'] = [[x.email] for x in ceaset]
-        datatable['title'] = action
 
     elif action == 'Enroll multiple students':
 
@@ -449,6 +447,7 @@ def instructor_dashboard(request, course_id):
 
     context = {
         'course': course,
+        'course_is_cohorted': is_course_cohorted(course.id),
         'staff_access': True,
         'admin_access': request.user.is_staff,
         'instructor_access': instructor_access,
@@ -749,7 +748,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
         if get_grades:
             gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-            log.debug('student={0}, gradeset={1}'.format(student, gradeset))
+            log.debug(u'student=%s, gradeset=%s', student, gradeset)
             with gtab.add_row(student.id) as add_grade:
                 if get_raw_scores:
                     # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
@@ -825,7 +824,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
         registration_url = '{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
-            path=reverse('student.views.register_user')
+            path=reverse('register_user')
         )
         course_url = '{proto}://{site}{path}'.format(
             proto=protocol,

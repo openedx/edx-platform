@@ -44,14 +44,6 @@ class InheritanceMixin(XBlockMixin):
         help=_("Enter the default date by which problems are due."),
         scope=Scope.settings,
     )
-    extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
-             "can be set by an instructor, and will override the global due "
-             "date if it is set to a date that is later than the global due "
-             "date.",
-        default=None,
-        scope=Scope.user_state,
-    )
     visible_to_staff_only = Boolean(
         help=_("If true, can be seen only by course staff, regardless of start date."),
         default=False,
@@ -90,9 +82,17 @@ class InheritanceMixin(XBlockMixin):
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings,
     )
+    group_access = Dict(
+        help=_("Enter the ids for the content groups this problem belongs to."),
+        scope=Scope.settings,
+    )
     showanswer = String(
         display_name=_("Show Answer"),
-        help=_("Specify when the Show Answer button appears for each problem. Valid values are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", \"past_due\", and \"never\"."),
+        help=_(
+            'Specify when the Show Answer button appears for each problem. '
+            'Valid values are "always", "answered", "attempted", "closed", '
+            '"finished", "past_due", "correct_or_past_due", and "never".'
+        ),
         scope=Scope.settings,
         default="finished",
     )
@@ -151,6 +151,18 @@ class InheritanceMixin(XBlockMixin):
         display_name=_("Enable video caching system"),
         help=_("Enter true or false. If true, video caching will be used for HTML5 videos."),
         default=True,
+        scope=Scope.settings
+    )
+    video_bumper = Dict(
+        display_name=_("Video Pre-Roll"),
+        help=_(
+            """Identify a video, 5-10 seconds in length, to play before course videos. Enter the video ID from"""
+            """ the Video Uploads page and one or more transcript files in the following format:"""
+            """ {"video_id": "ID", "transcripts": {"language": "/static/filename.srt"}}."""
+            """ For example, an entry for a video with two transcripts looks like this:"""
+            """ {"video_id": "77cef264-d6f5-4cf2-ad9d-0178ab8c77be","""
+            """ "transcripts": {"en": "/static/DemoX-D01_1.srt", "uk": "/static/DemoX-D01_1_uk.srt"}}"""
+        ),
         scope=Scope.settings
     )
 

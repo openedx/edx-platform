@@ -1,5 +1,7 @@
-<%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+import json
+from django.utils.translation import ugettext as _
+%>
 
 <h2 class="problem-header">
     ## Translators:  "External resource" means that this learning module is hosted on a platform external to the edX LMS
@@ -39,6 +41,7 @@
     % else:
         ## The result of the form submit will be rendered here.
         <iframe
+            title="Form Result"
             class="ltiLaunchFrame"
             name="ltiFrame-${element_id}"
             src="${form_url}"

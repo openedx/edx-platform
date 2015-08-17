@@ -7,13 +7,11 @@ import logging
 import re
 import json
 import datetime
-from uuid import uuid4
 
 from pytz import UTC
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 import collections
 from contextlib import contextmanager
-import functools
 import threading
 from operator import itemgetter
 from sortedcontainers import SortedListWithKey
@@ -27,8 +25,6 @@ from xmodule.errortracker import make_error_tracker
 from xmodule.assetstore import AssetMetadata
 from opaque_keys.edx.keys import CourseKey, UsageKey, AssetKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
 
@@ -37,6 +33,10 @@ log = logging.getLogger('edx.modulestore')
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
+new_contract('XBlock', XBlock)
+
+LIBRARY_ROOT = 'library.xml'
+COURSE_ROOT = 'course.xml'
 
 
 class ModuleStoreEnum(object):
@@ -115,6 +115,8 @@ class BulkOpsRecord(object):
     """
     def __init__(self):
         self._active_count = 0
+        self.has_publish_item = False
+        self.has_library_updated_item = False
 
     @property
     def active(self):
@@ -169,7 +171,7 @@ class BulkOperationsMixin(object):
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
 
     @contextmanager
-    def bulk_operations(self, course_id):
+    def bulk_operations(self, course_id, emit_signals=True):
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
 
@@ -180,7 +182,7 @@ class BulkOperationsMixin(object):
             self._begin_bulk_operation(course_id)
             yield
         finally:
-            self._end_bulk_operation(course_id)
+            self._end_bulk_operation(course_id, emit_signals)
 
     # the relevant type of bulk_ops_record for the mixin (overriding classes should override
     # this variable)
@@ -196,12 +198,14 @@ class BulkOperationsMixin(object):
         # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
         if ignore_case:
             for key, record in self._active_bulk_ops.records.iteritems():
-                if (
+                # Shortcut: check basic equivalence for cases where org/course/run might be None.
+                if key == course_key or (
                     key.org.lower() == course_key.org.lower() and
                     key.course.lower() == course_key.course.lower() and
                     key.run.lower() == course_key.run.lower()
                 ):
                     return record
+
         return self._active_bulk_ops.records[course_key.for_branch(None)]
 
     @property
@@ -217,7 +221,8 @@ class BulkOperationsMixin(object):
         """
         Clear the record for this course
         """
-        del self._active_bulk_ops.records[course_key.for_branch(None)]
+        if course_key.for_branch(None) in self._active_bulk_ops.records:
+            del self._active_bulk_ops.records[course_key.for_branch(None)]
 
     def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
         """
@@ -241,7 +246,7 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.is_root:
             self._start_outermost_bulk_operation(bulk_ops_record, course_key)
 
-    def _end_outermost_bulk_operation(self, bulk_ops_record, course_key):
+    def _end_outermost_bulk_operation(self, bulk_ops_record, structure_key):
         """
         The outermost nested bulk_operation call: do the actual end of the bulk operation.
 
@@ -249,12 +254,12 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _end_bulk_operation(self, course_key):
+    def _end_bulk_operation(self, structure_key, emit_signals=True):
         """
-        End the active bulk operation on course_key.
+        End the active bulk operation on structure_key (course or library key).
         """
         # If no bulk op is active, return
-        bulk_ops_record = self._get_bulk_ops_record(course_key)
+        bulk_ops_record = self._get_bulk_ops_record(structure_key)
         if not bulk_ops_record.active:
             return
 
@@ -265,15 +270,198 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.active:
             return
 
-        self._end_outermost_bulk_operation(bulk_ops_record, course_key)
+        dirty = self._end_outermost_bulk_operation(bulk_ops_record, structure_key)
 
-        self._clear_bulk_ops_record(course_key)
+        # The bulk op has ended. However, the signal tasks below still need to use the
+        # built-up bulk op information (if the signals trigger tasks in the same thread).
+        # So re-nest until the signals are sent.
+        bulk_ops_record.nest()
+
+        if emit_signals and dirty:
+            self.send_bulk_published_signal(bulk_ops_record, structure_key)
+            self.send_bulk_library_updated_signal(bulk_ops_record, structure_key)
+
+        # Signals are sent. Now unnest and clear the bulk op for good.
+        bulk_ops_record.unnest()
+
+        self._clear_bulk_ops_record(structure_key)
 
     def _is_in_bulk_operation(self, course_key, ignore_case=False):
         """
         Return whether a bulk operation is active on `course_key`.
         """
         return self._get_bulk_ops_record(course_key, ignore_case).active
+
+    def send_bulk_published_signal(self, bulk_ops_record, course_id):
+        """
+        Sends out the signal that items have been published from within this course.
+        """
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler and bulk_ops_record.has_publish_item:
+            signal_handler.send("course_published", course_key=course_id)
+            bulk_ops_record.has_publish_item = False
+
+    def send_bulk_library_updated_signal(self, bulk_ops_record, library_id):
+        """
+        Sends out the signal that library have been updated.
+        """
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler and bulk_ops_record.has_library_updated_item:
+            signal_handler.send("library_updated", library_key=library_id)
+            bulk_ops_record.has_library_updated_item = False
+
+
+class EditInfo(object):
+    """
+    Encapsulates the editing info of a block.
+    """
+    def __init__(self, **kwargs):
+        self.from_storable(kwargs)
+
+        # For details, see caching_descriptor_system.py get_subtree_edited_by/on.
+        self._subtree_edited_on = kwargs.get('_subtree_edited_on', None)
+        self._subtree_edited_by = kwargs.get('_subtree_edited_by', None)
+
+    def to_storable(self):
+        """
+        Serialize to a Mongo-storable format.
+        """
+        return {
+            'previous_version': self.previous_version,
+            'update_version': self.update_version,
+            'source_version': self.source_version,
+            'edited_on': self.edited_on,
+            'edited_by': self.edited_by,
+            'original_usage': self.original_usage,
+            'original_usage_version': self.original_usage_version,
+        }
+
+    def from_storable(self, edit_info):
+        """
+        De-serialize from Mongo-storable format to an object.
+        """
+        # Guid for the structure which previously changed this XBlock.
+        # (Will be the previous value of 'update_version'.)
+        self.previous_version = edit_info.get('previous_version', None)
+
+        # Guid for the structure where this XBlock got its current field values.
+        # May point to a structure not in this structure's history (e.g., to a draft
+        # branch from which this version was published).
+        self.update_version = edit_info.get('update_version', None)
+
+        self.source_version = edit_info.get('source_version', None)
+
+        # Datetime when this XBlock's fields last changed.
+        self.edited_on = edit_info.get('edited_on', None)
+        # User ID which changed this XBlock last.
+        self.edited_by = edit_info.get('edited_by', None)
+
+        # If this block has been copied from a library using copy_from_template,
+        # these fields point to the original block in the library, for analytics.
+        self.original_usage = edit_info.get('original_usage', None)
+        self.original_usage_version = edit_info.get('original_usage_version', None)
+
+    def __repr__(self):
+        # pylint: disable=bad-continuation, redundant-keyword-arg
+        return ("{classname}(previous_version={self.previous_version}, "
+                "update_version={self.update_version}, "
+                "source_version={source_version}, "
+                "edited_on={self.edited_on}, "
+                "edited_by={self.edited_by}, "
+                "original_usage={self.original_usage}, "
+                "original_usage_version={self.original_usage_version}, "
+                "_subtree_edited_on={self._subtree_edited_on}, "
+                "_subtree_edited_by={self._subtree_edited_by})").format(
+            self=self,
+            classname=self.__class__.__name__,
+            source_version="UNSET" if self.source_version is None else self.source_version,
+        )  # pylint: disable=bad-continuation
+
+    def __eq__(self, edit_info):
+        """
+        Two EditInfo instances are equal iff their storable representations
+        are equal.
+        """
+        return self.to_storable() == edit_info.to_storable()
+
+    def __neq__(self, edit_info):
+        """
+        Two EditInfo instances are not equal if they're not equal.
+        """
+        return not self == edit_info
+
+
+class BlockData(object):
+    """
+    Wrap the block data in an object instead of using a straight Python dictionary.
+    Allows the storing of meta-information about a structure that doesn't persist along with
+    the structure itself.
+    """
+    def __init__(self, **kwargs):
+        # Has the definition been loaded?
+        self.definition_loaded = False
+        self.from_storable(kwargs)
+
+    def to_storable(self):
+        """
+        Serialize to a Mongo-storable format.
+        """
+        return {
+            'fields': self.fields,
+            'block_type': self.block_type,
+            'definition': self.definition,
+            'defaults': self.defaults,
+            'edit_info': self.edit_info.to_storable()
+        }
+
+    def from_storable(self, block_data):
+        """
+        De-serialize from Mongo-storable format to an object.
+        """
+        # Contains the Scope.settings and 'children' field values.
+        # 'children' are stored as a list of (block_type, block_id) pairs.
+        self.fields = block_data.get('fields', {})
+
+        # XBlock type ID.
+        self.block_type = block_data.get('block_type', None)
+
+        # DB id of the record containing the content of this XBlock.
+        self.definition = block_data.get('definition', None)
+
+        # Scope.settings default values copied from a template block (used e.g. when
+        # blocks are copied from a library to a course)
+        self.defaults = block_data.get('defaults', {})
+
+        # EditInfo object containing all versioning/editing data.
+        self.edit_info = EditInfo(**block_data.get('edit_info', {}))
+
+    def __repr__(self):
+        # pylint: disable=bad-continuation, redundant-keyword-arg
+        return ("{classname}(fields={self.fields}, "
+                "block_type={self.block_type}, "
+                "definition={self.definition}, "
+                "definition_loaded={self.definition_loaded}, "
+                "defaults={self.defaults}, "
+                "edit_info={self.edit_info})").format(
+            self=self,
+            classname=self.__class__.__name__,
+        )  # pylint: disable=bad-continuation
+
+    def __eq__(self, block_data):
+        """
+        Two BlockData objects are equal iff all their attributes are equal.
+        """
+        attrs = ['fields', 'block_type', 'definition', 'defaults', 'edit_info']
+        return all(getattr(self, attr) == getattr(block_data, attr) for attr in attrs)
+
+    def __neq__(self, block_data):
+        """
+        Just define this as not self.__eq__(block_data)
+        """
+        return not self == block_data
+
+
+new_contract('BlockData', BlockData)
 
 
 class IncorrectlySortedList(Exception):
@@ -571,7 +759,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @abstractmethod
-    def get_item(self, usage_key, depth=0, **kwargs):
+    def get_item(self, usage_key, depth=0, using_descriptor_system=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -615,27 +803,32 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         """
         pass
 
-    def _block_matches(self, fields_or_xblock, qualifiers):
-        '''
+    @contract(block='XBlock | BlockData | dict', qualifiers=dict)
+    def _block_matches(self, block, qualifiers):
+        """
         Return True or False depending on whether the field value (block contents)
-        matches the qualifiers as per get_items. Note, only finds directly set not
-        inherited nor default value matches.
-        For substring matching pass a regex object.
-        for arbitrary function comparison such as date time comparison, pass
-        the function as in start=lambda x: x < datetime.datetime(2014, 1, 1, 0, tzinfo=pytz.UTC)
+        matches the qualifiers as per get_items.
+        NOTE: Method only finds directly set value matches - not inherited nor default value matches.
+        For substring matching:
+            pass a regex object.
+        For arbitrary function comparison such as date time comparison:
+            pass the function as in start=lambda x: x < datetime.datetime(2014, 1, 1, 0, tzinfo=pytz.UTC)
 
         Args:
-            fields_or_xblock (dict or XBlock): either the json blob (from the db or get_explicitly_set_fields)
-                or the xblock.fields() value or the XBlock from which to get those values
-             qualifiers (dict): field: searchvalue pairs.
-        '''
-        if isinstance(fields_or_xblock, XBlock):
-            fields = fields_or_xblock.fields
-            xblock = fields_or_xblock
-            is_xblock = True
+            block (dict, XBlock, or BlockData): either the BlockData (transformed from the db) -or-
+                a dict (from BlockData.fields or get_explicitly_set_fields_by_scope) -or-
+                the xblock.fields() value -or-
+                the XBlock from which to get the 'fields' value.
+             qualifiers (dict): {field: value} search pairs.
+        """
+        if isinstance(block, XBlock):
+            # If an XBlock is passed-in, just match its fields.
+            xblock, fields = (block, block.fields)
+        elif isinstance(block, BlockData):
+            # BlockData is an object - compare its attributes in dict form.
+            xblock, fields = (None, block.__dict__)
         else:
-            fields = fields_or_xblock
-            is_xblock = False
+            xblock, fields = (None, block)
 
         def _is_set_on(key):
             """
@@ -646,13 +839,15 @@ class ModuleStoreRead(ModuleStoreAssetBase):
             if key not in fields:
                 return False, None
             field = fields[key]
-            if is_xblock:
-                return field.is_set_on(fields_or_xblock), getattr(xblock, key)
+            if xblock is not None:
+                return field.is_set_on(block), getattr(xblock, key)
             else:
                 return True, field
 
         for key, criteria in qualifiers.iteritems():
             is_set, value = _is_set_on(key)
+            if isinstance(criteria, dict) and '$exists' in criteria and criteria['$exists'] == is_set:
+                continue
             if not is_set:
                 return False
             if not self._value_matches(value, criteria):
@@ -660,7 +855,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         return True
 
     def _value_matches(self, target, criteria):
-        '''
+        """
         helper for _block_matches: does the target (field value) match the criteria?
 
         If target is a list, do any of the list elements meet the criteria
@@ -668,7 +863,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         If the criteria is a function, does invoking it on the target yield something truthy?
         If criteria is a dict {($nin|$in): []}, then do (none|any) of the list elements meet the criteria
         Otherwise, is the target == criteria
-        '''
+        """
         if isinstance(target, list):
             return any(self._value_matches(ele, criteria) for ele in target)
         elif isinstance(criteria, re._pattern_type):  # pylint: disable=protected-access
@@ -698,7 +893,9 @@ class ModuleStoreRead(ModuleStoreAssetBase):
     def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
-        in this modulestore.
+        in this modulestore. This method can take an optional argument 'org' which
+        will efficiently apply a filter so that only the courses of the specified
+        ORG in the CourseKey will be fetched.
         '''
         pass
 
@@ -778,7 +975,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @contextmanager
-    def bulk_operations(self, course_id):
+    def bulk_operations(self, course_id, emit_signals=True):    # pylint: disable=unused-argument
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
         """
@@ -925,7 +1122,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        xblock_mixins=(), xblock_select=None,
+        xblock_mixins=(), xblock_select=None, disabled_xblock_types=(),  # pylint: disable=bad-continuation
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
         # allow lower level init args to pass harmlessly
@@ -942,6 +1139,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.disabled_xblock_types = disabled_xblock_types
         self.contentstore = contentstore
 
     def get_course_errors(self, course_key):
@@ -1033,41 +1231,6 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
             raise ValueError(u"Cannot set default store to type {}".format(store_type))
         yield
 
-    @staticmethod
-    def memoize_request_cache(func):
-        """
-        Memoize a function call results on the request_cache if there's one. Creates the cache key by
-        joining the unicode of all the args with &; so, if your arg may use the default &, it may
-        have false hits
-        """
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            """
-            Wraps a method to memoize results.
-            """
-            if self.request_cache:
-                cache_key = '&'.join([hashvalue(arg) for arg in args])
-                if cache_key in self.request_cache.data.setdefault(func.__name__, {}):
-                    return self.request_cache.data[func.__name__][cache_key]
-
-                result = func(self, *args, **kwargs)
-
-                self.request_cache.data[func.__name__][cache_key] = result
-                return result
-            else:
-                return func(self, *args, **kwargs)
-        return wrapper
-
-
-def hashvalue(arg):
-    """
-    If arg is an xblock, use its location. otherwise just turn it into a string
-    """
-    if isinstance(arg, XBlock):
-        return unicode(arg.location)
-    else:
-        return unicode(arg)
-
 
 # pylint: disable=abstract-method
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
@@ -1120,10 +1283,11 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         This base method just copies the assets. The lower level impls must do the actual cloning of
         content.
         """
-        # copy the assets
-        if self.contentstore:
-            self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
-        return dest_course_id
+        with self.bulk_operations(dest_course_id):
+            # copy the assets
+            if self.contentstore:
+                self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
+            return dest_course_id
 
     def delete_course(self, course_key, user_id, **kwargs):
         """
@@ -1164,6 +1328,40 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent = self.get_item(parent_usage_key)
         parent.children.append(item.location)
         self.update_item(parent, user_id)
+
+    def _flag_publish_event(self, course_key):
+        """
+        Wrapper around calls to fire the course_published signal
+        Unless we're nested in an active bulk operation, this simply fires the signal
+        otherwise a publish will be signalled at the end of the bulk operation
+
+        Arguments:
+            course_key - course_key to which the signal applies
+        """
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler:
+            bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
+            if bulk_record and bulk_record.active:
+                bulk_record.has_publish_item = True
+            else:
+                signal_handler.send("course_published", course_key=course_key)
+
+    def _flag_library_updated_event(self, library_key):
+        """
+        Wrapper around calls to fire the library_updated signal
+        Unless we're nested in an active bulk operation, this simply fires the signal
+        otherwise a publish will be signalled at the end of the bulk operation
+
+        Arguments:
+            library_updated - library_updated to which the signal applies
+        """
+        signal_handler = getattr(self, 'signal_handler', None)
+        if signal_handler:
+            bulk_record = self._get_bulk_ops_record(library_key) if isinstance(self, BulkOperationsMixin) else None
+            if bulk_record and bulk_record.active:
+                bulk_record.has_library_updated_item = True
+            else:
+                signal_handler.send("library_updated", library_key=library_key)
 
 
 def only_xmodules(identifier, entry_points):

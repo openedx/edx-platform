@@ -73,12 +73,12 @@ class ResponseXMLFactory(object):
         question.text = question_text
 
         # Add the response(s)
-        for i in range(0, int(num_responses)):
+        for __ in range(int(num_responses)):
             response_element = self.create_response_element(**kwargs)
             root.append(response_element)
 
             # Add input elements
-            for j in range(0, int(num_inputs)):
+            for __ in range(int(num_inputs)):
                 input_element = self.create_input_element(**kwargs)
                 if not (None == input_element):
                     response_element.append(input_element)
@@ -248,27 +248,6 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         if cfn_extra_args:
             response_element.set('cfn_extra_args', str(cfn_extra_args))
 
-        return response_element
-
-    def create_input_element(self, **kwargs):
-        return ResponseXMLFactory.textline_input_xml(**kwargs)
-
-
-class SymbolicResponseXMLFactory(ResponseXMLFactory):
-    """ Factory for creating <symbolicresponse> XML trees """
-
-    def create_response_element(self, **kwargs):
-        cfn = kwargs.get('cfn', None)
-        answer = kwargs.get('answer', None)
-        options = kwargs.get('options', None)
-
-        response_element = etree.Element("symbolicresponse")
-        if cfn:
-            response_element.set('cfn', str(cfn))
-        if answer:
-            response_element.set('answer', str(answer))
-        if options:
-            response_element.set('options', str(options))
         return response_element
 
     def create_input_element(self, **kwargs):
@@ -699,6 +678,9 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *additional_answers*: list of additional asnwers.
 
+            *non_attribute_answers*: list of additional answers to be coded in the
+                non-attribute format
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
@@ -707,6 +689,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         hint_fn = kwargs.get('hintfn', None)
         regexp = kwargs.get('regexp', None)
         additional_answers = kwargs.get('additional_answers', [])
+        non_attribute_answers = kwargs.get('non_attribute_answers', [])
         assert answer
 
         # Create the <stringresponse> element
@@ -744,7 +727,12 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 hintgroup_element.set("hintfn", hint_fn)
 
         for additional_answer in additional_answers:
-            etree.SubElement(response_element, "additional_answer").text = additional_answer
+            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node.set("answer", additional_answer)
+
+        for answer in non_attribute_answers:
+            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node.text = answer
 
         return response_element
 
@@ -844,7 +832,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         choice_inputs = []
         # Ensure that the first element of choices is an ordered
         # collection. It will start as a list, a tuple, or not a Container.
-        if type(choices[0]) not in [list, tuple]:
+        if not isinstance(choices[0], (list, tuple)):
             choices = [choices]
 
         for choice in choices:
@@ -859,7 +847,7 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
 
                 # Make sure that `answers` is an ordered collection for
                 # convenience.
-                if type(answers) not in [list, tuple]:
+                if not isinstance(answers, (list, tuple)):
                     answers = [answers]
 
                 numtolerance_inputs = [

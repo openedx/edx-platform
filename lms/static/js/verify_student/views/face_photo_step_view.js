@@ -10,6 +10,8 @@ var edx = edx || {};
 
     edx.verify_student.FacePhotoStepView = edx.verify_student.StepView.extend({
 
+        templateName: "face_photo_step",
+
         defaultContext: function() {
             return {
                 platformName: ''
@@ -17,12 +19,13 @@ var edx = edx || {};
         },
 
         postRender: function() {
-            var webcam = new edx.verify_student.WebcamPhotoView({
+            var webcam = edx.verify_student.getSupportedWebcamView({
                 el: $( '#facecam' ),
                 model: this.model,
                 modelAttribute: 'faceImage',
                 submitButton: '#next_step_button',
-                errorModel: this.errorModel
+                errorModel: this.errorModel,
+                captureSoundPath: this.stepData.captureSoundPath
             }).render();
 
             // Track a virtual pageview, for easy funnel reconstruction.

@@ -104,7 +104,7 @@ function($, Backbone, _, Utils) {
                 this.upload();
             } else {
                 this.options.messenger
-                    .showError('Please select a file in .srt format.');
+                    .showError(gettext('Please select a file in .srt format.'));
             }
         },
 
@@ -182,7 +182,7 @@ function($, Backbone, _, Utils) {
         */
         xhrCompleteHandler: function (xhr) {
             var resp = JSON.parse(xhr.responseText),
-                err = resp.status || 'Error: Uploading failed.',
+                err = resp.status || gettext('Error: Uploading failed.'),
                 sub = resp.subs;
 
             this.$progress

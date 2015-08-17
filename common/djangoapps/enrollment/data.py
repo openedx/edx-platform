@@ -7,11 +7,15 @@ import logging
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from enrollment.errors import CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError, \
-    CourseEnrollmentExistsError, UserNotFoundError
+from enrollment.errors import (
+    CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError,
+    CourseEnrollmentExistsError, UserNotFoundError,
+)
 from enrollment.serializers import CourseEnrollmentSerializer, CourseField
-from student.models import CourseEnrollment, NonExistentCourseError, CourseEnrollmentException, EnrollmentClosedError, \
-    CourseFullError, AlreadyEnrolledError
+from student.models import (
+    CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
+    CourseFullError, AlreadyEnrolledError,
+)
 
 log = logging.getLogger(__name__)
 
@@ -97,7 +101,8 @@ def create_course_enrollment(username, course_id, mode, is_active):
     except CourseFullError as err:
         raise CourseEnrollmentFullError(err.message)
     except AlreadyEnrolledError as err:
-        raise CourseEnrollmentExistsError(err.message)
+        enrollment = get_course_enrollment(username, course_id)
+        raise CourseEnrollmentExistsError(err.message, enrollment)
 
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):
@@ -137,13 +142,16 @@ def _update_enrollment(enrollment, is_active=None, mode=None):
     return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
 
 
-def get_course_enrollment_info(course_id):
+def get_course_enrollment_info(course_id, include_expired=False):
     """Returns all course enrollment information for the given course.
 
     Based on the course id, return all related course information..
 
     Args:
         course_id (str): The course to retrieve enrollment information for.
+
+        include_expired (bool): Boolean denoting whether expired course modes
+        should be included in the returned JSON data.
 
     Returns:
         A serializable dictionary representing the course's enrollment information.
@@ -158,4 +166,4 @@ def get_course_enrollment_info(course_id):
         msg = u"Requested enrollment information for unknown course {course}".format(course=course_id)
         log.warning(msg)
         raise CourseNotFoundError(msg)
-    return CourseField().to_native(course)
+    return CourseField().to_native(course, include_expired=include_expired)

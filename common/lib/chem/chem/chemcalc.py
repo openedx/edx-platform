@@ -91,7 +91,7 @@ def _clean_parse_tree(tree):
                 'paren_group_square': lambda x: nltk.tree.Tree(x.node, x[1]),
                 'paren_group_round': lambda x: nltk.tree.Tree(x.node, x[1])}
 
-    if type(tree) == str:
+    if isinstance(tree, str):
         return tree
 
     old_node = None
@@ -124,7 +124,7 @@ def _merge_children(tree, tags):
         # Haven't grokked the code to tell if this is indeed the right thing to do.
         raise ParseException("Shouldn't have empty trees")
 
-    if type(tree) == str:
+    if isinstance(tree, str):
         return tree
 
     merged_children = []
@@ -134,7 +134,7 @@ def _merge_children(tree, tags):
     while not done:
         done = True
         for child in tree:
-            if type(child) == nltk.tree.Tree and child.node == tree.node and tree.node in tags:
+            if isinstance(child, nltk.tree.Tree) and child.node == tree.node and tree.node in tags:
                 merged_children = merged_children + list(child)
                 done = False
             else:
@@ -182,7 +182,7 @@ def _render_to_html(tree):
                 'paren_group_round': round_brackets,
                 'paren_group_square': square_brackets}
 
-    if type(tree) == str:
+    if isinstance(tree, str):
         return tree
     else:
         children = "".join(map(_render_to_html, tree))

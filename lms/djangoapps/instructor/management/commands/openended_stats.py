@@ -55,7 +55,7 @@ class Command(BaseCommand):
             return
 
         try:
-            enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+            enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
             print "Total students enrolled in {0}: {1}".format(course_id, enrolled_students.count())
 
             calculate_task_statistics(enrolled_students, course, usage_key, task_number)
@@ -89,7 +89,7 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         student = student_module.student
         print "{0}:{1}".format(student.id, student.username)
 
-        module = get_module_for_student(student, location)
+        module = get_module_for_student(student, location, course=course)
         if module is None:
             print "  WARNING: No state found"
             students_with_no_state.append(student)

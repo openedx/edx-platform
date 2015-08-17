@@ -45,9 +45,20 @@ def intercept_errors(api_error, ignore_errors=None):
             try:
                 return func(*args, **kwargs)
             except Exception as ex:
-                # Raise the original exception if it's in our list of "ignored" errors
+                # Raise and log the original exception if it's in our list of "ignored" errors
                 for ignored in ignore_errors or []:
                     if isinstance(ex, ignored):
+                        msg = (
+                            u"A handled error occurred when calling '{func_name}' "
+                            u"with arguments '{args}' and keyword arguments '{kwargs}': "
+                            u"{exception}"
+                        ).format(
+                            func_name=func.func_name,
+                            args=args,
+                            kwargs=kwargs,
+                            exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
+                        )
+                        LOGGER.warning(msg)
                         raise
 
                 # Otherwise, log the error and raise the API-specific error
@@ -59,7 +70,7 @@ def intercept_errors(api_error, ignore_errors=None):
                     func_name=func.func_name,
                     args=args,
                     kwargs=kwargs,
-                    exception=repr(ex)
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
@@ -297,7 +308,7 @@ class FormDescription(object):
         Field properties not in `OVERRIDE_FIELD_PROPERTIES` will be ignored.
 
         Arguments:
-            field_name (string): The name of the field to override.
+            field_name (str): The name of the field to override.
 
         Keyword Args:
             Same as to `add_field()`.
@@ -373,16 +384,6 @@ def shim_student_view(view_func, check_logged_in=False):
                         analytics=analytics
                     )
                 )
-
-        # Backwards compatibility: the student view expects both
-        # terms of service and honor code values.  Since we're combining
-        # these into a single checkbox, the only value we may get
-        # from the new view is "honor_code".
-        # Longer term, we will need to make this more flexible to support
-        # open source installations that may have separate checkboxes
-        # for TOS, privacy policy, etc.
-        if request.POST.get("honor_code") is not None and request.POST.get("terms_of_service") is None:
-            request.POST["terms_of_service"] = request.POST.get("honor_code")
 
         # Call the original view to generate a response.
         # We can safely modify the status code or content

@@ -1,16 +1,15 @@
 define([
     'jquery',
-    'js/common_helpers/template_helpers',
-    'js/common_helpers/ajax_helpers',
+    'common/js/spec_helpers/template_helpers',
+    'common/js/spec_helpers/ajax_helpers',
     'js/student_account/views/AccessView',
     'js/student_account/views/FormView',
     'js/student_account/enrollment',
     'js/student_account/shoppingcart',
     'js/student_account/emailoptin'
 ], function($, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface, ShoppingCartInterface) {
+        "use strict";
         describe('edx.student.account.AccessView', function() {
-            'use strict';
-
             var requests = null,
                 view = null,
                 FORM_DESCRIPTION = {
@@ -41,10 +40,15 @@ define([
                         }
                     ]
                 },
-                FORWARD_URL = '/courseware/next',
-                COURSE_KEY = 'edx/DemoX/Fall';
+                FORWARD_URL = (
+                    '/account/finish_auth' +
+                    '?course_id=edx%2FDemoX%2FFall' +
+                    '&enrollment_action=enroll' +
+                    '&next=%2Fdashboard'
+                ),
+                THIRD_PARTY_COMPLETE_URL = '/auth/complete/provider/';
 
-            var ajaxSpyAndInitialize = function(that, mode) {
+            var ajaxSpyAndInitialize = function(that, mode, nextUrl, finishAuthUrl) {
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(that);
 
@@ -53,8 +57,11 @@ define([
                     mode: mode,
                     thirdPartyAuth: {
                         currentProvider: null,
-                        providers: []
+                        providers: [],
+                        secondaryProviders: [{name: "provider"}],
+                        finishAuthUrl: finishAuthUrl
                     },
+                    nextUrl: nextUrl, // undefined for default
                     platformName: 'edX',
                     loginFormDesc: FORM_DESCRIPTION,
                     registrationFormDesc: FORM_DESCRIPTION,
@@ -84,20 +91,6 @@ define([
                 view.toggleForm(changeEvent);
             };
 
-            /**
-             * Simulate query string params.
-             *
-             * @param {object} params Parameters to set, each of which
-             * should be prefixed with '?'
-             */
-            var setFakeQueryParams = function( params ) {
-                spyOn( $, 'url' ).andCallFake(function( requestedParam ) {
-                    if ( params.hasOwnProperty(requestedParam) ) {
-                        return params[requestedParam];
-                    }
-                });
-            };
-
             beforeEach(function() {
                 setFixtures('<div id="login-and-registration-container"></div>');
                 TemplateHelpers.installTemplate('templates/student_account/access');
@@ -105,6 +98,8 @@ define([
                 TemplateHelpers.installTemplate('templates/student_account/register');
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
+                TemplateHelpers.installTemplate('templates/student_account/institution_login');
+                TemplateHelpers.installTemplate('templates/student_account/institution_register');
 
                 // Stub analytics tracking
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'pageview', 'trackLink']);
@@ -143,46 +138,41 @@ define([
                 assertForms('#login-form', '#register-form');
             });
 
+            it('toggles between the login and institution login view', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate clicking on institution login button
+                $('#login-form .button-secondary-login[data-type="institution_login"]').click();
+                assertForms('#institution_login-form', '#login-form');
+
+                // Simulate selection of the login form
+                selectForm('login');
+                assertForms('#login-form', '#institution_login-form');
+            });
+
+            it('toggles between the register and institution register view', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                // Simulate clicking on institution login button
+                $('#register-form .button-secondary-login[data-type="institution_login"]').click();
+                assertForms('#institution_login-form', '#register-form');
+
+                // Simulate selection of the login form
+                selectForm('register');
+                assertForms('#register-form', '#institution_login-form');
+            });
+
             it('displays the reset password form', function() {
                 ajaxSpyAndInitialize(this, 'login');
 
                 // Simulate a click on the reset password link
                 view.resetPassword();
 
-                // Verify that the password reset wrapper is populated
-                expect($('#password-reset-wrapper')).not.toBeEmpty();
-            });
+                // Verify that the login-anchor is hidden
+                expect($("#login-anchor")).toHaveClass('hidden');
 
-            it('enrolls the user on auth complete', function() {
-                ajaxSpyAndInitialize(this, 'login');
-
-                // Simulate providing enrollment query string params
-                setFakeQueryParams({
-                    '?enrollment_action': 'enroll',
-                    '?course_id': COURSE_KEY
-                });
-
-                // Trigger auth complete on the login view
-                view.subview.login.trigger('auth-complete');
-
-                // Expect that the view tried to enroll the student
-                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith( COURSE_KEY );
-            });
-
-            it('adds a white-label course to the shopping cart on auth complete', function() {
-                ajaxSpyAndInitialize(this, 'register');
-
-                // Simulate providing "add to cart" query string params
-                setFakeQueryParams({
-                    '?enrollment_action': 'add_to_cart',
-                    '?course_id': COURSE_KEY
-                });
-
-                // Trigger auth complete on the register view
-                view.subview.register.trigger('auth-complete');
-
-                // Expect that the view tried to add the course to the user's shopping cart
-                expect( ShoppingCartInterface.addCourseToCart ).toHaveBeenCalledWith( COURSE_KEY );
+                // Verify that the password reset form is not hidden
+                expect($("#password-reset-form")).not.toHaveClass('hidden');
             });
 
             it('redirects the user to the dashboard on auth complete', function() {
@@ -195,11 +185,19 @@ define([
                 expect( view.redirect ).toHaveBeenCalledWith( '/dashboard' );
             });
 
-            it('redirects the user to the next page on auth complete', function() {
-                ajaxSpyAndInitialize(this, 'register');
+            it('proceeds with the third party auth pipeline if active', function() {
+                ajaxSpyAndInitialize(this, 'register', '/', THIRD_PARTY_COMPLETE_URL);
 
-                // Simulate providing a ?next query string parameter
-                setFakeQueryParams({ '?next': FORWARD_URL });
+                // Trigger auth complete
+                view.subview.register.trigger('auth-complete');
+
+                // Verify that we were redirected
+                expect( view.redirect ).toHaveBeenCalledWith( THIRD_PARTY_COMPLETE_URL );
+            });
+
+            it('redirects the user to the next page on auth complete', function() {
+                // The 'next' argument is often used to redirect to the auto-enrollment view
+                ajaxSpyAndInitialize(this, 'register', FORWARD_URL);
 
                 // Trigger auth complete
                 view.subview.register.trigger('auth-complete');
@@ -209,11 +207,7 @@ define([
             });
 
             it('ignores redirect to external URLs', function() {
-                ajaxSpyAndInitialize(this, 'register');
-
-                // Simulate providing a ?next query string parameter
-                // that goes to an external URL
-                setFakeQueryParams({ '?next': "http://www.example.com" });
+                ajaxSpyAndInitialize(this, 'register', "http://www.example.com");
 
                 // Trigger auth complete
                 view.subview.register.trigger('auth-complete');

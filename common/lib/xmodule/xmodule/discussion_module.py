@@ -3,7 +3,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xblock.fields import String, Scope
+from xblock.fields import String, Scope, UNIQUE_ID
 from uuid import uuid4
 
 # Make '_' a no-op so we can scrape strings
@@ -15,7 +15,7 @@ class DiscussionFields(object):
         display_name=_("Discussion Id"),
         help=_("The id is a unique identifier for the discussion. It is non editable."),
         scope=Scope.settings,
-        default="$$GUID$$")
+        default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this module"),
@@ -72,13 +72,6 @@ class DiscussionModule(DiscussionFields, XModule):
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
-
-    def __init__(self, *args, **kwargs):
-        super(DiscussionDescriptor, self).__init__(*args, **kwargs)
-        # is this too late? i.e., will it get persisted and stay static w/ the first value
-        # any code references. I believe so.
-        if self.discussion_id == '$$GUID$$':
-            self.discussion_id = uuid4().hex
 
     module_class = DiscussionModule
     # The discussion XML format uses `id` and `for` attributes,

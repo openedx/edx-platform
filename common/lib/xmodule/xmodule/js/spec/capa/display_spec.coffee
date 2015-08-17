@@ -54,19 +54,19 @@ describe 'Problem', ->
       expect(window.update_schematics).toHaveBeenCalled()
 
     it 'bind answer refresh on button click', ->
-      expect($('div.action input:button')).toHandleWith 'click', @problem.refreshAnswers
+      expect($('div.action button')).toHandleWith 'click', @problem.refreshAnswers
 
     it 'bind the check button', ->
-      expect($('div.action input.check')).toHandleWith 'click', @problem.check_fd
+      expect($('div.action button.check')).toHandleWith 'click', @problem.check_fd
 
     it 'bind the reset button', ->
-      expect($('div.action input.reset')).toHandleWith 'click', @problem.reset
+      expect($('div.action button.reset')).toHandleWith 'click', @problem.reset
 
     it 'bind the show button', ->
       expect($('div.action button.show')).toHandleWith 'click', @problem.show
 
     it 'bind the save button', ->
-      expect($('div.action input.save')).toHandleWith 'click', @problem.save
+      expect($('div.action button.save')).toHandleWith 'click', @problem.save
 
     it 'bind the math input', ->
       expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
@@ -86,7 +86,7 @@ describe 'Problem', ->
       $(@).html readFixtures('problem_content_1240.html')
 
     it 'bind the check button', ->
-      expect($('div.action input.check')).toHandleWith 'click', @problem.check_fd
+      expect($('div.action button.check')).toHandleWith 'click', @problem.check_fd
 
     it 'bind the show button', ->
       expect($('div.action button.show')).toHandleWith 'click', @problem.show
@@ -323,7 +323,7 @@ describe 'Problem', ->
   <div><p></p><span><section id="choicetextinput_1_2_1" class="choicetextinput">
 
 <form class="choicetextgroup capa_inputtype" id="inputtype_1_2_1">
-  <div class="indicator_container">
+  <div class="indicator-container">
     <span class="unanswered" style="display:inline-block;" id="status_1_2_1"></span>
   </div>
   <fieldset>
@@ -628,3 +628,31 @@ describe 'Problem', ->
     it 'check_save_waitfor should return false', ->
       $(@problem.inputs[0]).data('waitfor', ->)
       expect(@problem.check_save_waitfor()).toEqual(false)
+
+  describe 'Submitting an xqueue-graded problem', ->
+    matlabinput_html = readFixtures('matlabinput_problem.html')
+
+    beforeEach ->
+      spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+        callback html: matlabinput_html
+      jasmine.Clock.useMock()
+      @problem = new Problem($('.xblock-student_view'))
+      spyOn(@problem, 'poll').andCallThrough()
+      @problem.render(matlabinput_html)
+
+    it 'check that we stop polling after a fixed amount of time', ->
+      expect(@problem.poll).not.toHaveBeenCalled()
+      jasmine.Clock.tick(1)
+      time_steps = [1000, 2000, 4000, 8000, 16000, 32000]
+      num_calls = 1
+      for time_step in time_steps
+        do (time_step) =>
+          jasmine.Clock.tick(time_step)
+          expect(@problem.poll.callCount).toEqual(num_calls)
+          num_calls += 1
+
+      # jump the next step and verify that we are not still continuing to poll
+      jasmine.Clock.tick(64000)
+      expect(@problem.poll.callCount).toEqual(6)
+
+      expect($('.capa_alert').text()).toEqual("The grading process is still running. Refresh the page to see updates.")

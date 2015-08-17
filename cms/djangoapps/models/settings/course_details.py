@@ -33,6 +33,7 @@ class CourseDetails(object):
         self.org = org
         self.course_id = course_id
         self.run = run
+        self.language = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -42,6 +43,7 @@ class CourseDetails(object):
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
+        self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
         self.pre_requisite_courses = []  # pre-requisite courses
@@ -79,6 +81,9 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.language = descriptor.language
+        # Default course license is "All Rights Reserved"
+        course_details.license = getattr(descriptor, "license", "all-rights-reserved")
 
         for attribute in ABOUT_ATTRIBUTES:
             value = cls._fetch_about_attribute(course_key, attribute)
@@ -173,6 +178,14 @@ class CourseDetails(object):
             descriptor.pre_requisite_courses = jsondict['pre_requisite_courses']
             dirty = True
 
+        if 'license' in jsondict:
+            descriptor.license = jsondict['license']
+            dirty = True
+
+        if 'language' in jsondict and jsondict['language'] != descriptor.language:
+            descriptor.language = jsondict['language']
+            dirty = True
+
         if dirty:
             module_store.update_item(descriptor, user.id)
 
@@ -215,7 +228,7 @@ class CourseDetails(object):
         # the right thing
         result = None
         if video_key:
-            result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
+            result = '<iframe title="YouTube Video" width="560" height="315" src="//www.youtube.com/embed/' + \
                 video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 

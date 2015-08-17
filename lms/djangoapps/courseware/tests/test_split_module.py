@@ -2,10 +2,9 @@
 Test for split test XModule
 """
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from mock import MagicMock
+from nose.plugins.attrib import attr
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -15,7 +14,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class SplitTestBase(ModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -29,6 +28,7 @@ class SplitTestBase(ModuleStoreTestCase):
     VISIBLE_CONTENT = None
 
     def setUp(self):
+        super(SplitTestBase, self).setUp()
         self.partition = UserPartition(
             0,
             'first_partition',
@@ -270,12 +270,14 @@ class TestSplitTestVert(SplitTestBase):
         html1 = self._html(cond1vert, 1)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@attr('shard_1')
 class SplitTestPosition(ModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined
     """
     def setUp(self):
+        super(SplitTestPosition, self).setUp()
+
         self.partition = UserPartition(
             0,
             'first_partition',
@@ -308,7 +310,8 @@ class SplitTestPosition(ModuleStoreTestCase):
             MagicMock(name='request'),
             self.course,
             mock_field_data_cache,
-            self.course.id
+            self.course.id,
+            course=self.course
         )
 
         # Now that we have the course, change the position and save, nothing should explode!

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator', 'js/edxnotes/views/notes_factory', 'jasmine-jquery'
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'jasmine-jquery'
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Shim', function() {
@@ -29,15 +29,15 @@ define([
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             highlights = [];
             annotators = [
-                NotesFactory.factory($('div#edx-notes-wrapper-123').get(0), {
+                NotesFactory.factory($('#edx-notes-wrapper-123').get(0), {
                     endpoint: 'http://example.com/'
                 }),
-                NotesFactory.factory($('div#edx-notes-wrapper-456').get(0), {
+                NotesFactory.factory($('#edx-notes-wrapper-456').get(0), {
                     endpoint: 'http://example.com/'
                 })
             ];
-            _.each(annotators, function(annotator, index) {
-                highlights.push($('<span class="annotator-hl" />').appendTo(annotators[index].element));
+            _.each(annotators, function(annotator) {
+                highlights.push($('<span class="annotator-hl" />').appendTo(annotator.element));
                 spyOn(annotator, 'onHighlightClick').andCallThrough();
                 spyOn(annotator, 'onHighlightMouseover').andCallThrough();
                 spyOn(annotator, 'startViewerHideTimer').andCallThrough();
@@ -56,6 +56,15 @@ define([
             expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
         });
 
+        it('clicking on highlights does not open the viewer when the editor is opened', function() {
+            spyOn(annotators[1].editor, 'isShown').andReturn(false);
+            highlights[0].click();
+            annotators[1].editor.isShown.andReturn(true);
+            highlights[1].click();
+            expect($('#edx-notes-wrapper-123 .annotator-viewer')).not.toHaveClass('annotator-hide');
+            expect($('#edx-notes-wrapper-456 .annotator-viewer')).toHaveClass('annotator-hide');
+        });
+
         it('clicking a highlight freezes mouseover and mouseout in all highlighted text', function() {
             _.each(annotators, function(annotator) {
                 expect(annotator.isFrozen).toBe(false);
@@ -65,10 +74,7 @@ define([
             // in turn calls onHighlightMouseover.
             // To test if onHighlightMouseover is called or not on
             // mouseover, we'll have to reset onHighlightMouseover.
-            expect(annotators[0].onHighlightClick).toHaveBeenCalled();
-            expect(annotators[0].onHighlightMouseover).toHaveBeenCalled();
             annotators[0].onHighlightMouseover.reset();
-
             // Check that both instances of annotator are frozen
             _.invoke(highlights, 'mouseover');
             _.invoke(highlights, 'mouseout');
@@ -121,12 +127,143 @@ define([
             checkClickEventsNotBound('edxnotes:freeze' + annotators[1].uid);
         });
 
-        it('should unbind onNotesLoaded on destruction', function() {
+        it('should unbind events on destruction', function() {
             annotators[0].destroy();
             expect($.fn.off).toHaveBeenCalledWith(
-                'click',
-                annotators[0].onNoteClick
+                'click', annotators[0].onNoteClick
             );
+            expect($.fn.off).toHaveBeenCalledWith(
+                'click', '.annotator-hl'
+            );
+        });
+
+        it('should hide viewer when close button is clicked', function() {
+            var close,
+                annotation = {
+                    id: '01',
+                    text: "Test text",
+                    highlights: [highlights[0].get(0)]
+                };
+
+            annotators[0].viewer.load([annotation]);
+            close = annotators[0].viewer.element.find('.annotator-close');
+            close.click();
+            expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
+        });
+
+        describe('_setupViewer', function () {
+            var mockViewer = null;
+
+            beforeEach(function () {
+                var  element = $('<div />');
+                mockViewer = {
+                    fields: [],
+                    element: element
+                };
+
+                mockViewer.on = jasmine.createSpy().andReturn(mockViewer);
+                mockViewer.hide = jasmine.createSpy().andReturn(mockViewer);
+                mockViewer.destroy = jasmine.createSpy().andReturn(mockViewer);
+                mockViewer.addField = jasmine.createSpy().andCallFake(function (options) {
+                    mockViewer.fields.push(options);
+                    return mockViewer;
+                });
+
+                spyOn(element, 'bind').andReturn(element);
+                spyOn(element, 'appendTo').andReturn(element);
+                spyOn(Annotator, 'Viewer').andReturn(mockViewer);
+
+                annotators[0]._setupViewer();
+            });
+
+            it('should create a new instance of Annotator.Viewer and set Annotator#viewer', function () {
+                expect(annotators[0].viewer).toEqual(mockViewer);
+            });
+
+            it('should hide the annotator on creation', function () {
+                expect(mockViewer.hide.callCount).toBe(1);
+            });
+
+            it('should setup the default text field', function () {
+                var args = mockViewer.addField.mostRecentCall.args[0];
+
+                expect(mockViewer.addField.callCount).toBe(1);
+                expect(_.isFunction(args.load)).toBeTruthy();
+            });
+
+            it('should set the contents of the field on load', function () {
+                var field = document.createElement('div'),
+                    annotation = {text: 'text \nwith\r\nline\n\rbreaks \r'};
+
+                annotators[0].viewer.fields[0].load(field, annotation);
+                expect($(field).html()).toBe('text <br>with<br>line<br>breaks <br>');
+            });
+
+            it('should set the contents of the field to placeholder text when empty', function () {
+                var field = document.createElement('div'),
+                    annotation = {text: ''};
+
+                annotators[0].viewer.fields[0].load(field, annotation);
+                expect($(field).html()).toBe('<i>No Comment</i>');
+            });
+
+            it('should setup the default text field to publish an event on load', function () {
+                var field = document.createElement('div'),
+                    annotation = {text: ''},
+                    callback = jasmine.createSpy();
+
+                annotators[0].on('annotationViewerTextField', callback);
+                annotators[0].viewer.fields[0].load(field, annotation);
+                expect(callback).toHaveBeenCalledWith(field, annotation);
+            });
+
+            it('should subscribe to custom events', function () {
+                expect(mockViewer.on).toHaveBeenCalledWith('edit', annotators[0].onEditAnnotation);
+                expect(mockViewer.on).toHaveBeenCalledWith('delete', annotators[0].onDeleteAnnotation);
+            });
+
+            it('should bind to browser mouseover and mouseout events', function () {
+                expect(mockViewer.element.bind).toHaveBeenCalledWith({
+                    'mouseover': annotators[0].clearViewerHideTimer,
+                    'mouseout':  annotators[0].startViewerHideTimer
+                });
+            });
+
+            it('should append the Viewer#element to the Annotator#wrapper', function () {
+                expect(mockViewer.element.appendTo).toHaveBeenCalledWith(annotators[0].wrapper);
+            });
+        });
+
+        describe('TagsPlugin', function () {
+            it('should add ARIA label information to the viewer', function() {
+                var tagDiv,
+                    annotation = {
+                        id: '01',
+                        text: "Test text",
+                        tags: ["tag1", "tag2", "tag3"],
+                        highlights: [highlights[0].get(0)]
+                    };
+
+                annotators[0].viewer.load([annotation]);
+                tagDiv = annotators[0].viewer.element.find('.annotator-tags');
+                expect($(tagDiv).attr('role')).toEqual('region');
+                expect($(tagDiv).attr('aria-label')).toEqual('tags');
+
+                // Three children for the individual tags.
+                expect($(tagDiv).children().length).toEqual(3);
+            });
+
+            it('should add screen reader label to the editor', function() {
+                var srLabel, editor, inputId;
+
+                // We don't know exactly what the input ID will be (depends on number of annotatable components shown),
+                // but the sr label "for" attribute should match the ID of the element immediately following it.
+                annotators[0].showEditor({}, {});
+                editor = annotators[0].editor;
+                srLabel = editor.element.find("label.sr");
+                inputId = srLabel.next().attr('id');
+                expect(srLabel.attr('for')).toEqual(inputId);
+            });
         });
     });
 });

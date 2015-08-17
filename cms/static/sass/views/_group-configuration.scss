@@ -100,6 +100,28 @@
         color: $gray-l1;
         margin-left: $baseline;
 
+        &.group-configuration-info-inline {
+          display: table;
+          width: 70%;
+          margin: ($baseline/4) 0 ($baseline/2) $baseline;
+
+          li {
+            @include box-sizing(border-box);
+            display: table-cell;
+            margin-right: 1%;
+
+            &.group-configuration-usage-count {
+              font-style: italic;
+            }
+          }
+        }
+
+        &.group-configuration-info-block {
+          li {
+            padding: ($baseline/4) 0;
+          }
+        }
+
         &.collection-info-inline {
           display: table;
           width: 70%;
@@ -355,11 +377,30 @@
           }
         }
 
-        .field.add-collection-name label {
-          @extend %t-title5;
-          display: inline-block;
-          vertical-align: bottom;
+        .field.add-collection-name {
+
+          label {
+            width: 50%;
+            @extend %t-title5;
+            display: inline-block;
+            vertical-align: bottom;
+          }
+
+          .group-configuration-id {
+            display: inline-block;
+            width: 45%;
+            text-align: right;
+            vertical-align: top;
+            color: $gray-l1;
+
+            .group-configuration-value {
+              @extend %t-strong;
+              white-space: nowrap;
+              margin-left: ($baseline*0.5);
+            }
+          }
         }
+
 
         .actions {
           box-shadow: inset 0 1px 2px $shadow;
@@ -443,7 +484,7 @@
       .collection-header{
 
          .title {
-          margin-bottom: 0;
+            margin-bottom: 0;
         }
       }
     }
@@ -456,28 +497,6 @@
           @extend %t-copy-sub1;
           color: $gray-l1;
           margin-left: $baseline;
-
-          &.group-configuration-info-inline {
-            display: table;
-            width: 70%;
-            margin: ($baseline/4) 0 ($baseline/2) $baseline;
-
-            li {
-              @include box-sizing(border-box);
-              display: table-cell;
-              margin-right: 1%;
-
-              &.group-configuration-usage-count {
-                font-style: italic;
-              }
-            }
-          }
-
-          &.group-configuration-info-block {
-            li {
-              padding: ($baseline/4) 0;
-            }
-          }
 
           .group-configuration-label {
             text-transform: uppercase;
@@ -526,25 +545,10 @@
       .group-configuration-edit {
 
         .add-collection-name label {
-          width: 50%;
           padding-right: 5%;
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: bottom;
-        }
-
-        .group-configuration-id {
-          display: inline-block;
-          width: 45%;
-          text-align: right;
-          vertical-align: top;
-          color: $gray-l1;
-
-          .group-configuration-value {
-            @extend %t-strong;
-            white-space: nowrap;
-            margin-left: ($baseline*0.5);
-          }
         }
 
         .field-group {

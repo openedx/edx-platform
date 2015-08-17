@@ -1,0 +1,5 @@
+<div class="search-tools">
+    <span class="search-count">
+        <%= message %>
+    </span>
+</div>

@@ -24,8 +24,6 @@ class Command(BaseCommand):
     args = "course_id software_id serial_file"
 
     def handle(self, *args, **options):
-        """
-        """
         course_id, software_name, filename = self._parse_arguments(args)
 
         software, _ = CourseSoftware.objects.get_or_create(course_id=course_id,

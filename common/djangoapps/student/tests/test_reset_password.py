@@ -17,20 +17,22 @@ from django.utils.http import int_to_base36
 from mock import Mock, patch
 import ddt
 
-from student.views import password_reset, password_reset_confirm_wrapper
+from student.views import password_reset, password_reset_confirm_wrapper, SETTING_CHANGE_INITIATED
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
+from util.testing import EventTestMixin
 
 from test_microsite import fake_site_name
 
 
 @ddt.ddt
-class ResetPasswordTests(TestCase):
+class ResetPasswordTests(EventTestMixin, TestCase):
     """ Tests that clicking reset password sends email, and doesn't activate the user
     """
     request_factory = RequestFactory()
 
     def setUp(self):
+        super(ResetPasswordTests, self).setUp('student.views.tracker')
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -55,6 +57,7 @@ class ResetPasswordTests(TestCase):
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
         })
+        self.assert_no_events_were_emitted()
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
@@ -71,6 +74,7 @@ class ResetPasswordTests(TestCase):
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
         })
+        self.assert_no_events_were_emitted()
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_password_reset_ratelimited(self):
@@ -88,6 +92,7 @@ class ResetPasswordTests(TestCase):
         bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
         bad_resp = password_reset(bad_req)
         self.assertEquals(bad_resp.status_code, 403)
+        self.assert_no_events_were_emitted()
 
         cache.clear()
 
@@ -98,6 +103,7 @@ class ResetPasswordTests(TestCase):
         """Tests contents of reset password email, and that user is not active"""
 
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
+        good_req.user = self.user
         good_resp = password_reset(good_req)
         self.assertEquals(good_resp.status_code, 200)
         obj = json.loads(good_resp.content)
@@ -112,6 +118,10 @@ class ResetPasswordTests(TestCase):
         self.assertEquals(from_addr, settings.DEFAULT_FROM_EMAIL)
         self.assertEquals(len(to_addrs), 1)
         self.assertIn(self.user.email, to_addrs)
+
+        self.assert_event_emitted(
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None,
+        )
 
         #test that the user is not active
         self.user = User.objects.get(pk=self.user.pk)
@@ -130,11 +140,16 @@ class ResetPasswordTests(TestCase):
             '/password_reset/', {'email': self.user.email}
         )
         req.is_secure = Mock(return_value=is_secure)
-        resp = password_reset(req)
+        req.user = self.user
+        password_reset(req)
         _, msg, _, _ = send_email.call_args[0]
         expected_msg = "Please go to the following page and choose a new password:\n\n" + protocol
 
         self.assertIn(expected_msg, msg)
+
+        self.assert_event_emitted(
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
@@ -150,7 +165,8 @@ class ResetPasswordTests(TestCase):
                 '/password_reset/', {'email': self.user.email}
             )
             req.get_host = Mock(return_value=domain_override)
-            resp = password_reset(req)
+            req.user = self.user
+            password_reset(req)
             _, msg, _, _ = send_email.call_args[0]
 
             reset_msg = "you requested a password reset for your user account at {}"
@@ -164,6 +180,10 @@ class ResetPasswordTests(TestCase):
             sign_off = "The {} Team".format(platform_name)
             self.assertIn(sign_off, msg)
 
+            self.assert_event_emitted(
+                SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+            )
+
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch("microsite_configuration.microsite.get_value", fake_site_name)
     @patch('django.core.mail.send_mail')
@@ -176,12 +196,17 @@ class ResetPasswordTests(TestCase):
             '/password_reset/', {'email': self.user.email}
         )
         req.get_host = Mock(return_value=None)
-        resp = password_reset(req)
+        req.user = self.user
+        password_reset(req)
         _, msg, _, _ = send_email.call_args[0]
 
         reset_msg = "you requested a password reset for your user account at openedx.localhost"
 
         self.assertIn(reset_msg, msg)
+
+        self.assert_event_emitted(
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'password', old=None, new=None
+        )
 
     @patch('student.views.password_reset_confirm')
     def test_reset_password_bad_token(self, reset_confirm):

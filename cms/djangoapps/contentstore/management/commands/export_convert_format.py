@@ -12,7 +12,7 @@ from django.conf import settings
 from tempfile import mkdtemp
 import tarfile
 import shutil
-from extract_tar import safetar_extractall
+from openedx.core.lib.extract_tar import safetar_extractall
 
 from xmodule.modulestore.xml_exporter import convert_between_versions
 

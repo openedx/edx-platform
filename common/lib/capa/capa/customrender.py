@@ -6,8 +6,6 @@ These tags do not have state, so they just get passed the system (for access to 
 and the xml element.
 """
 
-from .registry import TagRegistry
-
 import logging
 import re
 
@@ -137,3 +135,35 @@ class TargetedFeedbackRenderer(object):
         return xhtml
 
 registry.register(TargetedFeedbackRenderer)
+
+#-----------------------------------------------------------------------------
+
+
+class ClarificationRenderer(object):
+    """
+    A clarification appears as an inline icon which reveals more information when the user
+    hovers over it.
+
+    e.g. <p>Enter the ROA <clarification>Return on Assets</clarification> for 2015:</p>
+    """
+    tags = ['clarification']
+
+    def __init__(self, system, xml):
+        self.system = system
+        # Get any text content found inside this tag prior to the first child tag. It may be a string or None type.
+        initial_text = xml.text if xml.text else ''
+        self.inner_html = initial_text + ''.join(etree.tostring(element) for element in xml)  # pylint: disable=no-member
+        self.tail = xml.tail
+
+    def get_html(self):
+        """
+        Return the contents of this tag, rendered to html, as an etree element.
+        """
+        context = {'clarification': self.inner_html}
+        html = self.system.render_template("clarification.html", context)
+        xml = etree.XML(html)  # pylint: disable=no-member
+        # We must include any text that was following our original <clarification>...</clarification> XML node.:
+        xml.tail = self.tail
+        return xml
+
+registry.register(ClarificationRenderer)

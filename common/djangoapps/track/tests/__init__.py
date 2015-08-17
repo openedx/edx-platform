@@ -48,6 +48,14 @@ class EventTrackingTestCase(TestCase):
     def setUp(self):
         super(EventTrackingTestCase, self).setUp()
 
+        self.recreate_tracker()
+
+    def recreate_tracker(self):
+        """
+        Re-initialize the tracking system using updated django settings.
+
+        Use this if you make use of the @override_settings decorator to customize the tracker configuration.
+        """
         self.tracker = DjangoTracker()
         tracker.register_tracker(self.tracker)
 

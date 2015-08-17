@@ -8,8 +8,17 @@ define([
             return {
                 name: '',
                 version: 1,
-                order: null
-             };
+                order: null,
+                usage: []
+            };
+        },
+        url : function() {
+            var parentModel = this.collection.parents[0];
+            return parentModel.urlRoot + '/' + encodeURIComponent(parentModel.id) + '/' + encodeURIComponent(this.id);
+        },
+
+        reset: function() {
+            this.set(this._originalAttributes, { parse: true });
         },
 
         isEmpty: function() {
@@ -20,7 +29,8 @@ define([
             return {
                 id: this.get('id'),
                 name: this.get('name'),
-                version: this.get('version')
+                version: this.get('version'),
+                usage: this.get('usage')
              };
         },
 

@@ -222,7 +222,7 @@ class CourseOutlineContainer(CourseOutlineItem):
             require_notification=require_notification,
         )
 
-    def toggle_expand(self):
+    def expand_subsection(self):
         """
         Toggle the expansion of this subsection.
         """
@@ -236,11 +236,14 @@ class CourseOutlineContainer(CourseOutlineItem):
         currently_expanded = subsection_expanded()
 
         self.q(css=self._bounded_selector('.ui-toggle-expansion i')).first.click()
+        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
         EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
             "Check that the container {} has been toggled".format(self.locator)
         ).fulfill()
+
+        self.browser.execute_script("jQuery.fx.off = false;")
 
         return self
 
@@ -505,6 +508,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.q(css=self.EXPAND_COLLAPSE_CSS).click()
 
+    def start_reindex(self):
+        """
+        Starts course reindex by clicking reindex button
+        """
+        self.reindex_button.click()
+
     @property
     def bottom_add_section_button(self):
         """
@@ -545,16 +554,23 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         else:
             return ExpandCollapseLinkState.EXPAND
 
+    @property
+    def reindex_button(self):
+        """
+        Returns reindex button.
+        """
+        return self.q(css=".button.button-reindex")[0]
+
     def expand_all_subsections(self):
         """
         Expands all the subsections in this course.
         """
         for section in self.sections():
             if section.is_collapsed:
-                section.toggle_expand()
+                section.expand_subsection()
             for subsection in section.subsections():
                 if subsection.is_collapsed:
-                    subsection.toggle_expand()
+                    subsection.expand_subsection()
 
     @property
     def xblocks(self):
@@ -562,6 +578,69 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Return a list of xblocks loaded on the outline page.
         """
         return self.children(CourseOutlineChild)
+
+    @property
+    def license(self):
+        """
+        Returns the course license text, if present. Else returns None.
+        """
+        return self.q(css=".license-value").first.text[0]
+
+    @property
+    def deprecated_warning_visible(self):
+        """
+        Returns true if the deprecated warning is visible.
+        """
+        return self.q(css='.wrapper-alert-error.is-shown').is_present()
+
+    @property
+    def warning_heading_text(self):
+        """
+        Returns deprecated warning heading text.
+        """
+        return self.q(css='.warning-heading-text').text[0]
+
+    @property
+    def components_list_heading(self):
+        """
+        Returns deprecated warning component list heading text.
+        """
+        return self.q(css='.components-list-heading-text').text[0]
+
+    @property
+    def modules_remove_text_shown(self):
+        """
+        Returns True if deprecated warning advance modules remove text is visible.
+        """
+        return self.q(css='.advance-modules-remove-text').visible
+
+    @property
+    def modules_remove_text(self):
+        """
+        Returns deprecated warning advance modules remove text.
+        """
+        return self.q(css='.advance-modules-remove-text').text[0]
+
+    @property
+    def components_visible(self):
+        """
+        Returns True if components list visible.
+        """
+        return self.q(css='.components-list').visible
+
+    @property
+    def components_display_names(self):
+        """
+        Returns deprecated warning components display name list.
+        """
+        return self.q(css='.components-list li>a').text
+
+    @property
+    def deprecated_advance_modules(self):
+        """
+        Returns deprecated advance modules list.
+        """
+        return self.q(css='.advance-modules-list li').text
 
 
 class CourseOutlineModal(object):

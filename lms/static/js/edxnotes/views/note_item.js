@@ -13,6 +13,7 @@ define([
         events: {
             'click .note-excerpt-more-link': 'moreHandler',
             'click .reference-unit-link': 'unitLinkHandler',
+            'click .reference-tags': 'tagHandler'
         },
 
         initialize: function (options) {
@@ -29,9 +30,10 @@ define([
         },
 
         getContext: function () {
-            return $.extend({
-                message: this.model.getNoteText()
-            }, this.model.toJSON());
+            return $.extend({}, this.model.toJSON(), {
+                message: this.model.getQuote(),
+                text: this.model.getText()
+            });
         },
 
         toggleNote: function () {
@@ -47,12 +49,18 @@ define([
         unitLinkHandler: function (event) {
             var REQUEST_TIMEOUT = 2000;
             event.preventDefault();
-            this.logger.emit('edx.student_notes.used_unit_link', {
+            this.logger.emit('edx.course.student_notes.used_unit_link', {
                 'note_id': this.model.get('id'),
-                'component_usage_id': this.model.get('usage_id')
+                'component_usage_id': this.model.get('usage_id'),
+                'view': this.options.view
             }, REQUEST_TIMEOUT).always(_.bind(function () {
                 this.redirectTo(event.target.href);
             }, this));
+        },
+
+        tagHandler: function (event) {
+            event.preventDefault();
+            this.options.scrollToTag(event.currentTarget.text);
         },
 
         redirectTo: function (uri) {

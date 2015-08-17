@@ -23,7 +23,7 @@ class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
-        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
+        xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
@@ -79,10 +79,14 @@ class ConditionalFactory(object):
         child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
         child_descriptor.location = source_location.replace(category='html', name='child')
 
-        descriptor_system.load_item = {
-            child_descriptor.location: child_descriptor,
-            source_location: source_descriptor
-        }.get
+        def load_item(usage_id, for_parent=None):  # pylint: disable=unused-argument
+            """Test-only implementation of load_item that simply returns static xblocks."""
+            return {
+                child_descriptor.location: child_descriptor,
+                source_location: source_descriptor
+            }.get(usage_id)
+
+        descriptor_system.load_item = load_item
 
         system.descriptor_runtime = descriptor_system
 
@@ -116,6 +120,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
+        super(ConditionalModuleBasicTest, self).setUp()
         self.test_system = get_test_system()
 
     def test_icon_class(self):
@@ -178,13 +183,14 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
+        super(ConditionalModuleXmlTest, self).setUp()
         self.test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
         print "Importing {0}".format(name)
 
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
         self.assertEquals(len(courses), 1)
@@ -204,6 +210,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
                 location = descriptor
                 descriptor = self.modulestore.get_item(location, depth=None)
             descriptor.xmodule_runtime = get_test_system()
+            descriptor.xmodule_runtime.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.xmodule_runtime.get_module = inner_get_module
             return descriptor
 

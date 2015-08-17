@@ -1,6 +1,6 @@
 define(
     [
-        'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'squire'
+        'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'squire'
     ],
 function ($, _, AjaxHelpers, Squire) {
     'use strict';

@@ -1,7 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
-<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
 
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>

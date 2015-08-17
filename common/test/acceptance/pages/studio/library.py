@@ -1,24 +1,22 @@
 """
 Library edit page in Studio
 """
-
+from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
-from .overview import CourseOutlineModal
+from .component_editor import ComponentEditorView
 from .container import XBlockWrapper
+from ...pages.studio.users import UsersPageMixin
 from ...pages.studio.pagination import PaginatedMixin
-from ...tests.helpers import disable_animations
 from .utils import confirm_prompt, wait_for_notification
 from . import BASE_URL
 
 
-class LibraryPage(PageObject, PaginatedMixin):
+class LibraryPage(PageObject):
     """
-    Library page in Studio
+    Base page for Library pages. Defaults URL to the edit page.
     """
-
     def __init__(self, browser, locator):
         super(LibraryPage, self).__init__(browser)
         self.locator = locator
@@ -36,6 +34,12 @@ class LibraryPage(PageObject, PaginatedMixin):
         """
         return self.q(css='body.view-library').present
 
+
+class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
+    """
+    Library edit page in Studio
+    """
+
     def get_header_title(self):
         """
         The text of the main heading (H1) visible on the page.
@@ -52,11 +56,7 @@ class LibraryPage(PageObject, PaginatedMixin):
         for improved test reliability.
         """
         self.wait_for_ajax()
-        self.wait_for_element_invisibility(
-            '.ui-loading',
-            'Wait for the page to complete its initial loading of XBlocks via AJAX'
-        )
-        disable_animations(self)
+        super(LibraryEditPage, self).wait_until_ready()
 
     @property
     def xblocks(self):
@@ -64,6 +64,25 @@ class LibraryPage(PageObject, PaginatedMixin):
         Return a list of xblocks loaded on the container page.
         """
         return self._get_xblocks()
+
+    def are_previews_showing(self):
+        """
+        Determines whether or not previews are showing for XBlocks
+        """
+        return all([not xblock.is_placeholder() for xblock in self.xblocks])
+
+    def toggle_previews(self):
+        """
+        Clicks the preview toggling button and waits for the previews to appear or disappear.
+        """
+        toggle = not self.are_previews_showing()
+        self.q(css='.toggle-preview-button').click()
+        EmptyPromise(
+            lambda: self.are_previews_showing() == toggle,
+            'Preview is visible: %s' % toggle,
+            timeout=30
+        ).fulfill()
+        self.wait_until_ready()
 
     def click_duplicate_button(self, xblock_id):
         """
@@ -111,65 +130,42 @@ class LibraryPage(PageObject, PaginatedMixin):
         )
 
 
-class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
+class StudioLibraryContentEditor(ComponentEditorView):
     """
     Library Content XBlock Modal edit window
     """
-    url = None
-    MODAL_SELECTOR = ".wrapper-modal-window-edit-xblock"
-
     # Labels used to identify the fields on the edit modal:
-    LIBRARY_LABEL = "Libraries"
+    LIBRARY_LABEL = "Library"
     COUNT_LABEL = "Count"
     SCORED_LABEL = "Scored"
     PROBLEM_TYPE_LABEL = "Problem Type"
 
-    def is_browser_on_page(self):
-        """
-        Check that we are on the right page in the browser.
-        """
-        return self.is_shown()
-
     @property
-    def library_key(self):
-        """
-        Gets value of first library key input
-        """
-        library_key_input = self.get_metadata_input(self.LIBRARY_LABEL)
-        if library_key_input is not None:
-            return library_key_input.get_attribute('value').strip(',')
-        return None
+    def library_name(self):
+        """ Gets name of library """
+        return self.get_selected_option_text(self.LIBRARY_LABEL)
 
-    @library_key.setter
-    def library_key(self, library_key):
+    @library_name.setter
+    def library_name(self, library_name):
         """
-        Sets value of first library key input, creating it if necessary
+        Select a library from the library select box
         """
-        library_key_input = self.get_metadata_input(self.LIBRARY_LABEL)
-        if library_key_input is None:
-            library_key_input = self._add_library_key()
-        if library_key is not None:
-            # can't use lib_text.clear() here as input get deleted by client side script
-            library_key_input.send_keys(Keys.HOME)
-            library_key_input.send_keys(Keys.SHIFT, Keys.END)
-            library_key_input.send_keys(library_key)
-        else:
-            library_key_input.clear()
-        EmptyPromise(lambda: self.library_key == library_key, "library_key is updated in modal.").fulfill()
+        self.set_select_value(self.LIBRARY_LABEL, library_name)
+        EmptyPromise(lambda: self.library_name == library_name, "library_name is updated in modal.").fulfill()
 
     @property
     def count(self):
         """
         Gets value of children count input
         """
-        return int(self.get_metadata_input(self.COUNT_LABEL).get_attribute('value'))
+        return int(self.get_setting_element(self.COUNT_LABEL).get_attribute('value'))
 
     @count.setter
     def count(self, count):
         """
         Sets value of children count input
         """
-        count_text = self.get_metadata_input(self.COUNT_LABEL)
+        count_text = self.get_setting_element(self.COUNT_LABEL)
         count_text.clear()
         count_text.send_keys(count)
         EmptyPromise(lambda: self.count == count, "count is updated in modal.").fulfill()
@@ -179,7 +175,7 @@ class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
         """
         Gets value of scored select
         """
-        value = self.get_metadata_input(self.SCORED_LABEL).get_attribute('value')
+        value = self.get_selected_option_text(self.SCORED_LABEL)
         if value == 'True':
             return True
         elif value == 'False':
@@ -191,10 +187,7 @@ class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
         """
         Sets value of scored select
         """
-        select_element = self.get_metadata_input(self.SCORED_LABEL)
-        select_element.click()
-        scored_select = Select(select_element)
-        scored_select.select_by_value(str(scored))
+        self.set_select_value(self.SCORED_LABEL, str(scored))
         EmptyPromise(lambda: self.scored == scored, "scored is updated in modal.").fulfill()
 
     @property
@@ -202,61 +195,43 @@ class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
         """
         Gets value of CAPA type select
         """
-        return self.get_metadata_input(self.PROBLEM_TYPE_LABEL).get_attribute('value')
+        return self.get_setting_element(self.PROBLEM_TYPE_LABEL).get_attribute('value')
 
     @capa_type.setter
     def capa_type(self, value):
         """
         Sets value of CAPA type select
         """
-        select_element = self.get_metadata_input(self.PROBLEM_TYPE_LABEL)
-        select_element.click()
-        problem_type_select = Select(select_element)
-        problem_type_select.select_by_value(value)
+        self.set_select_value(self.PROBLEM_TYPE_LABEL, value)
         EmptyPromise(lambda: self.capa_type == value, "problem type is updated in modal.").fulfill()
 
-    def _add_library_key(self):
+    def set_select_value(self, label, value):
         """
-        Adds library key input
+        Sets the select with given label (display name) to the specified value
         """
-        wrapper = self._get_metadata_element(self.LIBRARY_LABEL)
-        add_button = wrapper.find_element_by_xpath(".//a[contains(@class, 'create-action')]")
-        add_button.click()
-        return self._get_list_inputs(wrapper)[0]
-
-    def _get_list_inputs(self, list_wrapper):
-        """
-        Finds nested input elements (useful for List and Dict fields)
-        """
-        return list_wrapper.find_elements_by_xpath(".//input[@type='text']")
-
-    def _get_metadata_element(self, metadata_key):
-        """
-        Gets metadata input element (a wrapper div for List and Dict fields)
-        """
-        metadata_inputs = self.find_css(".metadata_entry .wrapper-comp-setting label.setting-label")
-        target_label = [elem for elem in metadata_inputs if elem.text == metadata_key][0]
-        label_for = target_label.get_attribute('for')
-        return self.find_css("#" + label_for)[0]
-
-    def get_metadata_input(self, metadata_key):
-        """
-        Gets input/select element for given field
-        """
-        element = self._get_metadata_element(metadata_key)
-        if element.tag_name == 'div':
-            # List or Dict field - return first input
-            # TODO support multiple values
-            inputs = self._get_list_inputs(element)
-            element = inputs[0] if inputs else None
-        return element
+        elem = self.get_setting_element(label)
+        select = Select(elem)
+        select.select_by_value(value)
 
 
+@js_defined('window.LibraryContentAuthorView')
 class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
     """
     Wraps :class:`.container.XBlockWrapper` for use with LibraryContent blocks
     """
     url = None
+
+    def is_browser_on_page(self):
+        """
+        Returns true iff the library content area has been loaded
+        """
+        return self.q(css='article.content-primary').visible
+
+    def is_finished_loading(self):
+        """
+        Returns true iff the Loading indicator is not visible
+        """
+        return not self.q(css='div.ui-loading').visible
 
     @classmethod
     def from_xblock_wrapper(cls, xblock_wrapper):
@@ -271,11 +246,21 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         """
         return self.q(css=self._bounded_selector(".xblock-message-area p"))
 
+    @wait_for_js  # Wait for the fragment.initialize_js('LibraryContentAuthorView') call to finish
     def refresh_children(self):
         """
         Click "Update now..." button
         """
         btn_selector = self._bounded_selector(".library-update-btn")
-        refresh_button = self.q(css=btn_selector)
-        refresh_button.click()
-        self.wait_for_element_absence(btn_selector, 'Wait for the XBlock to reload')
+        self.wait_for_element_presence(btn_selector, 'Update now button is present.')
+        self.q(css=btn_selector).first.click()
+
+        # This causes a reload (see cms/static/xmodule_js/public/js/library_content_edit.js)
+        self.wait_for(lambda: self.is_browser_on_page(), 'StudioLibraryContainerXBlockWrapper has reloaded.')
+        # Wait longer than the default 60 seconds, because this was intermittently failing on jenkins
+        # with the screenshot showing that the Loading indicator was still visible. See TE-745.
+        self.wait_for(lambda: self.is_finished_loading(), 'Loading indicator is not visible.', timeout=120)
+
+        # And wait to make sure the ajax post has finished.
+        self.wait_for_ajax()
+        self.wait_for_element_absence(btn_selector, 'Wait for the XBlock to finish reloading')

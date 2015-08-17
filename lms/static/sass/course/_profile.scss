@@ -144,6 +144,16 @@
         font-weight: 100;
         margin: 0;
       }
+
+      &.progress-certificates {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+
+        .progress-certificates-title {
+          float: none;
+        }
+      }
     }
 
     #course-success {
@@ -167,6 +177,66 @@
     #grade-detail-graph {
       min-height: 400px;
       width: 100%;
+    }
+
+    > .credit-eligibility{
+      border-top: 1px solid $lightGrey;
+      margin-top: lh();
+      @include padding-left(0);
+
+      > .credit-eligibility-container {
+          padding: lh();
+        > .credit-help {
+          background: $blue;
+          color: $white;
+          width: lh();
+          margin: 0;
+          padding: 0;
+          border-radius: lh(0.9);
+          border-color: $white;
+          text-shadow: None;
+        }
+        > .detail-collapse{
+          border: none;
+          box-shadow: none;
+          background: $white;
+          padding: 0;
+          color: $blue;
+          > i {
+            padding: lh(0.25);
+          }
+          > span{
+            color: inherit;
+          }
+        }
+        > .requirement-container{
+          padding: lh();
+          > .requirement{
+            border-bottom: 1px solid $lightGrey;
+            padding: lh(0.5);
+            > .requirement-name {
+              width: bi-app-invert-percentage(40%);
+              display: inline-block;
+            }
+            > .requirement-status{
+              width: bi-app-invert-percentage(60%);
+              @include float(right);
+              display: inline-block;
+              .fa-times{
+                @extend %t-icon6;
+                color: $alert-color;
+              }
+              .fa-check{
+                @extend %t-icon6;
+                color: $success-color;
+              }
+              > .not-achieve{
+                color: $darkGrey;
+              }
+            }
+          }
+        }
+      }
     }
 
     > .chapters {

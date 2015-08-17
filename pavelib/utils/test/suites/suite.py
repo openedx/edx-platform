@@ -3,6 +3,8 @@ A class used for defining and running test suites
 """
 import sys
 import subprocess
+from paver.easy import sh
+
 from pavelib.utils.process import kill_process
 
 try:
@@ -22,6 +24,8 @@ class TestSuite(object):
         self.subsuites = kwargs.get('subsuites', [])
         self.failed_suites = []
         self.verbosity = kwargs.get('verbosity', 1)
+        self.skip_clean = kwargs.get('skip_clean', False)
+        self.pdb = kwargs.get('pdb', False)
 
     def __enter__(self):
         """
@@ -54,6 +58,14 @@ class TestSuite(object):
         The command to run tests (as a string). For this base class there is none.
         """
         return None
+
+    def generate_optimized_static_assets(self):
+        """
+        Collect static assets using test_static_optimized.py which generates
+        optimized files to a dedicated test static root.
+        """
+        print colorize('green', "Generating optimized static assets...")
+        sh("paver update_assets --settings=test_static_optimized")
 
     def run_test(self):
         """

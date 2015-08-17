@@ -11,7 +11,8 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from courseware.models import StudentModule, StudentModuleHistory
+from courseware.models import StudentModule
+from courseware.user_state_client import DjangoXBlockUserStateClient
 
 LOG = logging.getLogger(__name__)
 
@@ -66,13 +67,15 @@ class Command(BaseCommand):
             if student_module_id == 'id':
                 continue
             try:
-                module = StudentModule.objects.get(id=student_module_id)
+                module = StudentModule.objects.select_related('student').get(id=student_module_id)
             except StudentModule.DoesNotExist:
-                LOG.error("Unable to find student module with id = {0}: skipping... ".format(student_module_id))
+                LOG.error(u"Unable to find student module with id = %s: skipping... ", student_module_id)
                 continue
             self.remove_studentmodule_input_state(module, save_changes)
 
-            hist_modules = StudentModuleHistory.objects.filter(student_module_id=student_module_id)
+            user_state_client = DjangoXBlockUserStateClient()
+            hist_modules = user_state_client.get_history(module.student.username, module.module_state_key)
+
             for hist_module in hist_modules:
                 self.remove_studentmodulehistory_input_state(hist_module, save_changes)
 

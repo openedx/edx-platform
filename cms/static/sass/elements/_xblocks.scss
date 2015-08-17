@@ -1,9 +1,22 @@
 // studio - elements - xblock rendering
 // ==========================
 
-// styling for xblocks at various levels of nesting: page level,
+// Table of Contents
+// * +Layout - Xblocks
+// * +Licensing - Xblocks
+// * +Pagination - Xblocks 
+// * +Messaging - Xblocks
+// * +Case: Page Level
+// * +Case: Nesting Level
+// * +Case: Element / Component Level
+// * +Case: Experiment Groups - Edited
+// * +Editing - Xblocks
+// * +Case - Special Xblock Type Overrides
 
-// extends - UI archetypes - xblock rendering
+
+// +Layout - Xblocks 
+// ====================
+// styling for xblocks at various levels of nesting: page level,
 .wrapper-xblock {
   margin: ($baseline/2);
   border: 1px solid $gray-l4;
@@ -45,7 +58,7 @@
     }
   }
 
-  // secondary header for meta-information and associated actions
+  // UI: secondary header for meta-information and associated actions
   .xblock-header-secondary {
     overflow: hidden;
     border-top: 1px solid $gray-l3;
@@ -103,6 +116,48 @@
     }
   }
 
+  // +Licensing - Xblocks 
+  // ====================
+  .xblock-license,
+  .xmodule_display.xmodule_HtmlModule .xblock-license,
+  .xmodule_VideoModule .xblock-license {
+    @include text-align(right);
+    @extend %t-title7;
+    display: block;
+    width: auto;
+    border-top: 1px solid $gray-l3;
+    padding: ($baseline/4) 0;
+    color: $gray;
+    text-align: $bi-app-right;
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    a {
+      color: $gray;
+
+      &:hover {
+        color: $ui-link-color;
+      }
+    }
+
+    i {
+      font-style: normal;
+    }
+  }
+
+  // CASE: xblocks video
+  .xmodule_VideoModule .xblock-license {
+    border: 0;
+  }
+
+
+  // +Pagination - Xblocks 
   .container-paging-header {
     .meta-wrap {
       margin: $baseline ($baseline/2);
@@ -132,12 +187,9 @@
     }
   }
 
-
-
-  // ====================
-
   //UI: default internal xblock content styles
-
+  // ====================
+  // TO-DO: clean-up / remove this reset
   // internal headings for problems and video components
   h2 {
     @extend %t-title5;
@@ -198,6 +250,8 @@
     }
   }
 
+  // +Messaging - Xblocks
+  // ====================
   // xblock message area, for general information as well as validation
   .wrapper-xblock-message {
 
@@ -259,7 +313,8 @@
     }
   }
 
-  // CASE: page level - outer most level
+  // +Case: Page Level
+  // ====================
   &.level-page {
     margin: 0;
     box-shadow: none;
@@ -303,7 +358,9 @@
 
   }
 
-  // CASE: nesting level - element wrapper level
+  // +Case: Nesting Level
+  // ====================
+  // element wrapper level
   &.level-nesting {
     @include transition(all $tmg-f2 linear 0s);
     border: 1px solid $gray-l3;
@@ -337,7 +394,8 @@
     }
   }
 
-  // CASE: element/component level
+  // +Case: Element / Component Level
+  // ====================
   &.level-element {
     @include transition(all $tmg-f2 linear 0s);
     box-shadow: none;
@@ -356,6 +414,10 @@
       margin-bottom: 0;
       border-bottom: 1px solid $gray-l4;
       background-color: $gray-l6;
+      &.is-collapsed {
+        border-bottom: 0;
+        border-radius: 3px;
+      }
     }
 
     .xblock-render {
@@ -390,7 +452,9 @@
     }
   }
 
-  // CASE: edited experiment groups: active and inactive
+  // +Case: Experiment Groups - Edited
+  // ====================
+  // edited experiment groups: active and inactive
   .wrapper-groups {
 
     .title {
@@ -430,8 +494,8 @@
   }
 }
 
+// +Editing - Xblocks
 // ====================
-// XBlock editing
 
 // xblock Editor tab wrapper
 .wrapper-comp-editor {
@@ -781,7 +845,10 @@
   }
 }
 
-// CASE: special xblock type overrides
+
+// +Case - Special Xblock Type Overrides
+// ====================
+// TO-DO - remove this reset styling from base _xblocks.scss file
 
 // Latex Compiler
 // make room for the launch compiler button
@@ -811,4 +878,97 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
       color: $gray-l1;
       font-style: italic;
     }
+}
+
+// CASE: xblock license settings
+.wrapper-license {
+
+  .license-types {
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+
+    .license-type {
+      display: inline-block;
+    }
+
+    .action.license-button {
+      @include grey-button;
+      @extend %t-action2;
+      display: inline-block;
+      text-align: center;
+      width: 220px;
+      height: 40px;
+      cursor: pointer;
+
+      &.is-selected {
+        @include blue-button;
+      }
+    }
+
+    .tip {
+      @extend %t-copy-sub2;
+    }
+  }
+  
+  .wrapper-license-options {
+    margin-bottom: ($baseline/2);
+
+    .tip {
+      @extend %t-copy-sub2;
+    }
+    .license-options {
+      padding-bottom: ($baseline/2);
+
+      .license-option {
+        line-height: 1.5;
+        border-bottom: 1px solid $gray-l4;
+        padding: ($baseline/2) 0 ($baseline*0.4);
+
+        &.is-clickable {
+          cursor: pointer;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        input[type=checkbox] {
+          vertical-align: top;
+          width: auto;
+          min-width: auto;
+          height: auto;
+          border: 0;
+          margin: ($baseline*0.15) 15px 0px;
+        }
+
+        .option-name {
+          @extend %t-action3;
+          @extend %t-strong;
+          display: inline-block;
+          width: 15%;
+          vertical-align: top;
+          cursor: pointer;
+        }
+        .explanation {
+          @extend %t-action4;
+          display: inline-block;
+          width: 75%;
+          vertical-align: top;
+          color: $gray;
+        }
+      }
+    }
+  }
+  .license-preview a {
+    color: $gray;
+
+    &:hover {
+      color: $ui-link-color;
+    }
+  }
+  .list-input.settings-list ul.license-options li {
+    // to make sure the padding is correctly overridden
+    padding: ($baseline / 2) 0 ($baseline * 0.4);
+  }
 }

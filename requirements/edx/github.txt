@@ -1,8 +1,9 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb - to check licensing
-#   * One of @e0d or @feanil - to check system requirements
+#   * @mollydb to check licensing
+#   * One of @e0d, @feanil, @fredsmith, @maxrothman, or @jibsheet
+#     to check system requirements
 
 # Python libraries to install directly from github
 
@@ -10,7 +11,7 @@
 -e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
--e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-2#egg=django-oauth2-provider
+-e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-5#egg=django-oauth2-provider
 -e git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=mongodb_proxy
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
@@ -19,20 +20,41 @@
 -e git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
+-e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
+git+https://github.com/mfogel/django-settings-context-processor.git@b758c3930862761216267715a70bbefd206ac03a#egg=django-settings-context-processor==0.2
+# Master pyfs has a bug working with VPC auth. This is a fix. We should switch
+# back to master when and if this fix is merged back.
+# fs==0.4.0
+git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
+# The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
+git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
+# custom opaque-key implementations for ccx
+-e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@9c634481dfc85a17dcb3351ca232d7098a38e10e#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
--e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
--e git+https://github.com/edx/bok-choy.git@9fd05383dc434e0275c9874fd50ad14e519448bc#egg=bok_choy
+-e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2015-01-05T12.24#egg=edx-ora2
--e git+https://github.com/edx/opaque-keys.git@1254ed4d615a428591850656f39f26509b86d30a#egg=opaque-keys
--e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
--e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
--e git+https://github.com/edx/edx-oauth2-provider.git@0.4.0#egg=oauth2-provider
--e git+https://github.com/edx/edx-val.git@ba00a5f2e0571e9a3f37d293a98efe4cbca850d5#egg=edx-val
--e git+https://github.com/edx/edx-milestones.git@4dfe78a2aae9559ccc979746d13a9b67f0ec311e#egg=edx-milestones
--e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock
+-e git+https://github.com/edx/edx-ora2.git@release-2015-07-14T11.10#egg=edx-ora2
+-e git+https://github.com/edx/edx-submissions.git@7c766502058e04bc9094e6cbe286e949794b80b3#egg=edx-submissions
+-e git+https://github.com/edx/opaque-keys.git@df0dd602869e498e512659bb4bd243309e30e19a#egg=opaque-keys
+git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
+-e git+https://github.com/edx/i18n-tools.git@v0.1.1#egg=i18n-tools
+-e git+https://github.com/edx/edx-oauth2-provider.git@0.5.1#egg=oauth2-provider
+-e git+https://github.com/edx/edx-val.git@v0.0.5#egg=edx-val
+-e git+https://github.com/pmitros/RecommenderXBlock.git@518234bc354edbfc2651b9e534ddb54f96080779#egg=recommender-xblock
+-e git+https://github.com/edx/edx-search.git@release-2015-07-03#egg=edx-search
+-e git+https://github.com/edx/edx-milestones.git@release-2015-06-17#egg=edx-milestones
+git+https://github.com/edx/edx-lint.git@ed8c8d2a0267d4d42f43642d193e25f8bd575d9b#egg=edx_lint==0.2.3
+-e git+https://github.com/edx/xblock-utils.git@213a97a50276d6a2504d8133650b2930ead357a0#egg=xblock-utils
+-e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
+-e git+https://github.com/edx/edx-reverification-block.git@a286e89c73e1b788e35ac5b08a54b71a9fa63cfd#egg=edx-reverification-block
+git+https://github.com/edx/ecommerce-api-client.git@1.0.0#egg=ecommerce-api-client==1.0.0
+-e git+https://github.com/edx/edx-user-state-client.git@64a8b603f42669bb7fdca03d364d4e8d3d6ad67d#egg=edx-user-state-client
+
+# Third Party XBlocks
+-e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
+-e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll

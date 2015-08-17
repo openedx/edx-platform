@@ -9,4 +9,9 @@ div.static_tab_wrapper {
   section {
     margin: 0px 0px 20px;
   }
+
+  @media print {
+    border: 0;
+    background: transparent !important;
+  }
 }

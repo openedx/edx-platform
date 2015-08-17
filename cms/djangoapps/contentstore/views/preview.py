@@ -9,13 +9,15 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment, request_token
+from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, request_token
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LibraryToolsService
+from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from xmodule.x_module import ModuleSystem
@@ -112,6 +114,12 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             if aside_type != 'acid_aside'
         ]
 
+    def render_child_placeholder(self, block, view_name, context):
+        """
+        Renders a placeholder XBlock.
+        """
+        return self.wrap_xblock(block, view_name, Fragment(), context)
+
 
 class StudioPermissionsService(object):
     """
@@ -163,6 +171,10 @@ def _preview_module_system(request, descriptor, field_data):
         _studio_wrap_xblock,
     ]
 
+    if settings.FEATURES.get("LICENSING", False):
+        # stick the license wrapper in front
+        wrappers.insert(0, wrap_with_license)
+
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     return PreviewModuleSystem(
@@ -191,6 +203,7 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService(),
             "field-data": field_data,
             "library_tools": LibraryToolsService(modulestore()),
+            "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
         },
     )
@@ -206,12 +219,18 @@ def _load_preview_module(request, descriptor):
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
     if _has_author_view(descriptor):
-        field_data = CmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+        wrapper = partial(CmsFieldData, student_data=student_data)
     else:
-        field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+        wrapper = partial(LmsFieldData, student_data=student_data)
+
+    # wrap the _field_data upfront to pass to _preview_module_system
+    wrapped_field_data = wrapper(descriptor._field_data)  # pylint: disable=protected-access
+    preview_runtime = _preview_module_system(request, descriptor, wrapped_field_data)
+
     descriptor.bind_for_student(
-        _preview_module_system(request, descriptor, field_data),
-        field_data
+        preview_runtime,
+        request.user.id,
+        [wrapper]
     )
     return descriptor
 
@@ -231,17 +250,18 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     # Only add the Studio wrapper when on the container page. The "Pages" page will remain as is for now.
     if not context.get('is_pages_view', None) and view in PREVIEW_VIEWS:
         root_xblock = context.get('root_xblock')
-        can_edit_visibility = not isinstance(xblock.location, LibraryUsageLocator)
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
+            'show_preview': context.get('show_preview', True),
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': context.get('can_edit', True),
-            'can_edit_visibility': can_edit_visibility,
+            'can_edit_visibility': context.get('can_edit_visibility', True),
+            'can_add': context.get('can_add', True),
         }
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)

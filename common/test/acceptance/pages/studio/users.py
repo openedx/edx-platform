@@ -4,6 +4,7 @@ Page classes to test either the Course Team page or the Library Team page.
 from bok_choy.promise import EmptyPromise
 from bok_choy.page_object import PageObject
 from ...tests.helpers import disable_animations
+from .course_page import CoursePage
 from . import BASE_URL
 
 
@@ -20,16 +21,10 @@ def wait_for_ajax_or_reload(browser):
     EmptyPromise(_is_ajax_finished, "Finished waiting for ajax requests.").fulfill()
 
 
-class UsersPage(PageObject):
-    """
-    Base class for either the Course Team page or the Library Team page
-    """
+class UsersPageMixin(PageObject):
+    """ Common functionality for course/library team pages """
+    new_user_form_selector = '.form-create.create-user .user-email-input'
 
-    def __init__(self, browser, locator):
-        super(UsersPage, self).__init__(browser)
-        self.locator = locator
-
-    @property
     def url(self):
         """
         URL to this page - override in subclass
@@ -52,6 +47,13 @@ class UsersPage(PageObject):
         ).results
 
     @property
+    def usernames(self):
+        """
+        Returns a list of user names for users listed on this page
+        """
+        return [user.name for user in self.users]
+
+    @property
     def has_add_button(self):
         """
         Is the "New Team Member" button present?
@@ -62,7 +64,8 @@ class UsersPage(PageObject):
         """
         Click on the "New Team Member" button
         """
-        self.q(css='.create-user-button').click()
+        self.q(css='.create-user-button').first.click()
+        self.wait_for(lambda: self.new_user_form_visible, "Add user form is visible")
 
     @property
     def new_user_form_visible(self):
@@ -78,11 +81,76 @@ class UsersPage(PageObject):
         self.q(css='.form-create.create-user .action-primary').click()
         wait_for_ajax_or_reload(self.browser)
 
+    def get_user(self, email):
+        """ Gets user wrapper by email """
+        target_users = [user for user in self.users if user.email == email]
+        assert len(target_users) == 1
+        return target_users[0]
 
-class LibraryUsersPage(UsersPage):
+    def add_user_to_course(self, email):
+        """ Adds user to a course/library """
+        self.wait_for_element_visibility('.create-user-button', "Add team member button is available")
+        self.click_add_button()
+        self.set_new_user_email(email)
+        self.click_submit_new_user_form()
+
+    def delete_user_from_course(self, email):
+        """ Deletes user from course/library """
+        target_user = self.get_user(email)
+        target_user.click_delete()
+
+    def modal_dialog_visible(self, dialog_type):
+        """ Checks if modal dialog of specified class is displayed """
+        return self.q(css='.prompt.{dialog_type}'.format(dialog_type=dialog_type)).visible
+
+    def modal_dialog_text(self, dialog_type):
+        """ Gets modal dialog text """
+        return self.q(css='.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
+
+    def wait_until_no_loading_indicator(self):
+        """
+        When the page first loads, there is a loading indicator and most
+        functionality is not yet available. This waits for that loading to finish
+        and be removed from the DOM.
+
+        This method is different from wait_until_ready because the loading element
+        is removed from the DOM, rather than hidden.
+
+        It also disables animations for improved test reliability.
+        """
+
+        self.wait_for(
+            lambda: not self.q(css='.ui-loading').present,
+            "Wait for page to complete its initial loading"
+        )
+        disable_animations(self)
+
+    def wait_until_ready(self):
+        """
+        When the page first loads, there is a loading indicator and most
+        functionality is not yet available. This waits for that loading to
+        finish.
+
+        This method is different from wait_until_no_loading_indicator because this expects
+        the loading indicator to still exist on the page; it is just hidden.
+
+        It also disables animations for improved test reliability.
+        """
+
+        self.wait_for_element_invisibility(
+            '.ui-loading',
+            'Wait for the page to complete its initial loading'
+        )
+        disable_animations(self)
+
+
+class LibraryUsersPage(UsersPageMixin):
     """
     Library Team page in Studio
     """
+    def __init__(self, browser, locator):
+        super(LibraryUsersPage, self).__init__(browser)
+        self.locator = locator
 
     @property
     def url(self):
@@ -90,6 +158,14 @@ class LibraryUsersPage(UsersPage):
         URL to the "User Access" page for the given library.
         """
         return "{}/library/{}/team/".format(BASE_URL, unicode(self.locator))
+
+
+class CourseTeamPage(CoursePage, UsersPageMixin):
+    """
+    Course Team page in Studio.
+    """
+
+    url_path = "course_team"
 
 
 class UserWrapper(PageObject):

@@ -1,5 +1,55 @@
-$annotation-yellow: rgba(255,255,10,0.3);
+// capa - styling 
+// ====================
 
+// Table of Contents 
+// * +Variables - Capa
+// * +Extends - Capa
+// * +Mixins - Status Icon - Capa
+// * +Resets - Deprecate Please
+// * +Problem - Base
+// * +Problem - Choice Group
+// * +Problem - Misc, Unclassified Mess
+// * +Problem - Text Input, Numerical Input
+// * +Problem - Option Input (Dropdown)
+// * +Problem - CodeMirror
+// * +Problem - Misc, Unclassified Mess Part 2
+// * +Problem - Rubric
+// * +Problem - Annotation
+// * +Problem - Choice Text Group
+// * +Problem - Image Input Overrides
+
+// +Variables - Capa
+// ==================== 
+$annotation-yellow: rgba(255,255,10,0.3);
+$color-copy-tip: rgb(100,100,100);
+$correct: $green-d1;
+$incorrect: $red; 
+
+// +Extends - Capa
+// ==================== 
+// Duplicated from _mixins.scss due to xmodule compilation, inheritance issues
+%use-font-awesome {
+  font-family: FontAwesome;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  speak: none;
+}
+
+// +Mixins - Status Icon - Capa
+// ==================== 
+@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d"){
+  
+  &:after {
+    @extend %use-font-awesome;
+    @include margin-left(17px);
+    color: $color;
+    font-size: 1.2em;
+    content: $fontAwesomeIcon;
+  }
+}
+
+// +Resets - Deprecate Please
+// ==================== 
 h2 {
   margin-top: 0;
   margin-bottom: ($baseline*0.75);
@@ -19,10 +69,42 @@ h2 {
   }
 }
 
+.feedback-hint-correct {
+  margin-top: ($baseline/2);
+  color: $correct;
+}
+
+.feedback-hint-incorrect {
+  margin-top: ($baseline/2);
+  color: $incorrect;
+}
+
+.feedback-hint-text {
+  color: $color-copy-tip;
+}
+
+.problem-hint {
+  color: $color-copy-tip;
+  margin-bottom: 20px;
+}
+
+.hint-label {
+  font-weight: bold;
+  display: inline-block;
+  padding-right: 0.5em;
+}
+
+.hint-text {
+  display: inline-block;
+}
+
+.feedback-hint-multi .hint-text {
+  display: block;
+}
 
 iframe[seamless]{
   overflow: hidden;
-  padding: 0px;
+  padding: 0;
   border: 0px none transparent;
   background-color: transparent;
 }
@@ -32,13 +114,16 @@ iframe[seamless]{
 }
 
 div.problem-progress {
+  @include padding-left($baseline/4);
+  @extend %t-ultralight;
   display: inline-block;
-  padding-left: ($baseline/4);
-  color: #666;
+  color: $gray-d1;
   font-weight: 100;
   font-size: em(16);
 }
 
+// +Problem - Base
+// ==================== 
 div.problem {
   @media print {
     display: block;
@@ -53,7 +138,11 @@ div.problem {
   .inline {
     display: inline;
   }
+}
 
+// +Problem - Choice Group
+// ==================== 
+div.problem {
   .choicegroup {
     @include clearfix();
     min-width: 100px;
@@ -61,51 +150,98 @@ div.problem {
     width: 100px;
 
     label {
-      @include float(left);
+      @include box-sizing(border-box);
+      display: inline-block;
       clear: both;
-      margin-bottom: ($baseline/4);
+      margin-bottom: ($baseline/2);
+      border: 2px solid $gray-l4;
+      border-radius: 3px;
+      padding: ($baseline/2);
+      width: 100%;
 
       &.choicegroup_correct {
-        &:after {
-          margin-left: ($baseline*0.75);
-          content: url('../images/correct-icon.png');
+        @include status-icon($correct, "\f00c");
+        border: 2px solid $correct;
+
+        // keep green for correct answers on hover. 
+        &:hover {
+          border-color: $correct;
         }
       }
 
       &.choicegroup_incorrect {
-        &:after {
-          margin-left: ($baseline*0.75);
-          content: url('../images/incorrect-icon.png');
+        @include status-icon($incorrect, "\f00d");
+        border: 2px solid $incorrect;
+
+        // keep red for incorrect answers on hover. 
+        &:hover {
+          border-color: $incorrect;
         }
+      }
+
+      &:hover {
+        border: 2px solid $blue;
       }
     }
 
-    .indicator_container {
-      @include float(left);
+    .indicator-container {
+      display: inline-block;
+      min-height: 1px;
       width: 25px;
-      height: 1px;
-      @include margin-right(15px);
     }
 
     fieldset {
       @include box-sizing(border-box);
-      margin: 0px 0px $baseline;
-      @include padding-left($baseline);
-      @include border-left(1px solid #ddd);
     }
 
     input[type="radio"],
     input[type="checkbox"] {
-      @include float(left);
-      @include margin(4px, 8px, 0, 0);
+      @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
     }
 
     text {
+      @include margin-left(25px);
       display: inline;
-      margin-left: 25px;
     }
   }
+}
 
+// +Problem - Status Indicators 
+// ==================== 
+// Summary status indicators shown after the input area 
+div.problem { 
+
+  .indicator-container {
+
+    .status {
+      width: $baseline;
+      height: $baseline;
+
+      // CASE: correct answer
+      &.correct {
+        @include status-icon($correct, "\f00c");
+      }
+
+      // CASE: incorrect answer
+      &.incorrect {
+        @include status-icon($incorrect, "\f00d");
+      }
+
+      // CASE: unanswered
+      &.unanswered {
+        @include status-icon($gray-l4, "\f128");
+      }
+
+      // CASE: processing
+      &.processing {
+      }
+    }
+  }
+}
+
+// +Problem - Misc, Unclassified Mess
+// ==================== 
+div.problem { 
   ol.enumerate {
     li {
       &:before {
@@ -151,16 +287,27 @@ div.problem {
     }
   }
 
+  // known classes using this div: .indicator-container, moved to section above
   div {
+
+    // TO-DO: Styling used by advanced capa problem types. Should be synced up to use .status class
     p {
       &.answer {
         margin-top: -2px;
       }
+
       &.status {
-        margin: 8px 0 0 $baseline/2;
+        @include margin(8px, 0, 0, ($baseline/2));
         text-indent: 100%;
         white-space: nowrap;
         overflow: hidden;
+      }
+
+      span.clarification i {
+        font-style: normal;
+        &:hover {
+          color: $blue;
+        }
       }
     }
 
@@ -182,7 +329,7 @@ div.problem {
       }
 
       input {
-        border-color: green;
+        border-color: $correct;
       }
     }
 
@@ -199,7 +346,7 @@ div.problem {
       }
     }
 
-    &.incorrect, &.incomplete, &.ui-icon-close {
+    &.ui-icon-close {
       p.status {
         display: inline-block;
         width: 20px;
@@ -208,7 +355,21 @@ div.problem {
       }
 
       input {
-        border-color: red;
+        border-color: $incorrect;
+      }
+    }
+
+    &.incorrect, &.incomplete {
+
+      p.status {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url('../images/incorrect-icon.png') center center no-repeat;
+      }
+
+      input {
+        border-color: $incorrect;
       }
     }
 
@@ -218,14 +379,14 @@ div.problem {
     }
 
     p.answer {
+      @include margin-left($baseline/2);
       display: inline-block;
       margin-bottom: 0;
-      margin-left: $baseline/2;
 
       &:before {
+        @extend %t-strong;
         display: inline;
         content: "Answer: ";
-        font-weight: bold;
 
       }
       &:empty {
@@ -245,8 +406,8 @@ div.problem {
       }
 
       img.loading {
+        @include padding-left($baseline/2);
         display: inline-block;
-        padding-left: ($baseline/2);
       }
 
       span {
@@ -261,10 +422,18 @@ div.problem {
           background: #f1f1f1;
         }
       }
+    } 
+
+    // Hides equation previews in symbolic response problems when printing
+    [id^='display'].equation {
+      @media print {
+        display:none;
+      }
     }
 
+    //TO-DO: review and deprecate all these styles within span {}
     span {
-      &.unanswered, &.ui-icon-bullet {
+      &.ui-icon-bullet {
         display: inline-block;
         position: relative;
         top: 4px;
@@ -282,7 +451,7 @@ div.problem {
         background: url('../images/spinner.gif') center center no-repeat;
       }
 
-      &.correct, &.ui-icon-check {
+      &.ui-icon-check {
         display: inline-block;
         position: relative;
         top: 3px;
@@ -300,7 +469,7 @@ div.problem {
         background: url('../images/partially-correct-icon.png') center center no-repeat;
       }
 
-      &.incorrect, &.incomplete, &.ui-icon-close {
+      &.incomplete, &.ui-icon-close {
         display: inline-block;
         position: relative;
         top: 3px;
@@ -311,8 +480,8 @@ div.problem {
     }
 
     .reload {
-      float:right;
-      margin: $baseline/2;
+      @include float(right);
+      margin: ($baseline/2);
     }
 
 
@@ -408,15 +577,6 @@ div.problem {
     }
   }
 
-  form.option-input {
-    margin: -$baseline/2 0 $baseline;
-    padding-bottom: $baseline;
-
-    select {
-      margin-right: flex-gutter();
-    }
-  }
-
   ul {
     margin-bottom: lh();
     margin-left: .75em;
@@ -436,7 +596,8 @@ div.problem {
   }
 
   dl dt {
-    font-weight: bold;
+    @extend %t-strong;
+
   }
 
   dl dd {
@@ -482,8 +643,8 @@ div.problem {
     }
 
     th {
+      @extend %t-strong;
       text-align: left;
-      font-weight: bold;
     }
 
     td {
@@ -535,6 +696,93 @@ div.problem {
       white-space: pre;
     }
   }
+}
+
+// +Problem - Text Input, Numerical Input
+// ==================== 
+.problem {
+  .capa_inputtype.textline, .inputtype.formulaequationinput {
+    
+    input {
+      @include box-sizing(border-box);
+      border: 2px solid $gray-l4;
+      border-radius: 3px;
+      min-width: 160px;
+      height: 46px;
+    }
+
+    > .incorrect, .correct, .unanswered {
+
+      .status {
+        display: inline-block;
+        margin-top: ($baseline/2);
+        background: none;
+      }
+    }
+
+    // CASE: incorrect answer
+    > .incorrect {
+
+      input { 
+        border: 2px solid $incorrect;
+      }
+
+      .status {
+        @include status-icon($incorrect, "\f00d");
+      }
+    }
+
+    // CASE: correct answer
+    > .correct {
+      
+      input { 
+        border: 2px solid $correct;
+      }
+
+      .status {
+        @include status-icon($correct, "\f00c");
+      }
+    }
+
+    // CASE: unanswered
+    > .unanswered {
+
+      input { 
+        border: 2px solid $gray-l4;
+      }
+
+      .status {
+        @include status-icon($gray-l4, "\f128");
+      }
+    }
+  }
+}
+
+
+// +Problem - Option Input (Dropdown)
+// ==================== 
+.problem {
+  .inputtype.option-input {
+    margin: (-$baseline/2) 0 $baseline;
+    padding-bottom: $baseline;
+
+    select {
+      @include margin-right($baseline/2);
+    }
+
+    .indicator-container {
+      display: inline-block;
+
+      .status.correct:after, .status.incorrect:after {
+        @include margin-left(0);
+      }
+    }
+  }
+}
+
+// +Problem - CodeMirror
+// ==================== 
+div.problem { 
 
   .CodeMirror {
     border: 1px solid black;
@@ -585,7 +833,52 @@ div.problem {
   .CodeMirror-scroll {
     margin-right: 0px;
   }
+}
 
+// +Problem - Actions
+// ==================== 
+div.problem .action {
+  margin-top: $baseline;
+
+  .save, .check, .show, .reset, .hint-button {
+    @include margin-right($baseline/2);
+    margin-bottom: ($baseline/2);
+    height: ($baseline*2);
+    vertical-align: middle;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .save {
+    @extend .blue-button !optional;
+  }
+
+  .show {
+
+    .show-label {
+      font-weight: 600;
+      font-size: 1.0em;
+    }
+  }
+
+  .submission_feedback {
+    // background: #F3F3F3;
+    // border: 1px solid #ddd;
+    // border-radius: 3px;
+    // padding: 8px 12px;
+    // margin-top: ($baseline/2);
+    @include margin-left($baseline/2);
+    display: inline-block;
+    margin-top: 8px;
+    color: $gray-d1;
+    font-style: italic;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+// +Problem - Misc, Unclassified Mess Part 2
+// ==================== 
+div.problem { 
   hr {
     float: none;
     clear: both;
@@ -614,48 +907,12 @@ div.problem {
     padding: lh();
     border: 1px solid $gray-l3;
   }
-
-  div.action {
-    margin-top: $baseline;
-
-    .save, .check, .show, .reset {
-      height: ($baseline*2);
-      vertical-align: middle;
-      font-weight: 600;
-    }
-
-    .save {
-      @extend .blue-button !optional;
-    }
-
-    .show {
-
-      .show-label {
-        font-weight: 600;
-        font-size: 1.0em;
-      }
-    }
-
-    .submission_feedback {
-      // background: #F3F3F3;
-      // border: 1px solid #ddd;
-      // border-radius: 3px;
-      // padding: 8px 12px;
-      // margin-top: ($baseline/2);
-      display: inline-block;
-      margin-top: 8px;
-      @include margin-left($baseline/2);
-      color: #666;
-      font-style: italic;
-      -webkit-font-smoothing: antialiased;
-    }
-  }
-
+  
   .detailed-solution {
     > p:first-child {
+      @extend %t-strong;
       color: #aaa;
       text-transform: uppercase;
-      font-weight: bold;
       font-style: normal;
       font-size: 0.9em;
     }
@@ -667,9 +924,9 @@ div.problem {
 
   .detailed-targeted-feedback {
     > p:first-child {
-      color: red;
+       @extend %t-strong;
+      color: $incorrect;
       text-transform: uppercase;
-      font-weight: bold;
       font-style: normal;
       font-size: 0.9em;
     }
@@ -681,9 +938,9 @@ div.problem {
 
   .detailed-targeted-feedback-correct {
     > p:first-child {
-      color: green;
+       @extend %t-strong;
+      color: $correct;
       text-transform: uppercase;
-      font-weight: bold;
       font-style: normal;
       font-size: 0.9em;
     }
@@ -724,11 +981,11 @@ div.problem {
     border: 1px solid $gray-l3;
 
     h3 {
+      @extend %t-strong;
       padding: 9px;
       border-bottom: 1px solid #e3e3e3;
       background: #eee;
       text-shadow: 0 1px 0 $white;
-      font-weight: bold;
       font-size: em(16);
     }
 
@@ -765,9 +1022,9 @@ div.problem {
       margin-bottom: 12px;
 
       h3 {
+        @extend %t-strong;
         color: #aaa;
         text-transform: uppercase;
-        font-weight: bold;
         font-style: normal;
         font-size: 0.9em;
       }
@@ -824,7 +1081,7 @@ div.problem {
       }
 
       .shortform {
-        font-weight: bold;
+        @extend %t-strong;
       }
 
       .longform {
@@ -898,7 +1155,12 @@ div.problem {
       }
     }
   }
+}
 
+
+// +Problem - Rubric
+// ==================== 
+div.problem {
   .rubric {
     tr {
       margin: ($baseline/2) 0;
@@ -951,16 +1213,20 @@ div.problem {
       display: none;
     }
   }
+}
 
+// +Problem - Annotation
+// ==================== 
+div.problem {
   .annotation-input {
     margin: 0 0 1em 0;
     border: 1px solid $gray-l3;
     border-radius: 1em;
 
     .annotation-header {
+      @extend %t-strong;
       padding: .5em 1em;
       border-bottom: 1px solid $gray-l3;
-      font-weight: bold;
     }
 
     .annotation-body { padding: .5em 1em; }
@@ -1041,16 +1307,20 @@ div.problem {
       pre { background-color: $gray-l3; color: $black; }
 
       &:before {
+        @extend %t-strong;
         display: block;
         content: "debug input value";
         text-transform: uppercase;
-        font-weight: bold;
         font-size: 1.5em;
       }
     }
   }
+}
 
-  .choicetextgroup{
+// +Problem - Choice Text Group
+// ==================== 
+div.problem {
+  .choicetextgroup {
     @extend .choicegroup;
 
     input[type="text"]{
@@ -1061,7 +1331,7 @@ div.problem {
       @extend label.choicegroup_correct;
 
       input[type="text"] {
-        border-color: green;
+        border-color: $correct;
       }
     }
 
@@ -1079,5 +1349,26 @@ div.problem {
     span.mock_label {
       cursor : default;
     }
+  }
+}
+
+// +Problem - Image Input Overrides
+// ====================
+
+// NOTE: temporary override until image inputs use same base html structure as other common capa input types.
+div.problem .imageinput.capa_inputtype {
+
+  .status {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px;
+  }
+  .correct {
+    background: url('../images/correct-icon.png') center center no-repeat;
+  }
+  .incorrect {
+    background: url('../images/incorrect-icon.png') center center no-repeat;
   }
 }

@@ -1,6 +1,6 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
-    'annotator', 'logger', 'js/edxnotes/views/notes_factory'
+    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, AjaxHelpers, Helpers, Annotator, Logger, NotesFactory) {
     'use strict';
     describe('EdxNotes Events Plugin', function() {
@@ -9,19 +9,22 @@ define([
                 id: 'note-123',
                 text: 'text-123',
                 quote: 'quote-123',
-                usage_id: 'usage-123'
+                usage_id: 'usage-123',
+                tags: ["tag1", "tag2"]
             },
             noteWithoutId = {
                 user: 'user-123',
                 text: 'text-123',
                 quote: 'quote-123',
-                usage_id: 'usage-123'
+                usage_id: 'usage-123',
+                tags: ["tag1", "tag2"]
             };
 
         beforeEach(function() {
             this.annotator =  NotesFactory.factory(
                 $('<div />').get(0), {
-                    endpoint: 'http://example.com/'
+                    endpoint: 'http://example.com/',
+                    eventStringLimit: 300
                 }
             );
             spyOn(Logger, 'log');
@@ -65,9 +68,9 @@ define([
                 'edx.course.student_notes.added', {
                     'note_id': 'note-123',
                     'note_text': 'text-123',
-                    'note_text_truncated': false,
+                    'tags': ["tag1", "tag2"],
                     'highlighted_content': 'quote-123',
-                    'highlighted_content_truncated': false,
+                    'truncated': [],
                     'component_usage_id': 'usage-123'
                 }
             );
@@ -75,7 +78,7 @@ define([
 
         it('should log the edx.course.student_notes.edited event properly', function() {
             var oldNote = note,
-                newNote = $.extend({}, note, {text: 'text-456'});
+                newNote = $.extend({}, note, {text: 'text-456', tags: []});
 
             this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
             expect(this.annotator.plugins.Events.oldNoteText).toBe('text-123');
@@ -86,11 +89,11 @@ define([
                 'edx.course.student_notes.edited', {
                     'note_id': 'note-123',
                     'old_note_text': 'text-123',
-                    'old_note_text_truncated': false,
                     'note_text': 'text-456',
-                    'note_text_truncated': false,
+                    'old_tags': ["tag1", "tag2"],
+                    'tags': [],
                     'highlighted_content': 'quote-123',
-                    'highlighted_content_truncated': false,
+                    'truncated': [],
                     'component_usage_id': 'usage-123'
                 }
             );
@@ -115,9 +118,9 @@ define([
                 'edx.course.student_notes.deleted', {
                     'note_id': 'note-123',
                     'note_text': 'text-123',
-                    'note_text_truncated': false,
+                    'tags': ["tag1", "tag2"],
                     'highlighted_content': 'quote-123',
-                    'highlighted_content_truncated': false,
+                    'truncated': [],
                     'component_usage_id': 'usage-123'
                 }
             );
@@ -129,10 +132,11 @@ define([
         });
 
         it('should truncate values of some fields', function() {
-            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT}),
+            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT, tags: ["review", Helpers.LONG_TEXT]}),
                 newNote = $.extend({}, note, {
                     text: Helpers.LONG_TEXT + '123',
-                    quote: Helpers.LONG_TEXT + '123'
+                    quote: Helpers.LONG_TEXT + '123',
+                    tags: ["short", "tags", "will", "stay", Helpers.LONG_TEXT]
                 });
 
             this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
@@ -144,11 +148,11 @@ define([
                 'edx.course.student_notes.edited', {
                     'note_id': 'note-123',
                     'old_note_text': Helpers.TRUNCATED_TEXT,
-                    'old_note_text_truncated': true,
+                    'old_tags': ["review"],
+                    'tags': ["short", "tags", "will", "stay"],
                     'note_text': Helpers.TRUNCATED_TEXT,
-                    'note_text_truncated': true,
                     'highlighted_content': Helpers.TRUNCATED_TEXT,
-                    'highlighted_content_truncated': true,
+                    'truncated': ["note_text", "highlighted_content", "tags", "old_note_text", "old_tags"],
                     'component_usage_id': 'usage-123'
                 }
             );

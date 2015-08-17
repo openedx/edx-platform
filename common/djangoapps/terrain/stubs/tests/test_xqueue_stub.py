@@ -6,7 +6,7 @@ import mock
 import unittest
 import json
 import requests
-from ..xqueue import StubXQueueService, StubXQueueHandler
+from ..xqueue import StubXQueueService
 
 
 class FakeTimer(object):
@@ -23,6 +23,7 @@ class FakeTimer(object):
 class StubXQueueServiceTest(unittest.TestCase):
 
     def setUp(self):
+        super(StubXQueueServiceTest, self).setUp()
         self.server = StubXQueueService()
         self.url = "http://127.0.0.1:{0}/xqueue/submit".format(self.server.port)
         self.addCleanup(self.server.shutdown)

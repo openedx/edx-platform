@@ -198,16 +198,16 @@ class ReportStore(object):
     passing in the whole dataset. Doing that for now just because it's simpler.
     """
     @classmethod
-    def from_config(cls):
+    def from_config(cls, config_name):
         """
         Return one of the ReportStore subclasses depending on django
         configuration. Look at subclasses for expected configuration.
         """
-        storage_type = settings.GRADES_DOWNLOAD.get("STORAGE_TYPE")
+        storage_type = getattr(settings, config_name).get("STORAGE_TYPE")
         if storage_type.lower() == "s3":
-            return S3ReportStore.from_config()
+            return S3ReportStore.from_config(config_name)
         elif storage_type.lower() == "localfs":
-            return LocalFSReportStore.from_config()
+            return LocalFSReportStore.from_config(config_name)
 
     def _get_utf8_encoded_rows(self, rows):
         """
@@ -242,7 +242,7 @@ class S3ReportStore(ReportStore):
         self.bucket = conn.get_bucket(bucket_name)
 
     @classmethod
-    def from_config(cls):
+    def from_config(cls, config_name):
         """
         The expected configuration for an `S3ReportStore` is to have a
         `GRADES_DOWNLOAD` dict in settings with the following fields::
@@ -257,8 +257,8 @@ class S3ReportStore(ReportStore):
         and `AWS_SECRET_ACCESS_KEY` in settings.
         """
         return cls(
-            settings.GRADES_DOWNLOAD['BUCKET'],
-            settings.GRADES_DOWNLOAD['ROOT_PATH']
+            getattr(settings, config_name).get("BUCKET"),
+            getattr(settings, config_name).get("ROOT_PATH")
         )
 
     def key_for(self, course_id, filename):
@@ -275,7 +275,7 @@ class S3ReportStore(ReportStore):
 
         return key
 
-    def store(self, course_id, filename, buff):
+    def store(self, course_id, filename, buff, config=None):
         """
         Store the contents of `buff` in a directory determined by hashing
         `course_id`, and name the file `filename`. `buff` is typically a
@@ -288,10 +288,15 @@ class S3ReportStore(ReportStore):
         """
         key = self.key_for(course_id, filename)
 
+        _config = config if config else {}
+
+        content_type = _config.get('content_type', 'text/csv')
+        content_encoding = _config.get('content_encoding', 'gzip')
+
         data = buff.getvalue()
         key.size = len(data)
-        key.content_encoding = "gzip"
-        key.content_type = "text/csv"
+        key.content_encoding = content_encoding
+        key.content_type = content_type
 
         # Just setting the content encoding and type above should work
         # according to the docs, but when experimenting, this was necessary for
@@ -299,9 +304,9 @@ class S3ReportStore(ReportStore):
         key.set_contents_from_string(
             data,
             headers={
-                "Content-Encoding": "gzip",
+                "Content-Encoding": content_encoding,
                 "Content-Length": len(data),
-                "Content-Type": "text/csv",
+                "Content-Type": content_type,
             }
         )
 
@@ -354,7 +359,7 @@ class LocalFSReportStore(ReportStore):
             os.makedirs(root_path)
 
     @classmethod
-    def from_config(cls):
+    def from_config(cls, config_name):
         """
         Generate an instance of this object from Django settings. It assumes
         that there is a dict in settings named GRADES_DOWNLOAD and that it has
@@ -365,13 +370,13 @@ class LocalFSReportStore(ReportStore):
             STORAGE_TYPE : "localfs"
             ROOT_PATH : /tmp/edx/report-downloads/
         """
-        return cls(settings.GRADES_DOWNLOAD['ROOT_PATH'])
+        return cls(getattr(settings, config_name).get("ROOT_PATH"))
 
     def path_to(self, course_id, filename):
         """Return the full path to a given file for a given course."""
         return os.path.join(self.root_path, urllib.quote(course_id.to_deprecated_string(), safe=''), filename)
 
-    def store(self, course_id, filename, buff):
+    def store(self, course_id, filename, buff, config=None):  # pylint: disable=unused-argument
         """
         Given the `course_id` and `filename`, store the contents of `buff` in
         that file. Overwrite anything that was there previously. `buff` is

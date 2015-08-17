@@ -1,16 +1,24 @@
+# coding: utf-8
 """
 Acceptance tests for Studio's Setting pages
 """
-
+from __future__ import unicode_literals
 from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
-
+from bok_choy.promise import EmptyPromise
+from ...fixtures.course import XBlockFixtureDesc
+from ..helpers import create_user_partition_json
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from ...pages.lms.courseware import CoursewarePage
+from unittest import skip
+from textwrap import dedent
+from xmodule.partitions.partitions import Group
 
 
-@attr('shard_1')
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -23,6 +31,26 @@ class ContentGroupConfigurationTest(StudioCourseTest):
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run']
+        )
+
+        self.outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Populates test course with chapter, sequential, and 1 problems.
+        The problem is visible only to Group "alpha".
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
         )
 
     def create_and_verify_content_group(self, name, existing_groups):
@@ -38,7 +66,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config.name = name
         # Save the content group
         self.assertEqual(config.get_text('.action-primary'), "Create")
-        self.assertTrue(config.delete_button_is_absent)
+        self.assertFalse(config.delete_button_is_present)
         config.save()
         self.assertIn(name, config.name)
         return config
@@ -84,16 +112,68 @@ class ContentGroupConfigurationTest(StudioCourseTest):
 
         self.assertIn("Updated Second Content Group", second_config.name)
 
-    def test_cannot_delete_content_group(self):
+    def test_cannot_delete_used_content_group(self):
         """
-        Scenario: Delete is not currently supported for content groups.
-        Given I have a course without content groups
-        When I create a content group
-        Then there is no delete button
+        Scenario: Ensure that the user cannot delete used content group.
+        Given I have a course with 1 Content Group
+        And I go to the Group Configuration page
+        When I try to delete the Content Group with name "New Content Group"
+        Then I see the delete button is disabled.
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Configuration alpha,',
+                        'Content Group Partition',
+                        [Group("0", 'alpha')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+        problem_data = dedent("""
+            <problem markdown="Simple Problem" max_attempts="" weight="">
+              <p>Choose Yes.</p>
+              <choiceresponse>
+                <checkboxgroup direction="vertical">
+                  <choice correct="true">Yes</choice>
+                </checkboxgroup>
+              </choiceresponse>
+            </problem>
+        """)
+        vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+        self.course_fixture.create_xblock(
+            vertical.locator,
+            XBlockFixtureDesc('problem', "VISIBLE TO ALPHA", data=problem_data, metadata={"group_access": {0: [0]}}),
+        )
+        self.group_configurations_page.visit()
+        config = self.group_configurations_page.content_groups[0]
+        self.assertTrue(config.delete_button_is_disabled)
+
+    def test_can_delete_unused_content_group(self):
+        """
+        Scenario: Ensure that the user can delete unused content group.
+        Given I have a course with 1 Content Group
+        And I go to the Group Configuration page
+        When I delete the Content Group with name "New Content Group"
+        Then I see that there is no Content Group
+        When I refresh the page
+        Then I see that the content group has been deleted
         """
         self.group_configurations_page.visit()
         config = self.create_and_verify_content_group("New Content Group", 0)
-        self.assertTrue(config.delete_button_is_absent)
+        self.assertTrue(config.delete_button_is_present)
+
+        self.assertEqual(len(self.group_configurations_page.content_groups), 1)
+
+        # Delete content group
+        config.delete()
+        self.assertEqual(len(self.group_configurations_page.content_groups), 0)
+
+        self.group_configurations_page.visit()
+        self.assertEqual(len(self.group_configurations_page.content_groups), 0)
 
     def test_must_supply_name(self):
         """
@@ -129,8 +209,27 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config.cancel()
         self.assertEqual(0, len(self.group_configurations_page.content_groups))
 
+    def test_content_group_empty_usage(self):
+        """
+        Scenario: When content group is not used, ensure that the link to outline page works correctly.
+        Given I have a course without content group
+        And I create new content group
+        Then I see a link to the outline page
+        When I click on the outline link
+        Then I see the outline page
+        """
+        self.group_configurations_page.visit()
+        config = self.create_and_verify_content_group("New Content Group", 0)
+        config.toggle()
+        config.click_outline_anchor()
 
-@attr('shard_1')
+        # Waiting for the page load and verify that we've landed on course outline page
+        EmptyPromise(
+            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
+            timeout=30
+        ).fulfill()
+
+
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -290,3 +389,90 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
                 "Course Announcement Date": '"string"',
             }
         )
+
+    def test_only_expected_fields_are_displayed(self):
+        """
+        Scenario: The Advanced Settings screen displays settings/fields not specifically hidden from
+        view by a developer.
+        Given I have a set of CourseMetadata fields defined for the course
+        When I view the Advanced Settings screen for the course
+        The total number of fields displayed matches the number I expect
+        And the actual fields displayed match the fields I expect to see
+        """
+        expected_fields = self.advanced_settings.expected_settings_names
+        displayed_fields = self.advanced_settings.displayed_settings_names
+        self.assertEquals(set(displayed_fields), set(expected_fields))
+
+
+@attr('shard_1')
+class ContentLicenseTest(StudioCourseTest):
+    """
+    Tests for course-level licensing (that is, setting the license,
+    for an entire course's content, to All Rights Reserved or Creative Commons)
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(ContentLicenseTest, self).setUp()
+        self.outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.settings_page = SettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.lms_courseware = CoursewarePage(
+            self.browser,
+            self.course_id,
+        )
+        self.settings_page.visit()
+
+    def test_empty_license(self):
+        """
+        When I visit the Studio settings page,
+        I see that the course license is "All Rights Reserved" by default.
+        Then I visit the LMS courseware page,
+        and I see that the default course license is displayed.
+        """
+        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
+        self.lms_courseware.visit()
+        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
+
+    def test_arr_license(self):
+        """
+        When I visit the Studio settings page,
+        and I set the course license to "All Rights Reserved",
+        and I refresh the page,
+        I see that the course license is "All Rights Reserved".
+        Then I visit the LMS courseware page,
+        and I see that the course license is "All Rights Reserved".
+        """
+        self.settings_page.course_license = "All Rights Reserved"
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
+
+        self.lms_courseware.visit()
+        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
+
+    def test_cc_license(self):
+        """
+        When I visit the Studio settings page,
+        and I set the course license to "Creative Commons",
+        and I refresh the page,
+        I see that the course license is "Creative Commons".
+        Then I visit the LMS courseware page,
+        and I see that the course license is "Some Rights Reserved".
+        """
+        self.settings_page.course_license = "Creative Commons"
+        self.settings_page.save_changes()
+        self.settings_page.refresh_and_wait_for_load()
+        self.assertEqual(self.settings_page.course_license, "Creative Commons")
+
+        self.lms_courseware.visit()
+        # The course_license text will include a bunch of screen reader text to explain
+        # the selected options
+        self.assertIn("Some Rights Reserved", self.lms_courseware.course_license)

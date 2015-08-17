@@ -6,6 +6,7 @@ import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from contentstore.utils import reverse_usage_url
+from microsite_configuration import microsite
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -50,6 +51,53 @@ from contentstore.utils import reverse_usage_url
     </div>
   </div>
   %endif
+
+    %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('block_types_enabled'):
+      <%
+        platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+      %>
+      <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+        <div class="alert announcement">
+          <i class="feedback-symbol fa fa-warning" aria-hidden="true"></i><span class="sr">${_("Warning")}</span>
+
+          <div class="copy">
+            <h2 class="title title-3 warning-heading-text">${_("This course uses features that are no longer supported.")}</h2>
+
+            %if deprecated_blocks_info.get('blocks'):
+              <div class="components-list">
+                <p class="components-list-heading-text">${_("You must delete or replace the following components.")}</p>
+                  <nav class="nav-related" aria-label="${_('Unsupported Components')}">
+                    <ul>
+                      % for component_parent_url, component_display_name in deprecated_blocks_info['blocks']:
+                        <li class="nav-item"><a href="${component_parent_url}">${_(component_display_name)}</a></li>
+                      % endfor
+                    </ul>
+                  </nav>
+              </div>
+            %endif
+
+            % if deprecated_blocks_info.get('block_types_enabled'):
+              <div class="advance-modules-list">
+                <p class="advance-modules-remove-text">
+                  ${_("To avoid errors, {platform_name} strongly recommends that you remove unsupported features from the course advanced settings. To do this, go to the {link_start}Advanced Settings page{link_end}, locate the \"Advanced Module List\" setting, and then delete the following modules from the list.").format(
+                    platform_name=platform_name,
+                    link_start='<a href="{advance_settings_url}">'.format(advance_settings_url=deprecated_blocks_info['advance_settings_url']), link_end="</a>"
+                  )}
+                </p>
+                <nav class="nav-related" aria-label="${_('Unsupported Advance Modules')}">
+                  <ul>
+                    % for block_type in deprecated_blocks_info['block_types']:
+                      <li class="nav-item">${block_type}</li>
+                    % endfor
+                  </ul>
+                </nav>
+              </div>
+            % endif
+          </div>
+        </div>
+      </div>
+    %endif
+
 </%block>
 
 <%block name="content">
@@ -60,7 +108,7 @@ from contentstore.utils import reverse_usage_url
             <span class="sr">&gt; </span>${_("Course Outline")}
         </h1>
 
-        <nav class="nav-actions">
+        <nav class="nav-actions" aria-label="${_('Page Actions')}">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
@@ -68,6 +116,13 @@ from contentstore.utils import reverse_usage_url
                         <i class="icon fa fa-plus"></i>${_('New Section')}
                     </a>
                 </li>
+                %if reindex_link:
+                    <li class="nav-item">
+                        <a href="${reindex_link}" class="button button-reindex" data-category="reindex" title="${_('Reindex current course')}">
+                            <i class="icon-arrow-right"></i>${_('Reindex')}
+                        </a>
+                    </li>
+                %endif
                 <li class="nav-item">
                     <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
                         <span class="collapse-all"><i class="icon fa fa-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>

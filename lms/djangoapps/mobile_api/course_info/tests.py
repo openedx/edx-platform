@@ -8,44 +8,15 @@ from django.conf import settings
 from xmodule.html_module import CourseInfoModule
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ..testutils import (
-    MobileAPITestCase, MobileCourseAccessTestMixin, MobileEnrolledCourseAccessTestMixin, MobileAuthTestMixin
+    MobileAPITestCase, MobileCourseAccessTestMixin, MobileAuthTestMixin
 )
 
 
-class TestAbout(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
-    """
-    Tests for /api/mobile/v0.5/course_info/{course_id}/about
-    """
-    REVERSE_INFO = {'name': 'course-about-detail', 'params': ['course_id']}
-
-    def verify_success(self, response):
-        super(TestAbout, self).verify_success(response)
-        self.assertTrue('overview' in response.data)
-
-    def init_course_access(self, course_id=None):
-        # override this method since enrollment is not required for the About endpoint.
-        self.login()
-
-    def test_about_static_rewrite(self):
-        self.login()
-
-        about_usage_key = self.course.id.make_usage_key('about', 'overview')
-        about_module = modulestore().get_item(about_usage_key)
-        underlying_about_html = about_module.data
-
-        # check that we start with relative static assets
-        self.assertIn('\"/static/', underlying_about_html)
-
-        # but shouldn't finish with any
-        response = self.api_response()
-        self.assertNotIn('\"/static/', response.data['overview'])
-
-
 @ddt.ddt
-class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/updates
     """
@@ -111,7 +82,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAc
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/handouts
     """
@@ -120,8 +91,13 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseA
     def setUp(self):
         super(TestHandouts, self).setUp()
 
+        # Deleting handouts fails with split modulestore because the handout has no parent.
+        # This needs further investigation to determine if it is a bug in the split modulestore.
+        # pylint: disable=protected-access
+        self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+
         # use toy course with handouts, and make it mobile_available
-        course_items = import_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
+        course_items = import_course_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
         self.course = course_items[0]
         self.course.mobile_available = True
         self.store.update_item(self.course, self.user.id)
