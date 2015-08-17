@@ -540,6 +540,9 @@ class TestCreateTeamAPI(TeamAPITestCase):
         team_membership = team['membership']
         del team['membership']
 
+        self.assertIn('last_activity_at', team)
+        del team['last_activity_at']
+
         # Verify that the creating user gets added to the team.
         self.assertEqual(len(team_membership), 1)
         member = team_membership[0]['user']
@@ -587,6 +590,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         if status == 200:
             self.assertEqual(team['description'], self.test_team_1.description)
             self.assertEqual(team['discussion_topic_id'], self.test_team_1.discussion_topic_id)
+            self.assertIn('last_activity_at', team)
 
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)

@@ -58,9 +58,10 @@ class CourseTeamSerializer(serializers.ModelSerializer):
             "description",
             "country",
             "language",
+            "last_activity_at",
             "membership",
         )
-        read_only_fields = ("course_id", "date_created", "discussion_topic_id")
+        read_only_fields = ("course_id", "date_created", "discussion_topic_id", "last_activity_at")
 
 
 class CourseTeamCreationSerializer(serializers.ModelSerializer):
@@ -118,8 +119,8 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta(object):
         """Defines meta information for the ModelSerializer."""
         model = CourseTeamMembership
-        fields = ("user", "team", "date_joined")
-        read_only_fields = ("date_joined",)
+        fields = ("user", "team", "date_joined", "last_activity_at")
+        read_only_fields = ("date_joined", "last_activity_at")
 
 
 class PaginatedMembershipSerializer(PaginationSerializer):
