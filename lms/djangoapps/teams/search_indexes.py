@@ -27,25 +27,25 @@ class CourseTeamIndex(indexes.SearchIndex, indexes.Indexable):
         """
         return CourseTeam
 
-    def prepare_language(self, object):
+    def prepare_language(self, obj):
         """
         Convert the language from code to long name
         """
         languages = dict(settings.ALL_LANGUAGES)
         try:
-            return languages[object.language]
+            return languages[obj.language]
         except KeyError:
-            return object.language
+            return obj.language
 
-    def prepare_text(self, object):
+    def prepare_text(self, obj):
         """
         Generate the text field used for general search
         """
         return '{name} {description} {country} {language}'.format(
-            name=object.name,
-            description=object.description,
-            country=object.country.name.format(),
-            language=self.prepare_language(object)
+            name=obj.name.encode('utf-8'),
+            description=obj.description.encode('utf-8'),
+            country=obj.country.name.format(),
+            language=self.prepare_language(obj)
         )
 
     def index_queryset(self, using=None):

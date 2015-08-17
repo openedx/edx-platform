@@ -197,6 +197,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             course_id=self.test_course_2.id,
             topic_id='topic_6'
         )
+        self.test_team_7 = CourseTeamFactory.create(
+            name='Search',
+            description='queryable text',
+            country='GS',
+            language='to',
+            course_id=self.test_course_2.id,
+            topic_id='topic_7'
+        )
 
         self.test_team_name_id_map = {team.name: team for team in (
             self.test_team_1,
@@ -398,7 +406,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         self.verify_names(
             {'course_id': self.test_course_2.id},
             200,
-            ['Another Team', 'Public Profile Team'],
+            ['Another Team', 'Public Profile Team', 'Search'],
             user='staff'
         )
 
@@ -407,11 +415,6 @@ class TestListTeamsAPI(TeamAPITestCase):
 
     def test_filter_include_inactive(self):
         self.verify_names({'include_inactive': True}, 200, ['Coal Team', 'Nuclear Team', u'sólar team', 'Wind Team'])
-
-    # Text search is not yet implemented, so this should return HTTP
-    # 400 for now
-    def test_filter_text_search(self):
-        self.verify_names({'text_search': 'foobar'}, 400)
 
     @ddt.data(
         (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
@@ -455,6 +458,38 @@ class TestListTeamsAPI(TeamAPITestCase):
             user='student_enrolled_public_profile'
         )
         self.verify_expanded_public_user(result['results'][0]['membership'][0]['user'])
+
+    def test_text_search_name(self):
+        self.verify_names(
+            {'course_id': self.test_course_2.id, 'text_search':'search'},
+            200,
+            ['Search'],
+            user='student_enrolled_public_profile'
+        )
+
+    def test_text_search_description(self):
+        self.verify_names(
+            {'course_id': self.test_course_2.id, 'text_search':'queryable'},
+            200,
+            ['Search'],
+            user='student_enrolled_public_profile'
+        )
+
+    def test_text_search_langugae(self):
+        self.verify_names(
+            {'course_id': self.test_course_2.id, 'text_search':'Tonga'},
+            200,
+            ['Search'],
+            user='student_enrolled_public_profile'
+        )
+
+    def test_text_search_country(self):
+        self.verify_names(
+            {'course_id': self.test_course_2.id, 'text_search':'Island'},
+            200,
+            ['Search'],
+            user='student_enrolled_public_profile'
+        )
 
 
 @ddt.ddt
