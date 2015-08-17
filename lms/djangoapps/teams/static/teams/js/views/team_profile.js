@@ -22,6 +22,7 @@
                     this.requestUsername = options.requestUsername;
                     this.isPrivileged = options.isPrivileged;
                     this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
+                    this.setFocusToHeaderFunc = options.setFocusToHeaderFunc;
 
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(options.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(options.languages);
@@ -42,6 +43,7 @@
                         membershipText: TeamUtils.teamCapacityText(memberships.length, this.maxTeamSize),
                         isMember: isMember,
                         hasCapacity: memberships.length < this.maxTeamSize,
+                        hasMembers: memberships.length >= 1
 
                     }));
                     this.discussionView = new TeamDiscussionView({
@@ -50,6 +52,8 @@
                     this.discussionView.render();
 
                     this.renderTeamMembers();
+
+                    this.setFocusToHeaderFunc();
                     return this;
                 },
 

@@ -1,5 +1,6 @@
 <header class="page-header has-secondary">
     <div class="page-header-main">
+        <div class="sr-is-focusable" tabindex="-1"></div>
         <% if (breadcrumbs !== null && breadcrumbs.length > 0) { %>
             <nav class="breadcrumbs" aria-label="<%- nav_aria_label %>">
             <% _.each(breadcrumbs, function (breadcrumb) { %>

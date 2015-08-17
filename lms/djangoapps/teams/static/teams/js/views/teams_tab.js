@@ -283,6 +283,13 @@
                 },
 
                 /**
+                 * Sets focus to teams header.
+                 */
+                setFocusToHeader: function() {
+                    $('.page-header-main .sr-is-focusable').focus();
+                },
+
+                /**
                  * Return a promise for the team view for the given team ID.
                  */
                 getBrowseTeamView: function (topicID, teamID) {
@@ -301,7 +308,8 @@
                                 requestUsername: self.userInfo.username,
                                 countries: self.countries,
                                 languages: self.languages,
-                                teamMembershipDetailUrl: self.teamMembershipDetailUrl
+                                teamMembershipDetailUrl: self.teamMembershipDetailUrl,
+                                setFocusToHeaderFunc: self.setFocusToHeader
                             });
                             var teamJoinView = new TeamJoinView({
                                 teamEvents: self.teamEvents,
