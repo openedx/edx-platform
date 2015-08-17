@@ -92,6 +92,7 @@
                             course_id: this.courseID,
                             username: this.userInfo.username,
                             privileged: this.userInfo.privileged,
+                            staff: this.userInfo.staff,
                             parse: true
                         }
                     ).bootstrap();

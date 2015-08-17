@@ -173,7 +173,7 @@ define([
             AjaxHelpers.respondWithError(
                     requests,
                     400,
-                    {'error_message': {'user_message': 'User message', 'developer_message': 'Developer message' }}
+                    {'user_message': 'User message', 'developer_message': 'Developer message'}
             );
 
             expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("User message");

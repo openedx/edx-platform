@@ -130,7 +130,7 @@ define([
 
             it('does not allow access if the user is neither privileged nor a team member', function () {
                 var teamsTabView = createTeamsTabView({
-                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: false })
+                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: false, staff: true })
                 });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: { membership: [] }
