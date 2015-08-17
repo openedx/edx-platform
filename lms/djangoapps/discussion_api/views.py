@@ -382,7 +382,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           that are not endorsed as answers. Only applies to question threads,
           must be null for discussion threads.
 
-        * mark_as_read: Marks the thread of the comments as read. Defaults to 
+        * mark_as_read: Marks the thread of the comments as read. Defaults to
           False.
 
         * page: The (1-indexed) page to retrieve. Defaults to 1.
