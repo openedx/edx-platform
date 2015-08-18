@@ -1,0 +1,43 @@
+## mako
+
+<%inherit file="onboarding-base.html" />
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="view_title">Register</%block>
+<%block name="view_class">onboarding view-register</%block>
+
+<%block name="view_banner">
+<div class="wrapper-banner">
+    <div class="banner">${_("[BANNER]")}</div>
+</div>
+</%block>
+
+<%block name="view_modal">
+<div class="wrapper-modal">
+    <div class="modal">${_("[MODAL]")}</div>
+</div>
+</%block>
+
+<%block name="view_notifications">
+<div class="wrapper-notifications">
+    <div class="notification">${_("[NOTFICATIONS]")}</div>
+</div>
+</%block>
+
+
+<%include file="_header.html" />
+<%include file="_navigation-global.html" />
+
+<h1 class="hd-1">Register</h1>
+
+<div id="content-main" class="content-main">
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia perferendis aperiam exercitationem cumque deserunt provident tempora et in doloribus, cupiditate eligendi facilis. Rem, voluptatem assumenda nihil excepturi optio rerum repellendus?</p>
+</div>
+
+<%include file="_footer.html" />

@@ -1,0 +1,43 @@
+## mako
+## coding=utf-8
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+%>
+
+<!DOCTYPE html>
+<html class="no-js">
+    <head dir="${static.dir_rtl()}">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="path_prefix" content="${EDX_ROOT_URL}">
+
+        <title><%block name='view_title'/></title>
+
+        <%include file="_assets-primary.html" />
+    </head>
+
+    <body class="${static.dir_rtl()} <%block name='view_class'/> lang-${LANGUAGE_CODE}">
+        <div class="nav-skip sr-only">
+            <a class="action-skip" href="#content-main">${_("Skip to the main content of this view")}</a>
+        </div>
+
+        <div class="wrapper-view" dir="${static.dir_rtl()}">
+            <%block name='view_banner'/>
+
+            <div class="view">
+                ${self.body()}
+            </div>
+
+            <%block name='view_modal'/>
+            <%block name='view_notifications'/>
+        </div>
+
+        <%include file="_assets-secondary.html" />
+    </body>
+</html>

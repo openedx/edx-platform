@@ -424,6 +424,9 @@ FEATURES = {
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
+
+    # New onboarding feature
+    'ENABLE_ONBOARDING': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -503,6 +506,7 @@ import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
+                          PROJECT_ROOT / 'djangoapps' / 'onboarding' / 'templates',
                           COMMON_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
@@ -511,6 +515,7 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 # still left lying around.
 TEMPLATE_DIRS = [
     PROJECT_ROOT / "templates",
+    PROJECT_ROOT / 'djangoapps' / 'onboarding' / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
@@ -1966,6 +1971,9 @@ INSTALLED_APPS = (
 
     # Course teams
     'teams',
+
+    # Onboarding
+    'onboarding',
 
     'xblock_django',
 )
