@@ -1202,7 +1202,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### Pipeline #######################################
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
