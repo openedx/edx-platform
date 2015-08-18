@@ -222,6 +222,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 * language: Optionally specifies which language the team is
                   associated with.
 
+                * last_activity_at: The date of the last activity of any team member
+                  within the team.
+
                 * membership: A list of the users that are members of the team.
                   See membership endpoint for more detail.
 
@@ -450,6 +453,9 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
                 * membership: A list of the users that are members of the team. See
                   membership endpoint for more detail.
+
+                * last_activity_at: The date of the last activity of any team member
+                  within the team.
 
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
@@ -754,6 +760,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * date_joined: The date and time the membership was created.
 
+                * last_activity_at: The date of the last activity of the user
+                  within the team.
+
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
             stored exactly as specified. The intention is that plain text is
@@ -957,6 +966,9 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
               contain an expanded or collapsed representation.
 
             * date_joined: The date and time the membership was created.
+
+            * last_activity_at: The date of the last activity of any team member
+                within the team.
 
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
