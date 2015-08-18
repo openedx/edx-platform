@@ -394,8 +394,11 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     def setup_view(self):
         view = SingleThreadViewFixture(Thread(id="comment_deletion_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
-            Response(id="response1"),
-            [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
+            Response(id="response1"), [
+                Comment(id="comment_other_author"),
+                Comment(id="comment_self_author", user_id=self.user_id, thread_id="comment_deletion_test_thread")
+            ]
+        )
         view.push()
 
     def test_comment_deletion_as_student(self):

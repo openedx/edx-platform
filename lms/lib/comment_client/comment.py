@@ -30,6 +30,11 @@ class Comment(models.Model):
     def thread(self):
         return Thread(id=self.thread_id, type='thread')
 
+    @property
+    def context(self):
+        """Return the context of the thread which this comment belongs to."""
+        return self.thread.context
+
     @classmethod
     def url_for_comments(cls, params={}):
         if params.get('parent_id'):

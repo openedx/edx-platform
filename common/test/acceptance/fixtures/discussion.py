@@ -14,7 +14,7 @@ from . import COMMENTS_STUB_URL
 class ContentFactory(factory.Factory):
     FACTORY_FOR = dict
     id = None
-    user_id = "dummy-user-id"
+    user_id = "1234"
     username = "dummy-username"
     course_id = "dummy-course-id"
     commentable_id = "dummy-commentable-id"
