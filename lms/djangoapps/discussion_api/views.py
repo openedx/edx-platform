@@ -146,7 +146,7 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           "raw_body": "Body text"
         }
 
-        PATCH /api/discussion/v1/threads/thread_id
+        PATCH /api/discussion/v1/threads/{thread_id}
         {"raw_body": "Edited text"}
 
         DELETE /api/discussion/v1/threads/{thread_id}
@@ -206,7 +206,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         topic_id, type, title, and raw_body are accepted with the same meaning
         as in a POST request.
 
-        In addition, abuse_flagged, following, and voted are accepted.
+        In addition, abuse_flagged, following, and voted are accepted with the
+        same meaning as in a POST/PATCH response.
 
     **GET Response Values**
 
@@ -362,7 +363,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
     **Example Requests**
 
-        GET /api/discussion/v1/comments/?thread_id=0123456789abcdef01234567
+        GET /api/discussion/v1/comments/?thread_id={thread_id}
 
         POST /api/discussion/v1/comments/
         {
@@ -370,10 +371,10 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             "raw_body": "Body text"
         }
 
-        PATCH /api/discussion/v1/comments/comment_id
+        PATCH /api/discussion/v1/comments/{comment_id}
         {"raw_body": "Edited text"}
 
-        DELETE /api/discussion/v1/comments/comment_id
+        DELETE /api/discussion/v1/comments/{comment_id}
 
     **GET Parameters**
 
