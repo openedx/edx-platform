@@ -19,7 +19,9 @@ from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys.edx.locator import CourseLocator
 
+from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
+from discussion_api import api
 from discussion_api.api import (
     create_comment,
     create_thread,
@@ -1328,7 +1330,14 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+@disable_signal(api, 'thread_created')
+@disable_signal(api, 'thread_voted')
+class CreateThreadTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase,
+        MockSignalHandlerMixin
+):
     """Tests for create_thread"""
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1363,7 +1372,8 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
             "created_at": "2015-05-19T00:00:00Z",
             "updated_at": "2015-05-19T00:00:00Z",
         })
-        actual = create_thread(self.request, self.minimal_data)
+        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+            actual = create_thread(self.request, self.minimal_data)
         expected = {
             "id": "test_id",
             "course_id": unicode(self.course.id),
@@ -1512,7 +1522,8 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
         self.register_thread_votes_response("test_id")
         data = self.minimal_data.copy()
         data["voted"] = "True"
-        result = create_thread(self.request, data)
+        with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
+            result = create_thread(self.request, data)
         self.assertEqual(result["voted"], True)
         cs_request = httpretty.last_request()
         self.assertEqual(urlparse(cs_request.path).path, "/api/v1/threads/test_id/votes")
@@ -1570,7 +1581,14 @@ class CreateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
 
 
 @ddt.ddt
-class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+@disable_signal(api, 'comment_created')
+@disable_signal(api, 'comment_voted')
+class CreateCommentTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase,
+        MockSignalHandlerMixin
+):
     """Tests for create_comment"""
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1619,7 +1637,8 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         data = self.minimal_data.copy()
         if parent_id:
             data["parent_id"] = parent_id
-        actual = create_comment(self.request, data)
+        with self.assert_signal_sent(api, 'comment_created', sender=None, user=self.user, exclude_args=('post',)):
+            actual = create_comment(self.request, data)
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
@@ -1721,7 +1740,8 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.register_comment_votes_response("test_comment")
         data = self.minimal_data.copy()
         data["voted"] = "True"
-        result = create_comment(self.request, data)
+        with self.assert_signal_sent(api, 'comment_voted', sender=None, user=self.user, exclude_args=('post',)):
+            result = create_comment(self.request, data)
         self.assertEqual(result["voted"], True)
         cs_request = httpretty.last_request()
         self.assertEqual(urlparse(cs_request.path).path, "/api/v1/comments/test_comment/votes")
@@ -1835,7 +1855,14 @@ class CreateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
 
 @ddt.ddt
-class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+@disable_signal(api, 'thread_edited')
+@disable_signal(api, 'thread_voted')
+class UpdateThreadTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase,
+        MockSignalHandlerMixin
+):
     """Tests for update_thread"""
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1888,7 +1915,8 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
 
     def test_basic(self):
         self.register_thread()
-        actual = update_thread(self.request, "test_thread", {"raw_body": "Edited body"})
+        with self.assert_signal_sent(api, 'thread_edited', sender=None, user=self.user, exclude_args=('post',)):
+            actual = update_thread(self.request, "test_thread", {"raw_body": "Edited body"})
         expected = {
             "id": "test_thread",
             "course_id": unicode(self.course.id),
@@ -2074,7 +2102,12 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
         self.register_thread_votes_response("test_thread")
         self.register_thread()
         data = {"voted": new_voted}
-        result = update_thread(self.request, "test_thread", data)
+        if old_voted == new_voted:
+            result = update_thread(self.request, "test_thread", data)
+        else:
+            # Vote signals should only be sent if the number of votes has changed
+            with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
+                result = update_thread(self.request, "test_thread", data)
         self.assertEqual(result["voted"], new_voted)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/threads/test_thread/votes"
@@ -2142,7 +2175,14 @@ class UpdateThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
 
 
 @ddt.ddt
-class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+@disable_signal(api, 'comment_edited')
+@disable_signal(api, 'comment_voted')
+class UpdateCommentTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase,
+        MockSignalHandlerMixin
+):
     """Tests for update_comment"""
 
     @classmethod
@@ -2205,7 +2245,8 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
     @ddt.data(None, "test_parent")
     def test_basic(self, parent_id):
         self.register_comment({"parent_id": parent_id})
-        actual = update_comment(self.request, "test_comment", {"raw_body": "Edited body"})
+        with self.assert_signal_sent(api, 'comment_edited', sender=None, user=self.user, exclude_args=('post',)):
+            actual = update_comment(self.request, "test_comment", {"raw_body": "Edited body"})
         expected = {
             "id": "test_comment",
             "thread_id": "test_thread",
@@ -2387,7 +2428,12 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         self.register_comment_votes_response("test_comment")
         self.register_comment()
         data = {"voted": new_voted}
-        result = update_comment(self.request, "test_comment", data)
+        if old_voted == new_voted:
+            result = update_comment(self.request, "test_comment", data)
+        else:
+            # Vote signals should only be sent if the number of votes has changed
+            with self.assert_signal_sent(api, 'comment_voted', sender=None, user=self.user, exclude_args=('post',)):
+                result = update_comment(self.request, "test_comment", data)
         self.assertEqual(result["voted"], new_voted)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/comments/test_comment/votes"
@@ -2446,7 +2492,13 @@ class UpdateCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
 
 @ddt.ddt
-class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+@disable_signal(api, 'thread_deleted')
+class DeleteThreadTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase,
+        MockSignalHandlerMixin
+):
     """Tests for delete_thread"""
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2484,7 +2536,8 @@ class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
 
     def test_basic(self):
         self.register_thread()
-        self.assertIsNone(delete_thread(self.request, self.thread_id))
+        with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
+            self.assertIsNone(delete_thread(self.request, self.thread_id))
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/threads/{}".format(self.thread_id)
@@ -2578,7 +2631,13 @@ class DeleteThreadTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStor
 
 
 @ddt.ddt
-class DeleteCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+@disable_signal(api, 'comment_deleted')
+class DeleteCommentTest(
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase,
+        MockSignalHandlerMixin
+):
     """Tests for delete_comment"""
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2625,7 +2684,8 @@ class DeleteCommentTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     def test_basic(self):
         self.register_comment_and_thread()
-        self.assertIsNone(delete_comment(self.request, self.comment_id))
+        with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
+            self.assertIsNone(delete_comment(self.request, self.comment_id))
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/comments/{}".format(self.comment_id)

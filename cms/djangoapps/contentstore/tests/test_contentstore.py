@@ -23,6 +23,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from openedx.core.lib.tempdir import mkdtemp_clean
+from common.test.utils import XssTestMixin
 from contentstore.tests.utils import parse_json, AjaxEnabledTestClient, CourseTestCase
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
@@ -37,7 +38,6 @@ from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 
