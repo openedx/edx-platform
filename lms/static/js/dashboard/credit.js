@@ -31,7 +31,7 @@
                     'username': username
                 };
             $.ajax({
-                url: 'api/credit/v1/provider/' + provider_id + '/request/',
+                url: 'api/credit/v1/providers/' + provider_id + '/request/',
                 type: 'POST',
                 headers: {
                     'X-CSRFToken': $.cookie('csrftoken')
