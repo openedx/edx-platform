@@ -407,6 +407,28 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(CourseTeamSerializer(team).data)
 
 
+class IsEnrolledOrIsStaff(permissions.BasePermission):
+    """Permission that checks to see if the user is enrolled in the course or is staff."""
+
+    def has_object_permission(self, request, view, obj):
+        """Returns true if the user is enrolled or is staff."""
+        return has_team_api_access(request.user, obj.course_id)
+
+
+class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
+    """
+    Permission that checks to see if the user is global staff, course
+    staff, or has discussion privileges. If none of those conditions are
+    met, only read access will be granted.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            has_discussion_privileges(request.user, obj.course_id) or
+            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
+        )
+
+
 class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
@@ -489,26 +511,6 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             method returns a 400 error with all error messages in the
             "field_errors" field of the returned JSON.
     """
-
-    class IsEnrolledOrIsStaff(permissions.BasePermission):
-        """Permission that checks to see if the user is enrolled in the course or is staff."""
-
-        def has_object_permission(self, request, view, obj):
-            """Returns true if the user is enrolled or is staff."""
-            return has_team_api_access(request.user, obj.course_id)
-
-    class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
-        """Permission that checks to see if the user is global staff, course
-        staff, or has discussion privileges. If none of those conditions are
-        met, only read access will be granted.
-        """
-
-        def has_object_permission(self, request, view, obj):
-            return (
-                has_discussion_privileges(request.user, obj.course_id) or
-                IsStaffOrReadOnly.has_object_permission(self, request, view, obj)
-            )
-
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
