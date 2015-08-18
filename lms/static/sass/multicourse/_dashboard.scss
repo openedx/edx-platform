@@ -548,16 +548,7 @@
         padding: 0;
       }
 
-      .credit-eligibility-msg {
-        @include float(left);
-        margin-top: 10px;
-      }
-
-      .purchase_credit {
-        @include float(right);
-      }
-
-      .pending-credit-btn{
+      .credit-btn{
         @include float(right);
       }
 
@@ -757,6 +748,20 @@
               font-size: 1.2rem;
               font-weight: bold;
             }
+          }
+          .credit-eligibility-msg {
+            @include float(left);
+            margin-top: 10px;
+          }
+
+          .credit-request-pending-msg {
+            @include float(left);
+            margin-top: 10px;
+          }
+
+          .credit-request-approved-msg{
+            width: flex-grid(10, 12);
+            @include float(left);
           }
 
           .actions {
