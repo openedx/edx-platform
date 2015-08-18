@@ -76,11 +76,12 @@ class CreditApiTestBase(ModuleStoreTestCase):
         super(CreditApiTestBase, self).setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
 
-    def add_credit_course(self, enabled=True):
+    def add_credit_course(self, course_key=None, enabled=True):
         """Mark the course as a credit """
-        credit_course = CreditCourse.objects.create(course_key=self.course_key, enabled=enabled)
+        course_key = course_key or self.course_key
+        credit_course = CreditCourse.objects.create(course_key=course_key, enabled=enabled)
 
-        CreditProvider.objects.create(
+        CreditProvider.objects.get_or_create(
             provider_id=self.PROVIDER_ID,
             display_name=self.PROVIDER_NAME,
             provider_url=self.PROVIDER_URL,
@@ -684,6 +685,19 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         with self.assertRaises(UserIsNotEligible):
             api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
+    def test_create_credit_request_for_second_course(self):
+        # Create the first request
+        first_request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO["username"])
+
+        # Create a request for a second course
+        other_course_key = CourseKey.from_string("edX/other/2015")
+        self._configure_credit(course_key=other_course_key)
+        second_request = api.create_credit_request(other_course_key, self.PROVIDER_ID, self.USER_INFO["username"])
+
+        # Check that the requests have the correct course number
+        self.assertEqual(first_request["parameters"]["course_num"], self.course_key.course)
+        self.assertEqual(second_request["parameters"]["course_num"], other_course_key.course)
+
     def test_create_request_null_mailing_address(self):
         # User did not specify a mailing address
         self.user.profile.mailing_address = None
@@ -735,7 +749,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         requests = api.get_credit_requests_for_user(self.USER_INFO["username"])
         self.assertEqual(requests, [])
 
-    def _configure_credit(self):
+    def _configure_credit(self, course_key=None):
         """
         Configure a credit course and its requirements.
 
@@ -743,7 +757,9 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         that the user has satisfied.
 
         """
-        credit_course = self.add_credit_course()
+        course_key = course_key or self.course_key
+
+        credit_course = self.add_credit_course(course_key=course_key)
         requirement = CreditRequirement.objects.create(
             course=credit_course,
             namespace="grade",
@@ -760,7 +776,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 
         CreditEligibility.objects.create(
             username=self.USER_INFO['username'],
-            course=CreditCourse.objects.get(course_key=self.course_key)
+            course=CreditCourse.objects.get(course_key=course_key)
         )
 
     def _assert_credit_status(self, expected_status):
