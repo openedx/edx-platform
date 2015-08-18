@@ -375,6 +375,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -467,7 +468,8 @@ class TestCreateTeamAPI(TeamAPITestCase):
         ('student_unenrolled', 403),
         ('student_enrolled_not_on_team', 200),
         ('staff', 200),
-        ('course_staff', 200)
+        ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -580,6 +582,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -617,6 +620,7 @@ class TestUpdateTeamAPI(TeamAPITestCase):
         ('student_enrolled', 403),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -631,6 +635,7 @@ class TestUpdateTeamAPI(TeamAPITestCase):
         ('student_enrolled', 404),
         ('staff', 404),
         ('course_staff', 404),
+        ('community_ta', 404),
     )
     @ddt.unpack
     def test_access_bad_id(self, user, status):
@@ -666,6 +671,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -733,6 +739,7 @@ class TestDetailTopicAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -768,6 +775,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_enrolled_both_courses_other_team', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -784,6 +792,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_enrolled_both_courses_other_team', 200, True),
         ('staff', 200, True),
         ('course_staff', 200, True),
+        ('community_ta', 200, True),
     )
     @ddt.unpack
     def test_access_by_username(self, user, status, has_content):
@@ -874,6 +883,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
         ('student_enrolled_both_courses_other_team', 404),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -948,6 +958,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -1013,6 +1024,7 @@ class TestDeleteMembershipAPI(TeamAPITestCase):
         ('student_enrolled', 204),
         ('staff', 204),
         ('course_staff', 204),
+        ('community_ta', 204),
     )
     @ddt.unpack
     def test_access(self, user, status):
