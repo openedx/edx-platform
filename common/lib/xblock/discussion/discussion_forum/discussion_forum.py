@@ -66,6 +66,7 @@ class DiscussionXBlock(XBlock):
     def _student_view_lms(self):
         """ Renders student view for LMS """
         fragment = Fragment()
+        fragment.add_css_url(asset_to_static_url('css/discussion-forum.css'))
         discussion_service = self.xmodule_runtime.service(self, 'discussion')  # pylint: disable=no-member
         context = discussion_service.get_inline_template_context()
         context['discussion_id'] = self.discussion_id
@@ -154,6 +155,7 @@ class DiscussionCourseXBlock(XBlock):
     def _student_view_lms(self):
         """ Renders student view for LMS """
         fragment = Fragment()
+        fragment.add_css_url(asset_to_static_url('css/discussion-forum.css'))
         fragment.add_css_url(asset_to_static_url('xblock/discussion/css/discussion-course-custom.css'))
 
         discussion_service = self.xmodule_runtime.service(self, 'discussion')  # pylint: disable=no-member
