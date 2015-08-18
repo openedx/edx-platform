@@ -11,7 +11,7 @@ import dogstats_wrapper as dog_stats_api
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
-from util.misc import escape_html_characters
+from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError

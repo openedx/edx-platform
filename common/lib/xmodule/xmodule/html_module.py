@@ -10,7 +10,7 @@ from fs.errors import ResourceNotFoundError
 from pkg_resources import resource_string
 
 import dogstats_wrapper as dog_stats_api
-from util.misc import escape_html_characters
+from xmodule.util.misc import escape_html_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes

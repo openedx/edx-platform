@@ -54,6 +54,7 @@ def escape_html_characters(content):
             re.sub(
                 r"(\s|&nbsp;|//)+",
                 " ",
-                html_to_text(content))
+                html_to_text(content)
             )
         )
+    )
