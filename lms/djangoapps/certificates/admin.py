@@ -18,10 +18,14 @@ class CertificateTemplateForm(forms.ModelForm):
     """
     Django admin form for CertificateTemplate model
     """
-    organizations = get_organizations()
-    org_choices = [(org["id"], org["name"]) for org in organizations]
-    org_choices.insert(0, ('', 'None'))
-    organization_id = forms.TypedChoiceField(choices=org_choices, required=False, coerce=int, empty_value=None)
+    def __init__(self, *args, **kwargs):
+        super(CertificateTemplateForm, self).__init__(*args, **kwargs)
+        organizations = get_organizations()
+        org_choices = [(org["id"], org["name"]) for org in organizations]
+        org_choices.insert(0, ('', 'None'))
+        self.fields['organization_id'] = forms.TypedChoiceField(
+            choices=org_choices, required=False, coerce=int, empty_value=None
+        )
 
     class Meta(object):
         """ Meta definitions for CertificateTemplateForm  """
