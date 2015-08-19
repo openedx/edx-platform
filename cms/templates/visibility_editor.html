@@ -52,27 +52,27 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
             <div class="modal-section-content">
 
                 <section class="visibility-controls-primary">
-                    <ul class="list-fields list-radio">
-                        <li class="field field-radio field-visibility-level">
+                    <div class="list-fields list-radio">
+                        <div class="field field-radio field-visibility-level">
                             <input type="radio" id="visibility-level-all" name="visibility-level" value="" class="input input-radio visibility-level-all" ${'checked="checked"' if not has_selected_groups else ''} />
                             <label for="visibility-level-all" class="label">${_('All Students and Staff')}</label>
-                        </li>
+                        </div>
 
-                        <li class="field field-radio field-visibility-level">
+                        <div class="field field-radio field-visibility-level">
                             <input type="radio" id="visibility-level-specific" name="visibility-level" value="" class="input input-radio visibility-level-specific"  ${'checked="checked"' if has_selected_groups else ''} />
                             <label for="visibility-level-specific" class="label">${_('Specific Content Groups')}</label>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </section>
 
                 <div class="wrapper-visibility-specific">
                     <section class="visibility-controls-secondary">
                         <div class="visibility-controls-group">
                             <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
-                            <ul class="list-fields list-checkbox">
+                            <div class="list-fields list-checkbox">
                             % for partition in cohort_partitions:
                                 % for group in partition["groups"]:
-                                    <li class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
+                                    <div class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
                                         <input type="checkbox"
                                             id="visibility-content-group-${partition["id"]}-${group["id"]}"
                                             name="visibility-content-group"
@@ -88,24 +88,31 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                         % else:
                                             <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">${group["name"] | h}</label>
                                         % endif
-                                    </li>
+                                    </div>
                                 % endfor
                             % endfor
 
                             ## Allow only one verification checkpoint to be selected at a time.
                             % if verification_partitions:
-                                <li class="field field-checkbox field-visibility-verification">
-                                    <input type="checkbox"
-                                        id="verification-access-checkbox"
-                                        name="verification-access-checkbox"
-                                        class="input input-checkbox"
-                                        value=""
-                                        ${'checked="checked"' if selected_verified_partition_id is not None else ''}
-                                    />
-                                    <label for="verification-access-checkbox" class="label">
-                                        ${_('Verification Checkpoint')}:
+                                <div role="group" aria-labelledby="verification-access-title">
+                                    <div id="verification-access-title" class="sr">${_('Verification Checkpoint')}</div>
+                                    <div class="field field-checkbox field-visibility-verification">
+                                        <input type="checkbox"
+                                            id="verification-access-checkbox"
+                                            name="verification-access-checkbox"
+                                            class="input input-checkbox"
+                                            value=""
+                                            aria-describedby="verification-help-text"
+                                            ${'checked="checked"' if selected_verified_partition_id is not None else ''}
+                                        />
+                                        <label for="verification-access-checkbox" class="label">
+                                            ${_('Verification Checkpoint')}:
+                                        </label>
 
-                                        ## TODO - a11y fix
+                                        <label class="sr" for="verification-access-dropdown">
+                                            ${_('Verification checkpoint to complete')}
+                                        </label>
+
                                         <select id="verification-access-dropdown">
                                             % for partition in verification_partitions:
                                             <option
@@ -114,12 +121,14 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                             >${partition["name"]}</option>
                                             % endfor
                                         </select>
-                                    </label>
 
-                                    <span class="note">${_("Learners who require verification must pass the selected checkpoint to see the content in this component. Learners who do not require verification see this content by default.")}</span>
-                                </li>
+                                        <div class="note" id="verification-help-text">
+                                            ${_("Learners who require verification must pass the selected checkpoint to see the content in this component. Learners who do not require verification see this content by default.")}
+                                        </div>
+                                    </div>
+                                </div>
                             % endif
-                            </ul>
+                            </div>
                         </div>
                     </section>
                 </div>

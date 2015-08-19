@@ -675,6 +675,13 @@
       }
     }
 
+    .verification-access {
+      .checkbox-cosmetic .label {
+        @include float(left);
+        margin: 2px 6px 0 0;
+      }
+    }
+
     // UI: timed and proctored exam section
     .edit-settings-timed-examination {
 
