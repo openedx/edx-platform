@@ -113,6 +113,9 @@
             &:hover, &:focus {
               color: rgb(255,255,255);
             }
+            span {
+              display: inline-block;
+            }
           }
 
           a {
