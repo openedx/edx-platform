@@ -63,7 +63,9 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.credit_course.enabled = False
         self.credit_course.save()
 
-        self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertIsNotNone(credit_state)
+        self.assertFalse(credit_state['is_credit_course'])
 
     def test_no_profile_name(self):
         """
@@ -81,6 +83,8 @@ class CreditServiceTests(ModuleStoreTestCase):
         """
         Happy path through the service
         """
+
+        self.assertTrue(self.service.is_credit_course(self.course.id))
 
         CourseEnrollment.enroll(self.user, self.course.id)
 
@@ -110,11 +114,38 @@ class CreditServiceTests(ModuleStoreTestCase):
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
 
         self.assertIsNotNone(credit_state)
+        self.assertTrue(credit_state['is_credit_course'])
         self.assertEqual(credit_state['enrollment_mode'], 'honor')
         self.assertEqual(credit_state['profile_fullname'], 'Foo Bar')
         self.assertEqual(len(credit_state['credit_requirement_status']), 1)
         self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
         self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')
+
+    def test_set_status_non_credit(self):
+        """
+        assert that we can still try to update a credit status but return quickly if
+        a course is not credit eligible
+        """
+
+        no_credit_course = CourseFactory.create(org='NoCredit', number='NoCredit', display_name='Demo_Course')
+
+        self.assertFalse(self.service.is_credit_course(no_credit_course.id))
+
+        CourseEnrollment.enroll(self.user, no_credit_course.id)
+
+        # this should be a no-op
+        self.service.set_credit_requirement_status(
+            self.user.id,
+            no_credit_course.id,
+            'grade',
+            'grade'
+        )
+
+        credit_state = self.service.get_credit_state(self.user.id, no_credit_course.id)
+
+        self.assertIsNotNone(credit_state)
+        self.assertFalse(credit_state['is_credit_course'])
+        self.assertEqual(len(credit_state['credit_requirement_status']), 0)
 
     def test_bad_user(self):
         """
