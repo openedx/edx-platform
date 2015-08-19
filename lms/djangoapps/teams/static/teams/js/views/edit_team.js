@@ -14,9 +14,9 @@
                 maxTeamDescriptionLength: 300,
 
                 events: {
-                    'click .action-primary': 'createTeam',
-                    'submit form': 'createTeam',
-                    'click .action-cancel': 'goBackToTopic'
+                    'click .action-primary': 'createOrUpdateTeam',
+                    'submit form': 'createOrUpdateTeam',
+                    'click .action-cancel': 'cancelAndGoBack'
                 },
 
                 initialize: function(options) {
@@ -27,12 +27,20 @@
                     this.teamsUrl = options.teamParams.teamsUrl;
                     this.languages = options.teamParams.languages;
                     this.countries = options.teamParams.countries;
-                    this.primaryButtonTitle = options.primaryButtonTitle || 'Submit';
+                    this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
+                    this.action = options.action;
 
-                    _.bindAll(this, 'goBackToTopic', 'createTeam');
+                    _.bindAll(this, 'cancelAndGoBack', 'createOrUpdateTeam');
 
-                    this.teamModel = new TeamModel({});
-                    this.teamModel.url = this.teamsUrl;
+                    if (this.action === 'create') {
+                        this.teamModel = new TeamModel({});
+                        this.teamModel.url = this.teamsUrl;
+                        this.primaryButtonTitle = 'Create';
+                    } else if(this.action === 'edit' ) {
+                        this.teamModel = options.model;
+                        this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id')) + '?expand=user';
+                        this.primaryButtonTitle = 'Update';
+                    }
 
                     this.teamNameField = new FieldViews.TextFieldView({
                         model: this.teamModel,
@@ -74,7 +82,11 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({primaryButtonTitle: this.primaryButtonTitle}));
+                    this.$el.html(_.template(editTeamTemplate) ({
+                        primaryButtonTitle: this.primaryButtonTitle,
+                        action: this.action,
+                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
+                    }));
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
                     this.set(this.teamLanguageField, '.team-optional-fields');
@@ -91,20 +103,28 @@
                     }
                 },
 
-                createTeam: function (event) {
+                createOrUpdateTeam: function (event) {
                     event.preventDefault();
                     var view = this,
                         teamLanguage = this.teamLanguageField.fieldValue(),
-                        teamCountry = this.teamCountryField.fieldValue();
+                        teamCountry = this.teamCountryField.fieldValue(),
+                        data = {
+                            name: this.teamNameField.fieldValue(),
+                            description: this.teamDescriptionField.fieldValue(),
+                            language: _.isNull(teamLanguage) ? '' : teamLanguage,
+                            country: _.isNull(teamCountry) ? '' : teamCountry
+                        },
+                        saveOptions = {
+                            wait: true
+                        };
 
-                    var data = {
-                        course_id: this.courseID,
-                        topic_id: this.topicID,
-                        name: this.teamNameField.fieldValue(),
-                        description: this.teamDescriptionField.fieldValue(),
-                        language: _.isNull(teamLanguage) ? '' : teamLanguage,
-                        country: _.isNull(teamCountry) ? '' : teamCountry
-                    };
+                    if (this.action === 'create') {
+                        data.course_id = this.courseID;
+                        data.topic_id = this.topicID;
+                    } else if (this.action === 'edit' ) {
+                        saveOptions.patch = true;
+                        saveOptions.contentType = 'application/merge-patch+json';
+                    }
 
                     var validationResult = this.validateTeamData(data);
                     if (validationResult.status === false) {
@@ -112,10 +132,10 @@
                         return;
                     }
 
-                    this.teamModel.save(data, { wait: true })
+                    this.teamModel.save(data, saveOptions)
                         .done(function(result) {
                             view.teamEvents.trigger('teams:update', {
-                                action: 'create',
+                                action: view.action,
                                 team: result
                             });
                             Backbone.history.navigate(
@@ -186,8 +206,15 @@
                     }
                 },
 
-                goBackToTopic: function () {
-                    Backbone.history.navigate('topics/' + this.topicID, {trigger: true});
+                cancelAndGoBack: function (event) {
+                    event.preventDefault();
+                    var url;
+                    if (this.action === 'create') {
+                        url = 'topics/' + this.topicID;
+                    } else if (this.action === 'edit' ) {
+                        url = 'teams/' + this.topicID + '/' + this.teamModel.get('id');
+                    }
+                    Backbone.history.navigate(url, {trigger: true});
                 }
             });
         });

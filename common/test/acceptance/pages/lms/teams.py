@@ -205,7 +205,7 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
             self.wait_for_ajax()
 
 
-class CreateTeamPage(CoursePage, FieldsMixin):
+class CreateOrEditTeamPage(CoursePage, FieldsMixin):
     """
     Create team page.
     """
@@ -216,7 +216,7 @@ class CreateTeamPage(CoursePage, FieldsMixin):
         representation of a topic following the same convention as a
         course module's topic.
         """
-        super(CreateTeamPage, self).__init__(browser, course_id)
+        super(CreateOrEditTeamPage, self).__init__(browser, course_id)
         self.topic = topic
         self.url_path = "teams/#topics/{topic_id}/create-team".format(topic_id=self.topic['id'])
 
@@ -410,3 +410,12 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         """Navigate to the 'All Topics' page."""
         self.q(css='.breadcrumbs a').results[0].click()
         self.wait_for_ajax()
+
+    @property
+    def edit_team_button_present(self):
+        """ Returns True if Edit Team button is present else False """
+        return self.q(css='.form-actions .action-edit-team').present
+
+    def click_edit_team_button(self):
+        """ Click on Edit Team button"""
+        self.q(css='.form-actions .action-edit-team').first.click()
