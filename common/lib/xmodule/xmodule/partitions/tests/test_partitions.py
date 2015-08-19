@@ -60,7 +60,7 @@ class TestGroup(TestCase):
         jsonified = {
             "id": test_id,
             "name": name,
-            "version": 9001
+            "version": -1,
         }
         with self.assertRaisesRegexp(TypeError, "has unexpected version"):
             Group.from_json(jsonified)
@@ -241,14 +241,13 @@ class TestUserPartition(PartitionTestCase):
         with self.assertRaisesRegexp(UserPartitionError, "Unrecognized scheme"):
             UserPartition.from_json(jsonified)
 
-        # Wrong version (it's over 9000!)
-        # Wrong version (it's over 9000!)
+        # Wrong version
         jsonified = {
             'id': self.TEST_ID,
             "name": self.TEST_NAME,
             "description": self.TEST_DESCRIPTION,
             "groups": [group.to_json() for group in self.TEST_GROUPS],
-            "version": 9001,
+            "version": -1,
             "scheme": self.TEST_SCHEME_NAME,
         }
         with self.assertRaisesRegexp(TypeError, "has unexpected version"):
@@ -283,6 +282,24 @@ class TestUserPartition(PartitionTestCase):
         )
         with self.assertRaises(NoSuchUserPartitionGroupError):
             self.user_partition.get_group(3)
+
+    def test_forward_compatibility(self):
+        # If the user partition version is updated in a release,
+        # then the release is rolled back, courses might contain
+        # version numbers greater than the currently deployed
+        # version number.
+        newer_version_json = {
+            "id": self.TEST_ID,
+            "name": self.TEST_NAME,
+            "description": self.TEST_DESCRIPTION,
+            "groups": [group.to_json() for group in self.TEST_GROUPS],
+            "version": UserPartition.VERSION + 1,
+            "scheme": "mock",
+            "additional_new_field": "foo",
+        }
+        partition = UserPartition.from_json(newer_version_json)
+        self.assertEqual(partition.id, self.TEST_ID)
+        self.assertEqual(partition.name, self.TEST_NAME)
 
 
 class StaticPartitionService(PartitionService):
