@@ -3,7 +3,8 @@
 
 // overriding existing styles on the body element
 // .view-incourse scopes these rules to be specific to student being in a course
-body.view-incourse {
+body.view-incourse,
+body.is-in-course {
   background-color: $body-bg;
 
   // keep application of widths to window-wrap
@@ -57,7 +58,8 @@ body.view-incourse {
   .course-wrapper,
   .profile-wrapper,
   .instructor-dashboard-wrapper-2,
-  .wiki-wrapper {
+  .wiki-wrapper,
+  .teams-wrapper {
     max-width: 1180px;
     margin: 0 auto;
     padding: 0;
