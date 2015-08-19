@@ -2,7 +2,7 @@ class @Navigation
   constructor: ->
     if $('#accordion').length
       # First look for an active section
-      active = $('#accordion div div ol:has(li.active)').index('#accordion div div ol')
+      active = $('#accordion div div:has(a.active)').index('#accordion div div')
       # if we didn't find one, look for an active chapter
       if active < 0
         active = $('#accordion h3.active').index('#accordion h3')
@@ -40,8 +40,7 @@ class @Navigation
     $('.ui-accordion-content-active').parent().hide()
     $('#accordion .ui-accordion-content-active').removeClass('ui-accordion-content-active')
     $(this).closest('.chapter').next('div').children('div').addClass('ui-accordion-content-active')
-    $('.ui-accordion-content-active').parent().show()
+    $('.ui-accordion-content-active').parent().show().focus()
     $('.ui-accordion-content-active').show()
-    $('.ui-accordion-content-active li:first-child a').focus()
     $('.ui-accordion-content-active').attr('aria-hidden', 'false')
 

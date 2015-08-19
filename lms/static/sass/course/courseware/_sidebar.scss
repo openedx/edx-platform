@@ -1,234 +1,192 @@
 .course-index {
-  @extend .sidebar;
-  @extend .tran;
-  @include border-right(1px solid $border-color-2);
-  @include border-radius(3px, 0, 0, 3px);
+    @extend .sidebar;
+    @extend .tran;
+    @include border-right(1px solid $border-color-2);
+    @include border-radius(3px, 0, 0, 3px);
 
-  #open_close_accordion {
-    display: none;
-  }
-
-  header {
-    max-height: 47px;
-
-    h2 {
-      white-space: nowrap;
+    #open_close_accordion {
+        display: none;
     }
-  }
 
-  div#accordion {
-    @extend %t-copy-sub1;
-    width: auto;
+    header {
+        max-height: 47px;
 
-    h3 {
-      @extend %t-title6;
-      @include padding-left($baseline);
-      overflow: visible;
-      margin: 0;
-      border-radius: 0;
-      box-shadow: none;
-      color: $link-color;
-
-      &:first-child {
-        border: none;
-      }
-
-      &.ui-accordion-header {
-        @extend %t-regular;
-        border-bottom: none;
-
-        a {
-          @include padding-left($baseline);
-          border-radius: 0;
-          box-shadow: none;
-          color: $link-color;
+        h2 {
+            white-space: nowrap;
         }
+    }
 
-        &.ui-state-active {
-          border-bottom: none;
-          color: $base-font-color;
+    #accordion {
+        @extend %t-copy-sub1;
+        width: auto;
 
-          &:hover, &:focus {
-            background: none;
-          }
-        }
+        nav {
 
-        span.ui-icon {
-          @include left($baseline);
-          background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
-          opacity: 0.3;
+            .button-chapter {
+                @include box-sizing(border-box);
+                @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
+                @include transition(background-color .1s linear 0s);
+                width: 100% !important;
+                padding: 0;
+                border: 0;
+                border-radius: 0;
+                box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
+                background-color: $sidebar-chapter-bg;
+                color: $link-color;
 
-          &.ui-icon-triangle-1-e {
+                &.is-open {
+                    background: $white;
+                    box-shadow: none;
+                }
 
-            // CASE: left to right layout
-            @include ltr {
-              background-position: -32px -16px; // jQuery UI east arrow position
+                .group-heading {
+                    @extend %t-title6;
+                    overflow: visible;
+                    padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
+                    margin: 0;
+                    border-radius: 0;
+                    box-shadow: none;
+                    color: $link-color;
+
+                    &:first-child {
+                        border: none;
+                    }
+
+                    &.ui-state-active {
+                        border-bottom: none;
+                        color: $base-font-color;
+
+                        &:hover,
+                        &:focus {
+                            background: none;
+                        }
+                    }
+
+                    .ui-icon {
+                        @include left($baseline);
+                        background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
+                        opacity: 0.3;
+
+                        &.ui-icon-triangle-1-e {
+
+                            // CASE: left to right layout
+                            @include ltr {
+                                background-position: -32px -16px; // jQuery UI east arrow position
+                            }
+
+                            // CASE: right to left layout
+                            @include rtl {
+                                background-position: -96px -16px; // jQuery UI west arrow position
+                            }
+                        }
+                    }
+                }
             }
 
-           // CASE: right to left layout
-           @include rtl {
-              background-position: -96px -16px; // jQuery UI west arrow position
-            }
-          }
-        }
-      }
-    }
-
-    .chapter {
-      @include box-sizing(border-box);
-      @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
-      @include transition(background-color .1s linear 0s);
-      width: 100% !important;
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
-      background-color: $sidebar-chapter-bg;
-      color: $link-color;
-
-      h3 {
-        padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
-      }
-
-      &.is-open {
-        background: $white;
-        box-shadow: none;
-      }
-
-      &:hover, &:focus {
-        background-color: $white;
-      }
-    }
-
-    div.chapter-content-container{
-      display: none;
-      padding: 0 14px ($baseline/2) 14px;
-      border-bottom: 1px solid $shadow-l1;
-      background: $white;
-    }
-
-    div.ui-accordion-content {
-      margin: 0;
-      padding: 0 ($baseline*.75);
-      border: none;
-      border-radius: 0;
-      background: transparent;
-
-      li {
-        margin: ($baseline/5) 0;
-        // margin-bottom: ($baseline/5);
-        border-bottom: 0;
-        border-radius: 0;
-
-        a {
-          @extend %t-strong;
-          @include padding(($baseline/4) ($baseline/2));
-          position: relative;
-          display: block;
-          border-radius: ($baseline/5);
-          background: transparent;
-          text-decoration: none;
-
-          p {
-            @extend %t-action3;
-            @extend %t-strong;
-            margin-bottom: 0;
-            font-family: $sans-serif;
-
-            &.subtitle {
-              @extend %t-action3;
-              @extend %t-regular;
-              display: block;
-              margin: 0;
-              color: $gray-d1;
-
-              &:empty {
+            .chapter-content-container {
                 display: none;
-              }
+                padding: 0 14px ($baseline/2) 14px;
+                border-bottom: 1px solid $shadow-l1;
+                background: $white;
 
-              // definitions for proctored exam attempt status indicators
-              i.verified {
-                color: $success-color;
-              }
+                .chapter-menu {
+                    margin: 0;
+                    padding: 0 ($baseline*.75);
+                    border: none;
+                    border-radius: 0;
+                    background: transparent;
+                    overflow: hidden;
 
-              i.rejected {
-                color: $alert-color;
-              }
+                    a {
+                        @extend %t-strong;
+                        @include padding(($baseline/4) ($baseline/2));
+                        position: relative;
+                        display: block;
+                        margin: ($baseline/5) 0;
+                        border-radius: ($baseline/5);
+                        border-bottom: 0;
+                        background: transparent;
+                        text-decoration: none;
 
-              i.error {
-                color: $alert-color;
-              }
+                        p {
+                            @extend %t-action3;
+                            @extend %t-strong;
+                            margin-bottom: 0;
+                            font-family: $sans-serif;
+
+                            &.subtitle {
+                                @extend %t-action3;
+                                @extend %t-regular;
+                                display: block;
+                                margin: 0;
+                                color: $gray-d1;
+
+                                &:empty {
+                                    display: none;
+                                }
+
+                                // definitions for proctored exam attempt status indicators
+                                .verified {
+                                    color: $success-color;
+                                }
+
+                                .rejected {
+                                    color: $alert-color;
+                                }
+
+                                .error {
+                                    color: $alert-color;
+                                }
+                            }
+                        }
+
+                        &.graded {
+
+                            img {
+                                @include right($baseline/4);
+                                position: absolute;
+                                bottom: ($baseline/4);
+                                margin: auto;
+                            }
+                        }
+
+                        &.active {
+                            @extend %t-strong;
+                            background: linear-gradient(to bottom, $gray-l4, #d6d6d6);
+
+                            &:after {
+                                @extend %t-regular;
+                                @include transition(none);
+                                @include right($baseline);
+                                content: '›';
+                                position: absolute;
+                                top: 50%;
+                                margin-top: -13px;
+                                font-size: 30px;
+                                color: $gray-d3;
+                                opacity: 0;
+                            }
+                        }
+
+                        &:hover,
+                        &:focus {
+
+                            p {
+                                color: $gray-d3;
+                            }
+                        }
+
+                        &:active {
+                            box-shadow: inset 0 1px 14px 0 $shadow-l1;
+
+                            &:after {
+                                opacity: 1.0;
+                                right: 15px;
+                            }
+                        }
+                    }
+                }
             }
-          }
-
-          &:hover, &:focus {
-
-            > a p {
-              color: $gray-d3;
-            }
-          }
-
-          &:active {
-            box-shadow: inset 0 1px 14px 0 $shadow-l1;
-
-            &:after {
-              opacity: 1.0;
-              right: 15px;
-            }
-          }
         }
-
-        &.active {
-          @extend %t-strong;
-
-          &:after {
-            @extend %t-regular;
-            @include transition(none);
-            @include right($baseline);
-            content: '›';
-            position: absolute;
-            top: 50%;
-            margin-top: -13px;
-            font-size: 30px;
-            color: $gray-d3;
-            opacity: 0;
-          }
-
-          > a {
-            border: 1px solid $border-color-1;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, .35) inset;
-            background: $sidebar-active-image;
-
-            &:after {
-              opacity: 1.0;
-              right: 15px;
-            }
-
-            p {
-              color: $gray-d3;
-            }
-          }
-
-          span.subtitle {
-            @extend %t-regular;
-          }
-        }
-
-        &.graded {
-         > a {
-           > img {
-             @include right($baseline/4);
-             position: absolute;
-             bottom: ($baseline/4);
-             margin: auto;
-           }
-          }
-
-          &.active > a {
-            background: linear-gradient(to bottom, $gray-l4, #d6d6d6);
-          }
-        }
-      }
     }
-  }
 }
