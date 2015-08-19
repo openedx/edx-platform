@@ -18,6 +18,7 @@ from django.http import (
     HttpResponseForbidden,
 )
 from django.contrib import messages
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.http import Http404
@@ -45,9 +46,9 @@ from instructor.views.tools import get_student_from_identifier  # pylint: disabl
 from instructor.enrollment import (
     enroll_email,
     unenroll_email,
-    get_email_params,
 )
 
+from microsite_configuration import microsite
 from .models import CustomCourseForEdX
 from .overrides import (
     clear_override_for_ccx,
@@ -410,7 +411,13 @@ def ccx_invite(request, course, ccx=None):
         try:
             validate_email(email)
             course_key = CCXLocator.from_course_locator(course.id, ccx.id)
-            email_params = get_email_params(course, auto_enroll)
+            email_params = get_email_params(
+                request,
+                course.id,
+                ccx,
+                auto_enroll,
+                display_name_with_default=course.display_name_with_default
+            )
             if action == 'Enroll':
                 enroll_email(
                     course_key,
@@ -428,6 +435,54 @@ def ccx_invite(request, course, ccx=None):
         kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)}
     )
     return redirect(url)
+
+
+def get_email_params(request, course_id, ccx, auto_enroll, display_name_with_default=None):
+    """
+    Generate parameters used when parsing email templates.
+
+    `auto_enroll` is a flag for auto enrolling non-registered students: (a `boolean`)
+    Returns a dict of parameters
+    """
+    course_key = CCXLocator.from_course_locator(course_id, ccx.id)
+    stripped_site_name = microsite.get_value(
+        'SITE_NAME',
+        settings.SITE_NAME
+    )
+    # and check with the Services team that this works well with microsites
+    registration_url = request.build_absolute_uri(reverse('register_user'))
+    course_url = request.build_absolute_uri(
+        reverse('course_root', kwargs={'course_id': course_key})
+    )
+
+    # We can't get the url to the course's About page if the marketing site is enabled.
+    course_about_url = None
+    if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+        course_about_url = request.build_absolute_uri(
+            reverse('about_course', kwargs={'course_id': course_key})
+        )
+
+    class CourseNameHolder(object):
+        """
+        Holder for custom CCX course name if there is any.
+        else the default course name.
+        """
+        def __init__(self, display_name):
+            if display_name:
+                self.display_name_with_default = display_name
+            else:
+                self.display_name_with_default = display_name_with_default
+
+    # Composition of email
+    email_params = {
+        'site_name': stripped_site_name,
+        'registration_url': registration_url,
+        'course': CourseNameHolder(ccx.display_name),
+        'auto_enroll': auto_enroll,
+        'course_url': course_url,
+        'course_about_url': course_about_url,
+    }
+    return email_params
 
 
 @ensure_csrf_cookie
