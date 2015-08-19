@@ -70,7 +70,7 @@ class CourseTeam(models.Model):
         """Adds the given user to the CourseTeam."""
         if not CourseEnrollment.is_enrolled(user, self.course_id):
             raise NotEnrolledInCourseForTeam
-        if CourseTeamMembership.objects.filter(user=user, team__course_id=self.course_id).exists():
+        if CourseTeamMembership.user_in_team_for_course(user, self.course_id):
             raise AlreadyOnTeamInCourse
         return CourseTeamMembership.objects.create(
             user=user,
@@ -88,3 +88,38 @@ class CourseTeamMembership(models.Model):
     user = models.ForeignKey(User)
     team = models.ForeignKey(CourseTeam, related_name='membership')
     date_joined = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def get_memberships(cls, username=None, course_ids=None, team_id=None):
+        """
+        Get a queryset of memberships.
+
+        Args:
+            username (unicode, optional): The username to filter on.
+            course_ids (list of unicode, optional) Course IDs to filter on.
+            team_id (unicode, optional): The team_id to filter on.
+        """
+        queryset = cls.objects.all()
+        if username is not None:
+            queryset = queryset.filter(user__username=username)
+        if course_ids is not None:
+            queryset = queryset.filter(team__course_id__in=course_ids)
+        if team_id is not None:
+            queryset = queryset.filter(team__team_id=team_id)
+
+        return queryset
+
+    @classmethod
+    def user_in_team_for_course(cls, user, course_id):
+        """
+        Checks whether or not a user is already in a team in the given course.
+
+        Args:
+            user: the user that we want to query on
+            course_id: the course_id of the course we're interested in
+
+        Returns:
+            True if the user is on a team in the course already
+            False if not
+        """
+        return cls.objects.filter(user=user, team__course_id=course_id).exists()

@@ -173,6 +173,12 @@
     }
   }
 
+  // reset general ul styles
+  .cards-list {
+    margin: 0;
+    padding: 0;
+  }
+
   .card {
     @include clearfix();
     transition: all $tmg-f2 ease-in-out;
@@ -228,7 +234,7 @@
 
       .action-view {
         @extend %btn-pl-default-base;
-        float: right;
+        @include float(right);
         margin: ($baseline/4) 0;
       }
     }
@@ -242,11 +248,11 @@
 
       .meta-detail {
         margin-top: ($baseline/4);
-        margin-right: ($baseline*.75);
+        @include margin-right ($baseline*.75);
         color: $gray;
 
         .icon {
-          margin-right: ($baseline/4);
+          @include margin-right ($baseline/4);
         }
       }
 
@@ -306,7 +312,7 @@
       }
 
       .team-activity {
-        float: right;
+        @include float(right);
       }
 
       .card-actions {
@@ -328,7 +334,7 @@
         display: block;
         position: absolute;
         top: ($baseline/2);
-        left: -($baseline/4);
+        @include left(-($baseline/4));
         box-shadow: 1px 1px 1px 0 $blue-d1;
         background-color: $m-blue-l2;
         padding: ($baseline/10) ($baseline*.75);
@@ -344,6 +350,64 @@
         background-color: $gray-l4;
       }
     }
+  }
+
+  .team-profile {
+
+    .page-content-main {
+      display: inline-block;
+      width: flex-grid(8, 12);
+      vertical-align: top;
+
+      .forum-new-post-form,
+      .edit-post-form {
+        min-width: 700px;
+      }
+    }
+
+    .page-content-secondary {
+      display: inline-block;
+      width: flex-grid(4,12);
+      @include margin-left($baseline * 0.75);
+      margin-bottom: $baseline;
+
+      @extend %t-copy-sub1;
+      color: $gray-l1;
+
+      div, .team-detail-header {
+        margin-bottom: ($baseline/4);
+      }
+
+      .image-url {
+        border: 2px solid $outer-border-color;
+        border-radius: ($baseline/4);
+        margin-bottom: ($baseline/4);
+      }
+
+      .leave-team {
+        margin-bottom: $baseline;
+        margin-top: ($baseline/2);
+      }
+
+      .invite-header, .invite-text {
+        margin-bottom: ($baseline/2);
+      }
+
+      .invite-team {
+        margin-top: ($baseline);
+        margin-bottom: ($baseline/2);
+      }
+      .invite-link-input {
+        width: 100%;
+      }
+
+      .member-profile {
+        position: relative;
+        display: inline-block;
+
+        @include tooltip-hover-style(-($baseline*2));
+        }
+      }
   }
 
   .create-team {
@@ -426,7 +490,23 @@
         }
     }
 
-    .form-actions {
+    .required-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 60%; // TODO: susy grid
+    }
+
+    .optional-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 35%; // TODO: susy grid
+      @include margin-left(2%);
+      border-left: 2px solid $gray-l4;
+      padding-left: 2%;
+    }
+  }
+
+  .form-actions {
         margin-top: $baseline;
     }
 
@@ -454,23 +534,22 @@
       &:focus {
           border: 1px solid $link-color;
           color: $link-color;
-      }
     }
+  }
 
-    .required-wrapper {
-      display: inline-block;
-      vertical-align: top;
-      width: 60%; // TODO: susy grid
-    }
+  .header-action-view {
+    display: inline-block;
+    width: 33%;
+    vertical-align: text-bottom;
 
-    .optional-wrapper {
-      display: inline-block;
-      vertical-align: top;
-      width: 35%; // TODO: susy grid
-      margin-left: 2%;
-      border-left: 2px solid $gray-l4;
-      padding-left: 2%;
+    .join-team.form-actions, .join-team-message {
+      @include text-align(right);
     }
+  }
+
+  .join-team-message {
+    @extend %t-copy-sub1;
+    color: $gray-l1;
   }
 
   .team-actions {
@@ -629,3 +708,5 @@
 .create-team.form-actions {
   margin-top: $baseline;
 }
+
+

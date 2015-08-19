@@ -3,13 +3,13 @@ define([
     'underscore',
     'backbone',
     'common/js/spec_helpers/ajax_helpers',
-    'teams/js/views/edit_team'
-], function ($, _, Backbone, AjaxHelpers, TeamEditView) {
+    'teams/js/views/edit_team',
+    'teams/js/spec_helpers/team_spec_helpers'
+], function ($, _, Backbone, AjaxHelpers, TeamEditView, TeamSpecHelpers) {
     'use strict';
 
     describe('EditTeam', function () {
-        var teamEditView,
-            teamsUrl = '/api/team/v0/teams/',
+        var teamsUrl = '/api/team/v0/teams/',
             teamsData = {
                 id: null,
                 name: "TeamName",
@@ -22,7 +22,7 @@ define([
                 language: "a",
                 membership: []
             },
-            verifyValidation = function (requests, fieldsData) {
+            verifyValidation = function (requests, teamEditView, fieldsData) {
                 _.each(fieldsData, function (fieldData) {
                     teamEditView.$(fieldData[0]).val(fieldData[1]);
                 });
@@ -45,34 +45,26 @@ define([
                 });
 
                 expect(requests.length).toBe(0);
-            },
-            expectContent = function (selector, text) {
-                expect(teamEditView.$(selector).text().trim()).toBe(text);
-            },
-            verifyDropdownData = function (selector, expectedItems) {
-                var options = teamEditView.$(selector)[0].options;
-                var renderedItems = $.map(options, function( elem ) {
-                    return [[elem.value, elem.text]];
-                });
-                for (var i = 0; i < expectedItems.length; i++) {
-                    expect(renderedItems).toContain(expectedItems[i]);
-                }
             };
 
-        beforeEach(function () {
-            setFixtures('<div class="teams-content"></div>');
-            spyOn(Backbone.history, 'navigate');
-            teamEditView = new TeamEditView({
+        var createTeamEditView = function() {
+            return new TeamEditView({
+                teamEvents: TeamSpecHelpers.teamEvents,
                 el: $('.teams-content'),
                 teamParams: {
                     teamsUrl: teamsUrl,
-                    courseId: "a/b/c",
-                    topicId: 'awesomeness',
+                    courseID: "a/b/c",
+                    topicID: 'awesomeness',
                     topicName: 'Awesomeness',
                     languages: [['a', 'aaa'], ['b', 'bbb']],
                     countries: [['c', 'ccc'], ['d', 'ddd']]
                 }
             }).render();
+        };
+
+        beforeEach(function () {
+            setFixtures('<div class="teams-content"></div>');
+            spyOn(Backbone.history, 'navigate');
         });
 
         it('can render itself correctly', function () {
@@ -82,7 +74,8 @@ define([
                 '.u-field-optional_description',
                 '.u-field-language',
                 '.u-field-country'
-            ];
+            ],
+                teamEditView = createTeamEditView();
 
             _.each(fieldClasses, function (fieldClass) {
                 expect(teamEditView.$el.find(fieldClass).length).toBe(1);
@@ -93,7 +86,8 @@ define([
         });
 
         it('can create a team', function () {
-            var requests = AjaxHelpers.requests(this);
+            var requests = AjaxHelpers.requests(this),
+                teamEditView = createTeamEditView();
 
             teamEditView.$('.u-field-name input').val(teamsData.name);
             teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
@@ -109,46 +103,49 @@ define([
         });
 
         it('shows validation error message when field is empty', function () {
-            var requests = AjaxHelpers.requests(this);
-            verifyValidation(requests, [
+            var requests = AjaxHelpers.requests(this),
+                teamEditView = createTeamEditView();
+            verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', 'Name', 'success'],
                 ['.u-field-textarea textarea', '', 'error']
             ]);
             teamEditView.render();
-            verifyValidation(requests, [
+            verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', '', 'error'],
                 ['.u-field-textarea textarea', 'description', 'success']
             ]);
             teamEditView.render();
-            verifyValidation(requests, [
+            verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', '', 'error'],
                 ['.u-field-textarea textarea', '', 'error']
             ]);
         });
 
         it('shows validation error message when field value length exceeded the limit', function () {
-            var requests = AjaxHelpers.requests(this);
-            var teamName = new Array(500 + 1).join( '$' );
-            var teamDescription = new Array(500 + 1).join( '$' );
+            var requests = AjaxHelpers.requests(this),
+                teamEditView = createTeamEditView(),
+                teamName = new Array(500 + 1).join( '$'),
+                teamDescription = new Array(500 + 1).join( '$' );
 
-            verifyValidation(requests, [
+            verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', teamName, 'error'],
                 ['.u-field-textarea textarea', 'description', 'success']
             ]);
             teamEditView.render();
-            verifyValidation(requests, [
+            verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', 'name', 'success'],
                 ['.u-field-textarea textarea', teamDescription, 'error']
             ]);
             teamEditView.render();
-            verifyValidation(requests, [
+            verifyValidation(requests, teamEditView, [
                 ['.u-field-name input', teamName, 'error'],
                 ['.u-field-textarea textarea', teamDescription, 'error']
             ]);
         });
 
         it("shows an error message for HTTP 500", function () {
-            var requests = AjaxHelpers.requests(this);
+            var teamEditView = createTeamEditView(),
+                requests = AjaxHelpers.requests(this);
 
             teamEditView.$('.u-field-name input').val(teamsData.name);
             teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
@@ -162,7 +159,28 @@ define([
             expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("An error occurred. Please try again.");
         });
 
+        it("shows correct error message when server returns an error", function () {
+            var requests = AjaxHelpers.requests(this),
+                teamEditView = createTeamEditView();
+
+            teamEditView.$('.u-field-name input').val(teamsData.name);
+            teamEditView.$('.u-field-textarea textarea').val(teamsData.description);
+
+            teamEditView.$('.create-team.form-actions .action-primary').click();
+            teamsData.country = '';
+            teamsData.language = '';
+            AjaxHelpers.expectJsonRequest(requests, 'POST', teamsUrl, teamsData);
+            AjaxHelpers.respondWithError(
+                    requests,
+                    400,
+                    {'user_message': 'User message', 'developer_message': 'Developer message'}
+            );
+
+            expect(teamEditView.$('.wrapper-msg .copy').text().trim()).toBe("User message");
+        });
+
         it("changes route on cancel click", function () {
+            var teamEditView = createTeamEditView();
             teamEditView.$('.create-team.form-actions .action-cancel').click();
             expect(Backbone.history.navigate.calls[0].args).toContain('topics/awesomeness');
         });

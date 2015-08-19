@@ -16,8 +16,9 @@ from ...fixtures.discussion import (
 )
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
+from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import TeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
+from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
 
 
 class TeamsTabBase(UniqueCourseTest):
@@ -40,7 +41,9 @@ class TeamsTabBase(UniqueCourseTest):
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
                 'name': 'Team {}'.format(i),
-                'description': 'Description {}'.format(i)
+                'description': 'Description {}'.format(i),
+                'language': 'aa',
+                'country': 'AF'
             }
             response = self.course_fixture.session.post(
                 LMS_BASE_URL + '/api/team/v0/teams/',
@@ -84,9 +87,37 @@ class TeamsTabBase(UniqueCourseTest):
         if present:
             self.assertIn("Teams", self.tab_nav.tab_names)
             self.teams_page.visit()
-            self.assertEqual("This is the new Teams tab.", self.teams_page.get_body_text())
+            self.assertEqual(self.teams_page.active_tab(), 'browse')
         else:
             self.assertNotIn("Teams", self.tab_nav.tab_names)
+
+    def verify_teams(self, page, expected_teams):
+        """Verify that the list of team cards on the current page match the expected teams in order."""
+
+        def assert_team_equal(expected_team, team_card_name, team_card_description):
+            """
+            Helper to assert that a single team card has the expected name and
+            description.
+            """
+            self.assertEqual(expected_team['name'], team_card_name)
+            self.assertEqual(expected_team['description'], team_card_description)
+
+        team_cards = page.team_cards
+        team_card_names = [
+            team_card.find_element_by_css_selector('.card-title').text
+            for team_card in team_cards.results
+        ]
+        team_card_descriptions = [
+            team_card.find_element_by_css_selector('.card-description').text
+            for team_card in team_cards.results
+        ]
+        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
+
+    def verify_my_team_count(self, expected_number_of_teams):
+        """ Verify the number of teams shown on "My Team". """
+
+        # We are doing these operations on this top-level page object to avoid reloading the page.
+        self.teams_page.verify_my_team_count(expected_number_of_teams)
 
 
 @ddt.ddt
@@ -158,11 +189,12 @@ class TeamsTabTest(TeamsTabBase):
         self.verify_teams_present(True)
 
     @ddt.data(
-        ('browse', 'div.topics-list'),
-        ('teams', 'p.temp-tab-view'),
+        ('browse', '.topics-list'),
+        # TODO: find a reliable way to match the "My Teams" tab
+        # ('my-teams', 'div.teams-list'),
         ('teams/{topic_id}/{team_id}', 'div.discussion-module'),
         ('topics/{topic_id}/create-team', 'div.create-team-instructions'),
-        ('topics/{topic_id}', 'div.teams-list'),
+        ('topics/{topic_id}', '.teams-list'),
         ('not-a-real-route', 'div.warning')
     )
     @ddt.unpack
@@ -178,9 +210,16 @@ class TeamsTabTest(TeamsTabBase):
         })
         team = self.create_teams(topic, 1)[0]
         self.teams_page.visit()
+
+        # Get the base URL (the URL without any trailing fragment)
+        url = self.browser.current_url
+        fragment_index = url.find('#')
+        if fragment_index >= 0:
+            url = url[0:fragment_index]
+
         self.browser.get(
             '{url}#{route}'.format(
-                url=self.browser.current_url,
+                url=url,
                 route=route.format(
                     topic_id=topic['id'],
                     team_id=team['id']
@@ -189,6 +228,48 @@ class TeamsTabTest(TeamsTabBase):
         self.teams_page.wait_for_ajax()
         self.assertTrue(self.teams_page.q(css=selector).present)
         self.assertTrue(self.teams_page.q(css=selector).visible)
+
+
+@attr('shard_5')
+class MyTeamsTest(TeamsTabBase):
+    """
+    Tests for the "My Teams" tab of the Teams page.
+    """
+
+    def setUp(self):
+        super(MyTeamsTest, self).setUp()
+        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.my_teams_page = MyTeamsPage(self.browser, self.course_id)
+
+    def test_not_member_of_any_teams(self):
+        """
+        Scenario: Visiting the My Teams page when user is not a member of any team should not display any teams.
+        Given I am enrolled in a course with a team configuration and a topic but am not a member of a team
+        When I visit the My Teams page
+        And I should see no teams
+        And I should see a message that I belong to no teams.
+        """
+        self.my_teams_page.visit()
+        self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
+        self.assertEqual(
+            self.my_teams_page.q(css='.page-content-main').text,
+            [u'You are not currently a member of any team.']
+        )
+
+    def test_member_of_a_team(self):
+        """
+        Scenario: Visiting the My Teams page when user is a member of a team should display the teams.
+        Given I am enrolled in a course with a team configuration and a topic and am a member of a team
+        When I visit the My Teams page
+        Then I should see a pagination header showing the number of teams
+        And I should see all the expected team cards
+        And I should not see a pagination footer
+        """
+        teams = self.create_teams(self.topic, 1)
+        self.create_membership(self.user_info['username'], teams[0]['id'])
+        self.my_teams_page.visit()
+        self.verify_teams(self.my_teams_page, teams)
 
 
 @attr('shard_5')
@@ -344,28 +425,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.assertEqual(self.browse_teams_page.header_topic_name, self.topic['name'])
         self.assertEqual(self.browse_teams_page.header_topic_description, self.topic['description'])
 
-    def verify_teams(self, expected_teams):
-        """Verify that the list of team cards on the current page match the expected teams in order."""
-
-        def assert_team_equal(expected_team, team_card_name, team_card_description):
-            """
-            Helper to assert that a single team card has the expected name and
-            description.
-            """
-            self.assertEqual(expected_team['name'], team_card_name)
-            self.assertEqual(expected_team['description'], team_card_description)
-
-        team_cards = self.browse_teams_page.team_cards
-        team_card_names = [
-            team_card.find_element_by_css_selector('.card-title').text
-            for team_card in team_cards.results
-        ]
-        team_card_descriptions = [
-            team_card.find_element_by_css_selector('.card-description').text
-            for team_card in team_cards.results
-        ]
-        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
-
     def verify_on_page(self, page_num, total_teams, pagination_header_text, footer_visible):
         """
         Verify that we are on the correct team list page.
@@ -381,7 +440,10 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         """
         alphabetized_teams = sorted(total_teams, key=lambda team: team['name'])
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), pagination_header_text)
-        self.verify_teams(alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE])
+        self.verify_teams(
+            self.browse_teams_page,
+            alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
+        )
         self.assertEqual(
             self.browse_teams_page.pagination_controls_visible(),
             footer_visible,
@@ -424,7 +486,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1-10 out of 10 total')
-        self.verify_teams(teams)
+        self.verify_teams(self.browse_teams_page, teams)
         self.assertFalse(
             self.browse_teams_page.pagination_controls_visible(),
             msg='Expected paging footer to be invisible'
@@ -473,29 +535,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.verify_on_page(2, teams, 'Showing 11-20 out of 20 total', True)
         self.browse_teams_page.go_to_page(1)
         self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
-
-    def test_teams_membership(self):
-        """
-        Scenario: Team cards correctly reflect membership of the team.
-        Given I am enrolled in a course with a team configuration and a topic
-            containing one team
-        And I add myself to the team
-        When I visit the Teams page for that topic
-        Then I should see the correct page header
-        And I should see the team for that topic
-        And I should see that the team card shows my membership
-        """
-        teams = self.create_teams(self.topic, 1)
-        self.browse_teams_page.visit()
-        self.verify_page_header()
-        self.verify_teams(teams)
-        self.create_membership(self.user_info['username'], teams[0]['id'])
-        self.browser.refresh()
-        self.browse_teams_page.wait_for_ajax()
-        self.assertEqual(
-            self.browse_teams_page.team_cards[0].find_element_by_css_selector('.member-count').text,
-            '1 / 10 Members'
-        )
 
     def test_navigation_links(self):
         """
@@ -558,7 +597,7 @@ class CreateTeamTest(TeamsTabBase):
 
     def fill_create_form(self):
         """Fill the create team form fields with appropriate values."""
-        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name)
+        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name, press_enter=False)
         self.create_team_page.value_for_textarea_field(
             field_id='description',
             value='The Avengers are a fictional team of superheroes.'
@@ -637,7 +676,8 @@ class CreateTeamTest(TeamsTabBase):
                   'transform themselves through cutting-edge technologies, innovative pedagogy, and '
                   'rigorous courses. More than 70 schools, nonprofits, corporations, and international'
                   'organizations offer or plan to offer courses on the edX website. As of 22 October 2014,'
-                  'edX has more than 4 million users taking more than 500 courses online.'
+                  'edX has more than 4 million users taking more than 500 courses online.',
+            press_enter=False
         )
         self.create_team_page.submit_form()
 
@@ -656,6 +696,10 @@ class CreateTeamTest(TeamsTabBase):
         When I fill all the fields present with appropriate data
         And I click Create button
         Then I should see the page for my team
+        And I should see the message that says "You are member of this team"
+        And the new team should be added to the list of teams within the topic
+        And the number of teams should be updated on the topic card
+        And if I switch to "My Team", the newly created team is displayed
         """
         self.verify_and_navigate_to_create_team_page()
 
@@ -667,6 +711,17 @@ class CreateTeamTest(TeamsTabBase):
         team_page.wait_for_page()
         self.assertEqual(team_page.team_name, self.team_name)
         self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
+        self.assertEqual(team_page.team_user_membership_text, 'You are a member of this team.')
+
+        # Verify the new team was added to the topic list
+        self.teams_page.click_specific_topic("Example Topic")
+        self.teams_page.verify_topic_team_count(1)
+
+        self.teams_page.click_all_topics()
+        self.teams_page.verify_team_count_in_first_topic(1)
+
+        # Verify that if one switches to "My Team" without reloading the page, the newly created team is shown.
+        self.verify_my_team_count(1)
 
     def test_user_can_cancel_the_team_creation(self):
         """
@@ -676,6 +731,7 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see the Create Team header and form
         When I click Cancel button
         Then I should see teams list page without any new team.
+        And if I switch to "My Team", it shows no teams
         """
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
 
@@ -685,17 +741,53 @@ class CreateTeamTest(TeamsTabBase):
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
 
+        self.teams_page.click_all_topics()
+        self.teams_page.verify_team_count_in_first_topic(0)
+
+        self.verify_my_team_count(0)
+
 
 @attr('shard_5')
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
     """Tests for viewing a specific team"""
+
+    SEND_INVITE_TEXT = 'Send this link to friends so that they can join too.'
+
     def setUp(self):
         super(TeamPageTest, self).setUp()
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
-        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
-        self.team = self.create_teams(self.topic, 1)[0]
-        self.team_page = TeamPage(self.browser, self.course_id, self.team)
+
+    def _set_team_configuration_and_membership(
+            self,
+            max_team_size=10,
+            membership_team_index=0,
+            visit_team_index=0,
+            create_membership=True,
+            another_user=False):
+        """
+        Set team configuration.
+
+        Arguments:
+            max_team_size (int): number of users a team can have
+            membership_team_index (int): index of team user will join
+            visit_team_index (int): index of team user will visit
+            create_membership (bool): whether to create membership or not
+            another_user (bool): another user to visit a team
+        """
+        #pylint: disable=attribute-defined-outside-init
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': max_team_size, 'topics': [self.topic]}
+        )
+        self.teams = self.create_teams(self.topic, 2)
+
+        if create_membership:
+            self.create_membership(self.user_info['username'], self.teams[membership_team_index]['id'])
+
+        if another_user:
+            AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.team_page = TeamPage(self.browser, self.course_id, self.teams[visit_team_index])
 
     def setup_thread(self):
         """
@@ -703,7 +795,7 @@ class TeamPageTest(TeamsTabBase):
         """
         thread = Thread(
             id="test_thread_{}".format(uuid4().hex),
-            commentable_id=self.team['discussion_topic_id'],
+            commentable_id=self.teams[0]['discussion_topic_id'],
             body="Dummy text body."
         )
         thread_fixture = MultipleThreadFixture([thread])
@@ -732,7 +824,7 @@ class TeamPageTest(TeamsTabBase):
         """
         thread = self.setup_thread()
         self.team_page.visit()
-        self.assertEqual(self.team_page.discussion_id, self.team['discussion_topic_id'])
+        self.assertEqual(self.team_page.discussion_id, self.teams[0]['discussion_topic_id'])
         discussion = self.team_page.discussion_page
         self.assertTrue(discussion.is_browser_on_page())
         self.assertTrue(discussion.is_discussion_expanded())
@@ -754,7 +846,7 @@ class TeamPageTest(TeamsTabBase):
         And I should see the existing thread
         And I should see controls to change the state of the discussion
         """
-        self.create_membership(self.user_info['username'], self.team['id'])
+        self._set_team_configuration_and_membership()
         self.verify_teams_discussion_permissions(True)
 
     @ddt.data(True, False)
@@ -770,10 +862,193 @@ class TeamPageTest(TeamsTabBase):
         And I should see the team's thread
         And I should not see controls to change the state of the discussion
         """
+        self._set_team_configuration_and_membership(create_membership=False)
         self.setup_discussion_user(staff=is_staff)
         self.verify_teams_discussion_permissions(False)
 
     @ddt.data('Moderator', 'Community TA', 'Administrator')
     def test_discussion_privileged(self, role):
+        self._set_team_configuration_and_membership(create_membership=False)
         self.setup_discussion_user(role=role)
         self.verify_teams_discussion_permissions(True)
+
+    def assert_team_details(self, num_members, is_member=True, max_size=10):
+        """
+        Verifies that user can see all the information, present on detail page according to their membership status.
+
+        Arguments:
+            num_members (int): number of users in a team
+            is_member (bool) default True: True if request user is member else False
+            max_size (int): number of users a team can have
+        """
+        self.assertEqual(
+            self.team_page.team_capacity_text,
+            self.team_page.format_capacity_text(num_members, max_size)
+        )
+        self.assertEqual(self.team_page.team_location, 'Afghanistan')
+        self.assertEqual(self.team_page.team_language, 'Afar')
+        self.assertEqual(self.team_page.team_members, num_members)
+
+        if num_members > 0:
+            self.assertTrue(self.team_page.team_members_present)
+        else:
+            self.assertFalse(self.team_page.team_members_present)
+
+        if is_member:
+            self.assertEqual(self.team_page.team_user_membership_text, 'You are a member of this team.')
+            self.assertTrue(self.team_page.team_leave_link_present)
+            self.assertTrue(self.team_page.new_post_button_present)
+        else:
+            self.assertEqual(self.team_page.team_user_membership_text, '')
+            self.assertFalse(self.team_page.team_leave_link_present)
+            self.assertFalse(self.team_page.new_post_button_present)
+
+    def test_team_member_can_see_full_team_details(self):
+        """
+        Scenario: Team member can see full info for team.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When I visit the Team page for that team
+        Then I should see the full team detail
+        And I should see the team members
+        And I should see my team membership text
+        And I should see the language & country
+        And I should see the Leave Team and Invite Team
+        """
+        self._set_team_configuration_and_membership()
+        self.team_page.visit()
+
+        self.assert_team_details(
+            num_members=1,
+        )
+
+    def test_other_users_can_see_limited_team_details(self):
+        """
+        Scenario: Users who are not member of this team can only see limited info for this team.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am not a member
+        When I visit the Team page for that team
+        Then I should not see full team detail
+        And I should see the team members
+        And I should not see my team membership text
+        And I should not see the Leave Team and Invite Team links
+        """
+        self._set_team_configuration_and_membership(create_membership=False)
+        self.team_page.visit()
+
+        self.assert_team_details(is_member=False, num_members=0)
+
+    def test_user_can_navigate_to_members_profile_page(self):
+        """
+        Scenario: User can navigate to profile page via team member profile image.
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic of which I am a member
+        When I visit the Team page for that team
+        Then I should see profile images for the team members
+        When I click on the first profile image
+        Then I should be taken to the user's profile page
+        And I should see the username on profile page
+        """
+        self._set_team_configuration_and_membership()
+        self.team_page.visit()
+
+        self.team_page.click_first_profile_image()
+
+        learner_profile_page = LearnerProfilePage(self.browser, self.team_page.first_member_username)
+        learner_profile_page.wait_for_page()
+        learner_profile_page.wait_for_field('username')
+        self.assertTrue(learner_profile_page.field_is_visible('username'))
+
+    def test_join_team(self):
+        """
+        Scenario: User can join a Team if not a member already..
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I visit the Team page for that team
+        Then I should see Join Team button
+        And I should not see New Post button
+        When I click on Join Team button
+        Then there should be no Join Team button and no message
+        And I should see the updated information under Team Details
+        And I should see New Post button
+        And if I switch to "My Team", the team I have joined is displayed
+        """
+        self._set_team_configuration_and_membership(create_membership=False)
+        self.team_page.visit()
+        self.assertTrue(self.team_page.join_team_button_present)
+        self.team_page.click_join_team_button()
+        self.assertFalse(self.team_page.join_team_button_present)
+        self.assertFalse(self.team_page.join_team_message_present)
+        self.assert_team_details(num_members=1, is_member=True)
+
+        # Verify that if one switches to "My Team" without reloading the page, the newly created team is shown.
+        self.teams_page.click_all_topics()
+        self.verify_my_team_count(1)
+
+    def test_already_member_message(self):
+        """
+        Scenario: User should see `You are already in a team` if user is a
+            member of other team.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I am already a member of a team
+        And I visit a team other than mine
+        Then I should see `You are already in a team` message
+        """
+        self._set_team_configuration_and_membership(membership_team_index=0, visit_team_index=1)
+        self.team_page.visit()
+        self.assertEqual(self.team_page.join_team_message, 'You already belong to another team.')
+        self.assert_team_details(num_members=0, is_member=False)
+
+    def test_team_full_message(self):
+        """
+        Scenario: User should see `Team is full` message when team is full.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And team has no space left
+        And I am not a member of any team
+        And I visit the team
+        Then I should see `Team is full` message
+        """
+        self._set_team_configuration_and_membership(
+            create_membership=True,
+            max_team_size=1,
+            membership_team_index=0,
+            visit_team_index=0,
+            another_user=True
+        )
+        self.team_page.visit()
+        self.assertEqual(self.team_page.join_team_message, 'This team is full.')
+        self.assert_team_details(num_members=1, is_member=False, max_size=1)
+
+    def test_leave_team(self):
+        """
+        Scenario: User can leave a team.
+
+        Given I am enrolled in a course with a team configuration, a topic,
+            and a team belonging to that topic
+        And I am a member of team
+        And I visit the team
+        And I should not see Join Team button
+        And I should see New Post button
+        Then I should see Leave Team link
+        When I click on Leave Team link
+        Then user should be removed from team
+        And I should see Join Team button
+        And I should not see New Post button
+        And if I switch to "My Team", the team I have left is not displayed
+        """
+        self._set_team_configuration_and_membership()
+        self.team_page.visit()
+        self.assertFalse(self.team_page.join_team_button_present)
+        self.assert_team_details(num_members=1)
+        self.team_page.click_leave_team_link()
+        self.assert_team_details(num_members=0, is_member=False)
+        self.assertTrue(self.team_page.join_team_button_present)
+
+        # Verify that if one switches to "My Team" without reloading the page, the old team no longer shows.
+        self.teams_page.click_all_topics()
+        self.verify_my_team_count(0)

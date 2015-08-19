@@ -231,12 +231,13 @@ def _get_proctoring_requirements(course_key):
     requirements = [
         {
             'namespace': 'proctored_exam',
-            'name': 'proctored_exam_id:{id}'.format(id=exam['id']),
+            'name': exam['content_id'],
             'display_name': exam['exam_name'],
             'criteria': {},
         }
         for exam in get_all_exams_for_course(unicode(course_key))
-        if exam['is_proctored'] and exam['is_active']
+        # practice exams do not count towards eligibility
+        if exam['is_proctored'] and exam['is_active'] and not exam['is_practice_exam']
     ]
 
     log_msg = (

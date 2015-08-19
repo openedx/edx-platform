@@ -86,7 +86,8 @@
             <ol class="list-input">
               <li class="field text" id="field-course-minimum_grade_credit">
                 <label for="course-minimum_grade_credit">${_("Minimum Credit-Eligible Grade:")}</label>
-                <input type="text" class="short time" id="course-minimum_grade_credit" value="0" placeholder="80%" autocomplete="off" aria-describedby="minimum_grade_description"/>
+                <input type="text" class="short time input-minimum-grade" id="course-minimum_grade_credit" value="0" placeholder="80" autocomplete="off" aria-describedby="minimum_grade_description"/>
+                <span class="minimum-grade-percentage-sign">%</span>
                 <span class="tip tip-inline" id="minimum_grade_description">${_("Must be greater than or equal to the course passing grade")}</span>
               </li>
             </ol>

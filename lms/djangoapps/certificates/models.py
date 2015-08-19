@@ -674,6 +674,88 @@ class BadgeImageConfiguration(models.Model):
             return cls.objects.get(default=True).icon
 
 
+class CertificateTemplate(TimeStampedModel):
+    """A set of custom web certificate templates.
+
+    Web certificate templates are Django web templates
+    to replace PDF certificate.
+
+    A particular course may have several kinds of certificate templates
+    (e.g. honor and verified).
+
+    """
+    name = models.CharField(
+        max_length=255,
+        help_text=_(u'Name of template.'),
+    )
+    description = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Description and/or admin notes.'),
+    )
+    template = models.TextField(
+        help_text=_(u'Django template HTML.'),
+    )
+    organization_id = models.IntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text=_(u'Organization of template.'),
+    )
+    course_key = CourseKeyField(
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    mode = models.CharField(
+        max_length=125,
+        choices=GeneratedCertificate.MODES,
+        default=GeneratedCertificate.MODES.honor,
+        null=True,
+        blank=True,
+        help_text=_(u'The course mode for this template.'),
+    )
+    is_active = models.BooleanField(
+        help_text=_(u'On/Off switch.'),
+        default=False,
+    )
+
+    def __unicode__(self):
+        return u'%s' % (self.name, )
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = 'created'
+        unique_together = (('organization_id', 'course_key', 'mode'),)
+
+
+class CertificateTemplateAsset(TimeStampedModel):
+    """A set of assets to be used in custom web certificate templates.
+
+    This model stores assets used in custom web certificate templates
+    such as image, css files.
+
+    """
+    description = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=_(u'Description of the asset.'),
+    )
+    asset = models.FileField(
+        max_length=255,
+        upload_to='certificate_template_assets',
+        help_text=_(u'Asset file. It could be an image or css file.'),
+    )
+
+    def __unicode__(self):
+        return u'%s' % (self.asset.url, )  # pylint: disable=no-member
+
+    class Meta(object):  # pylint: disable=missing-docstring
+        get_latest_by = 'created'
+
+
 @receiver(post_save, sender=GeneratedCertificate)
 #pylint: disable=unused-argument
 def create_badge(sender, instance, **kwargs):

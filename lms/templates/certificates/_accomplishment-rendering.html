@@ -32,7 +32,7 @@ course_mode_class = course_mode if course_mode else ''
 
                         <span class="accomplishment-course hd-1 emphasized">
                             <span class="accomplishment-course-org">${accomplishment_copy_course_org}  </span>
-                            <span class="accomplishment-course-number">101x</span>:
+                            <span class="accomplishment-course-number">${course_number}</span>:
                             <span class="accomplishment-course-name">${accomplishment_course_title}</span>
                         </span>
                     </p>
@@ -75,10 +75,10 @@ course_mode_class = course_mode if course_mode else ''
                         </div>
                     </li>
 
-                    % if certificate_data and certificate_data.get('org_logo_path', ''):
+                    % if organization_logo:
                     <li class="wrapper-organization">
                         <div class="organization">
-                            <img class="organization-logo" src="${static.url(certificate_data['org_logo_path'])}" alt="${platform_name}">
+                            <img class="organization-logo" src="${organization_logo.url}" alt="${platform_name}">
                         </div>
                     </li>
                     % endif

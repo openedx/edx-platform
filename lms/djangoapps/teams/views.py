@@ -1,13 +1,11 @@
 """HTTP endpoints for the Teams API."""
 
 from django.shortcuts import render_to_response
-from courseware.courses import get_course_with_access, has_access
 from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.views.generic.base import View
 import newrelic.agent
-
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -18,16 +16,11 @@ from rest_framework.authentication import (
 )
 from rest_framework import status
 from rest_framework import permissions
-
 from django.db.models import Count
 from django.contrib.auth.models import User
 from django_countries import countries
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-
-from student.models import CourseEnrollment, CourseAccessRole
-from student.roles import CourseStaffRole
-
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -37,14 +30,15 @@ from openedx.core.lib.api.view_utils import (
     ExpandableFieldViewMixin
 )
 from openedx.core.lib.api.serializers import PaginationSerializer
-
 from xmodule.modulestore.django import modulestore
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from courseware.courses import get_course_with_access, has_access
+from student.models import CourseEnrollment, CourseAccessRole
+from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
-
+from teams import is_feature_enabled
 from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
@@ -52,12 +46,12 @@ from .serializers import (
     BaseTopicSerializer,
     TopicSerializer,
     PaginatedTopicSerializer,
-    MembershipSerializer
+    MembershipSerializer,
+    PaginatedMembershipSerializer,
 )
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
-
-# Constants
+TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 
 
@@ -91,28 +85,39 @@ class TeamsDashboardView(View):
             context={'course_id': course.id, 'sort_order': sort_order}
         )
         user = request.user
+
+        team_memberships = CourseTeamMembership.get_memberships(request.user.username, [course.id])
+        team_memberships_page = Paginator(team_memberships, TEAM_MEMBERSHIPS_PER_PAGE).page(1)
+        team_memberships_serializer = PaginatedMembershipSerializer(
+            instance=team_memberships_page,
+            context={'expand': ('team',)},
+        )
+
         context = {
             "course": course,
             "topics": topics_serializer.data,
+            # It is necessary to pass both privileged and staff because only privileged users can
+            # administer discussion threads, but both privileged and staff users are allowed to create
+            # multiple teams (since they are not automatically added to teams upon creation).
+            "user_info": {
+                "username": user.username,
+                "privileged": has_discussion_privileges(user, course_key),
+                "staff": bool(has_access(user, 'staff', course_key)),
+                "team_memberships_data": team_memberships_serializer.data,
+            },
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
+            "team_memberships_url": reverse('team_membership_list', request=request),
+            "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),
-            "username": user.username,
-            "privileged": has_discussion_privileges(user, course_key),
             "disable_courseware_js": True,
+            "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
         }
         return render_to_response("teams/teams.html", context)
-
-
-def is_feature_enabled(course):
-    """
-    Returns True if the teams feature is enabled.
-    """
-    return settings.FEATURES.get('ENABLE_TEAMS', False) and course.teams_enabled
 
 
 def has_team_api_access(user, course_key, access_username=None):
@@ -361,6 +366,20 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 ugettext_noop('The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
+            return Response({
+                'field_errors': field_errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Course and global staff, as well as discussion "privileged" users, will not automatically
+        # be added to a team when they create it. They are allowed to create multiple teams.
+        team_administrator = (has_access(request.user, 'staff', course_key)
+                              or has_discussion_privileges(request.user, course_key))
+        if not team_administrator and CourseTeamMembership.user_in_team_for_course(request.user, course_key):
+            error_message = build_api_error(
+                ugettext_noop('You are already in a team in this course.'),
+                course_id=course_id
+            )
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
 
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -377,8 +396,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
-            if not (has_access(request.user, 'staff', course_key)
-                    or has_discussion_privileges(request.user, course_key)):
+            if not team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
             return Response(CourseTeamSerializer(team).data)
@@ -789,9 +807,19 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
     def get(self, request):
         """GET /api/team/v0/team_membership"""
-        queryset = CourseTeamMembership.objects.all()
-
         specified_username_or_team = False
+        username = None
+        team_id = None
+        requested_course_id = None
+        requested_course_key = None
+        accessible_course_ids = None
+
+        if 'course_id' in request.QUERY_PARAMS:
+            requested_course_id = request.QUERY_PARAMS['course_id']
+            try:
+                requested_course_key = CourseKey.from_string(requested_course_id)
+            except InvalidKeyError:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         if 'team_id' in request.QUERY_PARAMS:
             specified_username_or_team = True
@@ -800,12 +828,14 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 team = CourseTeam.objects.get(team_id=team_id)
             except CourseTeam.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
+            if requested_course_key is not None and requested_course_key != team.course_id:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             if not has_team_api_access(request.user, team.course_id):
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            queryset = queryset.filter(team__team_id=team_id)
 
         if 'username' in request.QUERY_PARAMS:
             specified_username_or_team = True
+            username = request.QUERY_PARAMS['username']
             if not request.user.is_staff:
                 enrolled_courses = (
                     CourseEnrollment.enrollments_for_user(request.user).values_list('course_id', flat=True)
@@ -813,13 +843,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 staff_courses = (
                     CourseAccessRole.objects.filter(user=request.user, role='staff').values_list('course_id', flat=True)
                 )
-                valid_courses = [
-                    CourseKey.from_string(course_key_string)
-                    for course_list in [enrolled_courses, staff_courses]
-                    for course_key_string in course_list
-                ]
-                queryset = queryset.filter(team__course_id__in=valid_courses)
-            queryset = queryset.filter(user__username=request.QUERY_PARAMS['username'])
+                accessible_course_ids = [item for sublist in (enrolled_courses, staff_courses) for item in sublist]
+                if requested_course_id is not None and requested_course_id not in accessible_course_ids:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not specified_username_or_team:
             return Response(
@@ -827,6 +853,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        course_keys = None
+        if requested_course_key is not None:
+            course_keys = [requested_course_key]
+        elif accessible_course_ids is not None:
+            course_keys = [CourseKey.from_string(course_string) for course_string in accessible_course_ids]
+
+        queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)
         serializer = self.get_pagination_serializer(page)
         return Response(serializer.data)  # pylint: disable=maybe-no-member
@@ -859,6 +892,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        course_module = modulestore().get_course(team.course_id)
+        if course_module.teams_max_size is not None and team.users.count() >= course_module.teams_max_size:
+            return Response(
+                build_api_error(ugettext_noop("This team is already full.")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             membership = team.add_user(user)

@@ -110,7 +110,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TeamAPITestCase, cls).setUpClass()
-        teams_configuration = {
+        teams_configuration_1 = {
             'topics':
             [
                 {
@@ -124,9 +124,31 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             org='TestX',
             course='TS101',
             display_name='Test Course',
-            teams_configuration=teams_configuration
+            teams_configuration=teams_configuration_1
         )
-        cls.test_course_2 = CourseFactory.create(org='MIT', course='6.002x', display_name='Circuits')
+
+        teams_configuration_2 = {
+            'topics':
+            [
+                {
+                    'id': 'topic_5',
+                    'name': 'Other Interests',
+                    'description': 'Description for topic 5.'
+                },
+                {
+                    'id': 'topic_6',
+                    'name': 'Public Profiles',
+                    'description': 'Description for topic 6.'
+                },
+            ],
+            'max_team_size': 1
+        }
+        cls.test_course_2 = CourseFactory.create(
+            org='MIT',
+            course='6.002x',
+            display_name='Circuits',
+            teams_configuration=teams_configuration_2
+        )
 
     def setUp(self):
         super(TeamAPITestCase, self).setUp()
@@ -152,6 +174,22 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             username='student_enrolled_both_courses_other_team'
         )
 
+        # Make this student have a public profile
+        self.create_and_enroll_student(
+            courses=[self.test_course_2],
+            username='student_enrolled_public_profile'
+        )
+        profile = self.users['student_enrolled_public_profile'].profile
+        profile.year_of_birth = 1970
+        profile.save()
+
+        # This student is enrolled in the other course, but not yet a member of a team. This is to allow
+        # course_2 to use a max_team_size of 1 without breaking other tests on course_1
+        self.create_and_enroll_student(
+            courses=[self.test_course_2],
+            username='student_enrolled_other_course_not_on_team'
+        )
+
         # 'solar team' is intentionally lower case to test case insensitivity in name ordering
         self.test_team_1 = CourseTeamFactory.create(
             name=u'sólar team',
@@ -162,11 +200,21 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.test_team_3 = CourseTeamFactory.create(name='Nuclear Team', course_id=self.test_course_1.id)
         self.test_team_4 = CourseTeamFactory.create(name='Coal Team', course_id=self.test_course_1.id, is_active=False)
         self.test_team_5 = CourseTeamFactory.create(name='Another Team', course_id=self.test_course_2.id)
+        self.test_team_6 = CourseTeamFactory.create(
+            name='Public Profile Team',
+            course_id=self.test_course_2.id,
+            topic_id='topic_6'
+        )
 
-        for user, course in [
-                ('staff', self.test_course_1),
-                ('course_staff', self.test_course_1),
-        ]:
+        self.test_team_name_id_map = {team.name: team for team in (
+            self.test_team_1,
+            self.test_team_2,
+            self.test_team_3,
+            self.test_team_4,
+            self.test_team_5,
+        )}
+
+        for user, course in [('staff', self.test_course_1), ('course_staff', self.test_course_1)]:
             CourseEnrollment.enroll(
                 self.users[user], course.id, check_access=True
             )
@@ -174,6 +222,15 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.test_team_1.add_user(self.users['student_enrolled'])
         self.test_team_3.add_user(self.users['student_enrolled_both_courses_other_team'])
         self.test_team_5.add_user(self.users['student_enrolled_both_courses_other_team'])
+        self.test_team_6.add_user(self.users['student_enrolled_public_profile'])
+
+    def build_membership_data_raw(self, username, team):
+        """Assembles a membership creation payload based on the raw values provided."""
+        return {'username': username, 'team_id': team}
+
+    def build_membership_data(self, username, team):
+        """Assembles a membership creation payload based on the username and team model provided."""
+        return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     def create_and_enroll_student(self, courses=None, username=None):
         """ Creates a new student and enrolls that student in the course.
@@ -305,10 +362,17 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             **kwargs
         )
 
-    def verify_expanded_user(self, user):
+    def verify_expanded_public_user(self, user):
         """Verifies that fields exist on the returned user json indicating that it is expanded."""
-        for field in ['id', 'url', 'email', 'name', 'username', 'preferences']:
+        for field in ['username', 'url', 'bio', 'country', 'profile_image', 'time_zone', 'language_proficiencies']:
             self.assertIn(field, user)
+
+    def verify_expanded_private_user(self, user):
+        """Verifies that fields exist on the returned user json indicating that it is expanded."""
+        for field in ['username', 'url', 'profile_image']:
+            self.assertIn(field, user)
+        for field in ['bio', 'country', 'time_zone', 'language_proficiencies']:
+            self.assertNotIn(field, user)
 
     def verify_expanded_team(self, team):
         """Verifies that fields exist on the returned team json indicating that it is expanded."""
@@ -347,7 +411,12 @@ class TestListTeamsAPI(TeamAPITestCase):
         self.verify_names({'course_id': 'no_such_course'}, 400)
 
     def test_filter_course_id(self):
-        self.verify_names({'course_id': self.test_course_2.id}, 200, ['Another Team'], user='staff')
+        self.verify_names(
+            {'course_id': self.test_course_2.id},
+            200,
+            ['Another Team', 'Public Profile Team'],
+            user='staff'
+        )
 
     def test_filter_topic_id(self):
         self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'sólar team'])
@@ -386,9 +455,22 @@ class TestListTeamsAPI(TeamAPITestCase):
         self.assertIsNone(result['next'])
         self.assertIsNotNone(result['previous'])
 
-    def test_expand_user(self):
+    def test_expand_private_user(self):
+        # Use the default user which is already private because to year_of_birth is set
         result = self.get_teams_list(200, {'expand': 'user', 'topic_id': 'topic_0'})
-        self.verify_expanded_user(result['results'][0]['membership'][0]['user'])
+        self.verify_expanded_private_user(result['results'][0]['membership'][0]['user'])
+
+    def test_expand_public_user(self):
+        result = self.get_teams_list(
+            200,
+            {
+                'expand': 'user',
+                'topic_id': 'topic_6',
+                'course_id': self.test_course_2.id
+            },
+            user='student_enrolled_public_profile'
+        )
+        self.verify_expanded_public_user(result['results'][0]['membership'][0]['user'])
 
 
 @ddt.ddt
@@ -423,11 +505,11 @@ class TestCreateTeamAPI(TeamAPITestCase):
         )
 
     @ddt.data((400, {
-        'name': 'Bad Course Id',
+        'name': 'Bad Course ID',
         'course_id': 'no_such_course',
         'description': "Filler Description"
     }), (404, {
-        'name': "Non-existent course id",
+        'name': "Non-existent course ID",
         'course_id': 'no/such/course',
         'description': "Filler Description"
     }))
@@ -435,15 +517,49 @@ class TestCreateTeamAPI(TeamAPITestCase):
     def test_bad_course_data(self, status, data):
         self.post_create_team(status, data)
 
+    def test_student_in_team(self):
+        response = self.post_create_team(
+            400,
+            data=self.build_team_data(
+                name="Doomed team",
+                course=self.test_course_1,
+                description="Overly ambitious student"
+            ),
+            user='student_enrolled'
+        )
+        self.assertEqual(
+            "You are already in a team in this course.",
+            json.loads(response.content)["user_message"]
+        )
+
+    @ddt.data('staff', 'course_staff', 'community_ta')
+    def test_privileged_create_multiple_teams(self, user):
+        """ Privileged users can create multiple teams, even if they are already in one. """
+        # First add the privileged user to a team.
+        self.post_create_membership(
+            200,
+            self.build_membership_data(user, self.test_team_1),
+            user=user
+        )
+
+        self.post_create_team(
+            data=self.build_team_data(
+                name="Another team",
+                course=self.test_course_1,
+                description="Privileged users are the best"
+            ),
+            user=user
+        )
+
+    @ddt.data({'description': ''}, {'name': 'x' * 1000}, {'name': ''})
+    def test_bad_fields(self, kwargs):
+        self.post_create_team(400, self.build_team_data(**kwargs))
+
     def test_missing_name(self):
         self.post_create_team(400, {
             'course_id': str(self.test_course_1.id),
             'description': "foobar"
         })
-
-    @ddt.data({'description': ''}, {'name': 'x' * 1000}, {'name': ''})
-    def test_bad_fields(self, kwargs):
-        self.post_create_team(400, self.build_team_data(**kwargs))
 
     def test_full_student_creator(self):
         creator = self.create_and_enroll_student()
@@ -515,9 +631,19 @@ class TestDetailTeamAPI(TeamAPITestCase):
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)
 
-    def test_expand_user(self):
+    def test_expand_private_user(self):
+        # Use the default user which is already private because to year_of_birth is set
         result = self.get_team_detail(self.test_team_1.team_id, 200, {'expand': 'user'})
-        self.verify_expanded_user(result['membership'][0]['user'])
+        self.verify_expanded_private_user(result['membership'][0]['user'])
+
+    def test_expand_public_user(self):
+        result = self.get_team_detail(
+            self.test_team_6.team_id,
+            200,
+            {'expand': 'user'},
+            user='student_enrolled_public_profile'
+        )
+        self.verify_expanded_public_user(result['membership'][0]['user'])
 
 
 @ddt.ddt
@@ -709,15 +835,58 @@ class TestListMembershipAPI(TeamAPITestCase):
             else:
                 self.assertEqual(membership['count'], 0)
 
+    @ddt.data(
+        ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
+        ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'sólar team'),
+        ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
+    )
+    @ddt.unpack
+    def test_course_filter_with_username(self, user, course_id, status, team_name):
+        membership = self.get_membership_list(
+            status,
+            {
+                'username': self.users[user],
+                'course_id': course_id
+            },
+            user=user
+        )
+        if status == 200:
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_name_id_map[team_name].team_id)
+
+    @ddt.data(
+        ('TestX/TS101/Test_Course', 200),
+        ('MIT/6.002x/Circuits', 400),
+    )
+    @ddt.unpack
+    def test_course_filter_with_team_id(self, course_id, status):
+        membership = self.get_membership_list(status, {'team_id': self.test_team_1.team_id, 'course_id': course_id})
+        if status == 200:
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_1.team_id)
+
+    def test_bad_course_id(self):
+        self.get_membership_list(404, {'course_id': 'no_such_course'})
+
     def test_no_username_or_team_id(self):
         self.get_membership_list(400, {})
 
     def test_bad_team_id(self):
         self.get_membership_list(404, {'team_id': 'no_such_team'})
 
-    def test_expand_user(self):
+    def test_expand_private_user(self):
+        # Use the default user which is already private because to year_of_birth is set
         result = self.get_membership_list(200, {'team_id': self.test_team_1.team_id, 'expand': 'user'})
-        self.verify_expanded_user(result['results'][0]['user'])
+        self.verify_expanded_private_user(result['results'][0]['user'])
+
+    def test_expand_public_user(self):
+        result = self.get_membership_list(
+            200,
+            {'team_id': self.test_team_6.team_id, 'expand': 'user'},
+            user='student_enrolled_public_profile'
+        )
+        self.verify_expanded_public_user(result['results'][0]['user'])
 
     def test_expand_team(self):
         result = self.get_membership_list(200, {'team_id': self.test_team_1.team_id, 'expand': 'team'})
@@ -727,14 +896,6 @@ class TestListMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestCreateMembershipAPI(TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
-
-    def build_membership_data_raw(self, username, team):
-        """Assembles a membership creation payload based on the raw values provided."""
-        return {'username': username, 'team_id': team}
-
-    def build_membership_data(self, username, team):
-        """Assembles a membership creation payload based on the username and team model provided."""
-        return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     @ddt.data(
         (None, 401),
@@ -806,6 +967,14 @@ class TestCreateMembershipAPI(TeamAPITestCase):
         )
         self.assertIn('not enrolled', json.loads(response.content)['developer_message'])
 
+    def test_over_max_team_size_in_course_2(self):
+        response = self.post_create_membership(
+            400,
+            self.build_membership_data('student_enrolled_other_course_not_on_team', self.test_team_5),
+            user='student_enrolled_other_course_not_on_team'
+        )
+        self.assertIn('full', json.loads(response.content)['developer_message'])
+
 
 @ddt.ddt
 class TestDetailMembershipAPI(TeamAPITestCase):
@@ -842,14 +1011,25 @@ class TestDetailMembershipAPI(TeamAPITestCase):
             404
         )
 
-    def test_expand_user(self):
+    def test_expand_private_user(self):
+        # Use the default user which is already private because to year_of_birth is set
         result = self.get_membership_detail(
             self.test_team_1.team_id,
             self.users['student_enrolled'].username,
             200,
             {'expand': 'user'}
         )
-        self.verify_expanded_user(result['user'])
+        self.verify_expanded_private_user(result['user'])
+
+    def test_expand_public_user(self):
+        result = self.get_membership_detail(
+            self.test_team_6.team_id,
+            self.users['student_enrolled_public_profile'].username,
+            200,
+            {'expand': 'user'},
+            user='student_enrolled_public_profile'
+        )
+        self.verify_expanded_public_user(result['user'])
 
     def test_expand_team(self):
         result = self.get_membership_detail(

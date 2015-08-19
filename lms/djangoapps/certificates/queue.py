@@ -155,7 +155,14 @@ class XQueueCertInterface(object):
         except GeneratedCertificate.DoesNotExist:
             pass
 
-        return self.add_cert(student, course_id, course, forced_grade, template_file, generate_pdf)
+        return self.add_cert(
+            student,
+            course_id,
+            course=course,
+            forced_grade=forced_grade,
+            template_file=template_file,
+            generate_pdf=generate_pdf
+        )
 
     def del_cert(self, student, course_id):
 

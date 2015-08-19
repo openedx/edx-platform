@@ -41,7 +41,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         uploadDialog: 'form.upload-dialog',
         uploadDialogButton: '.action-upload',
         uploadDialogFileInput: 'form.upload-dialog input[type=file]',
-        uploadOrgLogoButton: '.action-upload-org-logo',
         saveCertificateButton: 'button.action-primary'
     };
 
@@ -311,9 +310,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 setValuesToInputs(this.view, {
                     inputCertificateDescription: 'New Test Description'
                 });
-                this.view.$(SELECTORS.uploadOrgLogoButton).click();
-                var org_logo_path = '/c4x/edX/DemoX/asset/org-logo.png';
-                uploadFile(org_logo_path, requests);
 
                 setValuesToInputs(this.view, {
                     inputSignatoryName: 'New Signatory Name'
@@ -334,8 +330,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 ViewHelpers.submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
                 expect(this.model).toBeCorrectValuesInModel({
                     name: 'New Test Name',
-                    description: 'New Test Description',
-                    org_logo_path: org_logo_path
+                    description: 'New Test Description'
                 });
 
                 // get the first signatory from the signatories collection.

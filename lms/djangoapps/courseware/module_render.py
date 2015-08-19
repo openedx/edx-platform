@@ -78,6 +78,9 @@ from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService
 
+from edx_proctoring.services import ProctoringService
+from openedx.core.djangoapps.credit.services import CreditService
+
 from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
@@ -178,13 +181,69 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                           section.url_name == active_section)
 
                 if not section.hide_from_toc:
-                    sections.append({'display_name': section.display_name_with_default,
-                                     'url_name': section.url_name,
-                                     'format': section.format if section.format is not None else '',
-                                     'due': section.due,
-                                     'active': active,
-                                     'graded': section.graded,
-                                     })
+                    section_context = {
+                        'display_name': section.display_name_with_default,
+                        'url_name': section.url_name,
+                        'format': section.format if section.format is not None else '',
+                        'due': section.due,
+                        'active': active,
+                        'graded': section.graded,
+                    }
+
+                    #
+                    # Add in rendering context for proctored exams
+                    # if applicable
+                    #
+                    is_proctored_enabled = (
+                        getattr(section, 'is_proctored_enabled', False) and
+                        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+                    )
+                    if is_proctored_enabled:
+                        # We need to import this here otherwise Lettuce test
+                        # harness fails. When running in 'harvest' mode, the
+                        # test service appears to get into trouble with
+                        # circular references (not sure which as edx_proctoring.api
+                        # doesn't import anything from edx-platform). Odd thing
+                        # is that running: manage.py lms runserver --settings=acceptance
+                        # works just fine, it's really a combination of Lettuce and the
+                        # 'harvest' management command
+                        #
+                        # One idea is that there is some coupling between
+                        # lettuce and the 'terrain' Djangoapps projects in /common
+                        # This would need more investigation
+                        from edx_proctoring.api import get_attempt_status_summary
+
+                        #
+                        # call into edx_proctoring subsystem
+                        # to get relevant proctoring information regarding this
+                        # level of the courseware
+                        #
+                        # This will return None, if (user, course_id, content_id)
+                        # is not applicable
+                        #
+                        proctoring_attempt_context = None
+                        try:
+                            proctoring_attempt_context = get_attempt_status_summary(
+                                user.id,
+                                unicode(course.id),
+                                unicode(section.location)
+                            )
+                        except Exception, ex:  # pylint: disable=broad-except
+                            # safety net in case something blows up in edx_proctoring
+                            # as this is just informational descriptions, it is better
+                            # to log and continue (which is safe) than to have it be an
+                            # unhandled exception
+                            log.exception(ex)
+
+                        if proctoring_attempt_context:
+                            # yes, user has proctoring context about
+                            # this level of the courseware
+                            # so add to the accordion data context
+                            section_context.update({
+                                'proctoring': proctoring_attempt_context,
+                            })
+
+                    sections.append(section_context)
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
                 'url_name': chapter.url_name,
@@ -678,7 +737,9 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
+            "reverification": ReverificationService(),
+            'proctoring': ProctoringService(),
+            'credit': CreditService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

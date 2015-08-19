@@ -1,8 +1,8 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone'
-    ], function (gettext, $, _, Backbone) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/fields/message_banner.underscore'
+    ], function (gettext, $, _, Backbone, messageBannerTemplate) {
 
         var MessageBannerView = Backbone.View.extend({
 
@@ -11,14 +11,13 @@
                     options = {};
                 }
                 this.options = _.defaults(options, {urgency: 'high', type: ''});
-                this.template = _.template($('#message_banner-tpl').text());
             },
 
             render: function () {
                 if (_.isUndefined(this.message) || _.isNull(this.message)) {
                     this.$el.html('');
                 } else {
-                    this.$el.html(this.template(_.extend(this.options, {
+                    this.$el.html(_.template(messageBannerTemplate, _.extend(this.options, {
                         message: this.message
                     })));
                 }

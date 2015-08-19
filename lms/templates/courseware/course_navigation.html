@@ -1,9 +1,11 @@
 ## mako
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from courseware.tabs import get_course_tab_list
 from courseware.views import notification_image_for_tab
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 from student.models import CourseEnrollment
 %>
@@ -29,8 +31,18 @@ masquerade_group_id = masquerade.group_id if masquerade else None
 staff_selected = selected(not masquerade or masquerade.role != "student")
 specific_student_selected = selected(not staff_selected and masquerade.user_name)
 student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
+include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and course.enable_proctored_exams
 %>
 
+% if include_proctoring:
+  <%static:js group='proctoring'/>
+  % for template_name in ["proctored-exam-status"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="courseware/${template_name}.underscore" />
+    </script>
+  % endfor
+<div class="proctored_exam_status"></div>
+% endif
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu">

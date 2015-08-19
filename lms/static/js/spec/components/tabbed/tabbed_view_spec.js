@@ -101,7 +101,7 @@
                            view.$('.nav-item[data-index=1]').click();
                            expect(Backbone.history.navigate).toHaveBeenCalledWith(
                                'test 2',
-                               {replace: true, trigger: true}
+                               {replace: true}
                            );
                        });
 

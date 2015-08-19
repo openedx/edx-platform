@@ -904,7 +904,8 @@ class CourseFields(object):
             "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
             "topics is a list of topics."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=True,  # Deprecated until the teams feature is made generally available
     )
 
     enable_proctored_exams = Boolean(

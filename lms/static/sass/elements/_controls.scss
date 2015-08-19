@@ -403,3 +403,16 @@
       margin-bottom: none;
     }
   }
+
+  .btn-link {
+    @extend %btn-pl-secondary-base;
+
+    background-image: none;
+
+    &:focus,
+    &:hover {
+      background-image: none !important;
+      background-color: transparent !important;
+      color: $link-color;
+    }
+  }

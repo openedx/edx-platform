@@ -30,10 +30,12 @@
             </p>
 
             <p>
-              ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your edX course! Click {link} to get your credit now.").format(
-                link=u'<a href="{dashboard_url}">here</a>'.format(
+              ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
+                link_start=u'<a href="{dashboard_url}">'.format(
                     dashboard_url=dashboard_link
-                )
+                ),
+                link_end=u'</a>',
+                platform_name=settings.PLATFORM_NAME
               )}
             </p>
 
@@ -42,16 +44,18 @@
             </p>
 
             <p>
-              ${_(u'To get course credit, simply go to your {link} and click the <b>Get Credit</b> button. No application, transcript, or grade report is required.').format(
-                link=u'<a href="{dashboard_url}">edX dashboard</a>'.format(
+              ${_(u'To get course credit, simply go to your {link_start}{platform_name} dashboard{link_end} and click the <b>Get Credit</b> button. No application, transcript, or grade report is required.').format(
+                link_start=u'<a href="{dashboard_url}">'.format(
                     dashboard_url=dashboard_link
-                )
+                ),
+                link_end=u'</a>',
+                platform_name=settings.PLATFORM_NAME
               )}
             </p>
 
             <p>
-              ${_(u"We hope you enjoyed the course, and we hope to see you in future edX courses!")}<br/>
-              ${_(u"The edX team")}
+              ${_(u"We hope you enjoyed the course, and we hope to see you in future {platform_name} courses!").format(platform_name=settings.PLATFORM_NAME)}<br/>
+              ${_(u"The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
             </p>
           </td>
         </tr>
@@ -61,8 +65,10 @@
         <tr>
           <td class="cn-footer-content">
             <p>
-              ${_(u"For more information on credit at edX, click {link}.").format(
-                link=u'<a href="https://www.edx.org/gfa">here</a>'
+              ${_(u"{link_start}Click here for more information on credit at {platform_name}{link_end}.").format(
+                link_start=u'<a href="https://www.edx.org/gfa">',
+                link_end=u'</a>',
+                platform_name=settings.PLATFORM_NAME
               )}
             </p>
           </td>

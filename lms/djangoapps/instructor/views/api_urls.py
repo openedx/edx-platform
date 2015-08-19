@@ -80,6 +80,10 @@ urlpatterns = patterns(
     url(r'^show_student_extensions$', 'instructor.views.api.show_student_extensions',
         name='show_student_extensions'),
 
+    # proctored exam downloads...
+    url(r'^get_proctored_exam_results$',
+        'instructor.views.api.get_proctored_exam_results', name="get_proctored_exam_results"),
+
     # Grade downloads...
     url(r'^list_report_downloads$',
         'instructor.views.api.list_report_downloads', name="list_report_downloads"),

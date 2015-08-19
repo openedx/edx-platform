@@ -1489,7 +1489,9 @@ class TestSubmitPhotosForVerification(TestCase):
             AssertionError
 
         """
-        account_settings = get_account_settings(self.user)
+        request = RequestFactory().get('/url')
+        request.user = self.user
+        account_settings = get_account_settings(request)
         self.assertEqual(account_settings['name'], full_name)
 
     def _get_post_data(self):

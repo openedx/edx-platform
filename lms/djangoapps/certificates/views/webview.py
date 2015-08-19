@@ -1,50 +1,42 @@
-"""URL handlers related to certificate handling by LMS"""
-from microsite_configuration import microsite
+"""
+Certificate HTML webview.
+"""
 from datetime import datetime
 from uuid import uuid4
-from django.shortcuts import redirect, get_object_or_404
-from opaque_keys.edx.locator import CourseLocator
-from eventtracking import tracker
-import dogstats_wrapper as dog_stats_api
-import json
 import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404, HttpResponseForbidden
+from django.http import HttpResponse
+from django.template import RequestContext
 from django.utils.translation import ugettext as _
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 
-from capa.xqueue_interface import XQUEUE_METRIC_NAME
+from courseware.courses import course_image_url
+from edxmako.shortcuts import render_to_response
+from edxmako.template import Template
+from eventtracking import tracker
+from microsite_configuration import microsite
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from student.models import LinkedInAddToProfileConfiguration
+from util import organizations_helpers as organization_api
+from xmodule.modulestore.django import modulestore
+
 from certificates.api import (
     get_active_web_certificate,
     get_certificate_url,
-    generate_user_certificates,
     emit_certificate_event,
-    has_html_certificates_enabled
+    has_html_certificates_enabled,
+    get_certificate_template
 )
 from certificates.models import (
-    certificate_status_for_student,
-    CertificateStatuses,
     GeneratedCertificate,
-    ExampleCertificate,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     BadgeAssertion
 )
-from edxmako.shortcuts import render_to_response
-from util.views import ensure_valid_course_key
-from xmodule.modulestore.django import modulestore
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.models import LinkedInAddToProfileConfiguration
-from util.json_request import JsonResponse, JsonResponseBadRequest
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from courseware.courses import course_image_url
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class CourseDoesNotExist(Exception):
@@ -52,211 +44,6 @@ class CourseDoesNotExist(Exception):
     This exception is raised in the case where None is returned from the modulestore
     """
     pass
-
-
-@csrf_exempt
-def request_certificate(request):
-    """Request the on-demand creation of a certificate for some user, course.
-
-    A request doesn't imply a guarantee that such a creation will take place.
-    We intentionally use the same machinery as is used for doing certification
-    at the end of a course run, so that we can be sure users get graded and
-    then if and only if they pass, do they get a certificate issued.
-    """
-    if request.method == "POST":
-        if request.user.is_authenticated():
-            username = request.user.username
-            student = User.objects.get(username=username)
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
-            course = modulestore().get_course(course_key, depth=2)
-
-            status = certificate_status_for_student(student, course_key)['status']
-            if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
-                logger.info(log_msg, username, course_key)
-                status = generate_user_certificates(student, course_key, course=course)
-            return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
-        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
-
-
-@csrf_exempt
-def update_certificate(request):
-    """
-    Will update GeneratedCertificate for a new certificate or
-    modify an existing certificate entry.
-
-    See models.py for a state diagram of certificate states
-
-    This view should only ever be accessed by the xqueue server
-    """
-
-    status = CertificateStatuses
-    if request.method == "POST":
-
-        xqueue_body = json.loads(request.POST.get('xqueue_body'))
-        xqueue_header = json.loads(request.POST.get('xqueue_header'))
-
-        try:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
-
-            cert = GeneratedCertificate.objects.get(
-                user__username=xqueue_body['username'],
-                course_id=course_key,
-                key=xqueue_header['lms_key'])
-
-        except GeneratedCertificate.DoesNotExist:
-            logger.critical(
-                'Unable to lookup certificate\n'
-                'xqueue_body: %s\n'
-                'xqueue_header: %s',
-                xqueue_body,
-                xqueue_header
-            )
-
-            return HttpResponse(json.dumps({
-                'return_code': 1,
-                'content': 'unable to lookup key'}),
-                mimetype='application/json')
-
-        if 'error' in xqueue_body:
-            cert.status = status.error
-            if 'error_reason' in xqueue_body:
-
-                # Hopefully we will record a meaningful error
-                # here if something bad happened during the
-                # certificate generation process
-                #
-                # example:
-                #  (aamorm BerkeleyX/CS169.1x/2012_Fall)
-                #  <class 'simples3.bucket.S3Error'>:
-                #  HTTP error (reason=error(32, 'Broken pipe'), filename=None) :
-                #  certificate_agent.py:175
-
-                cert.error_reason = xqueue_body['error_reason']
-        else:
-            if cert.status in [status.generating, status.regenerating]:
-                cert.download_uuid = xqueue_body['download_uuid']
-                cert.verify_uuid = xqueue_body['verify_uuid']
-                cert.download_url = xqueue_body['url']
-                cert.status = status.downloadable
-            elif cert.status in [status.deleting]:
-                cert.status = status.deleted
-            else:
-                logger.critical(
-                    'Invalid state for cert update: %s', cert.status
-                )
-                return HttpResponse(
-                    json.dumps({
-                        'return_code': 1,
-                        'content': 'invalid cert status'
-                    }),
-                    mimetype='application/json'
-                )
-
-        dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
-            u'action:update_certificate',
-            u'course_id:{}'.format(cert.course_id)
-        ])
-
-        cert.save()
-        return HttpResponse(json.dumps({'return_code': 0}),
-                            mimetype='application/json')
-
-
-@csrf_exempt
-@require_POST
-def update_example_certificate(request):
-    """Callback from the XQueue that updates example certificates.
-
-    Example certificates are used to verify that certificate
-    generation is configured correctly for a course.
-
-    Unlike other certificates, example certificates
-    are not associated with a particular user or displayed
-    to students.
-
-    For this reason, we need a different end-point to update
-    the status of generated example certificates.
-
-    Arguments:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse (200): Status was updated successfully.
-        HttpResponse (400): Invalid parameters.
-        HttpResponse (403): Rate limit exceeded for bad requests.
-        HttpResponse (404): Invalid certificate identifier or access key.
-
-    """
-    logger.info(u"Received response for example certificate from XQueue.")
-
-    rate_limiter = BadRequestRateLimiter()
-
-    # Check the parameters and rate limits
-    # If these are invalid, return an error response.
-    if rate_limiter.is_rate_limit_exceeded(request):
-        logger.info(u"Bad request rate limit exceeded for update example certificate end-point.")
-        return HttpResponseForbidden("Rate limit exceeded")
-
-    if 'xqueue_body' not in request.POST:
-        logger.info(u"Missing parameter 'xqueue_body' for update example certificate end-point")
-        rate_limiter.tick_bad_request_counter(request)
-        return JsonResponseBadRequest("Parameter 'xqueue_body' is required.")
-
-    if 'xqueue_header' not in request.POST:
-        logger.info(u"Missing parameter 'xqueue_header' for update example certificate end-point")
-        rate_limiter.tick_bad_request_counter(request)
-        return JsonResponseBadRequest("Parameter 'xqueue_header' is required.")
-
-    try:
-        xqueue_body = json.loads(request.POST['xqueue_body'])
-        xqueue_header = json.loads(request.POST['xqueue_header'])
-    except (ValueError, TypeError):
-        logger.info(u"Could not decode params to example certificate end-point as JSON.")
-        rate_limiter.tick_bad_request_counter(request)
-        return JsonResponseBadRequest("Parameters must be JSON-serialized.")
-
-    # Attempt to retrieve the example certificate record
-    # so we can update the status.
-    try:
-        uuid = xqueue_body.get('username')
-        access_key = xqueue_header.get('lms_key')
-        cert = ExampleCertificate.objects.get(uuid=uuid, access_key=access_key)
-    except ExampleCertificate.DoesNotExist:
-        # If we are unable to retrieve the record, it means the uuid or access key
-        # were not valid.  This most likely means that the request is NOT coming
-        # from the XQueue.  Return a 404 and increase the bad request counter
-        # to protect against a DDOS attack.
-        logger.info(u"Could not find example certificate with uuid '%s' and access key '%s'", uuid, access_key)
-        rate_limiter.tick_bad_request_counter(request)
-        raise Http404
-
-    if 'error' in xqueue_body:
-        # If an error occurs, save the error message so we can fix the issue.
-        error_reason = xqueue_body.get('error_reason')
-        cert.update_status(ExampleCertificate.STATUS_ERROR, error_reason=error_reason)
-        logger.warning(
-            (
-                u"Error occurred during example certificate generation for uuid '%s'.  "
-                u"The error response was '%s'."
-            ), uuid, error_reason
-        )
-    else:
-        # If the certificate generated successfully, save the download URL
-        # so we can display the example certificate.
-        download_url = xqueue_body.get('url')
-        if download_url is None:
-            rate_limiter.tick_bad_request_counter(request)
-            logger.warning(u"No download URL provided for example certificate with uuid '%s'.", uuid)
-            return JsonResponseBadRequest(
-                "Parameter 'download_url' is required for successfully generated certificates."
-            )
-        else:
-            cert.update_status(ExampleCertificate.STATUS_SUCCESS, download_url=download_url)
-            logger.info("Successfully updated example certificate with uuid '%s'.", uuid)
-
-    # Let the XQueue know that we handled the response
-    return JsonResponse({'return_code': 0})
 
 
 def get_certificate_description(mode, certificate_type, platform_name):
@@ -290,6 +77,7 @@ def get_certificate_description(mode, certificate_type, platform_name):
 
 
 # pylint: disable=bad-continuation
+# pylint: disable=too-many-statements
 def _update_certificate_context(context, course, user, user_certificate):
     """
     Build up the certificate web view context using the provided values
@@ -299,16 +87,24 @@ def _update_certificate_context(context, course, user, user_certificate):
     user_fullname = user.profile.name
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     certificate_type = context.get('certificate_type')
+    partner_name = course.org
+    organizations = organization_api.get_course_organizations(course_id=course.id)
+    if organizations:
+        #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
+        organization = organizations[0]
+        partner_name = organization.get('name', course.org)
+        context['organization_logo'] = organization.get('logo', None)
 
     context['username'] = user.username
     context['course_mode'] = user_certificate.mode
     context['accomplishment_user_id'] = user.id
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
-    context['accomplishment_copy_course_org'] = course.org
+    context['accomplishment_copy_course_org'] = partner_name
     context['accomplishment_copy_course_name'] = course.display_name
     context['course_image_url'] = course_image_url(course)
     context['share_settings'] = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
+    context['course_number'] = course.number
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
     except BadgeAssertion.DoesNotExist:
@@ -330,14 +126,10 @@ def _update_certificate_context(context, course, user, user_certificate):
         year=user_certificate.modified_date.year
     )
 
-    accd_course_org_html = '<span class="detail--xuniversity">{partner_name}</span>'.format(partner_name=course.org)
-    accd_platform_name_html = '<span class="detail--company">{platform_name}</span>'.format(platform_name=platform_name)
-    # Translators: This line appears on the certificate after the name of a course, and provides more
-    # information about the organizations providing the course material to platform users
     context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_name}, '
                                                           'through {platform_name}.').format(
-        partner_name=accd_course_org_html,
-        platform_name=accd_platform_name_html
+        partner_name=partner_name,
+        platform_name=platform_name
     )
 
     # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
@@ -412,13 +204,13 @@ def _update_certificate_context(context, course, user, user_certificate):
                                              'who participated in {partner_name} {course_number}').format(
         platform_name=platform_name,
         user_name=user_fullname,
-        partner_name=course.org,
+        partner_name=partner_name,
         course_number=course.number
     )
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
     context['document_title'] = _("{partner_name} {course_number} Certificate | {platform_name}").format(
-        partner_name=course.org,
+        partner_name=partner_name,
         course_number=course.number,
         platform_name=platform_name
     )
@@ -562,7 +354,7 @@ def render_html_view(request, user_id, course_id):
                 }
             )
         except BadgeAssertion.DoesNotExist:
-            logger.warn(
+            log.warn(
                 "Could not find badge for %s on course %s.",
                 user.id,
                 course_key,
@@ -613,26 +405,11 @@ def render_html_view(request, user_id, course_id):
     context.update(course.cert_html_view_overrides)
 
     # FINALLY, generate and send the output the client
+    if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
+        custom_template = get_certificate_template(course_key, user_certificate.mode)
+        if custom_template:
+            template = Template(custom_template)
+            context = RequestContext(request, context)
+            return HttpResponse(template.render(context))
+
     return render_to_response("certificates/valid.html", context)
-
-
-@ensure_valid_course_key
-def track_share_redirect(request__unused, course_id, network, student_username):
-    """
-    Tracks when a user downloads a badge for sharing.
-    """
-    course_id = CourseLocator.from_string(course_id)
-    assertion = get_object_or_404(BadgeAssertion, user__username=student_username, course_id=course_id)
-    tracker.emit(
-        'edx.badge.assertion.shared', {
-            'course_id': unicode(course_id),
-            'social_network': network,
-            'assertion_id': assertion.id,
-            'assertion_json_url': assertion.data['json']['id'],
-            'assertion_image_url': assertion.image_url,
-            'user_id': assertion.user.id,
-            'enrollment_mode': assertion.mode,
-            'issuer': assertion.data['issuer'],
-        }
-    )
-    return redirect(assertion.image_url)

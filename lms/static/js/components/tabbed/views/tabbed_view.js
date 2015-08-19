@@ -48,7 +48,11 @@
                            }));
                            self.$('.page-content-nav').append(tabEl);
                        });
-                       if(Backbone.history.getHash() === "") {
+                       // Re-display the default (first) tab if the
+                       // current route does not belong to one of the
+                       // tabs.  Otherwise continue displaying the tab
+                       // corresponding to the current URL.
+                       if (!(Backbone.history.getHash() in this.urlMap)) {
                            this.setActiveTab(0);
                        }
                        return this;
@@ -70,7 +74,7 @@
                        view.setElement(this.$('.page-content-main')).render();
                        this.$('.sr-is-focusable.sr-tab').focus();
                        if (this.router) {
-                           this.router.navigate(tab.url, {replace: true, trigger: true});
+                           this.router.navigate(tab.url, {replace: true});
                        }
                    },
 

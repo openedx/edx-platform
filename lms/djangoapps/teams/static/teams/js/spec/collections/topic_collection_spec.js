@@ -1,5 +1,5 @@
-define(['URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic'],
-    function (URI, _, AjaxHelpers, TopicCollection) {
+define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic'],
+    function (Backbone, URI, _, AjaxHelpers, TopicCollection) {
         'use strict';
         describe('TopicCollection', function () {
             var topicCollection;
@@ -39,7 +39,11 @@ define(['URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/co
                         ],
                         "sort_order": "name"
                     },
-                    {course_id: 'my/course/id', parse: true});
+                    {
+                        teamEvents:_.clone(Backbone.Events),
+                        course_id: 'my/course/id',
+                        parse: true
+                    });
             });
 
             var testRequestParam = function (self, param, value) {

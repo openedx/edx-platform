@@ -3,30 +3,29 @@ define([
     'backbone',
     'common/js/spec_helpers/ajax_helpers',
     'teams/js/views/teams_tab',
-    'URI'
-], function ($, Backbone, AjaxHelpers, TeamsTabView, URI) {
+    'teams/js/spec_helpers/team_spec_helpers'
+], function ($, Backbone, AjaxHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function () {
-        var teamsTabView,
-            expectContent = function (text) {
-                expect(teamsTabView.$('.page-content-main').text()).toContain(text);
-            },
-            expectHeader = function (text) {
-                expect(teamsTabView.$('.teams-header').text()).toContain(text);
-            },
-            expectError = function (text) {
-                expect(teamsTabView.$('.warning').text()).toContain(text);
-            },
-            expectFocus = function (element) {
-                expect(element.focus).toHaveBeenCalled();
-            };
+        var expectContent = function (teamsTabView, text) {
+            expect(teamsTabView.$('.page-content-main').text()).toContain(text);
+        };
 
-        beforeEach(function () {
-            setFixtures('<div class="teams-content"></div>');
-            teamsTabView = new TeamsTabView({
-                el: $('.teams-content'),
-                topics: {
+        var expectHeader = function (teamsTabView, text) {
+            expect(teamsTabView.$('.teams-header').text()).toContain(text);
+        };
+
+        var expectError = function (teamsTabView, text) {
+            expect(teamsTabView.$('.warning').text()).toContain(text);
+        };
+
+        var expectFocus = function (element) {
+            expect(element.focus).toHaveBeenCalled();
+        };
+
+        var createTeamsTabView = function(options) {
+            var defaultTopics = {
                     count: 1,
                     num_pages: 1,
                     current_page: 1,
@@ -38,12 +37,26 @@ define([
                         team_count: 0
                     }]
                 },
-                topicsUrl: 'api/topics/',
-                topicUrl: 'api/topics/topic_id,test/course/id',
-                teamsUrl: 'api/teams/',
-                courseID: 'test/course/id'
-            }).render();
-            Backbone.history.start();
+                teamsTabView = new TeamsTabView(
+                    _.extend(
+                        {
+                            el: $('.teams-content'),
+                            topics: defaultTopics,
+                            userInfo: TeamSpecHelpers.createMockUserInfo(),
+                            topicsUrl: 'api/topics/',
+                            topicUrl: 'api/topics/topic_id,test/course/id',
+                            teamsUrl: 'api/teams/',
+                            courseID: 'test/course/id'
+                        },
+                        options || {}
+                    )
+                );
+            teamsTabView.start();
+            return teamsTabView;
+        };
+
+        beforeEach(function () {
+            setFixtures('<div class="teams-content"></div>');
             spyOn($.fn, 'focus');
         });
 
@@ -51,47 +64,46 @@ define([
             Backbone.history.stop();
         });
 
-        it('shows the teams tab initially', function () {
-            expectHeader('See all teams in your course, organized by topic');
-            expectContent('This is the new Teams tab.');
-        });
-
         describe('Navigation', function () {
-            it('can switch tabs', function () {
-                teamsTabView.$('a.nav-item[data-url="browse"]').click();
-                expectContent('test description');
-                teamsTabView.$('a.nav-item[data-url="teams"]').click();
-                expectContent('This is the new Teams tab.');
-            });
-
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function () {
+                var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
-                expectError('The page "no_such_page" could not be found.');
+                expectError(teamsTabView, 'The page "no_such_page" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
             });
 
+            it('does not interfere with anchor links to #content', function () {
+                var teamsTabView = createTeamsTabView();
+                teamsTabView.router.navigate('#content', {trigger: true});
+                expect(teamsTabView.$('.warning')).toHaveClass('is-hidden');
+            });
+
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function () {
-                var requests = AjaxHelpers.requests(this);
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('topics/no_such_topic', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', 'api/topics/no_such_topic,test/course/id', null);
                 AjaxHelpers.respondWithError(requests, 404);
-                expectError('The topic "no_such_topic" could not be found.');
+                expectError(teamsTabView, 'The topic "no_such_topic" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent team', function () {
-                var requests = AjaxHelpers.requests(this);
+                var requests = AjaxHelpers.requests(this),
+                    teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('teams/test_topic/no_such_team', {trigger: true});
-                AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team', null);
+                AjaxHelpers.expectRequest(requests, 'GET', 'api/teams/no_such_team?expand=user', null);
                 AjaxHelpers.respondWithError(requests, 404);
-                expectError('The team "no_such_team" could not be found.');
+                expectError(teamsTabView, 'The team "no_such_team" could not be found.');
                 expectFocus(teamsTabView.$('.warning'));
             });
         });
 
         describe('Discussion privileges', function () {
             it('allows privileged access to any team', function () {
-                teamsTabView.$el.data('privileged', true);
+                var teamsTabView = createTeamsTabView({
+                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: true })
+                });
                 // Note: using `undefined` here to ensure that we
                 // don't even look at the team when the user is
                 // privileged
@@ -99,7 +111,12 @@ define([
             });
 
             it('allows access to a team which an unprivileged user is a member of', function () {
-                teamsTabView.$el.data('privileged', false).data('username', 'test-user');
+                var teamsTabView = createTeamsTabView({
+                    userInfo: TeamSpecHelpers.createMockUserInfo({
+                        username: 'test-user',
+                        privileged: false
+                    })
+                });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: {
                         membership: [{
@@ -112,7 +129,9 @@ define([
             });
 
             it('does not allow access if the user is neither privileged nor a team member', function () {
-                teamsTabView.$el.data('privileged', false).data('username', 'test-user');
+                var teamsTabView = createTeamsTabView({
+                    userInfo: TeamSpecHelpers.createMockUserInfo({ privileged: false, staff: true })
+                });
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: { membership: [] }
                 })).toBe(true);

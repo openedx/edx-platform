@@ -620,6 +620,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                             has_explicit_staff_lock: true,
                             staff_only_message: true,
                             "is_time_limited": true,
+                            "is_practice_exam": false,
                             "is_proctored_enabled": true,
                             "default_time_limit_minutes": 150
                         }, [
@@ -706,6 +707,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                             "start":"2014-07-09T00:00:00.000Z",
                             "due":"2014-07-10T00:00:00.000Z",
                             "is_time_limited": true,
+                            "is_practice_exam": false,
                             "is_proctored_enabled": true,
                             "default_time_limit_minutes": 150
                         }
@@ -740,6 +742,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "js/views/utils/view_ut
                     expect($("#staff_lock").is(":checked")).toBe(true);
                     expect($("#id_timed_examination").is(":checked")).toBe(true);
                     expect($("#id_exam_proctoring").is(":checked")).toBe(true);
+                    expect($("#is_practice_exam").is(":checked")).toBe(false);
                     expect($("#id_time_limit").val()).toBe("02:30");
                 });
 

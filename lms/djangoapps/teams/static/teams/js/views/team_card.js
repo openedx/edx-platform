@@ -5,8 +5,9 @@
         'underscore',
         'gettext',
         'js/components/card/views/card',
+        'teams/js/views/team_utils',
         'text!teams/templates/team-country-language.underscore'
-    ], function (Backbone, _, gettext, CardView, teamCountryLanguageTemplate) {
+    ], function (Backbone, _, gettext, CardView, TeamUtils, teamCountryLanguageTemplate) {
         var TeamMembershipView, TeamCountryLanguageView, TeamCardView;
 
         TeamMembershipView = Backbone.View.extend({
@@ -25,15 +26,7 @@
                 var memberships = this.model.get('membership'),
                     maxMemberCount = this.maxTeamSize;
                 this.$el.html(this.template({
-                    membership_message: interpolate(
-                        // Translators: The following message displays the number of members on a team.
-                        ngettext(
-                            '%(member_count)s / %(max_member_count)s Member',
-                            '%(member_count)s / %(max_member_count)s Members',
-                            maxMemberCount
-                        ),
-                        {member_count: memberships.length, max_member_count: maxMemberCount}, true
-                    )
+                    membership_message: TeamUtils.teamCapacityText(memberships.length, maxMemberCount)
                 }));
                 _.each(memberships, function (membership) {
                     this.$('list-member-thumbs').append(
@@ -66,32 +59,35 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({model: this.model, maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({model: this.teamModel(), maxTeamSize: this.maxTeamSize}),
                     new TeamCountryLanguageView({
-                        model: this.model,
+                        model: this.teamModel(),
                         countries: this.countries,
                         languages: this.languages
                     })
                 ];
             },
 
+            teamModel: function () {
+                if (this.model.has('team')) { return this.model.get('team'); };
+                return this.model;
+            },
+
             configuration: 'list_card',
             cardClass: 'team-card',
-            title: function () { return this.model.get('name'); },
-            description: function () { return this.model.get('description'); },
+            title: function () { return this.teamModel().get('name'); },
+            description: function () { return this.teamModel().get('description'); },
             details: function () { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
                 return interpolate(
                     gettext('View %(span_start)s %(team_name)s %(span_end)s'),
-                    {span_start: '<span class="sr">', team_name: this.model.get('name'), span_end: '</span>'},
+                    {span_start: '<span class="sr">', team_name: this.teamModel().get('name'), span_end: '</span>'},
                     true
                 );
             },
-            action: function (event) {
-                var url = 'teams/' + this.topic.get('id') + '/' + this.model.get('id');
-                event.preventDefault();
-                this.router.navigate(url, {trigger: true});
+            actionUrl: function () {
+                return '#teams/' + this.teamModel().get('topic_id') + '/' + this.teamModel().get('id');
             }
         });
         return TeamCardView;

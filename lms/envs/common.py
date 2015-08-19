@@ -346,6 +346,9 @@ FEATURES = {
     # Milestones application flag
     'MILESTONES_APP': False,
 
+    # Organizations application flag
+    'ORGANIZATIONS_APP': False,
+
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
@@ -396,13 +399,16 @@ FEATURES = {
     'ENABLE_SOFTWARE_SECURE_FAKE': False,
 
     # Teams feature
-    'ENABLE_TEAMS': False,
+    'ENABLE_TEAMS': True,
 
     # Show video bumper in LMS
     'ENABLE_VIDEO_BUMPER': False,
 
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
+
+    # Timed Proctored Exams
+    'ENABLE_PROCTORED_EXAMS': False,
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
     'ENABLE_OPENBADGES': False,
@@ -415,6 +421,9 @@ FEATURES = {
 
     # Enable the max score cache to speed up grading
     'ENABLE_MAX_SCORE_CACHE': True,
+
+    # Enable LTI Provider feature.
+    'ENABLE_LTI_PROVIDER': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -587,7 +596,7 @@ LMS_MIGRATION_ALLOWED_IPS = []
 # Note: these intentionally greedily grab all chars up to the next slash including any pluses
 # DHM: I really wanted to ensure the separators were the same (+ or /) but all patts I tried had
 # too many inadvertent side effects :-(
-COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/]+)'
+COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
 COURSE_KEY_REGEX = COURSE_KEY_PATTERN.replace('P<course_key_string>', ':')
 
@@ -1120,7 +1129,7 @@ TEMPLATE_LOADERS = (
     'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
-    # 'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.app_directories.Loader',
 
 )
 
@@ -1215,6 +1224,12 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
+proctoring_js = (
+    ['proctoring/js/models/*.js'] +
+    ['proctoring/js/collections/*.js'] +
+    ['proctoring/js/views/*.js'] +
+    ['proctoring/js/*.js']
+)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
@@ -1253,6 +1268,7 @@ base_application_js = [
     'js/form.ext.js',
     'js/src/ie_shim.js',
     'js/src/accessibility_tools.js',
+    'js/toggle_login_modal.js',
 ]
 
 dashboard_js = (
@@ -1289,7 +1305,6 @@ instructor_dash_js = (
 # JavaScript modules.
 student_account_js = [
     'js/utils/edx.utils.validate.js',
-    'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
     'js/student_account/models/LoginModel.js',
@@ -1306,7 +1321,6 @@ student_account_js = [
 ]
 
 verify_student_js = [
-    'js/toggle_login_modal.js',
     'js/sticky_filter.js',
     'js/query-params.js',
     'js/verify_student/models/verification_model.js',
@@ -1499,11 +1513,14 @@ PIPELINE_JS = {
 
         # Application will contain all paths not in courseware_only_js
         'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
-            'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
         ],
         'output_filename': 'js/lms-application.js',
+    },
+    'proctoring': {
+        'source_filenames': proctoring_js,
+        'output_filename': 'js/lms-proctoring.js',
     },
     'courseware': {
         'source_filenames': courseware_js,
@@ -1831,6 +1848,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
+
+    # Student support tools
+    'support',
 
     # External auth (OpenID, shib)
     'external_auth',
@@ -2402,6 +2422,9 @@ OPTIONAL_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 )
 
 for app_name in OPTIONAL_APPS:
@@ -2511,6 +2534,25 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'username',
         'profile_image',
     ],
+
+    # The list of account fields that are visible only to staff and users viewing their own profiles
+    "admin_fields": [
+        "username",
+        "email",
+        "date_joined",
+        "is_active",
+        "bio",
+        "country",
+        "profile_image",
+        "language_proficiencies",
+        "name",
+        "gender",
+        "goals",
+        "year_of_birth",
+        "level_of_education",
+        "mailing_address",
+        "requires_parental_consent",
+    ]
 }
 
 # E-Commerce API Configuration
@@ -2597,3 +2639,11 @@ JWT_ISSUER = None
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
+
+#### PROCTORING CONFIGURATION DEFAULTS
+
+PROCTORING_BACKEND_PROVIDER = {
+    'class': 'edx_proctoring.backends.null.NullBackendProvider',
+    'options': {},
+}
+PROCTORING_SETTINGS = {}

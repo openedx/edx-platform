@@ -19,6 +19,7 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from util.testing import UrlResetMixin
 
 from certificates.api import get_certificate_url
 from certificates.models import (
@@ -29,6 +30,7 @@ from certificates.models import (
     CertificateStatuses,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
+    CertificateTemplate,
 )
 
 from certificates.tests.factories import (
@@ -36,13 +38,18 @@ from certificates.tests.factories import (
     LinkedInAddToProfileConfigurationFactory,
     BadgeAssertionFactory,
 )
-from lms import urls
+from util import organizations_helpers as organizations_api
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
+
+FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
+    "CUSTOM_CERTIFICATE_TEMPLATES_ENABLED": True
+}
+FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
 @attr('shard_1')
@@ -259,7 +266,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
@@ -427,6 +433,63 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
+    def _create_custom_template(self, org_id=None, mode=None, course_key=None):
+        """
+        Creates a custom certificate template entry in DB.
+        """
+        template_html = """
+            <html>
+            <body>
+                lang: ${LANGUAGE_CODE}
+                course name: ${accomplishment_copy_course_name}
+                mode: ${course_mode}
+                ${accomplishment_copy_course_description}
+            </body>
+            </html>
+        """
+        template = CertificateTemplate(
+            name='custom template',
+            template=template_html,
+            organization_id=org_id,
+            course_key=course_key,
+            mode=mode,
+            is_active=True
+        )
+        template.save()
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_rendering_course_organization_data(self):
+        """
+        Test: organization data should render on certificate web view if course has organization.
+        """
+        test_organization_data = {
+            'name': 'test_organization',
+            'description': 'Test Organization Description',
+            'active': True,
+            'logo': '/logo_test1.png/'
+        }
+        test_org = organizations_api.add_organization(organization_data=test_organization_data)
+        organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn(
+            'a course of study offered by test_organization',
+            response.content
+        )
+        self.assertNotIn(
+            'a course of study offered by testorg',
+            response.content
+        )
+        self.assertIn(
+            '<title>test_organization {} Certificate |'.format(self.course.number, ),
+            response.content
+        )
+        self.assertIn('logo_test1.png', response.content)
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
         test_url = get_certificate_url(
@@ -458,7 +521,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
         self.assertIn('course_title_0', response.content)
-        self.assertIn('/t4x/orgX/testX/asset/org-logo-0.png', response.content)
         self.assertIn('Signatory_Name 0', response.content)
         self.assertIn('Signatory_Title 0', response.content)
         self.assertIn('Signatory_Organization 0', response.content)
@@ -692,13 +754,84 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 response_json = json.loads(response.content)
                 self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    @override_settings(LANGUAGE_CODE='fr')
+    def test_certificate_custom_template_with_org_mode_course(self):
+        """
+        Tests custom template search and rendering.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(1, mode='honor', course_key=unicode(self.course.id))
+        self._create_custom_template(2, mode='honor')
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
 
-class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.side_effect = [
+                [{"id": 1, "name": "organization name"}],
+                [{"id": 2, "name": "organization name 2"}],
+            ]
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'lang: fr')
+            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+            # test with second organization template
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'lang: fr')
+            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_custom_template_with_org(self):
+        """
+        Tests custom template search if if have a single template for all courses of organization.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(1)
+        self._create_custom_template(1, mode='honor')
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.side_effect = [
+                [{"id": 1, "name": "organization name"}],
+            ]
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'course name: {}'.format(self.course.display_name))
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_custom_template_with_course_mode(self):
+        """
+        Tests custom template search if if have a single template for a course mode.
+        """
+        mode = 'honor'
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(mode=mode)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'mode: {}'.format(mode))
+
+
+class TrackShareRedirectTest(UrlResetMixin, ModuleStoreTestCase, EventTrackingTestCase):
     """
     Verifies the badge image share event is sent out.
     """
+
+    @patch.dict(settings.FEATURES, {"ENABLE_OPENBADGES": True})
     def setUp(self):
-        super(TrackShareRedirectTest, self).setUp()
+        super(TrackShareRedirectTest, self).setUp('certificates.urls')
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='trackable course'
@@ -710,13 +843,6 @@ class TrackShareRedirectTest(ModuleStoreTestCase, EventTrackingTestCase):
                 'issuer': 'http://www.example.com/issuer.json',
             },
         )
-        # Enabling the feature flag isn't enough to change the URLs-- they're already loaded by this point.
-        self.old_patterns = urls.urlpatterns
-        urls.urlpatterns += (urls.BADGE_SHARE_TRACKER_URL,)
-
-    def tearDown(self):
-        super(TrackShareRedirectTest, self).tearDown()
-        urls.urlpatterns = self.old_patterns
 
     def test_social_event_sent(self):
         test_url = '/certificates/badge_share_tracker/{}/social_network/{}/'.format(

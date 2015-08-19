@@ -3,6 +3,9 @@ Tests for instructor.basic
 """
 
 import json
+import datetime
+from django.db.models import Q
+import pytz
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from django.core.urlresolvers import reverse
 from mock import patch
@@ -16,16 +19,14 @@ from course_modes.models import CourseMode
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features,
     course_registration_features, coupon_codes_features, list_may_enroll,
-    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
-)
+    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
+    get_proctored_exam_results)
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-import datetime
-from django.db.models import Q
-import pytz
+from edx_proctoring.api import create_exam
+from edx_proctoring.models import ProctoredExamStudentAttempt
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -126,6 +127,40 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         for student in may_enroll:
             self.assertEqual(student.keys(), ['email'])
             self.assertIn(student['email'], email_adresses)
+
+    def test_get_student_exam_attempt_features(self):
+        query_features = [
+            'created',
+            'modified',
+            'started_at',
+            'exam_name',
+            'user_email',
+            'completed_at',
+            'external_id',
+            'allowed_time_limit_mins',
+            'status',
+            'attempt_code',
+            'is_sample_attempt',
+        ]
+
+        proctored_exam_id = create_exam(self.course_key, 'Test Content', 'Test Exam', 1)
+        ProctoredExamStudentAttempt.create_exam_attempt(
+            proctored_exam_id, self.users[0].id, '', 1,
+            'Test Code 1', True, False, 'ad13'
+        )
+        ProctoredExamStudentAttempt.create_exam_attempt(
+            proctored_exam_id, self.users[1].id, '', 2,
+            'Test Code 2', True, False, 'ad13'
+        )
+        ProctoredExamStudentAttempt.create_exam_attempt(
+            proctored_exam_id, self.users[2].id, '', 3,
+            'Test Code 3', True, False, 'asd'
+        )
+
+        proctored_exam_attempts = get_proctored_exam_results(self.course_key, query_features)
+        self.assertEqual(len(proctored_exam_attempts), 3)
+        for proctored_exam_attempt in proctored_exam_attempts:
+            self.assertEqual(set(proctored_exam_attempt.keys()), set(query_features))
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})

@@ -145,7 +145,7 @@ class FieldsMixin(object):
 
         return self.value_for_text_field(field_id)
 
-    def value_for_text_field(self, field_id, value=None):
+    def value_for_text_field(self, field_id, value=None, press_enter=True):
         """
         Get or set the value of a text field.
         """
@@ -159,7 +159,8 @@ class FieldsMixin(object):
             current_value = query.attrs('value')[0]
             query.results[0].send_keys(u'\ue003' * len(current_value))  # Delete existing value.
             query.results[0].send_keys(value)  # Input new value
-            query.results[0].send_keys(u'\ue007')  # Press Enter
+            if press_enter:
+                query.results[0].send_keys(u'\ue007')  # Press Enter
         return query.attrs('value')[0]
 
     def value_for_textarea_field(self, field_id, value=None):
