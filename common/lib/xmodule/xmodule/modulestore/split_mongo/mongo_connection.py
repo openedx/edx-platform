@@ -532,5 +532,6 @@ class MongoConnection(object):
                 ('course', pymongo.ASCENDING),
                 ('run', pymongo.ASCENDING)
             ],
-            unique=True
+            unique=True,
+            background=True
         )
