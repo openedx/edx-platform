@@ -436,7 +436,9 @@ class TestListTeamsAPI(TeamAPITestCase):
     @ddt.data(
         (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
         ('name', 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
-        ('open_slots', 200, ['Wind Team', u'sólar team', 'Nuclear Team']),
+        # Note that "Nuclear Team" and "solar team" have the same number of open slots.
+        # "Nuclear Team" comes first due to secondary sort by name.
+        ('open_slots', 200, ['Wind Team', 'Nuclear Team', u'sólar team']),
         ('last_activity', 400, []),
     )
     @ddt.unpack
@@ -740,10 +742,20 @@ class TestListTopicsAPI(TeamAPITestCase):
     @ddt.data(
         (None, 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
         ('name', 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
+        # Note that "Nuclear Power" and "solar power" both have 2 teams. "Coal Power" and "Window Power"
+        # both have 0 teams. The secondary sort is alphabetical by name.
+        ('team_count', 200, ['Nuclear Power', u'sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names, expected_ordering):
+        # Add 2 teams to "Nuclear Power", which previously had no teams.
+        CourseTeamFactory.create(
+            name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+        )
+        CourseTeamFactory.create(
+            name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
+        )
         data = {'course_id': self.test_course_1.id}
         if field:
             data['order_by'] = field
@@ -751,6 +763,35 @@ class TestListTopicsAPI(TeamAPITestCase):
         if status == 200:
             self.assertEqual(names, [topic['name'] for topic in topics['results']])
             self.assertEqual(topics['sort_order'], expected_ordering)
+
+    def test_order_by_team_count_secondary(self):
+        """
+        Ensure that the secondary sort (alphabetical) when primary sort is team_count
+        works across pagination boundaries.
+        """
+        # Add 2 teams to "Wind Power", which previously had no teams.
+        CourseTeamFactory.create(
+            name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+        )
+        CourseTeamFactory.create(
+            name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+        )
+
+        topics = self.get_topics_list(data={
+            'course_id': self.test_course_1.id,
+            'page_size': 2,
+            'page': 1,
+            'order_by': 'team_count'
+        })
+        self.assertEqual(["Wind Power", u'sólar power'], [topic['name'] for topic in topics['results']])
+
+        topics = self.get_topics_list(data={
+            'course_id': self.test_course_1.id,
+            'page_size': 2,
+            'page': 2,
+            'order_by': 'team_count'
+        })
+        self.assertEqual(["Coal Power", "Nuclear Power"], [topic['name'] for topic in topics['results']])
 
     def test_pagination(self):
         response = self.get_topics_list(data={
