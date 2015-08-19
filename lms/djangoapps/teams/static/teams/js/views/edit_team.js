@@ -125,9 +125,9 @@
                         })
                         .fail(function(data) {
                             var response = JSON.parse(data.responseText);
-                            var message = gettext("An error occurred. Please try again.")
-                            if ('error_message' in response && 'user_message' in response['error_message']){
-                                message = response['error_message']['user_message'];
+                            var message = gettext("An error occurred. Please try again.");
+                            if ('user_message' in response){
+                                message = response.user_message;
                             }
                             view.showMessage(message, message);
                         });

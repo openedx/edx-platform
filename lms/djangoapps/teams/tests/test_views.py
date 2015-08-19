@@ -143,7 +143,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'name': 'Public Profiles',
                     'description': 'Description for topic 6.'
                 },
-            ]
+            ],
+            'max_team_size': 1
         }
         cls.test_course_2 = CourseFactory.create(
             org='MIT',
@@ -185,6 +186,13 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         profile.year_of_birth = 1970
         profile.save()
 
+        # This student is enrolled in the other course, but not yet a member of a team. This is to allow
+        # course_2 to use a max_team_size of 1 without breaking other tests on course_1
+        self.create_and_enroll_student(
+            courses=[self.test_course_2],
+            username='student_enrolled_other_course_not_on_team'
+        )
+
         # 'solar team' is intentionally lower case to test case insensitivity in name ordering
         self.test_team_1 = CourseTeamFactory.create(
             name=u'sólar team',
@@ -218,6 +226,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.test_team_3.add_user(self.users['student_enrolled_both_courses_other_team'])
         self.test_team_5.add_user(self.users['student_enrolled_both_courses_other_team'])
         self.test_team_6.add_user(self.users['student_enrolled_public_profile'])
+
+    def build_membership_data_raw(self, username, team):
+        """Assembles a membership creation payload based on the raw values provided."""
+        return {'username': username, 'team_id': team}
+
+    def build_membership_data(self, username, team):
+        """Assembles a membership creation payload based on the username and team model provided."""
+        return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     def create_and_enroll_student(self, courses=None, username=None):
         """ Creates a new student and enrolls that student in the course.
@@ -507,13 +523,37 @@ class TestCreateTeamAPI(TeamAPITestCase):
         self.post_create_team(status, data)
 
     def test_student_in_team(self):
-        self.post_create_team(
+        response = self.post_create_team(
             400,
-            {
-                'course_id': str(self.test_course_1.id),
-                'description': "You are already on a team in this course."
-            },
+            data=self.build_team_data(
+                name="Doomed team",
+                course=self.test_course_1,
+                description="Overly ambitious student"
+            ),
             user='student_enrolled'
+        )
+        self.assertEqual(
+            "You are already in a team in this course.",
+            json.loads(response.content)["user_message"]
+        )
+
+    @ddt.data('staff', 'course_staff', 'community_ta')
+    def test_privileged_create_multiple_teams(self, user):
+        """ Privileged users can create multiple teams, even if they are already in one. """
+        # First add the privileged user to a team.
+        self.post_create_membership(
+            200,
+            self.build_membership_data(user, self.test_team_1),
+            user=user
+        )
+
+        self.post_create_team(
+            data=self.build_team_data(
+                name="Another team",
+                course=self.test_course_1,
+                description="Privileged users are the best"
+            ),
+            user=user
         )
 
     @ddt.data({'description': ''}, {'name': 'x' * 1000}, {'name': ''})
@@ -877,14 +917,6 @@ class TestListMembershipAPI(TeamAPITestCase):
 class TestCreateMembershipAPI(TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
 
-    def build_membership_data_raw(self, username, team):
-        """Assembles a membership creation payload based on the raw values provided."""
-        return {'username': username, 'team_id': team}
-
-    def build_membership_data(self, username, team):
-        """Assembles a membership creation payload based on the username and team model provided."""
-        return self.build_membership_data_raw(self.users[username].username, team.team_id)
-
     @ddt.data(
         (None, 401),
         ('student_inactive', 401),
@@ -955,6 +987,14 @@ class TestCreateMembershipAPI(TeamAPITestCase):
             user=user
         )
         self.assertIn('not enrolled', json.loads(response.content)['developer_message'])
+
+    def test_over_max_team_size_in_course_2(self):
+        response = self.post_create_membership(
+            400,
+            self.build_membership_data('student_enrolled_other_course_not_on_team', self.test_team_5),
+            user='student_enrolled_other_course_not_on_team'
+        )
+        self.assertIn('full', json.loads(response.content)['developer_message'])
 
 
 @ddt.ddt

@@ -96,9 +96,13 @@ class TeamsDashboardView(View):
         context = {
             "course": course,
             "topics": topics_serializer.data,
+            # It is necessary to pass both privileged and staff because only privileged users can
+            # administer discussion threads, but both privileged and staff users are allowed to create
+            # multiple teams (since they are not automatically added to teams upon creation).
             "user_info": {
                 "username": user.username,
                 "privileged": has_discussion_privileges(user, course_key),
+                "staff": bool(has_access(user, 'staff', course_key)),
                 "team_memberships_data": team_memberships_serializer.data,
             },
             "topic_url": reverse(
@@ -372,14 +376,16 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 'field_errors': field_errors,
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if CourseTeamMembership.user_in_team_for_course(request.user, course_key):
+        # Course and global staff, as well as discussion "privileged" users, will not automatically
+        # be added to a team when they create it. They are allowed to create multiple teams.
+        team_administrator = (has_access(request.user, 'staff', course_key)
+                              or has_discussion_privileges(request.user, course_key))
+        if not team_administrator and CourseTeamMembership.user_in_team_for_course(request.user, course_key):
             error_message = build_api_error(
                 ugettext_noop('You are already in a team in this course.'),
                 course_id=course_id
             )
-            return Response({
-                'error_message': error_message,
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
 
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -396,8 +402,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
             team = serializer.save()
-            if not (has_access(request.user, 'staff', course_key)
-                    or has_discussion_privileges(request.user, course_key)):
+            if not team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
             return Response(CourseTeamSerializer(team).data)
@@ -913,6 +918,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        course_module = modulestore().get_course(team.course_id)
+        if course_module.teams_max_size is not None and team.users.count() >= course_module.teams_max_size:
+            return Response(
+                build_api_error(ugettext_noop("This team is already full.")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             membership = team.add_user(user)

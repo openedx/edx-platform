@@ -89,7 +89,8 @@ define([
                     parse: true,
                     url: 'api/teams/team_memberships',
                     username: testUser,
-                    privileged: false
+                    privileged: false,
+                    staff: false
                 }),
                 options)
         );
@@ -100,6 +101,7 @@ define([
             {
                 username: testUser,
                 privileged: false,
+                staff: false,
                 team_memberships_data: createMockTeamMembershipsData(1, 5)
             },
             options
