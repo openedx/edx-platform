@@ -292,7 +292,8 @@
                                                 teamsUrl: self.teamsUrl,
                                                 topicName: topic.get('name'),
                                                 languages: self.languages,
-                                                countries: self.countries
+                                                countries: self.countries,
+                                                teamsDetailUrl: self.teamsDetailUrl
                                             }
                                         });
                                         deferred.resolve(

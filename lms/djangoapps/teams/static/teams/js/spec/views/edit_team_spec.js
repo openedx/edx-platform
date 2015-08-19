@@ -47,10 +47,11 @@ define([
                 expect(requests.length).toBe(0);
             };
 
-        var createTeamEditView = function() {
+        var createTeamEditView = function(action) {
             return new TeamEditView({
                 teamEvents: TeamSpecHelpers.teamEvents,
                 el: $('.teams-content'),
+                action: action || 'create',
                 teamParams: {
                     teamsUrl: teamsUrl,
                     courseID: "a/b/c",
