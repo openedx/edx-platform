@@ -591,6 +591,17 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
             self.assertIn(param_key, parameters)
             self.assertEqual(parameters[param_key], self.USER_INFO[key])
 
+    def test_user_eligible_multiple_credit_request(self):
+        # Create a new credit course and initiate credit requests for the user
+        # for multiple credit courses
+        second_course_key = CourseKey.from_string("edX/DemoX/Fall")
+        self._configure_credit(course_key=second_course_key)
+
+        # Now test that user can successfully request for credit against a
+        # particular credit course and a specific credit provider
+        api.create_credit_request(second_course_key, self.PROVIDER_ID, self.USER_INFO['username'])
+        api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
+
     def test_credit_request_disable_integration(self):
         CreditProvider.objects.all().update(enable_integration=False)
 

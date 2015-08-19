@@ -244,6 +244,7 @@ def create_credit_request(course_key, provider_id, username):
     try:
         final_grade = CreditRequirementStatus.objects.get(
             username=username,
+            requirement__course=credit_course,
             requirement__namespace="grade",
             requirement__name="grade",
             requirement__course__course_key=course_key,
