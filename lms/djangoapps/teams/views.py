@@ -175,9 +175,11 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * name: Orders results by case insensitive team name (default).
 
-                * open_slots: Orders results by most open slots (with name as a secondary sort).
+                * open_slots: Orders results by most open slots (for tie-breaking,
+                  last_activity_at is used, with most recent first).
 
-                * last_activity: Currently not supported.
+                * last_activity_at: Orders result by team activity, with most active first
+                  (for tie-breaking, open_slots is used, with most open slots first).
 
             * page_size: Number of results to return per page.
 
@@ -331,20 +333,17 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             )
 
         queryset = CourseTeam.objects.filter(**result_filter)
-        # We will always use name as either a primary or secondary sort.
-        queryset = queryset.extra(select={'lower_name': "lower(name)"})
 
         order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
         if order_by_input == 'name':
+            queryset = queryset.extra(select={'lower_name': "lower(name)"})
             queryset = queryset.order_by('lower_name')
         elif order_by_input == 'open_slots':
             queryset = queryset.annotate(team_size=Count('users'))
-            queryset = queryset.order_by('team_size', 'lower_name')
-        elif order_by_input == 'last_activity':
-            return Response(
-                build_api_error(ugettext_noop("last_activity is not yet supported")),
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            queryset = queryset.order_by('team_size', '-last_activity_at')
+        elif order_by_input == 'last_activity_at':
+            queryset = queryset.annotate(team_size=Count('users'))
+            queryset = queryset.order_by('-last_activity_at', 'team_size')
         else:
             return Response({
                 'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
