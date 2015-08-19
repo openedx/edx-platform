@@ -6,7 +6,7 @@
 %>
 
 <%def name="make_chapter(chapter)">
-<button class="button-chapter chapter" id="${chapter['display_id']}-parent" aria-controls="${chapter['display_id']}-child" aria-expanded="false" aria-pressed="false">
+<button class="button-chapter chapter" id="${chapter['display_id']}-parent" aria-controls="${chapter['display_id']}-child" aria-pressed="false">
     <%
     if chapter.get('active'):
         aria_label = _('{chapter}, current chapter').format(chapter=chapter['display_name'])
@@ -16,10 +16,11 @@
         active_class = ''
     %>
     <h3 class="group-heading ${active_class}" aria-label="${aria_label}">
+        <span class="icon fa fa-caret-right" aria-hidden="true"></span>
         ${chapter['display_name']}
     </h3>
 </button>
-<div class="chapter-content-container" tabindex="-1">
+<div class="chapter-content-container" tabindex="-1" aria-expanded="false">
     <div class="chapter-menu" id="${chapter['display_id']}-child" role="region" aria-labelledby="${chapter['display_id']}-parent" aria-hidden="false">
         % for section in chapter['sections']:
         <a class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}" href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
