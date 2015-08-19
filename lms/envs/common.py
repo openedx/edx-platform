@@ -1968,6 +1968,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # haystack elasticsearch
+    'haystack',
 )
 
 ######################### CSRF #########################################
@@ -2505,6 +2508,16 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
+
+# HAYSTACK Elasticsearch setting
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'lms_index',
+    },
+}
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 ### PERFORMANCE EXPERIMENT SETTINGS ###
 # CDN experiment/monitoring flags

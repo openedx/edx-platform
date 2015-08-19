@@ -19,6 +19,7 @@ django-countries==3.3
 django-extensions==1.2.5
 django-filter==0.6.0
 django-followit==0.0.3
+django-haystack==2.3.1
 django-keyedcache==1.4-6
 django-kombu==0.9.4
 django-mako==0.1.5pre
