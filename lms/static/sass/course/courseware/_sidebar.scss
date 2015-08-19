@@ -39,9 +39,14 @@
                     box-shadow: none;
                 }
 
+                &:hover,
+                &:focus {
+                    background: $sidebar-active-image;
+                }
+
                 .group-heading {
                     @extend %t-title6;
-                    overflow: visible;
+                    position: relative;
                     padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
                     margin: 0;
                     border-radius: 0;
@@ -52,7 +57,7 @@
                         border: none;
                     }
 
-                    &.ui-state-active {
+                    &.active {
                         border-bottom: none;
                         color: $base-font-color;
 
@@ -62,23 +67,12 @@
                         }
                     }
 
-                    .ui-icon {
+                    .icon {
+                        position: absolute;
                         @include left($baseline);
-                        background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
-                        opacity: 0.3;
-
-                        &.ui-icon-triangle-1-e {
-
-                            // CASE: left to right layout
-                            @include ltr {
-                                background-position: -32px -16px; // jQuery UI east arrow position
-                            }
-
-                            // CASE: right to left layout
-                            @include rtl {
-                                background-position: -96px -16px; // jQuery UI west arrow position
-                            }
-                        }
+                        top: 18px;
+                        font-size: 90%;
+                        color: $gray-d1;
                     }
                 }
             }
@@ -107,6 +101,7 @@
                         border-bottom: 0;
                         background: transparent;
                         text-decoration: none;
+                        color: $base-font-color;
 
                         p {
                             @extend %t-action3;
@@ -171,8 +166,10 @@
                         &:hover,
                         &:focus {
 
-                            p {
-                                color: $gray-d3;
+                            color: $link-color;
+
+                            .subtitle {
+                                color: $gray-d1;
                             }
                         }
 
