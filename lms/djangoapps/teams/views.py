@@ -752,6 +752,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
               specified team. The requesting user must be staff or enrolled in
               the course associated with the team.
 
+            * course_id: Returns membership records only for the specified
+              course. Username must have access to this course, or else team_id
+              must be in this course.
+
             * page_size: Number of results to return per page.
 
             * page: Page number to retrieve.
@@ -799,6 +803,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             If team_id is provided but the team does not exist, a 404 error is
             returned.
 
+            If the specified course_id is invalid, a 404 error is returned.
+
             This endpoint uses 404 error codes to avoid leaking information
             about team or user existence. Specifically, a 404 error will be
             returned if a logged in user specifies a team_id for a course
@@ -807,6 +813,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             Additionally, when username is specified the list of returned
             memberships will be filtered to memberships in teams associated
             with courses that the requesting user is enrolled in.
+
+            If the course specified by course_id does not contain the team
+            specified by team_id, a 400 error is returned.
+
+            If the user is not enrolled in the course specified by course_id,
+            and does not have staff access to the course, a 400 error is
+            returned.
 
         **Response Values for POST**
 
