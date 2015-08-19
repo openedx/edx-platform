@@ -81,7 +81,6 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     @ddt.data(
         ("verified", SUBMITTED, VerificationPartitionScheme.ALLOW),
         ("verified", APPROVED, VerificationPartitionScheme.ALLOW),
-        ("verified", SUBMITTED, VerificationPartitionScheme.ALLOW),
         ("verified", DENIED, VerificationPartitionScheme.ALLOW),
         ("verified", None, VerificationPartitionScheme.DENY),
         ("honor", None, VerificationPartitionScheme.ALLOW),

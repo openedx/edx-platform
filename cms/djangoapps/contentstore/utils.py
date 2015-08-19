@@ -447,3 +447,42 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             })
 
     return partitions
+
+
+def get_visibility_partition_info(xblock):
+    """
+    Retrieve user partition information for the component visibility editor.
+
+    This pre-processes partition information to simplify the template.
+
+    Arguments:
+        xblock (XBlock): The component being edited.
+
+    Returns: dict
+
+    """
+    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
+    cohort_partitions = []
+    verification_partitions = []
+    has_selected_groups = False
+    selected_verified_partition_id = None
+
+    # Pre-process the partitions to make it easier to display the UI
+    for p in user_partitions:
+        has_selected = any(g["selected"] for g in p["groups"])
+        has_selected_groups = has_selected_groups or has_selected
+
+        if p["scheme"] == "cohort":
+            cohort_partitions.append(p)
+        elif p["scheme"] == "verification":
+            verification_partitions.append(p)
+            if has_selected:
+                selected_verified_partition_id = p["id"]
+
+    return {
+        "user_partitions": user_partitions,
+        "cohort_partitions": cohort_partitions,
+        "verification_partitions": verification_partitions,
+        "has_selected_groups": has_selected_groups,
+        "selected_verified_partition_id": selected_verified_partition_id,
+    }

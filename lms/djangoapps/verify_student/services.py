@@ -11,7 +11,6 @@ from django.db import IntegrityError
 from opaque_keys.edx.keys import CourseKey
 
 from student.models import User, CourseEnrollment
-from course_modes.models import CourseMode
 from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 
 
@@ -37,9 +36,10 @@ class ReverificationService(object):
 
         Returns: str or None
         """
+        user = User.objects.get(id=user_id)
         course_key = CourseKey.from_string(course_id)
 
-        if not self._is_enrolled_as_verified(user_id, course_key):
+        if not CourseEnrollment.is_enrolled_as_verified(user, course_key):
             return self.NON_VERIFIED_TRACK
         elif SkippedReverification.check_user_skipped_reverification_exists(user_id, course_key):
             return self.SKIPPED_STATUS
@@ -117,22 +117,3 @@ class ReverificationService(object):
         """
         course_key = CourseKey.from_string(course_id)
         return VerificationStatus.get_user_attempts(user_id, course_key, related_assessment_location)
-
-    def _is_enrolled_as_verified(self, user_id, course_key):
-        """
-        Check whether the user is enrolled in a verified track.
-
-        Arguments:
-            user_id (str): Identifier for the user.
-            course_key (CourseKey): Identifier for the course.
-
-        Returns: bool
-
-        """
-        user = User.objects.get(id=user_id)
-        enrollment = CourseEnrollment.get_enrollment(user, course_key)
-        return (
-            enrollment is not None and
-            enrollment.is_active and
-            enrollment.mode in CourseMode.VERIFIED_MODES
-        )

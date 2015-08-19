@@ -258,13 +258,9 @@ function(Backbone, _, str, ModuleUtils) {
         hasVerifiedCheckpoints: function() {
             var partitions = this.get("user_partitions") || [];
 
-            for (var i = 0; i < partitions.length; i++) {
-                if (partitions[i].scheme === "verification") {
-                    return true;
-                }
-            }
-
-            return false;
+            return Boolean(_.find(partitions, function(p) {
+                return p.scheme === "verification";
+            }));
         }
     });
     return XBlockInfo;

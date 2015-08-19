@@ -17,7 +17,7 @@ from django.conf import settings
 
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
-from openedx.core.djangoapps.credit.verification_access import create_verification_partitions
+from openedx.core.djangoapps.credit.verification_access import update_verification_partitions
 from openedx.core.djangoapps.credit.signals import on_pre_publish
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler
@@ -211,7 +211,7 @@ class CreateVerificationPartitionTest(ModuleStoreTestCase):
 
     def _update_partitions(self, reload_items=True):
         """Update user partitions in the course descriptor, then reload the content. """
-        create_verification_partitions(self.course.id)  # pylint: disable=no-member
+        update_verification_partitions(self.course.id)  # pylint: disable=no-member
 
         # Reload each component so we can see the changes
         if reload_items:

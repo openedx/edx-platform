@@ -13,11 +13,10 @@ and the LMS, but verify_student is specific to the LMS, and
 specific to credit requirements.
 
 """
-from django.core.cache import cache
-
 import logging
 
-from course_modes.models import CourseMode
+from django.core.cache import cache
+
 from lms.djangoapps.verify_student.models import SkippedReverification, VerificationStatus
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
@@ -44,9 +43,9 @@ class VerificationPartitionScheme(object):
         status.
 
         Args:
-            course_key(CourseKey): CourseKey
-            user(User): user object
-            user_partition: location object
+            course_key (CourseKey): CourseKey
+            user (User): user object
+            user_partition (UserPartition): The user partition object.
 
         Returns:
             string of allowed access group
@@ -112,7 +111,7 @@ def _get_user_statuses(user, course_key, checkpoint):
     # Retrieve whether the user is enrolled in a verified mode.
     is_verified = cache_values.get(enrollment_cache_key)
     if is_verified is None:
-        is_verified = _is_enrolled_in_verified_mode(user, course_key)
+        is_verified = CourseEnrollment.is_enrolled_as_verified(user, course_key)
         cache.set(enrollment_cache_key, is_verified)
 
     # Retrieve whether the user has skipped any checkpoints in this course
@@ -132,20 +131,6 @@ def _get_user_statuses(user, course_key, checkpoint):
     # since we want to show the user the content if they've submitted
     # photos.
     checkpoint = verification_statuses.get(checkpoint)
-    has_completed_check = checkpoint
+    has_completed_check = bool(checkpoint)
 
     return (is_verified, has_skipped, has_completed_check)
-
-
-def _is_enrolled_in_verified_mode(user, course_key):
-    """
-    Returns the Boolean value if given user for the given course is enrolled in
-    verified modes.
-    Args:
-        user(User): user object
-        course_key(CourseKey): CourseKey
-    Returns:
-        Boolean
-    """
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    return enrollment_mode in CourseMode.VERIFIED_MODES

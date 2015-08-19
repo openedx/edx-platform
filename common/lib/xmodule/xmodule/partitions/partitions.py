@@ -197,12 +197,15 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         )
 
     def get_group(self, group_id):
-        """ Returns the group with the specified id.
+        """
+        Returns the group with the specified id.
 
-        Args:
-            group_id: ID of the partition group.
+        Arguments:
+            group_id (int): ID of the partition group.
 
-        Returns the group with the specified id.  Raises NoSuchUserPartitionGroupError if not found.
+        Raises:
+            NoSuchUserPartitionGroupError: The specified group could not be found.
+
         """
         # pylint: disable=no-member
         for group in self.groups:

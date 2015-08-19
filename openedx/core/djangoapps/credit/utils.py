@@ -11,6 +11,9 @@ def get_course_blocks(course_key, category):
 
     Returns only XBlocks that are published and haven't been deleted.
     """
+    # Note: we need to check if found components have been orphaned
+    # due to a bug in split modulestore (PLAT-799).  Once that bug
+    # is resolved, we can skip the `_is_in_course_tree()` check entirely.
     return [
         block for block in modulestore().get_items(
             course_key,
