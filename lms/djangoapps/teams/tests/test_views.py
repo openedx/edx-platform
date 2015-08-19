@@ -436,13 +436,22 @@ class TestListTeamsAPI(TeamAPITestCase):
     @ddt.data(
         (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
         ('name', 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
-        # Note that "Nuclear Team" and "solar team" have the same number of open slots.
-        # "Nuclear Team" comes first due to secondary sort by name.
-        ('open_slots', 200, ['Wind Team', 'Nuclear Team', u'sólar team']),
-        ('last_activity', 400, []),
+        # Note that "Nuclear Team" and "solar team" have the same open_slots.
+        # "solar team" comes first due to secondary sort by last_activity_at.
+        ('open_slots', 200, ['Wind Team', u'sólar team', 'Nuclear Team']),
+        # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
+        # "Wind Team" comes first due to secondary sort by open_slots.
+        ('last_activity_at', 200, [u'sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
+        # Make "solar team" the most recently active team.
+        # The CourseTeamFactory sets the last_activity_at to a fixed time (in the past), so all of the
+        # other teams have the same last_activity_at.
+        solar_team = self.test_team_name_id_map[u'sólar team']
+        solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+        solar_team.save()
+
         data = {'order_by': field} if field else {}
         self.verify_names(data, status, names)
 
