@@ -73,11 +73,12 @@ class TeamsDashboardView(View):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, "load", course_key)
 
+        is_staff = bool(has_access(request.user, 'staff', course, course.id))
+
         if not is_feature_enabled(course):
             raise Http404
 
-        if not CourseEnrollment.is_enrolled(request.user, course.id) and \
-                not has_access(request.user, 'staff', course, course.id):
+        if not CourseEnrollment.is_enrolled(request.user, course.id) and not is_staff:
             raise Http404
 
         # Even though sorting is done outside of the serializer, sort_order needs to be passed
@@ -118,6 +119,7 @@ class TeamsDashboardView(View):
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
             "team_memberships_url": reverse('team_membership_list', request=request),
+            "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
             "languages": settings.ALL_LANGUAGES,
             "countries": list(countries),

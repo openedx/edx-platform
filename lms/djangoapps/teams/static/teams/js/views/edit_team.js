@@ -14,8 +14,8 @@
                 maxTeamDescriptionLength: 300,
 
                 events: {
-                    'click .action-primary': 'createTeam',
-                    'submit form': 'createTeam',
+                    'click .action-primary': 'createUpdateTeam',
+                    'submit form': 'createUpdateTeam',
                     'click .action-cancel': 'goBackToTopic'
                 },
 
@@ -28,11 +28,18 @@
                     this.languages = options.teamParams.languages;
                     this.countries = options.teamParams.countries;
                     this.primaryButtonTitle = options.primaryButtonTitle || 'Submit';
+                    this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
+                    this.action = options.action;
 
-                    _.bindAll(this, 'goBackToTopic', 'createTeam');
+                    _.bindAll(this, 'goBackToTopic', 'createUpdateTeam');
 
-                    this.teamModel = new TeamModel({});
-                    this.teamModel.url = this.teamsUrl;
+                    if (this.action === 'create') {
+                        this.teamModel = new TeamModel({});
+                        this.teamModel.url = this.teamsUrl;
+                    } else {
+                        this.teamModel = options.model;
+                        this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id'));
+                    }
 
                     this.teamNameField = new FieldViews.TextFieldView({
                         model: this.teamModel,
@@ -74,7 +81,12 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({primaryButtonTitle: this.primaryButtonTitle}));
+                    this.$el.html(_.template(editTeamTemplate)({
+                        primaryButtonTitle: this.primaryButtonTitle,
+                        isNew: this.action === 'create',
+                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length,
+                        totalPosts: 9
+                    }));
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
                     this.set(this.teamLanguageField, '.team-optional-fields');
@@ -91,20 +103,28 @@
                     }
                 },
 
-                createTeam: function (event) {
+                createUpdateTeam: function (event) {
                     event.preventDefault();
                     var view = this,
                         teamLanguage = this.teamLanguageField.fieldValue(),
-                        teamCountry = this.teamCountryField.fieldValue();
+                        teamCountry = this.teamCountryField.fieldValue(),
+                        data = {
+                            name: this.teamNameField.fieldValue(),
+                            description: this.teamDescriptionField.fieldValue(),
+                            language: _.isNull(teamLanguage) ? '' : teamLanguage,
+                            country: _.isNull(teamCountry) ? '' : teamCountry
+                        },
+                        defaultParams = {
+                            wait: true
+                        };
 
-                    var data = {
-                        course_id: this.courseID,
-                        topic_id: this.topicID,
-                        name: this.teamNameField.fieldValue(),
-                        description: this.teamDescriptionField.fieldValue(),
-                        language: _.isNull(teamLanguage) ? '' : teamLanguage,
-                        country: _.isNull(teamCountry) ? '' : teamCountry
-                    };
+                    if (this.action === 'create') {
+                        data.course_id = this.courseID;
+                        data.topic_id = this.topicID;
+                    } else {
+                        defaultParams.patch = true;
+                        defaultParams.contentType = 'application/merge-patch+json';
+                    }
 
                     var validationResult = this.validateTeamData(data);
                     if (validationResult.status === false) {
@@ -112,10 +132,10 @@
                         return;
                     }
 
-                    this.teamModel.save(data, { wait: true })
+                    this.teamModel.save(data, defaultParams)
                         .done(function(result) {
                             view.teamEvents.trigger('teams:update', {
-                                action: 'create',
+                                action: view.action,
                                 team: result
                             });
                             Backbone.history.navigate(

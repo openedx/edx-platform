@@ -17,12 +17,12 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
-            'teams/js/views/team_join',
+            'teams/js/views/team_profile_header_actions',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamJoinView, teamsTemplate) {
+                  TeamProfileHeaderActionsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function (attributes) {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -52,6 +52,7 @@
                     this.topics = options.topics;
                     this.topicUrl = options.topicUrl;
                     this.teamsUrl = options.teamsUrl;
+                    this.teamsDetailUrl = options.teamsDetailUrl;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
                     this.maxTeamSize = options.maxTeamSize;
@@ -74,6 +75,7 @@
                         }, this)],
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
+                        ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
@@ -208,6 +210,7 @@
                                 })
                             }),
                             main: new TeamEditView({
+                                action: 'create',
                                 teamEvents: self.teamEvents,
                                 tagName: 'create-new-team',
                                 teamParams: teamsView.main.teamParams,
@@ -215,6 +218,41 @@
                             })
                         });
                         self.render();
+                    });
+                },
+
+                /**
+                 * Render the edit team form.
+                 */
+                editTeam: function (topicID, teamID) {
+                    var self = this;
+                    this.getTeamsView(topicID).done(function (teamsView) {
+                        self.getTeam(teamID, false).done(function(team) {
+                            self.mainView = new ViewWithHeader({
+                                header: new HeaderView({
+                                    model: new TeamsHeaderModel({
+                                        description: gettext("You can edit the details of a team here, and should separately let your team members know about changes."),
+                                        title: gettext("Edit Team"),
+                                        breadcrumbs: [
+                                            {
+                                                title: teamsView.main.teamParams.topicName,
+                                                url: '#topics/' + teamsView.main.teamParams.topicID
+                                            }
+                                        ]
+                                    })
+                                }),
+                                main: new TeamEditView({
+                                    action: 'edit',
+                                    teamEvents: self.teamEvents,
+                                    tagName: 'create-new-team',
+                                    teamParams: teamsView.main.teamParams,
+                                    primaryButtonTitle: 'Update',
+                                    model: team,
+                                    teamsDetailUrl: self.teamsDetailUrl
+                                })
+                            });
+                            self.render();
+                        });
                     });
                 },
 
@@ -303,14 +341,17 @@
                                 languages: self.languages,
                                 teamMembershipDetailUrl: self.teamMembershipDetailUrl
                             });
-                            var teamJoinView = new TeamJoinView({
+
+                            var TeamProfileActionsView = new TeamProfileHeaderActionsView({
                                 teamEvents: self.teamEvents,
-                                    courseID: courseID,
-                               model: team,
+                                courseID: courseID,
+                                model: team,
                                 teamsUrl: self.teamsUrl,
                                 maxTeamSize: self.maxTeamSize,
                                 currentUsername: self.userInfo.username,
-                                teamMembershipsUrl: self.teamMembershipsUrl
+                                teamMembershipsUrl: self.teamMembershipsUrl,
+                                topicID: topicID,
+                                hasInstructorRights: self.userInfo.has_instructor_rights
                             });
                             deferred.resolve(
                                 self.createViewWithHeader(
@@ -318,7 +359,7 @@
                                         mainView: view,
                                         subject: team,
                                         parentTopic: topic,
-                                        headerActionsView: teamJoinView
+                                        headerActionsView: TeamProfileActionsView
                                     }
                                 )
                             );
@@ -481,14 +522,14 @@
                 },
 
                 showWarning: function (message) {
-                    var warningEl = this.$('.warning');
+                    var warningEl = this.$('.wrapper-msg.warning');
                     warningEl.find('.copy').html('<p>' + message + '</p');
                     warningEl.toggleClass('is-hidden', false);
                     warningEl.focus();
                 },
 
                 hideWarning: function () {
-                    this.$('.warning').toggleClass('is-hidden', true);
+                    this.$('.wrapper-msg.warning').toggleClass('is-hidden', true);
                 },
 
                 /**

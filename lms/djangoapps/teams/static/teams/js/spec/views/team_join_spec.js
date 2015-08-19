@@ -1,6 +1,6 @@
 define([
     'backbone', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
-    'teams/js/views/team_join', 'teams/js/spec_helpers/team_spec_helpers'
+    'teams/js/views/team_profile_header_actions', 'teams/js/spec_helpers/team_spec_helpers'
 ], function (Backbone, _, AjaxHelpers, TeamModel, TeamJoinView, TeamSpecHelpers) {
     'use strict';
     describe('TeamJoinView', function () {
