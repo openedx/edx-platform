@@ -688,14 +688,12 @@ class VerificationStatusTest(ModuleStoreTestCase):
             status='submitted'
         )
 
-        self.assertEqual(
-            VerificationStatus.get_user_attempts(
-                user_id=self.user.id,
-                course_key=self.course.id,
-                related_assessment_location=self.first_checkpoint_location
-            ),
-            1
+        actual_attempts = VerificationStatus.get_user_attempts(
+            self.user.id,
+            self.course.id,
+            self.first_checkpoint_location
         )
+        self.assertEqual(actual_attempts, 1)
 
 
 class SkippedReverificationTest(ModuleStoreTestCase):
@@ -763,12 +761,18 @@ class SkippedReverificationTest(ModuleStoreTestCase):
             checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
         )
         self.assertTrue(
-            SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=self.user)
+            SkippedReverification.check_user_skipped_reverification_exists(
+                user_id=self.user.id,
+                course_id=self.course.id
+            )
         )
 
         user2 = UserFactory.create()
         self.assertFalse(
-            SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=user2)
+            SkippedReverification.check_user_skipped_reverification_exists(
+                user_id=user2.id,
+                course_id=self.course.id
+            )
         )
 
 

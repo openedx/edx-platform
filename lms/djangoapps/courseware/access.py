@@ -487,16 +487,24 @@ def _has_group_access(descriptor, user, course_key):
 
     # resolve the partition IDs in group_access to actual
     # partition objects, skipping those which contain empty group directives.
-    # if a referenced partition could not be found, access will be denied.
-    try:
-        partitions = [
-            descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
-            for partition_id, group_ids in merged_access.items()
-            if group_ids is not None
-        ]
-    except NoSuchUserPartitionError:
-        log.warning("Error looking up user partition, access will be denied.", exc_info=True)
-        return ACCESS_DENIED
+    # If a referenced partition could not be found, it will be denied
+    # If the partition is found but is no longer active (meaning it's been disabled)
+    # then skip the access check for that partition.
+    partitions = []
+    for partition_id, group_ids in merged_access.items():
+        try:
+            partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
+            if partition.active:
+                if group_ids is not None:
+                    partitions.append(partition)
+            else:
+                log.debug(
+                    "Skipping partition with ID %s in course %s because it is no longer active",
+                    partition.id, course_key
+                )
+        except NoSuchUserPartitionError:
+            log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+            return ACCESS_DENIED
 
     # next resolve the group IDs specified within each partition
     partition_groups = []

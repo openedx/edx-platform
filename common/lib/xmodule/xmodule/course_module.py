@@ -1533,3 +1533,39 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns the topics that have been configured for teams for this course, else None.
         """
         return self.teams_configuration.get('topics', None)
+
+    def get_user_partitions_for_scheme(self, scheme):
+        """
+        Retrieve all user partitions defined in the course for a particular
+        partition scheme.
+
+        Arguments:
+            scheme (object): The user partition scheme.
+
+        Returns:
+            list of `UserPartition`
+
+        """
+        return [
+            p for p in self.user_partitions
+            if p.scheme == scheme
+        ]
+
+    def set_user_partitions_for_scheme(self, partitions, scheme):
+        """
+        Set the user partitions for a particular scheme.
+
+        Preserves partitions associated with other schemes.
+
+        Arguments:
+            scheme (object): The user partition scheme.
+
+        Returns:
+            list of `UserPartition`
+
+        """
+        other_partitions = [
+            p for p in self.user_partitions  # pylint: disable=access-member-before-definition
+            if p.scheme != scheme
+        ]
+        self.user_partitions = other_partitions + partitions  # pylint: disable=attribute-defined-outside-init

@@ -465,6 +465,15 @@
       }
     }
 
+    .field-visibility-verification {
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 24px;
+        display: block;
+      }
+    }
+
     // CASE: content group has been removed
     .field-visibility-content-group.was-removed {
 
@@ -629,8 +638,12 @@
       }
     }
 
+    .edit-staff-lock {
+      margin-bottom: $baseline;
+    }
+
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination {
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
@@ -652,6 +665,20 @@
       // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
       .checkbox-cosmetic .label {
         margin-bottom: 0;
+      }
+
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 21px;
+        display: block;
+      }
+    }
+
+    .verification-access {
+      .checkbox-cosmetic .label {
+        @include float(left);
+        margin: 2px 6px 0 0;
       }
     }
 

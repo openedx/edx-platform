@@ -151,11 +151,13 @@ class LmsBlockMixin(XBlockMixin):
             except NoSuchUserPartitionError:
                 has_invalid_user_partitions = True
             else:
-                for group_id in group_ids:
-                    try:
-                        user_partition.get_group(group_id)
-                    except NoSuchUserPartitionGroupError:
-                        has_invalid_groups = True
+                # Skip the validation check if the partition has been disabled
+                if user_partition.active:
+                    for group_id in group_ids:
+                        try:
+                            user_partition.get_group(group_id)
+                        except NoSuchUserPartitionGroupError:
+                            has_invalid_groups = True
 
         if has_invalid_user_partitions:
             validation.add(

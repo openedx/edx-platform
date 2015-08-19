@@ -86,11 +86,13 @@ class SignalHandler(object):
        almost no work. Its main job is to kick off the celery task that will
        do the actual work.
     """
+    pre_publish = django.dispatch.Signal(providing_args=["course_key"])
     course_published = django.dispatch.Signal(providing_args=["course_key"])
     course_deleted = django.dispatch.Signal(providing_args=["course_key"])
     library_updated = django.dispatch.Signal(providing_args=["library_key"])
 
     _mapping = {
+        "pre_publish": pre_publish,
         "course_published": course_published,
         "course_deleted": course_deleted,
         "library_updated": library_updated,
