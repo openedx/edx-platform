@@ -484,6 +484,9 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
+    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+        return redirect(settings.MKTG_URLS.get('ROOT') + '/dashboard')
+
     user = request.user
 
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
