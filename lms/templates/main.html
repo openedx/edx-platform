@@ -103,6 +103,7 @@ from branding import api as branding_api
     google_analytics_file = microsite.get_template_path('google_analytics.html')
 
     style_overrides_file = microsite.get_value('css_overrides_file')
+  google_tag_manager_file = microsite.get_template_path('google_tag_manager.html')
 %>
 
   % if header_extra_file:
@@ -124,6 +125,7 @@ from branding import api as branding_api
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+<%include file="${google_tag_manager_file}" />
 <div id="page-prompt"></div>
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
