@@ -25,7 +25,7 @@
                     this.maxTeamSize = options.maxTeamSize;
                     this.currentUsername = options.currentUsername;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
-                    this.hasInstructorRights = options.hasInstructorRights;
+                    this.showEditButton = options.showEditButton;
                     this.topicID = options.topicID;
                     _.bindAll(this, 'render', 'joinTeam','editTeam', 'getUserTeamInfo');
                     this.listenTo(this.model, "change", this.render);
@@ -53,7 +53,7 @@
                         view.$el.html(view.template({
                             showJoinButton: showJoinButton,
                             message: message,
-                            showEditButton: view.hasInstructorRights
+                            showEditButton: view.showEditButton
                         }));
                     });
                     return view;

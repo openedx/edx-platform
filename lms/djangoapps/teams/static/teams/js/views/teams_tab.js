@@ -352,7 +352,7 @@
                                 currentUsername: self.userInfo.username,
                                 teamMembershipsUrl: self.teamMembershipsUrl,
                                 topicID: topicID,
-                                hasInstructorRights: self.userInfo.has_instructor_rights
+                                showEditButton: self.userInfo.privileged || self.userInfo.staff
                             });
                             deferred.resolve(
                                 self.createViewWithHeader(
