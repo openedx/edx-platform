@@ -16,7 +16,7 @@
                 events: {
                     'click .action-primary': 'createUpdateTeam',
                     'submit form': 'createUpdateTeam',
-                    'click .action-cancel': 'goBackToTopic'
+                    'click .action-cancel': 'cancelTeam'
                 },
 
                 initialize: function(options) {
@@ -31,7 +31,7 @@
                     this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
                     this.action = options.action;
 
-                    _.bindAll(this, 'goBackToTopic', 'createUpdateTeam');
+                    _.bindAll(this, 'cancelTeam', 'createUpdateTeam');
 
                     if (this.action === 'create') {
                         this.teamModel = new TeamModel({});
@@ -205,8 +205,14 @@
                     }
                 },
 
-                goBackToTopic: function () {
-                    Backbone.history.navigate('topics/' + this.topicID, {trigger: true});
+                cancelTeam: function () {
+                    var url;
+                    if (this.action === 'create') {
+                        url = 'topics/' + this.topicID;
+                    } else {
+                        url = 'teams/' + this.topicID + this.teamModel.get('id');
+                    }
+                    Backbone.history.navigate(url, {trigger: true});
                 }
             });
         });

@@ -265,7 +265,7 @@
                     var self = this,
                         router = this.router,
                         deferred = $.Deferred();
-                    if (this.teamsCollection && this.teamsCollection.topic_id === topicID) {
+                    if (this.teamsCollection && this.teamsCollection.topic_id === topicID && this.teamsView) {
                         deferred.resolve(this.teamsView);
                     } else {
                         this.getTopic(topicID)
