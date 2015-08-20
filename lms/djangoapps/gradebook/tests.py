@@ -5,7 +5,9 @@ Run these tests @ Devstack:
 """
 from mock import MagicMock, patch
 import uuid
+import json
 
+from collections import OrderedDict
 from datetime import datetime
 from django.utils.timezone import UTC
 
@@ -55,6 +57,7 @@ class GradebookTests(ModuleStoreTestCase):
         self.user = UserFactory()
         self.score = 0.75
 
+    # pylint: disable=attribute-defined-outside-init
     def _create_course(self, start=None, end=None):
         self.course = CourseFactory.create(
             start=start,
@@ -101,6 +104,21 @@ class GradebookTests(ModuleStoreTestCase):
             display_name="homework problem 1",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
         )
+        self.problem_progress_summary = {
+            "url_name": "homework_problem_1",
+            "display_name": "homework problem 1",
+            "graded": True,
+            "format": "Homework",
+            "section_total": [0.75, 1.0, False, "homework problem 1", None, None],
+            "due": None,
+            "scores": [[0.75, 1.0, True, "homework problem 1", unicode(self.problem.location), None]]
+        }
+        self.problem_grade_summary = {
+            "category": "Homework",
+            "percent": 0.75,
+            "detail": "Homework 1 - homework problem 1 - 75% (0.75/1)",
+            "label": "HW 01"
+        }
         self.problem2 = ItemFactory.create(
             parent_location=chapter2.location,
             category='problem',
@@ -108,6 +126,21 @@ class GradebookTests(ModuleStoreTestCase):
             display_name="homework problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
         )
+        self.problem2_progress_summary = {
+            "url_name": "homework_problem_2",
+            "display_name": "homework problem 2",
+            "graded": True,
+            "format": "Homework",
+            "section_total": [0.95, 1.0, False, "homework problem 2", None, None],
+            "due": None,
+            "scores": [[0.95, 1.0, True, "homework problem 2", unicode(self.problem2.location), None]]
+        }
+        self.problem2_grade_summary = {
+            "category": "Homework",
+            "percent": 0.95,
+            "detail": "Homework 2 - homework problem 2 - 95% (0.95/1)",
+            "label": "HW 02"
+        }
         self.problem3 = ItemFactory.create(
             parent_location=chapter2.location,
             category='problem',
@@ -115,6 +148,21 @@ class GradebookTests(ModuleStoreTestCase):
             display_name="lab problem 1",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
         )
+        self.problem3_progress_summary = {
+            "url_name": "lab_problem_1",
+            "display_name": "lab problem 1",
+            "graded": True,
+            "format": "Lab",
+            "section_total": [0.86, 1.0, False, "lab problem 1", None, None],
+            "due": None,
+            "scores": [[0.86, 1.0, True, "lab problem 1", unicode(self.problem3.location), None]]
+        }
+        self.problem3_grade_summary = {
+            "category": "Lab",
+            "percent": 0.86,
+            "detail": "Lab 1 - lab problem 1 - 86% (0.86/1)",
+            "label": "Lab 01"
+        }
         self.problem4 = ItemFactory.create(
             parent_location=chapter2.location,
             category='problem',
@@ -122,6 +170,22 @@ class GradebookTests(ModuleStoreTestCase):
             display_name="midterm problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
         )
+        self.problem4_progress_summary = {
+            "url_name": "midterm_problem_2",
+            "display_name": "midterm problem 2",
+            "graded": True,
+            "format": "Midterm Exam",
+            "section_total": [0.92, 1.0, False, "midterm problem 2", None, None],
+            "due": None,
+            "scores": [[0.92, 1.0, True, "midterm problem 2", unicode(self.problem4.location), None]]
+        }
+        self.problem4_grade_summary = OrderedDict([
+            ("category", "Midterm Exam"),
+            ("prominent", True),
+            ("percent", 0.92),
+            ("detail", "Midterm Exam = 92%"),
+            ("label", "Midterm")
+        ])
         self.problem5 = ItemFactory.create(
             parent_location=chapter2.location,
             category='problem',
@@ -129,34 +193,110 @@ class GradebookTests(ModuleStoreTestCase):
             display_name="final problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
         )
-
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
+        self.problem5_progress_summary = {
+            "url_name": "final_problem_2",
+            "display_name": "final problem 2",
+            "graded": True,
+            "format": "Final Exam",
+            "section_total": [0.87, 1.0, False, "final problem 2", None, None],
+            "due": None,
+            "scores": [[0.87, 1.0, True, "final problem 2", unicode(self.problem5.location), None]]
         }
-    )
+        self.problem5_grade_summary = OrderedDict([
+            ("category", "Final Exam"),
+            ("prominent", True),
+            ("percent", 0.87),
+            ("detail", "Final Exam = 87%"),
+            ("label", "Final")
+        ])
+        self.grading_policy = {
+            "GRADER": [{
+                "short_label": "HW",
+                "min_count": 12,
+                "type": "Homework",
+                "drop_count": 2,
+                "weight": 0.15
+            }, {
+                "min_count": 12,
+                "type": "Lab",
+                "drop_count": 2,
+                "weight": 0.15
+            }, {
+                "short_label": "Midterm",
+                "min_count": 1,
+                "type": "Midterm Exam",
+                "drop_count": 0,
+                "weight": 0.3
+            }, {
+                "short_label": "Final",
+                "min_count": 1,
+                "type": "Final Exam",
+                "drop_count": 0,
+                "weight": 0.4
+            }],
+            "GRADE_CUTOFFS": {"Pass": 0.5}
+        }
+
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_receiver_on_score_changed(self):
         self._create_course()
         module = self.get_module_for_user(self.user, self.course, self.problem)
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.01)
+        self.assertEqual(gradebook.proforma_grade, 0.75)
+        self.assertIn(json.dumps(self.problem_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
+
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.03)
+        self.assertEqual(gradebook.proforma_grade, 0.8500000000000001)
+        self.assertIn(json.dumps(self.problem2_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem2_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
 
         module = self.get_module_for_user(self.user, self.course, self.problem3)
         grade_dict = {'value': 0.86, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.04)
+        self.assertEqual(gradebook.proforma_grade, 0.855)
+        self.assertIn(json.dumps(self.problem3_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem3_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
+
         module = self.get_module_for_user(self.user, self.course, self.problem4)
         grade_dict = {'value': 0.92, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.31)
+        self.assertEqual(gradebook.proforma_grade, 0.8831666666666667)
+        self.assertIn(json.dumps(self.problem4_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem4_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
+
         module = self.get_module_for_user(self.user, self.course, self.problem5)
         grade_dict = {'value': 0.87, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.66)
+        self.assertEqual(gradebook.proforma_grade, 0.8805000000000001)
+        self.assertIn(json.dumps(self.problem5_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem5_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 1)
@@ -164,14 +304,11 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 5)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True,
-            'ENABLE_NOTIFICATIONS': True
-        }
-    )
-    @patch.dict(settings.FEATURES, {})
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True,
+        'ENABLE_NOTIFICATIONS': True
+    })
     def test_notifications_publishing(self):
         initialize_notifications()
 
@@ -187,12 +324,10 @@ class GradebookTests(ModuleStoreTestCase):
         # leaderboard
         self.assertEqual(get_notifications_count_for_user(self.user.id), 1)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
-        }
-    )
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_open_course(self):
         self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(3000, 1, 1, tzinfo=UTC()))
 
@@ -200,9 +335,23 @@ class GradebookTests(ModuleStoreTestCase):
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.01)
+        self.assertEqual(gradebook.proforma_grade, 0.75)
+        self.assertIn(json.dumps(self.problem_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
+
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.03)
+        self.assertEqual(gradebook.proforma_grade, 0.8500000000000001)
+        self.assertIn(json.dumps(self.problem2_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem2_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 1)
@@ -210,12 +359,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 2)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
-        }
-    )
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_not_yet_started_course(self):
         self._create_course(start=datetime(3000, 1, 1, tzinfo=UTC()), end=datetime(3000, 1, 1, tzinfo=UTC()))
 
@@ -223,9 +370,23 @@ class GradebookTests(ModuleStoreTestCase):
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.01)
+        self.assertEqual(gradebook.proforma_grade, 0.75)
+        self.assertIn(json.dumps(self.problem_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
+
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.03)
+        self.assertEqual(gradebook.proforma_grade, 0.8500000000000001)
+        self.assertIn(json.dumps(self.problem2_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem2_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 1)
@@ -233,12 +394,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 2)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
-        }
-    )
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_closed_course_student(self):
         self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(2011, 1, 1, tzinfo=UTC()))
 
@@ -246,9 +405,15 @@ class GradebookTests(ModuleStoreTestCase):
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 0)
@@ -256,12 +421,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
-        }
-    )
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_closed_course_admin(self):
         """
         Users marked as Admin should be able to submit grade events to a closed course
@@ -273,9 +436,15 @@ class GradebookTests(ModuleStoreTestCase):
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 0)
@@ -283,12 +452,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
-        }
-    )
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_closed_course_staff(self):
         """
         Users marked as course staff should be able to submit grade events to a closed course
@@ -300,9 +467,15 @@ class GradebookTests(ModuleStoreTestCase):
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
 
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 0)
@@ -310,17 +483,22 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
-    @patch.dict(
-        settings.FEATURES, {
-            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-            'SIGNAL_ON_SCORE_CHANGED': True
-        }
-    )
+    @patch.dict(settings.FEATURES, {
+        'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+        'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_receiver_on_course_deleted(self):
         self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(2020, 1, 1, tzinfo=UTC()))
         module = self.get_module_for_user(self.user, self.course, self.problem)
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
+        self.assertEqual(gradebook.grade, 0.01)
+        self.assertEqual(gradebook.proforma_grade, 0.75)
+        self.assertIn(json.dumps(self.problem_progress_summary), gradebook.progress_summary)
+        self.assertIn(json.dumps(self.problem_grade_summary), gradebook.grade_summary)
+        self.assertEquals(json.loads(gradebook.grading_policy), self.grading_policy)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 1)
@@ -329,6 +507,9 @@ class GradebookTests(ModuleStoreTestCase):
         self.assertEqual(len(history), 1)
 
         course_deleted.send(sender=None, course_key=self.course.id)
+
+        with self.assertRaises(StudentGradebook.DoesNotExist):
+            gradebook = StudentGradebook.objects.get(user=self.user, course_id=self.course.id)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 0)
