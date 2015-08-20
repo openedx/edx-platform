@@ -124,7 +124,7 @@ chrono==1.0.2
 coverage==4.0b3
 ddt==0.8.0
 diff-cover==0.8.0
-django-crum==0.5
+django-crum==0.6.1
 django_nose==1.4.1
 factory_boy==2.2.1
 flaky==2.0.3
