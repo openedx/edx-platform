@@ -116,7 +116,7 @@ transifex-client==0.10
 ipaddr==2.1.11
 
 # Used to allow to configure CORS headers for cross-domain requests
-django-cors-headers==0.13
+django-cors-headers==1.1.0
 
 # Debug toolbar
 django_debug_toolbar==1.2.2
