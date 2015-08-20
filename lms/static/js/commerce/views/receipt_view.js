@@ -36,7 +36,7 @@ var edx = edx || {};
             this.username = this.$el.data('username');
             _.extend(context, {
                 receipt: this.receiptContext(data),
-                courseKey: this.course_key
+                courseKey: this.courseKey
             });
 
             this.$el.html(_.template(templateHtml, context));
