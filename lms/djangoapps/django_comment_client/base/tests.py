@@ -322,7 +322,10 @@ class ViewsTestCaseMixin(object):
         # the thread did, overwriting any changes.
         with patch.object(Thread, 'save'):
             response = self.client.post(
-                reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
+                reverse("update_thread", kwargs={
+                    "thread_id": "dummy",
+                    "course_id": self.course_id.to_deprecated_string()
+                }),
                 data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
             )
         self.assertEqual(response.status_code, 200)
