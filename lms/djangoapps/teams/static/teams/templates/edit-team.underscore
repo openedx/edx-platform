@@ -69,7 +69,7 @@
     <button class="action action-primary">
         <%=
             interpolate_text(
-                _.escape(gettext("{primaryButtonTitle} {span_start}a new team{span_end}")),
+                _.escape(gettext("{primaryButtonTitle} {span_start}a team{span_end}")),
                 {
                     'primaryButtonTitle': primaryButtonTitle, 'span_start': '<span class="sr">', 'span_end': '</span>'
                 }

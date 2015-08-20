@@ -210,7 +210,7 @@
                     if (this.action === 'create') {
                         url = 'topics/' + this.topicID;
                     } else {
-                        url = 'teams/' + this.topicID + this.teamModel.get('id');
+                        url = 'teams/' + this.topicID + '/' + this.teamModel.get('id');
                     }
                     Backbone.history.navigate(url, {trigger: true});
                 }
