@@ -8,12 +8,20 @@ define([
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
 
         beforeEach(function() {
-            setFixtures('<div class="discussion-module""></div>');
-            $('.discussion-module').data('course-id', TeamSpecHelpers.testCourseID);
-            $('.discussion-module').data('discussion-id', TeamSpecHelpers.testTeamDiscussionID);
-            $('.discussion-module').data('user-create-comment', true);
-            $('.discussion-module').data('user-create-subcomment', true);
-            DiscussionSpecHelper.setUnderscoreFixtures();
+            runs(function() {
+                setFixtures('<div class="discussion-module""></div>');
+                $('.discussion-module').data('course-id', TeamSpecHelpers.testCourseID);
+                $('.discussion-module').data('discussion-id', TeamSpecHelpers.testTeamDiscussionID);
+                $('.discussion-module').data('user-create-comment', true);
+                $('.discussion-module').data('user-create-subcomment', true);
+                DiscussionSpecHelper.setUnderscoreFixtures();
+            });
+            
+            waitsFor(
+                function() {return typeof(jQuery)!='undefined' && jQuery.active==0;},
+                "Ajax did not finish",
+                10000
+            })
         });
 
         createDiscussionView = function(requests, threads) {
