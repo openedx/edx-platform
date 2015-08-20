@@ -748,7 +748,6 @@ class CreateTeamTest(TeamsTabBase):
         self.verify_my_team_count(0)
 
 
-@flaky  # TODO fix this, see TNL-3069
 @attr('shard_5')
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
