@@ -208,7 +208,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         self.add_icrv_xblock()
 
-        with check_mongo_calls_range(max_finds=7):
+        with check_mongo_calls_range(max_finds=11):
             on_course_publish(self.course.id)
 
     def test_remove_icrv_requirement(self):

@@ -10,6 +10,7 @@ from django.db import IntegrityError
 
 from opaque_keys.edx.keys import CourseKey
 
+from student.models import User, CourseEnrollment
 from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 
 
@@ -21,24 +22,28 @@ class ReverificationService(object):
     Reverification XBlock service
     """
 
+    SKIPPED_STATUS = "skipped"
+    NON_VERIFIED_TRACK = "not-verified"
+
     def get_status(self, user_id, course_id, related_assessment_location):
         """Get verification attempt status against a user for a given
         'checkpoint' and 'course_id'.
 
         Args:
-            user_id(str): User Id string
-            course_id(str): A string of course id
-            related_assessment_location(str): Location of Reverification XBlock
+            user_id (str): User Id string
+            course_id (str): A string of course id
+            related_assessment_location (str): Location of Reverification XBlock
 
-        Returns:
-            "skipped" if the user has skipped the re-verification or
-            Verification Status string if the user has submitted photo
-            verification attempt else None
+        Returns: str or None
         """
+        user = User.objects.get(id=user_id)
         course_key = CourseKey.from_string(course_id)
-        has_skipped = SkippedReverification.check_user_skipped_reverification_exists(user_id, course_key)
-        if has_skipped:
-            return "skipped"
+
+        if not CourseEnrollment.is_enrolled_as_verified(user, course_key):
+            return self.NON_VERIFIED_TRACK
+        elif SkippedReverification.check_user_skipped_reverification_exists(user_id, course_key):
+            return self.SKIPPED_STATUS
+
         try:
             checkpoint_status = VerificationStatus.objects.filter(
                 user_id=user_id,
