@@ -243,6 +243,8 @@ def update_thread(request, course_id, thread_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
+    # Get thread context first in order to be safe from reseting the values of thread object later
+    thread_context = getattr(thread, "context", "course")
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
     # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
@@ -252,7 +254,6 @@ def update_thread(request, course_id, thread_id):
     if "commentable_id" in request.POST:
         commentable_id = request.POST["commentable_id"]
         course = get_course_with_access(request.user, 'load', course_key)
-        thread_context = getattr(thread, "context", "course")
         if thread_context == "course" and not discussion_category_id_access(course, request.user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
         else:

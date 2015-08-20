@@ -316,11 +316,23 @@ class ViewsTestCaseMixin(object):
         Issues a request to update a thread and verifies the result.
         """
         self._setup_mock_request(mock_request)
-        response = self.client.post(
-            reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
-            data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
-        )
+        # Mock out saving in order to test that content is correctly
+        # updated. Otherwise, the call to thread.save() receives the
+        # same mocked request data that the original call to retrieve
+        # the thread did, overwriting any changes.
+        with patch.object(Thread, 'save'):
+            response = self.client.post(
+                reverse("update_thread", kwargs={
+                    "thread_id": "dummy",
+                    "course_id": self.course_id.to_deprecated_string()
+                }),
+                data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
+            )
         self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data['body'], 'foo')
+        self.assertEqual(data['title'], 'foo')
+        self.assertEqual(data['commentable_id'], 'some_topic')
 
 
 @ddt.ddt
