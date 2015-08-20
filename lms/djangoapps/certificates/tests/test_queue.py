@@ -27,6 +27,7 @@ from certificates.models import (
     ExampleCertificate,
     GeneratedCertificate,
     CertificateStatuses,
+    PDFCertificateConfiguration,
 )
 
 
@@ -58,6 +59,35 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         __, kwargs = mock_send.call_args_list[0]
         actual_header = json.loads(kwargs['header'])
         self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+
+    def test_add_cert_with_pdf_cert_config(self):
+        """
+        Tests send_to_queue is called with appropriate pdf certificate configuration parameters
+        """
+        long_org = "Long organization name"
+        long_course = "Long course name"
+        version = 2
+        config = PDFCertificateConfiguration(
+            course_key=self.course.id,
+            long_org=long_org,
+            long_course=long_course,
+            version=version,
+            is_active=True
+        )
+        config.save()
+
+        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                mock_send.return_value = (0, None)
+                self.xqueue.add_cert(self.user, self.course.id)
+
+        # Verify that the task was sent to the queue with the correct callback URL
+        self.assertTrue(mock_send.called)
+        __, kwargs = mock_send.call_args_list[0]
+        message_body = json.loads(kwargs['body'])
+        self.assertEqual(message_body['cert_config']['long_org'], long_org)
+        self.assertEqual(message_body['cert_config']['long_course'], long_course)
+        self.assertEqual(message_body['cert_config']['version'], version)
 
     def test_no_create_action_in_queue_for_html_view_certs(self):
         """

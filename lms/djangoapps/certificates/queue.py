@@ -23,7 +23,8 @@ from certificates.models import (
     certificate_status_for_student,
     CertificateStatuses as status,
     CertificateWhitelist,
-    ExampleCertificate
+    ExampleCertificate,
+    PDFCertificateConfiguration,
 )
 
 
@@ -354,6 +355,22 @@ class XQueueCertInterface(object):
                     cert.save()
 
                     if generate_pdf:
+                        # fetch pdf certificate configuration if there is any
+                        try:
+                            pdf_config = PDFCertificateConfiguration.objects.get(course_key=course_id, is_active=True)
+                            contents['cert_config'] = {
+                                'long_org': pdf_config.long_org,
+                                'long_course': pdf_config.long_course,
+                                'version': pdf_config.version,
+                                'render_course_name': pdf_config.render_course_name,
+                                'render_attr_phrase': pdf_config.render_attr_phrase,
+                                'create_verification_page': pdf_config.create_verification_page,
+                                'course_association_text': pdf_config.course_association_text,
+                                'xseries_num_courses': pdf_config.xseries_num_courses,
+                            }
+                        except PDFCertificateConfiguration.DoesNotExist:
+                            pass
+
                         try:
                             self._send_to_xqueue(contents, key)
                         except XQueueAddToQueueError as exc:
