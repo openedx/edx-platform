@@ -64,6 +64,7 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
+            'js/utils/navigation': 'js/utils/navigation',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -803,6 +804,8 @@
         'lms/include/teams/js/spec/views/topic_teams_spec.js',
         'lms/include/teams/js/spec/views/topics_spec.js',
         'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js'
+        'lms/include/teams/js/spec/views/team_join_spec.js',
+        'lms/include/js/spec/navigation_spec.js'
     ]);
 
 }).call(this, requirejs, define);
