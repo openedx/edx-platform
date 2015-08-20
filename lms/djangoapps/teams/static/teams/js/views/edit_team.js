@@ -84,8 +84,7 @@
                     this.$el.html(_.template(editTeamTemplate)({
                         primaryButtonTitle: this.primaryButtonTitle,
                         isNew: this.action === 'create',
-                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length,
-                        totalPosts: 9
+                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
                     }));
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');

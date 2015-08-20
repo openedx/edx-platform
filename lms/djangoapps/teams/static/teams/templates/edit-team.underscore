@@ -31,7 +31,16 @@
                 </h3>
                 <span class="screen-reader-message sr"></span>
                 <div class="copy">
-                    <p><%- gettext("The team that you are editing has 6 members and 50 posts. Communicate important changes to students prior to updating the team when possible.") %></p>
+                <p>
+                    <%=
+                        interpolate_text(
+                            _.escape(gettext("The team that you are editing has {total_members} members. Communicate important changes to students prior to updating the team when possible.")),
+                            {
+                                'total_members': totalMembers
+                            }
+                        )
+                    %>
+                </p>
                 </div>
             </div>
         </div>
