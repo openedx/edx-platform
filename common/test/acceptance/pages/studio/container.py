@@ -305,7 +305,7 @@ class ContainerPage(PageObject):
         Returns:
             list
         """
-        css = '#tab{tab_index} a[data-category={category_type}] span'.format(
+        css = '#tab{tab_index} button[data-category={category_type}] span'.format(
             tab_index=tab_index,
             category_type=category_type
         )
