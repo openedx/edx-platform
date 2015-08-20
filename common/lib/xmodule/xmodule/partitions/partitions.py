@@ -161,7 +161,11 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if value["version"] == 1:
             # If no scheme was provided, set it to the default ('random')
             scheme_id = UserPartition.VERSION_1_SCHEME
-        elif value["version"] == UserPartition.VERSION:
+
+        # Version changes should be backwards compatible in case the code
+        # gets rolled back.  If we see a version number greater than the current
+        # version, we should try to read it rather than raising an exception.
+        elif value["version"] >= UserPartition.VERSION:
             if "scheme" not in value:
                 raise TypeError("UserPartition dict {0} missing value key 'scheme'".format(value))
             scheme_id = value["scheme"]
