@@ -149,7 +149,7 @@ import json
     <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
   % endif
 
-  % if settings.FEATURES.get('IS_EDX_DOMAIN'):
+  % if settings.FEATURES.get('IS_EDX_DOMAIN') and settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
     <div class="wrapper-find-courses">
       <p class="copy">Check out our recently launched courses and what's new in your favorite subjects</p>
       <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
