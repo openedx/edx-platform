@@ -67,7 +67,7 @@ from verify_student.views import PayAndVerifyView
       data-contribution-amount='${contribution_amount}'
       data-processors='${json.dumps(processors)}'
       data-verification-deadline='${verification_deadline}'
-      data-display-steps='${json.dumps(display_steps)}'
+      data-display-steps='${json.dumps(display_steps) | h}'
       data-current-step='${current_step}'
       data-requirements='${json.dumps(requirements)}'
       data-msg-key='${message_key}'
