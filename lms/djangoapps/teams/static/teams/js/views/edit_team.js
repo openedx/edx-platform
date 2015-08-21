@@ -205,7 +205,8 @@
                     }
                 },
 
-                cancelTeam: function () {
+                cancelTeam: function (event) {
+                    event.preventDefault();
                     var url;
                     if (this.action === 'create') {
                         url = 'topics/' + this.topicID;

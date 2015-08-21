@@ -26,10 +26,6 @@
     <div class="team-info wrapper-msg-fixed is-incontext urgency-low warning" tabindex="-1">
         <div class="msg">
             <div class="msg-content">
-                <h3 class="title">
-
-                </h3>
-                <span class="screen-reader-message sr"></span>
                 <div class="copy">
                 <p>
                     <%=
@@ -79,7 +75,7 @@
     <button class="action action-cancel">
         <%=
             interpolate_text(
-                _.escape(gettext("Cancel {span_start}a new team{span_end}")),
+                _.escape(gettext("Cancel {span_start} team {span_end}")),
                 {
                     'span_start': '<span class="sr">', 'span_end': '</span>'
                 }
