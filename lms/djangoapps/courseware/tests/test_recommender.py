@@ -12,7 +12,7 @@ from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
@@ -20,7 +20,7 @@ from courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
-class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly
     """
@@ -30,42 +30,43 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
     ]
     XBLOCK_NAMES = ['recommender', 'recommender_second']
 
-    def setUp(self):
-        super(TestRecommender, self).setUp()
-
-        self.course = CourseFactory.create(
+    @classmethod
+    def setUpClass(cls):
+        super(TestRecommender, cls).setUpClass()
+        cls.course = CourseFactory.create(
             display_name='Recommender_Test_Course'
         )
-        self.chapter = ItemFactory.create(
-            parent=self.course, display_name='Overview'
-        )
-        self.section = ItemFactory.create(
-            parent=self.chapter, display_name='Welcome'
-        )
-        self.unit = ItemFactory.create(
-            parent=self.section, display_name='New Unit'
-        )
-        self.xblock = ItemFactory.create(
-            parent=self.unit,
-            category='recommender',
-            display_name='recommender'
-        )
-        self.xblock2 = ItemFactory.create(
-            parent=self.unit,
-            category='recommender',
-            display_name='recommender_second'
-        )
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.chapter = ItemFactory.create(
+                parent=cls.course, display_name='Overview'
+            )
+            cls.section = ItemFactory.create(
+                parent=cls.chapter, display_name='Welcome'
+            )
+            cls.unit = ItemFactory.create(
+                parent=cls.section, display_name='New Unit'
+            )
+            cls.xblock = ItemFactory.create(
+                parent=cls.unit,
+                category='recommender',
+                display_name='recommender'
+            )
+            cls.xblock2 = ItemFactory.create(
+                parent=cls.unit,
+                category='recommender',
+                display_name='recommender_second'
+            )
 
-        self.course_url = reverse(
+        cls.course_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
+                'course_id': cls.course.id.to_deprecated_string(),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
         )
 
-        self.resource_urls = [
+        cls.resource_urls = [
             (
                 "https://courses.edx.org/courses/MITx/3.091X/"
                 "2013_Fall/courseware/SP13_Week_4/"
@@ -77,10 +78,10 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
         ]
 
-        self.test_recommendations = {
-            self.resource_urls[0]: {
+        cls.test_recommendations = {
+            cls.resource_urls[0]: {
                 "title": "Covalent bonding and periodic trends",
-                "url": self.resource_urls[0],
+                "url": cls.resource_urls[0],
                 "description": (
                     "http://people.csail.mit.edu/swli/edx/"
                     "recommendation/img/videopage1.png"
@@ -90,9 +91,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
                     "and periodic trends"
                 )
             },
-            self.resource_urls[1]: {
+            cls.resource_urls[1]: {
                 "title": "Polar covalent bonds and electronegativity",
-                "url": self.resource_urls[1],
+                "url": cls.resource_urls[1],
                 "description": (
                     "http://people.csail.mit.edu/swli/edx/"
                     "recommendation/img/videopage2.png"
@@ -104,6 +105,8 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             }
         }
 
+    def setUp(self):
+        super(TestRecommender, self).setUp()
         for idx, student in enumerate(self.STUDENTS):
             username = "u{}".format(idx)
             self.create_account(username, student['email'], student['password'])
