@@ -183,7 +183,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             u'video_bumper': {
                 u'value': {
                     "transcripts": {},
-                    "video_id": "edx_video_id"
+                    "video_id": "video_001"
                 }
             }
         }
