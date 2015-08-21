@@ -25,11 +25,7 @@ var edx = edx || {},
 
                 active = $('#accordion div div:has(a.active)').index('#accordion div div');
 
-                if (active < 0) {
-                    active = $('#accordion group-heading.active').index('#accordion h3');
-                }
-
-                if (active < 0) {
+                if (typeof active === 'undefined' || active < 0) {
                     active = 0;
                 }
 
