@@ -515,8 +515,10 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 signal.send(sender=None, user=context["request"].user, post=cc_content)
                 if form_value:
                     context["cc_requester"].vote(cc_content, "up")
+                    api_content["vote_count"] += 1
                 else:
                     context["cc_requester"].unvote(cc_content)
+                    api_content["vote_count"] -= 1
 
 
 def create_thread(request, thread_data):
@@ -647,6 +649,7 @@ def update_thread(request, thread_id, update_data):
     # Only save thread object if some of the edited fields are in the thread data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
+        # signal to update Teams when a user edits a thread
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
