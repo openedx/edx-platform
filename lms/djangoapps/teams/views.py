@@ -361,8 +361,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
             if order_by_input == 'name':
-                queryset = queryset.extra(select={'lower_name': "lower(name)"})
-                queryset = queryset.order_by('lower_name')
+                # MySQL does case-insensitive order_by.
+                queryset = queryset.order_by('name')
             elif order_by_input == 'open_slots':
                 queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('team_size', '-last_activity_at')

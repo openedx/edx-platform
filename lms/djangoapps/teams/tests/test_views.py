@@ -122,7 +122,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'id': 'topic_{}'.format(i),
                     'name': name,
                     'description': 'Description for topic {}.'.format(i)
-                } for i, name in enumerate([u'sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
+                } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
             ]
         }
         cls.test_course_1 = CourseFactory.create(
@@ -201,9 +201,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            # 'solar team' is intentionally lower case to test case insensitivity in name ordering
             self.test_team_1 = CourseTeamFactory.create(
-                name=u'sólar team',
+                name=u'Sólar team',
                 course_id=self.test_course_1.id,
                 topic_id='topic_0'
             )
@@ -445,24 +444,24 @@ class TestListTeamsAPI(TeamAPITestCase):
         )
 
     def test_filter_topic_id(self):
-        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'sólar team'])
+        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
 
     def test_filter_include_inactive(self):
-        self.verify_names({'include_inactive': True}, 200, ['Coal Team', 'Nuclear Team', u'sólar team', 'Wind Team'])
+        self.verify_names({'include_inactive': True}, 200, ['Coal Team', 'Nuclear Team', u'Sólar team', 'Wind Team'])
 
     @ddt.data(
-        (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
-        ('name', 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
-        # Note that "Nuclear Team" and "solar team" have the same open_slots.
-        # "solar team" comes first due to secondary sort by last_activity_at.
-        ('open_slots', 200, ['Wind Team', u'sólar team', 'Nuclear Team']),
+        (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        ('name', 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        # Note that "Nuclear Team" and "Solar team" have the same open_slots.
+        # "Solar team" comes first due to secondary sort by last_activity_at.
+        ('open_slots', 200, ['Wind Team', u'Sólar team', 'Nuclear Team']),
         # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
         # "Wind Team" comes first due to secondary sort by open_slots.
-        ('last_activity_at', 200, [u'sólar team', 'Wind Team', 'Nuclear Team']),
+        ('last_activity_at', 200, [u'Sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
-        # Make "solar team" the most recently active team.
+        # Make "Solar team" the most recently active team.
         # The CourseTeamFactory sets the last_activity_at to a fixed time (in the past), so all of the
         # other teams have the same last_activity_at.
         with skip_signal(
@@ -471,7 +470,7 @@ class TestListTeamsAPI(TeamAPITestCase):
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            solar_team = self.test_team_name_id_map[u'sólar team']
+            solar_team = self.test_team_name_id_map[u'Sólar team']
             solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
             solar_team.save()
 
@@ -810,11 +809,11 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
-        ('name', 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
-        # Note that "Nuclear Power" and "solar power" both have 2 teams. "Coal Power" and "Window Power"
+        (None, 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        # Note that "Nuclear Power" and "Solar power" both have 2 teams. "Coal Power" and "Window Power"
         # both have 0 teams. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', u'sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
+        ('team_count', 200, ['Nuclear Power', u'Sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
@@ -865,7 +864,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             'page': 1,
             'order_by': 'team_count'
         })
-        self.assertEqual(["Wind Power", u'sólar power'], [topic['name'] for topic in topics['results']])
+        self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,
@@ -981,7 +980,7 @@ class TestListMembershipAPI(TeamAPITestCase):
     @ddt.data(
         ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
         ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
-        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'sólar team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'Sólar team'),
         ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
     )
     @ddt.unpack
