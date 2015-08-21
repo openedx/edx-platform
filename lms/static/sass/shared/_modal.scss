@@ -63,8 +63,7 @@
     position: relative;
 
     p {
-      font-size: .9em;
-      line-height: 1.4;
+      @extend %t-copy-base;
     }
 
     header {
