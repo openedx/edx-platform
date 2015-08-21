@@ -46,6 +46,6 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_page.open_add_textbook_form()
         self.textbook_page.upload_pdf_file('textbook.pdf')
         self.textbook_page.set_input_field_value('.edit-textbook #textbook-name-input', 'book_1')
-        self.textbook_page.set_input_field_value('.edit-textbook #chapter1-name', 'chapter_1')
+        self.textbook_page.set_input_field_value('.edit-textbook #chapter1-name', 'chap_1')
         self.textbook_page.click_textbook_submit_button()
         self.assertTrue(self.textbook_page.is_view_live_link_worked())
