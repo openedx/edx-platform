@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:42+0000\n"
+"POT-Creation-Date: 2015-08-21 14:18+0000\n"
 "PO-Revision-Date: 2015-08-12 08:13+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -501,10 +501,10 @@ msgid "Your legal name must be a minimum of two characters long"
 msgstr "يجب أن يتألّف اسمك القانوني من حرفين على الأقلّ"
 
 #: common/djangoapps/student/forms.py
-msgid "Username should only consist of A-Z and 0-9, with no spaces."
+msgid ""
+"Usernames must contain only letters, numbers, underscores (_), and hyphens "
+"(-)."
 msgstr ""
-"يجب ألّا يتألّف اسم المستخدم سوى من أحرف بين A-Z وأرقام بين 0-9، من دون "
-"تضمين مسافات. "
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -5586,43 +5586,6 @@ msgstr "{currency_symbol}{price}"
 msgid "Free"
 msgstr "مجّانًا"
 
-#. Translators: The join of three or more institution names (e.g., Harvard,
-#. MIT, and Dartmouth).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institutions}, and {last_institution}"
-msgstr "{first_institutions}، و{last_institution}"
-
-#. Translators: The join of two institution names (e.g., Harvard and MIT).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institution} and {second_institution}"
-msgstr "{first_institution} و{second_institution}"
-
-#: lms/djangoapps/courseware/views.py
-msgid ""
-"I would like to receive email from {institution_series} and learn about its "
-"other programs."
-msgid_plural ""
-"I would like to receive email from {institution_series} and learn about "
-"their other programs."
-msgstr[0] ""
-"أرغب باستلام رسائل إلكترونية من {institution_series} للتعرّف على برامجهم "
-"الأخرى"
-msgstr[1] ""
-"أرغب باستلام رسائل إلكترونية من {institution_series} للتعرّف على برامجها "
-"الأخرى"
-msgstr[2] ""
-"أرغب باستلام رسائل إلكترونية من {institution_series} للتعرّف على برامجهم "
-"الأخرى"
-msgstr[3] ""
-"أرغب باستلام رسائل إلكترونية من {institution_series} للتعرّف على برامجهم "
-"الأخرى"
-msgstr[4] ""
-"أرغب باستلام رسائل إلكترونية من {institution_series} للتعرّف على برامجهم "
-"الأخرى"
-msgstr[5] ""
-"أودّ استلام رسائل البريد الإلكتروني من {institution_series} والتعرّف على "
-"برامجهم الأخرى."
-
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
 msgstr "موقع غير صحيح."
@@ -8426,10 +8389,6 @@ msgstr "الرقم التعريفي الذي جرى توفيره حول المو
 msgid "text_search is not yet supported."
 msgstr "إنّ خاصّية البحث في النصّ text_search غير مدعومة بعد."
 
-#: lms/djangoapps/teams/views.py
-msgid "last_activity is not yet supported"
-msgstr "إنّ خاصّية النشاط الأخير last_activity غير مدعومة بعد."
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8443,6 +8402,10 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "الرقم التعريفي الذي جرى توفيره حول المساق {course_id} غير صالح."
 
 #: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this course."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
 msgstr "يجب تحديد اسم المستخدم أو الرقم التعريفي للفريق."
 
@@ -8453,6 +8416,10 @@ msgstr "اسم المستخدم مطلوب."
 #: lms/djangoapps/teams/views.py
 msgid "Team id is required."
 msgstr "الرقم التعريفي للفريق مطلوب."
+
+#: lms/djangoapps/teams/views.py
+msgid "This team is already full."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "The user {username} is already a member of a team in this course."
@@ -9515,7 +9482,7 @@ msgstr "فاطمة الفهري"
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 msgid "Needed for any certificates you may earn"
-msgstr "مطلوب لأي شهادة قد تنالها "
+msgstr "مطلوب لأي شهادة قد تنالها - يفضل باللغة العربية"
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -9577,9 +9544,7 @@ msgstr "أوافق على {terms_of_service} الخاصين بمنصّة {platfo
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
-msgstr ""
-"يجب الموافقة على شروط الخدمة {terms_of_service} الخاصة بمنصّة "
-"{platform_name}. "
+msgstr "يجب الموافقة على {terms_of_service} الخاصين بمنصّة {platform_name}. "
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
@@ -9715,6 +9680,10 @@ msgstr "موقع المساق الذي تم تقديمه غير صحيح"
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
 msgstr "هناك فرع ناقص على النسخة الجديدة"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Deleted group"
+msgstr ""
 
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
@@ -10098,6 +10067,11 @@ msgstr "إلغاء"
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "رقم المساق "
+
+#: cms/templates/course_outline.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Start Date:"
+msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -11972,6 +11946,11 @@ msgstr "التسجيل على دفعات"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Email Addresses/Usernames"
+msgstr "عناوين البريد الإلكتروني/أسماء المستخدمين"
+
+#: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter email addresses and/or usernames separated by new lines or commas."
 msgstr ""
@@ -11986,11 +11965,6 @@ msgid ""
 msgstr ""
 "لن تتلقى إشعاراً عن رسائل البريد الإلكتروني التي ترتد ولا يتم استلامها، لذا "
 "يرجى التحقق جيّداً من عدم وجود أخطاء إملائيّة."
-
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses/Usernames"
-msgstr "عناوين البريد الإلكتروني/أسماء المستخدمين"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12039,7 +12013,6 @@ msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
 msgstr "تسجيل"
@@ -12047,6 +12020,10 @@ msgstr "تسجيل"
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "إدارة قوائم الطلاب"
+
+#: lms/templates/ccx/enrollment.html
+msgid "Enter username or email"
+msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -12441,7 +12418,6 @@ msgid "This section is graded."
 msgstr "هذا القسم جرى تقييمه."
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة لاحقًا. "
 
@@ -12482,8 +12458,8 @@ msgid "Enrollment is Closed"
 msgstr "أُغلِق باب التسجيل"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart ({price})"
-msgstr "إضافة {course_name} إلى السلّة ({price})"
+msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course_name}"
@@ -12561,7 +12537,6 @@ msgid "Additional Resources"
 msgstr "مصادر إضافية"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "enroll"
 msgstr "تسجيل"
 
@@ -12967,54 +12942,6 @@ msgstr ""
 msgid "Course errors"
 msgstr "أخطاء المساق "
 
-#: lms/templates/courseware/mktg_coming_soon.html
-msgid "About {course_id}"
-msgstr "لمحة عن {course_id} "
-
-#: lms/templates/courseware/mktg_coming_soon.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Coming Soon"
-msgstr "قريبًا"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "About {course_number}"
-msgstr "لمحة عن {course_number} "
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Access Courseware"
-msgstr "إمكانية الدخول إلى محتويات المساق "
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "You Are Enrolled"
-msgstr "أنت مسجَّل"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enroll in"
-msgstr "سجِّل في"
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. The "choose your student track" means users can select between taking the
-#. course as an auditor, as a verified student, etc
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and choose your student track"
-msgstr "واختر مسارك كطالب في هذا المساق"
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. 'Verification' here refers to verifying one's identity in order to receive
-#. a
-#. verified certificate.
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and proceed to verification"
-msgstr "وتابع لاستكمال عملية التحقّق"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enrollment Is Closed"
-msgstr "أُغلِق باب التسجيل"
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "أخبار- MITx 6.002x "
@@ -13330,6 +13257,10 @@ msgid "Started - {start_date}"
 msgstr "بدأ - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Coming Soon"
+msgstr "قريبًا"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {start_date}"
 msgstr "يبدأ - {start_date}"
 
@@ -13540,8 +13471,8 @@ msgstr "استكمال الحصول على الوحدات الدراسية"
 #. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been processed and approved. <b>Congratulations</b>. Please "
-"see {link_to_provider_site} for more information."
+"Your credit has been processed and approved. <b>Congratulations!</b>. Please"
+" see {link_to_provider_site} for more information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -13736,10 +13667,6 @@ msgstr "حسب أكبر عدد من الأنشطة"
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
 msgstr "حسب أكبر عدد من الأصوات"
-
-#: lms/templates/discussion/_user_profile.html
-msgid ", "
-msgstr ","
 
 #: lms/templates/discussion/_user_profile.html
 #, python-format
@@ -14809,6 +14736,10 @@ msgid "Course Display Name:"
 msgstr "الاسم الظاهر للمساق:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course End Date:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
 msgstr "هل بدأ المساق؟"
 
@@ -14823,6 +14754,10 @@ msgstr "لا"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
 msgstr "هل انتهى المساق؟"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Number of sections:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
@@ -17955,10 +17890,6 @@ msgid "View Live"
 msgstr "المشاهدة عبر بثّ مباشر"
 
 #: cms/templates/course_outline.html
-msgid "Course Start Date:"
-msgstr "تاريخ بداية المساق:"
-
-#: cms/templates/course_outline.html
 msgid "Edit Start Date"
 msgstr "تعديل تاريخ البداية"
 
@@ -20441,6 +20372,21 @@ msgid ""
 msgstr ""
 "لم تعد مجموعة المحتوى موجودة. يُرجى اختيار غيرها أو إتاحة إمكانية الدخول "
 "لجميع الطلّاب وأفراد طاقم المساق."
+
+#: cms/templates/visibility_editor.html
+msgid "Verification Checkpoint"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid "Verification checkpoint to complete"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this component. Learners who do not require verification see "
+"this content by default."
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:52+0000\n"
-"PO-Revision-Date: 2015-08-14 13:52:02.752089\n"
+"POT-Creation-Date: 2015-08-21 14:39+0000\n"
+"PO-Revision-Date: 2015-08-21 14:39:19.680894\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -412,8 +412,12 @@ msgid "Your legal name must be a minimum of two characters long"
 msgstr "غخعق مثلشم رشوث وعسف زث ش وهرهوعو خب فصخ ذاشقشذفثقس مخرل"
 
 #: common/djangoapps/student/forms.py
-msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr "عسثقرشوث ساخعمي خرمغ ذخرسهسف خب ش-ظ شري 0-9, صهفا رخ سحشذثس."
+msgid ""
+"Usernames must contain only letters, numbers, underscores (_), and hyphens "
+"(-)."
+msgstr ""
+"عسثقرشوثس وعسف ذخرفشهر خرمغ مثففثقس, رعوزثقس, عريثقسذخقثس (_), شري اغحاثرس "
+"(-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -2785,8 +2789,8 @@ msgid ""
 "YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
 "ثرفثق فاث بخقوشف بخق يعث يشفثس. فاث يثبشعمف هس وخر يي, غغغغ. ثرفثق "
-"\"%و-%ي-%غ\" بخق وو-يي-غغغغ, \"%ي-%و-%غ\" بخق يي-وو-غغغغ, \"%غ-%و-%ي\" بخق "
-"غغغغ-وو-يي, خق \"%غ-%ي-%و\" بخق غغغغ-يي-وو."
+"\"%و-%d-%غ\" بخق وو-يي-غغغغ, \"%d-%و-%غ\" بخق يي-وو-غغغغ, \"%غ-%و-%d\" بخق "
+"غغغغ-وو-يي, خق \"%غ-%d-%و\" بخق غغغغ-يي-وو."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "External Login Domain"
@@ -5422,31 +5426,6 @@ msgstr "{currency_symbol}{price}"
 msgid "Free"
 msgstr "بقثث"
 
-#. Translators: The join of three or more institution names (e.g., Harvard,
-#. MIT, and Dartmouth).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institutions}, and {last_institution}"
-msgstr "{first_institutions}, شري {last_institution}"
-
-#. Translators: The join of two institution names (e.g., Harvard and MIT).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institution} and {second_institution}"
-msgstr "{first_institution} شري {second_institution}"
-
-#: lms/djangoapps/courseware/views.py
-msgid ""
-"I would like to receive email from {institution_series} and learn about its "
-"other programs."
-msgid_plural ""
-"I would like to receive email from {institution_series} and learn about "
-"their other programs."
-msgstr[0] ""
-"ه صخعمي مهنث فخ قثذثهدث ثوشهم بقخو {institution_series} شري مثشقر شزخعف هفس "
-"خفاثق حقخلقشوس."
-msgstr[1] ""
-"ه صخعمي مهنث فخ قثذثهدث ثوشهم بقخو {institution_series} شري مثشقر شزخعف "
-"فاثهق خفاثق حقخلقشوس."
-
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
 msgstr "هردشمهي مخذشفهخر."
@@ -6206,12 +6185,12 @@ msgstr "سعذذثسسبعممغ قثسثف يعث يشفث بخق سفعيثر�
 #: lms/djangoapps/instructor/views/api.py
 #, python-format
 msgid "This student (%s) will skip the entrance exam."
-msgstr "فاهس سفعيثرف (%س) صهمم سنهح فاث ثرفقشرذث ثطشو."
+msgstr "فاهس سفعيثرف (%s) صهمم سنهح فاث ثرفقشرذث ثطشو."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-format
 msgid "This student (%s) is already allowed to skip the entrance exam."
-msgstr "فاهس سفعيثرف (%س) هس شمقثشيغ شممخصثي فخ سنهح فاث ثرفقشرذث ثطشو."
+msgstr "فاهس سفعيثرف (%s) هس شمقثشيغ شممخصثي فخ سنهح فاث ثرفقشرذث ثطشو."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -8270,10 +8249,6 @@ msgstr "فاث سعححمهثي فخحهذ هي {topic_id} هس رخف دشمه�
 msgid "text_search is not yet supported."
 msgstr "فثطف_سثشقذا هس رخف غثف سعححخقفثي."
 
-#: lms/djangoapps/teams/views.py
-msgid "last_activity is not yet supported"
-msgstr "مشسف_شذفهدهفغ هس رخف غثف سعححخقفثي"
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -8287,6 +8262,10 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "فاث سعححمهثي ذخعقسث_هي {course_id} هس رخف دشمهي."
 
 #: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this course."
+msgstr "غخع شقث شمقثشيغ هر ش فثشو هر فاهس ذخعقسث."
+
+#: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
 msgstr "عسثقرشوث خق فثشو_هي وعسف زث سحثذهبهثي."
 
@@ -8297,6 +8276,10 @@ msgstr "عسثقرشوث هس قثضعهقثي."
 #: lms/djangoapps/teams/views.py
 msgid "Team id is required."
 msgstr "فثشو هي هس قثضعهقثي."
+
+#: lms/djangoapps/teams/views.py
+msgid "This team is already full."
+msgstr "فاهس فثشو هس شمقثشيغ بعمم."
 
 #: lms/djangoapps/teams/views.py
 msgid "The user {username} is already a member of a team in this course."
@@ -9578,6 +9561,10 @@ msgstr "زشي ذخعقسث مخذشفهخر حقخدهيثي"
 msgid "Missing branch on fresh clone"
 msgstr "وهسسهرل زقشرذا خر بقثسا ذمخرث"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Deleted group"
+msgstr "يثمثفثي لقخعح"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -9964,6 +9951,11 @@ msgstr "ذشرذثم"
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "ذخعقسث رعوزثق"
+
+#: cms/templates/course_outline.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Start Date:"
+msgstr "ذخعقسث سفشقف يشفث:"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -10989,7 +10981,7 @@ msgstr ""
 #: lms/templates/provider_login.html
 #, python-format
 msgid "Return To %s"
-msgstr "قثفعقر فخ %س"
+msgstr "قثفعقر فخ %s"
 
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
@@ -11826,6 +11818,11 @@ msgstr "زشفذا ثرقخمموثرف"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Email Addresses/Usernames"
+msgstr "ثوشهم شييقثسسثس/عسثقرشوثس"
+
+#: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter email addresses and/or usernames separated by new lines or commas."
 msgstr ""
@@ -11839,11 +11836,6 @@ msgid ""
 msgstr ""
 "غخع صهمم رخف لثف رخفهبهذشفهخر بخق ثوشهمس فاشف زخعرذث, سخ حمثشسث يخعزمث-ذاثذن"
 " سحثممهرل."
-
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses/Usernames"
-msgstr "ثوشهم شييقثسسثس/عسثقرشوثس"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11891,7 +11883,6 @@ msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
 msgstr "ثرقخمم"
@@ -11899,6 +11890,10 @@ msgstr "ثرقخمم"
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "سفعيثرف مهسف وشرشلثوثرف"
+
+#: lms/templates/ccx/enrollment.html
+msgid "Enter username or email"
+msgstr "ثرفثق عسثقرشوث خق ثوشهم"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -12293,7 +12288,6 @@ msgid "This section is graded."
 msgstr "فاهس سثذفهخر هس لقشيثي."
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
 
@@ -12334,8 +12328,8 @@ msgid "Enrollment is Closed"
 msgstr "ثرقخمموثرف هس ذمخسثي"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart ({price})"
-msgstr "شيي {course_name} فخ ذشقف ({price})"
+msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgstr "شيي {course_name} فخ ذشقف <span>({price} عسي)</span>"
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course_name}"
@@ -12413,7 +12407,6 @@ msgid "Additional Resources"
 msgstr "شييهفهخرشم قثسخعقذثس"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "enroll"
 msgstr "ثرقخمم"
 
@@ -12825,54 +12818,6 @@ msgstr ""
 msgid "Course errors"
 msgstr "ذخعقسث ثققخقس"
 
-#: lms/templates/courseware/mktg_coming_soon.html
-msgid "About {course_id}"
-msgstr "شزخعف {course_id}"
-
-#: lms/templates/courseware/mktg_coming_soon.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Coming Soon"
-msgstr "ذخوهرل سخخر"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "About {course_number}"
-msgstr "شزخعف {course_number}"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Access Courseware"
-msgstr "شذذثسس ذخعقسثصشقث"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "You Are Enrolled"
-msgstr "غخع شقث ثرقخممثي"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enroll in"
-msgstr "ثرقخمم هر"
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. The "choose your student track" means users can select between taking the
-#. course as an auditor, as a verified student, etc
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and choose your student track"
-msgstr "شري ذاخخسث غخعق سفعيثرف فقشذن"
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. 'Verification' here refers to verifying one's identity in order to receive
-#. a
-#. verified certificate.
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and proceed to verification"
-msgstr "شري حقخذثثي فخ دثقهبهذشفهخر"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enrollment Is Closed"
-msgstr "ثرقخمموثرف هس ذمخسثي"
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "رثصس - وهفط 6.002ط"
@@ -13200,6 +13145,10 @@ msgid "Started - {start_date}"
 msgstr "سفشقفثي - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Coming Soon"
+msgstr "ذخوهرل سخخر"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {start_date}"
 msgstr "سفشقفس - {start_date}"
 
@@ -13410,11 +13359,11 @@ msgstr "بهرشمهظث ذقثيهف"
 #. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been processed and approved. <b>Congratulations</b>. Please "
-"see {link_to_provider_site} for more information."
+"Your credit has been processed and approved. <b>Congratulations!</b>. Please"
+" see {link_to_provider_site} for more information."
 msgstr ""
-"غخعق ذقثيهف اشس زثثر حقخذثسسثي شري شححقخدثي. <b>ذخرلقشفعمشفهخرس</b>. حمثشسث "
-"سثث {link_to_provider_site} بخق وخقث هربخقوشفهخر."
+"غخعق ذقثيهف اشس زثثر حقخذثسسثي شري شححقخدثي. <b>ذخرلقشفعمشفهخرس!</b>. حمثشسث"
+" سثث {link_to_provider_site} بخق وخقث هربخقوشفهخر."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Access credit"
@@ -13614,22 +13563,18 @@ msgid "by most votes"
 msgstr "زغ وخسف دخفثس"
 
 #: lms/templates/discussion/_user_profile.html
-msgid ", "
-msgstr ", "
-
-#: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "%س يهسذعسسهخر سفشقفثي"
-msgstr[1] "%س يهسذعسسهخرس سفشقفثي"
+msgstr[0] "%s يهسذعسسهخر سفشقفثي"
+msgstr[1] "%s يهسذعسسهخرس سفشقفثي"
 
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%س ذخووثرف"
-msgstr[1] "%س ذخووثرفس"
+msgstr[0] "%s ذخووثرف"
+msgstr[1] "%s ذخووثرفس"
 
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
@@ -14680,6 +14625,10 @@ msgid "Course Display Name:"
 msgstr "ذخعقسث يهسحمشغ رشوث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course End Date:"
+msgstr "ذخعقسث ثري يشفث:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
 msgstr "اشس فاث ذخعقسث سفشقفثي?"
 
@@ -14694,6 +14643,10 @@ msgstr "رخ"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
 msgstr "اشس فاث ذخعقسث ثريثي?"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Number of sections:"
+msgstr "رعوزثق خب سثذفهخرس:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
@@ -17843,10 +17796,6 @@ msgid "View Live"
 msgstr "دهثص مهدث"
 
 #: cms/templates/course_outline.html
-msgid "Course Start Date:"
-msgstr "ذخعقسث سفشقف يشفث:"
-
-#: cms/templates/course_outline.html
 msgid "Edit Start Date"
 msgstr "ثيهف سفشقف يشفث"
 
@@ -19864,7 +19813,7 @@ msgstr "غخعق ذخعقسث سعووشقغ حشلث"
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
 msgstr ""
-"هرفقخيعذفهخرس, حقثقثضعهسهفثس, بشضس فاشف شقث عسثي خر %س (بخقوشففثي هر افوم)"
+"هرفقخيعذفهخرس, حقثقثضعهسهفثس, بشضس فاشف شقث عسثي خر %s (بخقوشففثي هر افوم)"
 
 #: cms/templates/settings.html
 msgid "Course Image"
@@ -20354,6 +20303,24 @@ msgstr ""
 "ذخرفثرف لقخعح رخ مخرلثق ثطهسفس. حمثشسث ذاخخسث شرخفاثق خق شممخص شذذثسس فخ شمم"
 " سفعيثرفس شري سفشبب"
 
+#: cms/templates/visibility_editor.html
+msgid "Verification Checkpoint"
+msgstr "دثقهبهذشفهخر ذاثذنحخهرف"
+
+#: cms/templates/visibility_editor.html
+msgid "Verification checkpoint to complete"
+msgstr "دثقهبهذشفهخر ذاثذنحخهرف فخ ذخوحمثفث"
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this component. Learners who do not require verification see "
+"this content by default."
+msgstr ""
+"مثشقرثقس صاخ قثضعهقث دثقهبهذشفهخر وعسف حشسس فاث سثمثذفثي ذاثذنحخهرف فخ سثث "
+"فاث ذخرفثرف هر فاهس ذخوحخرثرف. مثشقرثقس صاخ يخ رخف قثضعهقث دثقهبهذشفهخر سثث "
+"فاهس ذخرفثرف زغ يثبشعمف."
+
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for {studio_name}! To activate your account, please"
@@ -20651,12 +20618,12 @@ msgstr "ش سمعل وشغ رخف زثلهر صهفا شر عريثقسذخقث.
 #: wiki/forms.py
 #, python-format
 msgid "A deleted article with slug \"%s\" already exists."
-msgstr "ش يثمثفثي شقفهذمث صهفا سمعل \"%س\" شمقثشيغ ثطهسفس."
+msgstr "ش يثمثفثي شقفهذمث صهفا سمعل \"%s\" شمقثشيغ ثطهسفس."
 
 #: wiki/forms.py
 #, python-format
 msgid "A slug named \"%s\" already exists."
-msgstr "ش سمعل رشوثي \"%س\" شمقثشيغ ثطهسفس."
+msgstr "ش سمعل رشوثي \"%s\" شمقثشيغ ثطهسفس."
 
 #: wiki/forms.py
 msgid "Yes, I am sure"
@@ -20918,7 +20885,7 @@ msgstr "ش رخر-قخخف رخفث وعسف شمصشغس اشدث ش سمعل."
 #: wiki/models/urlpath.py
 #, python-format
 msgid "There is already a root node on %s"
-msgstr "فاثقث هس شمقثشيغ ش قخخف رخيث خر %س"
+msgstr "فاثقث هس شمقثشيغ ش قخخف رخيث خر %s"
 
 #: wiki/models/urlpath.py
 msgid ""
@@ -20983,12 +20950,12 @@ msgstr "شففشذاوثرف قثدهسهخرس"
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "%s was successfully added."
-msgstr "%س صشس سعذذثسسبعممغ شييثي."
+msgstr "%s صشس سعذذثسسبعممغ شييثي."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Your file could not be saved: %s"
-msgstr "غخعق بهمث ذخعمي رخف زث سشدثي: %س"
+msgstr "غخعق بهمث ذخعمي رخف زث سشدثي: %s"
 
 #: wiki/plugins/attachments/views.py
 msgid ""
@@ -21001,7 +20968,7 @@ msgstr ""
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "%s uploaded and replaces old attachment."
-msgstr "%س عحمخشيثي شري قثحمشذثس خمي شففشذاوثرف."
+msgstr "%s عحمخشيثي شري قثحمشذثس خمي شففشذاوثرف."
 
 #: wiki/plugins/attachments/views.py
 msgid ""
@@ -21014,7 +20981,7 @@ msgstr ""
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Current revision changed for %s."
-msgstr "ذعققثرف قثدهسهخر ذاشرلثي بخق %س."
+msgstr "ذعققثرف قثدهسهخر ذاشرلثي بخق %s."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
@@ -21024,22 +20991,22 @@ msgstr "شييثي ش قثبثقثرذث فخ \"%(att)s\" بقخو \"%(art)s\"."
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "The file %s was deleted."
-msgstr "فاث بهمث %س صشس يثمثفثي."
+msgstr "فاث بهمث %s صشس يثمثفثي."
 
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "This article is no longer related to the file %s."
-msgstr "فاهس شقفهذمث هس رخ مخرلثق قثمشفثي فخ فاث بهمث %س."
+msgstr "فاهس شقفهذمث هس رخ مخرلثق قثمشفثي فخ فاث بهمث %s."
 
 #: wiki/plugins/attachments/wiki_plugin.py
 #, python-format
 msgid "A file was changed: %s"
-msgstr "ش بهمث صشس ذاشرلثي: %س"
+msgstr "ش بهمث صشس ذاشرلثي: %s"
 
 #: wiki/plugins/attachments/wiki_plugin.py
 #, python-format
 msgid "A file was deleted: %s"
-msgstr "ش بهمث صشس يثمثفثي: %س"
+msgstr "ش بهمث صشس يثمثفثي: %s"
 
 #: wiki/plugins/images/forms.py
 #, python-format
@@ -21047,7 +21014,7 @@ msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
 msgstr ""
-"رثص هوشلث %س صشس سعذذثسسبعممغ عحمخشيثي. غخع ذشر عسث هف زغ سثمثذفهرل هف بقخو "
+"رثص هوشلث %s صشس سعذذثسسبعممغ عحمخشيثي. غخع ذشر عسث هف زغ سثمثذفهرل هف بقخو "
 "فاث مهسف خب شدشهمشزمث هوشلثس."
 
 #: wiki/plugins/images/forms.py
@@ -21065,7 +21032,7 @@ msgstr "هوشلثس"
 #: wiki/plugins/images/models.py
 #, python-format
 msgid "Image: %s"
-msgstr "هوشلث: %س"
+msgstr "هوشلث: %s"
 
 #: wiki/plugins/images/models.py
 msgid "Current revision not set!!"
@@ -21082,17 +21049,17 @@ msgstr "هوشلث قثدهسهخرس"
 #: wiki/plugins/images/models.py
 #, python-format
 msgid "Image Revsion: %d"
-msgstr "هوشلث قثدسهخر: %ي"
+msgstr "هوشلث قثدسهخر: %d"
 
 #: wiki/plugins/images/views.py
 #, python-format
 msgid "%s has been restored"
-msgstr "%س اشس زثثر قثسفخقثي"
+msgstr "%s اشس زثثر قثسفخقثي"
 
 #: wiki/plugins/images/views.py
 #, python-format
 msgid "%s has been marked as deleted"
-msgstr "%س اشس زثثر وشقنثي شس يثمثفثي"
+msgstr "%s اشس زثثر وشقنثي شس يثمثفثي"
 
 #: wiki/plugins/images/views.py
 #, python-format
@@ -21111,7 +21078,7 @@ msgstr "هوشلثس"
 #: wiki/plugins/images/wiki_plugin.py
 #, python-format
 msgid "An image was added: %s"
-msgstr "شر هوشلث صشس شييثي: %س"
+msgstr "شر هوشلث صشس شييثي: %s"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
@@ -21145,17 +21112,17 @@ msgstr "%(user)s سعزسذقهزهرل فخ %(article)s (%(type)s)"
 #: wiki/plugins/notifications/models.py
 #, python-format
 msgid "Article deleted: %s"
-msgstr "شقفهذمث يثمثفثي: %س"
+msgstr "شقفهذمث يثمثفثي: %s"
 
 #: wiki/plugins/notifications/models.py
 #, python-format
 msgid "Article modified: %s"
-msgstr "شقفهذمث وخيهبهثي: %س"
+msgstr "شقفهذمث وخيهبهثي: %s"
 
 #: wiki/plugins/notifications/models.py
 #, python-format
 msgid "New article created: %s"
-msgstr "رثص شقفهذمث ذقثشفثي: %س"
+msgstr "رثص شقفهذمث ذقثشفثي: %s"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
@@ -21172,12 +21139,12 @@ msgstr "غخع شقث رخص مخللثي هر! اشدث بعر!"
 #: wiki/views/article.py
 #, python-format
 msgid "New article '%s' created."
-msgstr "رثص شقفهذمث '%س' ذقثشفثي."
+msgstr "رثص شقفهذمث '%s' ذقثشفثي."
 
 #: wiki/views/article.py
 #, python-format
 msgid "There was an error creating this article: %s"
-msgstr "فاثقث صشس شر ثققخق ذقثشفهرل فاهس شقفهذمث: %س"
+msgstr "فاثقث صشس شر ثققخق ذقثشفهرل فاهس شقفهذمث: %s"
 
 #: wiki/views/article.py
 msgid "There was an error creating this article."
@@ -21201,7 +21168,7 @@ msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
 msgstr ""
-"فاث شقفهذمث \"%س\" هس رخص وشقنثي شس يثمثفثي! فاشرنس بخق نثثحهرل فاث سهفث "
+"فاث شقفهذمث \"%s\" هس رخص وشقنثي شس يثمثفثي! فاشرنس بخق نثثحهرل فاث سهفث "
 "بقثث بقخو عرصشرفثي وشفثقهشم!"
 
 #: wiki/views/article.py
@@ -21219,12 +21186,12 @@ msgstr "قثسفخقهرل شقفهذمث"
 #: wiki/views/article.py
 #, python-format
 msgid "The article \"%s\" and its children are now restored."
-msgstr "فاث شقفهذمث \"%س\" شري هفس ذاهميقثر شقث رخص قثسفخقثي."
+msgstr "فاث شقفهذمث \"%s\" شري هفس ذاهميقثر شقث رخص قثسفخقثي."
 
 #: wiki/views/article.py
 #, python-format
 msgid "The article %s is now set to display revision #%d"
-msgstr "فاث شقفهذمث %س هس رخص سثف فخ يهسحمشغ قثدهسهخر #%ي"
+msgstr "فاث شقفهذمث %s هس رخص سثف فخ يهسحمشغ قثدهسهخر #%d"
 
 #: wiki/views/article.py
 msgid "New title"
