@@ -120,6 +120,27 @@ def _is_user_author_or_privileged(cc_content, context):
     )
 
 
+def _update_vote_count(voted, serializer):
+    """
+    Updates the vote_count in the given serializer
+
+    If the user has already voted and `voted == True` do nothing,
+    else +1 to the vote count.
+    If the user has not voted and `voted == False` do nothing,
+    else -1 to the vote count.
+
+    Arguments:
+
+        voted (Bool): Boolean of the new vote status
+        serializer (ThreadSerializer/CommentSerializer): Serializer to update
+    """
+    if voted and not serializer.data["voted"]:
+        serializer.data["vote_count"] += 1
+    elif not voted and serializer.data["voted"]:
+        serializer.data["vote_count"] -= 1
+    return serializer
+
+
 def get_thread_list_url(request, course_key, topic_id_list=None, following=False):
     """
     Returns the URL for the thread_list_url field, given a list of topic_ids
@@ -642,8 +663,12 @@ def update_thread(request, thread_id, update_data):
     _check_editable_fields(cc_thread, update_data, context)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
-    if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+    if not actions_form.is_valid():
+        raise ValidationError(dict(actions_form.errors.items()))
+    if "voted" in update_data:
+        serializer = _update_vote_count(actions_form.cleaned_data["voted"], serializer)
+    if not serializer.is_valid():
+        raise ValidationError(dict(serializer.errors.items()))
     # Only save thread object if some of the edited fields are in the thread data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
@@ -686,8 +711,12 @@ def update_comment(request, comment_id, update_data):
     _check_editable_fields(cc_comment, update_data, context)
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
     actions_form = CommentActionsForm(update_data)
-    if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+    if not actions_form.is_valid():
+        raise ValidationError(dict(actions_form.errors.items()))
+    if "voted" in update_data:
+        serializer = _update_vote_count(actions_form.cleaned_data["voted"], serializer)
+    if not serializer.is_valid():
+        raise ValidationError(dict(serializer.errors.items()))
     # Only save comment object if some of the edited fields are in the comment data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()

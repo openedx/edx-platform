@@ -2088,45 +2088,46 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, old_voted, new_voted):
+    def test_voted(self, current_vote_status, new_vote_status):
         """
         Test attempts to edit the "voted" field.
 
-        old_voted indicates whether the thread should be upvoted at the start of
-        the test. new_voted indicates the value for the "voted" field in the
-        update. If old_voted and new_voted are the same, no update should be
-        made. Otherwise, a vote should be PUT or DELETEd according to the
-        new_voted value.
+        current_vote_status indicates whether the thread should be upvoted at
+        the start of the test. new_vote_status indicates the value for the
+        "voted" field in the update. If current_vote_status and new_vote_status
+        are the same, no update should be made. Otherwise, a vote should be PUT
+        or DELETEd according to the new_vote_status value.
         """
-        if old_voted:
+        vote_count = 0
+        if current_vote_status:
             self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            vote_count = 1
         self.register_thread_votes_response("test_thread")
-        self.register_thread()
-        data = {"voted": new_voted}
-        if old_voted == new_voted:
-            result = update_thread(self.request, "test_thread", data)
+        self.register_thread(overrides={"votes": {"up_count": vote_count}})
+        data = {"voted": new_vote_status}
+        result = update_thread(self.request, "test_thread", data)
+        if new_vote_status:
+            self.assertEqual(result["vote_count"], 1)
         else:
-            # Vote signals should only be sent if the number of votes has changed
-            with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
-                result = update_thread(self.request, "test_thread", data)
-        self.assertEqual(result["voted"], new_voted)
+            self.assertEqual(result["vote_count"], 0)
+        self.assertEqual(result["voted"], new_vote_status)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/threads/test_thread/votes"
-        if old_voted == new_voted:
+        if current_vote_status == new_vote_status:
             self.assertNotEqual(last_request_path, votes_url)
         else:
             self.assertEqual(last_request_path, votes_url)
             self.assertEqual(
                 httpretty.last_request().method,
-                "PUT" if new_voted else "DELETE"
+                "PUT" if new_vote_status else "DELETE"
             )
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_voted else
+                httpretty.last_request().parsed_body if new_vote_status else
                 parse_qs(urlparse(httpretty.last_request().path).query)
             )
             actual_request_data.pop("request_id", None)
             expected_request_data = {"user_id": [str(self.user.id)]}
-            if new_voted:
+            if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
 
@@ -2414,45 +2415,46 @@ class UpdateCommentTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, old_voted, new_voted):
+    def test_voted(self, current_vote_status, new_vote_status):
         """
         Test attempts to edit the "voted" field.
 
-        old_voted indicates whether the comment should be upvoted at the start of
-        the test. new_voted indicates the value for the "voted" field in the
-        update. If old_voted and new_voted are the same, no update should be
-        made. Otherwise, a vote should be PUT or DELETEd according to the
-        new_voted value.
+        current_vote_status indicates whether the comment should be upvoted at
+        the start of the test. new_vote_status indicates the value for the
+        "voted" field in the update. If current_vote_status and new_vote_status
+        are the same, no update should be made. Otherwise, a vote should be PUT
+        or DELETEd according to the new_vote_status value.
         """
-        if old_voted:
+        vote_count = 0
+        if current_vote_status:
             self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            vote_count = 1
         self.register_comment_votes_response("test_comment")
-        self.register_comment()
-        data = {"voted": new_voted}
-        if old_voted == new_voted:
-            result = update_comment(self.request, "test_comment", data)
+        self.register_comment(overrides={"votes": {"up_count": vote_count}})
+        data = {"voted": new_vote_status}
+        result = update_comment(self.request, "test_comment", data)
+        if new_vote_status:
+            self.assertEqual(result["vote_count"], 1)
         else:
-            # Vote signals should only be sent if the number of votes has changed
-            with self.assert_signal_sent(api, 'comment_voted', sender=None, user=self.user, exclude_args=('post',)):
-                result = update_comment(self.request, "test_comment", data)
-        self.assertEqual(result["voted"], new_voted)
+            self.assertEqual(result["vote_count"], 0)
+        self.assertEqual(result["voted"], new_vote_status)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/comments/test_comment/votes"
-        if old_voted == new_voted:
+        if current_vote_status == new_vote_status:
             self.assertNotEqual(last_request_path, votes_url)
         else:
             self.assertEqual(last_request_path, votes_url)
             self.assertEqual(
                 httpretty.last_request().method,
-                "PUT" if new_voted else "DELETE"
+                "PUT" if new_vote_status else "DELETE"
             )
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_voted else
+                httpretty.last_request().parsed_body if new_vote_status else
                 parse_qs(urlparse(httpretty.last_request().path).query)
             )
             actual_request_data.pop("request_id", None)
             expected_request_data = {"user_id": [str(self.user.id)]}
-            if new_voted:
+            if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
 
