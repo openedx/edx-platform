@@ -30,7 +30,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @attr('shard_1')
@@ -296,40 +296,40 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 
 
 @attr('shard_1')
-class TestInstructorEnrollmentStudentModule(ModuleStoreTestCase):
+class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
-    def setUp(self):
-        super(TestInstructorEnrollmentStudentModule, self).setUp()
-        store = modulestore()
-        self.user = UserFactory()
-        self.course = CourseFactory(
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorEnrollmentStudentModule, cls).setUpClass()
+        cls.course = CourseFactory(
             name='fake',
             org='course',
             run='id',
         )
         # pylint: disable=no-member
-        self.course_key = self.course.location.course_key
-        self.parent = ItemFactory(
-            category="library_content",
-            user_id=self.user.id,
-            parent=self.course,
-            publish_item=True,
-            modulestore=store,
-        )
-        self.child = ItemFactory(
-            category="html",
-            user_id=self.user.id,
-            parent=self.parent,
-            publish_item=True,
-            modulestore=store,
-        )
-        self.unrelated = ItemFactory(
-            category="html",
-            user_id=self.user.id,
-            parent=self.course,
-            publish_item=True,
-            modulestore=store,
-        )
+        cls.course_key = cls.course.location.course_key
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.parent = ItemFactory(
+                category="library_content",
+                parent=cls.course,
+                publish_item=True,
+            )
+            cls.child = ItemFactory(
+                category="html",
+                parent=cls.parent,
+                publish_item=True,
+            )
+            cls.unrelated = ItemFactory(
+                category="html",
+                parent=cls.course,
+                publish_item=True,
+            )
+
+    def setUp(self):
+        super(TestInstructorEnrollmentStudentModule, self).setUp()
+
+        self.user = UserFactory()
+
         parent_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
         child_state = json.dumps({'attempts': 10, 'whatever': 'things'})
         unrelated_state = json.dumps({'attempts': 12, 'brains': 'zombie'})
@@ -567,26 +567,27 @@ class TestSendBetaRoleEmail(TestCase):
 
 
 @attr('shard_1')
-class TestGetEmailParams(ModuleStoreTestCase):
+class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
     production-like conditions.
     """
-    def setUp(self):
-        super(TestGetEmailParams, self).setUp()
-
-        self.course = CourseFactory.create()
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetEmailParams, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
         # Explicitly construct what we expect the course URLs to be
         site = settings.SITE_NAME
-        self.course_url = u'https://{}/courses/{}/'.format(
+        cls.course_url = u'https://{}/courses/{}/'.format(
             site,
-            self.course.id.to_deprecated_string()
+            cls.course.id.to_deprecated_string()
         )
-        self.course_about_url = self.course_url + 'about'
-        self.registration_url = u'https://{}/register'.format(
-            site,
-        )
+        cls.course_about_url = cls.course_url + 'about'
+        cls.registration_url = u'https://{}/register'.format(site)
+
+    def setUp(self):
+        super(TestGetEmailParams, self).setUp()
 
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
@@ -612,16 +613,19 @@ class TestGetEmailParams(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TestRenderMessageToString(ModuleStoreTestCase):
+class TestRenderMessageToString(SharedModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestRenderMessageToString, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.subject_template = 'emails/enroll_email_allowedsubject.txt'
+        cls.message_template = 'emails/enroll_email_allowedmessage.txt'
 
     def setUp(self):
         super(TestRenderMessageToString, self).setUp()
-        self.subject_template = 'emails/enroll_email_allowedsubject.txt'
-        self.message_template = 'emails/enroll_email_allowedmessage.txt'
-        self.course = CourseFactory.create()
 
     def get_email_params(self):
         """

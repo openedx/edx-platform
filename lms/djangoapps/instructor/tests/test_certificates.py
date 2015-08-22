@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.conf import settings
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
 from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
@@ -18,19 +18,23 @@ from certificates import api as certs_api
 
 @attr('shard_1')
 @ddt.ddt
-class CertificatesInstructorDashTest(ModuleStoreTestCase):
+class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
 
     ERROR_REASON = "An error occurred!"
     DOWNLOAD_URL = "http://www.example.com/abcd123/cert.pdf"
 
+    @classmethod
+    def setUpClass(cls):
+        super(CertificatesInstructorDashTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.url = reverse(
+            'instructor_dashboard',
+            kwargs={'course_id': unicode(cls.course.id)}
+        )
+
     def setUp(self):
         super(CertificatesInstructorDashTest, self).setUp()
-        self.course = CourseFactory.create()
-        self.url = reverse(
-            'instructor_dashboard',
-            kwargs={'course_id': unicode(self.course.id)}
-        )
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
 
@@ -189,12 +193,15 @@ class CertificatesInstructorDashTest(ModuleStoreTestCase):
 @attr('shard_1')
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
-class CertificatesInstructorApiTest(ModuleStoreTestCase):
+class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
     """Tests for the certificates end-points in the instructor dash API. """
+    @classmethod
+    def setUpClass(cls):
+        super(CertificatesInstructorApiTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(CertificatesInstructorApiTest, self).setUp()
-        self.course = CourseFactory.create()
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
 

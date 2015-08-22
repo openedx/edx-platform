@@ -14,7 +14,7 @@ from nose.plugins.attrib import attr
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from student.tests.factories import UserFactory  # pylint: disable=import-error
 from xmodule.fields import Date
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.keys import CourseKey
 
@@ -102,23 +102,17 @@ class TestParseDatetime(unittest.TestCase):
 
 
 @attr('shard_1')
-class TestFindUnit(ModuleStoreTestCase):
+class TestFindUnit(SharedModuleStoreTestCase):
     """
     Test the find_unit function.
     """
-
-    def setUp(self):
-        """
-        Fixtures.
-        """
-        super(TestFindUnit, self).setUp()
-
-        course = CourseFactory.create()
-        week1 = ItemFactory.create(parent=course)
-        homework = ItemFactory.create(parent=week1)
-
-        self.course = course
-        self.homework = homework
+    @classmethod
+    def setUpClass(cls):
+        super(TestFindUnit, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            week1 = ItemFactory.create(parent=cls.course)
+            cls.homework = ItemFactory.create(parent=week1)
 
     def test_find_unit_success(self):
         """
