@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class CreditService(object):
 
         return is_credit_course(course_key)
 
-    def get_credit_state(self, user_id, course_key_or_id):
+    def get_credit_state(self, user_id, course_key_or_id, return_course_name=False):
         """
         Return all information about the user's credit state inside of a given
         course.
@@ -64,6 +65,7 @@ class CreditService(object):
                 'profile_fullname': the name that the student registered under, used for verification
                 'is_credit_course': if the course has been marked as a credit bearing course
                 'credit_requirement_status': the user's status in fulfilling those requirements
+                'course_name': optional display name of the course
             }
         """
 
@@ -89,12 +91,19 @@ class CreditService(object):
             # not enrolled
             return None
 
-        return {
+        result = {
             'enrollment_mode': enrollment.mode,
             'profile_fullname': user.profile.name,
             'is_credit_course': is_credit_course(course_key),
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
+
+        if return_course_name:
+            course = modulestore().get_course(course_key, depth=0)
+            result.update({
+                'course_name': course.display_name,
+            })
+        return result
 
     def set_credit_requirement_status(self, user_id, course_key_or_id, req_namespace,
                                       req_name, status="satisfied", reason=None):

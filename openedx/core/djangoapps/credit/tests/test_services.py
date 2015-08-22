@@ -121,6 +121,22 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
         self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')
 
+    def test_course_name(self):
+        """
+        Make sure we can get back the optional course name
+        """
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        # make sure it is not returned by default
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertNotIn('course_name', credit_state)
+
+        # now make sure it is in there when we pass in the flag
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_name=True)
+        self.assertIn('course_name', credit_state)
+        self.assertEqual(credit_state['course_name'], self.course.display_name)
+
     def test_set_status_non_credit(self):
         """
         assert that we can still try to update a credit status but return quickly if
