@@ -2,6 +2,7 @@
 // ====================
 
 // Table of Contents
+// * +Paths
 // * +Grid
 // * +Fonts
 // * +Colors - Utility
@@ -11,10 +12,13 @@
 // * +Timing
 // * +Archetype UI
 // * +Specific UI
-// * +Paths
 // * +Deprecated
 
 $baseline: 20px;
+
+// +Paths
+// ====================
+$static-path: '..' !default;
 
 // +Grid
 // ====================
@@ -213,10 +217,6 @@ $ui-link-color-focus: $blue-s1;
 // ====================
 $ui-notification-height: ($baseline*10);
 $ui-update-color: $blue-l4;
-
-// +Paths
-// ====================
-$static-path: '..' !default;
 
 // +Deprecated
 // ====================
