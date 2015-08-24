@@ -13,10 +13,6 @@ var edx = edx || {},
             },
 
             openAccordion: function() {
-                $('#open_close_accordion a').click();
-                $('.course-wrapper').removeClass('closed');
-                $('#accordion').show();
-
                 navigation.checkForCurrent();
                 navigation.listenForClick();
             },
