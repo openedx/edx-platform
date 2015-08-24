@@ -29,7 +29,7 @@
       % for keyword in keywords_supported:
         <tr>
           <td><input type="text" value="${keyword['name']}" readonly="readonly" /></td>
-          <td>${_(keyword['desc'])}</td>
+          <td>${keyword['desc']}</td>
         </tr>
       % endfor
     </table>

@@ -28,6 +28,7 @@ Usage:
 from collections import namedtuple
 
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 from student.models import anonymous_id_for_user
 
 Keyword = namedtuple('Keyword', 'func desc')
@@ -36,27 +37,27 @@ Keyword = namedtuple('Keyword', 'func desc')
 KEYWORD_FUNCTION_MAP = {
     '%%USER_ID%%': Keyword(
         lambda context: anonymous_id_from_user_id(context.get('user_id')),
-        'anonymous_user_id (for use in survey links)'
+        _('anonymous_user_id (for use in survey links)')
     ),
     '%%USER_FULLNAME%%': Keyword(
         lambda context: context.get('name'),
-        'user profile name'
+        _('user profile name')
     ),
     '%%COURSE_DISPLAY_NAME%%': Keyword(
         lambda context: context.get('course_title'),
-        'display name of the course'
+        _('display name of the course')
     ),
     '%%COURSE_ID%%': Keyword(
         lambda context: unicode(context.get('course_id')),
-        'course identifier'
+        _('course identifier')
     ),
     '%%COURSE_START_DATE%%': Keyword(
         lambda context: context.get('course_start_date'),
-        'start date of the course'
+        _('start date of the course')
     ),
     '%%COURSE_END_DATE%%': Keyword(
         lambda context: context.get('course_end_date'),
-        'end date of the course'
+        _('end date of the course')
     ),
 }
 
