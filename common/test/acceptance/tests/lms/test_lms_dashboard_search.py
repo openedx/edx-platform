@@ -80,7 +80,7 @@ class DashboardSearchTest(WebAppTest):
             course_fix.add_children(
                 XBlockFixtureDesc('chapter', 'Section 1').add_children(
                     XBlockFixtureDesc('sequential', 'Subsection 1').add_children(
-                        XBlockFixtureDesc('problem', 'dashboard search')
+                        XBlockFixtureDesc('problem', 'Test Problem')
                     )
                 )
             ).add_children(
