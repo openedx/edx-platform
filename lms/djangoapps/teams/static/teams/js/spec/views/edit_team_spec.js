@@ -38,7 +38,7 @@ define([
 
                 var message = teamEditView.$('.wrapper-msg');
                 expect(message.hasClass('is-hidden')).toBeFalsy();
-                var actionMessage = teamAction === 'create' ? 'Your team could not be created!' : 'Your team could not be updated!';
+                var actionMessage = teamAction === 'create' ? 'Your team could not be created.' : 'Your team could not be updated.';
                 expect(message.find('.title').text().trim()).toBe(actionMessage);
                 expect(message.find('.copy').text().trim()).toBe(
                     "Check the highlighted fields below and try again."

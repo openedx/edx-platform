@@ -4,9 +4,9 @@
         <div class="msg-content">
             <h3 class="title">
                 <% if (isNew) { %>
-                    <%- gettext("Your team could not be created!") %>
+                    <%- gettext("Your team could not be created.") %>
                 <% } else { %>
-                    <%- gettext("Your team could not be updated!") %>
+                    <%- gettext("Your team could not be updated.") %>
                 <% } %>
             </h3>
             <span class="screen-reader-message sr"></span>

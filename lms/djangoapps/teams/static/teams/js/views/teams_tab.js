@@ -231,7 +231,7 @@
                             self.mainView = new ViewWithHeader({
                                 header: new HeaderView({
                                     model: new TeamsHeaderModel({
-                                        description: gettext("You can edit the details of a team here, and should separately let your team members know about changes."),
+                                        description: gettext("If you edit any team details, you should notify team members of your changes."),
                                         title: gettext("Edit Team"),
                                         breadcrumbs: [
                                             {
