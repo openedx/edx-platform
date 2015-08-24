@@ -633,6 +633,10 @@ class TestTOC(ModuleStoreTestCase):
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
             self.setup_modulestore(default_ms, setup_finds, setup_sends)
+
+            from nose.tools import set_trace;
+            set_trace();
+
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
                             'format': u'Lecture Sequence', 'due': None, 'active': False},
