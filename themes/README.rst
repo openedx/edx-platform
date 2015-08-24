@@ -38,7 +38,7 @@ edx-platform.  Here's a sample::
 The top directory is named whatever you like.  This example uses "my-theme".
 The files provided here override the files in edx-platform.  In this case, the
 ``my-theme/lms/static/sass/lms-main.scss`` file is used in place of the
-``edx-platform/lms/static/lms-main.scss`` file.
+``edx-platform/lms/static/sass/lms-main.scss`` file.
 
 
 Images
@@ -66,9 +66,9 @@ The variables that can currently be overridden are defined in
 
 **Note:** We are currently in the middle of a re-engineering of the Sass
 variables.  They will change in the future.  If you are interested, you can see
-the new development in the `edX Pattern Library`__.
+the new development in the `edX Pattern Library`_.
 
-.. __: http://ux.edx.org/
+.. _edX Pattern Library: http://ux.edx.org/
 
 Then create ``lms/static/sass/lms-main.scss`` to use those overrides, and also
 the rest of the definitions from the original file::
@@ -94,18 +94,28 @@ copied template in your theme also.
 Installing your theme
 ---------------------
 
-To use your theme, follow these steps:
+To use your theme, you need to add a configuration value pointing to your theme
+directory. There are two ways to do this.
 
-#. Edit /edx/app/edx_ansible/server-vars.yml to add the edxapp_comp_theme_dir
-   value::
+#.  If you usually edit server-vars.yml:
 
-        edxapp_comp_theme_dir: '/full/path/to/my-theme'
+    #.  As the vagrant user, edit (or create)
+        /edx/app/edx_ansible/server-vars.yml to add the
+        ``edxapp_comp_theme_dir`` value::
 
-#. Re-run the provisioning script::
+            edxapp_comp_theme_dir: '/full/path/to/my-theme'
 
-        $ sudo /edx/bin/update edx-platform HEAD
+    #.  Run the update script::
 
-Your changes should now be visible on your site.
+            $ sudo /edx/bin/update configuration master
+            $ sudo /edx/bin/update edx-platform HEAD
+
+#.  Otherwise, edit the /edx/app/edxapp/lms.env.json file to add the
+    ``COMP_THEME_DIR`` value::
+
+        "COMP_THEME_DIR": "/full/path/to/my-theme",
+
+Restart your site.  Your changes should now be visible.
 
 
 "Stanford" theming
