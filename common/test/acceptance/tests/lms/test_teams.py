@@ -805,21 +805,24 @@ class CreateAndEditTeamTest(TeamsTabBase):
         And the number of teams should be updated on the topic card
         And if I switch to "My Team", the newly created team is displayed
         """
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.browse_teams_page.visit()
+        self.browse_teams_page.wait_for_page()
+
         self.verify_and_navigate_to_create_team_page()
 
         self.fill_create_or_edit_form()
         self.create_or_edit_team_page.submit_form()
 
         # Verify that the page is shown for the new team
-        team_page = TeamPage(self.browser, self.course_id)
-        team_page.wait_for_page()
-        self.assertEqual(team_page.team_name, self.team_name)
-        self.assertEqual(team_page.team_description, 'The Avengers are a fictional team of superheroes.')
-        self.assertEqual(team_page.team_user_membership_text, 'You are a member of this team.')
+        self.team_page.wait_for_page()
+        self.assertEqual(self.team_page.team_name, self.team_name)
+        self.assertEqual(self.team_page.team_description, 'The Avengers are a fictional team of superheroes.')
+        self.assertEqual(self.team_page.team_user_membership_text, 'You are a member of this team.')
 
         # Verify the new team was added to the topic list
         self.teams_page.click_specific_topic("Example Topic")
-        self.teams_page.verify_topic_team_count(1)
+        self.teams_page.verify_topic_team_count(2)
 
         self.teams_page.click_all_topics()
         self.teams_page.verify_team_count_in_first_topic(1)
