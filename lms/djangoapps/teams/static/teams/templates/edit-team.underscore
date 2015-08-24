@@ -30,7 +30,7 @@
                 <p>
                     <%=
                         interpolate_text(
-                            _.escape(gettext("The team that you are editing has {total_members} members. Communicate important changes to students prior to updating the team when possible.")),
+                            _.escape(gettext("The team that you are editing has {total_members} members. Notify team members prior to making significant changes.")),
                             {
                                 'total_members': totalMembers
                             }

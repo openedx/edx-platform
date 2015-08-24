@@ -20,7 +20,7 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
+from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateOrEditTeamPage, TeamPage
 
 
 TOPICS_PER_PAGE = 12
@@ -629,47 +629,101 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
 
 
 @attr('shard_5')
-class CreateTeamTest(TeamsTabBase):
+@ddt.ddt
+class CreateAndEditTeamTest(TeamsTabBase):
     """
     Tests for creating a new Team within a Topic on the Teams page.
     """
 
     def setUp(self):
-        super(CreateTeamTest, self).setUp()
+        super(CreateAndEditTeamTest, self).setUp()
         self.topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
-        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.browse_teams_page.visit()
-        self.create_team_page = CreateTeamPage(self.browser, self.course_id, self.topic)
+        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
         self.team_name = 'Avengers'
 
-    def verify_page_header(self):
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+
+    def verify_page_header(self, title, description, breadcrumbs):
         """
         Verify that the page header correctly reflects the
         create team header, description and breadcrumb.
         """
-        self.assertEqual(self.create_team_page.header_page_name, 'Create a New Team')
-        self.assertEqual(
-            self.create_team_page.header_page_description,
-            'Create a new team if you can\'t find existing teams to join, '
-            'or if you would like to learn with friends you know.'
-        )
-        self.assertEqual(self.create_team_page.header_page_breadcrumbs, self.topic['name'])
+        self.assertEqual(self.create_or_edit_team_page.header_page_name, title)
+        self.assertEqual(self.create_or_edit_team_page.header_page_description, description)
+        self.assertEqual(self.create_or_edit_team_page.header_page_breadcrumbs, breadcrumbs)
 
     def verify_and_navigate_to_create_team_page(self):
         """Navigates to the create team page and verifies."""
         self.browse_teams_page.click_create_team_link()
-        self.verify_page_header()
+        self.verify_page_header(
+            title='Create a New Team',
+            description='Create a new team if you can\'t find existing teams to '
+                        'join, or if you would like to learn with friends you know.',
+            breadcrumbs=self.topic['name']
+        )
 
-    def fill_create_form(self):
-        """Fill the create team form fields with appropriate values."""
-        self.create_team_page.value_for_text_field(field_id='name', value=self.team_name, press_enter=False)
-        self.create_team_page.value_for_textarea_field(
+    def verify_and_navigate_to_edit_team_page(self):
+        """Navigates to the edit team page and verifies."""
+        self.assertEqual(self.team_page.team_name, self.team['name'])
+        self.assertTrue(self.team_page.edit_team_button_present)
+
+        self.team_page.click_edit_team_button()
+
+        self.create_or_edit_team_page.wait_for_page()
+
+        # Edit page header.
+        self.verify_page_header(
+            title='Edit Team',
+            description='If you edit any team details, you should notify team members of your changes.',
+            breadcrumbs=self.topic['name']
+        )
+
+    def verify_form_values_on_team_page(self, name, description, location, language):
+        """Verify the values for create/edit form."""
+        self.assertEqual(self.team_page.team_name, name)
+        self.assertEqual(self.team_page.team_description, description)
+        self.assertEqual(self.team_page.team_location, location)
+        self.assertEqual(self.team_page.team_language, language)
+
+    def fill_create_or_edit_form(self):
+        """Fill the create/edit team form fields with appropriate values."""
+        self.create_or_edit_team_page.value_for_text_field(field_id='name', value=self.team_name, press_enter=False)
+        self.create_or_edit_team_page.value_for_textarea_field(
             field_id='description',
             value='The Avengers are a fictional team of superheroes.'
         )
-        self.create_team_page.value_for_dropdown_field(field_id='language', value='English')
-        self.create_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+        self.create_or_edit_team_page.value_for_dropdown_field(field_id='language', value='English')
+        self.create_or_edit_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
+
+    def verify_create_or_edit_page(self):
+        """
+        Verify the fields for create/edit page.
+        """
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_field('name'),
+            'A name that identifies your team (maximum 255 characters).'
+        )
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_textarea_field('description'),
+            'A short description of the team to help other learners understand '
+            'the goals or direction of the team (maximum 300 characters).'
+        )
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_field('country'),
+            'The country that team members primarily identify with.'
+        )
+        self.assertEqual(
+            self.create_or_edit_team_page.message_for_field('language'),
+            'The language that team members primarily use to communicate with each other.'
+        )
 
     def test_user_can_see_create_team_page(self):
         """
@@ -683,23 +737,7 @@ class CreateTeamTest(TeamsTabBase):
         And I should also see the help messages for fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.assertEqual(
-            self.create_team_page.message_for_field('name'),
-            'A name that identifies your team (maximum 255 characters).'
-        )
-        self.assertEqual(
-            self.create_team_page.message_for_textarea_field('description'),
-            'A short description of the team to help other learners understand '
-            'the goals or direction of the team (maximum 300 characters).'
-        )
-        self.assertEqual(
-            self.create_team_page.message_for_field('country'),
-            'The country that team members primarily identify with.'
-        )
-        self.assertEqual(
-            self.create_team_page.message_for_field('language'),
-            'The language that team members primarily use to communicate with each other.'
-        )
+        self.verify_create_or_edit_page()
 
     def test_user_can_see_error_message_for_missing_data(self):
         """
@@ -711,14 +749,14 @@ class CreateTeamTest(TeamsTabBase):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.create_team_page.submit_form()
+        self.create_or_edit_team_page.submit_form()
 
         self.assertEqual(
-            self.create_team_page.validation_message_text,
+            self.create_or_edit_team_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
-        self.assertTrue(self.create_team_page.error_for_field(field_id='description'))
+        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='description'))
 
     def test_user_can_see_error_message_for_incorrect_data(self):
         """
@@ -733,7 +771,7 @@ class CreateTeamTest(TeamsTabBase):
         self.verify_and_navigate_to_create_team_page()
 
         # Fill the name field with >255 characters to see validation message.
-        self.create_team_page.value_for_text_field(
+        self.create_or_edit_team_page.value_for_text_field(
             field_id='name',
             value='EdX is a massive open online course (MOOC) provider and online learning platform. '
                   'It hosts online university-level courses in a wide range of disciplines to a worldwide '
@@ -745,13 +783,13 @@ class CreateTeamTest(TeamsTabBase):
                   'edX has more than 4 million users taking more than 500 courses online.',
             press_enter=False
         )
-        self.create_team_page.submit_form()
+        self.create_or_edit_team_page.submit_form()
 
         self.assertEqual(
-            self.create_team_page.validation_message_text,
+            self.create_or_edit_team_page.validation_message_text,
             'Check the highlighted fields below and try again.'
         )
-        self.assertTrue(self.create_team_page.error_for_field(field_id='name'))
+        self.assertTrue(self.create_or_edit_team_page.error_for_field(field_id='name'))
 
     def test_user_can_create_new_team_successfully(self):
         """
@@ -769,8 +807,8 @@ class CreateTeamTest(TeamsTabBase):
         """
         self.verify_and_navigate_to_create_team_page()
 
-        self.fill_create_form()
-        self.create_team_page.submit_form()
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.submit_form()
 
         # Verify that the page is shown for the new team
         team_page = TeamPage(self.browser, self.course_id)
@@ -802,7 +840,7 @@ class CreateTeamTest(TeamsTabBase):
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
 
         self.verify_and_navigate_to_create_team_page()
-        self.create_team_page.cancel_team()
+        self.create_or_edit_team_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
         self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
@@ -811,6 +849,133 @@ class CreateTeamTest(TeamsTabBase):
         self.teams_page.verify_team_count_in_first_topic(0)
 
         self.verify_my_team_count(0)
+
+    def test_staff_can_navigate_to_edit_team_page(self):
+        """
+        Scenario: The user should be able to see and navigate to the edit team page.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the edit team page
+        And I should see the edit team header
+        And I should also see the help messages for fields
+        And I should also see the warning message.
+        """
+        self.team_page.visit()
+        self.team_page.wait_for_page()
+
+        self.verify_and_navigate_to_edit_team_page()
+        self.verify_create_or_edit_page()
+        self.assertEqual(
+            self.create_or_edit_team_page.warning_message_text,
+            'The team that you are editing has 0 members. '
+            'Notify team members prior to making significant changes.'
+        )
+
+    def test_staff_can_edit_team_successfully(self):
+        """
+        Scenario: The staff should be able to edit team successfully.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the edit team page
+        When I edit all the fields with appropriate data
+        And I click Update button
+        Then I should see the page for my team with updated data
+        """
+        self.team_page.visit()
+        self.team_page.wait_for_page()
+
+        self.verify_form_values_on_team_page(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+        self.verify_and_navigate_to_edit_team_page()
+
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.submit_form()
+
+        self.team_page.wait_for_page()
+
+        self.verify_form_values_on_team_page(
+            name=self.team_name,
+            description='The Avengers are a fictional team of superheroes.',
+            location='Pakistan',
+            language='English'
+        )
+
+    def test_staff_can_cancel_the_team_edit(self):
+        """
+        Scenario: The user should be able to cancel the editing of team.
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the edit team page
+        Then I should see the Edit Team header
+        When I click Cancel button
+        Then I should see team page page without changes.
+        """
+        self.team_page.visit()
+        self.team_page.wait_for_page()
+
+        self.verify_form_values_on_team_page(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+
+        self.verify_and_navigate_to_edit_team_page()
+
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.cancel_team()
+
+        self.team_page.wait_for_page()
+
+        self.verify_form_values_on_team_page(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+
+    def test_student_cannot_see_edit_button(self):
+        """
+        Scenario: The student should not see the edit team button.
+        Given I am student for a course with a team
+        When I visit the Team profile page
+        Then I should not see the Edit Team button
+        """
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.team_page.visit()
+        self.teams_page.wait_for_page()
+        self.assertFalse(self.team_page.edit_team_button_present)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator')
+    def test_discussion_privileged_user_can_see_edit_button(self, role):
+        """
+        Scenario: The user with specified role should see the edit team button.
+        Given I am user with role for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        """
+        kwargs = {
+            'course_id': self.course_id,
+            'staff': False
+        }
+        if role is not None:
+            kwargs['roles'] = role
+
+        AutoAuthPage(self.browser, **kwargs).visit()
+
+        self.team_page.visit()
+        self.teams_page.wait_for_page()
+        self.assertTrue(self.team_page.edit_team_button_present)
 
 
 @attr('shard_5')
