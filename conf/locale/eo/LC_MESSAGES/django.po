@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:39+0000\n"
-"PO-Revision-Date: 2015-08-21 14:39:19.680894\n"
+"POT-Creation-Date: 2015-08-24 22:03+0000\n"
+"PO-Revision-Date: 2015-08-24 22:03:48.240461\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -9511,6 +9511,7 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/plugins.py
+#: lms/djangoapps/teams/templates/teams/teams.html
 msgid "Teams"
 msgstr "Téäms Ⱡ'σяєм ιρѕ#"
 
@@ -9525,15 +9526,16 @@ msgid "course_id must be provided"
 msgstr "çöürsé_ïd müst ßé prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/teams/views.py
+msgid "text_search and order_by cannot be provided together"
+msgstr ""
+"téxt_séärçh änd ördér_ßý çännöt ßé prövïdéd tögéthér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/teams/views.py
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
 "Thé süpplïéd töpïç ïd {topic_id} ïs nöt välïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported."
-msgstr ""
-"téxt_séärçh ïs nöt ýét süppörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
@@ -10898,6 +10900,18 @@ msgstr ""
 "Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
+#: openedx/core/lib/api/paginators.py
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+"Pägé ïs nöt 'läst', nör çän ït ßé çönvértéd tö än ïnt. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/lib/api/paginators.py
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+"Ìnvälïd pägé (%(page_number)s): %(message)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "Thïs välüé ïs ïnvälïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
@@ -11577,6 +11591,10 @@ msgstr "Hélp Ⱡ'σяєм ι#"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "{programming_language} editor"
+msgstr "{programming_language} édïtör Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -19852,73 +19870,83 @@ msgid "This module is not enabled."
 msgstr "Thïs mödülé ïs nöt énäßléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/certificates.html
-msgid ""
-"Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. If you are a course team member with the "
-"Admin role in Studio, you can configure your course certificate."
-msgstr ""
-"Ûpön süççéssfül çömplétïön öf ýöür çöürsé, léärnérs réçéïvé ä çértïfïçäté tö"
-" äçknöwlédgé théïr äççömplïshmént. Ìf ýöü äré ä çöürsé téäm mémßér wïth thé "
-"Àdmïn rölé ïn Stüdïö, ýöü çän çönfïgüré ýöür çöürsé çértïfïçäté. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυ#"
+msgid "Working with Certificates"
+msgstr "Wörkïng wïth Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}Add your first certificate{em_end} to add a certificate "
-"configuration. Upload the organization logo to be used on the certificate, "
-"and specify at least one signatory. You can include up to four signatories "
-"for a certificate. You can also upload a signature image file for each "
-"signatory. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates. Optionally, specify a different course title to use "
-"on your course certificate. You might want to use a different title if, for "
-"example, the official course name is too long to display well on a "
-"certificate."
+"Specify a course title to use on the certificate if the course's official "
+"title is too long to be displayed well."
 msgstr ""
-"Çlïçk {em_start}Àdd ýöür fïrst çértïfïçäté{em_end} tö ädd ä çértïfïçäté "
-"çönfïgürätïön. Ûplöäd thé örgänïzätïön lögö tö ßé üséd ön thé çértïfïçäté, "
-"änd spéçïfý ät léäst öné sïgnätörý. Ýöü çän ïnçlüdé üp tö föür sïgnätörïés "
-"för ä çértïfïçäté. Ýöü çän älsö üplöäd ä sïgnätüré ïmägé fïlé för éäçh "
-"sïgnätörý. {em_start}Nöté:{em_end} Sïgnätüré ïmägés äré üséd önlý för "
-"vérïfïéd çértïfïçätés. Öptïönällý, spéçïfý ä dïfférént çöürsé tïtlé tö üsé "
-"ön ýöür çöürsé çértïfïçäté. Ýöü mïght wänt tö üsé ä dïfférént tïtlé ïf, för "
-"éxämplé, thé öffïçïäl çöürsé nämé ïs töö löng tö dïspläý wéll ön ä "
-"çértïfïçäté.#"
+"Spéçïfý ä çöürsé tïtlé tö üsé ön thé çértïfïçäté ïf thé çöürsé's öffïçïäl "
+"tïtlé ïs töö löng tö ßé dïspläýéd wéll. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/certificates.html
 msgid ""
-"Select a course mode and click {em_start}Preview Certificate{em_end} to "
-"preview the certificate that a learner in the selected enrollment track "
-"would receive. When the certificate is ready for issuing, click "
-"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
-"{em_start}Deactivate{em_end}."
+"For verified certificates, specify between one and four signatories and "
+"upload the associated images."
 msgstr ""
-"Séléçt ä çöürsé mödé änd çlïçk {em_start}Prévïéw Çértïfïçäté{em_end} tö "
-"prévïéw thé çértïfïçäté thät ä léärnér ïn thé séléçtéd énröllmént träçk "
-"wöüld réçéïvé. Whén thé çértïfïçäté ïs réädý för ïssüïng, çlïçk "
-"{em_start}Àçtïväté.{em_end} Tö stöp ïssüïng än äçtïvé çértïfïçäté, çlïçk "
-"{em_start}Déäçtïväté{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕ#"
+"För vérïfïéd çértïfïçätés, spéçïfý ßétwéén öné änd föür sïgnätörïés änd "
+"üplöäd thé ässöçïätéd ïmägés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/certificates.html
 msgid ""
-" To edit the certificate configuration, hover over the top right corner of "
-"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
-"over the top right corner of the form and click the delete icon. In general,"
-" do not delete certificates after a course has started, because some "
-"certificates might already have been issued to learners."
+"To edit or delete a certificate before it is activated, hover over the top "
+"right corner of the form and select {em_start}Edit{em_end} or the delete "
+"icon."
 msgstr ""
-" Tö édït thé çértïfïçäté çönfïgürätïön, hövér övér thé töp rïght çörnér öf "
-"thé förm änd çlïçk {em_start}Édït{em_end}. Tö délété ä çértïfïçäté, hövér "
-"övér thé töp rïght çörnér öf thé förm änd çlïçk thé délété ïçön. Ìn généräl,"
-" dö nöt délété çértïfïçätés äftér ä çöürsé häs stärtéd, ßéçäüsé sömé "
-"çértïfïçätés mïght älréädý hävé ßéén ïssüéd tö léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι#"
+"Tö édït ör délété ä çértïfïçäté ßéföré ït ïs äçtïvätéd, hövér övér thé töp "
+"rïght çörnér öf thé förm änd séléçt {em_start}Édït{em_end} ör thé délété "
+"ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
+"єѕт #"
+
+#: cms/templates/certificates.html
+msgid ""
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
+msgstr ""
+"Tö vïéw ä sämplé çértïfïçäté, çhöösé ä çöürsé mödé änd séléçt "
+"{em_start}Prévïéw Çértïfïçäté{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/templates/certificates.html
+msgid "Issuing Certificates to Learners"
+msgstr ""
+"Ìssüïng Çértïfïçätés tö Léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/certificates.html
+msgid ""
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Course team members without the Admin "
+"role cannot edit or delete an activated certificate."
+msgstr ""
+"Tö ßégïn ïssüïng çértïfïçätés, ä çöürsé téäm mémßér wïth thé Àdmïn rölé "
+"séléçts {em_start}Àçtïväté{em_end}. Çöürsé téäm mémßérs wïthöüt thé Àdmïn "
+"rölé çännöt édït ör délété än äçtïvätéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂є#"
+
+#: cms/templates/certificates.html
+msgid ""
+"{em_start}Do not{em_end} delete certificates after a course has started; "
+"learners who have already earned certificates will no longer be able to "
+"access them."
+msgstr ""
+"{em_start}Dö nöt{em_end} délété çértïfïçätés äftér ä çöürsé häs stärtéd; "
+"léärnérs whö hävé älréädý éärnéd çértïfïçätés wïll nö löngér ßé äßlé tö "
+"äççéss thém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"
