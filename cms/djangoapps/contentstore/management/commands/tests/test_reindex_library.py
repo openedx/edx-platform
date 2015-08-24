@@ -1,6 +1,4 @@
 """ Tests for library reindex command """
-import sys
-import contextlib
 import ddt
 from django.core.management import call_command, CommandError
 import mock
@@ -8,33 +6,13 @@ import mock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from common.test.utils import nostderr
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 
 from opaque_keys import InvalidKeyError
 
 from contentstore.management.commands.reindex_library import Command as ReindexCommand
 from contentstore.courseware_index import SearchIndexingError
-
-
-@contextlib.contextmanager
-def nostderr():
-    """
-    ContextManager to suppress stderr messages
-    http://stackoverflow.com/a/1810086/882918
-    """
-    savestderr = sys.stderr
-
-    class Devnull(object):
-        """ /dev/null incarnation as output-stream-like object """
-        def write(self, _):
-            """ Write method - just does nothing"""
-            pass
-
-    sys.stderr = Devnull()
-    try:
-        yield
-    finally:
-        sys.stderr = savestderr
 
 
 @ddt.ddt

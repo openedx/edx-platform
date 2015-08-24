@@ -17,6 +17,7 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
+from ..search_indexes import CourseTeamIndexer
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
@@ -193,6 +194,9 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             username='student_enrolled_other_course_not_on_team'
         )
 
+        # clear the teams search index before rebuilding teams
+        CourseTeamIndexer.engine().destroy()
+
         # 'solar team' is intentionally lower case to test case insensitivity in name ordering
         self.test_team_1 = CourseTeamFactory.create(
             name=u'sólar team',
@@ -207,6 +211,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             name='Public Profile Team',
             course_id=self.test_course_2.id,
             topic_id='topic_6'
+        )
+        self.test_team_7 = CourseTeamFactory.create(
+            name='Search',
+            description='queryable text',
+            country='GS',
+            language='to',
+            course_id=self.test_course_2.id,
+            topic_id='topic_7'
         )
 
         self.test_team_name_id_map = {team.name: team for team in (
@@ -418,7 +430,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         self.verify_names(
             {'course_id': self.test_course_2.id},
             200,
-            ['Another Team', 'Public Profile Team'],
+            ['Another Team', 'Public Profile Team', 'Search'],
             user='staff'
         )
 
@@ -427,11 +439,6 @@ class TestListTeamsAPI(TeamAPITestCase):
 
     def test_filter_include_inactive(self):
         self.verify_names({'include_inactive': True}, 200, ['Coal Team', 'Nuclear Team', u'sólar team', 'Wind Team'])
-
-    # Text search is not yet implemented, so this should return HTTP
-    # 400 for now
-    def test_filter_text_search(self):
-        self.verify_names({'text_search': 'foobar'}, 400)
 
     @ddt.data(
         (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
@@ -454,6 +461,10 @@ class TestListTeamsAPI(TeamAPITestCase):
 
         data = {'order_by': field} if field else {}
         self.verify_names(data, status, names)
+
+    def test_order_by_with_text_search(self):
+        data = {'order_by': 'name', 'text_search': 'search'}
+        self.verify_names(data, 400, [])
 
     @ddt.data((404, {'course_id': 'no/such/course'}), (400, {'topic_id': 'no_such_topic'}))
     @ddt.unpack
@@ -486,6 +497,23 @@ class TestListTeamsAPI(TeamAPITestCase):
             user='student_enrolled_public_profile'
         )
         self.verify_expanded_public_user(result['results'][0]['membership'][0]['user'])
+
+    @ddt.data(
+        ('search', ['Search']),
+        ('queryable', ['Search']),
+        ('Tonga', ['Search']),
+        ('Island', ['Search']),
+        ('search queryable', []),
+        ('team', ['Another Team', 'Public Profile Team']),
+    )
+    @ddt.unpack
+    def test_text_search(self, text_search, expected_team_names):
+        self.verify_names(
+            {'course_id': self.test_course_2.id, 'text_search': text_search},
+            200,
+            expected_team_names,
+            user='student_enrolled_public_profile'
+        )
 
 
 @ddt.ddt
