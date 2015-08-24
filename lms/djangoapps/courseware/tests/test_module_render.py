@@ -634,9 +634,6 @@ class TestTOC(ModuleStoreTestCase):
         with self.store.default_store(default_ms):
             self.setup_modulestore(default_ms, setup_finds, setup_sends)
 
-            from nose.tools import set_trace;
-            set_trace();
-
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
                             'format': u'Lecture Sequence', 'due': None, 'active': False},
@@ -646,7 +643,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False},
                            {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
-                          'url_name': 'Overview', 'display_name': u'Overview', 'display_id': u'Overview'},
+                          'url_name': 'Overview', 'display_name': u'Overview', 'display_id': u'overview'},
                          {'active': False, 'sections':
                           [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
@@ -686,7 +683,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False},
                            {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
-                          'url_name': 'Overview', 'display_name': u'Overview', 'display_id': u'Overview'},
+                          'url_name': 'Overview', 'display_name': u'Overview', 'display_id': u'overview'},
                          {'active': False, 'sections':
                           [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
                             'format': '', 'due': None, 'active': False}],
