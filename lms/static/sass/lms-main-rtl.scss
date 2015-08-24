@@ -14,6 +14,8 @@
 @import 'base/variables';
 @import 'base/mixins';
 
+// This comment is used by preprocess_assets.py to include resources from a
+// theme, for old-style deprecated theming.
 //<THEME-OVERRIDE>
 
 @import 'build-lms'; // shared app style assets/rendering

@@ -37,9 +37,9 @@ class Command(BaseCommand):
     def process_one_file(self, source_file, dest_dir, theme_name):
         """Pre-process a .scss file to replace our markers with real code."""
         with open(source_file) as fsource:
-            original_content = content = fsource.read()
+            original_content = fsource.read()
 
-        content = content.replace(
+        content = original_content.replace(
             "//<THEME-OVERRIDE>",
             "@import '{}';".format(theme_name),
         )
