@@ -28,7 +28,8 @@ from django.conf import settings
     </div>
     <div class="problem-timer" data-start="${ start_time }" data-end="${ end_time_to_display }" data-total-seconds-left="${ total_seconds_left }"
         data-seconds-before-warning="${ seconds_before_warning }">
-        ${_("You have")} <span class="minutes-left"></span> ${_("minutes left to complete these questions.")}
+        ${_("You have {minutes_left} minutes left to complete these questions.").format(
+            minutes_left='<span class="minutes-left"></span>')}
     </div>
   % elif exceeded_time_limit:
     <div class="time_limit">

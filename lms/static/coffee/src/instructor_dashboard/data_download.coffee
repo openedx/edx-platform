@@ -270,7 +270,9 @@ class ReportDownloads
       table_row = jQuery(e.target.parentElement.parentElement)
       filename_cell = table_row.find('.course-forums-data')
       file_to_delete = filename_cell.text()
-      if confirm gettext 'Are you sure you want to delete the file ' + file_to_delete + '? This cannot be undone.'
+      delete_text = gettext('Are you sure you want to delete the file <%= file %>? This cannot be undone.')
+      full_delete_text = _.template(delete_text, {file: file_to_delete})
+      if confirm full_delete_text
         @$delete_element = @$section.find '.report-downloads-delete'
         @$delete_endpoint = @$delete_element.data 'endpoint'
         success_cb = =>
@@ -291,12 +293,16 @@ class ReportDownloads
       $sib_row.offset(top: currY - row_height, left: currX)
 
   display_file_delete_success: (file_to_delete) ->
-    @$reports_request_response.text gettext('The file ' + file_to_delete + ' was successfully deleted.')
+    success_text = gettext('The file <%= file %> was successfully deleted.')
+    full_success_text = _.template(success_text, {file: file_to_delete})
+    @$reports_request_response.text full_success_text
     @$reports_request_response.css({'display': 'block'})
     @$reports_request_response_error.css({'display': 'none'})
 
   display_file_delete_failure: (file_to_delete) ->
-    @$reports_request_response_error.text gettext('Error deleting the file ' + file_to_delete + '. Please try again.')
+    failure_text = gettext('Error deleting the file <%= file %>. Please try again.')
+    full_failure_text = _.template(failure_text, {file: file_to_delete})
+    @$reports_request_response_error.text full_failure_text
     @$reports_request_response_error.css({'display': 'block'})
     @$reports_request_response.css({'display': 'none'})
 
