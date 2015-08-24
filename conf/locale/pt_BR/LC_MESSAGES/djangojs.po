@@ -63,6 +63,7 @@
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Allan Melo <allmelo@gmail.com>, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
+# Antonio Henrique Dianin <antoniohdianin@hotmail.com>, 2015
 # brk0_0, 2013
 # Bruno Horphoz <horphoz@gmail.com>, 2014
 # brunojm <brunojm@gmail.com>, 2014
@@ -150,8 +151,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:42+0000\n"
-"PO-Revision-Date: 2015-08-14 13:44+0000\n"
+"POT-Creation-Date: 2015-08-21 14:17+0000\n"
+"PO-Revision-Date: 2015-08-21 02:41+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -2435,7 +2436,7 @@ msgid "Team description cannot have more than 300 characters."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
-msgid "You are not currently a member of any teams."
+msgid "You are not currently a member of any team."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
@@ -7077,6 +7078,25 @@ msgstr ""
 msgid ""
 "Please check the following validation feedbacks and reflect them in your "
 "course settings:"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification Checkpoint"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Must complete verification checkpoint"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification checkpoint to be completed"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this unit. Learners who do not require verification see this "
+"content by default."
 msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore
