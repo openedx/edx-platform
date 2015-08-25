@@ -239,47 +239,22 @@ $sequence--border-color: #C8C8C8;
 
 .sequence-nav-button {
   @extend %ui-depth3;
+  @include transition(all .2s $ease-in-out-quad 0s);
   position: absolute;
   display: block;
   top: 0;
   width: ($baseline*2);
   height: 46px;
-  background-position: center;
-  background-repeat: no-repeat;
-  text-indent: -9999px;
-  overflow: hidden;
-  @include transition(all .2s $ease-in-out-quad 0s);
+  padding: 0;
 
   &.button-previous {
     @include border-radius(35px, 0, 0, 35px);
-    left: 0;
-    background-position: center 15px;
-
-    // CASE: left to right layout
-    @include ltr {
-      background-image: url('../images/sequence-nav/previous-icon.png');
-    }
-
-    // CASE: right to left layout
-    @include rtl {
-      background-image: url('../images/sequence-nav/next-icon.png');
-    }
+    @include left(0);
   }
 
   &.button-next {
     @include border-radius(0, 35px, 35px, 0);
-    right: 0;
-    background-position: center 15px;
-
-    // CASE: left to right layout
-    @include ltr {
-      background-image: url('../images/sequence-nav/next-icon.png');
-    }
-
-    // CASE: right to left layout
-    @include rtl {
-      background-image: url('../images/sequence-nav/previous-icon.png');
-    }
+    @include right(0);
   }
 
   &:hover,

@@ -209,7 +209,7 @@ class ContainerPage(PageObject):
 
     def preview(self):
         """
-        Clicks "Preview Changes", which will open the draft version of the unit page in the LMS.
+        Clicks "Preview", which will open the draft version of the unit page in the LMS.
 
         Switches the browser to the newly opened LMS window.
         """

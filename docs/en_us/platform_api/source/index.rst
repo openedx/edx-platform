@@ -24,6 +24,7 @@ Supported APIs
 
     enrollment/index
     mobile/index
+    user/index
 
 ******************
 Experimental APIs
@@ -33,5 +34,3 @@ Experimental APIs
     :maxdepth: 2
     
     course_structure/index
-    user/index
-

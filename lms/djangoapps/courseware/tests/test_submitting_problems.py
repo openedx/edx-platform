@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from mock import patch
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
@@ -293,6 +294,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return [s.earned for s in hw_section['scores']]
 
 
+@attr('shard_1')
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
@@ -593,6 +595,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
 
 
+@attr('shard_1')
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
 
@@ -645,6 +648,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
+@attr('shard_1')
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -893,6 +897,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self._check_ireset(name)
 
 
+@attr('shard_1')
 class TestAnswerDistributions(TestSubmittingProblems):
     """Check that we can pull answer distributions for problems."""
 
@@ -1048,6 +1053,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
             )
 
 
+@attr('shard_1')
 class TestConditionalContent(TestSubmittingProblems):
     """
     Check that conditional content works correctly with grading.

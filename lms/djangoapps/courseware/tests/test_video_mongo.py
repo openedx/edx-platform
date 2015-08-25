@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 from lxml import etree
 from mock import patch, MagicMock, Mock
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.test import TestCase
@@ -23,6 +24,7 @@ from .test_video_xml import SOURCE_XML
 from .test_video_handlers import TestVideo
 
 
+@attr('shard_1')
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -74,6 +76,7 @@ class TestVideoYouTube(TestVideo):
         )
 
 
+@attr('shard_1')
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -142,6 +145,7 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
+@attr('shard_1')
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
     Make sure that `get_html` works correctly.
@@ -766,6 +770,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
 
+@attr('shard_1')
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
     Make sure that module initialization works correctly.
@@ -836,6 +841,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.download_video)
 
 
+@attr('shard_1')
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.

@@ -2,6 +2,7 @@
 import datetime
 import json
 import mock
+from nose.plugins.attrib import attr
 from pytz import UTC
 from django.utils.timezone import UTC as django_utc
 
@@ -14,16 +15,17 @@ from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import ContentGroupTestCase
 import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
+@attr('shard_1')
 class DictionaryTestCase(TestCase):
     def test_extract(self):
         d = {'cats': 'meow', 'dogs': 'woof'}
@@ -48,6 +50,7 @@ class DictionaryTestCase(TestCase):
         self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
+@attr('shard_1')
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """
     Base testcase class for access and roles for the
@@ -90,6 +93,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.assertFalse(ret)
 
 
+@attr('shard_1')
 class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     Base testcase class for courseware context for the
@@ -168,6 +172,7 @@ class CategoryMapTestMixin(object):
         )
 
 
+@attr('shard_1')
 class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     """
     Base testcase class for discussion categories for the
@@ -759,6 +764,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
 
+@attr('shard_1')
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
     """
     Tests `get_discussion_category_map` on discussion modules which are
@@ -932,6 +938,7 @@ class JsonResponseTestCase(TestCase, UnicodeTestMixin):
         self.assertEqual(reparsed, text)
 
 
+@attr('shard_1')
 class RenderMustacheTests(TestCase):
     """
     Test the `render_mustache` utility function.

@@ -208,7 +208,8 @@ class XQueueCertInterface(object):
             status.unavailable,
             status.deleted,
             status.error,
-            status.notpassing
+            status.notpassing,
+            status.downloadable
         ]
 
         if keep_current:
@@ -270,6 +271,7 @@ class XQueueCertInterface(object):
             cert.grade = grade['percent']
             cert.course_id = course_id
             cert.name = profile_name
+            cert.download_url = ''
             # Strip HTML from grade range label
             grade_contents = grade.get('grade', None)
             try:

@@ -1,6 +1,6 @@
 ;(function (define, undefined) {
 'use strict';
-define(['backbone'], function (Backbone) {
+define(['underscore', 'backbone'], function (_, Backbone) {
     var TabModel = Backbone.Model.extend({
         defaults: {
             'identifier': '',

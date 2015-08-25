@@ -58,6 +58,34 @@ define([
         return (timeToExpiry > 0) ? timeToExpiry : 0;
     };
 
+
+    Annotator.Plugin.Tags.prototype.updateField = _.compose(
+        function() {
+            // Add screen reader label for edit mode. Note that the id of the tags element will not always be "1".
+            // It depends on the number of annotatable components on the page.
+            var tagsField = $("li.annotator-item >input", this.annotator.editor.element).attr('id');
+            if ($("label.sr[for='"+ tagsField + "']", this.annotator.editor.element).length === 0) {
+                $('<label class="sr" for='+ tagsField +'>' + _t('Tags (space-separated)') + '</label>').insertBefore(
+                    $('#'+tagsField, this.annotator.editor.element)
+                );
+            }
+            return this;
+        },
+        Annotator.Plugin.Tags.prototype.updateField
+    );
+
+    Annotator.Plugin.Tags.prototype.updateViewer = _.compose(
+        function() {
+            // Add ARIA information for viewing mode.
+            $('div.annotator-tags', this.wrapper).attr({
+                'role': 'region',
+                'aria-label': 'tags'
+            });
+            return this;
+        },
+        Annotator.Plugin.Tags.prototype.updateViewer
+    );
+
     /**
      * Modifies Annotator.highlightRange to add "tabindex=0" and role="link"
      * attributes to the <span class="annotator-hl"> markup that encloses the
@@ -186,25 +214,24 @@ define([
         '</div>'
     ].join('');
 
-    /**
-     * Modifies Annotator._setupEditor to add a label for textarea#annotator-field-0.
-     **/
-    Annotator.prototype._setupEditor = _.compose(
-        function () {
-            $('<label class="sr" for="annotator-field-0">Edit note</label>').insertBefore(
-                $('#annotator-field-0', this.wrapper)
-            );
-            return this;
-        },
-        Annotator.prototype._setupEditor
-    );
 
     /**
      * Modifies Annotator.Editor.show, in the case of a keydown event, to remove
      * focus from Save button and put it on form.annotator-widget instead.
+     *
+     * Also add a sr label for note textarea.
      **/
     Annotator.Editor.prototype.show = _.compose(
         function (event) {
+            // Add screen reader label for the note area. Note that the id of the tags element will not always be "0".
+            // It depends on the number of annotatable components on the page.
+            var noteField = $("li.annotator-item >textarea", this.element).attr('id');
+            if ($("label.sr[for='"+ noteField + "']", this.element).length === 0) {
+                $('<label class="sr" for='+ noteField +'>' + _t('Note') + '</label>').insertBefore(
+                    $('#'+noteField, this.element)
+                );
+            }
+
             if (event.type === 'keydown') {
                 this.element.find('.annotator-save').removeClass(this.classes.focus);
                 this.element.find('form.annotator-widget').focus();

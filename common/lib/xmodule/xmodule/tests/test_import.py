@@ -281,7 +281,13 @@ class ImportTestCase(BaseCourseTestCase):
             due=from_date_string, org=ORG, course=COURSE, url_name=url_name, unicorn_color=unicorn_color
         )
         descriptor = system.process_xml(start_xml)
+
+        # pylint: disable=protected-access
+        original_unwrapped = descriptor._unwrapped_field_data
         LibraryXMLModuleStore.patch_descriptor_kvs(descriptor)
+        # '_unwrapped_field_data' is reset in `patch_descriptor_kvs`
+        # pylint: disable=protected-access
+        self.assertIsNot(original_unwrapped, descriptor._unwrapped_field_data)
         compute_inherited_metadata(descriptor)
         # Check the course module, since it has inheritance
         descriptor = descriptor.get_children()[0]

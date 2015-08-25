@@ -9,8 +9,6 @@
 
   {% compressed_css 'style-vendor' %}
   {% compressed_css 'style-app' %}
-  {% compressed_css 'style-app-extend1' %}
-  {% compressed_css 'style-app-extend2' %}
   {% compressed_css 'style-course-vendor' %}
   {% compressed_css 'style-course' %}
 
@@ -24,10 +22,6 @@
   {% render_block "css" %}
 
   {% microsite_css_overrides_file %}
-
-  <!--[if lt IE 9]>
-  <script src="{% static 'js/html5shiv.js' %}"></script>
-  <![endif]-->
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>

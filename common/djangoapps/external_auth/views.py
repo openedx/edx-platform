@@ -170,10 +170,13 @@ def _external_login_or_signup(request,
                 else:
                     # otherwise, there must have been an error, b/c we've already linked a user with these external
                     # creds
-                    failure_msg = _(dedent("""
-                        You have already created an account using an external login like WebAuth or Shibboleth.
-                        Please contact %s for support """
-                                           % settings.TECH_SUPPORT_EMAIL))
+                    failure_msg = _(
+                        "You have already created an account using "
+                        "an external login like WebAuth or Shibboleth. "
+                        "Please contact {tech_support_email} for support."
+                    ).format(
+                        tech_support_email=settings.TECH_SUPPORT_EMAIL,
+                    )
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info(u'SHIB: No user for %s yet, doing signup', eamap.external_email)

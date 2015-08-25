@@ -4,8 +4,6 @@ Utilities for django models.
 from eventtracking import tracker
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields.related import RelatedField
 
 from django_countries.fields import Country
 

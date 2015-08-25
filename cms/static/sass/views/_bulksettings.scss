@@ -40,36 +40,33 @@
             float: left;
         }
     }
-    
-    
-    .subsection-header {
-        background-color: #eee;
-
-        td > strong {
-            padding-left: 30px;
-        }
-    }
-    
-    .subsection-settings {
-        padding-right: 10px; 
-    }
-    
-    .unit-header {
-        td > strong {
-        padding-left: 50px;
-        }
-    }
-    .problem-header {
-        td > strong {
-            padding-left: 70px;
-        }
-    }
 
     .course-utility .settings-table {
         width: 100%;
 
         tr td {
             padding: 5px;
+        }
+
+        .subsection-header {
+            background-color: #eee;
+
+            .subsection-header-cell {
+                padding-left: 30px;
+            }
+        }
+        .subsection-settings {
+            padding-right: 10px;
+        }
+        .unit-header {
+            .unit-title {
+                padding-left: 50px;
+            }
+        }
+        .problem-header {
+            .problem-title {
+                padding-left: 70px;
+            }
         }
     }
 

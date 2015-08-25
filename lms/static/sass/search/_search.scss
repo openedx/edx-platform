@@ -1,0 +1,177 @@
+.search-bar {
+
+  @include box-sizing(border-box);
+  position: relative;
+  padding: ($baseline/4);
+
+  .search-field-wrapper {
+    position: relative;
+  }
+
+  .search-field {
+    @extend %t-weight2;
+    @include box-sizing(border-box);
+    top: 5px;
+    width: 100%;
+    border-radius: 4px;
+    background: $white-t1;
+    &.is-active {
+      background: $white;
+    }
+  }
+
+  .search-button, .cancel-button,
+  .search-button:hover, .cancel-button:hover {
+    @extend %t-icon6;
+    @extend %t-regular;
+    @include box-sizing(border-box);
+    @include right(12px);
+    display: block;
+    position: absolute;
+    top: 0;
+    border: none;
+    background: transparent;
+    padding: 0;
+    height: 35px;
+    color: $gray-l1;
+    box-shadow: none;
+    line-height: 35px;
+    text-shadow: none;
+    text-transform: none;
+  }
+
+  .cancel-button {
+    display: none;
+  }
+
+}
+
+.search-results {
+
+  display: none;
+
+  .search-info {
+    border-bottom: 4px solid $border-color-l4;
+    padding-bottom: $baseline;
+    .search-count {
+      @include float(right);
+      color: $gray-l1;
+    }
+  }
+
+  .search-result-list {
+    margin: 0;
+    padding: 0;
+  }
+
+  .search-results-item {
+    @include padding-right(140px);
+    position: relative;
+    border-bottom: 1px solid $gray-l4;
+    padding: $baseline ($baseline/2);
+    list-style-type: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $gray-l6;
+    }
+
+    .result-excerpt {
+      margin-bottom: $baseline;
+    }
+    .result-type {
+      @include right($baseline/2);
+      position: absolute;
+      bottom: $baseline;
+      font-size: 14px;
+      color: $gray-l1;
+    }
+    .result-course-name {
+      @include margin-right(1em);
+      font-size: 14px;
+      color: $gray-l1;
+    }
+    .result-location {
+      font-size: 14px;
+      color: $gray-l1;
+    }
+    .result-link {
+      @include right($baseline/2);
+      position: absolute;
+      top: $baseline;
+      line-height: 1.6em;
+      text-transform: uppercase;
+    }
+    .search-results-ellipsis {
+      @extend %t-copy-sub2;
+      color: $gray;
+
+      &:after {
+        content: '\2026';
+      }
+    }
+  }
+
+  .search-load-next {
+    display: block;
+    border: 2px solid $link-color;
+    padding: 1rem;
+    border-radius: 3px;
+    color: $base-font-color;
+    text-transform: uppercase;
+  }
+
+}
+
+
+.courseware-search-bar {
+  box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
+}
+
+
+.dashboard-search-bar  {
+  @include float(right);
+  @include margin-left(flex-gutter());
+  margin-bottom: $baseline;
+  padding: 0;
+  width: flex-grid(3);
+  label {
+    @extend %t-regular;
+    font-family: $sans-serif;
+    color: $gray;
+    font-size: 13px;
+    font-style: normal;
+    text-transform: uppercase;
+  }
+  .search-field {
+    background: $white;
+    box-shadow: 0 1px 0 0 $white, inset 0 0 3px 0 $shadow-l2;
+    font-family: $sans-serif;
+    font-style: normal;
+  }
+}
+
+.dashboard-search-results {
+  @include float(left);
+  margin: 0;
+  padding: 0;
+  width: flex-grid(9);
+  min-height: 300px;
+  .search-info {
+    padding-bottom: lh(1.75);
+    a {
+      display: block;
+      margin-bottom: lh(.5);
+      font-size: 13px;
+    }
+    h2 {
+      @extend %t-title5;
+      @include float(left);
+      @include clear(left);
+    }
+  }
+}
+
+.courseware-search-results {
+  padding: ($baseline*2);
+}

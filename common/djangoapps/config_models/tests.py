@@ -28,6 +28,7 @@ class ConfigurationModelTests(TestCase):
     Tests of ConfigurationModel
     """
     def setUp(self):
+        super(ConfigurationModelTests, self).setUp()
         self.user = User()
         self.user.save()
 

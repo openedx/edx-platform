@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
 <%page args="section_data"/>
 
 <div>
@@ -156,6 +157,47 @@
       <div class="task-history-all-table"></div>
     </p>
   </div>
+%endif
+
+%if section_data['access']['instructor']:
+  <hr>
+  <div class='course-specific-container action-type-container'>
+    <h2>${_("Submit External Grades")}</h2>
+    <p>
+      ${_("To import grades from an assignment outside of the Lagunita platform, "
+      "ask the Course Operations team to set up external grading for your course. "
+      "Then download the grade submission CSV with the button below and fill in the missing fields. "
+      "Once you have saved your changes, select an assignment you are importing from the drop-down. "
+      "Finally, upload and submit your grades.")}
+    </p>
+    <p><input type='button' name='lti-blank-grades' value="${_("Download Blank Grade Submission CSV")}" data-csv='true' class='csv' data-endpoint="${ section_data['get_blank_lti_url'] }"></p>
+    <form id='lti-upload-form' method='post' action="${ section_data['upload_lti_url'] }" enctype='multipart/form-data'>
+      <h4 class='new-section'>${_("Select Assignment")}</h4>
+      <select class='endpoint-selector select-tag new-section' name='lti-endpoint'></select>
+      <div class='new-section'>
+        <label for='lti-key'>${_("LTI Key")}</label>
+        <input type='text' name='lti-key'>
+        <label for='lti-secret'>${_("LTI Secret")}</label>
+        <input type='text' name='lti-secret'>
+      </div>
+      <h4 class='new-section'>${_("Upload Revised Grade CSV")}</h4>
+      <div class='upload new-section'></div>
+      <input type='hidden' name='csrfmiddlewaretoken' value="${ csrf_token }">
+      <fieldset class='bordered-fieldset output-box'>
+        <legend>${_("Upload Status")}</legend>
+        <div class='loading'></div>
+        <div class='error'>
+          <h3 class='error'>${_("Error:")}</h3>
+          <ul class='error'></ul>
+        </div>
+        <div class='success new-section'>
+          <h3 class='success'>${_("Success:")}</h3>
+          <ul class='success'></ul>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  <script type='text/javascript' src="${static.url('js/instructor/lti_uploads.js')}"></script>
 %endif
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):

@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 class TestLongUsernameEmail(TestCase):
 
     def setUp(self):
+        super(TestLongUsernameEmail, self).setUp()
         self.url = reverse('create_account')
         self.url_params = {
             'username': 'username',

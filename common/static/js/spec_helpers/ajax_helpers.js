@@ -1,6 +1,6 @@
 define(['sinon', 'underscore'], function(sinon, _) {
-    var fakeServer, fakeRequests, expectRequest, expectJsonRequest,
-        respondWithJson, respondWithError, respondWithTextError, responseWithNoContent;
+    var fakeServer, fakeRequests, expectRequest, expectJsonRequest, expectPostRequest,
+        respondWithJson, respondWithError, respondWithTextError, respondWithNoContent;
 
     /* These utility methods are used by Jasmine tests to create a mock server or
      * get reference to mock requests. In either case, the cleanup (restore) is done with
@@ -68,6 +68,20 @@ define(['sinon', 'underscore'], function(sinon, _) {
         expect(JSON.parse(request.requestBody)).toEqual(jsonRequest);
     };
 
+    /**
+     * Intended for use with POST requests using application/x-www-form-urlencoded.
+     */
+    expectPostRequest = function(requests, url, body, requestIndex) {
+        var request;
+        if (_.isUndefined(requestIndex)) {
+            requestIndex = requests.length - 1;
+        }
+        request = requests[requestIndex];
+        expect(request.url).toEqual(url);
+        expect(request.method).toEqual("POST");
+        expect(_.difference(request.requestBody.split('&'), body.split('&'))).toEqual([]);
+    };
+
     respondWithJson = function(requests, jsonResponse, requestIndex) {
         if (_.isUndefined(requestIndex)) {
             requestIndex = requests.length - 1;
@@ -122,6 +136,7 @@ define(['sinon', 'underscore'], function(sinon, _) {
         'requests': fakeRequests,
         'expectRequest': expectRequest,
         'expectJsonRequest': expectJsonRequest,
+        'expectPostRequest': expectPostRequest,
         'respondWithJson': respondWithJson,
         'respondWithError': respondWithError,
         'respondWithTextError': respondWithTextError,

@@ -1,9 +1,9 @@
+""" URL definitions for the verify_student app. """
+
+from django.conf import settings
 from django.conf.urls import patterns, url
 
 from verify_student import views
-from verify_student.views import PayAndVerifyView
-
-from django.conf import settings
 
 
 urlpatterns = patterns(
@@ -19,7 +19,7 @@ urlpatterns = patterns(
         views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
         name="verify_student_start_flow",
         kwargs={
-            'message': PayAndVerifyView.FIRST_TIME_VERIFY_MSG
+            'message': views.PayAndVerifyView.FIRST_TIME_VERIFY_MSG
         }
     ),
 
@@ -31,7 +31,7 @@ urlpatterns = patterns(
         views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
         name="verify_student_upgrade_and_verify",
         kwargs={
-            'message': PayAndVerifyView.UPGRADE_MSG
+            'message': views.PayAndVerifyView.UPGRADE_MSG
         }
     ),
 
@@ -47,8 +47,8 @@ urlpatterns = patterns(
         name="verify_student_verify_now",
         kwargs={
             'always_show_payment': True,
-            'current_step': PayAndVerifyView.FACE_PHOTO_STEP,
-            'message': PayAndVerifyView.VERIFY_NOW_MSG
+            'current_step': views.PayAndVerifyView.FACE_PHOTO_STEP,
+            'message': views.PayAndVerifyView.VERIFY_NOW_MSG
         }
     ),
 
@@ -59,11 +59,8 @@ urlpatterns = patterns(
     # (since the user already paid).
     url(
         r'^verify-later/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
-        name="verify_student_verify_later",
-        kwargs={
-            'message': PayAndVerifyView.VERIFY_LATER_MSG
-        }
+        views.VerifyLaterView.as_view(),  # pylint: disable=no-value-for-parameter
+        name="verify_student_verify_later"
     ),
 
     # The user is returning to the flow after paying.
@@ -75,8 +72,8 @@ urlpatterns = patterns(
         name="verify_student_payment_confirmation",
         kwargs={
             'always_show_payment': True,
-            'current_step': PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
-            'message': PayAndVerifyView.PAYMENT_CONFIRMATION_MSG
+            'current_step': views.PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
+            'message': views.PayAndVerifyView.PAYMENT_CONFIRMATION_MSG
         }
     ),
 
@@ -143,10 +140,20 @@ urlpatterns = patterns(
     # Users are sent to this end-point from within courseware
     # to re-verify their identities by re-submitting face photos.
     url(
-        r'^reverify/{course_id}/{checkpoint}/(?P<location>.*)/$'.format(
-            course_id=settings.COURSE_ID_PATTERN, checkpoint=settings.CHECKPOINT_PATTERN
+        r'^reverify/{course_id}/{checkpoint}/{usage_id}/$'.format(
+            course_id=settings.COURSE_ID_PATTERN,
+            checkpoint=settings.CHECKPOINT_PATTERN,
+            usage_id=settings.USAGE_ID_PATTERN
         ),
         views.InCourseReverifyView.as_view(),
         name="verify_student_incourse_reverify"
     ),
 )
+
+# Fake response page for incourse reverification ( software secure )
+if settings.FEATURES.get('ENABLE_SOFTWARE_SECURE_FAKE'):
+    from verify_student.tests.fake_software_secure import SoftwareSecureFakeView
+    urlpatterns += patterns(
+        'verify_student.tests.fake_software_secure',
+        url(r'^software-secure-fake-response', SoftwareSecureFakeView.as_view()),
+    )

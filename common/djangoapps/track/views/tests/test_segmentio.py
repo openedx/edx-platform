@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
+from openedx.core.lib.tests.assertions.events import assert_event_matches
 from track.middleware import TrackMiddleware
 from track.tests import EventTrackingTestCase
 from track.views import segmentio
@@ -227,7 +228,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         finally:
             middleware.process_response(request, None)
 
-        self.assertEqualUnicode(self.get_event(), expected_event)
+        assert_event_matches(expected_event, self.get_event())
 
     def test_invalid_course_id(self):
         request = self.create_request(
@@ -331,6 +332,9 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             'code': 'mobile'
         }
         if name == 'edx.video.loaded':
+            # We use the same expected payload for all of these types of events, but the load video event is the only
+            # one that is not actually expected to contain a "current time" field. So we remove it from the expected
+            # event here.
             del input_payload['current_time']
 
         request = self.create_request(
@@ -355,7 +359,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             response = segmentio.segmentio_event(request)
             self.assertEquals(response.status_code, 200)
 
-            expected_event_without_payload = {
+            expected_event = {
                 'accept_language': '',
                 'referer': '',
                 'username': str(sentinel.username),
@@ -389,22 +393,22 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                     },
                     'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
                 },
-            }
-            expected_payload = {
-                'currentTime': 132.134456,
-                'id': 'i4x-foo-bar-baz-some_module',
-                'code': 'mobile'
+                'event': {
+                    'currentTime': 132.134456,
+                    'id': 'i4x-foo-bar-baz-some_module',
+                    'code': 'mobile'
+                }
             }
             if name == 'edx.video.loaded':
-                del expected_payload['currentTime']
+                # We use the same expected payload for all of these types of events, but the load video event is the
+                # only one that is not actually expected to contain a "current time" field. So we remove it from the
+                # expected event here.
+                del expected_event['event']['currentTime']
         finally:
             middleware.process_response(request, None)
 
-        actual_event = dict(self.get_event())
-        payload = json.loads(actual_event.pop('event'))
-
-        self.assertEqualUnicode(actual_event, expected_event_without_payload)
-        self.assertEqualUnicode(payload, expected_payload)
+        actual_event = self.get_event()
+        assert_event_matches(expected_event, actual_event)
 
     @data(
         # Verify positive slide case. Verify slide to onSlideSeek. Verify edx.video.seeked emitted from iOS v1.0.02 is changed to edx.video.position.changed.
@@ -479,7 +483,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             response = segmentio.segmentio_event(request)
             self.assertEquals(response.status_code, 200)
 
-            expected_event_without_payload = {
+            expected_event = {
                 'accept_language': '',
                 'referer': '',
                 'username': str(sentinel.username),
@@ -513,19 +517,17 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                     },
                     'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
                 },
-            }
-            expected_payload = {
-                "code": "mobile",
-                "new_time": 89.699177437,
-                "old_time": 119.699177437,
-                "type": expected_seek_type,
-                "requested_skip_interval": expected_skip_interval,
-                'id': 'i4x-foo-bar-baz-some_module',
+                'event': {
+                    "code": "mobile",
+                    "new_time": 89.699177437,
+                    "old_time": 119.699177437,
+                    "type": expected_seek_type,
+                    "requested_skip_interval": expected_skip_interval,
+                    'id': 'i4x-foo-bar-baz-some_module',
+                }
             }
         finally:
             middleware.process_response(request, None)
 
-        actual_event = dict(self.get_event())
-        payload = json.loads(actual_event.pop('event'))
-        self.assertEqualUnicode(actual_event, expected_event_without_payload)
-        self.assertEqualUnicode(payload, expected_payload)
+        actual_event = self.get_event()
+        assert_event_matches(expected_event, actual_event)

@@ -59,7 +59,10 @@
                                 <td class = "subsection-header-cell" colspan = "7">
                           <strong><a href="${subsection_settings['url']}">${subsection_settings['name']}</a></strong> -
                           % for setting_type in setting_type_list_map['subsection_setting_types']:
-                              <span title=${setting_type} class="subsection-settings"><strong>${subsection_setting_map[setting_type]}:</strong> ${subsection_settings[setting_type]}</span>
+                              <%
+                              subsection_setting = subsection_settings[setting_type] or 'N/A'
+                              %>
+                              <span title=${setting_type} class="subsection-settings"><strong>${subsection_setting_map[setting_type]}:</strong> ${subsection_setting}</span>
                           % endfor
                         </td>
                             </tr>
@@ -67,15 +70,25 @@
                             % for unit_settings in subsection_settings['children']:
                                 <tr class = "unit-header">
                                     <!-- TODO: dynamically allocate space ?-->
-                                    <td width = "92%" colspan="6"><strong><a href="${unit_settings['url']}">${unit_settings['name']}</a></strong></td>
+                                    <td width = "92%" colspan="6" class="unit-title"><strong><a href="${unit_settings['url']}">${unit_settings['name']}</a></strong></td>
                                     <td width = "8%">${unit_settings['ispublic']}</td> <!--hard coded right now-->
                                 </tr>
 
                                 % for problem_settings in unit_settings['children']:
                                     <tr class="problem-header">
-                                        <td width="52%"><strong><a href="${problem_settings['url']}">${problem_settings['name']}</a></strong></td>
+                                        <%
+                                        problem_title = problem_settings['name'] or 'Unnamed Problem'
+                                        %>
+                                        <td width="52%" class="problem-title"><strong><a href="${problem_settings['url']}">${problem_title}</a></strong></td>
                                         % for setting_type in setting_type_list_map['problem_setting_types']:
-                                            <td width="8%">${problem_settings[setting_type]}</td>
+                                            <%
+                                            problem_setting_type = problem_settings[setting_type]
+                                            if setting_type == 'weight':
+                                                problem_setting_type = problem_settings[setting_type] or '1'
+                                            elif setting_type == 'max_attempts':
+                                                problem_setting_type = problem_settings[setting_type] or 'unlimited'
+                                            %>
+                                            <td width="8%">${problem_setting_type}</td>
                                         % endfor
                                         <td width="8%"></td> <!-- Padding-->
                                     </tr>

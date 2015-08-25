@@ -30,14 +30,34 @@ from ...pages.lms.problem import ProblemPage
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.studio.settings import SettingsPage
-from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
-@attr('shard_1')
+@attr('shard_4')
+class ForgotPasswordPageTest(UniqueCourseTest):
+    """
+    Test that forgot password forms is rendered if url contains 'forgot-password-modal'
+    in hash.
+    """
+
+    def setUp(self):
+        """ Initialize the page object """
+        super(ForgotPasswordPageTest, self).setUp()
+        self.reset_password_page = ResetPasswordPage(self.browser)
+
+    def test_reset_password_form_visibility(self):
+        # Navigate to the password reset page
+        self.reset_password_page.visit()
+
+        # Expect that reset password form is visible on the page
+        self.assertTrue(self.reset_password_page.is_form_visible())
+
+
+@attr('shard_4')
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -133,7 +153,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr('shard_1')
+@attr('shard_4')
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -207,7 +227,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertEqual(self.register_page.current_form, "login")
 
 
-@attr('shard_1')
+@attr('shard_4')
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -256,22 +276,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-        # Expect enrollment activated event
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.activated",
-            self.start_time,
-            student_id,
-            1
-        )
-
-        # Expect that one mode_changed enrollment event fired as part of the upgrade
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.mode_changed",
-            self.start_time,
-            student_id,
-            1
-        )
-
         # Proceed to verification
         self.payment_and_verification_flow.immediate_verification()
 
@@ -309,14 +313,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-        # Expect enrollment activated event
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.activated",
-            self.start_time,
-            student_id,
-            1
-        )
-
         # Navigate to the dashboard
         self.dashboard_page.visit()
 
@@ -344,24 +340,23 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Proceed to the fake payment page
         self.upgrade_page.proceed_to_payment()
 
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        def only_enrollment_events(event):
+            """Filter out all non-enrollment events."""
+            return event['event_type'].startswith('edx.course.enrollment.')
 
-        # Expect that one mode_changed enrollment event fired as part of the upgrade
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.mode_changed",
-            self.start_time,
-            student_id,
-            1
-        )
+        expected_events = [
+            {
+                'event_type': 'edx.course.enrollment.mode_changed',
+                'event': {
+                    'user_id': int(student_id),
+                    'mode': 'verified',
+                }
+            }
+        ]
 
-        # Expect no enrollment activated event
-        self.assert_event_emitted_num_times(
-            "edx.course.enrollment.activated",
-            self.start_time,
-            student_id,
-            0
-        )
+        with self.assert_events_match_during(event_filter=only_enrollment_events, expected_events=expected_events):
+            # Submit payment
+            self.fake_payment_page.submit_payment()
 
         # Navigate to the dashboard
         self.dashboard_page.visit()
@@ -371,6 +366,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(enrollment_mode, 'verified')
 
 
+@attr('shard_5')
 class CourseWikiTest(UniqueCourseTest):
     """
     Tests that verify the course wiki.
@@ -424,6 +420,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.assertEqual(content, actual_content)
 
 
+@attr('shard_5')
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -597,6 +594,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
+    @skip('TODO: fix this, see TNL-2083')
     def test_verify_textbook_tabs(self):
         """
         Test multiple pdf textbooks loads correctly in lms.
@@ -608,6 +606,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
             self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
+@attr('shard_5')
 class VideoTest(UniqueCourseTest):
     """
     Navigate to a video in the courseware and play it.
@@ -678,6 +677,7 @@ class VideoTest(UniqueCourseTest):
         self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
 
 
+@attr('shard_5')
 class VisibleToStaffOnlyTest(UniqueCourseTest):
     """
     Tests that content with visible_to_staff_only set to True cannot be viewed by students.
@@ -762,6 +762,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
 
 
+@attr('shard_5')
 class TooltipTest(UniqueCourseTest):
     """
     Tests that tooltips are displayed
@@ -806,6 +807,7 @@ class TooltipTest(UniqueCourseTest):
         self.assertTrue(self.courseware_page.tooltips_displayed())
 
 
+@attr('shard_5')
 class PreRequisiteCourseTest(UniqueCourseTest):
     """
     Tests that pre-requisite course messages are displayed
@@ -890,6 +892,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         self.settings_page.save_changes()
 
 
+@attr('shard_5')
 class ProblemExecutionTest(UniqueCourseTest):
     """
     Tests of problems.
@@ -968,6 +971,7 @@ class ProblemExecutionTest(UniqueCourseTest):
         self.assertFalse(problem_page.is_correct())
 
 
+@attr('shard_5')
 class EntranceExamTest(UniqueCourseTest):
     """
     Tests that course has an entrance exam.

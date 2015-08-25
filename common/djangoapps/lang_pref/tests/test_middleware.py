@@ -14,6 +14,7 @@ class TestUserPreferenceMiddleware(TestCase):
     """
 
     def setUp(self):
+        super(TestUserPreferenceMiddleware, self).setUp()
         self.middleware = LanguagePreferenceMiddleware()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()

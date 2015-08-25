@@ -18,7 +18,7 @@ var edx = edx || {};
             courseKey: '',
             checkpointName: '',
             faceImage: '',
-            location: ''
+            usageId: ''
         },
 
         sync: function( method ) {
@@ -28,10 +28,10 @@ var edx = edx || {};
                     face_image: model.get( 'faceImage' )
                 },
                 url = _.str.sprintf(
-                    '/verify_student/reverify/%(courseKey)s/%(checkpointName)s/%(location)s/', {
+                    '/verify_student/reverify/%(courseKey)s/%(checkpointName)s/%(usageId)s/', {
                         courseKey: model.get('courseKey'),
                         checkpointName: model.get('checkpointName'),
-                        location: model.get('location')
+                        usageId: model.get('usageId')
                     }
                 );
 

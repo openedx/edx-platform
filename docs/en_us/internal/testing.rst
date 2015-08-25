@@ -236,7 +236,8 @@ you can do one of::
     paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
     python -m coverage run --rcfile=cms/.coveragerc `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
-Very handy: if you uncomment the ``pdb=1`` line in ``setup.cfg``, it
+Very handy: if you pass the ``--pdb`` flag to a paver test function, or
+uncomment the ``pdb=1`` line in ``setup.cfg``, the test runner
 will drop you into pdb on error. This lets you go up and down the stack
 and see what the values of the variables are. Check out `the pdb
 documentation <http://docs.python.org/library/pdb.html>`__
@@ -297,18 +298,18 @@ writing robust `Selenium <http://docs.seleniumhq.org/>`__ tests in
 tests reliable and maintainable by utilizing the Page Object and Promise
 design patterns.
 
-**Prerequisites**: 
+**Prerequisites**:
 
 These prerequisites are all automatically installed and available in `Devstack
 <https://github.com/edx/configuration/wiki/edX-Developer-Stack>`__, the
-supported development enviornment for the edX Platform. 
+supported development enviornment for the edX Platform.
 
 * Chromedriver and Chrome (see Running Lettuce Acceptance Tests below for
-  the latest tested versions) 
+  the latest tested versions)
 
-* Mongo 
+* Mongo
 
-* Memcache 
+* Memcache
 
 * mySQL
 
@@ -394,10 +395,9 @@ To test only a specific scenario
 
     paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature -s 3"
 
-To start the debugger on failure, add the ``--pdb`` option to
-extra\_args::
+To start the debugger on failure, pass the ``--pdb`` option to the paver command::
 
-    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature --pdb"
+    paver test_acceptance -s lms --pdb --extra_args="lms/djangoapps/courseware/features/problems.feature"
 
 To run tests faster by not collecting static files, you can use
 ``paver test_acceptance -s lms --fasttest`` and

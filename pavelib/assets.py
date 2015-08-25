@@ -128,6 +128,8 @@ def compile_coffeescript(*files):
     ))
 
 
+@task
+@no_help
 def compile_sass(debug=False):
     """
     Compile Sass to CSS.

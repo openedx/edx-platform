@@ -16,6 +16,7 @@ from pkg_resources import (
 )
 from webob import Response
 from webob.multidict import MultiDict
+from lazy import lazy
 
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import (
@@ -269,9 +270,6 @@ class XModuleMixin(XModuleFields, XBlockMixin):
 
     Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
     """
-
-    entry_point = "xmodule.v1"
-
     # Attributes for inspection of the descriptor
 
     # This indicates whether the xmodule is a problem-type.
@@ -360,6 +358,14 @@ class XModuleMixin(XModuleFields, XBlockMixin):
         # if caller wants kvs, caller's assuming it's up to date; so, decache it
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
+
+    @lazy
+    def _unwrapped_field_data(self):
+        """
+        This property hold the value _field_data here before we wrap it in
+        the LmsFieldData or OverrideFieldData classes.
+        """
+        return self._field_data
 
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
@@ -542,19 +548,24 @@ class XModuleMixin(XModuleFields, XBlockMixin):
         """
         return None
 
-    def bind_for_student(self, xmodule_runtime, field_data, user_id):
+    def bind_for_student(self, xmodule_runtime, user_id, wrappers=None):
         """
         Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
 
         Arguments:
             xmodule_runtime (:class:`ModuleSystem'): the runtime to use when accessing student facing methods
-            field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
             user_id: The user_id to set in scope_ids
+            wrappers: These are a list functions that put a wrapper, such as
+                      LmsFieldData or OverrideFieldData, around the field_data.
+                      Note that the functions will be applied in the order in
+                      which they're listed. So [f1, f2] -> f2(f1(field_data))
         """
         # pylint: disable=attribute-defined-outside-init
 
         # Skip rebinding if we're already bound a user, and it's this user.
         if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
+            if getattr(xmodule_runtime, 'position', None):
+                self.position = xmodule_runtime.position   # update the position of the tab
             return
 
         # If we are switching users mid-request, save the data from the old user.
@@ -576,7 +587,15 @@ class XModuleMixin(XModuleFields, XBlockMixin):
 
         # Set the new xmodule_runtime and field_data (which are user-specific)
         self.xmodule_runtime = xmodule_runtime
-        self._field_data = field_data
+
+        if wrappers is None:
+            wrappers = []
+
+        wrapped_field_data = self._unwrapped_field_data
+        for wrapper in wrappers:
+            wrapped_field_data = wrapper(wrapped_field_data)
+
+        self._field_data = wrapped_field_data
 
     @property
     def non_editable_metadata_fields(self):
@@ -725,6 +744,8 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
 
         See the HTML module for a simple example.
     """
+
+    entry_point = "xmodule.v1"
 
     has_score = descriptor_attr('has_score')
     _field_data_cache = descriptor_attr('_field_data_cache')
@@ -921,6 +942,9 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     create a problem, and can generate XModules (which do know about student
     state).
     """
+
+    entry_point = "xmodule.v1"
+
     module_class = XModule
 
     # VS[compat].  Backwards compatibility code that can go away after

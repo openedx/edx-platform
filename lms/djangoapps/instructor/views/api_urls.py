@@ -115,6 +115,8 @@ urlpatterns = patterns(
         'instructor.views.api.list_report_downloads', name="list_report_downloads"),
     url(r'calculate_grades_csv$',
         'instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
+    url(r'problem_grade_report$',
+        'instructor.views.api.problem_grade_report', name="problem_grade_report"),
 
     # Student responses for questions
     url(r'^get_student_responses$',
@@ -137,6 +139,20 @@ urlpatterns = patterns(
     # spoc gradebook
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+
+    # Blank LTI csv
+    url(
+        r'^get_blank_lti$',
+        'instructor.views.api.get_blank_lti',
+        name='get_blank_lti',
+    ),
+
+    # Upload LTI csv
+    url(
+        r'^upload_lti$',
+        'instructor.views.api.upload_lti',
+        name='upload_lti',
+    ),
 
     # Collect student forums data
     url(r'get_student_forums_usage',

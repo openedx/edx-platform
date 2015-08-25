@@ -69,6 +69,7 @@ class MakoMiddlewareTest(TestCase):
     """
 
     def setUp(self):
+        super(MakoMiddlewareTest, self).setUp()
         self.middleware = edxmako.middleware.MakoMiddleware()
         self.user = UserFactory.create()
         self.url = "/"

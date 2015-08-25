@@ -2,6 +2,7 @@
 """Video xmodule tests in mongo."""
 
 from mock import patch
+from nose.plugins.attrib import attr
 import os
 import tempfile
 import textwrap
@@ -103,6 +104,7 @@ def _upload_file(subs_file, location, filename):
     del_cached_content(content.location)
 
 
+@attr('shard_1')
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
@@ -157,6 +159,7 @@ class TestVideo(BaseTestXmodule):
         super(TestVideo, self).tearDown()
 
 
+@attr('shard_1')
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
     Test video handler that provide available translations info.
@@ -216,6 +219,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
 
 
+@attr('shard_1')
 class TestTranscriptDownloadDispatch(TestVideo):
     """
     Test video handler that provide translation transcripts.
@@ -280,6 +284,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
 
 
+@attr('shard_1')
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
     Test video handler that provide translation transcripts.
@@ -485,6 +490,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.status, '404 Not Found')
 
 
+@attr('shard_1')
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -542,6 +548,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Language'], 'zh')
 
 
+@attr('shard_1')
 class TestStudioTranscriptTranslationPostDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -602,6 +609,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         self.assertTrue(_check_asset(self.item_descriptor.location, u'filename.srt'))
 
 
+@attr('shard_1')
 class TestGetTranscript(TestVideo):
     """
     Make sure that `get_transcript` method works correctly

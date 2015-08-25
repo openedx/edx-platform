@@ -35,7 +35,7 @@ from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
-from courseware.access import has_access, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, in_preview_mode, _adjust_start_date_for_beta_testers
 from courseware.courses import (
     get_courses, get_course,
     get_studio_url, get_course_with_access,
@@ -436,7 +436,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
-        if staff_access and now < effective_start:
+        if not in_preview_mode() and staff_access and now < effective_start:
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             context['disable_student_access'] = True
@@ -711,7 +711,7 @@ def course_info(request, course_id):
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
-        if staff_access and now < effective_start:
+        if not in_preview_mode() and staff_access and now < effective_start:
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             context['disable_student_access'] = True
@@ -1550,10 +1550,8 @@ def generate_user_cert(request, course_id):
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
-    if certificate_status["is_downloadable"]:
-        return HttpResponseBadRequest(_("Certificate has already been created."))
-    elif certificate_status["is_generating"]:
-        return HttpResponseBadRequest(_("Certificate is already being created."))
+    if certificate_status["is_generating"]:
+        return HttpResponseBadRequest(_("Certificate is being created."))
     else:
         # If the certificate is not already in-process or completed,
         # then create a new certificate generation task.

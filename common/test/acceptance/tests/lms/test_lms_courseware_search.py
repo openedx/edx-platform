@@ -4,6 +4,9 @@ Test courseware search
 import os
 import json
 
+from nose.plugins.attrib import attr
+from flaky import flaky
+
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.utils import add_html_component, click_css, type_in_codemirror
@@ -14,6 +17,7 @@ from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@attr('shard_5')
 class CoursewareSearchTest(UniqueCourseTest):
     """
     Test courseware search.
@@ -45,6 +49,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
+        self.addCleanup(os.remove, self.TEST_INDEX_FILENAME)
 
         super(CoursewareSearchTest, self).setUp()
         self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
@@ -72,9 +77,6 @@ class CoursewareSearchTest(UniqueCourseTest):
                 XBlockFixtureDesc('sequential', 'Subsection 2')
             )
         ).install()
-
-    def tearDown(self):
-        os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):
         """
@@ -175,6 +177,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         # Do the search again, this time we expect results.
         self.assertTrue(self._search_for_content(self.SEARCH_STRING))
 
+    @flaky  # TODO fix SOL-835
     def test_reindex(self):
         """
         Make sure new content gets reindexed on button press.

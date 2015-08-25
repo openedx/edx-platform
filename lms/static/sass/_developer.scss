@@ -50,3 +50,22 @@
   padding: ($baseline*1.5) $baseline;
   text-align: center;
 }
+
+// for verify_student/make_payment_step.underscore
+.payment-buttons {
+
+  .purchase {
+    float: left;
+    padding: ($baseline*.5) 0;
+
+    .product-info, .product-name, .price {
+      @extend %t-ultrastrong;
+      color: $m-blue-d3;
+    }
+  }
+
+  .payment-button {
+    float: right;
+    @include margin-left( ($baseline/2) );
+  }
+}

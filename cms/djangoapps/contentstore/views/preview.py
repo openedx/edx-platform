@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment, request_token
+from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, request_token
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
@@ -214,13 +214,18 @@ def _load_preview_module(request, descriptor):
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
     if _has_author_view(descriptor):
-        field_data = CmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+        wrapper = partial(CmsFieldData, student_data=student_data)
     else:
-        field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+        wrapper = partial(LmsFieldData, student_data=student_data)
+
+    # wrap the _field_data upfront to pass to _preview_module_system
+    wrapped_field_data = wrapper(descriptor._field_data)  # pylint: disable=protected-access
+    preview_runtime = _preview_module_system(request, descriptor, wrapped_field_data)
+
     descriptor.bind_for_student(
-        _preview_module_system(request, descriptor, field_data),
-        field_data,
-        request.user.id
+        preview_runtime,
+        request.user.id,
+        [wrapper]
     )
     return descriptor
 

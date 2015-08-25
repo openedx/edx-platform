@@ -10,6 +10,7 @@ from uuid import uuid4
 from mock import patch
 from pymongo.errors import PyMongoError
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -125,6 +126,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
+@attr('shard_1')
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
@@ -583,6 +585,7 @@ class TestSysadmin(SysadminBaseTestCase):
         )
 
 
+@attr('shard_1')
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
