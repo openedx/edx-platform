@@ -111,6 +111,7 @@ from student.tasks import publish_course_notifications_task
 from edx_notifications.data import NotificationMessage
 from edx_notifications.lib.publisher import get_notification_type
 
+
 class AccessListFallback(Exception):
     """
     An exception that is raised whenever we need to `fall back` to fetching *all* courses
@@ -890,7 +891,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     excerpt = strip_tags(request.json['content'])
 
                     excerpt = excerpt.strip()
-                    excerpt = excerpt.replace('\n','').replace('\r','')
+                    excerpt = excerpt.replace('\n', '').replace('\r', '')
 
                     announcement_date = request.json['date']
 

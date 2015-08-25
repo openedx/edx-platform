@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
+
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class MigrateCourseIdsTests(ModuleStoreTestCase):
     """

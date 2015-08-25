@@ -76,7 +76,7 @@ class SessionsList(SecureAPIView):
                                              'Try again later.')
                 return Response(response_data, status=response_status)
 
-         # see if the user must reset his/her password due to any policy settings
+        # see if the user must reset his/her password due to any policy settings
         if existing_user and PasswordHistory.should_user_reset_password_now(existing_user):
             response_status = status.HTTP_403_FORBIDDEN
             response_data['message'] = _(
@@ -193,7 +193,7 @@ class SessionsDetail(SecureAPIView):
     def delete(self, request, session_id):
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(session_id)
-        if session is None or not SESSION_KEY in session:
+        if session is None or SESSION_KEY not in session:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         user_id = session[SESSION_KEY]
         session.delete()

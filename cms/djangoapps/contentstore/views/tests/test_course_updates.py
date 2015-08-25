@@ -14,6 +14,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from edx_notifications.lib.consumer import get_notifications_count_for_user
 from mock import patch
 
+
 class CourseUpdateTest(CourseTestCase):
     """
     Test for course updates

@@ -37,7 +37,6 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         self.bad_style_content_id2 = "location:old2+style2+id2+chapter2+1234567890"
         self.good_style_content_id2 = "i4x://old2/style2/chapter2/1234567890"
 
-
     def test_migrate_courseids_v2(self):
         """
         Test the data migration
@@ -57,10 +56,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         course_content_group2 = api_models.CourseContentGroupRelationship.objects.create(course_id=self.bad_style_course_id2, content_id=self.bad_style_content_id2, group_profile=group_profile2)
         course_module_completion2 = CourseModuleCompletion.objects.create(user=user2, course_id=self.bad_style_course_id2, content_id=self.bad_style_content_id2, stage=self.bad_style_content_id2)
 
-
         # Run the data migration
         migrate_courseids_v2.Command().handle()
-
 
         # Confirm that the data has been properly migrated
         updated_course_group = api_models.CourseGroupRelationship.objects.get(id=course_group.id)
