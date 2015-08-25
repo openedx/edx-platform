@@ -1715,8 +1715,7 @@ class DiscussionService(object):
         threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
         utils.add_courseware_context(threads, course, user)
 
-        flag_moderator = has_permission(user, 'openclose_thread', course_id) or \
-                         has_access(user, 'staff', course)
+        flag_moderator = has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
         category_map = utils.get_discussion_category_map(course, user)
@@ -1773,8 +1772,7 @@ class DiscussionService(object):
         category_map = get_discussion_category_map(course, user)
 
         is_moderator = has_permission(user, "see_all_cohorts", course_id)
-        flag_moderator =  has_permission(user, 'openclose_thread', course_id) or \
-                          has_access(user, 'staff', course)
+        flag_moderator = has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
 
         context = {
             'user': user,

@@ -17,6 +17,7 @@ def _anonymous_known_flag(user):
     if isinstance(user, AnonymousUser):
         user.known = False
 
+
 def get_modulestore():
     return modulestore()
 
@@ -70,7 +71,7 @@ def get_course_leaf_nodes(course_key):
     nodes = []
     detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
     store = get_modulestore()
-    verticals = store.get_items(course_key,  qualifiers={'category': 'vertical'})
+    verticals = store.get_items(course_key, qualifiers={'category': 'vertical'})
     orphans = store.get_orphans(course_key)
     for vertical in verticals:
         if hasattr(vertical, 'children') and vertical.location not in orphans:

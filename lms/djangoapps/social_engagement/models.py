@@ -70,7 +70,7 @@ class StudentSocialEngagementScore(TimeStampedModel):
             user_score = queryset.score
 
             query = cls.objects.filter(Q(score__gt=user_score),
-                                             course_id__exact=course_key, user__is_active=True)
+                                       course_id__exact=course_key, user__is_active=True)
 
             if exclude_users:
                 query = query.exclude(user__id__in=exclude_users)

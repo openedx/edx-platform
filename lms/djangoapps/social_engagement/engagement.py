@@ -127,6 +127,7 @@ def _compute_social_engagement_score(social_metrics):
 
     return social_total
 
+
 def update_course_engagement_scores(course_id, compute_if_closed_course=False, course_descriptor=None):
     """
     Iterate over all active course enrollments and update the
@@ -166,6 +167,7 @@ def update_all_courses_engagement_scores(compute_if_closed_course=False):
             compute_if_closed_course=compute_if_closed_course,
             course_descriptor=course
         )
+
 
 #
 # Support for Notifications, these two receivers should actually be migrated into a new Leaderboard django app.
@@ -247,5 +249,3 @@ def handle_progress_post_save_signal(sender, instance, **kwargs):
                 # Notifications are never critical, so we don't want to disrupt any
                 # other logic processing. So log and continue.
                 log.exception(ex)
-
-

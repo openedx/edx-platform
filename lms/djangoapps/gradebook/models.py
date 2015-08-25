@@ -134,13 +134,14 @@ class StudentGradebook(TimeStampedModel):
 
         # if we were not passed in an existing queryset, build it up
         if not queryset:
-            queryset = StudentGradebook.objects.select_related('user')\
-                .filter(
-                    course_id__exact=course_key,
-                    user__is_active=True,
-                    user__courseenrollment__is_active=True,
-                    user__courseenrollment__course_id__exact=course_key
-                ).exclude(user__in=exclude_users)
+            queryset = StudentGradebook.objects.select_related('user').filter(
+                course_id__exact=course_key,
+                user__is_active=True,
+                user__courseenrollment__is_active=True,
+                user__courseenrollment__course_id__exact=course_key
+            ).exclude(
+                user__in=exclude_users
+            )
 
         users_above = queryset.filter(grade__gte=user_grade)\
             .exclude(user__id=user_id)\

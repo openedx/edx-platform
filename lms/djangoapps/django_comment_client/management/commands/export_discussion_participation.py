@@ -20,7 +20,7 @@ import django_comment_client.utils as utils
 from xmodule.modulestore.django import modulestore
 
 
-class MissingCohortedConfigCommandError(CommandError): #pylint: disable=no-init
+class MissingCohortedConfigCommandError(CommandError):  # pylint: disable=no-init
     """ Raised when a command requires cohorted discussions configured, but none are found """
     pass
 
@@ -189,8 +189,8 @@ class Command(BaseCommand):
             cohorted_discussions = course.cohort_config.get('cohorted_inline_discussions', None)
             if not cohorted_discussions:
                 raise MissingCohortedConfigCommandError(
-                        "Only cohorted discussions are marked for export, "
-                        "but no cohorted discussions found for the course")
+                    "Only cohorted discussions are marked for export, "
+                    "but no cohorted discussions found for the course")
             else:
                 target_discussion_ids = cohorted_discussions
 
@@ -217,6 +217,7 @@ class Command(BaseCommand):
             self.dump_one(*args, **options)
 
         self.stdout.write("Success!\n")
+
 
 class Extractor(object):
     """ Extracts discussion participation data from db and cs_comments_service """

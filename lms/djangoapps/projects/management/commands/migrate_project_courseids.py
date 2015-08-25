@@ -13,6 +13,7 @@ from projects.models import Project, WorkgroupReview, WorkgroupSubmissionReview
 
 log = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     """
     Migrates legacy course/content identifiers across several models to the new format
