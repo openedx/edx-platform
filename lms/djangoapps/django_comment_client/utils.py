@@ -801,6 +801,7 @@ def format_filename(filename):
     filename = filename.replace(' ', '_')
     return filename
 
+
 def is_comment_too_deep(parent):
     """
     Determine whether a comment with the given parent violates MAX_COMMENT_DEPTH

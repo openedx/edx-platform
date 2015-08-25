@@ -110,6 +110,7 @@ class GroupsList(SecureListAPIView):
         groups = Group.objects.filter(groupprofile__group_type=group_type).select_related('group')
         return groups
 
+
 class GroupsDetail(SecureAPIView):
     """
     ### The GroupsDetail view allows clients to interact with a specific Group entity

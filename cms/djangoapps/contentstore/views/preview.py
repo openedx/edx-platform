@@ -180,6 +180,7 @@ def get_available_xblock_services(request=None, field_data=None):
 
     return services
 
+
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for

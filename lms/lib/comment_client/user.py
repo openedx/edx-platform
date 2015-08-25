@@ -213,6 +213,9 @@ def get_course_social_stats(course_id, end_date=None):
     )
     return response
 
+
+# pylint: disable=missing-docstring
+
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
 
@@ -233,8 +236,10 @@ def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
 
 
-def _url_for_user_stats(user_id,course_id):
-    return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(prefix=settings.PREFIX, user_id=user_id,course_id=course_id)
+def _url_for_user_stats(user_id, course_id):
+    return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(
+        prefix=settings.PREFIX, user_id=user_id, course_id=course_id
+    )
 
 
 def _url_for_user_social_stats(user_id, end_date=None):

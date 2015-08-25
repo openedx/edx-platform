@@ -261,4 +261,3 @@ class ProjectsApiTests(TestCase):
 
         self.assertEqual(len(user_ids), 1)
         self.assertIn(self.test_user2.id, user_ids)
-

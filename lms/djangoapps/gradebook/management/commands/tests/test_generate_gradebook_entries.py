@@ -134,10 +134,12 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
             field_data_cache,
         )._xmodule
 
-    @patch.dict(settings.FEATURES, {
-                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-                'SIGNAL_ON_SCORE_CHANGED': False
-    })
+    @patch.dict(
+        settings.FEATURES, {
+            'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+            'SIGNAL_ON_SCORE_CHANGED': False
+        }
+    )
     def test_generate_gradebook_entries(self):
         """
         Test the gradebook entry generator

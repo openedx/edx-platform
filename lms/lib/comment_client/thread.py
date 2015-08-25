@@ -213,7 +213,7 @@ class Thread(models.Model):
         url = _url_for_num_thread_followers(self.id)
         params = {}
         if not include_self_follow:
-            params ={
+            params = {
                 'exclude_user_id': self.user_id
             }
         response = perform_request(
@@ -222,7 +222,6 @@ class Thread(models.Model):
             params
         )
         return response['num_followers']
-
 
 
 def get_course_thread_stats(course_id):
@@ -255,6 +254,7 @@ def _url_for_un_pin_thread(thread_id):
 
 def _url_for_course_thread_stats(course_id):
     return "{prefix}/courses/{course_id}/stats".format(prefix=settings.PREFIX, course_id=course_id)
+
 
 def _url_for_num_thread_followers(thread_id):
     return "{prefix}/threads/{thread_id}/num_followers".format(prefix=settings.PREFIX, thread_id=thread_id)

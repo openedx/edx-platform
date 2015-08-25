@@ -59,14 +59,14 @@ def _fake_get_course_social_stats(course_id, end_date=None):
 
     course_key = get_course_key(course_id)
     users = CourseEnrollment.objects.users_enrolled_in(course_key)
-    return {str(user.id):  {user.first_name: user.last_name} for user in users}
+    return {str(user.id): {user.first_name: user.last_name} for user in users}
 
 
 def _fake_get_course_social_stats_date_expected(course_id, end_date=None):
     if not end_date:
         raise Exception("Expected non-None end_date parameter")
     return {
-        '2': {'two':'two-two'},
+        '2': {'two': 'two-two'},
         '3': {'three': 'three-three-three'}
     }
 
@@ -1648,7 +1648,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         # make the last user an observer to asset that its content is being filtered out from
         # the aggregates
         expected_course_average = 0.398
-        allow_access(self.course, self.users[USER_COUNT-1], 'observer')
+        allow_access(self.course, self.users[USER_COUNT - 1], 'observer')
 
         item = ItemFactory.create(
             parent_location=self.chapter.location,
@@ -1801,7 +1801,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, test_course_id)
         leaders_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, test_course_id)
         # Make last user as observer to make sure that data is being filtered out
-        allow_access(course, users[USER_COUNT-1], 'observer')
+        allow_access(course, users[USER_COUNT - 1], 'observer')
 
         contents = []
         for i in xrange(1, 26):
@@ -1829,7 +1829,7 @@ class CoursesApiTests(ModuleStoreTestCase):
 
             # observer should complete everything, so we can assert that it is filtered out
             response = self.do_post(completion_uri, {
-                'content_id': content_id, 'user_id': users[USER_COUNT-1].id
+                'content_id': content_id, 'user_id': users[USER_COUNT - 1].id
             })
             self.assertEqual(response.status_code, 201)
 
@@ -2355,7 +2355,6 @@ class CoursesApiTests(ModuleStoreTestCase):
         )
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 400)
-
 
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri

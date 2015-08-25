@@ -288,7 +288,6 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertIsNotNone(cohort)
         self.assertTrue(is_user_in_cohort(cohort, self.test_user.id))
 
-
     def test_workgroups_users_post_preexisting_workgroup(self):
         data = {
             'name': self.test_workgroup_name,
@@ -340,7 +339,6 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
         self.assertEqual(response.status_code, 400)
-
 
     def test_workgroups_users_post_with_cohort_backfill(self):
         """
@@ -485,7 +483,6 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], pr1_id)
         self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
-
 
     def test_workgroups_workgroup_reviews_get(self):
         data = {
