@@ -47,47 +47,57 @@
     font-size: 90%;
   }
 }
-.exam-timer {
-  line-height: 56px;
-  background-color: #e5eaec;
-  padding-left: 42px;
-  padding-right: 32px;
-  border-left: 4px solid #14a6ea;
-  margin: 0 auto;
-  color: #4e575b;
-  font-size: 14px;
-  a {
-    color: #0979ba;
+.proctored_exam_status {
+  // STATE: Fixed to viewport (used for scrolling)
+  &.is-fixed {
+    @extend %ui-depth4;
+    box-shadow: 0 3px 3px $shadow-d1;
+    position: fixed;
+    top: 0;
+    width: 100%;
   }
-  span.pull-right {
-    color: #646161;
-    line-height: 56px;
-    b {
-      color: #414040;
-    }
-  }
-  &.low-time {
-    color: #cdd7db;
-    background-color: #4F585C;
+  .exam-timer {
+    @include line-height(39);
+    background-color: rgb(229, 234, 236);
+    padding-left: 42px;
+    padding-right: 32px;
+    border-left: 4px solid $m-blue-l1;
+    margin: 0 auto;
+    color: $gray-d2;
+    @include font-size(14);
     a {
-      color: #fff;
-      text-decoration: underline;
+      color: rgb(9, 121, 186);
     }
     span.pull-right {
-      color: #cdd7db;
+      color: $gray-d1;
+      @include line-height(39);
       b {
-        color: #fff;
+        color: $gray-d3;
       }
     }
-  }
-  &.warning {
-    border-left-color: #feb93e;
-  }
-  &.critical {
-    border-left-color: #b30101;
-    color: #fff;
-  }
-  .exam-button-turn-in-exam {
-    margin-right: 20px;
+    &.low-time {
+      color: $gray-l3;
+      background-color: rgb(79, 88, 92);
+      a {
+        color: $white;
+        text-decoration: underline;
+      }
+      span.pull-right {
+        color: $gray-l3;
+        b {
+          color: $white;
+        }
+      }
+    }
+    &.warning {
+      border-left-color: $warning-color;
+    }
+    &.critical {
+      border-left-color: $alert-color;
+      color: $white;
+    }
+    .exam-button-turn-in-exam {
+      margin-right: $baseline;
+    }
   }
 }
