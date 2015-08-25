@@ -49,7 +49,7 @@ from verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
     VerificationCheckpoint, VerificationStatus
 )
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.django import modulestore
@@ -82,7 +82,7 @@ class StartView(TestCase):
 
 
 @ddt.ddt
-class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
+class TestPayAndVerifyView(UrlResetMixin, SharedModuleStoreTestCase, XssTestMixin):
     """
     Tests for the payment and verification flow views.
     """
@@ -94,6 +94,16 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     YESTERDAY = NOW - timedelta(days=1)
     TOMORROW = NOW + timedelta(days=1)
 
+    @classmethod
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def setUpClass(cls):
+        super(TestPayAndVerifyView, cls).setUpClass()
+        cls.courses = {
+            course_mode: cls._create_course(course_mode)
+            for course_mode
+            in ["honor", "verified", "professional", "no-id-professional"]
+        }
+
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(TestPayAndVerifyView, self).setUp('embargo')
@@ -103,7 +113,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("verified", "professional")
     def test_start_flow_not_verified(self, course_mode):
-        course = self._create_course(course_mode)
+        course = self.courses[course_mode]
         self._enroll(course.id, "honor")
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_displayed_mode(response, course_mode)
@@ -121,7 +131,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("no-id-professional")
     def test_start_flow_with_no_id_professional(self, course_mode):
-        course = self._create_course(course_mode)
+        course = self.courses[course_mode]
         # by default enrollment is honor
         self._enroll(course.id, "honor")
         response = self._get_page('verify_student_start_flow', course.id)
@@ -136,7 +146,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("expired", "denied")
     def test_start_flow_expired_or_denied_verification(self, verification_status):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._set_verification_status(verification_status)
         response = self._get_page('verify_student_start_flow', course.id)
@@ -162,7 +172,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     @ddt.unpack
     def test_start_flow_already_verified(self, course_mode, verification_status):
-        course = self._create_course(course_mode)
+        course = self.courses[course_mode]
         self._enroll(course.id, "honor")
         self._set_verification_status(verification_status)
         response = self._get_page('verify_student_start_flow', course.id)
@@ -177,7 +187,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("verified", "professional")
     def test_start_flow_already_paid(self, course_mode):
-        course = self._create_course(course_mode)
+        course = self.courses[course_mode]
         self._enroll(course.id, course_mode)
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_displayed_mode(response, course_mode)
@@ -193,7 +203,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         ])
 
     def test_start_flow_not_enrolled(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._set_verification_status("submitted")
         response = self._get_page('verify_student_start_flow', course.id)
 
@@ -209,7 +219,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._assert_requirements_displayed(response, [])
 
     def test_start_flow_unenrolled(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._set_verification_status("submitted")
         self._enroll(course.id, "verified")
         self._unenroll(course.id)
@@ -231,7 +241,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     @ddt.unpack
     def test_start_flow_already_verified_and_paid(self, course_mode, verification_status):
-        course = self._create_course(course_mode)
+        course = self.courses[course_mode]
         self._enroll(course.id, course_mode)
         self._set_verification_status(verification_status)
         response = self._get_page(
@@ -243,7 +253,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
     def test_pay_and_verify_hides_header_nav(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_start_flow', course.id)
 
@@ -254,7 +264,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     def test_verify_now(self):
         # We've already paid, and now we're trying to verify
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_verify_now', course.id)
 
@@ -277,7 +287,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         ])
 
     def test_verify_now_already_verified(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._set_verification_status("submitted")
 
@@ -291,7 +301,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._assert_redirects_to_dashboard(response)
 
     def test_verify_now_user_details(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_verify_now', course.id)
         self._assert_user_details(response, self.user.profile.name)
@@ -301,7 +311,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         "verify_student_payment_confirmation"
     )
     def test_verify_now_not_enrolled(self, page_name):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         response = self._get_page(page_name, course.id, expected_status_code=302)
         self._assert_redirects_to_start_flow(response, course.id)
 
@@ -310,7 +320,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         "verify_student_payment_confirmation"
     )
     def test_verify_now_unenrolled(self, page_name):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._unenroll(course.id)
         response = self._get_page(page_name, course.id, expected_status_code=302)
@@ -321,21 +331,21 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         "verify_student_payment_confirmation"
     )
     def test_verify_now_not_paid(self, page_name):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "honor")
         response = self._get_page(page_name, course.id, expected_status_code=302)
         self._assert_redirects_to_upgrade(response, course.id)
 
     def test_verify_later(self):
         """ The deprecated verify-later page should redirect to the verification start page. """
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         course_key = course.id
         self._enroll(course_key, "verified")
         response = self._get_page("verify_student_verify_later", course_key, expected_status_code=301)
         self._assert_redirects_to_verify_start(response, course_key, 301)
 
     def test_payment_confirmation(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_payment_confirmation', course.id)
 
@@ -366,7 +376,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
          skip it. Despite setting the parameter, the current step should still be
          MAKE_PAYMENT_STEP.
         """
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         response = self._get_page(
             'verify_student_start_flow',
             course.id,
@@ -386,7 +396,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         )
 
     def test_payment_confirmation_already_verified(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._set_verification_status("submitted")
 
@@ -404,7 +414,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         )
 
     def test_payment_confirmation_already_verified_skip_first_step(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._set_verification_status("submitted")
 
@@ -446,7 +456,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("verified", "professional")
     def test_upgrade(self, course_mode):
-        course = self._create_course(course_mode)
+        course = self.courses[course_mode]
         self._enroll(course.id, "honor")
 
         response = self._get_page('verify_student_upgrade_and_verify', course.id)
@@ -465,7 +475,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assert_xss(response, '<script>alert("XSS")</script>')
 
     def test_upgrade_already_verified(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "honor")
         self._set_verification_status("submitted")
 
@@ -479,7 +489,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._assert_requirements_displayed(response, [])
 
     def test_upgrade_already_paid(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
 
         # If we've already paid, then the upgrade messaging
@@ -493,7 +503,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._assert_redirects_to_verify_start(response, course.id)
 
     def test_upgrade_already_verified_and_paid(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._set_verification_status("submitted")
 
@@ -506,7 +516,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._assert_redirects_to_dashboard(response)
 
     def test_upgrade_not_enrolled(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         response = self._get_page(
             'verify_student_upgrade_and_verify',
             course.id,
@@ -515,7 +525,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._assert_redirects_to_start_flow(response, course.id)
 
     def test_upgrade_unenrolled(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._enroll(course.id, "verified")
         self._unenroll(course.id)
         response = self._get_page(
@@ -557,7 +567,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     def test_require_login(self, url_name):
         self.client.logout()
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         response = self._get_page(url_name, course.id, expected_status_code=302)
 
         original_url = reverse(url_name, kwargs={'course_id': unicode(course.id)})
@@ -583,7 +593,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     def test_account_not_active(self):
         self.user.is_active = False
         self.user.save()
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_steps_displayed(
             response,
@@ -598,13 +608,13 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     def test_no_contribution(self):
         # Do NOT specify a contribution for the course in a session var.
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         response = self._get_page("verify_student_start_flow", course.id)
         self._assert_contribution_amount(response, "")
 
     def test_contribution_other_course(self):
         # Specify a contribution amount for another course in the session
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         other_course_id = CourseLocator(org="other", run="test", course="test")
         self._set_contribution("12.34", other_course_id)
 
@@ -614,7 +624,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     def test_contribution(self):
         # Specify a contribution amount for this course in the session
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._set_contribution("12.34", course.id)
 
         # Expect that the contribution amount is pre-filled,
@@ -623,7 +633,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     def test_verification_deadline(self):
         deadline = datetime(2999, 1, 2, tzinfo=pytz.UTC)
-        course = self._create_course("verified")
+        course = self.courses["verified"]
 
         # Set a deadline on the course mode AND on the verification deadline model.
         # This simulates the common case in which the upgrade deadline (course mode expiration)
@@ -639,7 +649,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     def test_course_mode_expired(self):
         deadline = datetime(1999, 1, 2, tzinfo=pytz.UTC)
-        course = self._create_course("verified")
+        course = self.courses["verified"]
 
         # Set the upgrade deadline (course mode expiration) and verification deadline
         # to the same value.  This used to be the default when we used the expiration datetime
@@ -657,7 +667,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data(datetime(2999, 1, 2, tzinfo=pytz.UTC), None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
 
         # Set the upgrade deadline in the past, but the verification
         # deadline in the future.
@@ -691,7 +701,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             self.assertEqual(data["verification_deadline"], "")
 
     def test_course_mode_not_expired_verification_deadline_passed(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
 
         # Set the upgrade deadline in the future
         # and the verification deadline in the past
@@ -717,7 +727,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restrict(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         with restrict_course(course.id) as redirect_url:
             # Simulate that we're embargoed from accessing this
             # course based on our IP address.
@@ -726,10 +736,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_allow(self):
-        course = self._create_course("verified")
+        course = self.courses["verified"]
         self._get_page('verify_student_start_flow', course.id)
 
-    def _create_course(self, *course_modes, **kwargs):
+    @classmethod
+    def _create_course(cls, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
         course = CourseFactory.create(display_name='<script>alert("XSS")</script>')
 
@@ -742,7 +753,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             mode_kwargs['sku'] = kwargs['sku']
 
         for course_mode in course_modes:
-            min_price = (0 if course_mode in ["honor", "audit"] else self.MIN_PRICE)
+            min_price = (0 if course_mode in ["honor", "audit"] else cls.MIN_PRICE)
             CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
@@ -974,7 +985,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertNotEqual(httpretty.last_request().headers, {})
 
 
-class CheckoutTestMixin(object):
+class CheckoutTestMixin(SharedModuleStoreTestCase):
     """
     Mixin implementing test methods that should behave identically regardless
     of which backend is used (shoppingcart or ecommerce service).  Subclasses
@@ -986,12 +997,17 @@ class CheckoutTestMixin(object):
     compatibility, the effect of using this endpoint is to choose a specific product
     (i.e. course mode) and trigger immediate checkout.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(CheckoutTestMixin, cls).setUpClass()
+        # This course will continue to exist in the modulestore, even if 
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         """ Create a user and course. """
         super(CheckoutTestMixin, self).setUp()
 
         self.user = UserFactory.create(username="test", password="test")
-        self.course = CourseFactory.create()
         for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
             CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
         self.client.login(username="test", password="test")
@@ -1100,7 +1116,7 @@ class CheckoutTestMixin(object):
 
 
 @patch('verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA)
-class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
+class TestCreateOrderShoppingCart(CheckoutTestMixin):
     """ Test view behavior when the shoppingcart is used. """
 
     def make_sku(self):
@@ -1114,7 +1130,7 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
 
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 @patch('verify_student.views.checkout_with_ecommerce_service', return_value=TEST_PAYMENT_DATA)
-class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
+class TestCreateOrderEcommerceService(CheckoutTestMixin):
     """ Test view behavior when the ecommerce service is used. """
 
     def make_sku(self):
@@ -1500,15 +1516,20 @@ class TestSubmitPhotosForVerification(TestCase):
         return json.loads(last_request.body)
 
 
-class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
+class TestPhotoVerificationResultsCallback(SharedModuleStoreTestCase):
     """
     Tests for the results_callback view.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestPhotoVerificationResultsCallback, cls).setUpClass()
+        cls.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        cls.course_id = cls.course.id
+
+
     def setUp(self):
         super(TestPhotoVerificationResultsCallback, self).setUp()
 
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        self.course_id = self.course.id
         self.user = UserFactory.create()
         self.attempt = SoftwareSecurePhotoVerification(
             status="submitted",
@@ -1894,27 +1915,30 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         # pylint: disable=attribute-defined-outside-init
 
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+
+        with self.store.bulk_operations(self.course_key, emit_signals=False):
+            self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+
+            # Create the 'edx-reverification-block' in course tree
+            section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+            subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
+            vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
+            self.reverification = ItemFactory.create(
+                parent=vertical,
+                category='edx-reverification-block',
+                display_name='Test Verification Block'
+            )
+            self.section_location = section.location
+            self.subsection_location = subsection.location
+            self.vertical_location = vertical.location
+            self.reverification_location = unicode(self.reverification.location)
+            self.reverification_assessment = self.reverification.related_assessment
 
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
             CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
-        # Create the 'edx-reverification-block' in course tree
-        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
-        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
-        self.reverification = ItemFactory.create(
-            parent=vertical,
-            category='edx-reverification-block',
-            display_name='Test Verification Block'
-        )
-        self.section_location = section.location
-        self.subsection_location = subsection.location
-        self.vertical_location = vertical.location
-        self.reverification_location = unicode(self.reverification.location)
-        self.reverification_assessment = self.reverification.related_assessment
 
     def setUp(self):
         super(TestInCourseReverifyView, self).setUp()
