@@ -416,3 +416,20 @@
       color: $link-color;
     }
   }
+
+.btn-link {
+    @extend %shame-link-text;
+
+    // reset of inherited buttons
+    border-radius: 0;
+    border-color: $transparent;
+    padding: 1px;
+    background: $transparent;
+    background-image: none;
+
+    &:focus,
+    &:hover {
+        background-image: none !important;
+        background-color: $transparent !important;
+    }
+}

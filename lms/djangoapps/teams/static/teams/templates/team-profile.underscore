@@ -48,7 +48,7 @@
 
         <% if (isMember) { %>
             <div class="leave-team">
-                <button class="btn btn-secondary leave-team-link"><%- gettext("Leave Team") %></button>
+                <button class="btn btn-link leave-team-link"><%- gettext("Leave Team") %></button>
             </div>
 
             <div class="divider-lv1"></div>

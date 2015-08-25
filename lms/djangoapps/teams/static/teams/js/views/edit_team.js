@@ -13,10 +13,12 @@
                 maxTeamNameLength: 255,
                 maxTeamDescriptionLength: 300,
 
+                tagName: 'create-new-team',
+
                 events: {
-                    'click .action-primary': 'createUpdateTeam',
-                    'submit form': 'createUpdateTeam',
-                    'click .action-cancel': 'cancelTeam'
+                    'click .action-primary': 'createOrUpdateTeam',
+                    'submit form': 'createOrUpdateTeam',
+                    'click .action-cancel': 'cancelAndGoBack'
                 },
 
                 initialize: function(options) {
@@ -27,18 +29,18 @@
                     this.teamsUrl = options.teamParams.teamsUrl;
                     this.languages = options.teamParams.languages;
                     this.countries = options.teamParams.countries;
-                    this.primaryButtonTitle = options.primaryButtonTitle || 'Submit';
                     this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
                     this.action = options.action;
 
-                    _.bindAll(this, 'cancelTeam', 'createUpdateTeam');
+                    _.bindAll(this, 'cancelAndGoBack', 'createOrUpdateTeam');
 
                     if (this.action === 'create') {
-                        this.teamModel = new TeamModel({});
-                        this.teamModel.url = this.teamsUrl;
-                    } else {
+                        this.teamModel = new TeamModel({ url:this.teamsUrl });
+                        this.primaryButtonTitle = 'Create';
+                    } else if(this.action === 'edit' ) {
                         this.teamModel = options.model;
                         this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id'));
+                        this.primaryButtonTitle = 'Update';
                     }
 
                     this.teamNameField = new FieldViews.TextFieldView({
@@ -81,9 +83,9 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({
+                    this.$el.html(_.template(editTeamTemplate) ({
                         primaryButtonTitle: this.primaryButtonTitle,
-                        isNew: this.action === 'create',
+                        action: this.action,
                         totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
                     }));
                     this.set(this.teamNameField, '.team-required-fields');
@@ -102,7 +104,7 @@
                     }
                 },
 
-                createUpdateTeam: function (event) {
+                createOrUpdateTeam: function (event) {
                     event.preventDefault();
                     var view = this,
                         teamLanguage = this.teamLanguageField.fieldValue(),
@@ -113,16 +115,16 @@
                             language: _.isNull(teamLanguage) ? '' : teamLanguage,
                             country: _.isNull(teamCountry) ? '' : teamCountry
                         },
-                        defaultParams = {
+                        saveOptions = {
                             wait: true
                         };
 
                     if (this.action === 'create') {
                         data.course_id = this.courseID;
                         data.topic_id = this.topicID;
-                    } else {
-                        defaultParams.patch = true;
-                        defaultParams.contentType = 'application/merge-patch+json';
+                    } else if(this.action === 'edit' ) {
+                        saveOptions.patch = true;
+                        saveOptions.contentType = 'application/merge-patch+json';
                     }
 
                     var validationResult = this.validateTeamData(data);
@@ -131,7 +133,7 @@
                         return;
                     }
 
-                    this.teamModel.save(data, defaultParams)
+                    this.teamModel.save(data, saveOptions)
                         .done(function(result) {
                             view.teamEvents.trigger('teams:update', {
                                 action: view.action,
@@ -205,12 +207,12 @@
                     }
                 },
 
-                cancelTeam: function (event) {
+                cancelAndGoBack: function (event) {
                     event.preventDefault();
                     var url;
                     if (this.action === 'create') {
                         url = 'topics/' + this.topicID;
-                    } else {
+                    } else if(this.action === 'edit' ) {
                         url = 'teams/' + this.topicID + '/' + this.teamModel.get('id');
                     }
                     Backbone.history.navigate(url, {trigger: true});

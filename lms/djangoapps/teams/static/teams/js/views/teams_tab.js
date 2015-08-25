@@ -212,9 +212,7 @@
                             main: new TeamEditView({
                                 action: 'create',
                                 teamEvents: self.teamEvents,
-                                tagName: 'create-new-team',
-                                teamParams: teamsView.main.teamParams,
-                                primaryButtonTitle: 'Create'
+                                teamParams: teamsView.main.teamParams
                             })
                         });
                         self.render();
@@ -244,9 +242,7 @@
                                 main: new TeamEditView({
                                     action: 'edit',
                                     teamEvents: self.teamEvents,
-                                    tagName: 'create-new-team',
                                     teamParams: teamsView.main.teamParams,
-                                    primaryButtonTitle: 'Update',
                                     model: team,
                                     teamsDetailUrl: self.teamsDetailUrl
                                 })
