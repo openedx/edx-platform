@@ -40,6 +40,7 @@ class Project(TimeStampedModel):
 
         return query
 
+
 class Workgroup(TimeStampedModel):
     """
     Model representing the Workgroup concept.  Workgroups are an

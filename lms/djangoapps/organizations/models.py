@@ -22,4 +22,3 @@ class Organization(TimeStampedModel):
     workgroups = models.ManyToManyField(Workgroup, related_name="organizations")
     users = models.ManyToManyField(User, related_name="organizations")
     groups = models.ManyToManyField(Group, related_name="organizations")
-

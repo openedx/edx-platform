@@ -193,6 +193,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
 
     return threads, query_params
 
+
 def _set_group_names(course_id, threads):
     """ Adds group name if the thread has a group id"""
 
@@ -209,7 +210,6 @@ def _set_group_names(course_id, threads):
             thread['pinned'] = False
 
     return threads
-
 
 
 def use_bulk_ops(view_func):
@@ -321,7 +321,7 @@ def forum_form_discussion(request, course_key):
             'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id, # read from container in NewPostView
+            'user_cohort': user_cohort_id,  # read from container in NewPostView
             'cohorted_commentables': (get_cohorted_commentables(course_key)),
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
