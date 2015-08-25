@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:38+0000\n"
-"PO-Revision-Date: 2015-08-21 14:39:20.002663\n"
+"POT-Creation-Date: 2015-08-24 22:03+0000\n"
+"PO-Revision-Date: 2015-08-24 22:03:48.948707\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -85,6 +85,10 @@ msgstr "ÖK Ⱡ'σя#"
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: common/static/common/templates/discussion/thread-response-edit.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
@@ -105,6 +109,7 @@ msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-outline.underscore
+#: common/static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 
@@ -185,6 +190,8 @@ msgstr "Sävé Ⱡ'σяєм ι#"
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/signatory-editor.underscore
+#: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/forum-action-close.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
@@ -280,6 +287,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
 msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
@@ -740,6 +749,7 @@ msgstr "Édït HTML Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
 msgstr "Édït Ⱡ'σяєм ι#"
 
@@ -827,9 +837,11 @@ msgstr "Förmät Ⱡ'σяєм ιρѕυ#"
 msgid "Formats"
 msgstr "Förmäts Ⱡ'σяєм ιρѕυм #"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
 msgstr "Füllsçréén Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -1145,6 +1157,8 @@ msgstr "Néw wïndöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
 msgid "Next"
 msgstr "Néxt Ⱡ'σяєм ι#"
 
@@ -1500,6 +1514,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
 
@@ -1903,6 +1919,7 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
+#: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "… Ⱡ#"
 
@@ -2120,6 +2137,8 @@ msgid "Your post will be discarded."
 msgstr "Ýöür pöst wïll ßé dïsçärdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "änönýmöüs Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -2327,6 +2346,7 @@ msgstr "Däté pöstéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -2345,6 +2365,7 @@ msgid "Public"
 msgstr "Püßlïç Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "Search"
 msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
 
@@ -2451,6 +2472,7 @@ msgid "Language"
 msgstr "Längüägé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid ""
 "The language that team members primarily use to communicate with each other."
 msgstr ""
@@ -2463,6 +2485,7 @@ msgid "Country"
 msgstr "Çöüntrý Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "The country that team members primarily identify with."
 msgstr ""
 "Thé çöüntrý thät téäm mémßérs prïmärïlý ïdéntïfý wïth. Ⱡ'σяєм ιρѕυм ∂σłσя "
@@ -4795,6 +4818,7 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
+#: common/static/common/templates/discussion/post-user-display.underscore
 msgid "Staff"
 msgstr "Stäff Ⱡ'σяєм ιρѕ#"
 
@@ -5022,6 +5046,7 @@ msgid "Date Added"
 msgstr "Däté Àddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Type"
 msgstr "Týpé Ⱡ'σяєм ι#"
 
@@ -5818,10 +5843,546 @@ msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
 msgid "Due Date"
 msgstr "Düé Däté Ⱡ'σяєм ιρѕυм ∂#"
 
+#: cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
+msgid "Previous"
+msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
+
 #: cms/templates/js/previous-video-upload-list.underscore
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/common/templates/image-modal.underscore
+msgid "Large"
+msgstr "Lärgé Ⱡ'σяєм ιρѕ#"
+
+#: common/static/common/templates/image-modal.underscore
+msgid "Zoom In"
+msgstr "Zööm Ìn Ⱡ'σяєм ιρѕυм #"
+
+#: common/static/common/templates/image-modal.underscore
+msgid "Zoom Out"
+msgstr "Zööm Öüt Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/components/paging-footer.underscore
+msgid "Page number"
+msgstr "Pägé nümßér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/static/common/templates/components/paging-footer.underscore
+msgid "Enter the page number you'd like to quickly navigate to."
+msgstr ""
+"Éntér thé pägé nümßér ýöü'd lïké tö qüïçklý nävïgäté tö. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "DISCUSSION HOME:"
+msgstr "DÌSÇÛSSÌÖN HÖMÉ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/templates/commerce/provider.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/discovery/course_card.underscore
+msgid "gettext("
+msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Find discussions"
+msgstr "Fïnd dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Focus in on specific topics"
+msgstr "Föçüs ïn ön spéçïfïç töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Search for specific posts"
+msgstr "Séärçh för spéçïfïç pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Sort by date, vote, or comments"
+msgstr "Sört ßý däté, vöté, ör çömménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Engage with posts"
+msgstr "Éngägé wïth pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Upvote posts and good responses"
+msgstr "Ûpvöté pösts änd gööd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Report Forum Misuse"
+msgstr "Répört Förüm Mïsüsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Follow posts for updates"
+msgstr "Föllöw pösts för üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Receive updates"
+msgstr "Réçéïvé üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid "Toggle Notifications Setting"
+msgstr "Tögglé Nötïfïçätïöns Séttïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/static/common/templates/discussion/discussion-home.underscore
+msgid ""
+"Check this box to receive an email digest once a day notifying you about "
+"new, unread activity from posts you are following."
+msgstr ""
+"Çhéçk thïs ßöx tö réçéïvé än émäïl dïgést önçé ä däý nötïfýïng ýöü äßöüt "
+"néw, ünréäd äçtïvïtý fröm pösts ýöü äré föllöwïng. Ⱡ'σяєм ιρ#"
+
+#: common/static/common/templates/discussion/forum-action-answer.underscore
+msgid "Mark as Answer"
+msgstr "Märk äs Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/common/templates/discussion/forum-action-answer.underscore
+msgid "Unmark as Answer"
+msgstr "Ûnmärk äs Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/forum-action-close.underscore
+msgid "Open"
+msgstr "Öpén Ⱡ'σяєм ι#"
+
+#: common/static/common/templates/discussion/forum-action-endorse.underscore
+msgid "Endorse"
+msgstr "Éndörsé Ⱡ'σяєм ιρѕυм #"
+
+#: common/static/common/templates/discussion/forum-action-endorse.underscore
+msgid "Unendorse"
+msgstr "Ûnéndörsé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/common/templates/discussion/forum-action-follow.underscore
+msgid "Follow"
+msgstr "Föllöw Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/common/templates/discussion/forum-action-follow.underscore
+msgid "Unfollow"
+msgstr "Ûnföllöw Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/discussion/forum-action-pin.underscore
+msgid "Pin"
+msgstr "Pïn Ⱡ'σяєм#"
+
+#: common/static/common/templates/discussion/forum-action-pin.underscore
+msgid "Unpin"
+msgstr "Ûnpïn Ⱡ'σяєм ιρѕ#"
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+msgid "Report abuse"
+msgstr "Répört äßüsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+msgid "Report"
+msgstr "Répört Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+msgid "Unreport"
+msgstr "Ûnrépört Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/discussion/forum-action-vote.underscore
+msgid "Vote for this post,"
+msgstr "Vöté för thïs pöst, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Visible To:"
+msgstr "Vïsïßlé Tö: Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "All Groups"
+msgstr "Àll Gröüps Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single cohort."
+msgstr ""
+"Dïsçüssïön ädmïns, mödérätörs, änd TÀs çän mäké théïr pösts vïsïßlé tö äll "
+"stüdénts ör spéçïfý ä sïnglé çöhört. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Title:"
+msgstr "Tïtlé: Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr ""
+"Àdd ä çléär änd désçrïptïvé tïtlé tö énçöürägé pärtïçïpätïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Enter your question or comment"
+msgstr "Éntér ýöür qüéstïön ör çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "follow this post"
+msgstr "föllöw thïs pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "post anonymously"
+msgstr "pöst änönýmöüslý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "post anonymously to classmates"
+msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+msgid "Add Post"
+msgstr "Àdd Pöst Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "Community TA"
+msgstr "Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/static/common/templates/discussion/profile-thread.underscore
+#: common/static/common/templates/discussion/thread.underscore
+msgid "This thread is closed."
+msgstr "Thïs thréäd ïs çlöséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: common/static/common/templates/discussion/profile-thread.underscore
+msgid "View discussion"
+msgstr "Vïéw dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+msgid "Editing comment"
+msgstr "Édïtïng çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+msgid "Update comment"
+msgstr "Ûpdäté çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/common/templates/discussion/response-comment-show.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr "pöstéd %(time_ago)s ßý %(author)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/static/common/templates/discussion/response-comment-show.underscore
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "Reported"
+msgstr "Répörtéd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Editing post"
+msgstr "Édïtïng pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Edit post title"
+msgstr "Édït pöst tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Update post"
+msgstr "Ûpdäté pöst Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion"
+msgstr "dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "answered question"
+msgstr "änswéréd qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "unanswered question"
+msgstr "ünänswéréd qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr "Pïnnéd Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Following"
+msgstr "Föllöwïng Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "By: Staff"
+msgstr "Bý: Stäff Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "By: Community TA"
+msgstr "Bý: Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-response-show.underscore
+msgid "fmt"
+msgstr "fmt Ⱡ'σяєм#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr ""
+"%(comments_count)s %(span_sr_open)sçömménts (%(unread_comments_count)s "
+"ünréäd çömménts)%(span_close)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr ""
+"%(comments_count)s %(span_sr_open)sçömménts %(span_close)s Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+msgid "Editing response"
+msgstr "Édïtïng réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+msgid "Update response"
+msgstr "Ûpdäté réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr ""
+"märkéd äs änswér %(time_ago)s ßý %(user)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє#"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr "märkéd äs änswér %(time_ago)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr "éndörséd %(time_ago)s ßý %(user)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr "éndörséd %(time_ago)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/static/common/templates/discussion/thread-response.underscore
+msgid "fmts"
+msgstr "fmts Ⱡ'σяєм ι#"
+
+#: common/static/common/templates/discussion/thread-response.underscore
+msgid "Add a comment"
+msgstr "Àdd ä çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+"Thïs pöst ïs vïsïßlé önlý tö %(group_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+"Thïs pöst ïs vïsïßlé tö évérýöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+"%(post_type)s pöstéd %(time_ago)s ßý %(author)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" #"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+msgid "Closed"
+msgstr "Çlöséd Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr "Rélätéd tö: %(courseware_title_linked)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Post type:"
+msgstr "Pöst týpé: Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Question"
+msgstr "Qüéstïön Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Discussion"
+msgstr "Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations."
+msgstr ""
+"Qüéstïöns räïsé ïssüés thät nééd änswérs. Dïsçüssïöns shäré ïdéäs änd stärt "
+"çönvérsätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Add a Response"
+msgstr "Àdd ä Réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Post a response:"
+msgstr "Pöst ä réspönsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Expand discussion"
+msgstr "Éxpänd dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/static/common/templates/discussion/thread.underscore
+msgid "Collapse discussion"
+msgstr "Çölläpsé dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Topic Area:"
+msgstr "Töpïç Àréä: Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Discussion topics; current selection is:"
+msgstr ""
+"Dïsçüssïön töpïçs; çürrént séléçtïön ïs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Filter topics"
+msgstr "Fïltér töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/common/templates/discussion/topic.underscore
+msgid "Add your post to a relevant topic to help others find it."
+msgstr ""
+"Àdd ýöür pöst tö ä rélévänt töpïç tö hélp öthérs fïnd ït. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/static/common/templates/discussion/user-profile.underscore
+msgid "Active Threads"
+msgstr "Àçtïvé Thréäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+msgid "username or email"
+msgstr "üsérnämé ör émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "No results"
+msgstr "Nö résülts Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Course Key"
+msgstr "Çöürsé Kéý Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Download URL"
+msgstr "Döwnlöäd ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Grade"
+msgstr "Grädé Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Last Updated"
+msgstr "Läst Ûpdätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Download the user's certificate"
+msgstr "Döwnlöäd thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Not available"
+msgstr "Nöt äväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Regenerate"
+msgstr "Régénéräté Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Regenerate the user's certificate"
+msgstr ""
+"Régénéräté thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Your team could not be created!"
+msgstr "Ýöür téäm çöüld nöt ßé çréätéd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid ""
+"Enter information to describe your team. You cannot change these details "
+"after you create the team."
+msgstr ""
+"Éntér ïnförmätïön tö désçrïßé ýöür téäm. Ýöü çännöt çhängé thésé détäïls "
+"äftér ýöü çréäté thé téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Optional Characteristics"
+msgstr "Öptïönäl Çhäräçtérïstïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid ""
+"Help other learners decide whether to join your team by specifying some "
+"characteristics for your team. Choose carefully, because fewer people might "
+"be interested in joining your team if it seems too restrictive."
+msgstr ""
+"Hélp öthér léärnérs déçïdé whéthér tö jöïn ýöür téäm ßý spéçïfýïng sömé "
+"çhäräçtérïstïçs för ýöür téäm. Çhöösé çäréfüllý, ßéçäüsé féwér péöplé mïght "
+"ßé ïntéréstéd ïn jöïnïng ýöür téäm ïf ït sééms töö réstrïçtïvé. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρт#"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "{primaryButtonTitle} {span_start}a new team{span_end}"
+msgstr ""
+"{primaryButtonTitle} {span_start}ä néw téäm{span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, #"
+
+#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
+msgid "Cancel {span_start}a new team{span_end}"
+msgstr ""
+"Çänçél {span_start}ä néw téäm{span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
+msgid "Are you having trouble finding a team to join?"
+msgstr ""
+"Àré ýöü hävïng tröüßlé fïndïng ä téäm tö jöïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-join.underscore
+msgid "Join Team"
+msgstr "Jöïn Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "New Post"
+msgstr "Néw Pöst Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Details"
+msgstr "Téäm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "You are a member of this team."
+msgstr "Ýöü äré ä mémßér öf thïs téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team member profiles"
+msgstr "Téäm mémßér pröfïlés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team capacity"
+msgstr "Téäm çäpäçïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "country"
+msgstr "çöüntrý Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "language"
+msgstr "längüägé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Leave Team"
+msgstr "Léävé Téäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/static/js/fixtures/donation.underscore
+#: lms/templates/dashboard/donation.underscore
+msgid "Donate"
+msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -5862,12 +6423,6 @@ msgstr "tögglé süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #: lms/templates/ccx/schedule.underscore
 msgid "Subsection"
 msgstr "Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/commerce/provider.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/discovery/course_card.underscore
-msgid "gettext("
-msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -5975,10 +6530,6 @@ msgstr "Märk Éxäm Às Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr "Énd Mý Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/dashboard/donation.underscore
-msgid "Donate"
-msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -7752,10 +8303,6 @@ msgstr ""
 #: cms/templates/js/no-textbooks.underscore
 msgid "Add your first textbook"
 msgstr "Àdd ýöür fïrst téxtßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/templates/js/paging-header.underscore
-msgid "Previous"
-msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
