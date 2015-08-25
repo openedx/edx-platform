@@ -23,7 +23,7 @@ class RegistryTest(testutil.TestCase):
         enabled_providers = provider.Registry.enabled()
         self.assertEqual(len(enabled_providers), 1)
         self.assertEqual(enabled_providers[0].name, "Google")
-        self.assertEqual(enabled_providers[0].secret, "opensesame")
+        self.assertEqual(enabled_providers[0].get_setting("SECRET"), "opensesame")
 
         self.configure_google_provider(enabled=False)
         enabled_providers = provider.Registry.enabled()
@@ -32,7 +32,17 @@ class RegistryTest(testutil.TestCase):
         self.configure_google_provider(enabled=True, secret="alohomora")
         enabled_providers = provider.Registry.enabled()
         self.assertEqual(len(enabled_providers), 1)
-        self.assertEqual(enabled_providers[0].secret, "alohomora")
+        self.assertEqual(enabled_providers[0].get_setting("SECRET"), "alohomora")
+
+    def test_secure_configuration(self):
+        """ Test that some sensitive values can be configured via Django settings """
+        self.configure_google_provider(enabled=True, secret="")
+        enabled_providers = provider.Registry.enabled()
+        self.assertEqual(len(enabled_providers), 1)
+        self.assertEqual(enabled_providers[0].name, "Google")
+        self.assertEqual(enabled_providers[0].get_setting("SECRET"), "")
+        with self.settings(SOCIAL_AUTH_OAUTH_SECRETS={'google-oauth2': 'secret42'}):
+            self.assertEqual(enabled_providers[0].get_setting("SECRET"), "secret42")
 
     def test_cannot_load_arbitrary_backends(self):
         """ Test that only backend_names listed in settings.AUTHENTICATION_BACKENDS can be used """
