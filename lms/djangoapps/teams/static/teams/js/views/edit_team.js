@@ -35,7 +35,8 @@
                     _.bindAll(this, 'cancelAndGoBack', 'createOrUpdateTeam');
 
                     if (this.action === 'create') {
-                        this.teamModel = new TeamModel({ url:this.teamsUrl });
+                        this.teamModel = new TeamModel({});
+                        this.teamModel.url = this.teamsUrl;
                         this.primaryButtonTitle = 'Create';
                     } else if(this.action === 'edit' ) {
                         this.teamModel = options.model;

@@ -629,27 +629,14 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
 
 
 @attr('shard_5')
-@ddt.ddt
-class CreateAndEditTeamTest(TeamsTabBase):
+class TeamFormActions(TeamsTabBase):
     """
-    Tests for creating a new Team within a Topic on the Teams page.
+    Base class for create & edit team.
     """
+    TEAM_DESCRIPTION = 'The Avengers are a fictional team of superheroes.'
 
-    def setUp(self):
-        super(CreateAndEditTeamTest, self).setUp()
-        self.topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
-        self.set_team_configuration(
-            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
-            global_staff=True
-        )
-
-        self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
-        self.browse_teams_page.visit()
-        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
-        self.team_name = 'Avengers'
-
-        self.team = self.create_teams(self.topic, num_teams=1)[0]
-        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+    topic = {'name': 'Example Topic', 'id': 'example_topic', 'description': 'Description'}
+    team_name = 'Avengers'
 
     def verify_page_header(self, title, description, breadcrumbs):
         """
@@ -672,6 +659,7 @@ class CreateAndEditTeamTest(TeamsTabBase):
 
     def verify_and_navigate_to_edit_team_page(self):
         """Navigates to the edit team page and verifies."""
+        # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, self.team['name'])
         self.assertTrue(self.team_page.edit_team_button_present)
 
@@ -688,6 +676,7 @@ class CreateAndEditTeamTest(TeamsTabBase):
 
     def verify_form_values_on_team_page(self, name, description, location, language):
         """Verify the values for create/edit form."""
+        # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, name)
         self.assertEqual(self.team_page.team_description, description)
         self.assertEqual(self.team_page.team_location, location)
@@ -698,12 +687,12 @@ class CreateAndEditTeamTest(TeamsTabBase):
         self.create_or_edit_team_page.value_for_text_field(field_id='name', value=self.team_name, press_enter=False)
         self.create_or_edit_team_page.value_for_textarea_field(
             field_id='description',
-            value='The Avengers are a fictional team of superheroes.'
+            value=self.TEAM_DESCRIPTION
         )
         self.create_or_edit_team_page.value_for_dropdown_field(field_id='language', value='English')
         self.create_or_edit_team_page.value_for_dropdown_field(field_id='country', value='Pakistan')
 
-    def verify_create_or_edit_page(self):
+    def verify_team_data(self):
         """
         Verify the fields for create/edit page.
         """
@@ -725,6 +714,21 @@ class CreateAndEditTeamTest(TeamsTabBase):
             'The language that team members primarily use to communicate with each other.'
         )
 
+
+@ddt.ddt
+class CreateTeamTest(TeamFormActions):
+    """
+    Tests for creating a new Team within a Topic on the Teams page.
+    """
+
+    def setUp(self):
+        super(CreateTeamTest, self).setUp()
+        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+
+        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
+        self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
+        self.browse_teams_page.visit()
+
     def test_user_can_see_create_team_page(self):
         """
         Scenario: The user should be able to see the create team page via teams list page.
@@ -737,7 +741,7 @@ class CreateAndEditTeamTest(TeamsTabBase):
         And I should also see the help messages for fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.verify_create_or_edit_page()
+        self.verify_team_data()
 
     def test_user_can_see_error_message_for_missing_data(self):
         """
@@ -815,14 +819,15 @@ class CreateAndEditTeamTest(TeamsTabBase):
         self.create_or_edit_team_page.submit_form()
 
         # Verify that the page is shown for the new team
-        self.team_page.wait_for_page()
-        self.assertEqual(self.team_page.team_name, self.team_name)
-        self.assertEqual(self.team_page.team_description, 'The Avengers are a fictional team of superheroes.')
-        self.assertEqual(self.team_page.team_user_membership_text, 'You are a member of this team.')
+        team_page = TeamPage(self.browser, self.course_id)
+        team_page.wait_for_page()
+        self.assertEqual(team_page.team_name, self.team_name)
+        self.assertEqual(team_page.team_description, self.TEAM_DESCRIPTION)
+        self.assertEqual(team_page.team_user_membership_text, 'You are a member of this team.')
 
         # Verify the new team was added to the topic list
         self.teams_page.click_specific_topic("Example Topic")
-        self.teams_page.verify_topic_team_count(2)
+        self.teams_page.verify_topic_team_count(1)
 
         self.teams_page.click_all_topics()
         self.teams_page.verify_team_count_in_first_topic(1)
@@ -853,6 +858,27 @@ class CreateAndEditTeamTest(TeamsTabBase):
 
         self.verify_my_team_count(0)
 
+
+@ddt.ddt
+class EditTeamTest(TeamFormActions):
+    """
+    Tests for editing the team.
+    """
+
+    def setUp(self):
+        super(EditTeamTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+        self.create_or_edit_team_page = CreateOrEditTeamPage(self.browser, self.course_id, self.topic)
+
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+        self.team_page.visit()
+        self.team_page.wait_for_page()
+
     def test_staff_can_navigate_to_edit_team_page(self):
         """
         Scenario: The user should be able to see and navigate to the edit team page.
@@ -865,11 +891,8 @@ class CreateAndEditTeamTest(TeamsTabBase):
         And I should also see the help messages for fields
         And I should also see the warning message.
         """
-        self.team_page.visit()
-        self.team_page.wait_for_page()
-
         self.verify_and_navigate_to_edit_team_page()
-        self.verify_create_or_edit_page()
+        self.verify_team_data()
         self.assertEqual(
             self.create_or_edit_team_page.warning_message_text,
             'The team that you are editing has 0 members. '
@@ -888,9 +911,6 @@ class CreateAndEditTeamTest(TeamsTabBase):
         And I click Update button
         Then I should see the page for my team with updated data
         """
-        self.team_page.visit()
-        self.team_page.wait_for_page()
-
         self.verify_form_values_on_team_page(
             name=self.team['name'],
             description=self.team['description'],
@@ -906,7 +926,7 @@ class CreateAndEditTeamTest(TeamsTabBase):
 
         self.verify_form_values_on_team_page(
             name=self.team_name,
-            description='The Avengers are a fictional team of superheroes.',
+            description=self.TEAM_DESCRIPTION,
             location='Pakistan',
             language='English'
         )
@@ -923,9 +943,6 @@ class CreateAndEditTeamTest(TeamsTabBase):
         When I click Cancel button
         Then I should see team page page without changes.
         """
-        self.team_page.visit()
-        self.team_page.wait_for_page()
-
         self.verify_form_values_on_team_page(
             name=self.team['name'],
             description=self.team['description'],
@@ -960,10 +977,10 @@ class CreateAndEditTeamTest(TeamsTabBase):
         self.assertFalse(self.team_page.edit_team_button_present)
 
     @ddt.data('Moderator', 'Community TA', 'Administrator')
-    def test_discussion_privileged_user_can_see_edit_button(self, role):
+    def test_discussion_privileged_user_can_edit_team(self, role):
         """
         Scenario: The user with specified role should see the edit team button.
-        Given I am user with role for a course with a team
+        Given I am user with privileged role for a course with a team
         When I visit the Team profile page
         Then I should see the Edit Team button
         """
@@ -979,6 +996,26 @@ class CreateAndEditTeamTest(TeamsTabBase):
         self.team_page.visit()
         self.teams_page.wait_for_page()
         self.assertTrue(self.team_page.edit_team_button_present)
+
+        self.verify_form_values_on_team_page(
+            name=self.team['name'],
+            description=self.team['description'],
+            location='Afghanistan',
+            language='Afar'
+        )
+        self.verify_and_navigate_to_edit_team_page()
+
+        self.fill_create_or_edit_form()
+        self.create_or_edit_team_page.submit_form()
+
+        self.team_page.wait_for_page()
+
+        self.verify_form_values_on_team_page(
+            name=self.team_name,
+            description=self.TEAM_DESCRIPTION,
+            location='Pakistan',
+            language='English'
+        )
 
 
 @attr('shard_5')

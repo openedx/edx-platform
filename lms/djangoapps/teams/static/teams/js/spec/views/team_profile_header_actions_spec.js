@@ -231,11 +231,11 @@ define([
                 expect(view.$('.action-edit-team').length).toEqual(showEditButton ? 1 : 0);
             };
 
-            it('can render itself for staff or privileged user', function () {
+            it('renders when option showEditButton is true', function () {
                 createAndAssertView(true);
             });
 
-            it('cannot render itself for non-staff and non-privileged user', function () {
+            it('does not render when option showEditButton is false', function () {
                 createAndAssertView(false);
             });
 
