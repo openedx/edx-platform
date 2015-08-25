@@ -28,12 +28,17 @@
             <div class="msg-content">
                 <div class="copy">
                 <p>
-                    <%=
-                        interpolate_text(
-                            _.escape(gettext("The team that you are editing has {total_members} members. Notify team members prior to making significant changes.")),
+                    <%-
+                        interpolate(
+                            ngettext(
+                                'The team that you are editing has %(total_members)s member. Notify team members prior to making significant changes.',
+                                'The team that you are editing has %(total_members)s members. Notify team members prior to making significant changes.',
+                                totalMembers
+                            ),
                             {
-                                'total_members': totalMembers
-                            }
+                                total_members: totalMembers
+                            },
+                            true
                         )
                     %>
                 </p>
