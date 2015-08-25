@@ -50,4 +50,3 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         """ Meta class for defining additional serializer characteristics """
         model = Group
         fields = ('id', 'url', 'name', 'type', 'data')
-

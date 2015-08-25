@@ -796,10 +796,8 @@ def _get_current_position_loc(parent_module):
     the Mongo database
     """
 
-
     if not hasattr(parent_module, 'position'):
         return None
-
 
     if not parent_module.children:
         return None
@@ -904,10 +902,12 @@ class UsersCoursesDetail(SecureAPIView):
         parent_module = course_module
         while parent_module is not None:
             current_child_loc = _get_current_position_loc(parent_module)
-            if  current_child_loc:
+            if current_child_loc:
                 response_data['position_tree'][current_child_loc.category] = {}
                 response_data['position_tree'][current_child_loc.category]['id'] = unicode(current_child_loc)
-                _,_,parent_module = get_course_child(request, user, course_key, unicode(current_child_loc), load_content=True)
+                _, _, parent_module = get_course_child(
+                    request, user, course_key, unicode(current_child_loc), load_content=True
+                )
             else:
                 parent_module = None
         return Response(response_data, status=status.HTTP_200_OK)
@@ -1098,6 +1098,7 @@ class UsersPreferences(SecureAPIView):
                 status_code = status.HTTP_201_CREATED
 
         return Response({}, status_code)
+
 
 class UsersPreferencesDetail(SecureAPIView):
     """

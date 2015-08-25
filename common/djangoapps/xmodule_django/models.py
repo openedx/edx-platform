@@ -149,6 +149,7 @@ class CourseKeyField(OpaqueKeyField):
     description = "A CourseKey object, saved to the DB in the form of a string"
     KEY_CLASS = CourseKey
 
+
 class UsageKeyField(OpaqueKeyField):
     """
     A django Field that stores a UsageKey object as a string.

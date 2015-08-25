@@ -158,4 +158,3 @@ class StudentEngagementTests(ModuleStoreTestCase):
 
             self.assertEqual(get_notifications_count_for_user(self.user.id), 0)
             self.assertEqual(get_notifications_count_for_user(self.user2.id), 0)
-

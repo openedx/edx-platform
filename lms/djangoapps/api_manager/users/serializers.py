@@ -6,6 +6,7 @@ from api_manager.models import APIUser
 from organizations.serializers import BasicOrganizationSerializer
 from student.models import UserProfile
 
+
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
     A ModelSerializer that takes an additional `fields` argument that
@@ -25,6 +26,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
 
+
 class UserSerializer(DynamicFieldsModelSerializer):
 
     """ Serializer for User model interactions """
@@ -42,6 +44,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
         fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active", "organizations", "avatar_url", "city", "title", "country", "full_name", "is_staff")
         read_only_fields = ("id", "email", "username")
 
+
 class SimpleUserSerializer(DynamicFieldsModelSerializer):
     created = serializers.DateTimeField(source='date_joined', required=False)
 
@@ -50,6 +53,7 @@ class SimpleUserSerializer(DynamicFieldsModelSerializer):
         model = APIUser
         fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active")
         read_only_fields = ("id", "email", "username")
+
 
 class UserCountByCitySerializer(serializers.Serializer):
     """ Serializer for user count by city """
