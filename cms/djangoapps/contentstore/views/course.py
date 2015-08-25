@@ -123,6 +123,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
 WAFFLE_NAMESPACE = 'studio_home'
 
 
+
 class AccessListFallback(Exception):
     """
     An exception that is raised whenever we need to `fall back` to fetching *all* courses
@@ -990,7 +991,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     excerpt = strip_tags(request.json['content'])
 
                     excerpt = excerpt.strip()
-                    excerpt = excerpt.replace('\n','').replace('\r','')
+                    excerpt = excerpt.replace('\n', '').replace('\r', '')
 
                     announcement_date = request.json['date']
 

@@ -14,6 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_st
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
+
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class MigrateCourseIdsTests(ModuleStoreTestCase):
     """
@@ -31,7 +32,6 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         self.good_style_course_id2 = "old2/style2/id2"
         self.bad_style_content_id2 = "location:old2+style2+id2+chapter2+1234567890"
         self.good_style_content_id2 = "i4x://old2/style2/chapter2/1234567890"
-
 
     def test_migrate_project_courseids_v2(self):
         """

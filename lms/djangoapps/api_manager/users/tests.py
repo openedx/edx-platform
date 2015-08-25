@@ -48,19 +48,20 @@ def _fake_get_user_social_stats(user_id, course_id, end_date=None):
         raise Exception('Expected None end_date parameter')
 
     return {
-        '1': {'foo':'bar'}
+        '1': {'foo': 'bar'}
     }
+
 
 def _fake_get_user_social_stats_with_end(user_id, course_id, end_date=None):
     if not end_date:
         raise Exception('Expected non-None end_date parameter')
 
     return {
-        '1': {'foo':'bar'}
+        '1': {'foo': 'bar'}
     }
 
-class SecureClient(Client):
 
+class SecureClient(Client):
     """ Django test client using a "secure" connection. """
 
     def __init__(self, *args, **kwargs):
@@ -198,14 +199,14 @@ class UsersApiTests(ModuleStoreTestCase):
         test_uri = self.users_base_uri
         for i in xrange(1, 7):
             data = {
-                    'email': 'test{}@example.com'.format(i),
-                    'username': 'test_user{}'.format(i),
-                    'password': 'PassWord1',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'city': 'Boston',
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'PassWord1',
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'city': 'Boston',
+                'is_staff': True if i % 2 == 0 else False,
             }
-            data['is_staff'] = True if i % 2 == 0 else False
 
             response = self.do_post(test_uri, data)
             self.assertEqual(response.status_code, 201)
@@ -1097,7 +1098,7 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_post(confirm_uri, data=position_data)
         self.assertEqual(response.data['positions'][0], unicode(chapter1.scope_ids.usage_id))
         response = self.do_get(confirm_uri)
-        self.assertGreater(response.data['position'], 0) # Position in the GET response is an integer!
+        self.assertGreater(response.data['position'], 0)  # Position in the GET response is an integer!
         self.assertEqual(response.data['position_tree']['chapter']['id'], unicode(chapter1.scope_ids.usage_id))
 
     def test_user_courses_detail_get_invalid_course(self):
@@ -1141,8 +1142,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
-        response = self.do_post(post_uri, data)
-                                # Re-enroll the student in the course
+        response = self.do_post(post_uri, data)  # Re-enroll the student in the course
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1528,8 +1528,8 @@ class UsersApiTests(ModuleStoreTestCase):
             content_id=unicode(self.course_content.scope_ids.usage_id),
         )
         p1_workgroup_1 = Workgroup.objects.create(
-            name = 'Workgroup 1',
-            project = project_1
+            name='Workgroup 1',
+            project=project_1
         )
 
         project_2 = Project.objects.create(
@@ -1537,10 +1537,10 @@ class UsersApiTests(ModuleStoreTestCase):
             content_id=unicode(self.course2_content.scope_ids.usage_id),
         )
         p2_workgroup_1 = Workgroup.objects.create(
-            name = 'Workgroup 2',
-            project = project_2
+            name='Workgroup 2',
+            project=project_2
         )
-        for i in xrange(1,12):
+        for __ in xrange(1, 12):
             test_user = UserFactory()
             users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 1)
             data = {"id": test_user.id}

@@ -41,7 +41,7 @@ class CourseNamespaceResolver(NotificationNamespaceResolver):
                 course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
                 try:
-                   course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+                    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
                 except InvalidKeyError:
                     return None
         else:
@@ -62,5 +62,3 @@ class CourseNamespaceResolver(NotificationNamespaceResolver):
             },
             'default_user_resolver': NamespaceEnrollmentsScopeResolver(),
         }
-
-

@@ -97,6 +97,7 @@ def _remove_instructors(course_key):
         log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
+
 def get_lms_link_for_item(location, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.

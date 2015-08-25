@@ -113,8 +113,8 @@ class NotificationsService(object):
         This is the class factory to make sure this is a Singleton
         """
         if not cls._instance:
-            cls._instance = super(NotificationsService, cls).__new__(
-                                cls, *args, **kwargs)
+            cls._instance = super(
+                NotificationsService, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self):
@@ -150,8 +150,8 @@ class CoursewareParentInfoService(object):
         This is the class factory to make sure this is a Singleton
         """
         if not cls._instance:
-            cls._instance = super(CoursewareParentInfoService, cls).__new__(
-                                cls, *args, **kwargs)
+            cls._instance = super(
+                CoursewareParentInfoService, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def get_parent_info(self, module):
@@ -166,4 +166,3 @@ class CoursewareParentInfoService(object):
             'location': parent_location,
             'display_name': parent_module.display_name
         }
-
