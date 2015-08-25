@@ -15,19 +15,22 @@ import json
 from student.tests.factories import UserFactory, CourseModeFactory
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @attr('shard_1')
 @override_settings(REGISTRATION_CODE_LENGTH=8)
-class TestCourseRegistrationCodeStatus(ModuleStoreTestCase):
+class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """
     Test registration code status.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseRegistrationCodeStatus, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestCourseRegistrationCodeStatus, self).setUp()
-        self.course = CourseFactory.create()
         CourseModeFactory.create(course_id=self.course.id, min_price=50)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')

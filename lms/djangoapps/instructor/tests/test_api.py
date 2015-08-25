@@ -51,7 +51,7 @@ from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
@@ -184,22 +184,26 @@ class TestCommonExceptions400(TestCase):
 @attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIDenyLevels, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.problem_location = msk_from_problem_urlname(
+            cls.course.id,
+            'robot-some-problem-urlname'
+        )
+        cls.problem_urlname = cls.problem_location.to_deprecated_string()
+
     def setUp(self):
         super(TestInstructorAPIDenyLevels, self).setUp()
-        self.course = CourseFactory.create()
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
 
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-        self.problem_urlname = self.problem_location.to_deprecated_string()
         _module = StudentModule.objects.create(
             student=self.user,
             course_id=self.course.id,
@@ -347,18 +351,22 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
-class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test Bulk account creation and enrollment from csv file
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIBulkAccountCreationAndEnrollment, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.url = reverse('register_and_enroll_students', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+
     def setUp(self):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
 
         self.request = RequestFactory().request()
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
-        self.url = reverse('register_and_enroll_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         self.not_enrolled_student = UserFactory(
             username='NotEnrolledStudent',
@@ -647,7 +655,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
 
 @attr('shard_1')
 @ddt.ddt
-class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test enrollment modification endpoint.
 
@@ -655,11 +663,23 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     job of test_enrollment. This tests the response and action switch.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIEnrollment, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+        # Email URL values
+        cls.site_name = microsite.get_value(
+            'SITE_NAME',
+            settings.SITE_NAME
+        )
+        cls.about_path = '/courses/{}/about'.format(cls.course.id)
+        cls.course_path = '/courses/{}/'.format(cls.course.id)
+
     def setUp(self):
         super(TestInstructorAPIEnrollment, self).setUp()
 
         self.request = RequestFactory().request()
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -678,14 +698,6 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.notregistered_email = 'robot-not-an-email-yet@robot.org'
         self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
-
-        # Email URL values
-        self.site_name = microsite.get_value(
-            'SITE_NAME',
-            settings.SITE_NAME
-        )
-        self.about_path = '/courses/{}/about'.format(self.course.id)
-        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -1399,15 +1411,25 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 @attr('shard_1')
 @ddt.ddt
-class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test bulk beta modify access endpoint.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIBulkBetaEnrollment, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        # Email URL values
+        cls.site_name = microsite.get_value(
+            'SITE_NAME',
+            settings.SITE_NAME
+        )
+        cls.about_path = '/courses/{}/about'.format(cls.course.id)
+        cls.course_path = '/courses/{}/'.format(cls.course.id)
 
     def setUp(self):
         super(TestInstructorAPIBulkBetaEnrollment, self).setUp()
 
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -1424,14 +1446,6 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
 
         self.request = RequestFactory().request()
-
-        # Email URL values
-        self.site_name = microsite.get_value(
-            'SITE_NAME',
-            settings.SITE_NAME
-        )
-        self.about_path = '/courses/{}/about'.format(self.course.id)
-        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -1720,7 +1734,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
 
 @attr('shard_1')
-class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
     of other users.
@@ -1731,11 +1745,14 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     Actually, modify_access does not have a very meaningful
     response yet, so only the status code is tested.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPILevelsAccess, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestInstructorAPILevelsAccess, self).setUp()
 
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -1961,14 +1978,17 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
 @attr('shard_1')
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints that show data without side effects.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPILevelsDataDump, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestInstructorAPILevelsDataDump, self).setUp()
-        self.course = CourseFactory.create()
         self.course_mode = CourseMode(course_id=self.course.id,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -2539,9 +2559,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
             '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
-            '\n"3","41","42"\n'
+            '\n"{user_id}","41","42"\n'.format(user_id=self.students[0].id)
         ))
-        self.assertTrue(body.endswith('"8","41","42"\n'))
+        self.assertTrue(
+            body.endswith('"{user_id}","41","42"\n'.format(user_id=self.students[-1].id))
+        )
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -2664,7 +2686,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
 
 @attr('shard_1')
-class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change student grades.
     This includes resetting attempts and starting rescore tasks.
@@ -2672,22 +2694,23 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     This test does NOT test whether the actions had an effect on the
     database, that is the job of task tests and test_enrollment.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIRegradeTask, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.problem_location = msk_from_problem_urlname(
+            cls.course.id,
+            'robot-some-problem-urlname'
+        )
+        cls.problem_urlname = cls.problem_location.to_deprecated_string()
 
     def setUp(self):
         super(TestInstructorAPIRegradeTask, self).setUp()
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
-
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-
-        self.problem_urlname = self.problem_location.to_deprecated_string()
 
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
@@ -2827,21 +2850,51 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
-class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can rescore student grades,
     reset student attempts and delete state for entrance exam.
     """
-
-    def setUp(self):
-        super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()
-        self.course = CourseFactory.create(
+    @classmethod
+    def setUpClass(cls):
+        super(TestEntranceExamInstructorAPIRegradeTask, cls).setUpClass()
+        cls.course = CourseFactory.create(
             org='test_org',
             course='test_course',
             run='test_run',
             entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
         )
-        self.course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
+        cls.course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
+
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.entrance_exam = ItemFactory.create(
+                parent=cls.course,
+                category='chapter',
+                display_name='Entrance exam'
+            )
+            subsection = ItemFactory.create(
+                parent=cls.entrance_exam,
+                category='sequential',
+                display_name='Subsection 1'
+            )
+            vertical = ItemFactory.create(
+                parent=subsection,
+                category='vertical',
+                display_name='Vertical 1'
+            )
+            cls.ee_problem_1 = ItemFactory.create(
+                parent=vertical,
+                category="problem",
+                display_name="Exam Problem - Problem 1"
+            )
+            cls.ee_problem_2 = ItemFactory.create(
+                parent=vertical,
+                category="problem",
+                display_name="Exam Problem - Problem 2"
+            )
+
+    def setUp(self):
+        super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         # Add instructor to invalid ee course
@@ -2850,32 +2903,6 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
-
-        self.entrance_exam = ItemFactory.create(
-            parent=self.course,
-            category='chapter',
-            display_name='Entrance exam'
-        )
-        subsection = ItemFactory.create(
-            parent=self.entrance_exam,
-            category='sequential',
-            display_name='Subsection 1'
-        )
-        vertical = ItemFactory.create(
-            parent=subsection,
-            category='vertical',
-            display_name='Vertical 1'
-        )
-        self.ee_problem_1 = ItemFactory.create(
-            parent=vertical,
-            category="problem",
-            display_name="Exam Problem - Problem 1"
-        )
-        self.ee_problem_2 = ItemFactory.create(
-            parent=vertical,
-            category="problem",
-            display_name="Exam Problem - Problem 2"
-        )
 
         ee_module_to_reset1 = StudentModule.objects.create(
             student=self.student,
@@ -3073,26 +3100,29 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
 @attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
     these endpoints are only accessible with courses that actually exist,
     only with valid email messages.
     """
-
-    def setUp(self):
-        super(TestInstructorSendEmail, self).setUp()
-
-        self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorSendEmail, cls).setUpClass()
+        cls.course = CourseFactory.create()
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
-        self.full_test_message = {
+        cls.full_test_message = {
             'send_to': 'staff',
             'subject': test_subject,
             'message': test_message,
         }
+
+    def setUp(self):
+        super(TestInstructorSendEmail, self).setUp()
+
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
 
     def test_send_email_as_logged_in_instructor(self):
         url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -3156,7 +3186,7 @@ class MockCompletionInfo(object):
 
 
 @attr('shard_1')
-class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test instructor task list endpoint.
     """
@@ -3204,22 +3234,25 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             attr_dict['created'] = attr_dict['created'].isoformat()
             return attr_dict
 
-    def setUp(self):
-        super(TestInstructorAPITaskLists, self).setUp()
-        self.course = CourseFactory.create(
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPITaskLists, cls).setUpClass()
+        cls.course = CourseFactory.create(
             entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
         )
+        cls.problem_location = msk_from_problem_urlname(
+            cls.course.id,
+            'robot-some-problem-urlname'
+        )
+        cls.problem_urlname = cls.problem_location.to_deprecated_string()
+
+    def setUp(self):
+        super(TestInstructorAPITaskLists, self).setUp()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
-
-        self.problem_location = msk_from_problem_urlname(
-            self.course.id,
-            'robot-some-problem-urlname'
-        )
-        self.problem_urlname = self.problem_location.to_deprecated_string()
 
         self.module = StudentModule.objects.create(
             student=self.student,
@@ -3316,15 +3349,18 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 @attr('shard_1')
 @patch.object(instructor_task.api, 'get_instructor_task_history')
-class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test the instructor email content history endpoint.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorEmailContentList, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestInstructorEmailContentList, self).setUp()
 
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         self.tasks = {}
@@ -3500,10 +3536,30 @@ def get_extended_due(course, unit, user):
 
 
 @attr('shard_1')
-class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestDueDateExtensions, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.week1 = ItemFactory.create(due=cls.due)
+            cls.week2 = ItemFactory.create(due=cls.due)
+            cls.week3 = ItemFactory.create()  # No due date
+            cls.course.children = [
+                cls.week1.location.to_deprecated_string(),
+                cls.week2.location.to_deprecated_string(),
+                cls.week3.location.to_deprecated_string()
+            ]
+            cls.homework = ItemFactory.create(
+                parent_location=cls.week1.location,
+                due=cls.due
+            )
+            cls.week1.children = [cls.homework.location.to_deprecated_string()]
 
     def setUp(self):
         """
@@ -3511,75 +3567,55 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         super(TestDueDateExtensions, self).setUp()
 
-        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
-        course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due)
-        week2 = ItemFactory.create(due=due)
-        week3 = ItemFactory.create()  # No due date
-        course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
-                           week3.location.to_deprecated_string()]
-
-        homework = ItemFactory.create(
-            parent_location=week1.location,
-            due=due
-        )
-        week1.children = [homework.location.to_deprecated_string()]
-
         user1 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user1.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
-            course_id=course.id,
-            module_state_key=week2.location).save()
+            course_id=self.course.id,
+            module_state_key=self.week2.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
-            course_id=course.id,
-            module_state_key=week3.location).save()
+            course_id=self.course.id,
+            module_state_key=self.week3.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
-            course_id=course.id,
-            module_state_key=week1.location).save()
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
-            course_id=course.id,
-            module_state_key=homework.location).save()
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
 
-        self.course = course
-        self.week1 = week1
-        self.homework = homework
-        self.week2 = week2
-        self.week3 = week3
         self.user1 = user1
         self.user2 = user2
-
-        self.instructor = InstructorFactory(course_key=course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
     def test_change_due_date(self):
@@ -3640,6 +3676,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         })
         self.assertEqual(response.status_code, 400, response.content)
 
+    @SharedModuleStoreTestCase.modifies_courseware
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal
@@ -3690,10 +3727,18 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 @attr('shard_1')
 @override_settings(REGISTRATION_CODE_LENGTH=8)
-class TestCourseRegistrationCodes(ModuleStoreTestCase):
+class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
     """
     Test data dumps for E-commerce Course Registration Codes.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseRegistrationCodes, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.url = reverse(
+            'generate_registration_codes',
+            kwargs={'course_id': cls.course.id.to_deprecated_string()}
+        )
 
     def setUp(self):
         """
@@ -3701,14 +3746,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         """
         super(TestCourseRegistrationCodes, self).setUp()
 
-        self.course = CourseFactory.create()
         CourseModeFactory.create(course_id=self.course.id, min_price=50)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         CourseSalesAdminRole(self.course.id).add_users(self.instructor)
-
-        url = reverse('generate_registration_codes',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
             'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
@@ -3718,7 +3759,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(self.url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         for i in range(5):
             order = Order(user=self.instructor, status='purchased')
@@ -4148,13 +4189,17 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TestBulkCohorting(ModuleStoreTestCase):
+class TestBulkCohorting(SharedModuleStoreTestCase):
     """
     Test adding users to cohorts in bulk via CSV upload.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestBulkCohorting, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(TestBulkCohorting, self).setUp()
-        self.course = CourseFactory.create()
         self.staff_user = StaffFactory(course_key=self.course.id)
         self.non_staff_user = UserFactory.create()
         self.tempdir = tempfile.mkdtemp()

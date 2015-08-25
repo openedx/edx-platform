@@ -3,6 +3,7 @@
 Modulestore configuration for test cases.
 """
 import datetime
+import functools
 import pytz
 from uuid import uuid4
 
@@ -220,7 +221,8 @@ class SharedModuleStoreTestCase(TestCase):
     Subclass for any test case that uses a ModuleStore that can be shared
     between individual tests. This class ensures that the ModuleStore is cleaned
     before/after the entire test case has run. Use this class if your tests
-    set up one or a small number of courses that individual tests do not modify.
+    set up one or a small number of courses that individual tests do not modify
+    (or modify extermely rarely -- see @modifies_courseware).
     If your tests modify contents in the ModuleStore, you should use
     ModuleStoreTestCase instead.
 
@@ -278,6 +280,52 @@ class SharedModuleStoreTestCase(TestCase):
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
         super(SharedModuleStoreTestCase, self).setUp()
+
+    def reset(self):
+        """
+        Manually run tearDownClass/setUpClass again.
+
+        This is so that if you have a mostly read-only course that you're just
+        modifying in one test, you can write `self.reset()` at the
+        end of that test and reset the state of the world for other tests in
+        the class.
+        """
+        self.tearDownClass()
+        self.setUpClass()
+
+    @staticmethod
+    def modifies_courseware(f):
+        """
+        Decorator to place around tests that modify course content.
+
+        For performance reasons, SharedModuleStoreTestCase intentionally does
+        not reset the modulestore between individual tests. However, sometimes
+        you might have a test case where the vast majority of tests treat a
+        course as read-only, but one or two want to modify it. In that case, you
+        can do this:
+
+            class MyTestCase(SharedModuleStoreTestCase):
+                # ...
+                @SharedModuleStoreTestCase.modifies_courseware
+                def test_that_edits_modulestore(self):
+                    do_something()
+
+        This is equivalent to calling `self.reset()` at the end of
+        your test.
+
+        If you find yourself using this functionality a lot, it might indicate
+        that you should be using ModuleStoreTestCase instead, or that you should
+        break up your tests into different TestCases.
+        """
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            """Call the object method, and reset the test case afterwards."""
+            return_val = f(*args, **kwargs)
+            obj = args[0]
+            obj.reset()
+            return return_val
+
+        return wrapper
 
 
 class ModuleStoreTestCase(TestCase):
