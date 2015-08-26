@@ -11,6 +11,7 @@ from .fields import FieldsMixin
 
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
+CARD_TITLE_CSS = 'h3.card-title'
 MY_TEAMS_BUTTON_CSS = 'a.nav-item[data-index="0"]'
 BROWSE_BUTTON_CSS = 'a.nav-item[data-index="1"]'
 TEAMS_LINK_CSS = '.action-view'
@@ -121,6 +122,11 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         """Return a list of the topic cards present on the page."""
         return self.q(css=TOPIC_CARD_CSS).results
 
+    @property
+    def topic_names(self):
+        """Return a list of the topic names present on the page."""
+        return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
+
     def browse_teams_for_topic(self, topic_name):
         """
         Show the teams list for `topic_name`.
@@ -128,6 +134,13 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
         self.q(css=TEAMS_LINK_CSS).filter(
             text='View Teams in the {topic_name} Topic'.format(topic_name=topic_name)
         )[0].click()
+        self.wait_for_ajax()
+
+    def sort_topics_by(self, sort_order):
+        """Sort the list of topics by the given `sort_order`."""
+        self.q(
+            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+        ).click()
         self.wait_for_ajax()
 
 
@@ -388,3 +401,8 @@ class TeamPage(CoursePage, PaginatedUIMixin):
     def new_post_button_present(self):
         """ Returns True if New Post button is present else False """
         return self.q(css='.discussion-module .new-post-btn').present
+
+    def click_all_topics_breadcrumb(self):
+        """Navigate to the 'All Topics' page."""
+        self.q(css='.breadcrumbs a').results[0].click()
+        self.wait_for_ajax()

@@ -2,6 +2,7 @@
 Acceptance tests for the teams feature.
 """
 import json
+import random
 
 import ddt
 from flaky import flaky
@@ -20,6 +21,9 @@ from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.learner_profile import LearnerProfilePage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.lms.teams import TeamsPage, MyTeamsPage, BrowseTopicsPage, BrowseTeamsPage, CreateTeamPage, TeamPage
+
+
+TOPICS_PER_PAGE = 12
 
 
 class TeamsTabBase(UniqueCourseTest):
@@ -274,6 +278,7 @@ class MyTeamsTest(TeamsTabBase):
 
 
 @attr('shard_5')
+@ddt.ddt
 class BrowseTopicsTest(TeamsTabBase):
     """
     Tests for the Browse tab of the Teams page.
@@ -282,6 +287,66 @@ class BrowseTopicsTest(TeamsTabBase):
     def setUp(self):
         super(BrowseTopicsTest, self).setUp()
         self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
+
+    @ddt.data(('name', False), ('team_count', True))
+    @ddt.unpack
+    def test_sort_topics(self, sort_order, reverse):
+        """
+        Scenario: the user should be able to sort the list of topics by name or team count
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        Then I should see a list of topics for the course
+        When I choose a sort order
+        Then I should see the paginated list of topics in that order
+        """
+        topics = self.create_topics(TOPICS_PER_PAGE + 1)
+        self.set_team_configuration({u"max_team_size": 100, u"topics": topics})
+        for i, topic in enumerate(random.sample(topics, len(topics))):
+            self.create_teams(topic, i)
+            topic['team_count'] = i
+        self.topics_page.visit()
+        self.topics_page.sort_topics_by(sort_order)
+        topic_names = self.topics_page.topic_names
+        self.assertEqual(len(topic_names), TOPICS_PER_PAGE)
+        self.assertEqual(
+            topic_names,
+            [t['name'] for t in sorted(topics, key=lambda t: t[sort_order], reverse=reverse)][:TOPICS_PER_PAGE]
+        )
+
+    def test_sort_topics_update(self):
+        """
+        Scenario: the list of topics should remain sorted after updates
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics and choose a sort order
+        Then I should see the paginated list of topics in that order
+        When I create a team in one of those topics
+        And I return to the topics list
+        Then I should see the topics in the correct sorted order
+        """
+        topics = self.create_topics(3)
+        self.set_team_configuration({u"max_team_size": 100, u"topics": topics})
+        self.topics_page.visit()
+        self.topics_page.sort_topics_by('team_count')
+        topic_name = self.topics_page.topic_names[-1]
+        topic = [t for t in topics if t['name'] == topic_name][0]
+        self.topics_page.browse_teams_for_topic(topic_name)
+        browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
+        self.assertTrue(browse_teams_page.is_browser_on_page())
+        browse_teams_page.click_create_team_link()
+        create_team_page = CreateTeamPage(self.browser, self.course_id, topic)
+        create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
+        create_team_page.value_for_textarea_field(
+            field_id='description',
+            value='Team description.'
+        )
+        create_team_page.submit_form()
+        team_page = TeamPage(self.browser, self.course_id)
+        self.assertTrue(team_page.is_browser_on_page)
+        team_page.click_all_topics_breadcrumb()
+        self.assertTrue(self.topics_page.is_browser_on_page())
+        self.assertEqual(topic_name, self.topics_page.topic_names[0])
 
     def test_list_topics(self):
         """
@@ -294,7 +359,7 @@ class BrowseTopicsTest(TeamsTabBase):
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(2)})
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.topic_cards), 2)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-2 out of 2 total')
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-2 out of 2 total'))
         self.assertFalse(self.topics_page.pagination_controls_visible())
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertFalse(self.topics_page.is_next_page_button_enabled())
@@ -309,8 +374,8 @@ class BrowseTopicsTest(TeamsTabBase):
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(20)})
         self.topics_page.visit()
-        self.assertEqual(len(self.topics_page.topic_cards), 12)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-12 out of 20 total')
+        self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 20 total'))
         self.assertTrue(self.topics_page.pagination_controls_visible())
         self.assertFalse(self.topics_page.is_previous_page_button_enabled())
         self.assertTrue(self.topics_page.is_next_page_button_enabled())
@@ -360,10 +425,10 @@ class BrowseTopicsTest(TeamsTabBase):
         self.topics_page.visit()
         self.topics_page.press_next_page_button()
         self.assertEqual(len(self.topics_page.topic_cards), 1)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 13-13 out of 13 total')
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 13-13 out of 13 total'))
         self.topics_page.press_previous_page_button()
-        self.assertEqual(len(self.topics_page.topic_cards), 12)
-        self.assertEqual(self.topics_page.get_pagination_header_text(), 'Showing 1-12 out of 13 total')
+        self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 13 total'))
 
     def test_topic_description_truncation(self):
         """
