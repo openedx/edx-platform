@@ -35,7 +35,7 @@ div.name{
 }
 
 .inline-error {
-  color: darken($error-red, 10%);
+  color: darken($error-color, 10%);
 }
 
 section.combined-open-ended {
@@ -863,9 +863,9 @@ section.open-ended-child {
     margin-top: ($baseline/2);
     margin-bottom: ($baseline/2);
     padding: 25px;
-    border: 1px solid $error-red;
+    border: 1px solid $error-color;
     border-radius: 3px;
-    background-color: lighten($error-red, 25%);
+    background-color: lighten($error-color, 25%);
     font-size: 1em;
   }
 

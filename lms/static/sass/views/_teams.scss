@@ -716,11 +716,11 @@
 
     .u-field.error {
       input, textarea {
-        border-color: $error-red;
+        border-color: $error-color;
       }
 
       .u-field-message-help, .u-field-description-message {
-        color: $error-red !important;
+        color: $error-color !important;
       }
     }
 
