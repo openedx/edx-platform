@@ -74,13 +74,13 @@ define([
             return profileView;
         };
 
-        clickLeaveTeam = function(requests, view, confirmLeave) {
+        clickLeaveTeam = function(requests, view, options) {
             expect(view.$(leaveTeamLinkSelector).length).toBe(1);
 
             // click on Leave Team link under Team Details
             view.$(leaveTeamLinkSelector).click();
 
-            if (confirmLeave) {
+            if (!options.cancel) {
                 // click on Confirm button on dialog
                 $('.prompt.warning .action-primary').click();
 
@@ -121,7 +121,7 @@ define([
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
                 expect(view.$('.new-post-btn').length).toEqual(1);
-                clickLeaveTeam(requests, view, true);
+                clickLeaveTeam(requests, view, {cancel: false});
                 expect(view.$('.new-post-btn').length).toEqual(0);
             });
         });
@@ -188,7 +188,7 @@ define([
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
                     assertTeamDetails(view, 1, true);
-                    clickLeaveTeam(requests, view, true);
+                    clickLeaveTeam(requests, view, {cancel: false});
                     assertTeamDetails(view, 0, false);
                 });
 
@@ -199,7 +199,7 @@ define([
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
                     assertTeamDetails(view, 1, true);
-                    clickLeaveTeam(requests, view, false);
+                    clickLeaveTeam(requests, view, {cancel: true});
                     assertTeamDetails(view, 1, true);
                 });
 
