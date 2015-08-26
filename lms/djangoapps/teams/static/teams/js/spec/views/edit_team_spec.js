@@ -273,7 +273,7 @@ define([
                 copyTeamsData.country = 'CA';
                 copyTeamsData.language = 'fr';
 
-                assertTeamCreateUpdateInfo(this, copyTeamsData, teamsUrl + editTeamID, 'teams/awesomeness/' + editTeamID);
+                assertTeamCreateUpdateInfo(this, copyTeamsData, teamsUrl + editTeamID + '?expand=user', 'teams/awesomeness/' + editTeamID);
             });
 
             it('shows validation error message when field is empty', function () {
@@ -285,11 +285,11 @@ define([
             });
 
             it("shows an error message for HTTP 500", function () {
-                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID, 500);
+                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID + '?expand=user', 500);
             });
 
             it("shows correct error message when server returns an error", function () {
-                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID, 400);
+                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID + '?expand=user', 400);
             });
 
             it("changes route on cancel click", function () {

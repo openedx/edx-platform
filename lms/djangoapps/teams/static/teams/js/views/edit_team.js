@@ -13,8 +13,6 @@
                 maxTeamNameLength: 255,
                 maxTeamDescriptionLength: 300,
 
-                tagName: 'create-new-team',
-
                 events: {
                     'click .action-primary': 'createOrUpdateTeam',
                     'submit form': 'createOrUpdateTeam',
