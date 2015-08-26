@@ -178,8 +178,6 @@ class CourseNavPage(PageObject):
         current_section_list = self.q(css='nav .chapter.is-open .group-heading').text
         current_subsection_list = self.q(css='nav .chapter-content-container a.active p').text
 
-        #from nose.tools import set_trace; set_trace()
-
         if len(current_section_list) == 0:
             self.warning("Could not find the current section")
             return False
