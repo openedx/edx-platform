@@ -82,7 +82,7 @@ class CourseNavPage(PageObject):
 
         # Click the section to ensure it's open (no harm in clicking twice if it's already open)
         # Add one to convert from list index to CSS index
-        section_css = 'nav>.chapter:nth-of-type({0})'.format(sec_index + 1)
+        section_css = 'nav .chapter:nth-of-type({0})'.format(sec_index + 1)
         self.q(css=section_css).first.click()
 
         # Get the subsection by index
@@ -94,7 +94,7 @@ class CourseNavPage(PageObject):
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
-        subsection_css = "nav>.chapter-content-container:nth-of-type({0})>.chapter-menu:nth-of-type({1})>a".format(
+        subsection_css = "nav .chapter-content-container:nth-of-type({0}) .chapter-menu a:nth-of-type({1})".format(
             sec_index + 1, subsec_index + 1
         )
 
@@ -130,7 +130,7 @@ class CourseNavPage(PageObject):
         """
         Return a list of all section titles on the page.
         """
-        chapter_css = 'nav > .chapter > .group-heading'
+        chapter_css = 'nav .chapter .group-heading'
         return self.q(css=chapter_css).map(lambda el: el.text.strip()).results
 
     def _subsection_titles(self, section_index):
@@ -140,7 +140,7 @@ class CourseNavPage(PageObject):
         """
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = 'nav>.chapter-content-container:nth-of-type({0})>.chapter-menu>a>p:nth-of-type(1)'.format(
+        subsection_css = 'nav .chapter-content-container:nth-of-type({0}) .chapter-menu a p:nth-of-type(1)'.format(
             section_index
         )
 
@@ -173,8 +173,12 @@ class CourseNavPage(PageObject):
         That's true right after we click the section/subsection, but not true in general
         (the user could go to a section, then expand another tab).
         """
-        current_section_list = self.q(css='nav>.chapter.is-open>.group-heading').text
-        current_subsection_list = self.q(css='nav .chapter-content-container a.active>p').text
+
+
+        current_section_list = self.q(css='nav .chapter.is-open .group-heading').text
+        current_subsection_list = self.q(css='nav .chapter-content-container a.active p').text
+
+        #from nose.tools import set_trace; set_trace()
 
         if len(current_section_list) == 0:
             self.warning("Could not find the current section")
