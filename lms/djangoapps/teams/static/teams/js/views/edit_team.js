@@ -199,12 +199,12 @@
                 },
 
                 showMessage: function (message, screenReaderMessage) {
-                    this.$('.wrapper-msg').removeClass('is-hidden');
-                    this.$('.msg-content .copy p').text(message);
-                    this.$('.wrapper-msg').focus();
+                    this.$('.error.wrapper-msg').removeClass('is-hidden');
+                    this.$('.error .msg-content .copy p').text(message);
+                    this.$('.error .wrapper-msg').focus();
 
                     if (screenReaderMessage) {
-                        this.$('.screen-reader-message').text(screenReaderMessage);
+                        this.$('.error .screen-reader-message').text(screenReaderMessage);
                     }
                 },
 

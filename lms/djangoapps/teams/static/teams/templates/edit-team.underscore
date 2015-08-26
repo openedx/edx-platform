@@ -1,5 +1,5 @@
 <form>
-<div class="create-team wrapper-msg is-incontext urgency-low warning is-hidden" tabindex="-1">
+<div class="create-team wrapper-msg is-incontext urgency-low error is-hidden" tabindex="-1">
     <div class="msg">
         <div class="msg-content">
             <h3 class="title">
