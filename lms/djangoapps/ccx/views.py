@@ -410,7 +410,7 @@ def ccx_invite(request, course, ccx=None):
         try:
             validate_email(email)
             course_key = CCXLocator.from_course_locator(course.id, ccx.id)
-            email_params = get_email_params(course, auto_enroll)
+            email_params = get_email_params(course, auto_enroll, course_key=course_key, display_name=ccx.display_name)
             if action == 'Enroll':
                 enroll_email(
                     course_key,
