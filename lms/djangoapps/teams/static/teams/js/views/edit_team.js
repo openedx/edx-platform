@@ -123,7 +123,7 @@
                     if (this.action === 'create') {
                         data.course_id = this.courseID;
                         data.topic_id = this.topicID;
-                    } else if(this.action === 'edit' ) {
+                    } else if (this.action === 'edit' ) {
                         saveOptions.patch = true;
                         saveOptions.contentType = 'application/merge-patch+json';
                     }
@@ -213,7 +213,7 @@
                     var url;
                     if (this.action === 'create') {
                         url = 'topics/' + this.topicID;
-                    } else if(this.action === 'edit' ) {
+                    } else if (this.action === 'edit' ) {
                         url = 'teams/' + this.topicID + '/' + this.teamModel.get('id');
                     }
                     Backbone.history.navigate(url, {trigger: true});

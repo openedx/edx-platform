@@ -73,12 +73,11 @@ class TeamsDashboardView(View):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, "load", course_key)
 
-        is_staff = bool(has_access(request.user, 'staff', course, course.id))
-
         if not is_feature_enabled(course):
             raise Http404
 
-        if not CourseEnrollment.is_enrolled(request.user, course.id) and not is_staff:
+        if not CourseEnrollment.is_enrolled(request.user, course.id) and \
+                not has_access(request.user, 'staff', course, course.id):
             raise Http404
 
         # Even though sorting is done outside of the serializer, sort_order needs to be passed

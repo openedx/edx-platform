@@ -427,9 +427,13 @@
     background: $transparent;
     background-image: none;
 
+    @extend %t-action3;
+    @extend %t-strong;
+
     &:focus,
     &:hover {
         background-image: none !important;
         background-color: $transparent !important;
+        box-shadow: none !important;
     }
 }

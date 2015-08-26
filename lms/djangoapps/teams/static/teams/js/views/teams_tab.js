@@ -223,30 +223,28 @@
                  * Render the edit team form.
                  */
                 editTeam: function (topicID, teamID) {
-                    var self = this;
+                    var self = this,
+                        editViewWithHeader;
                     this.getTeamsView(topicID).done(function (teamsView) {
                         self.getTeam(teamID, false).done(function(team) {
-                            self.mainView = new ViewWithHeader({
-                                header: new HeaderView({
-                                    model: new TeamsHeaderModel({
-                                        description: gettext("If you edit any team details, you should notify team members of your changes."),
-                                        title: gettext("Edit Team"),
-                                        breadcrumbs: [
-                                            {
-                                                title: teamsView.main.teamParams.topicName,
-                                                url: '#topics/' + teamsView.main.teamParams.topicID
-                                            }
-                                        ]
-                                    })
-                                }),
-                                main: new TeamEditView({
-                                    action: 'edit',
-                                    teamEvents: self.teamEvents,
-                                    teamParams: teamsView.main.teamParams,
-                                    model: team,
-                                    teamsDetailUrl: self.teamsDetailUrl
-                                })
+                            var view = new TeamEditView({
+                                action: 'edit',
+                                teamEvents: self.teamEvents,
+                                teamParams: teamsView.main.teamParams,
+                                model: team,
+                                teamsDetailUrl: self.teamsDetailUrl
                             });
+                            editViewWithHeader = self.createViewWithHeader({
+                                    mainView: view,
+                                    subject: {
+                                        name: gettext("Edit Team"),
+                                        description: gettext("If you edit any team details, you should notify team members of your changes.")
+                                    },
+                                    parentTeam: team,
+                                    topicID: teamsView.main.teamParams.topicID
+                                }
+                            );
+                            self.mainView = editViewWithHeader;
                             self.render();
                         });
                     });
@@ -367,7 +365,8 @@
 
                 createViewWithHeader: function (options) {
                     var router = this.router,
-                        breadcrumbs, headerView;
+                        breadcrumbs, headerView,
+                        viewDescription, viewTitle;
                     breadcrumbs = [{
                         title: gettext('All Topics'),
                         url: '#browse'
@@ -377,11 +376,25 @@
                             title: options.parentTopic.get('name'),
                             url: '#topics/' + options.parentTopic.id
                         });
+                    } else if (options.parentTeam) {
+                        breadcrumbs.push({
+                            title: options.parentTeam.get('name'),
+                            url: 'teams/' + options.topicID + '/' + options.parentTeam.id
+                        });
                     }
+                    if (options.subject instanceof Backbone.Model) {
+                        viewDescription = options.subject.get('description');
+                        viewTitle = options.subject.get('name');
+
+                    } else {
+                        viewDescription = options.subject.description;
+                        viewTitle = options.subject.name;
+                    }
+
                     headerView = new HeaderView({
                         model: new TeamsHeaderModel({
-                            description: options.subject.get('description'),
-                            title: options.subject.get('name'),
+                            description: viewDescription,
+                            title: viewTitle,
                             breadcrumbs: breadcrumbs
                         }),
                         headerActionsView: options.headerActionsView,
