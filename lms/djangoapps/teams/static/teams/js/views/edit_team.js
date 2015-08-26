@@ -40,7 +40,7 @@
                         this.primaryButtonTitle = 'Create';
                     } else if(this.action === 'edit' ) {
                         this.teamModel = options.model;
-                        this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id'));
+                        this.teamModel.url = this.teamsDetailUrl.replace('team_id', options.model.get('id')) + '?expand=user';
                         this.primaryButtonTitle = 'Update';
                     }
 
