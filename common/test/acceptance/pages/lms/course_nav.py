@@ -173,12 +173,8 @@ class CourseNavPage(PageObject):
         That's true right after we click the section/subsection, but not true in general
         (the user could go to a section, then expand another tab).
         """
-
-
         current_section_list = self.q(css='nav .chapter.is-open .group-heading').text
         current_subsection_list = self.q(css='nav .chapter-content-container a.active p').text
-
-        #from nose.tools import set_trace; set_trace()
 
         if len(current_section_list) == 0:
             self.warning("Could not find the current section")
