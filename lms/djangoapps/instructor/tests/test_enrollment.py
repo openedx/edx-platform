@@ -5,6 +5,7 @@ Unit tests for instructor.enrollment methods.
 
 import json
 import mock
+from mock import patch
 from abc import ABCMeta
 from courseware.models import StudentModule
 from django.conf import settings
@@ -12,11 +13,17 @@ from django.test import TestCase
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
 from nose.plugins.attrib import attr
+from ccx_keys.locator import CCXLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from ccx.tests.factories import CcxFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.tests.factories import (  # pylint: disable=import-error
+    AdminFactory
+)
 from instructor.enrollment import (
     EmailEnrollmentState,
     enroll_email,
@@ -30,7 +37,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+)
 
 
 @attr('shard_1')
@@ -567,6 +576,53 @@ class TestSendBetaRoleEmail(TestCase):
 
 
 @attr('shard_1')
+class TestGetEmailParamsCCX(ModuleStoreTestCase):
+    """
+    Test what URLs the function get_email_params for CCX student enrollment.
+    """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    def setUp(self):
+        super(TestGetEmailParamsCCX, self).setUp()
+
+        self.course = CourseFactory.create()
+        self.coach = AdminFactory.create()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(self.coach)
+        self.ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
+        self.course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
+        # Explicitly construct what we expect the course URLs to be
+        site = settings.SITE_NAME
+        self.course_url = u'https://{}/courses/{}/'.format(
+            site,
+            self.course_key
+        )
+        self.course_about_url = self.course_url + 'about'
+        self.registration_url = u'https://{}/register'.format(
+            site,
+        )
+
+    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    def test_ccx_enrollment_email_params(self):
+        # For a CCX, what do we expect to get for the URLs?
+        # Also make sure `auto_enroll` is properly passed through.
+        result = get_email_params(
+            self.course,
+            True,
+            course_key=self.course_key,
+            display_name=self.ccx.display_name
+        )
+
+        self.assertEqual(result['display_name'], self.ccx.display_name)
+        self.assertEqual(result['auto_enroll'], True)
+        self.assertEqual(result['course_about_url'], self.course_about_url)
+        self.assertEqual(result['registration_url'], self.registration_url)
+        self.assertEqual(result['course_url'], self.course_url)
+
+
+@attr('shard_1')
 class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
@@ -616,7 +672,10 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
 class TestRenderMessageToString(SharedModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.
+    Test CCX enrollmet email.
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super(TestRenderMessageToString, cls).setUpClass()
@@ -626,12 +685,35 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(TestRenderMessageToString, self).setUp()
+        self.course_key = None
+        self.ccx = None
 
     def get_email_params(self):
         """
         Returns a dictionary of parameters used to render an email.
         """
         email_params = get_email_params(self.course, True)
+        email_params["email_address"] = "user@example.com"
+        email_params["full_name"] = "Jean Reno"
+
+        return email_params
+
+    def get_email_params_ccx(self):
+        """
+        Returns a dictionary of parameters used to render an email for CCX.
+        """
+        coach = AdminFactory.create()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(coach)
+        self.ccx = CcxFactory(course_id=self.course.id, coach=coach)
+        self.course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
+
+        email_params = get_email_params(
+            self.course,
+            True,
+            course_key=self.course_key,
+            display_name=self.ccx.display_name
+        )
         email_params["email_address"] = "user@example.com"
         email_params["full_name"] = "Jean Reno"
 
@@ -648,6 +730,18 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
             language=language
         )
 
+    def get_subject_and_message_ccx(self):
+        """
+        Returns the subject and message rendered in the specified language for CCX.
+        """
+        subject_template = 'emails/enroll_email_enrolledsubject.txt'
+        message_template = 'emails/enroll_email_enrolledmessage.txt'
+        return render_message_to_string(
+            subject_template,
+            message_template,
+            self.get_email_params_ccx()
+        )
+
     def test_subject_and_message_translation(self):
         subject, message = self.get_subject_and_message('fr')
         language_after_rendering = get_language()
@@ -662,3 +756,18 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
             subject, message = self.get_subject_and_message(None)
             self.assertIn("You have been", subject)
             self.assertIn("You have been", message)
+
+    @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
+    def test_render_message_ccx(self):
+        """
+        Test email template renders for CCX.
+        """
+        subject, message = self.get_subject_and_message_ccx()
+        self.assertIn(self.ccx.display_name, subject)
+        self.assertIn(self.ccx.display_name, message)
+        site = settings.SITE_NAME
+        course_url = u'https://{}/courses/{}/'.format(
+            site,
+            self.course_key
+        )
+        self.assertIn(course_url, message)

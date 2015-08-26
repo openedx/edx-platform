@@ -9,7 +9,17 @@ from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModel
 from .models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, SAMLProviderData
 from .tasks import fetch_saml_metadata
 
-admin.site.register(OAuth2ProviderConfig, KeyedConfigurationModelAdmin)
+
+class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
+    """ Django Admin class for OAuth2ProviderConfig """
+    def get_list_display(self, request):
+        """ Don't show every single field in the admin change list """
+        return (
+            'name', 'enabled', 'backend_name', 'secondary', 'skip_registration_form',
+            'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
+        )
+
+admin.site.register(OAuth2ProviderConfig, OAuth2ProviderConfigAdmin)
 
 
 class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
@@ -55,10 +65,12 @@ class SAMLConfigurationAdmin(ConfigurationModelAdmin):
 
     def key_summary(self, inst):
         """ Short summary of the key pairs configured """
-        if not inst.public_key or not inst.private_key:
+        public_key = inst.get_setting('SP_PUBLIC_CERT')
+        private_key = inst.get_setting('SP_PRIVATE_KEY')
+        if not public_key or not private_key:
             return u'<em>Key pair incomplete/missing</em>'
-        pub1, pub2 = inst.public_key[0:10], inst.public_key[-10:]
-        priv1, priv2 = inst.private_key[0:10], inst.private_key[-10:]
+        pub1, pub2 = public_key[0:10], public_key[-10:]
+        priv1, priv2 = private_key[0:10], private_key[-10:]
         return u'Public: {}…{}<br>Private: {}…{}'.format(pub1, pub2, priv1, priv2)
     key_summary.allow_tags = True
 
