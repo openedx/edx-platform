@@ -191,6 +191,14 @@ div.course-wrapper {
         margin: 0 auto;
       }
     }
+    .disable-proctored-exam-btn {
+        i {
+          color: rgb(206, 216, 220);
+        }
+        i:hover, button:hover {
+          cursor: wait;
+        }
+    }
     div.proctored-exam {
       @extend .timed-exam;
       .proctored-exam-message {
