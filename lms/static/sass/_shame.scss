@@ -198,3 +198,22 @@ footer .references {
 .course-content .discussion-post.edit-post-form .topic-submenu {
   list-style: none;
 }
+
+
+// LMS system feedback button overrides
+.is-in-course .wrapper-prompt .nav-actions {
+  button {
+    font-family: inherit;
+  }
+
+  .action-primary {
+    @extend %t-action4;
+  }
+
+  .action-secondary {
+    @extend %btn-no-style;
+    @extend %t-strong;
+    box-shadow: none;
+    text-shadow: none;
+  }
+}
