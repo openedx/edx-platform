@@ -3,7 +3,6 @@
 import datetime
 import json
 import ddt
-from unittest import skip
 
 from ..helpers import EventsTestMixin
 from .test_video_module import VideoBaseTest
@@ -184,7 +183,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             u'video_bumper': {
                 u'value': {
                     "transcripts": {},
-                    "video_id": "edx_video_id"
+                    "video_id": "video_001"
                 }
             }
         }
@@ -196,7 +195,6 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         ('edx.video.bumper.stopped', wait_for_state)
     )
     @ddt.unpack
-    @skip("Failing on master; To see remove is_youtube_available() form base class")
     def test_video_control_events(self, event_type, action):
         """
         Scenario: Video component with pre-roll emits events correctly
@@ -287,7 +285,6 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         }
         self.assert_events_match([expected_event], [video_event])
 
-    @skip("Failing on master; To see remove is_youtube_available() form base class")
     def test_strict_event_format(self):
         """
         This test makes a very strong assertion about the fields present in events. The goal of it is to ensure that new
