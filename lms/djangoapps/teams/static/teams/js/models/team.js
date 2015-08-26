@@ -15,7 +15,8 @@
                 description: '',
                 country: '',
                 language: '',
-                membership: []
+                membership: [],
+                last_activity_at: ''
             },
 
             initialize: function(options) {

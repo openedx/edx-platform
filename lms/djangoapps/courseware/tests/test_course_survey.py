@@ -9,9 +9,9 @@ from django.core.urlresolvers import reverse
 
 from survey.models import SurveyForm
 
+from common.test.utils import XssTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.utils import XssTestMixin
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 

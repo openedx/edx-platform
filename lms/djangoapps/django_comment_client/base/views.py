@@ -18,6 +18,17 @@ from courseware.access import has_access
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
+from django_comment_common.signals import (
+    thread_created,
+    thread_edited,
+    thread_voted,
+    thread_deleted,
+    comment_created,
+    comment_edited,
+    comment_voted,
+    comment_deleted,
+    comment_endorsed
+)
 from django_comment_common.utils import ThreadContext
 from django_comment_client.utils import (
     add_courseware_context,
@@ -161,6 +172,7 @@ def create_thread(request, course_id, commentable_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     post = request.POST
+    user = request.user
 
     if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
@@ -182,7 +194,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
         'course_id': course_key.to_deprecated_string(),
-        'user_id': request.user.id,
+        'user_id': user.id,
         'thread_type': post["thread_type"],
         'body': post["body"],
         'title': post["title"],
@@ -206,6 +218,8 @@ def create_thread(request, course_id, commentable_id):
 
     thread.save()
 
+    thread_created.send(sender=None, user=user, post=thread)
+
     # patch for backward compatibility to comments service
     if 'pinned' not in thread.attributes:
         thread['pinned'] = False
@@ -213,13 +227,13 @@ def create_thread(request, course_id, commentable_id):
     follow = post.get('auto_subscribe', 'false').lower() == 'true'
 
     if follow:
-        user = cc.User.from_django_user(request.user)
-        user.follow(thread)
+        cc_user = cc.User.from_django_user(user)
+        cc_user.follow(thread)
 
     event_data = get_thread_created_event_data(thread, follow)
     data = thread.to_dict()
 
-    add_courseware_context([data], course, request.user)
+    add_courseware_context([data], course, user)
 
     track_forum_event(request, THREAD_CREATED_EVENT_NAME, course, thread, event_data)
 
@@ -247,19 +261,23 @@ def update_thread(request, course_id, thread_id):
     thread_context = getattr(thread, "context", "course")
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
+    user = request.user
     # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
     # while their browser still has the old client code. This will avoid erasing present values in those cases.
     if "thread_type" in request.POST:
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         commentable_id = request.POST["commentable_id"]
-        course = get_course_with_access(request.user, 'load', course_key)
-        if thread_context == "course" and not discussion_category_id_access(course, request.user, commentable_id):
+        course = get_course_with_access(user, 'load', course_key)
+        if thread_context == "course" and not discussion_category_id_access(course, user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
         else:
             thread.commentable_id = commentable_id
 
     thread.save()
+
+    thread_edited.send(sender=None, user=user, post=thread)
+
     if request.is_ajax():
         return ajax_content_response(request, course_key, thread.to_dict())
     else:
@@ -273,11 +291,12 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     """
     assert isinstance(course_key, CourseKey)
     post = request.POST
+    user = request.user
 
     if 'body' not in post or not post['body'].strip():
         return JsonError(_("Body can't be empty"))
 
-    course = get_course_with_access(request.user, 'load', course_key)
+    course = get_course_with_access(user, 'load', course_key)
     if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
@@ -291,7 +310,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     comment = cc.Comment(
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
-        user_id=request.user.id,
+        user_id=user.id,
         course_id=course_key.to_deprecated_string(),
         thread_id=thread_id,
         parent_id=parent_id,
@@ -299,11 +318,13 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     )
     comment.save()
 
+    comment_created.send(sender=None, user=user, post=comment)
+
     followed = post.get('auto_subscribe', 'false').lower() == 'true'
 
     if followed:
-        user = cc.User.from_django_user(request.user)
-        user.follow(comment.thread)
+        cc_user = cc.User.from_django_user(request.user)
+        cc_user.follow(comment.thread)
 
     event_name = get_comment_created_event_name(comment)
     event_data = get_comment_created_event_data(comment, comment.thread.commentable_id, followed)
@@ -339,7 +360,7 @@ def delete_thread(request, course_id, thread_id):  # pylint: disable=unused-argu
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.delete()
-
+    thread_deleted.send(sender=None, user=request.user, post=thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -357,6 +378,9 @@ def update_comment(request, course_id, comment_id):
         return JsonError(_("Body can't be empty"))
     comment.body = request.POST["body"]
     comment.save()
+
+    comment_edited.send(sender=None, user=request.user, post=comment)
+
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
@@ -373,9 +397,11 @@ def endorse_comment(request, course_id, comment_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     comment = cc.Comment.find(comment_id)
+    user = request.user
     comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
-    comment.endorsement_user_id = request.user.id
+    comment.endorsement_user_id = user.id
     comment.save()
+    comment_endorsed.send(sender=None, user=user, post=comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -422,6 +448,7 @@ def delete_comment(request, course_id, comment_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     comment = cc.Comment.find(comment_id)
     comment.delete()
+    comment_deleted.send(sender=None, user=request.user, post=comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -433,9 +460,11 @@ def vote_for_comment(request, course_id, comment_id, value):
     given a course_id and comment_id,
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    user = cc.User.from_django_user(request.user)
+    user = request.user
+    cc_user = cc.User.from_django_user(user)
     comment = cc.Comment.find(comment_id)
-    user.vote(comment, value)
+    cc_user.vote(comment, value)
+    comment_voted.send(sender=None, user=user, post=comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -463,10 +492,11 @@ def vote_for_thread(request, course_id, thread_id, value):
     ajax only
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    user = cc.User.from_django_user(request.user)
+    user = request.user
+    cc_user = cc.User.from_django_user(user)
     thread = cc.Thread.find(thread_id)
-    user.vote(thread, value)
-
+    cc_user.vote(thread, value)
+    thread_voted.send(sender=None, user=user, post=thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 

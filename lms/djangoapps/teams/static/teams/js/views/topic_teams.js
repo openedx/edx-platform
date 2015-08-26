@@ -1,9 +1,12 @@
 ;(function (define) {
     'use strict';
-
-    define(['backbone', 'gettext', 'teams/js/views/teams',
-            'text!teams/templates/team-actions.underscore'],
-        function (Backbone, gettext, TeamsView, teamActionsTemplate) {
+    define([
+        'backbone',
+        'gettext',
+        'teams/js/views/teams',
+        'common/js/components/views/paging_header',
+        'text!teams/templates/team-actions.underscore'
+    ], function (Backbone, gettext, TeamsView, PagingHeader, teamActionsTemplate) {
             var TopicTeamsView = TeamsView.extend({
                 events: {
                     'click a.browse-teams': 'browseTeams',
@@ -54,6 +57,14 @@
                 showCreateTeamForm: function (event) {
                     event.preventDefault();
                     Backbone.history.navigate('topics/' + this.teamParams.topicID + '/create-team', {trigger: true});
+                },
+
+                createHeaderView: function () {
+                    return new PagingHeader({
+                        collection: this.options.collection,
+                        srInfo: this.srInfo,
+                        showSortControls: true
+                    });
                 }
             });
 
