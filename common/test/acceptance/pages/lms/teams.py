@@ -183,6 +183,11 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
         """Get all the team cards on the page."""
         return self.q(css='.team-card')
 
+    @property
+    def team_names(self):
+        """Return the names of each team on the page."""
+        return self.q(css='h3.card-title').map(lambda e: e.text).results
+
     def click_create_team_link(self):
         """ Click on create team link."""
         query = self.q(css=CREATE_TEAM_LINK_CSS)
@@ -203,6 +208,13 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
         if query.present:
             query.first.click()
             self.wait_for_ajax()
+
+    def sort_teams_by(self, sort_order):
+        """Sort the list of teams by the given `sort_order`."""
+        self.q(
+            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+        ).click()
+        self.wait_for_ajax()
 
 
 class CreateTeamPage(CoursePage, FieldsMixin):

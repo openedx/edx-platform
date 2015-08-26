@@ -10,10 +10,6 @@
         var TeamsView = PaginatedView.extend({
             type: 'teams',
 
-            events: {
-                'click button.action': '' // entry point for team creation
-            },
-
             srInfo: {
                 id: "heading-browse-teams",
                 text: gettext('All teams')
