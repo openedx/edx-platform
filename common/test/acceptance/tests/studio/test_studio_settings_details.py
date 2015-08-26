@@ -3,7 +3,7 @@ Acceptance tests for Studio's Settings Details pages
 """
 from unittest import skip
 
-from acceptance.tests.studio.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 from ...fixtures.course import CourseFixture
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.overview import CourseOutlinePage

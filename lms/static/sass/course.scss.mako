@@ -19,6 +19,8 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
+@import 'build-course'; // shared app style assets/rendering
+
 @import 'base/base';
 @import 'base/extends';
 @import 'base/animations';

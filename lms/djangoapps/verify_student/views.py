@@ -8,7 +8,9 @@ import decimal
 import datetime
 from collections import namedtuple
 
+
 from pytz import UTC
+from django.utils import timezone
 from ipware.ip import get_ip
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -19,11 +21,12 @@ from django.http import (
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.views.generic.base import View
+from django.views.generic.base import View, RedirectView
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from ecommerce_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
@@ -33,8 +36,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
-from commerce.api import EcommerceAPI
-from commerce.exceptions import ApiError
+from commerce import ecommerce_api_client
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import reverification_info
@@ -57,6 +59,7 @@ from util.date_utils import get_default_time_display
 from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
+from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
 
@@ -380,6 +383,14 @@ class PayAndVerifyView(View):
         # Determine the photo verification status
         verification_good_until = self._verification_valid_until(request.user)
 
+        # get available payment processors
+        if unexpired_paid_course_mode.sku:
+            # transaction will be conducted via ecommerce service
+            processors = ecommerce_api_client(request.user).payment.processors.get()
+        else:
+            # transaction will be conducted using legacy shopping cart
+            processors = [settings.CC_PROCESSOR_NAME]
+
         # Render the top-level page
         context = {
             'contribution_amount': contribution_amount,
@@ -393,7 +404,7 @@ class PayAndVerifyView(View):
             'is_active': json.dumps(request.user.is_active),
             'message_key': message,
             'platform_name': settings.PLATFORM_NAME,
-            'purchase_endpoint': get_purchase_endpoint(),
+            'processors': processors,
             'requirements': requirements,
             'user_full_name': full_name,
             'verification_deadline': (
@@ -464,10 +475,9 @@ class PayAndVerifyView(View):
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
         elif message == self.UPGRADE_MSG:
             if is_enrolled:
-                # If upgrading and we've paid but haven't verified,
-                # then the "verify later" messaging makes more sense.
                 if already_paid:
-                    url = reverse('verify_student_verify_later', kwargs=course_kwargs)
+                    # If the student has paid, but not verified, redirect to the verification flow.
+                    url = reverse('verify_student_verify_now', kwargs=course_kwargs)
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
@@ -644,26 +654,63 @@ class PayAndVerifyView(View):
         return (has_paid, bool(is_active))
 
 
-def create_order_with_ecommerce_service(user, course_key, course_mode):     # pylint: disable=invalid-name
-    """ Create a new order using the E-Commerce API. """
+def checkout_with_ecommerce_service(user, course_key, course_mode, processor):     # pylint: disable=invalid-name
+    """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
     try:
-        api = EcommerceAPI()
+        api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
-        _order_number, _order_status, data = api.create_order(user, course_mode.sku)
-
+        result = api.baskets.post({
+            'products': [{'sku': course_mode.sku}],
+            'checkout': True,
+            'payment_processor_name': processor
+        })
         # Pass the payment parameters directly from the API response.
-        return HttpResponse(json.dumps(data['payment_parameters']), content_type='application/json')
-    except ApiError:
+        return result.get('payment_data')
+    except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': unicode(course_key)}
-        log.error('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
+        log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise
+
+
+def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
+    """ Create an order and trigger checkout using shoppingcart."""
+    cart = Order.get_cart_for_user(user)
+    cart.clear()
+    enrollment_mode = course_mode.slug
+    CertificateItem.add_to_order(cart, course_key, amount, enrollment_mode)
+
+    # Change the order's status so that we don't accidentally modify it later.
+    # We need to do this to ensure that the parameters we send to the payment system
+    # match what we store in the database.
+    # (Ordinarily we would do this client-side when the user submits the form, but since
+    # the JavaScript on this page does that immediately, we make the change here instead.
+    # This avoids a second AJAX call and some additional complication of the JavaScript.)
+    # If a user later re-enters the verification / payment flow, she will create a new order.
+    cart.start_purchase()
+
+    callback_url = request.build_absolute_uri(
+        reverse("shoppingcart.views.postpay_callback")
+    )
+
+    payment_data = {
+        'payment_processor_name': settings.CC_PROCESSOR_NAME,
+        'payment_page_url': get_purchase_endpoint(),
+        'payment_form_data': get_signed_purchase_params(
+            cart,
+            callback_url=callback_url,
+            extra_data=[unicode(course_key), course_mode.slug]
+        ),
+    }
+    return payment_data
 
 
 @require_POST
 @login_required
 def create_order(request):
     """
-    Submit PhotoVerification and create a new Order for this verified cert
+    This endpoint is named 'create_order' for backward compatibility, but its
+    actual use is to add a single product to the user's cart and request
+    immediate checkout.
     """
     # Only submit photos if photo data is provided by the client.
     # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
@@ -724,35 +771,23 @@ def create_order(request):
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
     if current_mode.sku:
-        return create_order_with_ecommerce_service(request.user, course_id, current_mode)
+        # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
+        payment_data = checkout_with_ecommerce_service(
+            request.user,
+            course_id,
+            current_mode,
+            request.POST.get('processor')
+        )
+    else:
+        payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
 
-    # I know, we should check this is valid. All kinds of stuff missing here
-    cart = Order.get_cart_for_user(request.user)
-    cart.clear()
-    enrollment_mode = current_mode.slug
-    CertificateItem.add_to_order(cart, course_id, amount, enrollment_mode)
-
-    # Change the order's status so that we don't accidentally modify it later.
-    # We need to do this to ensure that the parameters we send to the payment system
-    # match what we store in the database.
-    # (Ordinarily we would do this client-side when the user submits the form, but since
-    # the JavaScript on this page does that immediately, we make the change here instead.
-    # This avoids a second AJAX call and some additional complication of the JavaScript.)
-    # If a user later re-enters the verification / payment flow, she will create a new order.
-    cart.start_purchase()
-
-    callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
-    )
-
-    params = get_signed_purchase_params(
-        cart,
-        callback_url=callback_url,
-        extra_data=[unicode(course_id), current_mode.slug]
-    )
-
-    params['success'] = True
-    return HttpResponse(json.dumps(params), content_type="text/json")
+    if 'processor' not in request.POST:
+        # (XCOM-214) To be removed after release.
+        # the absence of this key in the POST payload indicates that the request was initiated from
+        # a stale js client, which expects a response containing only the 'payment_form_data' part of
+        # the payment data result.
+        payment_data = payment_data['payment_form_data']
+    return HttpResponse(json.dumps(payment_data), content_type="application/json")
 
 
 @require_POST
@@ -806,6 +841,8 @@ def submit_photos_for_verification(request):
     attempt.mark_ready()
     attempt.submit()
 
+    log.info(u"Submitted initial verification attempt for user %s", request.user.id)
+
     account_settings = get_account_settings(request.user)
 
     # Send a confirmation email to the user
@@ -822,6 +859,96 @@ def submit_photos_for_verification(request):
     send_mail(subject, message, from_address, [to_address], fail_silently=False)
 
     return HttpResponse(200)
+
+
+def _compose_message_reverification_email(
+        course_key, user_id, relates_assessment, photo_verification, status, is_secure
+):  # pylint: disable=invalid-name
+    """ Composes subject and message for email
+
+    Args:
+        course_key(CourseKey): CourseKey object
+        user_id(str): User Id
+        relates_assessment(str): related assessment name
+        photo_verification(QuerySet/SoftwareSecure): A query set of SoftwareSecure objects or SoftwareSecure objec
+        status(str): approval status
+        is_secure(Bool): Is running on secure protocol or not
+
+    Returns:
+        None if any error occurred else Tuple of subject and message strings
+    """
+    try:
+        location_id = VerificationStatus.get_location_id(photo_verification)
+        usage_key = UsageKey.from_string(location_id)
+        course = modulestore().get_course(course_key)
+        redirect_url = get_redirect_url(course_key, usage_key.replace(course_key=course_key))
+
+        subject = "Re-verification Status"
+
+        context = {
+            "status": status,
+            "course_name": course.display_name_with_default,
+            "assessment": relates_assessment,
+            "courseware_url": redirect_url
+        }
+
+        reverification_block = modulestore().get_item(usage_key)
+        # Allowed attempts is 1 if not set on verification block
+        allowed_attempts = 1 if reverification_block.attempts == 0 else reverification_block.attempts
+        user_attempts = VerificationStatus.get_user_attempts(user_id, course_key, relates_assessment, location_id)
+        left_attempts = allowed_attempts - user_attempts
+        is_attempt_allowed = left_attempts > 0
+        verification_open = True
+        if reverification_block.due:
+            verification_open = timezone.now() <= reverification_block.due
+
+        context["left_attempts"] = left_attempts
+        context["is_attempt_allowed"] = is_attempt_allowed
+        context["verification_open"] = verification_open
+        context["due_date"] = get_default_time_display(reverification_block.due)
+        context["is_secure"] = is_secure
+        context["site"] = microsite.get_value('SITE_NAME', 'localhost')
+        context['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME),
+
+        re_verification_link = reverse(
+            'verify_student_incourse_reverify',
+            args=(
+                unicode(course_key),
+                unicode(relates_assessment),
+                unicode(location_id)
+            )
+        )
+        context["reverify_link"] = re_verification_link
+        message = render_to_string('emails/reverification_processed.txt', context)
+        log.info(
+            "Sending email to User_Id=%s. Attempts left for this user are %s. "
+            "Allowed attempts %s. "
+            "Due Date %s",
+            str(user_id), left_attempts, allowed_attempts, str(reverification_block.due)
+        )
+        return subject, message
+    # Catch all exception to avoid raising back to view
+    except:  # pylint: disable=bare-except
+        log.exception("The email for re-verification sending failed for user_id %s", user_id)
+
+
+def _send_email(user_id, subject, message):
+    """ Send email to given user
+
+    Args:
+        user_id(str): User Id
+        subject(str): Subject lines of emails
+        message(str): Email message body
+
+    Returns:
+        None
+    """
+    from_address = microsite.get_value(
+        'email_from_address',
+        settings.DEFAULT_FROM_EMAIL
+    )
+    user = User.objects.get(id=user_id)
+    user.email_user(subject, message, from_address)
 
 
 @require_POST
@@ -875,26 +1002,24 @@ def results_callback(request):
     try:
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=receipt_id)
     except SoftwareSecurePhotoVerification.DoesNotExist:
-        log.error("Software Secure posted back for receipt_id {}, but not found".format(receipt_id))
+        log.error("Software Secure posted back for receipt_id %s, but not found", receipt_id)
         return HttpResponseBadRequest("edX ID {} not found".format(receipt_id))
 
-    checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
-
     if result == "PASS":
-        log.debug("Approving verification for {}".format(receipt_id))
+        log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
     elif result == "FAIL":
-        log.debug("Denying verification for {}".format(receipt_id))
+        log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
     elif result == "SYSTEM FAIL":
-        log.debug("System failure for {} -- resetting to must_retry".format(receipt_id))
+        log.debug("System failure for %s -- resetting to must_retry", receipt_id)
         attempt.system_error(json.dumps(reason), error_code=error_code)
         status = "error"
         log.error("Software Secure callback attempt for %s failed: %s", receipt_id, reason)
     else:
-        log.error("Software Secure returned unknown result {}".format(result))
+        log.error("Software Secure returned unknown result %s", result)
         return HttpResponseBadRequest(
             "Result {} not understood. Known results: PASS, FAIL, SYSTEM FAIL".format(result)
         )
@@ -904,7 +1029,22 @@ def results_callback(request):
         course_id = attempt.window.course_id
         course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)
-    VerificationStatus.add_status_from_checkpoints(checkpoints=checkpoints, user=attempt.user, status=status)
+
+    incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
+    if incourse_reverify_enabled:
+        checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
+        VerificationStatus.add_status_from_checkpoints(checkpoints=checkpoints, user=attempt.user, status=status)
+        # If this is re-verification then send the update email
+        if checkpoints:
+            user_id = attempt.user.id
+            course_key = checkpoints[0].course_id
+            relates_assessment = checkpoints[0].checkpoint_name
+
+            subject, message = _compose_message_reverification_email(
+                course_key, user_id, relates_assessment, attempt, status, request.is_secure()
+            )
+
+            _send_email(user_id, subject, message)
     return HttpResponse("OK!")
 
 
@@ -1115,26 +1255,38 @@ class InCourseReverifyView(View):
     Does not need to worry about pricing
     """
     @method_decorator(login_required)
-    def get(self, request, course_id, checkpoint_name, location):
+    def get(self, request, course_id, checkpoint_name, usage_id):
         """ Display the view for face photo submission"""
         # Check the in-course re-verification is enabled or not
+
         incourse_reverify_enabled = InCourseReverificationConfiguration.current().enabled
         if not incourse_reverify_enabled:
+            log.error(
+                u"In-course reverification is not enabled.  "
+                u"You can enable it in Django admin by setting "
+                u"InCourseReverificationConfiguration to enabled."
+            )
             raise Http404
 
         user = request.user
         course_key = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_key)
         if course is None:
+            log.error(u"Could not find course %s for in-course reverification.", course_key)
             raise Http404
 
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
+            log.error(
+                u"No verification checkpoint exists for the "
+                u"course %s and checkpoint name %s.",
+                course_key, checkpoint_name
+            )
             raise Http404
 
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
-            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+            return self._redirect_no_initial_verification(user, course_key)
 
         # emit the reverification event
         self._track_reverification_events(
@@ -1146,12 +1298,12 @@ class InCourseReverifyView(View):
             'course_name': course.display_name_with_default,
             'checkpoint_name': checkpoint_name,
             'platform_name': settings.PLATFORM_NAME,
-            'location': location
+            'usage_id': usage_id
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 
     @method_decorator(login_required)
-    def post(self, request, course_id, checkpoint_name, location):
+    def post(self, request, course_id, checkpoint_name, usage_id):
         """Submits the re-verification attempt to SoftwareSecure
 
         Args:
@@ -1161,7 +1313,7 @@ class InCourseReverifyView(View):
 
         Returns:
             HttpResponse with status_code 400 if photo is missing or any error
-            or redirect to verify_student_verify_later url if initial verification doesn't exist otherwise
+            or redirect to the verification flow if initial verification doesn't exist otherwise
             HttpsResponse with status code 200
         """
         # Check the in-course re-verification is enabled or not
@@ -1172,9 +1324,10 @@ class InCourseReverifyView(View):
         user = request.user
         try:
             course_key = CourseKey.from_string(course_id)
-            usage_key = UsageKey.from_string(location).replace(course_key=course_key)
+            usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
         except InvalidKeyError:
             raise Http404(u"Invalid course_key or usage_key")
+
         course = modulestore().get_course(course_key)
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
@@ -1187,20 +1340,20 @@ class InCourseReverifyView(View):
                 'error': True,
                 'errorMsg': _("No checkpoint found"),
                 'platform_name': settings.PLATFORM_NAME,
-                'location': location
+                'usage_id': usage_id
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
+
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
-            log.error("Could not submit verification attempt for user %s", request.user.id)
-            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+            return self._redirect_no_initial_verification(user, course_key)
 
         try:
             attempt = SoftwareSecurePhotoVerification.submit_faceimage(
                 request.user, request.POST['face_image'], init_verification.photo_id_key
             )
             checkpoint.add_verification_attempt(attempt)
-            VerificationStatus.add_verification_status(checkpoint, user, "submitted")
+            VerificationStatus.add_verification_status(checkpoint, user, "submitted", usage_id)
 
             # emit the reverification event
             self._track_reverification_events(
@@ -1210,6 +1363,10 @@ class InCourseReverifyView(View):
             try:
                 redirect_url = get_redirect_url(course_key, usage_key)
             except (ItemNotFoundError, NoPathToItem):
+                log.warning(
+                    u"Could not find redirect URL for location %s in course %s",
+                    course_key, usage_key
+                )
                 redirect_url = reverse("courseware", args=(unicode(course_key),))
 
             return JsonResponse({'url': redirect_url})
@@ -1235,6 +1392,11 @@ class InCourseReverifyView(View):
             None
 
         """
+        log.info(
+            u"In-course reverification: event %s occurred for user %s in course %s at checkpoint %s",
+            event_name, user_id, course_id, checkpoint
+        )
+
         if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
             tracking_context = tracker.get_tracker().resolve_context()
             analytics.track(
@@ -1251,3 +1413,37 @@ class InCourseReverifyView(View):
                     }
                 }
             )
+
+    def _redirect_no_initial_verification(self, user, course_key):
+        """Redirect because the user does not have an initial verification.
+
+        NOTE: currently, we assume that courses are configured such that
+        the first re-verification always occurs AFTER the initial verification
+        deadline.  Later, we may want to allow users to upgrade to a verified
+        track, then submit an initial verification that also counts
+        as a verification for the checkpoint in the course.
+
+        Arguments:
+            user (User): The user who made the request.
+            course_key (CourseKey): The identifier for the course for which
+                the user is attempting to re-verify.
+
+        Returns:
+            HttpResponse
+
+        """
+        log.warning(
+            u"User %s does not have an initial verification, so "
+            u"he/she will be redirected to the \"verify later\" flow "
+            u"for the course %s.",
+            user.id, course_key
+        )
+        return redirect(reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_key)}))
+
+
+class VerifyLaterView(RedirectView):
+    """ This view has been deprecated and should redirect to the unified verification flow. """
+    permanent = True
+
+    def get_redirect_url(self, course_id, **kwargs):    # pylint: disable=unused-argument
+        return reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_id)})

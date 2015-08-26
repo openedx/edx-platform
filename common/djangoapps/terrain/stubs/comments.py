@@ -100,7 +100,9 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
             self.send_response(404, content="404 Not Found")
 
     def do_threads(self):
-        self.send_json_response({"collection": [], "page": 1, "num_pages": 1})
+        threads = self.server.config.get('threads', {})
+        threads_data = [val for key, val in threads.items()]
+        self.send_json_response({"collection": threads_data, "page": 1, "num_pages": 1})
 
     def do_search_threads(self):
         self.send_json_response(self.server.config.get('search_result', {}))

@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:44+0000\n"
+"POT-Creation-Date: 2015-05-15 17:06+0000\n"
 "PO-Revision-Date: 2015-02-05 11:21+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -1891,15 +1891,33 @@ msgstr "خطأ: {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr "{num_hour} ساعة"
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr "{num_minute} دقيقة"
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr "{num_second}  ثانية"
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -4504,6 +4522,7 @@ msgstr "فهرس"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -4747,7 +4766,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4883,11 +4902,7 @@ msgid "Your certificate will be available when you pass the course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views.py
-msgid "Certificate has already been created."
-msgstr ""
-
-#: lms/djangoapps/courseware/views.py
-msgid "Certificate is already being created."
+msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
@@ -5508,6 +5523,19 @@ msgstr ""
 "متاحًا للتنزيل في الجدول أدناه."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your problem grade report is being generated! You can view the status of the"
+" generation task in the 'Pending Instructor Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem grade report is already being generated. Check the 'Pending "
+"Instructor Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr "نجح تغيير تاريخ الاستحقاق للطالب {0} من {1} إلى {2}"
 
@@ -5879,6 +5907,12 @@ msgstr "الإرسال بالبريد الإلكتروني"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "التقييم "
+
+#. Translators: This is a past-tense phrase that is inserted into task
+#. progress messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "problem distribution graded"
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -7220,6 +7254,10 @@ msgstr "لم يكن وجهك مرئيًّا في صورتك الذاتية."
 msgid "There was an error verifying your ID photos."
 msgstr "نأسف لحدوث خطأ أثناء التحقّق من صور بطاقتك الشخصية."
 
+#: lms/djangoapps/verify_student/models.py
+msgid "Usage id of Reverification XBlock."
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "المقدّمة "
@@ -7357,10 +7395,6 @@ msgstr ""
 #: lms/envs/common.py
 msgid "Taiwan"
 msgstr "تايوان"
-
-#: lms/lib/courseware_search/lms_result_processor.py
-msgid "(Unnamed)"
-msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -8064,6 +8098,10 @@ msgstr "عنوان البريد الإلكتروني الذي استخدمته �
 msgid "Password"
 msgstr "كلمة السر"
 
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "تذكُّر بياناتي"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -8233,6 +8271,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
+msgstr ""
+
+#: cms/djangoapps/contentstore/courseware_index.py
+msgid "(Unnamed)"
 msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
@@ -8698,6 +8740,7 @@ msgid "Settings"
 msgstr "الإعدادات"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr " خطأ:"
 
@@ -8960,6 +9003,14 @@ msgstr "استكشف المساقات الآن!"
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "الأخطاء الخاصة بتحميل المساقات "
+
+#: lms/templates/dashboard.html
+msgid "Search Your Courses"
+msgstr ""
+
+#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+msgid "Clear search"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Want to change your account settings?"
@@ -9403,6 +9454,10 @@ msgstr ""
 "نجح الأمر! أنت الآن في الصفحة الرئيسية الافتراضية لهذه الوحدة من Open edX."
 
 #: lms/templates/index.html
+msgid "Search for a course"
+msgstr ""
+
+#: lms/templates/index.html
 msgid "View all Courses"
 msgstr ""
 
@@ -9531,10 +9586,6 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "تفضيلات الحساب"
-
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "تذكُّر بياناتي"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -10292,6 +10343,7 @@ msgstr "أحدث نشاط تحميل git لمساق {course_id}"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "خطأ"
 
@@ -10649,9 +10701,26 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "استعراض المساق "
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Archived Custom Course"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Custom Course"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -11040,6 +11109,28 @@ msgstr[5] "{num} نقاط: {text}"
 msgid "Please enter a hint below:"
 msgstr "يُرجى إدخال تلميح أدناه:"
 
+#: lms/templates/commerce/checkout_cancel.html
+msgid "Checkout Cancelled"
+msgstr ""
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid ""
+"Your transaction has been cancelled. If you feel an error has occurred, "
+"contact {email}."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Could not retrieve payment information"
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Loading Order Data..."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Please wait while we retrieve your order details."
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
 msgstr "{chapter}، الفصل الحالي "
@@ -11254,10 +11345,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 msgid "search"
 msgstr "بحث"
-
-#: lms/templates/courseware/courseware.html
-msgid "Clear search"
-msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -11714,7 +11801,8 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"receive a higher grade,you can request an {link_start} updated certificate "
+"{link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11885,20 +11973,13 @@ msgid "Enrolled as: "
 msgstr "مسجَّل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "استعراض المساق المحفوظ في الأرشيف"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "استعراض المساق "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
@@ -12571,8 +12652,8 @@ msgid "Unfollow"
 msgstr "إلغاء المتابعة"
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Vote"
-msgstr "تصويت"
+msgid "Vote for this post,"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report abuse"
@@ -13368,6 +13449,46 @@ msgstr "لم يؤثر ذلك على باقي المساقات."
 msgid "You have been removed from a beta test for {course_name}"
 msgstr "لقد تم إلغاؤك من اختبار بيتا للمساق {course_name}"
 
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"been passed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"failed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment date has passed and retake not allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment closes on {due_date}."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to re-verify:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to go to the courseware:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} Team."
+msgstr ""
+
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
 msgstr "عزيزي الطالب،"
@@ -13725,6 +13846,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Grade Report"
 msgstr "إعداد تقرير خاص بالدرجات"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Problem Grade Report"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
@@ -15605,10 +15730,10 @@ msgstr "استبيان ما قبل المساق"
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*)."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
-"يمكنك أن تبدأ بمساقك ما إن تملأ الاستمارة التالية. يُرجى الانتباه إلى أنّ "
-"الحقول الضرورية محدّدة بعلامة النجمة (*)."
 
 #: lms/templates/survey/survey.html
 msgid "You are missing the following required fields:"
@@ -15752,7 +15877,7 @@ msgid "Edit Your Full Name"
 msgstr "قم بتعديل اسمك الكامل  "
 
 #: lms/templates/verify_student/incourse_reverify.html
-msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgid "Re-Verify for {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -16597,12 +16722,16 @@ msgid "Drag to reorder"
 msgstr "السحب لإعادة الترتيب"
 
 #: cms/templates/container.html
+msgid "Open the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
 msgid "View Live Version"
 msgstr "مشاهدة النسخة الحالية"
 
 #: cms/templates/container.html
-msgid "Preview Changes"
-msgstr "معاينة التغييرات"
+msgid "Preview the courseware in the LMS"
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Adding components"

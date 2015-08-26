@@ -42,6 +42,9 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
             qualifiers={'category': {'$nin': DIRECT_ONLY_CATEGORIES}},
             revision=ModuleStoreEnum.RevisionOption.draft_only
         )
+        # Check to see if the returned draft modules have changes w.r.t. the published module.
+        # Only modules with changes will be exported into the /drafts directory.
+        draft_modules = [module for module in draft_modules if modulestore.has_changes(module)]
 
         if draft_modules:
             draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
@@ -153,20 +156,15 @@ class ExportManager(object):
         Perform the export given the parameters handed to this class at init.
         """
         with self.modulestore.bulk_operations(self.courselike_key):
-            # depth = None: Traverses down the entire course structure.
-            # lazy = False: Loads and caches all block definitions during traversal for fast access later
-            #               -and- to eliminate many round-trips to read individual definitions.
-            # Why these parameters? Because a course export needs to access all the course block information
-            # eventually. Accessing it all now at the beginning increases performance of the export.
-            fsm = OSFS(self.root_dir)
-            courselike = self.get_courselike()
-            export_fs = courselike.runtime.export_fs = fsm.makeopendir(self.target_dir)
-            root_courselike_dir = self.root_dir + '/' + self.target_dir
 
+            fsm = OSFS(self.root_dir)
             root = lxml.etree.Element('unknown')  # pylint: disable=no-member
 
             # export only the published content
             with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
+                courselike = self.get_courselike()
+                export_fs = courselike.runtime.export_fs = fsm.makeopendir(self.target_dir)
+
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
                 xml_centric_courselike_key = self.get_key()
                 adapt_references(courselike, xml_centric_courselike_key, export_fs)
@@ -176,6 +174,7 @@ class ExportManager(object):
             self.process_root(root, export_fs)
 
             # Process extra items-- drafts, assets, etc
+            root_courselike_dir = self.root_dir + '/' + self.target_dir
             self.process_extra(root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs)
 
             # Any last pass adjustments
@@ -192,6 +191,11 @@ class CourseExportManager(ExportManager):
         )
 
     def get_courselike(self):
+        # depth = None: Traverses down the entire course structure.
+        # lazy = False: Loads and caches all block definitions during traversal for fast access later
+        #               -and- to eliminate many round-trips to read individual definitions.
+        # Why these parameters? Because a course export needs to access all the course block information
+        # eventually. Accessing it all now at the beginning increases performance of the export.
         return self.modulestore.get_course(self.courselike_key, depth=None, lazy=False)
 
     def process_root(self, root, export_fs):

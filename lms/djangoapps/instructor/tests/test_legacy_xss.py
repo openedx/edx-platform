@@ -5,6 +5,7 @@ Tests of various instructor dashboard features that include lists of students
 from django.conf import settings
 from django.test.client import RequestFactory
 from markupsafe import escape
+from nose.plugins.attrib import attr
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
@@ -16,6 +17,7 @@ from instructor.views import legacy
 # pylint: disable=missing-docstring
 
 
+@attr('shard_1')
 class TestXss(ModuleStoreTestCase):
     def setUp(self):
         super(TestXss, self).setUp()

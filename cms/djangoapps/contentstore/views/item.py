@@ -11,7 +11,7 @@ import json
 from collections import OrderedDict
 from functools import partial
 from static_replace import replace_static_urls
-from xmodule_modifiers import wrap_xblock, request_token
+from openedx.core.lib.xblock_utils import wrap_xblock, request_token
 
 import dogstats_wrapper as dog_stats_api
 from django.conf import settings

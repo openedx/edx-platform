@@ -11,7 +11,7 @@ define([
                 return [
                     TabPanelView.prototype.className,
                     'note-group'
-                ].join(' ')
+                ].join(' ');
             },
             renderContent: function () {
                 this.$el.append(this.getNotes(this.collection.toArray()));

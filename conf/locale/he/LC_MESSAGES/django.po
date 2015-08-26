@@ -59,9 +59,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:44+0000\n"
-"PO-Revision-Date: 2015-03-31 17:04+0000\n"
-"Last-Translator: Bentsi Magidovich <bentsi@yeda.org.il>\n"
+"POT-Creation-Date: 2015-05-15 17:06+0000\n"
+"PO-Revision-Date: 2015-04-26 15:16+0000\n"
+"Last-Translator: Nadav Stark <nadav@yeda.org.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -389,21 +389,21 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr ""
+msgstr "זכר"
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr ""
+msgstr "נקבה"
 
 #. Translators: 'Other' refers to the student's gender
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "Other"
-msgstr ""
+msgstr "אחר"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr ""
+msgstr "תואר שלישי"
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
@@ -411,19 +411,19 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Bachelor's degree"
-msgstr ""
+msgstr "תואר ראשון"
 
 #: common/djangoapps/student/models.py
 msgid "Associate degree"
-msgstr ""
+msgstr "הנדסאי"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
-msgstr ""
+msgstr "תיכון"
 
 #: common/djangoapps/student/models.py
 msgid "Junior secondary/junior high/middle school"
-msgstr ""
+msgstr "חטיבת ביניים"
 
 #: common/djangoapps/student/models.py
 msgid "Elementary/primary school"
@@ -1691,15 +1691,21 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr ""
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr ""
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr ""
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -4004,6 +4010,7 @@ msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -4248,7 +4255,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4367,11 +4374,7 @@ msgid "Your certificate will be available when you pass the course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views.py
-msgid "Certificate has already been created."
-msgstr ""
-
-#: lms/djangoapps/courseware/views.py
-msgid "Certificate is already being created."
+msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
@@ -4938,6 +4941,19 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your problem grade report is being generated! You can view the status of the"
+" generation task in the 'Pending Instructor Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem grade report is already being generated. Check the 'Pending "
+"Instructor Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 
@@ -5279,6 +5295,12 @@ msgstr ""
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
+msgstr ""
+
+#. Translators: This is a past-tense phrase that is inserted into task
+#. progress messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "problem distribution graded"
 msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -5705,13 +5727,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Page {page_number} of {page_count}"
-msgstr ""
+msgstr "עמוד {page_number} מתוך {page_count}"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
 msgid "Invoice"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Receipt"
 msgstr ""
 
@@ -6426,6 +6449,10 @@ msgstr ""
 msgid "There was an error verifying your ID photos."
 msgstr ""
 
+#: lms/djangoapps/verify_student/models.py
+msgid "Usage id of Reverification XBlock."
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr ""
@@ -6554,10 +6581,6 @@ msgstr "Youtube"
 
 #: lms/envs/common.py
 msgid "Taiwan"
-msgstr ""
-
-#: lms/lib/courseware_search/lms_result_processor.py
-msgid "(Unnamed)"
 msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
@@ -6836,7 +6859,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/container.html
 msgid "Preview"
 msgstr ""
 
@@ -7213,6 +7236,10 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
+msgid "Remember me"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -7374,6 +7401,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
+msgstr ""
+
+#: cms/djangoapps/contentstore/courseware_index.py
+msgid "(Unnamed)"
 msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
@@ -7803,6 +7834,7 @@ msgid "Settings"
 msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr ""
 
@@ -8059,6 +8091,14 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Search Your Courses"
+msgstr ""
+
+#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+msgid "Clear search"
 msgstr ""
 
 #: lms/templates/dashboard.html
@@ -8470,6 +8510,10 @@ msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 
 #: lms/templates/index.html
+msgid "Search for a course"
+msgstr ""
+
+#: lms/templates/index.html
 msgid "View all Courses"
 msgstr ""
 
@@ -8583,10 +8627,6 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Account Preferences"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Remember me"
 msgstr ""
 
 #. Translators: provider_name is the name of an external, third-party user
@@ -9307,6 +9347,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr ""
 
@@ -9640,8 +9681,25 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Archived Custom Course"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Custom Course"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
@@ -10005,6 +10063,28 @@ msgstr[1] ""
 msgid "Please enter a hint below:"
 msgstr ""
 
+#: lms/templates/commerce/checkout_cancel.html
+msgid "Checkout Cancelled"
+msgstr ""
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid ""
+"Your transaction has been cancelled. If you feel an error has occurred, "
+"contact {email}."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Could not retrieve payment information"
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Loading Order Data..."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Please wait while we retrieve your order details."
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
 msgstr ""
@@ -10210,10 +10290,6 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "search"
-msgstr ""
-
-#: lms/templates/courseware/courseware.html
-msgid "Clear search"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -10639,7 +10715,8 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"receive a higher grade,you can request an {link_start} updated certificate "
+"{link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -10790,19 +10867,12 @@ msgid "Enrolled as: "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -11442,7 +11512,7 @@ msgid "Unfollow"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Vote"
+msgid "Vote for this post,"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -12145,6 +12215,46 @@ msgstr ""
 msgid "You have been removed from a beta test for {course_name}"
 msgstr ""
 
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"been passed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"failed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment date has passed and retake not allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment closes on {due_date}."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to re-verify:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to go to the courseware:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} Team."
+msgstr ""
+
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
 msgstr ""
@@ -12466,6 +12576,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Grade Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Problem Grade Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -14199,7 +14313,9 @@ msgstr ""
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*)."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
 
 #: lms/templates/survey/survey.html
@@ -14327,7 +14443,7 @@ msgid "Edit Your Full Name"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.html
-msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgid "Re-Verify for {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -15091,11 +15207,15 @@ msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
+msgid "Open the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
 msgid "View Live Version"
 msgstr ""
 
 #: cms/templates/container.html
-msgid "Preview Changes"
+msgid "Preview the courseware in the LMS"
 msgstr ""
 
 #: cms/templates/container.html

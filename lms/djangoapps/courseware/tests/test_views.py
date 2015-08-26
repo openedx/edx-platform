@@ -7,6 +7,7 @@ import ddt
 import json
 import unittest
 from datetime import datetime
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -43,6 +44,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@attr('shard_1')
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -163,6 +165,7 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@attr('shard_1')
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
@@ -556,6 +559,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertNotContains(response, checkbox_html, html=True)
 
 
+@attr('shard_1')
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
@@ -673,6 +677,7 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
+@attr('shard_1')
 class TestNonRegisteredUser(TestCase):
     """
     Tests nonregistered (auto-created) users
@@ -692,6 +697,7 @@ class TestNonRegisteredUser(TestCase):
             views.progress(req, self.course_id)
 
 
+@attr('shard_1')
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -748,6 +754,7 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertIn("2015-JULY-17", text)
 
 
+@attr('shard_1')
 @ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
@@ -829,6 +836,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertNotContains(resp, 'Request Certificate')
 
 
+@attr('shard_1')
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
     Tests for the ensure_valid_course_key decorator.
@@ -854,6 +862,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         self.assertFalse(mocked_view.called)
 
 
+@attr('shard_1')
 class IsCoursePassedTests(ModuleStoreTestCase):
     """
     Tests for the is_course_passed helper function
@@ -888,6 +897,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
 
+@attr('shard_1')
 class GenerateUserCertTests(ModuleStoreTestCase):
     """
     Tests for the view function Generated User Certs
@@ -958,21 +968,44 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         )
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Certificate is already being created.", resp.content)
+        self.assertIn("Certificate is being created.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
     def test_user_with_passing_existing_downloadable_cert(self):
-        # If user has passing grade but also has existing downloadable cert
-        # then json will return cert generating message with bad request code
+        # If user has already downloadable certificate then he can again re-generate the
+        # the cert.
         GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
             mode='verified'
         )
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Certificate has already been created.", resp.content)
+
+        analytics_patcher = patch('courseware.views.analytics')
+        mock_tracker = analytics_patcher.start()
+        self.addCleanup(analytics_patcher.stop)
+
+        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+            mock_send_to_queue.return_value = (0, "Successfully queued")
+            resp = self.client.post(self.url)
+            self.assertEqual(resp.status_code, 200)
+
+            #Verify Google Analytics event fired after generating certificate
+            mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
+                self.student.id,  # pylint: disable=no-member
+                'edx.bi.user.certificate.generate',
+                {
+                    'category': 'certificates',
+                    'label': unicode(self.course.id)
+                },
+
+                context={
+                    'Google Analytics':
+                    {'clientId': None}
+                }
+            )
+            mock_tracker.reset_mock()
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return
@@ -1020,6 +1053,7 @@ class ViewCheckerBlock(XBlock):
         return result
 
 
+@attr('shard_1')
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """

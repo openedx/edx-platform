@@ -37,6 +37,12 @@
   display: block;
 }
 
+@mixin show-hover-state() {
+    opacity: 1;
+    background-color: $shadow-d2;
+    border-radius: ($baseline/4);
+}
+
 @function em($pxval, $base: 16) {
   @return #{$pxval / $base}em;
 }

@@ -126,7 +126,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
         # So, bind to the same one as the current descriptor.
         module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
 
-        descriptor.bind_for_student(module_system, descriptor._field_data, user.id)
+        descriptor.bind_for_student(module_system, user.id)
 
         return descriptor
 

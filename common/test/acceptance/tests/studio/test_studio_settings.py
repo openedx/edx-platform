@@ -2,8 +2,6 @@
 Acceptance tests for Studio's Setting pages
 """
 
-from nose.plugins.attrib import attr
-
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
 from ...fixtures.course import XBlockFixtureDesc
@@ -16,7 +14,6 @@ from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
 
-@attr('shard_1')
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -228,7 +225,6 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         ).fulfill()
 
 
-@attr('shard_1')
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -400,7 +396,4 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         """
         expected_fields = self.advanced_settings.expected_settings_names
         displayed_fields = self.advanced_settings.displayed_settings_names
-        self.assertEqual(len(expected_fields), len(displayed_fields))
-        for field in displayed_fields:
-            if field not in expected_fields:
-                self.fail("Field '{}' not expected for Advanced Settings display.".format(field))
+        self.assertEquals(set(displayed_fields), set(expected_fields))

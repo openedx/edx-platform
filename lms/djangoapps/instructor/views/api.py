@@ -36,6 +36,7 @@ from student.roles import GlobalStaff, CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+from instructor_analytics.csvs import create_csv_response
 import gzip
 
 from microsite_configuration import microsite
@@ -84,6 +85,7 @@ import instructor_analytics.csvs
 import csv
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from instructor.views import INVOICE_KEY
+from instructor.lti_grader import LTIGrader
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -2424,6 +2426,32 @@ def get_student_responses(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def problem_grade_report(request, course_id):
+    """
+    Request a CSV showing students' grades for all problems in the
+    course.
+
+    AlreadyRunningError is raised if the course's grades are already being
+    updated.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_problem_grade_report(request, course_key)
+        success_status = _("Your problem grade report is being generated! "
+                           "You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A problem grade report is already being generated. "
+                                   "Check the 'Pending Instructor Tasks' table for the status of the task. "
+                                   "When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 @require_query_params('rolename')
 def list_forum_members(request, course_id):
     """
@@ -2989,6 +3017,48 @@ def spoc_gradebook(request, course_id):
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_blank_lti(request, course_id):  # pylint: disable=unused-argument
+    """
+    Respond with 4-column CSV output of ID, email, grade (blank), max_grade (blank), and comments (blank)
+    """
+    course_id = CourseKey.from_string(course_id)
+    students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+    ).order_by('id')
+    header = ['ID', 'Anonymized User ID', 'email', 'grade', 'max_grade', 'comments']
+    encoded_header = [unicode(s).encode('utf-8') for s in header]
+    rows = [[s.id, unique_id_for_user(s, save=False), s.email, '', '', ''] for s in students]
+    csv_filename = "{course_id}-blank-grade-submission.csv".format(
+        course_id=unicode(course_id).replace('/', '-'),
+    )
+    return create_csv_response(csv_filename, encoded_header, rows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def upload_lti(request, course_id):
+    """
+    Update grades for the lti component specified by processing the uploaded csv file
+    :param request: The post request containing lti-key, lti-secret, and the lti-grades data file
+    :param course_id: the id of the course containing the lti component
+    :return: JsonResponse with the status from the LTIGrader
+    """
+    lti_base_url = re.sub(
+        r'\{anon_user_id\}',
+        '',
+        request.POST.get('lti-endpoint')
+    )
+    lti_key = request.POST.get('lti-key')
+    lti_secret = request.POST.get('lti-secret')
+    lti_grader = LTIGrader(course_id, lti_base_url, lti_key, lti_secret)
+    status = lti_grader.update_grades(request.FILES['lti-grades'])
+    return JsonResponse({'status': status})
 
 
 @ensure_csrf_cookie

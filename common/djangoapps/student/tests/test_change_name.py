@@ -19,6 +19,7 @@ class TestChangeName(TestCase):
     Check the change_name view of student.
     """
     def setUp(self):
+        super(TestChangeName, self).setUp()
         self.student = UserFactory.create(password='test')
         self.client = Client()
 

@@ -1,10 +1,10 @@
 $(document).ready(function() {
     'use strict';
 
-    $("#btn_generate_cert").click(function(e){
+    $(".generate_certs").click(function(e){
         e.preventDefault();
-        var post_url = $("#btn_generate_cert").data("endpoint");
-        $('#btn_generate_cert').prop("disabled", true);
+        var post_url = $(".generate_certs").data("endpoint");
+        $(".generate_certs").attr("disabled", true).addClass('is-disabled').attr('aria-disabled', true);
         $.ajax({
             type: "POST",
             url: post_url,
@@ -14,7 +14,7 @@ $(document).ready(function() {
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#errors-info').html(jqXHR.responseText);
-                $('#btn_generate_cert').prop("disabled", false);
+                $(".generate_certs").attr("disabled", false).removeClass('is-disabled').attr('aria-disabled', false);
             }
         });
     });

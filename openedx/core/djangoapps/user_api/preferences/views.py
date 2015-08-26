@@ -39,30 +39,48 @@ class PreferencesView(APIView):
 
         **Response Value for GET**
 
-            A JSON dictionary will be returned with key/value pairs (all of type String).
+            If the user makes the request for her own account, or makes a
+            request for another account and has "is_staff" access, the response
+            contains a JSON dictionary with a key/value pair (of type String)
+            for each preference.
 
-            If a user without "is_staff" access has requested preferences for a different user,
-            this method returns a 404.
+            The list of preferences depends on your implementation. By default,
+            preferences include:
 
-            If the specified username does not exist, this method returns a 404.
+            * pref-lan: The user's preferred language, as set in account
+              settings.
+
+            * account_privacy: The user's setting for sharing her personal
+              profile. Possible values are ``all_users`` or ``private``.
+
+            If a user without "is_staff" access requests preferences for a
+            different user, a 404 error is returned.
+
+            If the specified username does not exist, a 404 is returned.
 
         **Response for PATCH**
 
-            Users can only modify their own preferences. If the requesting user does not have username
-            "username", this method will return with a status of 403 for staff access but a 404 for ordinary
+            Users can only modify their own preferences. If the requesting user
+            does not have username "username", this method will return with a
+            status of 403 for users with staff access but a 404 for ordinary
             users to avoid leaking the existence of the account.
 
-            This method will also return a 404 if no user exists with username "username".
+            This method will also return a 404 if no user exists with username
+            "username".
 
-            If "application/merge-patch+json" is not the specified content_type, this method returns a 415 status.
+            If "application/merge-patch+json" is not the specified content_type,
+            this method returns a 415 status.
 
-            If the update could not be completed due to validation errors, this method returns a 400 with all
-            preference-specific error messages in the "field_errors" field of the returned JSON.
+            If the update could not be completed due to validation errors, this
+            method returns a 400 with all preference-specific error messages in
+            the "field_errors" field of the returned JSON.
 
-            If the update could not be completed due to failure at the time of update, this method returns a 400 with
-            specific errors in the returned JSON.
+            If the update could not be completed due to failure at the time of
+            update, this method returns a 400 with specific errors in the
+            returned JSON.
 
-            If the update is successful, a 204 status is returned with no additional content.
+            If the update is successful, a 204 status is returned with no
+            additional content.
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
@@ -136,30 +154,35 @@ class PreferencesDetailView(APIView):
 
             The preference value will be returned as a JSON string.
 
-            If a user without "is_staff" access has requested preferences for a different user,
-            this method returns a 404.
+            If a user without "is_staff" access has requested preferences for a
+            different user, this method returns a 404.
 
-            If the specified username or preference does not exist, this method returns a 404.
+            If the specified username or preference does not exist, this method
+            returns a 404.
 
         **Response Values for PUT**
 
             A successful put returns a 204 and no content.
 
-            Users can only update their own preferences. If the requesting user does not have username
-            "username", this method will return with a status of 403 for staff access but a 404 for ordinary
+            Users can only modify their own preferences. If the requesting user
+            does not have username "username", this method will return with a
+            status of 403 for users with staff access but a 404 for ordinary
             users to avoid leaking the existence of the account.
 
-            If the specified preference does not exist, this method returns a 404.
+            If the specified preference does not exist, this method returns a
+            404.
 
         **Response for DELETE**
 
             A successful delete returns a 204 and no content.
 
-            Users can only delete their own preferences. If the requesting user does not have username
-            "username", this method will return with a status of 403 for staff access but a 404 for ordinary
+            Users can only delete their own preferences. If the requesting user
+            does not have username "username", this method will return with a
+            status of 403 for users with staff access but a 404 for ordinary
             users to avoid leaking the existence of the account.
 
-            If the specified preference does not exist, this method returns a 404.
+            If the specified preference does not exist, this method returns a
+            404.
 
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)

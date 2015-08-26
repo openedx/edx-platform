@@ -243,6 +243,7 @@ class CourseAccessRuleHistoryTest(TestCase):
     """Test course access rule history. """
 
     def setUp(self):
+        super(CourseAccessRuleHistoryTest, self).setUp()
         self.course_key = CourseLocator('edx', 'DemoX', 'Demo_Course')
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course_key)
         self.countries = {

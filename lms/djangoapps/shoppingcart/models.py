@@ -371,7 +371,7 @@ class Order(models.Model):
         try:
             from_address = microsite.get_value(
                 'email_from_address',
-                settings.PAYMENT_SUPPORT_EMAIL
+                settings.PAYMENT_CONFIRM_EMAIL
             )
             # Send a unique email for each recipient. Don't put all email addresses in a single email.
             for recipient in recipient_list:
@@ -1663,7 +1663,7 @@ class CertificateItem(OrderItem):
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-        from_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+        from_email = microsite.get_value('payment_support_email', settings.PAYMENT_CONFIRM_EMAIL)
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except Exception as exception:  # pylint: disable=broad-except
@@ -1751,7 +1751,7 @@ class CertificateItem(OrderItem):
 
         if is_enrollment_mode_verified:
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
+            path = reverse('verify_student_verify_now', kwargs={'course_id': unicode(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
             verification_reminder = _(

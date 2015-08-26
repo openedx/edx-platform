@@ -193,9 +193,7 @@ simplefilter('ignore')
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'cache'
-BROKER_TRANSPORT = 'memory'
-
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 ########################### Server Ports ###################################
 
@@ -281,6 +279,10 @@ VIDEO_CDN_URL = {
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
+
+# teams feature
+FEATURES['ENABLE_TEAMS'] = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

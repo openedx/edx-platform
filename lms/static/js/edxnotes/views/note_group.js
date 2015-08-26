@@ -3,19 +3,22 @@
 define([
     'gettext', 'underscore', 'backbone'
 ], function (gettext, _, Backbone) {
-    var NoteSectionView, NoteGroupView;
+    var GroupView, ChapterView;
 
-    NoteSectionView = Backbone.View.extend({
+    GroupView = Backbone.View.extend({
         tagName: 'section',
-        className: 'note-section',
         id: function () {
             return 'note-section-' + _.uniqueId();
         },
-        template: _.template('<h4 class="course-subtitle"><%- sectionName %></h4>'),
+
+        initialize: function () {
+            this.template = _.template(this.options.template);
+            this.className = this.options.className;
+        },
 
         render: function () {
             this.$el.prepend(this.template({
-                sectionName: this.options.section.display_name
+                displayName: this.options.displayName
             }));
 
             return this;
@@ -26,7 +29,7 @@ define([
         }
     });
 
-    NoteGroupView = Backbone.View.extend({
+    ChapterView = Backbone.View.extend({
         tagName: 'section',
         className: 'note-group',
         id: function () {
@@ -52,7 +55,13 @@ define([
         },
 
         addChild: function (sectionInfo) {
-            var section = new NoteSectionView({section: sectionInfo});
+            var section = new GroupView(
+                {
+                    displayName: sectionInfo.display_name,
+                    template: '<h4 class="course-subtitle"><%- displayName %></h4>',
+                    className: "note-section"
+                }
+            );
             this.children.push(section);
             return section;
         },
@@ -65,6 +74,6 @@ define([
         }
     });
 
-    return NoteGroupView;
+    return {GroupView: GroupView, ChapterView: ChapterView};
 });
 }).call(this, define || RequireJS.define);

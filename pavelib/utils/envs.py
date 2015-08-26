@@ -28,6 +28,15 @@ class Env(object):
     BOK_CHOY_REPORT_DIR = REPORT_DIR / "bok_choy"
     BOK_CHOY_COVERAGERC = BOK_CHOY_DIR / ".coveragerc"
 
+    # If set, put reports for run in "unique" directories.
+    # The main purpose of this is to ensure that the reports can be 'slurped'
+    # in the main jenkins flow job without overwriting the reports from other
+    # build steps. For local development/testing, this shouldn't be needed.
+    if os.environ.get("SHARD", None):
+        shard_str = "shard_{}".format(os.environ.get("SHARD"))
+        BOK_CHOY_REPORT_DIR = BOK_CHOY_REPORT_DIR / shard_str
+        BOK_CHOY_LOG_DIR = BOK_CHOY_LOG_DIR / shard_str
+
     # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
     # For this reason, the stubs package is currently located in the Django app called "terrain"
     # where other lettuce configuration is stored.

@@ -11,6 +11,7 @@ MEDIA_ROOT = "/edx/var/edxapp/uploads"
 DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
+HTTPS = 'off'
 
 ################################ LOGGERS ######################################
 

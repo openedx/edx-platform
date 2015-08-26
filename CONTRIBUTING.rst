@@ -124,6 +124,20 @@ include things like documentation and passing tests: see the
 
 .. _contributor documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/process/contributor.html
 
+Areas of particular concern with their own detailed guidelines are:
+
+* `Accessibility`_: making sure our applications can
+  be used by people with disabilities, in keeping with the edX
+  `website accessibility policy`_.
+* `Internationalization`_: enabling translation for use
+  around the world.
+
+
+.. _Accessibility: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/accessibility.html
+.. _website accessibility policy: https://www.edx.org/accessibility
+.. _Internationalization: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/internationalization/index.html
+
+
 Step 4: Approval by Community Manager and Product Owner
 =======================================================
 

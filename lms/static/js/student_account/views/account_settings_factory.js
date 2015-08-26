@@ -10,7 +10,7 @@
     ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, isShibAuth) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName, isShibAuth) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
 
@@ -29,7 +29,9 @@
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
-                                helpMessage: gettext('The name that identifies you on this site. You cannot change your username.')
+                                helpMessage: interpolate_text(
+                                    gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'), {platform_name: platformName}
+                                )
                             })
                         }
                     ]

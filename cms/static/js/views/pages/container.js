@@ -68,11 +68,11 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     });
                     this.publishHistory.render();
 
-                    this.previewActions = new ContainerSubviews.PreviewActionController({
+                    this.viewLiveActions = new ContainerSubviews.ViewLiveButtonController({
                         el: this.$('.nav-actions'),
                         model: this.model
                     });
-                    this.previewActions.render();
+                    this.viewLiveActions.render();
 
                     this.unitOutlineView = new UnitOutlineView({
                         el: this.$('.wrapper-unit-overview'),

@@ -20,6 +20,7 @@ class CreatorGroupTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
+        super(CreatorGroupTest, self).setUp()
         self.user = User.objects.create_user('testuser', 'test+courses@edx.org', 'foo')
         self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
         self.admin.is_staff = True
@@ -138,6 +139,7 @@ class CourseGroupTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
+        super(CourseGroupTest, self).setUp()
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')

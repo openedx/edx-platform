@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import pytz
 
@@ -45,36 +46,28 @@ def user_track(request):
 
     GET or POST call should provide "event_type", "event", and "page" arguments.
     """
-    try:  # TODO: Do the same for many of the optional META parameters
+    try:
         username = request.user.username
     except:
         username = "anonymous"
 
+    name = _get_request_value(request, 'event_type')
+    data = _get_request_value(request, 'event', {})
     page = _get_request_value(request, 'page')
 
-    with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
-        context = eventtracker.get_tracker().resolve_context()
-        event = {
-            "username": username,
-            "session": context.get('session', ''),
-            "ip": _get_request_header(request, 'REMOTE_ADDR'),
-            "referer": _get_request_header(request, 'HTTP_REFERER'),
-            "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
-            "event_source": "browser",
-            "event_type": _get_request_value(request, 'event_type'),
-            "event": _get_request_value(request, 'event'),
-            "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
-            "page": page,
-            "time": datetime.datetime.utcnow(),
-            "host": _get_request_header(request, 'SERVER_NAME'),
-            "context": context,
-        }
+    if isinstance(data, basestring) and len(data) > 0:
+        try:
+            data = json.loads(data)
+        except ValueError:
+            pass
 
-    # Some duplicated fields are passed into event-tracking via the context by track.middleware.
-    # Remove them from the event here since they are captured elsewhere.
-    shim.remove_shim_context(event)
+    context_override = contexts.course_context_from_url(page)
+    context_override['username'] = username
+    context_override['event_source'] = 'browser'
+    context_override['page'] = page
 
-    log_event(event)
+    with eventtracker.get_tracker().context('edx.course.browser', context_override):
+        eventtracker.emit(name=name, data=data)
 
     return HttpResponse('success')
 

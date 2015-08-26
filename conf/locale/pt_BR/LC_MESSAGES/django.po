@@ -19,6 +19,7 @@
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Heitor Althmann <heitoralthmann@gmail.com>, 2014
 # Heitor Althmann <heitoralthmann@gmail.com>, 2014
+# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # JhonatannSilva <jhonatannpereiradasilva@hotmail.com>, 2014
 # katia04 <katia.csmiao@gmail.com>, 2014
@@ -104,6 +105,7 @@
 # Gislene Kucker Arantes <gislene.trad@gmail.com>, 2014
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
+# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
@@ -124,6 +126,7 @@
 # Paulo Castro, 2013
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014-2015
 # Raphael Mendonça, 2014
+# Raysa Valentim dos Santos <raysavalentims@gmail.com>, 2015
 # Renata Barboza-Murray, 2013-2014
 # Rene de Souza Vianello Argento <rene.argento@gmail.com>, 2015
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
@@ -143,6 +146,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Alan Mól <alan3df@gmail.com>, 2015
 # Alexander Rodrigo Ferreira <dr.alexander.ferreira@hotmail.com>, 2015
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Alextds <alex.tds@gmail.com>, 2014
@@ -160,6 +164,7 @@
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Hannah Ximenes <hannahmoreira@yahoo.com.br>, 2014
+# Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
@@ -206,7 +211,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-04-21 13:44+0000\n"
+"POT-Creation-Date: 2015-05-15 17:06+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -1888,15 +1893,21 @@ msgstr "Erro: {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr "{num_hour} hora"
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr "{num_minute} minuto"
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr "{num_second} segundo"
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -4392,6 +4403,7 @@ msgstr "Índice"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/dashboard.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -4640,7 +4652,7 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/dashboard.html
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -4764,11 +4776,7 @@ msgid "Your certificate will be available when you pass the course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views.py
-msgid "Certificate has already been created."
-msgstr ""
-
-#: lms/djangoapps/courseware/views.py
-msgid "Certificate is already being created."
+msgid "Certificate is being created."
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py
@@ -5369,6 +5377,19 @@ msgstr ""
 "concluído, o boletim ficará disponível para ser baixado na tabela abaixo."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your problem grade report is being generated! You can view the status of the"
+" generation task in the 'Pending Instructor Tasks' section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem grade report is already being generated. Check the 'Pending "
+"Instructor Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 "A alteração da data de entrega para o aluno {0} de {1} para {2} foi feita "
@@ -5718,6 +5739,12 @@ msgstr "E-mail enviado"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "corrigido"
+
+#. Translators: This is a past-tense phrase that is inserted into task
+#. progress messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "problem distribution graded"
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -6179,6 +6206,7 @@ msgid "Invoice"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Receipt"
 msgstr ""
 
@@ -6970,6 +6998,10 @@ msgstr ""
 msgid "There was an error verifying your ID photos."
 msgstr "Ocorreu um erro ao verificar as suas fotos de identificação."
 
+#: lms/djangoapps/verify_student/models.py
+msgid "Usage id of Reverification XBlock."
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr ""
@@ -7101,10 +7133,6 @@ msgstr ""
 
 #: lms/envs/common.py
 msgid "Taiwan"
-msgstr ""
-
-#: lms/lib/courseware_search/lms_result_processor.py
-msgid "(Unnamed)"
 msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
@@ -7801,6 +7829,10 @@ msgstr ""
 msgid "Password"
 msgstr "Senha"
 
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "Lembrar as minhas informações"
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -7940,6 +7972,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
+msgstr ""
+
+#: cms/djangoapps/contentstore/courseware_index.py
+msgid "(Unnamed)"
 msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
@@ -8383,6 +8419,7 @@ msgid "Settings"
 msgstr "Configurações"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error:"
 msgstr "Erro:"
 
@@ -8641,6 +8678,14 @@ msgstr "Encontre cursos agora! "
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "Erros de carregamento do curso"
+
+#: lms/templates/dashboard.html
+msgid "Search Your Courses"
+msgstr ""
+
+#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+msgid "Clear search"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Want to change your account settings?"
@@ -9070,6 +9115,10 @@ msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 
 #: lms/templates/index.html
+msgid "Search for a course"
+msgstr ""
+
+#: lms/templates/index.html
 msgid "View all Courses"
 msgstr ""
 
@@ -9196,10 +9245,6 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Preferências da conta"
-
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "Lembrar as minhas informações"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -9955,6 +10000,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/commerce/checkout_receipt.html
 msgid "Error"
 msgstr "Erro"
 
@@ -10308,9 +10354,26 @@ msgstr ""
 
 #: lms/templates/ccx/_dashboard_ccx_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "Visualizar curso "
+msgid "Ended - {end_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {start_date}"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Archived Custom Course"
+msgstr ""
+
+#: lms/templates/ccx/_dashboard_ccx_listing.html
+msgid "View Custom Course"
+msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -10695,6 +10758,28 @@ msgstr[1] "{num} pontos: {text}"
 msgid "Please enter a hint below:"
 msgstr "Por favor, adicione uma dica abaixo:"
 
+#: lms/templates/commerce/checkout_cancel.html
+msgid "Checkout Cancelled"
+msgstr ""
+
+#: lms/templates/commerce/checkout_cancel.html
+msgid ""
+"Your transaction has been cancelled. If you feel an error has occurred, "
+"contact {email}."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Could not retrieve payment information"
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Loading Order Data..."
+msgstr ""
+
+#: lms/templates/commerce/checkout_receipt.html
+msgid "Please wait while we retrieve your order details."
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
 msgstr "{chapter}, capítulo atual"
@@ -10907,10 +10992,6 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "search"
-msgstr ""
-
-#: lms/templates/courseware/courseware.html
-msgid "Clear search"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -11345,7 +11426,8 @@ msgstr ""
 #: lms/templates/courseware/progress.html
 msgid ""
 "You can now download your certificate as a PDF. If you keep working and "
-"receive a higher grade, you can request an updated certificate."
+"receive a higher grade,you can request an {link_start} updated certificate "
+"{link_end}."
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -11517,20 +11599,13 @@ msgid "Enrolled as: "
 msgstr "Inscrito como:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "Visualizar curso arquivado"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "Visualizar curso "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
@@ -12187,7 +12262,7 @@ msgid "Unfollow"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Vote"
+msgid "Vote for this post,"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -12942,6 +13017,46 @@ msgstr "Os seus outros cursos não foram afetados."
 msgid "You have been removed from a beta test for {course_name}"
 msgstr "Você foi excluído da lista de testadores beta do curso {course_name}"
 
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"been passed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"Your verification for course {course_name} and assessment {assessment} has "
+"failed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "You have reached your allowed attempts limit. No more retakes allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment date has passed and retake not allowed."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment closes on {due_date}."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Assessment is open and you have {left_attempts} attempt(s) remaining."
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to re-verify:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "Click on link below to go to the courseware:"
+msgstr ""
+
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} Team."
+msgstr ""
+
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
 msgstr "Prezado aluno:"
@@ -13293,6 +13408,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Grade Report"
 msgstr "Gerar relatório de notas"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Problem Grade Report"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
@@ -15165,7 +15284,9 @@ msgstr ""
 #: lms/templates/survey/survey.html
 msgid ""
 "You can begin your course as soon as you complete the following form. "
-"Required fields are marked with an asterisk (*)."
+"Required fields are marked with an asterisk (*). This information is for the"
+" use of {platform_name} only. It will not be linked to your public profile "
+"in any way."
 msgstr ""
 
 #: lms/templates/survey/survey.html
@@ -15297,7 +15418,7 @@ msgid "Edit Your Full Name"
 msgstr "Editar o seu nome completo"
 
 #: lms/templates/verify_student/incourse_reverify.html
-msgid "Verifying for \"{checkpoint_name}\" in course \"{course_name}\""
+msgid "Re-Verify for {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -16142,11 +16263,15 @@ msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
+msgid "Open the courseware in the LMS"
+msgstr ""
+
+#: cms/templates/container.html
 msgid "View Live Version"
 msgstr ""
 
 #: cms/templates/container.html
-msgid "Preview Changes"
+msgid "Preview the courseware in the LMS"
 msgstr ""
 
 #: cms/templates/container.html

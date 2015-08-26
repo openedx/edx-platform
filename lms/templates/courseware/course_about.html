@@ -246,9 +246,11 @@ from edxmako.shortcuts import marketing_link
       % if sneakpeek_allowed and not regularly_registered:
         <section class="unauth-tos" id="unauth-tos">
           <p>
-            * ${_("By exploring the course, you are agreeing to our")}
-            <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a> and <a href="${marketing_link('TOS')}#privacy">${_("Privacy Policy")}</a>.
-            ${_("Please read them carefully.")}
+            * ${_("By exploring the course, you are agreeing to our {tos_link_start}Terms of Service{link_end} and {privacy_link_start}Privacy Policy{link_end}. Please read them carefully.").format(
+              tos_link_start='<a href="/tos">',
+              privacy_link_start='<a href="/tos#privacy">',
+              link_end='</a>'
+            )}
           </p>
         </section>
       % endif

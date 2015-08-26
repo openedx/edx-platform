@@ -24,6 +24,7 @@ class EnrollmentTest(TestCase):
     COURSE_ID = "some/great/course"
 
     def setUp(self):
+        super(EnrollmentTest, self).setUp()
         fake_data_api.reset()
         cache.clear()
 

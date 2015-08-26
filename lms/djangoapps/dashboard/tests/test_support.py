@@ -5,6 +5,7 @@ import datetime
 
 from django.contrib.auth.models import Permission
 from django.test.client import Client
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
@@ -14,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
+@attr('shard_1')
 class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page

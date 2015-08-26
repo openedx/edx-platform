@@ -22,6 +22,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
@@ -32,7 +33,10 @@ from student.roles import (
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
 from student.models import UserProfile
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+    any_unfulfilled_milestones,
+)
 
 import dogstats_wrapper as dog_stats_api
 
@@ -188,7 +192,12 @@ def _has_access_course_desc(user, action, course):
             # check start date
             can_load() and
             # check mobile_available flag
-            is_mobile_available_for_user(user, course)
+            is_mobile_available_for_user(user, course) and
+            # check staff access, if not then check for unfulfilled milestones
+            (
+                _has_staff_access_to_descriptor(user, course, course.id) or
+                not any_unfulfilled_milestones(course.id, user.id)
+            )
         )
 
     def can_enroll():
@@ -495,11 +504,16 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
                 descriptor,
                 course_key=course_key
             )
+            if in_preview_mode():
+                # after start date, everyone can see it
+                debug("Allow: now > effective start date")
+                return True
             if now > effective_start:
                 # after start date, all registered users can see it
                 # nonregistered users shouldn't be able to access certain descriptor types
                 debug("Allow: now > effective start date")
                 return UserProfile.has_registered(user) or _can_load_descriptor_nonregistered(descriptor)
+
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor, course_key)
 
@@ -747,3 +761,11 @@ def get_user_role(user, course_key):
         return 'staff'
     else:
         return 'student'
+
+
+def in_preview_mode():
+    """
+    Returns whether the user is in preview mode or not.
+    """
+    hostname = get_current_request_hostname()
+    return hostname and settings.PREVIEW_DOMAIN in hostname.split('.')

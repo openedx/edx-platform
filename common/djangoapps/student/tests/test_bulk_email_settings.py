@@ -49,12 +49,6 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
             name=self.course.display_name.replace(' ', '_'),
         )
 
-    def tearDown(self):
-        """
-        Undo all patches.
-        """
-        patch.stopall()
-
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
         # Assert that the URL for the email view is in the response
@@ -97,6 +91,7 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
+        super(TestStudentDashboardEmailViewXMLBacked, self).setUp()
         self.course_name = 'edX/toy/2012_Fall'
 
         # Create student account

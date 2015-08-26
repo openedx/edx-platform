@@ -2,6 +2,7 @@
 Test the course_info xblock
 """
 import mock
+from nose.plugins.attrib import attr
 
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -14,6 +15,7 @@ from student.models import CourseEnrollment
 from .helpers import LoginEnrollmentTestCase
 
 
+@attr('shard_1')
 class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page
@@ -61,6 +63,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertFalse(enrollment_exists)
 
 
+@attr('shard_1')
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course

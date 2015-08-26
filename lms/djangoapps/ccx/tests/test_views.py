@@ -6,6 +6,7 @@ import json
 import re
 import pytz
 from mock import patch
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
@@ -55,6 +56,7 @@ def intercept_renderer(path, context):
     return response
 
 
+@attr('shard_1')
 class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
@@ -115,13 +117,6 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         from django.core import mail
         return mail.outbox
-
-    def tearDown(self):
-        """
-        Undo patches.
-        """
-        super(TestCoachDashboard, self).tearDown()
-        patch.stopall()
 
     def test_not_a_coach(self):
         """
@@ -433,6 +428,7 @@ def patched_get_children(self, usage_key_filter=None):  # pylint: disable=missin
     return list(iter_children())
 
 
+@attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
@@ -492,10 +488,13 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # sure if there's a way to poke the test harness to do so.  So, we'll
         # just inject the override field storage in this brute force manner.
         OverrideFieldData.provider_classes = None
+        # pylint: disable=protected-access
         for block in iter_blocks(course):
-            block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
-                coach, block._field_data)   # pylint: disable=protected-access
-            block._field_data_cache = {'tabs': [], 'discussion_topics': []}  # pylint: disable=protected-access
+            block._field_data = OverrideFieldData.wrap(coach, block._field_data)
+            new_cache = {'tabs': [], 'discussion_topics': []}
+            if 'grading_policy' in block._field_data_cache:
+                new_cache['grading_policy'] = block._field_data_cache['grading_policy']
+            block._field_data_cache = new_cache
 
         def cleanup_provider_classes():
             """
@@ -581,6 +580,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 
+@attr('shard_1')
 class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """Verify the view for switching which CCX is active, if any
     """
