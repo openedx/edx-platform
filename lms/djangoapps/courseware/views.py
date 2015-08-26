@@ -1513,7 +1513,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True, course=course
         )
 
+        responsive = block.has_support(getattr(block, 'student_view', None), 'multi_device')
+
         context = {
+            'responsive': responsive,
             'fragment': block.render('student_view', context=request.GET),
             'course': course,
             'disable_accordion': True,
