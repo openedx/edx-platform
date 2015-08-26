@@ -83,6 +83,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
             requestIndex = requests.length - 1;
         }
         request = requests[requestIndex];
+        expect(new URI(request.url).path()).toEqual(expectedUrl);
         parameters = new URI(request.url).query(true);
         delete parameters._;  // Ignore the cache-busting argument
         expect(parameters).toEqual(expectedParameters);

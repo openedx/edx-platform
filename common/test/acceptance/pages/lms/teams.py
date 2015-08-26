@@ -261,6 +261,7 @@ class TeamPage(CoursePage, PaginatedUIMixin):
 
     def is_browser_on_page(self):
         """Check if we're on the teams list page for a particular team."""
+        self.wait_for_ajax()
         if self.team:
             if not self.url.endswith(self.url_path):
                 return False

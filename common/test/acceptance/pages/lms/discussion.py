@@ -402,6 +402,7 @@ class InlineDiscussionPage(PageObject):
         return self.q(css=self._discussion_selector + " " + selector)
 
     def is_browser_on_page(self):
+        self.wait_for_ajax()
         return self.q(css=self._discussion_selector).present
 
     def is_discussion_expanded(self):

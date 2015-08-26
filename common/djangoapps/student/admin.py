@@ -95,6 +95,11 @@ class CourseAccessRoleForm(forms.ModelForm):
 
         return cleaned_data
 
+    def __init__(self, *args, **kwargs):
+        super(CourseAccessRoleForm, self).__init__(*args, **kwargs)
+        if self.instance.user_id:
+            self.fields['email'].initial = self.instance.user.email
+
 
 class CourseAccessRoleAdmin(admin.ModelAdmin):
     """Admin panel for the Course Access Role. """

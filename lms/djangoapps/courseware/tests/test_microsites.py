@@ -220,5 +220,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
-        self.assertIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn("Add {} to Cart <span>($10 USD)</span>".format(
+            self.course_with_visibility.id.course
+        ), resp.content)
         self.assertIn('$("#add_to_cart_post").click', resp.content)

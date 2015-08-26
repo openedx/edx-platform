@@ -246,6 +246,7 @@ def create_credit_request(course_key, provider_id, username):
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
+            requirement__course__course_key=course_key,
             status="satisfied"
         ).reason["final_grade"]
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):

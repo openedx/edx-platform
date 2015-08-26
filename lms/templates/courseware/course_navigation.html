@@ -25,7 +25,7 @@ def selected(is_selected):
   return "selected" if is_selected else ""
 
 show_preview_menu = not disable_preview_menu and staff_access and active_page in ["courseware", "info"]
-cohorted_user_partition = get_cohorted_user_partition(course.id)
+cohorted_user_partition = get_cohorted_user_partition(course)
 masquerade_user_name = masquerade.user_name if masquerade else None
 masquerade_group_id = masquerade.group_id if masquerade else None
 staff_selected = selected(not masquerade or masquerade.role != "student")

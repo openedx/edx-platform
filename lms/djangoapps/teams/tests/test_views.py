@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
 import json
+import pytz
+from datetime import datetime
+from dateutil import parser
 
 import ddt
 
@@ -13,7 +16,7 @@ from courseware.tests.factories import StaffFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory
-from .factories import CourseTeamFactory
+from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
@@ -391,6 +394,7 @@ class TestListTeamsAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -432,11 +436,22 @@ class TestListTeamsAPI(TeamAPITestCase):
     @ddt.data(
         (None, 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
         ('name', 200, ['Nuclear Team', u'sólar team', 'Wind Team']),
+        # Note that "Nuclear Team" and "solar team" have the same open_slots.
+        # "solar team" comes first due to secondary sort by last_activity_at.
         ('open_slots', 200, ['Wind Team', u'sólar team', 'Nuclear Team']),
-        ('last_activity', 400, []),
+        # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
+        # "Wind Team" comes first due to secondary sort by open_slots.
+        ('last_activity_at', 200, [u'sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
+        # Make "solar team" the most recently active team.
+        # The CourseTeamFactory sets the last_activity_at to a fixed time (in the past), so all of the
+        # other teams have the same last_activity_at.
+        solar_team = self.test_team_name_id_map[u'sólar team']
+        solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+        solar_team.save()
+
         data = {'order_by': field} if field else {}
         self.verify_names(data, status, names)
 
@@ -483,7 +498,8 @@ class TestCreateTeamAPI(TeamAPITestCase):
         ('student_unenrolled', 403),
         ('student_enrolled_not_on_team', 200),
         ('staff', 200),
-        ('course_staff', 200)
+        ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -580,6 +596,13 @@ class TestCreateTeamAPI(TeamAPITestCase):
         team_membership = team['membership']
         del team['membership']
 
+        # verify that it's been set to a time today.
+        self.assertEqual(
+            parser.parse(team['last_activity_at']).date(),
+            datetime.utcnow().replace(tzinfo=pytz.utc).date()
+        )
+        del team['last_activity_at']
+
         # Verify that the creating user gets added to the team.
         self.assertEqual(len(team_membership), 1)
         member = team_membership[0]['user']
@@ -620,6 +643,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -627,6 +651,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         if status == 200:
             self.assertEqual(team['description'], self.test_team_1.description)
             self.assertEqual(team['discussion_topic_id'], self.test_team_1.discussion_topic_id)
+            self.assertEqual(parser.parse(team['last_activity_at']), LAST_ACTIVITY_AT)
 
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)
@@ -657,6 +682,7 @@ class TestUpdateTeamAPI(TeamAPITestCase):
         ('student_enrolled', 403),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -671,6 +697,7 @@ class TestUpdateTeamAPI(TeamAPITestCase):
         ('student_enrolled', 404),
         ('staff', 404),
         ('course_staff', 404),
+        ('community_ta', 404),
     )
     @ddt.unpack
     def test_access_bad_id(self, user, status):
@@ -706,6 +733,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -723,10 +751,20 @@ class TestListTopicsAPI(TeamAPITestCase):
     @ddt.data(
         (None, 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
         ('name', 200, ['Coal Power', 'Nuclear Power', u'sólar power', 'Wind Power'], 'name'),
+        # Note that "Nuclear Power" and "solar power" both have 2 teams. "Coal Power" and "Window Power"
+        # both have 0 teams. The secondary sort is alphabetical by name.
+        ('team_count', 200, ['Nuclear Power', u'sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names, expected_ordering):
+        # Add 2 teams to "Nuclear Power", which previously had no teams.
+        CourseTeamFactory.create(
+            name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+        )
+        CourseTeamFactory.create(
+            name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
+        )
         data = {'course_id': self.test_course_1.id}
         if field:
             data['order_by'] = field
@@ -734,6 +772,35 @@ class TestListTopicsAPI(TeamAPITestCase):
         if status == 200:
             self.assertEqual(names, [topic['name'] for topic in topics['results']])
             self.assertEqual(topics['sort_order'], expected_ordering)
+
+    def test_order_by_team_count_secondary(self):
+        """
+        Ensure that the secondary sort (alphabetical) when primary sort is team_count
+        works across pagination boundaries.
+        """
+        # Add 2 teams to "Wind Power", which previously had no teams.
+        CourseTeamFactory.create(
+            name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+        )
+        CourseTeamFactory.create(
+            name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+        )
+
+        topics = self.get_topics_list(data={
+            'course_id': self.test_course_1.id,
+            'page_size': 2,
+            'page': 1,
+            'order_by': 'team_count'
+        })
+        self.assertEqual(["Wind Power", u'sólar power'], [topic['name'] for topic in topics['results']])
+
+        topics = self.get_topics_list(data={
+            'course_id': self.test_course_1.id,
+            'page_size': 2,
+            'page': 2,
+            'order_by': 'team_count'
+        })
+        self.assertEqual(["Coal Power", "Nuclear Power"], [topic['name'] for topic in topics['results']])
 
     def test_pagination(self):
         response = self.get_topics_list(data={
@@ -773,6 +840,7 @@ class TestDetailTopicAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -808,6 +876,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_enrolled_both_courses_other_team', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -824,6 +893,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_enrolled_both_courses_other_team', 200, True),
         ('staff', 200, True),
         ('course_staff', 200, True),
+        ('community_ta', 200, True),
     )
     @ddt.unpack
     def test_access_by_username(self, user, status, has_content):
@@ -906,6 +976,7 @@ class TestCreateMembershipAPI(TeamAPITestCase):
         ('student_enrolled_both_courses_other_team', 404),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -988,6 +1059,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         ('student_enrolled', 200),
         ('staff', 200),
         ('course_staff', 200),
+        ('community_ta', 200),
     )
     @ddt.unpack
     def test_access(self, user, status):
@@ -1053,6 +1125,7 @@ class TestDeleteMembershipAPI(TeamAPITestCase):
         ('student_enrolled', 204),
         ('staff', 204),
         ('course_staff', 204),
+        ('community_ta', 204),
     )
     @ddt.unpack
     def test_access(self, user, status):

@@ -1,49 +1,11 @@
-define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic'],
-    function (Backbone, URI, _, AjaxHelpers, TopicCollection) {
+define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+        'teams/js/spec_helpers/team_spec_helpers'],
+    function (Backbone, URI, _, AjaxHelpers, TeamSpecHelpers) {
         'use strict';
         describe('TopicCollection', function () {
             var topicCollection;
             beforeEach(function () {
-                topicCollection = new TopicCollection(
-                    {
-                        "count": 6,
-                        "num_pages": 2,
-                        "current_page": 1,
-                        "start": 0,
-                        "results": [
-                            {
-                                "description": "asdf description",
-                                "name": "asdf",
-                                "id": "_asdf"
-                            },
-                            {
-                                "description": "bar description",
-                                "name": "bar",
-                                "id": "_bar"
-                            },
-                            {
-                                "description": "baz description",
-                                "name": "baz",
-                                "id": "_baz"
-                            },
-                            {
-                                "description": "foo description",
-                                "name": "foo",
-                                "id": "_foo"
-                            },
-                            {
-                                "description": "qwerty description",
-                                "name": "qwerty",
-                                "id": "_qwerty"
-                            }
-                        ],
-                        "sort_order": "name"
-                    },
-                    {
-                        teamEvents:_.clone(Backbone.Events),
-                        course_id: 'my/course/id',
-                        parse: true
-                    });
+                topicCollection = TeamSpecHelpers.createMockTopicCollection();
             });
 
             var testRequestParam = function (self, param, value) {

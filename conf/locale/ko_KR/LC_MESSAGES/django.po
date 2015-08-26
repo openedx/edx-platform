@@ -87,7 +87,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:42+0000\n"
+"POT-Creation-Date: 2015-08-21 14:18+0000\n"
 "PO-Revision-Date: 2015-08-14 05:59+0000\n"
 "Last-Translator: Hongseob Lee <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -306,7 +306,7 @@ msgstr "인증된 학습자로 등록되었습니다."
 #: common/djangoapps/course_modes/models.py lms/envs/devstack.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
-msgstr "인증되었습니다."
+msgstr "인증"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -448,8 +448,10 @@ msgid "Your legal name must be a minimum of two characters long"
 msgstr "실명은 최소 두 글자 이상이어야 합니다."
 
 #: common/djangoapps/student/forms.py
-msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr "아이디는 영어 알파벳 및 0-9로 구성되어야 하며 공백이 없어야 됩니다."
+msgid ""
+"Usernames must contain only letters, numbers, underscores (_), and hyphens "
+"(-)."
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -513,7 +515,7 @@ msgstr "비밀번호"
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {support_email}"
-msgstr "귀하의 계정이 비활성화 되었습니다. 이것이 오류라고 생각되면 아래로 연락 주시기 바랍니다: {support_email}"
+msgstr "귀하의 계정이 비활성화 되었습니다. 이것이 오류로 보일 경우 {support_email}로 메일 보내주세요."
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
@@ -669,13 +671,13 @@ msgstr "{platform_name} 계정이 아직 없으시다면,  페이지 상단의 <
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
-msgstr "로그인 정보를 받는 데 오류가 있었습니다. 저희에게 이메일 보내주십시오."
+msgstr "로그인 정보를 받는 중 오류가 발생했습니다. 저희에게 이메일 보내주십시오."
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
-msgstr "이 계정은 로그인 실패 허용 횟수 초과로 인하여 일시적으로 잠금 상태입니다. 나중에 다시 시도해주세요."
+msgstr "이 계정은 로그인 실패 허용 횟수 초과로 인하여 일시적으로 잠금 상태입니다. 잠시 후에 다시 시도하세요."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -688,7 +690,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
-msgstr "로그인 실패 허용 횟수 초과. 나중에 다시 시도해주십시오."
+msgstr "로그인 실패 허용 횟수 초과. 잠시 후에 다시 시도하세요."
 
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
@@ -792,7 +794,7 @@ msgstr "이 이메일 주소의 계정이 이미 존재합니다."
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
-msgstr "이메일 활성화 링크를 보낼  수 없습니다. 나중에 다시 시도해주십시오."
+msgstr "이메일 활성화 링크를 보낼  수 없습니다. 잠시 후에 다시 시도하세요."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -1458,7 +1460,7 @@ msgstr "계승함수가 영역외에서 계산되었습니다:'{student_answer}'
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid math syntax: '{student_answer}'"
-msgstr "수식 입력문에 오류가 있습니다: '{student_answer}'"
+msgstr "수식 입력문에 오류가 발생했습니다. '{student_answer}'"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use complex numbers in range tolerance problems"
@@ -1527,7 +1529,7 @@ msgstr "기호수식 입력"
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr "SymbolicResponse에서 오류 발생했습니다. 오류: {error_msg} "
+msgstr "SymbolicResponse에서 오류가 발생했습니다. 오류: {error_msg} "
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Code Input"
@@ -1591,7 +1593,7 @@ msgstr "회로도 작성 도구"
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr "회로도 평가에 문제가 있습니다. 오류 내용: : {error_msg}"
+msgstr "회로도 평가에 오류가 발생했습니다. 오류 내용: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Image Mapped Input"
@@ -1691,7 +1693,7 @@ msgstr "마감일 이후 추가 제출이 허용되는 시한"
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/templates/problem.html
 msgid "Show Answer"
-msgstr "답 보기"
+msgstr "정답 보기"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -1798,7 +1800,7 @@ msgstr "마지막 제출시간 "
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Timer Between Attempts"
-msgstr "다음 시도까지 허용되는 시간 타이머"
+msgstr "다음 시도까지 지연 시간"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -1887,13 +1889,13 @@ msgstr "문제를 다시 확인하기 위해서는 문제가 재설정되어야 
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
-msgstr "다음 제출까지 최소  {wait} 초를 대기해야 합니다."
+msgstr "다음 문제 풀이까지 {wait}를 대기해야 합니다."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
 "remaining."
-msgstr "다음 제출까지 최소 {wait_secs}초를 기다려야 합니다. {remaining_secs} 남았습니다."
+msgstr "다음 문제 풀이까지 {wait_secs}를 기다려야 합니다. {remaining_secs} 남았습니다."
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2096,7 +2098,7 @@ msgstr "ORA1 은 이제 지원되지 않습니다. ORA2 구성요소로 대치�
 #: common/lib/xmodule/xmodule/course_metadata_utils.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
-msgstr "개강일 미지정"
+msgstr "미지정"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -2134,7 +2136,7 @@ msgstr "이 강좌가 종료되는 날짜"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Cosmetic Course Display Price"
-msgstr "Cosmetic Course Display Price"
+msgstr "강좌 가격"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2142,8 +2144,7 @@ msgid ""
 " registration price is set by an administrator in the database, that price "
 "will be displayed instead of this one."
 msgstr ""
-"학습자가 강좌를 수강 신청할 때 표시되는 가격입니다. 데이터베이스에서 관리자가 유료 강좌 신청 가격을 설정했다면, 이것 대신 그 가격이 "
-"표시됩니다."
+"학습자가 수강 신청할 때 표시될 가격입니다. 데이터베이스에서 관리자가 유료 강좌 가격을 설정했다면, 이것 대신 그 가격이 표시됩니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Advertised Start Date"
@@ -2155,8 +2156,8 @@ msgid ""
 "is different from the set start date. To advertise the set start date, enter"
 " null."
 msgstr ""
-"강좌 시작일을 홍보하고 싶은 날짜를 입력하세요. 두 날짜가 다른 경우에 입력하면 됩니다.  두 날짜가 같은 경우에는, null을 "
-"입력하십시오."
+"개강 홍보를 시작할 날짜를 입력하세요. 개강일과 홍보일을 다르게 하고 싶은 경우에 입력하면 됩니다. 두 날짜가 같은 경우에는, null을"
+" 입력하십시오."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -2168,7 +2169,7 @@ msgstr "선수 과목의 과목 키 값"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Grading policy definition for this class"
-msgstr "강좌 채점 규정 "
+msgstr "성적 규정 "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Show Calculator"
@@ -2301,8 +2302,8 @@ msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
 "on edx.org, and a New! badge temporarily appears next to the course image."
 msgstr ""
-"True 또는 False를 입력합니다. True의 경우, 사이트 내 새로운 강좌 목록에 나타납니다, 또한 New! 배지가 일시적으로 강좌"
-" 이미지 옆에 나타납니다."
+"True 또는 False를 입력합니다. True를 입력하면, 새로운 강좌 목록에 나타납니다, 또한 New! 배지가 일시적으로 강좌 대표 "
+"이미지 옆에 나타납니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Mobile Course Available"
@@ -2369,7 +2370,7 @@ msgid ""
 " name of the tab (usually the name of the book) as well as the URLs and "
 "titles of all the chapters in the book."
 msgstr ""
-"HTML 교재가 학습실에서 별도의 탭으로 표시될 수 있도록, 교재의 모든 주제의 URL과 제목과 함께 탭의 이름(보통 교재명 사용)을 "
+"HTML 교재가 별도의 탭으로 표시될 수 있도록, 교재 내 모든 챕터의 URL과 챕터 이름, 그리고 탭의 이름(보통 교재명 사용)을 "
 "입력하세요."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2467,13 +2468,13 @@ msgstr "강좌 세부 정보 &amp; 일정 편집"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Draft Your Course's Grading Policy"
-msgstr "강좌 채점 규정 초안 작성"
+msgstr "성적 규정 초안 작성"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Set up your assignment types and grading policy even if you haven't created "
 "all your assignments."
-msgstr "과제를 생성하지 않았더라도 과제 유형 및 채점 규정을 설정할 수 있습니다."
+msgstr "과제를 생성하지 않았더라도 과제 유형 및 성적 규정을 설정할 수 있습니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Edit Grading Settings"
@@ -2527,11 +2528,11 @@ msgstr "과제를 부여할 소주제를 설정하세요. 해당 소주제의 �
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Reordering Course Content"
-msgstr "강좌 콘텐츠 순서 변경하기"
+msgstr "강좌 주제 순서 변경하기"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Use drag and drop to reorder the content in your course."
-msgstr "강좌 콘텐츠를 다시 배열하기 위해 마우스로 끌고 옵니다."
+msgstr "주제의 순서를 다시 배열하기 위해 마우스로 끌고 옵니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Renaming Sections"
@@ -2543,7 +2544,7 @@ msgstr "강좌 개요에서 주제명을 클릭하면, 해당 주제명을 다�
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Deleting Course Content"
-msgstr "강좌 내용 삭제하기"
+msgstr "주제 및 소주제 삭제하기"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2560,9 +2561,7 @@ msgid ""
 "Some course authors find using a section for unsorted, in-progress work "
 "useful. To do this, create a section and set the release date to the distant"
 " future."
-msgstr ""
-"주제에 참여 가능 시간을 설정하지 않는 것이 때론 더 유용하기도 합니다. 이 방식을 원한다면, 주제를 만들 때 게시일을 먼 미래로 "
-"설정하면 됩니다."
+msgstr "이것을 원한다면, 주제를 만들 때 게시일을 먼 미래로 설정하면 됩니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Explore edX's Support Tools"
@@ -2619,9 +2618,7 @@ msgid ""
 "Courses on edX have an About page that includes a course video, description,"
 " and more. Draft the text students will read before deciding to enroll in "
 "your course."
-msgstr ""
-"KMOOC의 강좌에는 강좌 소개 영상, 설명 등이 들어가는 강좌 안내가 있습니다. 학습자가 등록하기 전에 참고할 소개 페이지의 초안을 "
-"작성하세요."
+msgstr "학습자가 등록하기 전에 참고할 강좌 소개 페이지의 초안을 작성하세요."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Edit Course Schedule &amp; Details"
@@ -2653,7 +2650,7 @@ msgstr "선수 과목 추가"
 msgid ""
 "Let students know what knowledge and/or skills they should have before they "
 "enroll in your course."
-msgstr "학습자들이 이 강좌에 등록하기 전에 반드시 알고 있어야 할 지식 또는 기술을 입력해주세요."
+msgstr "학습자들이 이 강좌에 등록하기 전에 반드시 알고 있어야 할 선수 강좌를 입력해주세요."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Info Sidebar Name"
@@ -2664,7 +2661,7 @@ msgid ""
 "Enter the heading that you want students to see above your course handouts "
 "on the Course Info page. Your course handouts appear in the right panel of "
 "the page."
-msgstr "학습자가 강좌 정보에서 볼 강의 자료의 제목을 입력해주세요. 학습 자료는 화면의 오른쪽에 있게 됩니다."
+msgstr "학습 자료는 화면의 오른쪽에 있게 됩니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2703,8 +2700,8 @@ msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
 msgstr ""
-"True 또는 False를 입력합니다. True의 경우, 수료증 취득 요건을 만족한 학습자들에 한해 강좌 종료 전, 수료증을 다운로드할 "
-"수 있습니다."
+"True 또는 False를 입력합니다. True를 입력하면, 수료증 취득 요건을 만족한 학습자들에 한해 강좌 종료 전, 수료증을 "
+"다운로드할 수 있습니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificates Display Behavior"
@@ -2880,7 +2877,7 @@ msgstr "모두에게 위키 접근 허용하기"
 msgid ""
 "Enter true or false. If true, edX users can view the course wiki even if "
 "they're not enrolled in the course."
-msgstr "True 또는 False를 입력하세요. True의 경우, 강좌를 등록하지 않은 사람이라도 위키를 볼 수  있습니다."
+msgstr "True 또는 False를 입력하세요. True를 입력하면, 수강하지 않는 사람도 위키를 볼 수 있습니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Invitation Only"
@@ -3676,7 +3673,7 @@ msgstr "실험은 비활성화된 집단이 포함되어 있습니다. 콘텐츠
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "This content experiment has issues that affect content visibility."
-msgstr "이 콘텐츠 실험은 콘텐츠 가시성에 영향을 미치는 이슈를 가지고 있습니다."
+msgstr "이 콘텐츠 실험으로 학습자 공개 설정이 변경될 수 있습니다."
 
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "External Discussion"
@@ -3849,7 +3846,7 @@ msgstr "베타 사용자들에게 조기 공개할 기간"
 msgid ""
 "Enter the number of days before the start date that beta users can access "
 "the course."
-msgstr "베타 사용자가 강좌에 접근할 수 있는 시작일 이전의  날짜 수를 입력합니다."
+msgstr "베타 사용자가 강좌에 접근할 수 있는 기간을 숫자로 입력해주세요."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Static Asset Path"
@@ -3880,8 +3877,8 @@ msgid ""
 "Enter true or false. If true, you can use the LaTeX templates for HTML "
 "components and advanced Problem components."
 msgstr ""
-"True 또는 False를 입력합니다. True의 경우, HTML 구성 요소와 고급 문제 구성 요소에 대한 LaTeX 템플릿을 사용할 수"
-" 있습니다."
+"True 또는 False를 입력합니다. True를 입력하면, HTML 구성 요소와 고급 문제 구성 요소에 대한 LaTeX 템플릿을 사용할"
+" 수 있습니다."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3927,12 +3924,12 @@ msgstr "학습자들이 어떻게 집단으로 구성될 지를 정하는 설정
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable video caching system"
-msgstr "Video caching 사용하기"
+msgstr "비디오 캐싱 사용하기"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, video caching will be used for HTML5 videos."
-msgstr "True 또는 False를 입력합니다. True의 경우, 비디오 캐싱은 HTML5 비디오에 사용됩니다."
+msgstr "True 또는 False를 입력합니다. True를 입력하면, 비디오 캐싱은 HTML5 비디오에 사용됩니다."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
@@ -3976,7 +3973,7 @@ msgstr "학습자 노트 활성화"
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, students can use the Student Notes feature."
-msgstr "True 또는 False를 입력하세요. True의 경우, 학습자는 학습자 노트 기능을 사용할 수 있습니다."
+msgstr "True 또는 False를 입력하세요. True를 입력하면, 학습자가 학습자 노트 기능을 사용할 수 있습니다."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -4110,7 +4107,7 @@ msgstr "피드백이 저장되었습니다."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Unable to save your feedback. Please try again later."
-msgstr "피드백을 저장할 수 없습니다. 다시 시도해 주십시오."
+msgstr "피드백을 저장할 수 없습니다. 잠시 후에 다시 시도하세요."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your submission."
@@ -4123,7 +4120,7 @@ msgstr "제출물이 저장되었습니다."
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid ""
 "Unable to submit your submission to the grader. Please try again later."
-msgstr "제출할 수 없습니다. 다시 시도해 주십시오. "
+msgstr "제출할 수 없습니다. 잠시 후에 다시 시도하세요."
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -4143,7 +4140,7 @@ msgstr "채점자로부터 피드백을 받을 수 없습니다."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error handling action. Please try again."
-msgstr "handling action에 오류가 있습니다. 다시 시도해 주십시오."
+msgstr "handling action에 오류가 발생했습니다. 다시 시도하세요."
 
 #. Translators: this string appears once an openended response
 #. is submitted but before it has been graded
@@ -4232,7 +4229,7 @@ msgstr "비디오 URL 기본값"
 msgid ""
 "The name students see. This name appears in the course ribbon and as a "
 "header for the video."
-msgstr "학습자가 보는 이름입니다. 이는 강좌 ribbon에 헤더로 보입니다."
+msgstr "학습자가 보는 제목입니다. 강좌 ribbon에 제목으로 보입니다."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4576,11 +4573,11 @@ msgstr ""
 msgid ""
 "Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
 "{end_date})"
-msgstr "\"{course_name}\" ({course_mode}, {start_date} - {end_date}) 강좌를 마쳤습니다."
+msgstr "\"{course_name}\" ({course_mode}, {start_date} - {end_date}) 강좌를 수료했습니다."
 
 #: lms/djangoapps/certificates/badge_handler.py
 msgid "Completed the course \"{course_name}\" ({course_mode})"
-msgstr "\"{course_name}\"({course_mode}) 강좌를 마쳤습니다."
+msgstr "\"{course_name}\"({course_mode}) 강좌를 수료했습니다."
 
 #: lms/djangoapps/certificates/models.py
 msgid ""
@@ -4714,8 +4711,8 @@ msgid ""
 "agreed to abide by {platform_name}'s honor code and completed all of the "
 "required tasks for this course under its guidelines."
 msgstr ""
-"{cert_type} 수료증은 {platform_name}  학습자가 {platform_name}의 명예 과정을 수강하면서  해당 강좌의"
-" 방침에 따라 과제를 모두 완료했음을 증명합니다.  "
+"{cert_type}수료증은 {platform_name} 학습자가 {platform_name}의 명예 과정을 수강하면서  해당 강좌의 "
+"방침에 따라 과제를 모두 완료했음을 증명합니다.  "
 
 #. Translators:  This text describes the 'ID Verified' course certificate
 #. type, which is a higher level of
@@ -4728,8 +4725,8 @@ msgid ""
 "required tasks for this course under its guidelines, as well as having their"
 " photo ID checked to verify their identity."
 msgstr ""
-"{cert_type} 수료증은 {platform_name}  학습자가 {platform_name}의 명예 과정을 수강하면서  해당 강좌의"
-" 방침에 따라 과제를 모두 완료했으며, 사진을 통한 신분 확인 절차까지 거쳤음을 증명합니다.  "
+"{cert_type}수료증은 {platform_name}  학습자가 {platform_name}의 명예 과정을 수강하면서  해당 강좌의 "
+"방침에 따라 과제를 모두 완료했으며, 사진을 통한 신분 확인 절차까지 거쳤음을 증명합니다.  "
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -5008,7 +5005,7 @@ msgstr "결제를 처리하는 동안 시스템 오류가 발생하였습니다.
 
 #: lms/djangoapps/commerce/views.py
 msgid "Please wait a few minutes and then try again."
-msgstr "잠시 기다린 후 다시 시도하세요. "
+msgstr "잠시 후에 다시 시도하세요."
 
 #: lms/djangoapps/commerce/views.py
 msgid "For help, contact {payment_support_link}."
@@ -5126,26 +5123,6 @@ msgstr "{currency_symbol}{price}"
 #: lms/djangoapps/courseware/views.py
 msgid "Free"
 msgstr "무료"
-
-#. Translators: The join of three or more institution names (e.g., Harvard,
-#. MIT, and Dartmouth).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institutions}, and {last_institution}"
-msgstr "{first_institutions} 및  {last_institution}"
-
-#. Translators: The join of two institution names (e.g., Harvard and MIT).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institution} and {second_institution}"
-msgstr "{first_institution} 및 {second_institution}"
-
-#: lms/djangoapps/courseware/views.py
-msgid ""
-"I would like to receive email from {institution_series} and learn about its "
-"other programs."
-msgid_plural ""
-"I would like to receive email from {institution_series} and learn about "
-"their other programs."
-msgstr[0] "{institution_series} 에서 보내는 이메일을 수신하고 다른 프로그램에 대한 정보를 받겠습니다."
 
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
@@ -5481,7 +5458,7 @@ msgstr "EdxNotes Service를 이용할 수 없습니다. 잠시후 다시 시도�
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Server error. Please try again in a few minutes."
-msgstr "서버 오류. 잠시 후 다시 시도해 주십시오. "
+msgstr "서버 오류. 잠시 후에 다시 시도하세요."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
@@ -5561,7 +5538,7 @@ msgid ""
 "An account with email {email} exists but the provided username {username} is"
 " different. Enrolling anyway with {email}."
 msgstr ""
-"{email} 의 계정이 존재하지만,  입력된 이용자 이름{username}이 다릅니다. 우선 {email}로 등록이 필요합니다. "
+"{email} 의 계정이 존재하지만,  {username}  입력된 아이디가 다릅니다. 우선 {email}로 등록이 필요합니다. "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Username {user} already exists."
@@ -5637,7 +5614,7 @@ msgstr "성별"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Level of Education"
-msgstr "교육 수준"
+msgstr "최종 학력"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
@@ -5946,7 +5923,7 @@ msgid ""
 "To gain insights into student enrollment and participation {link_start}visit"
 " {analytics_dashboard_name}, our new course analytics product{link_end}."
 msgstr ""
-"학습자의 수강 현황이 궁금하시면,  {link_start}  {analytics_dashboard_name}을 "
+"학습자의 수강 현황이 궁금하시면,  {link_start}  {analytics_dashboard_name}를 "
 "방문하세요{link_end}. 강좌 분석을 지원합니다."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -6536,7 +6513,7 @@ msgstr "기본 탭"
 msgid ""
 "Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
 " is selected."
-msgstr "XBlock안에 선택된 탭을 입력합니다. 만약 설정하지 않으면 Courseware 탭이 선택됩니다."
+msgstr "XBlock에서 선택된 탭을 입력합니다. 만약 설정하지 않으면 강좌내용 탭이 선택됩니다."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "LaTeX Source File Name"
@@ -7294,7 +7271,7 @@ msgstr "요청된 금액이 처음 승인된 금액을 초과합니다."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr "처리기 실패. 가능한 해결책:  지불을 다시 시도해 보십시오."
+msgstr "처리에 실패했습니다. 잠시 후에 다시 시도하세요."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The authorization has already been captured"
@@ -7816,10 +7793,6 @@ msgstr "제공된 주제 ID {topic_id}가 유효하지 않습니다."
 msgid "text_search is not yet supported."
 msgstr "text_search는 제공되지 않습니다."
 
-#: lms/djangoapps/teams/views.py
-msgid "last_activity is not yet supported"
-msgstr "last_activity는 아직 제공되지 않습니다."
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -7833,6 +7806,10 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "제공된 강좌 ID {course_id}가 유효하지 않습니다. "
 
 #: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this course."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
 msgstr "아이디 혹은 team_id 를 입력해야 합니다. "
 
@@ -7843,6 +7820,10 @@ msgstr "아이디가 필요합니다. "
 #: lms/djangoapps/teams/views.py
 msgid "Team id is required."
 msgstr "팀 id가 필요합니다."
+
+#: lms/djangoapps/teams/views.py
+msgid "This team is already full."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "The user {username} is already a member of a team in this course."
@@ -7880,7 +7861,7 @@ msgstr "사진에서 얼굴이 보이지 않았습니다."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
-msgstr "신분증 사진 확인에 오류가 있었습니다. "
+msgstr "신분증 사진 확인 중 오류가 발생했습니다."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -8121,7 +8102,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
-msgstr "등록 처리 중 다음 오류가 일어났습니다."
+msgstr "등록 처리 중 다음 오류가 발생했습니다."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must complete all fields."
@@ -8135,7 +8116,7 @@ msgstr "두 암호 필드가 일치하지 않습니다."
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
-msgstr "죄송합니다. 암호 재설정을 처리하는 도중에 문제가 발생한 것 같습니다."
+msgstr "죄송합니다. 비밀번호 재설정 처리 중, 오류가 발생했습니다. "
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8198,7 +8179,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"암호 재설정 링크가 무효합니다. 아마도 이미 링크가 사용되었기 때문일 수 있습니다. %(start_link)s 로그인 페이지 %(end_link)s 로 돌아가서 암호 재설정 과정을 다시 시작하십시오."
+"해당 링크가 이전에 사용된 적이 있습니다.  %(start_link)s 로그인 페이지%(end_link)s로 돌아가서 비밀번호 재설정 과정을 다시 시작하세요."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
@@ -8411,9 +8392,7 @@ msgid ""
 "to see how the article looked at this stage. At the bottom of this page, you"
 " can change to a particular revision or merge an old revision with the "
 "current one."
-msgstr ""
-"편집된 행이 나타난 목록을 보기 위해 각 수정본을 클릭하세요. 각 단계에서  미리보기 버튼을 클릭하세요. 이 페이지의 하단에서 수정본으로"
-" 변경하거나 이전 버전을 현재 버전으로 병합할 수 있습니다."
+msgstr "변경 사항을 보기 위해 각 수정본을 클릭하세요. 수정본으로 변경하거나 이전 버전을 현재 버전으로 병합할 수 있습니다."
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
@@ -8871,7 +8850,7 @@ msgstr ""
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
 msgid "Needed for any certificates you may earn"
-msgstr "앞으로 받게될 수료증에 필요합니다."
+msgstr "앞으로 받게 될 수료증에 필요합니다."
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -8889,7 +8868,7 @@ msgstr "강좌에서 표시되길 원하는 이름 -  {bold_start}(변경 불가
 #. a field on the registration form meant to hold the user's username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "JaneDoe"
-msgstr "Hong Gil Dong"
+msgstr "홍길동"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -8927,7 +8906,7 @@ msgstr "서비스 조항 및 명예 규범"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
-msgstr "{platform_name}의  {terms_of_service} 에 동의 합니다. "
+msgstr "{platform_name}의 {terms_of_service}에 동의합니다. "
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
@@ -9059,6 +9038,10 @@ msgstr ""
 msgid "Missing branch on fresh clone"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Deleted group"
+msgstr ""
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -9118,7 +9101,7 @@ msgstr ""
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change either organization or course number to be unique."
-msgstr "동일 기관, 강좌 번호, 강좌 운영에 이미 입력된 강좌가 있습니다. 기관이나 강좌 번호가 유일하도록 변경하세요"
+msgstr "동일 기관, 강좌 번호, 기관별 강좌 번호로 이미 다른 강좌가 있습니다. 기관이나 강좌 번호가 유일하도록 변경하세요"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -9417,6 +9400,11 @@ msgstr "취소"
 msgid "Course Number"
 msgstr "강좌 번호"
 
+#: cms/templates/course_outline.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Start Date:"
+msgstr ""
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "오류:"
@@ -9457,14 +9445,14 @@ msgstr "예: username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
 msgid "Forgot password?"
-msgstr "비밀번호를 잊어버렸습니까?"
+msgstr "비밀번호를 잊어버리셨나요?"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register.html
 #: lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
-msgstr "예: Jane Doe"
+msgstr "예: 홍길동"
 
 #: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/signup_modal.html
@@ -9490,7 +9478,7 @@ msgstr "강좌 종료일"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
-msgstr "요구사항"
+msgstr "학습 시간 및 선수 강좌"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
@@ -9571,7 +9559,7 @@ msgstr "{} 에 등록 | 유형을 선택하세요"
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to enroll you"
-msgstr "죄송합니다. 등록에 오류가 있었습니다."
+msgstr "죄송합니다. 등록에 오류가 발생했습니다."
 
 #: common/templates/course_modes/choose.html
 msgid "Congratulations!  You are now enrolled in {course_name}"
@@ -10023,7 +10011,7 @@ msgstr "질문에 대한 요약"
 
 #: lms/templates/help_modal.html
 msgid "An error has occurred."
-msgstr "오류발생"
+msgstr "오류가 발생했습니다."
 
 #: lms/templates/help_modal.html
 msgid "Please {link_start}send us e-mail{link_end}."
@@ -10031,7 +10019,7 @@ msgstr "{link_start}이메일{link_end}을 보내주세요."
 
 #: lms/templates/help_modal.html
 msgid "Please try again later."
-msgstr "다음에 다시 시도하세요."
+msgstr "잠시 후에 다시 시도하세요."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -10171,7 +10159,7 @@ msgstr "이메일 혹은 암호가 부정확합니다."
 
 #: lms/templates/login.html
 msgid "An error occurred when signing you in to {platform_name}."
-msgstr "{platform_name}에 로그인 하는동안 오류가 발생했습니다."
+msgstr "{platform_name}에 로그인 하는 동안 오류가 발생했습니다."
 
 #: lms/templates/login.html
 msgid ""
@@ -10282,7 +10270,7 @@ msgstr "작업중"
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
 msgid "There has been an error on the {platform_name} servers"
-msgstr "{platform_name} 서버에서 오류가 있었습니다."
+msgstr "{platform_name} 서버에서 오류가 발생했습니다."
 
 #: lms/templates/module-error.html
 msgid ""
@@ -10386,7 +10374,7 @@ msgstr "저장"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr "{num_total} 제출 중에서 {num_used} 를 사용하였습니다."
+msgstr "총 풀이 가능 횟수 {num_total}회 중 {num_used}회 풀었습니다."
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -10548,7 +10536,7 @@ msgstr "{provider_name}에 가입하세요!"
 
 #: lms/templates/register.html
 msgid "Create your own {platform_name} account below"
-msgstr "당신만의 {platform_name} 계정 생성을 밑에서 하세요."
+msgstr "{platform_name}에 가입하세요."
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -11204,12 +11192,17 @@ msgstr "일정"
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
-msgstr "채점 규정"
+msgstr "성적 규정"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
 msgstr "일괄 등록"
+
+#: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Email Addresses/Usernames"
+msgstr "이메일 주소/사용자이름"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11222,12 +11215,7 @@ msgstr "학습자 일괄 추가를 위해 줄바꿈 혹은 쉼표로  이메일/
 msgid ""
 "You will not get notification for emails that bounce, so please double-check"
 " spelling."
-msgstr "이메일이 정확한지 확인하세요. 반송된 이메일은 확인할 수 없습니다."
-
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses/Usernames"
-msgstr "이메일 주소/사용자이름"
+msgstr "이메일 주소가 정확한지 확인해야 합니다. 반송되는 이메일을 확인할 수 없기 때문입니다."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11255,12 +11243,12 @@ msgstr ""
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Checking this box has no effect if 'Unenroll' is selected."
-msgstr "'등록 취소'가 선택되어있는 경우 박스를 선택시 아무 효과도 없습니다."
+msgstr "'수강 취소'가 선택 되어 있는 경우, 적용되지 않습니다."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Notify users by email"
-msgstr "사용자 이메일로 안내"
+msgstr "이메일로 등록에 대해 알려줍니다."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11271,7 +11259,6 @@ msgstr "이옵션이 <em>체크</em> 되어 있으면, 사용자들은 이메일
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
 msgstr "등록"
@@ -11279,6 +11266,10 @@ msgstr "등록"
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "학습자 목록 관리"
+
+#: lms/templates/ccx/enrollment.html
+msgid "Enter username or email"
+msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -11294,11 +11285,11 @@ msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Most coaches should not need to make changes to the grading policy."
-msgstr "대부분의 코치는 채점 규정을 변경할 필요가 없습니다. "
+msgstr "대부분의 코치는 성적 규정을 변경할 필요가 없습니다. "
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Save Grading Policy"
-msgstr "채점 규정 저장하기"
+msgstr "성적 규정 저장하기"
 
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of YYYY-MM-DD
@@ -11322,7 +11313,7 @@ msgstr "저장되지 않은 변경사항이 있습니다."
 
 #: lms/templates/ccx/schedule.html
 msgid "There was an error saving changes."
-msgstr "변경을 저장하는데 오류가 있었습니다."
+msgstr "변경 사항 저장 중 오류가 발생했습니다."
 
 #: lms/templates/ccx/schedule.html
 msgid "Schedule a Unit"
@@ -11406,7 +11397,7 @@ msgstr "Twitter에 공유하기"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
-msgstr "이 성취 결과를 트윗하고, 윈도우로 뛰우기"
+msgstr "이 성과를 트윗하고, 윈도우로 보기."
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to LinkedIn Profile"
@@ -11602,7 +11593,7 @@ msgstr[0] "{num} 포인트: {explanatory_text}"
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
-msgstr "제출하는데 오류가 있었습니다. 강좌 운영팀에게 연락하십시오."
+msgstr "제출 중 오류가 발생했습니다. 강좌 운영팀에게 연락하세요."
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "Rubric"
@@ -11631,7 +11622,7 @@ msgstr "취소여부 확인하기"
 msgid ""
 "Your transaction has been cancelled. If you feel an error has occurred, "
 "contact {email}."
-msgstr "전송이 취소되었습니다. 오류가 발생한것 같으로 여겨지면, {email}로 이메일 주세요."
+msgstr "전송이 취소되었습니다. 오류가 발생한 것으로 보일 경우 {email}로 메일 보내세요."
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -11655,9 +11646,8 @@ msgid "This section is graded."
 msgstr "이 주제는 채점되었습니다."
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
-msgstr "오류가 발생하였습니다. 다음에 다시 시도하세요."
+msgstr "오류가 발생했습니다. 잠시 후에 다시 시도하세요."
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -11671,7 +11661,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
-msgstr "이 강좌에 등록되었습니다."
+msgstr "수강중입니다."
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -11694,8 +11684,8 @@ msgid "Enrollment is Closed"
 msgstr "등록마감"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart ({price})"
-msgstr "{course_name}을 ({price}) 장바구니에 추가하기"
+msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course_name}"
@@ -11749,11 +11739,11 @@ msgstr "개강일"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes End"
-msgstr "수업 종료"
+msgstr "종강일"
 
 #: lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
-msgstr "예상 학습 시간"
+msgstr "학습 권장 시간"
 
 #: lms/templates/courseware/course_about.html
 msgid "Prerequisites"
@@ -11771,7 +11761,6 @@ msgid "Additional Resources"
 msgstr "추가 자원"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "enroll"
 msgstr "등록"
 
@@ -11958,7 +11947,7 @@ msgstr "심리 측정"
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
-msgstr "관리자"
+msgstr "교수자"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Forum Admin"
@@ -12106,7 +12095,7 @@ msgstr "이메일을 보내기 위해, 교수자 대시보드의 이메일영역
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Pending Instructor Tasks"
-msgstr "대기중인 작업목록"
+msgstr "대기중인 작업 목록"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Task Type"
@@ -12149,54 +12138,6 @@ msgstr "강좌 통계는 교수자 대시보드의 관리자 섹션에서 볼 �
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Course errors"
 msgstr "강좌 오류"
-
-#: lms/templates/courseware/mktg_coming_soon.html
-msgid "About {course_id}"
-msgstr "{course_id} 소개"
-
-#: lms/templates/courseware/mktg_coming_soon.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Coming Soon"
-msgstr "곧 나옴"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "About {course_number}"
-msgstr " {course_number} 소개"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Access Courseware"
-msgstr "강좌 내용 접근"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "You Are Enrolled"
-msgstr "당신은 등록이 되어있습니다. "
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enroll in"
-msgstr "에 등록하였습니다."
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. The "choose your student track" means users can select between taking the
-#. course as an auditor, as a verified student, etc
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and choose your student track"
-msgstr "학습자 유형 선택하세요"
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. 'Verification' here refers to verifying one's identity in order to receive
-#. a
-#. verified certificate.
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and proceed to verification"
-msgstr "그리고 인증 절차를 진행합니다."
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enrollment Is Closed"
-msgstr "등록이 마감되었습니다"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -12336,7 +12277,7 @@ msgstr " {course.display_number_with_default} 강좌 정보"
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
 "another section on the left."
-msgstr "이전에 {section_link}을 학습했습니다. 완료했다면, 왼쪽에서 다른 학습 주제를 선택하세요."
+msgstr "{section_link} 학습을 완료했습니다. 왼쪽에서 다음 주제를 선택하세요."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -12389,7 +12330,7 @@ msgstr ""
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
-msgstr "최종 강좌 세부 사항이 지금 마무리 단계에 있습니다. 최종 출판본이 곧 사용가능할 것 입니다."
+msgstr "곧 강좌를 수강할 수 있습니다."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -12486,7 +12427,7 @@ msgstr "{course_number} {course_name} 홈페이지"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
-msgstr "{course_number} {course_name} 표지 이미지"
+msgstr "{course_number} {course_name} 대표 이미지"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
@@ -12499,6 +12440,10 @@ msgstr "종료 - {end_date}"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {start_date}"
 msgstr "개강 - {start_date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Coming Soon"
+msgstr "준비중입니다."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {start_date}"
@@ -12696,8 +12641,8 @@ msgstr "학점 완료하기"
 #. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been processed and approved. <b>Congratulations</b>. Please "
-"see {link_to_provider_site} for more information."
+"Your credit has been processed and approved. <b>Congratulations!</b>. Please"
+" see {link_to_provider_site} for more information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -12794,7 +12739,7 @@ msgstr "게시물 보기"
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
-msgstr "실시간 토론을 보려면, 학습 활동 설정에서 미리 보기나 실시간 보기를 클릭"
+msgstr "게시판을 보려면, 학습 활동 설정에서 미리 보기나 적용 결과 보기를 클릭하세요."
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "Discussion ID: {discussion_id}"
@@ -12802,11 +12747,11 @@ msgstr "토의 ID: {discussion_id}"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
-msgstr "토픽 필터"
+msgstr "제목 검색"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "filter topics"
-msgstr "토픽 필터"
+msgstr "제목 검색"
 
 #: lms/templates/discussion/_filter_dropdown.html
 #: lms/templates/discussion/_thread_list_template.html
@@ -12845,7 +12790,7 @@ msgstr "필터:"
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all"
-msgstr "다 보기"
+msgstr "전체 보기"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
@@ -12875,21 +12820,17 @@ msgstr "정렬:"
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by recent activity"
-msgstr "최근 활동으로 "
+msgstr "등록 순"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most activity"
-msgstr "활동빈도 순으로 "
+msgstr "댓글 순"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
-msgstr "투표순으로"
-
-#: lms/templates/discussion/_user_profile.html
-msgid ", "
-msgstr ","
+msgstr "추천 순"
 
 #: lms/templates/discussion/_user_profile.html
 #, python-format
@@ -13106,7 +13047,7 @@ msgstr "이 메일은 {site_name}에서  {email_address}으로 보내진 자동�
 
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
-msgstr "당신은  {course_name}에 베타테스터로 초대되었습니다"
+msgstr "{course_name} 베타테스터로 초대되었습니다."
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -13222,8 +13163,7 @@ msgstr " [[성함]]에게 "
 msgid ""
 "To enroll in {course_names} we have provided a registration URL for you.  "
 "Please follow the instructions below to claim your access."
-msgstr ""
-" {course_names} 에 등록할 수 있게 하기 위해, 저희가 등록 URL을 준비했습니다. 아래의 안내를 참고하세요.  "
+msgstr " {course_names} 등록 URL입니다. 아래의 안내를 참고하세요.  "
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
 #. template for course teams to use.
@@ -13318,7 +13258,7 @@ msgstr "친애하는 학습자에게,"
 msgid ""
 "You have been invited to join {course_name} at {site_name} by a member of "
 "the course staff."
-msgstr "강좌 스태프멤버가 당신을  {site_name}의  {course_name}에  초대하였습니다."
+msgstr "강좌 운영팀이 귀하를 {site_name} {course_name}에 초대하였습니다."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "To access the course visit {course_url} and login."
@@ -13342,7 +13282,7 @@ msgstr ""
 msgid ""
 "Once you have registered and activated your account, you will see "
 "{course_name} listed on your dashboard."
-msgstr "등록하고 계정을 활성화시키면 대시보드에 등록된  {course_name}을 볼수 있습니다. "
+msgstr "계정을 활성화하면 대시보드에 등록된 {course_name}을 볼 수 있습니다. "
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -13352,11 +13292,11 @@ msgstr "등록하고 계정을 활성화 시켰으면, {course_about_url}를 방
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "You can then enroll in {course_name}."
-msgstr "이제는 {course_name}에 등록할 수 있습니다 "
+msgstr "{course_name}에 등록할 수 있습니다 "
 
 #: lms/templates/emails/enroll_email_allowedsubject.txt
 msgid "You have been invited to register for {course_name}"
-msgstr "당신은  {course_name} 에 등록초대 되었습니다."
+msgstr "{course_name}에 초대받았습니다."
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid ""
@@ -13373,7 +13313,7 @@ msgstr "이 메일은 {site_name}에서 {full_name}으로 보내진 자동메일
 
 #: lms/templates/emails/enroll_email_enrolledsubject.txt
 msgid "You have been enrolled in {course_name}"
-msgstr "당신은  {course_name}에 등록되었습니다"
+msgstr "{course_name}에 등록되었습니다"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
@@ -13546,8 +13486,8 @@ msgid ""
 "name from {old_name} to {new_name}. If you need further assistance, please "
 "e-mail the tech support at {email}"
 msgstr ""
-"죄송합니다. 귀하가 요청한 {old_name} 에서 {new_name}로 이름 변경의 승인이 아직 처리되지 않았습니다. 도움이 "
-"필요하다면, 기술 지원팀  {email}으로 이메일 보내주세요."
+"죄송합니다. 귀하가 요청한 {old_name}에서 {new_name}로 이름 변경의 승인이 아직 처리되지 않았습니다. 도움이 필요하다면,"
+" 기술 지원팀  {email}으로 이메일 보내주세요."
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -13555,17 +13495,15 @@ msgid ""
 "name from {old_name} to {new_name}. If you need further assistance, please "
 "e-mail the course staff at {email}."
 msgstr ""
-"죄송합니다. 귀하가 요청한 {old_name} 에서 {new_name}로 이름 변경의 승인이 아직 처리되지 않았습니다. 도움이 "
-"필요하다면, 강좌 운영팀  {email}으로 이메일 보내주세요."
+"죄송합니다. 귀하가 요청한 {old_name}에서 {new_name}로 이름 변경의 승인이 아직 처리되지 않았습니다. 도움이 필요하다면,"
+" 강좌 운영팀 {email}으로 이메일 보내주세요."
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 msgid ""
 "You have been removed as a beta tester for {course_name} at {site_name} by a"
 " member of the course staff. The course will remain on your dashboard, but "
 "you will no longer be part of the beta testing group."
-msgstr ""
-"강좌 운영팀원이 당신을  {site_name}의  {course_name} 베타테스터에서 삭제하였습니다.\n"
-"해당 강좌는 대시보드 남아 있지만, 더이상 베타테스트 팀원이 아닙니다."
+msgstr "강좌 운영팀원이 당신을  {site_name}의  {course_name} 베타테스터에서 삭제하였습니다. "
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
@@ -13574,13 +13512,13 @@ msgstr "당신의 다른 강좌에 영향을 주지 않습니다."
 
 #: lms/templates/emails/remove_beta_tester_email_subject.txt
 msgid "You have been removed from a beta test for {course_name}"
-msgstr "당신은  {course_name}에 베타테스터에서 삭제되었습니다"
+msgstr "{course_name} 베타테스터가 아닙니다."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "We have successfully verified your identity for the {assessment} assessment "
 "in the {course_name} course."
-msgstr "{course_name} 강좌의 {assessment} 평가를 위해 귀하의 신분 인증이 성공적으로 이루어졌습니다. "
+msgstr "{course_name} 강좌의 {assessment} 평가를 위해 본인 인증이 성공적으로 이루어졌습니다. "
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -13588,8 +13526,8 @@ msgid ""
 "{course_name} course. You have used {used_attempts} out of "
 "{allowed_attempts} attempts to verify your identity."
 msgstr ""
-"{course_name} 강좌의 {assessment} 평가를 위한 신분 인증을 할 수 없습니다. {allowed_attempts} "
-"중에서 {used_attempts} 로는 신분 인증이 안 됩니다.  "
+"{course_name} 강좌의 {assessment} 평가를 위한 본인 인증을 할 수 없습니다. {allowed_attempts} "
+"중에서 {used_attempts} 로는 본인 인증이 안 됩니다.  "
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -13632,7 +13570,7 @@ msgstr "친애하는 학습자에게,"
 msgid ""
 "You have been un-enrolled from course {course_name} by a member of the "
 "course staff. Please disregard the invitation previously sent."
-msgstr "강좌 스태프멤버가 당신을  강좌 {course_name}에  등록하였습니다.  전에 발송된 초청장은 무시하세요."
+msgstr "강좌 운영팀이 귀하를 {course_name} 강좌에 등록하였습니다. 전에 발송된 초청장은 무시하세요."
 
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid ""
@@ -13640,12 +13578,12 @@ msgid ""
 " course staff. The course will no longer appear on your {site_name} "
 "dashboard."
 msgstr ""
-"강좌 운영팀이 당신을  {site_name}의  {course_name}에  등록취소하였습니다. 강좌가  {site_name} 의 "
+"강좌 운영팀이 당신을  {site_name}의  {course_name}에  등록 취소하였습니다. 강좌가  {site_name}의 "
 "대시보드에 나타나지 않을 것입니다."
 
 #: lms/templates/emails/unenroll_email_subject.txt
 msgid "You have been un-enrolled from {course_name}"
-msgstr "당신은  {course_name}에 등록취소되었습니다"
+msgstr "{course_name}에 등록 취소되었습니다."
 
 #: lms/templates/embargo/default_courseware.html
 #: lms/templates/embargo/default_enrollment.html
@@ -13838,7 +13776,7 @@ msgstr "활성 작업의 상태는 아래 표에 나타납니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
-msgstr "등록정보"
+msgstr "등록 정보"
 
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
@@ -13856,15 +13794,19 @@ msgstr "전문"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
-msgstr "기본적인 강좌정보"
+msgstr "강좌 기본 정보"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
-msgstr "강좌명."
+msgstr "기관별 강좌 번호"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
-msgstr "강좌 표시 이름:"
+msgstr "강좌 이름:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course End Date:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -13881,6 +13823,10 @@ msgstr "아니요"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
 msgstr "강좌가 끝났습니까?"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Number of sections:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
@@ -13904,8 +13850,8 @@ msgid ""
 "exams and problem sets), and can be changed on the 'Grading' page (under "
 "'Settings') in Studio."
 msgstr ""
-"강좌의 채점 정보를 표시하려면 클릭하세요. 채점 설정은 채점된 소주제(시험과 문제 세트 등)를 나누었으며, 스튜디오의 '채점' ('설정'"
-" 메뉴 아래) 페이지에서 바뀔 수 있습니다. "
+"강좌의 채점 정보를 표시하려면 클릭하세요. 스튜디오의 '과제 평가' ('설정' 메뉴 아래) 메뉴에서 설정(문제 세트, 평가 등)을 변경할"
+" 수 있습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
@@ -13974,7 +13920,7 @@ msgstr ""
 msgid ""
 "For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
-msgstr "소규모 강좌를 위해, 여기에서 등록된 학습자의 프로필 리스트를 클릭하세요."
+msgstr "소규모 강좌의 경우, 아래 버튼을 클릭하면 등록된 학습자의 프로필 목록을 볼 수 있습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
@@ -14024,8 +13970,8 @@ msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
-"<b>주의</b>: 학습자 데이터의 보안을 위해, 바로 접근할 수 있는 링크를 저장하거나 이메일로보낼 수 없습니다. 링크의 복사본은 5분"
-" 후 소멸됩니다."
+"<b>주의</b>: 학습자 데이터의 보안을 위해, 바로 접근할 수 있는 링크를 저장하거나 이메일로 보낼 수 없습니다. 링크의 복사본은 "
+"5분 후 소멸됩니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enrollment Codes"
@@ -14723,7 +14669,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Admin"
-msgstr "운영자 추가"
+msgstr "교수자 추가"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -14942,13 +14888,14 @@ msgstr "주 1회 이상 이메일 발송은 삼가해 주세요. 이메일 발�
 msgid ""
 "Have you read over the email to make sure it says everything you want to "
 "say?"
-msgstr "의도한 전달 내용이 정확히 담겨 있는지 확인했습니까?"
+msgstr "의도한 바가 잘 드러나도록 작성했는지 확인하셨나요?"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how"
 " it's displayed, and that embedded links and images work properly?"
-msgstr "이메일이 잘 작성되었는지 확인하기 위해 나에게만 우선 발송했습니까? 이메일 내용 중 링크와 이미지는 잘 보이나요?"
+msgstr ""
+"이메일이 잘 작성되었는지 확인하기 위해 우선 나에게만 발송하셨는지요? 이메일 내용 중 링크와 이미지는 잘 보이는지 확인하세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -14980,7 +14927,7 @@ msgstr "발송된 이메일 내용을 보기 위해 다음 버튼을 클릭하�
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Sent Email History"
-msgstr "이메일 기록 보내기"
+msgstr "이메일 기록 보기"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To read an email, click its subject."
@@ -15010,7 +14957,7 @@ msgstr "금액 설정"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
-msgstr "학습자 성적표"
+msgstr "학습자 성적기록부"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -15073,7 +15020,7 @@ msgid ""
 "problem and student, click on this button:"
 msgstr ""
 "재채점은 백그라운드에서 이루어지며, 작업의 상태는 '대기중인 작업' 표에 나타날 것입니다.  문제와 학습자 관련, 모든 제출된 작업의 "
-"상태를 보려면 이 버튼을 클릭하세요.   "
+"상태를 보려면 이 버튼을 클릭하세요.    "
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -15137,8 +15084,8 @@ msgid ""
 "appear in a table on the Course Info tab. To see status for all tasks "
 "submitted for this problem, click on this button"
 msgstr ""
-"이것은 활성 작업 상태는 강좌 정보탭에서 테이블을 나타내기 위해 백그라운드에서 나타납니다. 문제를 위한 상태와 와 학습자를 보기위해 이 "
-"버튼을 클릭합니다 :"
+"이 작업은 백그라운드에서 이루어지며, 작업 상태가 공지 사항 탭의 표에 나타날 것입니다. 전체 작업의 상태를 보려면, 이 버튼을 "
+"누르세요."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
@@ -15553,7 +15500,7 @@ msgstr "결제 오류"
 
 #: lms/templates/shoppingcart/error.html
 msgid "There was an error processing your order!"
-msgstr "주문을 처리하는데 오류가 있었습니다."
+msgstr "주문을 처리하는데 오류가 발생했습니다."
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Thank you for your purchase!"
@@ -15856,9 +15803,7 @@ msgid ""
 "The page that you were looking for was not found. Go back to the "
 "{link_start}homepage{link_end} or let us know about any pages that may have "
 "been moved at {email}."
-msgstr ""
-"찾으시는 페이지는 찾을 수 없습니다. {link_start}홈 페이지{link_end}로 돌아가거나 이동된 페이지들에 대해서 "
-"{email}로 알려 주세요."
+msgstr "페이지를 찾을 수 없습니다. {link_start}홈페이지{link_end}로 돌아가거나, {email}로 문의하세요."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -15922,13 +15867,13 @@ msgstr ""
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
-msgstr "{platform_name} 서버에서 500 오류가 있었습니다."
+msgstr "{platform_name}  500 오류"
 
 #: lms/templates/static_templates/server-error.html
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
 " please email us at {email}."
-msgstr "몇 초 기다렸다가 페이지를 다시 로드해 보세요. 문제가 지속되면 {email}로 이메일 주세요."
+msgstr "잠시 후 다시 시도하세요. 문제가 지속되면 {email}로 연락 바랍니다."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -16053,7 +15998,7 @@ msgstr "당신의 이름을 편집하는 동안 다음 오류가 발생했습니
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
-msgstr "{course_number} 재인증"
+msgstr "{course_name} 재인증"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid "Verification Deadline Has Passed"
@@ -16171,13 +16116,13 @@ msgstr "{studio_name} 서버 오류"
 
 #: cms/templates/500.html
 msgid "The {studio_name} servers encountered an error"
-msgstr "{studio_name}서버에서 오류가 발생하였습니다."
+msgstr "{studio_name}서버에서 오류가 발생했습니다."
 
 #: cms/templates/500.html
 msgid ""
 "An error occurred in {studio_name} and the page could not be loaded. Please "
 "try again in a few moments."
-msgstr "{studio_name} 에서 오류가 발생하여 페이지가 로드될 수 없었습니다. 잠시 후에 다시 시도해 보세요."
+msgstr "{studio_name} 에서 오류가 발생하여 페이지가 로드될 수 없었습니다. 잠시 후에 다시 시도하세요."
 
 #: cms/templates/500.html
 msgid ""
@@ -16278,7 +16223,7 @@ msgid ""
 "To add files to use in your course, click {em_start}Upload New File{em_end}."
 " Then follow the prompts to upload a file from your computer."
 msgstr ""
-"강좌에 사용할 파일을 추가하려면 {em_start}새 파일 업로드하기{em_end}를 클릭하세요. 그후 컴퓨터에서 파일을 업로드하세요."
+"강좌에 사용할 파일을 추가하려면 {em_start}새 파일 업로드{em_end}를 클릭하세요. 그후 컴퓨터에서 파일을 업로드하세요."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -16304,7 +16249,7 @@ msgid ""
 "Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
 "image from a component, a course update, or a course handout."
 msgstr ""
-"강좌에서 사용할 구성요소 및 학습자료의 링크를 {em_start}{studio_name} URL{em_end} 값으로 사용하세요."
+"구성요소 및 학습자료의 {em_start}{studio_name} URL{em_end}을 링크하면 강좌에서 활용할 수 있습니다."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -16312,7 +16257,7 @@ msgid ""
 "from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
 " Web URL no longer works for external access to a file."
 msgstr ""
-"외부에서 파일이나 이미지를 가져올 경우 {em_start}웹 URL 값{em_end}을 사용합니다. "
+"외부에서 파일이나 이미지를 가져올 경우 {em_start}웹 URL 값{em_end}을 사용하세요. "
 "{em_start}주의:{em_end} 파일 사용을 제한하면, 웹 URL이 있어도 파일에 접근할 수 없습니다."
 
 #: cms/templates/asset_index.html
@@ -16323,7 +16268,7 @@ msgstr "URL을 복사하려면 URL 값을 더블 클릭 후, 블록 처리된 �
 
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
-msgstr "파일을 관리하는 방법에 대해 자세히 알아보기"
+msgstr "파일 관리 방법에 대해 자세히 알아보기"
 
 #: cms/templates/asset_index.html
 msgid "Max per-file size: {max_filesize}MB"
@@ -16355,7 +16300,7 @@ msgid ""
 " acknowledge their accomplishment. If you are a course team member with the "
 "Admin role in Studio, you can configure your course certificate."
 msgstr ""
-"강좌 수료 직후,  학습자는 성과를 인정받을 수 있는 수료증을 받을 수 있습니다. 강좌 운영팀 중 관리자가 수료증을 설정할 수 있습니다."
+"강좌 수료 직후,  학습자는 성과를 인정받을 수 있는 수료증을 받을 수 있습니다. 강좌 운영팀 중 교수자가 수료증을 설정할 수 있습니다."
 " "
 
 #: cms/templates/certificates.html
@@ -16455,13 +16400,13 @@ msgstr "강좌 준비 점검은?"
 msgid ""
 "Course checklists are tools to help you understand and keep track of all the"
 " steps necessary to get your course ready for students."
-msgstr "강좌 준비 점검은 개강 전 필요한 모든 단계를 살피면서 개강 준비를 완료하도록 합니다."
+msgstr "강좌 준비 점검은 개강 전 필요한 모든 단계를 살피면서 개강 준비를 완료하도록 도와줍니다."
 
 #: cms/templates/checklists.html
 msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
-msgstr "해당 체크 리스트에 변경 사항이 생길 때마다 자동으로 저장되고, 다른 강좌 운영팀 구성원도 이를 바로 볼 수 있습니다."
+msgstr "변경 사항이 생길 때마다 자동으로 저장되고, 다른 강좌 운영팀 구성원도 이를 바로 볼 수 있습니다."
 
 #: cms/templates/checklists.html
 msgid "{studio_name} checklists"
@@ -16490,7 +16435,7 @@ msgstr "LMS에서 강좌내용 열기 "
 
 #: cms/templates/container.html
 msgid "View Live Version"
-msgstr "실시간 보기"
+msgstr "적용 결과 보기"
 
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
@@ -16588,7 +16533,7 @@ msgstr "강좌 재운영을 위한 식별 정보를 제공합니다. 원래 강�
 msgid ""
 "Note: Together, the organization, course number, and course run must "
 "uniquely identify this new course instance."
-msgstr "기관과 강좌 번호, 강좌 운영은 고유해야 합니다."
+msgstr "기관과 강좌 번호, 기관별 강좌 번호는 고유해야 합니다."
 
 #: cms/templates/course-create-rerun.html
 msgid "Required Information to Create a re-run of a course"
@@ -16643,7 +16588,7 @@ msgstr "기관 안에서 새로운 강의를 식별하는 고유 번호입니다
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
 msgid "Course Run"
-msgstr "강좌 운영 번호"
+msgstr "기관별 강좌 번호"
 
 #. Translators: This is an example for the "run" used to identify different
 #. instances of a course, seen when filling out the form to create a new
@@ -16728,8 +16673,8 @@ msgid ""
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
 msgstr ""
-"현재 강좌 콘텐츠를 볼 수 없으며, 수강신청한 학습자가 없습니다. 이 경우, 다음과 같은 조치를 시도해보세요. 강좌 시작일을 포함해 모든"
-" 날짜 확인 및 재설정, 강좌 운영팀 설정, 강좌 업데이트 및 다른 자료 검토, 게시판과 위키 업데이트를 할 수 있습니다. "
+"현재 강좌 콘텐츠를 볼 수 없으며, 수강신청한 학습자가 없습니다. 이 경우, 다음과 같은 조치를 시도해보세요. 개강일을 포함해 모든 날짜"
+" 확인 및 재설정, 강좌 운영팀 설정, 강좌 업데이트 및 다른 자료 검토, 게시판과 위키 업데이트를 할 수 있습니다. "
 
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
@@ -16800,11 +16745,7 @@ msgstr "새 탭에서 학습자가 보는 화면을 보려면 클릭하세요."
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
 #: cms/templates/index.html
 msgid "View Live"
-msgstr "미리 보기"
-
-#: cms/templates/course_outline.html
-msgid "Course Start Date:"
-msgstr "강좌 시작 날짜:"
+msgstr "적용 결과 보기"
 
 #: cms/templates/course_outline.html
 msgid "Edit Start Date"
@@ -16822,7 +16763,7 @@ msgstr "주제, 소주제, 학습활동을 추가하세요."
 msgid ""
 "Create a section, then add subsections and units. Open a unit to add course "
 "components."
-msgstr "먼저 주제를 만들고, 소주제와 학습 활동을 추가하시면 됩니다. 학습활동에 구성요소를 넣어보세요."
+msgstr "먼저 주제를 만들고, 소주제와 학습활동을 추가하시면 됩니다. 학습활동에 구성요소를 넣어보세요."
 
 #: cms/templates/course_outline.html
 msgid "Reorganizing your course"
@@ -16830,11 +16771,11 @@ msgstr "강좌 다시 구성하기"
 
 #: cms/templates/course_outline.html
 msgid "Drag sections, subsections, and units to new locations in the outline."
-msgstr "주제, 소주제 및 학습활동을 새 위치로 마우스로 끌고 오세요."
+msgstr "주제, 소주제 및 학습활동을 드래그 아이콘을 클릭한 채로 새 위치로 드래그 하세요."
 
 #: cms/templates/course_outline.html
 msgid "Setting release dates and grading policies"
-msgstr "공개일과 채점 규정 설정하기"
+msgstr "공개일과 성적 규정 설정하기"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -16842,11 +16783,12 @@ msgid ""
 "date. When you configure a subsection, you can also set the grading policy "
 "and due date."
 msgstr ""
-"공개일 설정은 주제 또는 소주제의 '설정' 아이콘을 클릭하시면 됩니다. 소주제를 설정할 때, 채점 규정과 마감일도 설정할 수 있습니다."
+"공개일을 설정하려면, 주제 또는 소주제의 '설정' 아이콘을 클릭하면 됩니다. 소주제를 설정할 때, 성적 규정과 마감일도 설정할 수 "
+"있습니다."
 
 #: cms/templates/course_outline.html
 msgid "Changing the content students see"
-msgstr "콘텐츠 보이게 하거나 숨기기"
+msgstr "콘텐츠 공개 설정"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -16858,11 +16800,12 @@ msgstr "콘텐츠를 게시하려면, 주제, 소주제, 학습활동에서 '게
 msgid ""
 "To hide content from students, select the Configure icon for a section, "
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
-msgstr "학습자에게 콘텐츠를 보이지 않게 하려면, {em_start}학습자에게 보이지 않게 하기{em_end}를 선택하세요."
+msgstr ""
+"학습자에게 콘텐츠를 보이지 않게 하려면, 주제 및 소주제의 설정에서 {em_start}학습자에게 감추기기{em_end}를 선택하세요."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about the course outline"
-msgstr "강좌 개요에 대해서 더 자세히 알아보기"
+msgstr "강좌 개요에 대해 더 자세히 알아보기"
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
@@ -16873,7 +16816,7 @@ msgstr "강좌 메뉴"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
-msgstr "신규 페이지"
+msgstr "신규 메뉴"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -16896,15 +16839,15 @@ msgstr "이페이지는 저장될수 없습니다."
 
 #: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
-msgstr " 강좌에 사용자 정의 페이지를 추가할 수 있습니다."
+msgstr " 강좌에 사용자 정의 메뉴를 추가할 수 있습니다."
 
 #: cms/templates/edit-tabs.html
 msgid "Add a New Page"
-msgstr " 신규 페이지 추가"
+msgstr " 신규 메뉴 추가"
 
 #: cms/templates/edit-tabs.html
 msgid "What are pages?"
-msgstr " 페이지란?"
+msgstr "메뉴란?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -16912,12 +16855,12 @@ msgid ""
 "(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
 "textbooks and custom pages that you create."
 msgstr ""
-"페이지가 강좌의 상단에 수평으로 정렬됩니다. 기본 페이지들(강좌 내용, 강좌 정보, 게시판, 위키, 진도) 다음에 귀하가 생성하는 교재 "
-"및 사용자 정의 페이지가 뒤 따르게 될 것입니다."
+"메뉴는 강좌의 상단에 수평으로 정렬됩니다. 기본 메뉴들(강좌 내용, 강좌 정보, 게시판, 위키, 진도) 다음에, 귀하가 추가할 경우 교재"
+" 및 사용자 정의 페이지가 뒤 따르게 될 것입니다."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
-msgstr "사용자 정의 페이지란?"
+msgstr "사용자 정의 메뉴란?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -16925,8 +16868,8 @@ msgid ""
 "course content. For example, you can create pages for the grading policy, "
 "course slides, and a course calendar. "
 msgstr ""
-"귀하는 강좌 콘텐츠를 제공할 사용자 정의 페이지를 생성하고 편집할 수 있습니다. 예를 들어, 채점 규정, 강좌 슬라이드, 강좌 일정 등의"
-" 페이지를 만들 수 있습니다. "
+"강좌 콘텐츠를 제공할 사용자 정의 메뉴를 생성하고 편집할 수 있습니다. 예를 들어, 성적 규정, 강좌 슬라이드, 강좌 일정 등의 메뉴를 "
+"만들 수 있습니다. "
 
 #: cms/templates/edit-tabs.html
 msgid "How do pages look to students in my course?"
@@ -16983,13 +16926,12 @@ msgid ""
 " still having problems accessing things, please feel free to "
 "{link_start}contact {studio_name} support{link_end} for further help."
 msgstr ""
-"죄송합니다. 당신이 찾고자 하는 {studio_name}  페이지를 우리가 찾을 수 없습니다. {studio_name}  대시보드로 "
-"돌아가서 다시 시도해 보십시요. 아직 접속하는데 문제가 있다면 추가 도움을 위해 {link_start}{studio_name}  지원 "
-"연락처{link_end} 로 연락주십시요."
+"죄송합니다.  {studio_name}페이지를 찾을 수 없습니다. {studio_name}대시보드로 돌아가서 다시 시도하세요. 도움이 "
+"필요하시면 {link_start}{studio_name}지원 연락처{link_end}로 연락하세요."
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
-msgstr "서버에 오류가 발생하였습니다"
+msgstr "오류가 발생했습니다."
 
 #: cms/templates/error.html
 msgid ""
@@ -17000,7 +16942,7 @@ msgid ""
 "further help."
 msgstr ""
 "죄송합니다.  요청을 처리하는 동안 서버에 문제가 발생했습니다. {studio_name} 대시보드로 돌아가거나 다시 요청을 시도 할 수 "
-"있습니다. 문제가 계속 발생하면, {link_start}{studio_name} 지원 연락처 {link_end}로 연락 주세요!"
+"있습니다. 문제가 계속 발생하면, {link_start}{studio_name} 지원 연락처 {link_end}로 연락하세요."
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
@@ -17074,7 +17016,7 @@ msgstr "강좌 콘텐츠 내보내기"
 
 #: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
-msgstr "강좌의 {em_start}내보내기{em_end}된 데이터"
+msgstr " {em_start}내보내기{em_end} 가능 데이터"
 
 #: cms/templates/export.html
 msgid ""
@@ -17103,7 +17045,7 @@ msgstr "강좌 설정"
 
 #: cms/templates/export.html
 msgid "Data {em_start}not exported{em_end} with your course:"
-msgstr "{em_start} export {em_end}되지 않는 데이터"
+msgstr "{em_start} 내보내기{em_end} 불가 데이터"
 
 #: cms/templates/export.html
 msgid "User Data"
@@ -17133,7 +17075,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
-msgstr "다운로드파일 여는중"
+msgstr "다운로드된 파일 열기"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -17165,7 +17107,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "What content is exported?"
-msgstr "어떤 content가 내보내지는가?"
+msgstr "어떤 콘텐츠가 내보내지는가?"
 
 #: cms/templates/export.html
 msgid ""
@@ -17175,8 +17117,8 @@ msgid ""
 "data, grading information, discussion forum data, course settings, and "
 "course team information, is not exported."
 msgstr ""
-"강좌 콘텐츠와 구조 (주제, 소주제, 학습활동 포함)가 내보내기 되었습니다. MATLAB API 키와 LTI Passport 포함 고급 "
-"설정 값 또한 내보내집니다. 학습자 데이터, 채점 정보, 게시판 데이터 등의 다른 자료들은 내보내기 되지 않습니다. "
+"강좌 콘텐츠와 구조 (주제, 소주제, 학습활동 포함)가 내보내기 됩니다. MATLAB API 키와 LTI Passport 포함 고급 설정"
+" 값 또한 내보내집니다. 학습자 데이터, 채점 정보, 게시판 데이터 등의 다른 자료들은 내보내기 되지 않습니다. "
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -17260,9 +17202,7 @@ msgid ""
 "If you have cohorts enabled in your course, you can use content groups to "
 "create cohort-specific courseware. In other words, you can customize the "
 "content that particular cohorts see in your course."
-msgstr ""
-"귀하의 강좌에서 학습 집단을 활성화하면, 콘텐츠 그룹을 학습 집단별 강좌에 사용할 수 있습니다. 즉, 특정 학습 집단이 볼 수 있는 "
-"콘텐츠로 맞춤 설정할 수 있는 것입니다. "
+msgstr "귀하의 강좌에서 학습 집단을 활성화하면, 특정 학습 집단이 볼 수 있는 콘텐츠를 맞춤 설정할 수 있습니다."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -17272,8 +17212,8 @@ msgid ""
 "Only learners in the cohorts that are associated with the specified content "
 "groups see the additional content."
 msgstr ""
-"각 콘텐츠 그룹은 1개 이상의 학습 집단과 관련지을 수 있습니다. 전체 학습자를 위한 강좌 콘텐츠 외에도, 지정한 콘텐츠 그룹에게만 해당"
-" 콘텐츠를 볼 수 있게 할 수 있습니다. 지정 콘텐츠 그룹과 관련 있는 학습 집단의 학습자만 추가 콘텐츠를 볼 수 있습니다.  "
+"각 콘텐츠 그룹은 1개 이상의 학습 집단과 연결할 수 있습니다. 전체 학습자를 위한 강좌 콘텐츠 외에도, 지정한 콘텐츠 그룹만 특정 "
+"콘텐츠를 볼 수 있도록 할 수 있습니다. "
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -17283,9 +17223,9 @@ msgid ""
 "use by a unit. To delete a content group, hover over its box and click the "
 "delete icon."
 msgstr ""
-"새 콘텐츠 그룹을 추가하려면 {em_start}새 콘텐츠 그룹{em_end}을 클릭합니다. 콘텐츠 그룹의 이름을 변경하려면, 박스 상단의"
-" {em_start}수정{em_end}을 클릭하세요. 학습 활동에서 활용하지 않는다면 콘텐츠 그룹을 삭제할 수 있습니다. 삭제는 박스 "
-"상단의 삭제 아이콘을 클릭하면 됩니다."
+"신규 콘텐츠 그룹을 추가하려면 {em_start}첫 번째 콘텐츠 그룹을 추가하세요{em_end}를 클릭합니다. 콘텐츠 그룹의 이름을 "
+"변경하려면, 박스 상단의 {em_start}편집{em_end}을 클릭하세요. 추후 학습 활동에서 활용하지 않는다면 콘텐츠 그룹을 삭제할 "
+"수 있습니다. 삭제는 박스 상단의 삭제 아이콘을 클릭하면 됩니다."
 
 #: cms/templates/group_configurations.html
 msgid "Learn More"
@@ -17338,7 +17278,7 @@ msgstr "{studio_name}는 강좌가 잘 구성되도록 도와줍니다."
 
 #: cms/templates/howitworks.html
 msgid "Keeping Your Course Organized"
-msgstr "자유롭게 강좌를 구성하실 수 있습니다."
+msgstr "자유롭게 강좌를 구성할 수 있습니다."
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -17483,7 +17423,7 @@ msgstr "로그인 & {platform_name} 강좌 만들기 시작"
 
 #: cms/templates/howitworks.html
 msgid "Already have a {studio_name} Account? Sign In"
-msgstr "{studio_name}계정이 있나요? 로그인 하세요."
+msgstr "{studio_name}계정이 있으신가요? "
 
 #: cms/templates/howitworks.html
 msgid "Outlining Your Course"
@@ -17895,11 +17835,11 @@ msgstr "강의가 처리중입니다."
 
 #: cms/templates/index.html
 msgid "Course Run:"
-msgstr "강좌 운영 번호:"
+msgstr "기관별 강좌 번호"
 
 #: cms/templates/index.html
 msgid "This course run is currently being created."
-msgstr "course run 이 만들어지고 있습니다."
+msgstr "기관별 강좌 번호가 만들어지고 있습니다."
 
 #. Translators: This is a status message, used to inform the user of what the
 #. system is doing. This status means that the user has requested to re-run an
@@ -17937,7 +17877,7 @@ msgstr "강의 다시 시작하기"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
-msgstr "{studio_name} 강의 스태프입니까?"
+msgstr "{studio_name} 관리자입니까?"
 
 #: cms/templates/index.html
 msgid ""
@@ -18058,8 +17998,8 @@ msgid ""
 " of the page to access our continually updated documentation and other "
 "{studio_name} resources."
 msgstr ""
-" {studio_name}에 대해 더 알고 싶으시면 오른쪽 상단의 도움말을 클릭하세요. 페이지 하단의 링크를 통해, 계속 업데이트 되고 "
-"있는 도움말과 다른 {studio_name} 자료들도 이용하실 수 있습니다."
+" {studio_name}에 대해 더 알고 싶으시면 화면 오른쪽 상단이나 아래의 도움말을 클릭하세요. 하단의 링크를 통해 다른 "
+"{studio_name} 자료들도 이용하실 수 있습니다."
 
 #: cms/templates/index.html
 msgid "Getting Started with {studio_name}"
@@ -18075,38 +18015,38 @@ msgstr "{studio_name}에 대한 도움 요청"
 
 #: cms/templates/index.html
 msgid "Can I create courses in {studio_name}?"
-msgstr "{studio_name}에서 강좌를 생성할 수 있을까요?"
+msgstr "{studio_name}에서 강좌를 개설할 수 있나요?"
 
 #: cms/templates/index.html
 msgid ""
 "In order to create courses in {studio_name}, you must {link_start}contact "
 "{platform_name} staff to help you create a course{link_end}."
 msgstr ""
-"{studio_name}에 강의를 만들기 위해서,  {link_start}강의를 만들때 도움이 필요하다면{platform_name} "
+"{studio_name}에 강좌를 개설하기 위해서,  {link_start}강의를 만들때 도움이 필요하다면{platform_name} "
 "스태프에게 연락하세요{link_end}."
 
 #: cms/templates/index.html
 msgid ""
 "In order to create courses in {studio_name}, you must have course creator "
 "privileges to create your own course."
-msgstr "{studio_name},에서 강좌를 만들기 위해서 강의 생성자 권한을 가져야 합니다."
+msgstr "{studio_name},에서 강좌를 개설하기 위해서 강좌 개설자 권한을 가져야 합니다."
 
 #: cms/templates/index.html
 msgid ""
 "Your request to author courses in {studio_name} has been denied. Please "
 "{link_start}contact {platform_name} Staff with further questions{link_end}."
 msgstr ""
-" {studio_name}에서 강의만들기 요청이 거절되었습니다. {link_start}더 질문이 있다면 {platform_name} "
-"스태프에게 연락하세요{link_end}."
+" {studio_name}에서 강좌 개설 요청이 거절되었습니다. {link_start} 문의 사항이 있으시면  "
+"{platform_name} 관리자에게 연락하세요{link_end}."
 
 #: cms/templates/index.html
 #, python-format
 msgid "Thanks for signing up, %(name)s!"
-msgstr "%(name)s 님, 등록해 주셔서 감사합니다."
+msgstr "%(name)s님, 환영합니다!"
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
-msgstr "이메일 주소를 검토할 필요가 있습니다."
+msgstr "이메일 확인이 필요합니다."
 
 #: cms/templates/index.html
 #, python-format
@@ -18115,8 +18055,7 @@ msgid ""
 "email address (%(email)s). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
-"거의 다 되었습니다!  등록을 완료하기 위해서는 이메일 주소(%(email)s)가 맞는지 확인해야 합니다. 활성화 메시지 및 다음 단계가"
-" 당신을 기다리고 있을 것입니다."
+"등록 절차를 완료하려면 이메일 주소(%(email)s)를 인증받아야 합니다. 입력한 이메일 주소로 발송된 등록 이메일을 확인해주세요."
 
 #: cms/templates/index.html
 msgid "Need help?"
@@ -18128,8 +18067,7 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
-"이메일이 받은 편지함에 없는 경우에는 정크 또는 스팸 메일 폴더를 확인하시기 바랍니다. 아직 확인 이메일을 찾을 수 없습니까? 아래의 "
-"링크를 통해 도움을 요청하십시요."
+"이메일을 받지 못한 경우에는 스팸 메일함을 확인하시기 바랍니다. 그래도 인증 메일을 확인할 수 없다면 아래 링크를 통해 도움을 받으세요."
 
 #: cms/templates/index.html
 msgid "Request help with your {studio_name} account"
@@ -18151,7 +18089,7 @@ msgstr "콘텐츠 추가하기"
 msgid ""
 "Add components to your library for use in courses, using Add New Component "
 "at the bottom of this page."
-msgstr "강좌에서 사용하기 위해 귀하의 콘텐츠 보관함에 구성요소를 추가합니다. 페이지 하단의 '새 구성요소 추가하기'를 클릭하세요."
+msgstr "강좌에서 사용하기 위해 귀하의 콘텐츠 보관함에 구성요소를 추가합니다. 상단의 새 구성요소 추가하기'를 클릭하세요."
 
 #: cms/templates/library.html
 msgid ""
@@ -18218,19 +18156,19 @@ msgstr "강좌 팀 설정"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "New Team Member"
-msgstr "신규 팀원 추가"
+msgstr "신규 구성원 추가"
 
 #: cms/templates/manage_users.html
 msgid "Add a User to Your Course's Team"
-msgstr "강좌 운영팀에 사용자 추가하기"
+msgstr "강좌 운영팀 구성원 추가하기"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "New Team Member Information"
-msgstr "신규 팀원 정보"
+msgstr "신규 구성원 정보"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "User's Email Address"
-msgstr "사용자의 이메일 주소"
+msgstr "새로 추가할 구성원 이메일 주소"
 
 #: cms/templates/manage_users.html
 msgid "Provide the email address of the user you want to add as Staff"
@@ -18238,7 +18176,7 @@ msgstr "관리자로 추가하고 싶은 이용자의 이메일 주소를 제공
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"
-msgstr "사용자 추가"
+msgstr "구성원 추가"
 
 #: cms/templates/manage_users.html
 msgid "Add Team Members to This Course"
@@ -18248,11 +18186,11 @@ msgstr "운영 팀원 추가"
 msgid ""
 "Adding team members makes course authoring collaborative. Users must be "
 "signed up for {studio_name} and have an active account."
-msgstr "팀원을 추가해서 강좌 제작을 협업할 수 있습니다. 사용자는  {studio_name}에 등록되어 있고 계정이 있어야 합니다."
+msgstr "운영팀 구성원을 추가해서 강좌 제작을 함께할 수 있습니다.  {studio_name}에 등록되어 있고 계정이 있어야 합니다."
 
 #: cms/templates/manage_users.html
 msgid "Add a New Team Member"
-msgstr "신규 팀원 추가"
+msgstr "신규 구성원 추가"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Roles"
@@ -18268,7 +18206,7 @@ msgstr "관리자와 함께 강좌 운영팀 구성원들이 강좌의 공동 �
 msgid ""
 "Admins are course team members who can add and remove other course team "
 "members."
-msgstr "관리자는 강좌 운영팀의 다른 구성원을 추가하거나 삭제할 수 있습니다."
+msgstr "교수자는 강좌 운영팀의 다른 구성원을 추가하거나 삭제할 수 있습니다."
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -18329,7 +18267,7 @@ msgstr "콘텐츠 보관함 접근 역할"
 
 #: cms/templates/manage_users_lib.html
 msgid "There are three access roles for libraries: User, Staff, and Admin."
-msgstr "콘텐츠 보관함에 이용자, 운영팀, 관리자가 접근할 수 있습니다."
+msgstr "콘텐츠 보관함에 이용자, 운영팀, 교수자가 접근할 수 있습니다."
 
 #: cms/templates/manage_users_lib.html
 msgid ""
@@ -18337,7 +18275,7 @@ msgid ""
 "components in their courses, but they cannot edit the contents of a library."
 msgstr ""
 "콘텐츠 보관함 사용자는 콘텐츠를 볼 수 있고 참조할 수 있으며, 구성요소를 자신의 강좌에서 사용할 수도 있습니다. 하지만 콘텐츠를 수정할"
-" 수는 없습니다. "
+" 수는 없습니다.  "
 
 #: cms/templates/manage_users_lib.html
 msgid ""
@@ -18351,8 +18289,8 @@ msgid ""
 "other team members. There must be at least one user with the Admin role in a"
 " library."
 msgstr ""
-"콘텐츠 보관함 관리자는 전체 수정 권한을 가지며 다른 강좌 운영팀 구성원을 추가하고 삭제할 수 있습니다. 이를 위해 보관함에 관리자가 "
-"최소 1명 이상 있어야 합니다.  "
+"교수자는 콘텐츠 보관함의 전체 수정 권한을 가지며, 다른 강좌 운영팀 구성원을 추가하고 삭제할 수 있습니다. 이를 위해 보관함에 교수자가"
+" 최소 1명 이상 있어야 합니다.  "
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -18364,7 +18302,7 @@ msgstr "{studio_name} 가입"
 
 #: cms/templates/register.html
 msgid "Already have a {studio_name} Account? Sign in"
-msgstr "{studio_name}계정이 있나요? 로그인 하세요."
+msgstr "{studio_name}계정이 있으신가요?"
 
 #: cms/templates/register.html
 msgid ""
@@ -18380,7 +18318,7 @@ msgstr "{studio_name}에 로그인하기 위한 필요 정보"
 msgid ""
 "This will be used in public discussions with your courses and in our edX101 "
 "support forums"
-msgstr "이것은 내 강좌들의 공개된 토론과 edX101 지원 포럼에서 사용될 것입니다"
+msgstr "edX101 지원 게시판이나, 강좌 게시판 등에서 나를 나타내는 아이디입니다."
 
 #: cms/templates/register.html
 msgid "Your Location"
@@ -18409,8 +18347,8 @@ msgid ""
 "members, teaching assistants and course staff, and members of instructional "
 "technology groups."
 msgstr ""
-"{studio_name}는 {platform_name} 플랫폼을 활용하여 온라인 교육 과정을 만들고자 하는 사람들을 위한 것입니다. "
-"교수자, 조교, 강좌 운영팀 등이 사용하실 수 있습니다."
+"{studio_name}는 {platform_name} 플랫폼을 활용하여 온라인 강좌를 만들고자 하는 사람들을 위한 것입니다. 교수자, "
+"조교, 강좌 운영팀 등이 사용하실 수 있습니다."
 
 #: cms/templates/register.html
 msgid ""
@@ -18605,7 +18543,7 @@ msgstr "강좌 세부정보"
 
 #: cms/templates/settings.html
 msgid "Provide useful information about your course"
-msgstr "강좌에 대한 유용한 정보를 제공하세요."
+msgstr "강좌 관련 세부 정보"
 
 #: cms/templates/settings.html
 msgid ""
@@ -18643,40 +18581,41 @@ msgstr "강좌 요약"
 #, python-format
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
-msgstr "소개, 선수조건, %s 에서 사용된 자주하는질문들(HTML 형식)"
+msgstr "%s 에 들어가게 될 내용으로 강좌 소개, 선수 과목, 자주 하는 질문 등의 내용을 입력하면 됩니다.(HTML 형식)"
 
 #: cms/templates/settings.html
 msgid "Course Image"
-msgstr "강좌 이미지"
+msgstr "강좌 대표 이미지"
 
 #: cms/templates/settings.html
 msgid ""
 "You can manage this image along with all of your other <a href='{}'>files "
 "&amp; uploads</a>"
-msgstr "다른 것들 <a href='{}'>files &amp; uploads</a>과 함께 이 이미지를 관리할 수 있습니다"
+msgstr "<a href='{}'>파일 업로드</a>에서 이 이미지를 변경할 수 있습니다"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
-"강좌에 이미지가 없습니다.  이미지를 업로드 하십시요 (JPEG 혹은 PNG 형식, 최소 추천 크기 :가로 375px  세로 200px)"
+"강좌 대표 이미지가 없습니다. 이미지를 업로드하세요 (JPEG 혹은 PNG 형식, 최소 이미지 크기: 가로 375px,  세로 "
+"200px)"
 
 #. Translators: This is the placeholder text for a field that requests the URL
 #. for a course image
 #: cms/templates/settings.html
 msgid "Your course image URL"
-msgstr "강좌 이미지 URL"
+msgstr "강좌 대표 이미지 URL"
 
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
-msgstr "강좌 이미지에 대한 유효한 경로와 이름을 입력하세요 ( JPEG 혹은 PNG 형식만 지원됨)"
+msgstr "강좌 대표 이미지에 대한 유효한 경로와 이름을 입력하세요. ( JPEG 혹은 PNG 형식만 지원)"
 
 #: cms/templates/settings.html
 msgid "Upload Course Image"
-msgstr "강좌 이미지 업로드"
+msgstr "강좌 대표 이미지 업로드"
 
 #: cms/templates/settings.html
 msgid "Course Introduction Video"
@@ -18698,15 +18637,15 @@ msgstr "Youtube 영상의 ID를 입력하세요. (URL의 뒷 부분 코드)"
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
-msgstr "본 강좌를 수강하는 학습자에게 요구하는 사항"
+msgstr "효과적인 학습을 위해 학습 시간 및 선수 강좌를 입력합니다."
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
-msgstr "주당 학습 시간"
+msgstr "주당 학습 권장 시간"
 
 #: cms/templates/settings.html
 msgid "Time spent on all course work"
-msgstr "학습자가 강좌에 들이는 총 시간"
+msgstr "주당 학습에 투자하길 권장하는 시간"
 
 #: cms/templates/settings.html
 msgid "Prerequisite Course"
@@ -18714,7 +18653,7 @@ msgstr "선수 강좌"
 
 #: cms/templates/settings.html
 msgid "Course that students must complete before beginning this course"
-msgstr "본 강좌를 수강하기 전에 반드시 들어야 하는 과정"
+msgstr "본 강좌를 수강하기 전에 반드시 들어야 하는 강좌"
 
 #: cms/templates/settings.html
 msgid "set pre-requisite course"
@@ -18775,16 +18714,16 @@ msgid ""
 "video, and estimated time requirements. Students use About pages to choose "
 "new courses to take."
 msgstr ""
-"'강좌 소개'에 강좌 개관, 강좌 이미지, 소개 영상, 예상 소요 시간이 안내될 것입니다. 이를 통해 학습자가 수강을 결정할 수 있도록 "
-"합니다."
+"'강좌 소개'에 강좌 개관, 강좌 대표 이미지, 소개 영상, 예상 소요 시간이 안내될 것입니다. 이를 통해 학습자가 수강을 결정할 수 "
+"있도록 합니다."
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
-msgstr "정책 변경사항이 저장되었습니다."
+msgstr "변경사항이 저장되었습니다."
 
 #: cms/templates/settings_advanced.html
 msgid "There was an error saving your information. Please see below."
-msgstr "정보를 저장하는데 오류가 있었습니다. 아래를 보십시요."
+msgstr "정보 저장 중 오류가 발생했습니다. 아래를 참고하세요."
 
 #: cms/templates/settings_advanced.html
 msgid "Manual Policy Definition"
@@ -18794,7 +18733,7 @@ msgstr "직접 설정하기"
 msgid ""
 "<strong>Warning</strong>: Do not modify these policies unless you are "
 "familiar with their purpose."
-msgstr "<strong>주의</strong>: 아래의 설정에 대해 정확히 모르시면 수정하지마시길 권해드립니다."
+msgstr "<strong>주의</strong>: 꼭 필요한 경우가 아니라면, 수정하지 않으시는 것이 좋습니다."
 
 #: cms/templates/settings_advanced.html
 msgid "Show Deprecated Settings"
@@ -18858,7 +18797,7 @@ msgstr "통과 기준 점수 이상을 받아야 합니다."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"
-msgstr "채점 규정"
+msgstr "성적 규정"
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
@@ -18866,11 +18805,11 @@ msgstr "채점에 관한 마감일, 요구사항, 세부 절차 "
 
 #: cms/templates/settings_graders.html
 msgid "Grace Period on Deadline:"
-msgstr "마감 유예 시간"
+msgstr "추가 제출 기간"
 
 #: cms/templates/settings_graders.html
 msgid "Leeway on due dates"
-msgstr "마감일에 대한 여지"
+msgstr "마감일이 지난 이후에, 학습자가 제출할 수 있는 기간을 의미합니다."
 
 #: cms/templates/settings_graders.html
 msgid "Assignment Types"
@@ -18878,7 +18817,7 @@ msgstr "과제명"
 
 #: cms/templates/settings_graders.html
 msgid "Categories and labels for any exercises that are gradable"
-msgstr "채점이 가능한 모든 연습문제에 대한 범주와 라벨"
+msgstr "성적 산출을 위한 항목별 세부 정보"
 
 #: cms/templates/settings_graders.html
 msgid "New Assignment Type"
@@ -18893,7 +18832,7 @@ msgid ""
 "You can use the slider under Overall Grade Range to specify whether your "
 "course is pass/fail or graded by letter, and to establish the thresholds for"
 " each grade."
-msgstr "강좌의 통과 또는 과락 여부를 지정할 '전반적 성적 범위' 아래의 슬라이더를 활용할 수 있습니다. "
+msgstr "왼쪽의 슬라이더를 움직여서 강좌의 통과 또는 과락 범위를 지정하세요."
 
 #: cms/templates/settings_graders.html
 msgid ""
@@ -18906,7 +18845,7 @@ msgid ""
 "You can also create assignment types, such as homework, labs, quizzes, and "
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
-msgstr "그리고 숙제, 실험, 퀴즈, 시험 등을 만들 수 있고, 각 항목의 성적 가중치를 정할 수 있습니다."
+msgstr "그리고 숙제, 실험, 퀴즈, 시험 등으로 과제 유형을 분류할 수 있고, 각 항목의 성적 가중치를 정할 수 있습니다."
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
@@ -18914,11 +18853,11 @@ msgstr "확장/붕괴"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility Settings"
-msgstr "보이기 설정"
+msgstr "공개 설정"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility"
-msgstr "보이기"
+msgstr "공개 설정 "
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -19048,8 +18987,8 @@ msgid ""
 "course content. Create one or more content groups, and make specific "
 "components visible to them."
 msgstr ""
-"학습자 집단이 특정 콘텐츠에 접근할 수 있도록 콘텐츠 그룹을 사용합니다. 1개 이상의 콘텐츠 그룹을 만들고, 특정 구성요소를 해당 그룹의"
-" 학습자들이 볼 수 있도록 하세요."
+"학습 집단이 특정 콘텐츠에 접근할 수 있도록 콘텐츠 그룹을 사용합니다. 1개 이상의 콘텐츠 그룹을 만들고, 특정 구성요소를 해당 집단의 "
+"학습자들이 볼 수 있도록 하세요."
 
 #: cms/templates/visibility_editor.html
 msgid "Manage content groups"
@@ -19063,8 +19002,8 @@ msgid ""
 "contained in is hidden from students. Visibility settings here will be "
 "trumped by this."
 msgstr ""
-"{screen_reader_start} 경고: {screen_reader_end} 구성요소가 포함된 학습활동이 학습자에게 가려져 "
-"있습니다. 이로 인해 Visibility 설정이 적용되지 않습니다."
+"{screen_reader_start} 주의: {screen_reader_end} 이 구성요소가 포함된 학습활동이 학습자에게 감추어져 "
+"있습니다. 이로 인해 학습자에게 공개되지 않습니다."
 
 #: cms/templates/visibility_editor.html
 msgid "Make visible to:"
@@ -19087,6 +19026,21 @@ msgid ""
 "Content group no longer exists. Please choose another or allow access to All"
 " Students and staff"
 msgstr "해당 콘텐츠 그룹이 없습니다. 다른 것를 선택하거나 전체 학생 및 직원에 대한 접근을 허용하세요."
+
+#: cms/templates/visibility_editor.html
+msgid "Verification Checkpoint"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid "Verification checkpoint to complete"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this component. Learners who do not require verification see "
+"this content by default."
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -19126,26 +19080,24 @@ msgid ""
 "Your request for course creation rights to {studio_name} have been denied. "
 "If you believe this was in error, please contact {email}"
 msgstr ""
-" {studio_name} 에서의 강좌 생성 권한 요청이 거절 되었습니다. 이것이 오류라고 생각되면 연락 주시기 바랍니다.  "
-"{email}"
+" {studio_name} 에서의 강좌 개설 권한 요청이 거절 되었습니다. 이것이 오류로 보일 경우  {email}로 연락하세요."
 
 #: cms/templates/emails/course_creator_granted.txt
 msgid ""
 "Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
 "\n"
 "{url}"
-msgstr "{studio_name} 강좌 생성 권한 요청이 승인 되었습니다. {url}에서 귀하의 첫 강좌를 만들어주세요.  "
+msgstr "{studio_name} 강좌 개설 권한 요청이 승인되었습니다. {url}에서 귀하의 첫 강좌를 개설해주세요.  "
 
 #: cms/templates/emails/course_creator_revoked.txt
 msgid ""
 "Your course creation rights to {studio_name} have been revoked. If you "
 "believe this was in error, please contact {email}"
-msgstr ""
-"{studio_name} 에서의 강좌 생성 권한이 폐지되었습니다. 이것이 오류라고 생각되면 {email}로 연락 주시기 바랍니다. "
+msgstr "{studio_name} 에서의 강좌 개설 권한이 폐지되었습니다. 이것이 오류로 보일 경우 {email}로 연락하세요. "
 
 #: cms/templates/emails/course_creator_subject.txt
 msgid "Your course creator status for {studio_name}"
-msgstr "{studio_name}에 강의 생성 상태"
+msgstr "{studio_name} 강좌 개설 준비 상태"
 
 #: cms/templates/registration/activation_complete.html
 msgid "You can now {link_start}login{link_end}."
@@ -19275,7 +19227,7 @@ msgstr "edX101 에 등록"
 
 #: cms/templates/widgets/sock.html
 msgid "How to use {studio_name} to build your course"
-msgstr "강좌를 만들기 위한 {studio_name}사용법"
+msgstr "강좌를 개설하기 위한 {studio_name}사용법"
 
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about {studio_name}?"

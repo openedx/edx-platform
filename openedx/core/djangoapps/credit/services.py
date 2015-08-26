@@ -31,6 +31,22 @@ class CreditService(object):
     Course Credit XBlock service
     """
 
+    def is_credit_course(self, course_key_or_id):
+        """
+        Returns boolean if the passed in course_id (string) or course_key is
+        a credit_course
+        """
+
+        # This seems to need to be here otherwise we get
+        # circular references when starting up the app
+        from openedx.core.djangoapps.credit.api.eligibility import (
+            is_credit_course,
+        )
+
+        course_key = _get_course_key(course_key_or_id)
+
+        return is_credit_course(course_key)
+
     def get_credit_state(self, user_id, course_key_or_id):
         """
         Return all information about the user's credit state inside of a given
@@ -46,6 +62,7 @@ class CreditService(object):
             {
                 'enrollment_mode': the mode that the user is enrolled in the course
                 'profile_fullname': the name that the student registered under, used for verification
+                'is_credit_course': if the course has been marked as a credit bearing course
                 'credit_requirement_status': the user's status in fulfilling those requirements
             }
         """
@@ -72,12 +89,10 @@ class CreditService(object):
             # not enrolled
             return None
 
-        if not is_credit_course(course_key):
-            return None
-
         return {
             'enrollment_mode': enrollment.mode,
             'profile_fullname': user.profile.name,
+            'is_credit_course': is_credit_course(course_key),
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
 
@@ -89,6 +104,19 @@ class CreditService(object):
 
         For more information, see documentation on this method name in api.eligibility.py
         """
+
+        # This seems to need to be here otherwise we get
+        # circular references when starting up the app
+        from openedx.core.djangoapps.credit.api.eligibility import (
+            is_credit_course,
+            set_credit_requirement_status as api_set_credit_requirement_status
+        )
+
+        course_key = _get_course_key(course_key_or_id)
+
+        # quick exit, if course is not credit enabled
+        if not is_credit_course(course_key):
+            return
 
         # always log any update activity to the credit requirements
         # table. This will be to help debug any issues that might
@@ -113,14 +141,6 @@ class CreditService(object):
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return None
-
-        course_key = _get_course_key(course_key_or_id)
-
-        # This seems to need to be here otherwise we get
-        # circular references when starting up the app
-        from openedx.core.djangoapps.credit.api.eligibility import (
-            set_credit_requirement_status as api_set_credit_requirement_status
-        )
 
         api_set_credit_requirement_status(
             user.username,

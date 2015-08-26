@@ -283,13 +283,15 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         test entrance exam score. we will hit the method get_entrance_exam_score to verify exam score.
         """
-        exam_score = get_entrance_exam_score(self.request, self.course)
+        with self.assertNumQueries(1):
+            exam_score = get_entrance_exam_score(self.request, self.course)
         self.assertEqual(exam_score, 0)
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
-        exam_score = get_entrance_exam_score(self.request, self.course)
+        with self.assertNumQueries(1):
+            exam_score = get_entrance_exam_score(self.request, self.course)
         # 50 percent exam score should be achieved.
         self.assertGreater(exam_score * 100, 50)
 

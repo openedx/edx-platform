@@ -4,7 +4,9 @@ Tests of re-verification service.
 
 import ddt
 
+from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 from verify_student.services import ReverificationService
@@ -34,6 +36,9 @@ class TestReverificationService(ModuleStoreTestCase):
         self.final_checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/final_uuid'.format(
             org=self.course_key.org, course=self.course_key.course
         )
+
+        # Enroll in a verified mode
+        self.enrollment = CourseEnrollment.enroll(self.user, self.course_key, mode=CourseMode.VERIFIED)
 
     @ddt.data('final', 'midterm')
     def test_start_verification(self, checkpoint_name):
@@ -107,6 +112,12 @@ class TestReverificationService(ModuleStoreTestCase):
             1
         )
 
+        # testing service for skipped attempt.
+        self.assertEqual(
+            reverification_service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location),
+            'skipped'
+        )
+
     def test_get_attempts(self):
         """Check verification attempts count against a user for a given
         'checkpoint' and 'course_id'.
@@ -129,3 +140,12 @@ class TestReverificationService(ModuleStoreTestCase):
             reverification_service.get_attempts(self.user.id, course_id, self.final_checkpoint_location),
             1
         )
+
+    def test_not_in_verified_track(self):
+        # No longer enrolled in a verified track
+        self.enrollment.update_enrollment(mode=CourseMode.HONOR)
+
+        # Should be marked as "skipped" (opted out)
+        service = ReverificationService()
+        status = service.get_status(self.user.id, unicode(self.course_key), self.final_checkpoint_location)
+        self.assertEqual(status, service.NON_VERIFIED_TRACK)

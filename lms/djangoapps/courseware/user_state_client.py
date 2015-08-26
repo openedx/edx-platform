@@ -40,7 +40,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
 
     # Use this sample rate for DataDog events.
-    API_DATADOG_SAMPLE_RATE = 0.01
+    API_DATADOG_SAMPLE_RATE = 0.1
 
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
         """
@@ -139,10 +139,13 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
+                self._ddog_increment(evt_time, 'get_many.empty_state')
                 continue
 
             state = json.loads(module.state)
             state_length += len(module.state)
+
+            self._ddog_histogram(evt_time, 'get_many.block_size', len(module.state))
 
             # If the state is the empty dict, then it has been deleted, and so
             # conformant UserStateClients should treat it as if it doesn't exist.
@@ -161,7 +164,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # The rest of this method exists only to submit DataDog events.
         # Remove it once we're no longer interested in the data.
         self._ddog_histogram(evt_time, 'get_many.blks_out', block_count)
-        self._ddog_histogram(evt_time, 'get_many.blks_size', state_length)
 
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
@@ -243,12 +245,20 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         Arguments:
             username: The name of the user whose state should be deleted
-            block_key (UsageKey): The UsageKey identifying which xblock state to delete.
+            block_keys (list): The UsageKey identifying which xblock state to delete.
             scope (Scope): The scope to delete data from
             fields: A list of fields to delete. If None, delete all stored fields.
         """
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
+
+        evt_time = time()
+        if fields is None:
+            self._ddog_increment(evt_time, 'delete_many.empty_state')
+        else:
+            self._ddog_histogram(evt_time, 'delete_many.field_count', len(fields))
+
+        self._ddog_histogram(evt_time, 'delete_many.block_count', len(block_keys))
 
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:

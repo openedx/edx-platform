@@ -4,8 +4,7 @@ This file contains all entrance exam related utils/logic.
 from django.conf import settings
 
 from courseware.access import has_access
-from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
+from courseware.model_data import FieldDataCache, ScoresClient
 from opaque_keys.edx.keys import UsageKey
 from student.models import EntranceExamConfiguration
 from util.milestones_helpers import get_required_content
@@ -88,21 +87,19 @@ def _calculate_entrance_exam_score(user, course_descriptor, exam_modules):
     """
     Calculates the score (percent) of the entrance exam using the provided modules
     """
-    # All of the exam module ids
-    exam_module_ids = [exam_module.location for exam_module in exam_modules]
-
-    # All of the corresponding student module records
-    student_modules = StudentModule.objects.filter(
-        student=user,
-        course_id=course_descriptor.id,
-        module_state_key__in=exam_module_ids,
-    )
     student_module_dict = {}
-    for student_module in student_modules:
-        student_module_dict[unicode(student_module.module_state_key)] = {
-            'grade': student_module.grade,
-            'max_grade': student_module.max_grade
-        }
+    scores_client = ScoresClient(course_descriptor.id, user.id)
+    locations = [exam_module.location for exam_module in exam_modules]
+    scores_client.fetch_scores(locations)
+
+    # Iterate over all of the exam modules to get score of user for each of them
+    for exam_module in exam_modules:
+        exam_module_score = scores_client.get(exam_module.location)
+        if exam_module_score:
+            student_module_dict[unicode(exam_module.location)] = {
+                'grade': exam_module_score.correct,
+                'max_grade': exam_module_score.total
+            }
     exam_percentage = 0
     module_percentages = []
     ignore_categories = ['course', 'chapter', 'sequential', 'vertical']

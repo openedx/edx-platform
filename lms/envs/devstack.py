@@ -20,11 +20,16 @@ HTTPS = 'off'
 
 ################################ LOGGERS ######################################
 
+# Silence noisy logs
 import logging
-
-# Disable noisy loggers
-for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
-    logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
+LOG_OVERRIDES = [
+    ('track.contexts', logging.CRITICAL),
+    ('track.middleware', logging.CRITICAL),
+    ('dd.dogapi', logging.CRITICAL),
+    ('django_comment_client.utils', logging.CRITICAL),
+]
+for log_name, log_level in LOG_OVERRIDES:
+    logging.getLogger(log_name).setLevel(log_level)
 
 
 ################################ EMAIL ########################################

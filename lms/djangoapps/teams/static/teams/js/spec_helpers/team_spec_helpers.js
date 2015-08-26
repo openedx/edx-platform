@@ -3,9 +3,11 @@ define([
     'underscore',
     'teams/js/collections/team',
     'teams/js/collections/team_membership',
-], function (Backbone, _, TeamCollection, TeamMembershipCollection) {
+    'teams/js/collections/topic'
+], function (Backbone, _, TeamCollection, TeamMembershipCollection, TopicCollection) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
+        createMockTopicData, createMockTopicCollection,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTeamDiscussionID = "12345",
@@ -230,6 +232,38 @@ define([
         );
     };
 
+    createMockTopicData = function (startIndex, stopIndex) {
+        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            return {
+                "description": "description " + i,
+                "name": "topic " + i,
+                "id": "id " + i,
+                "team_count": 0
+            };
+        });
+    };
+
+    createMockTopicCollection = function (topicData) {
+        topicData = topicData !== undefined ? topicData : createMockTopicData(1, 5);
+
+        return new TopicCollection(
+            {
+                count: topicData.length + 1,
+                current_page: 1,
+                num_pages: 2,
+                start: 0,
+                results: topicData,
+                sort_order: "name"
+            },
+            {
+                teamEvents: teamEvents,
+                course_id: 'my/course/id',
+                parse: true,
+                url: 'api/teams/topics'
+            }
+        );
+    };
+
     return {
         teamEvents: teamEvents,
         testCourseID: testCourseID,
@@ -246,6 +280,8 @@ define([
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,
         createMockThreadResponse: createMockThreadResponse,
+        createMockTopicData: createMockTopicData,
+        createMockTopicCollection: createMockTopicCollection,
         verifyCards: verifyCards
     };
 });

@@ -36,7 +36,7 @@
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # Wentao Han <wentao.han@gmail.com>, 2013
-# wzhd, 2015
+# wzhd <wzhdev@gmail.com>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # yan9yu, 2014
 # youjialin <hackeris@qq.com>, 2014
@@ -81,7 +81,7 @@
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # wanghe <1636807295@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2015
-# wzhd, 2015
+# wzhd <wzhdev@gmail.com>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # xianwei yang <yetie.net@gmail.com>, 2014
 # 刘知远 <liuliudong@163.com>, 2013
@@ -127,8 +127,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:42+0000\n"
-"PO-Revision-Date: 2015-08-14 13:44+0000\n"
+"POT-Creation-Date: 2015-08-21 14:17+0000\n"
+"PO-Revision-Date: 2015-08-21 12:22+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -2418,7 +2418,7 @@ msgid "Team description cannot have more than 300 characters."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
-msgid "You are not currently a member of any teams."
+msgid "You are not currently a member of any team."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
@@ -6959,6 +6959,25 @@ msgid ""
 "Please check the following validation feedbacks and reflect them in your "
 "course settings:"
 msgstr "请检查以下验证反馈并结合这样反馈修改您的课程设置："
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification Checkpoint"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Must complete verification checkpoint"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification checkpoint to be completed"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this unit. Learners who do not require verification see this "
+"content by default."
+msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"

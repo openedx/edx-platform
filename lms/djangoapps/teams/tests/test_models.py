@@ -29,9 +29,23 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         self.team1 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team1')
         self.team2 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team2')
 
-        self.team_membership11 = CourseTeamMembershipFactory(user=self.user1, team=self.team1)
-        self.team_membership12 = CourseTeamMembershipFactory(user=self.user2, team=self.team1)
-        self.team_membership21 = CourseTeamMembershipFactory(user=self.user1, team=self.team2)
+        self.team_membership11 = CourseTeamMembership(user=self.user1, team=self.team1)
+        self.team_membership11.save()
+        self.team_membership12 = CourseTeamMembership(user=self.user2, team=self.team1)
+        self.team_membership12.save()
+        self.team_membership21 = CourseTeamMembership(user=self.user1, team=self.team2)
+        self.team_membership21.save()
+
+    def test_membership_last_activity_set(self):
+        current_last_activity = self.team_membership11.last_activity_at
+        # Assert that the first save in the setUp sets a value.
+        self.assertIsNotNone(current_last_activity)
+
+        self.team_membership11.save()
+
+        # Verify that we only change the last activity_at when it doesn't
+        # already exist.
+        self.assertEqual(self.team_membership11.last_activity_at, current_last_activity)
 
     @ddt.data(
         (None, None, None, 3),

@@ -43,11 +43,12 @@ from .models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
     CourseTeamCreationSerializer,
-    BaseTopicSerializer,
     TopicSerializer,
     PaginatedTopicSerializer,
+    BulkTeamCountPaginatedTopicSerializer,
     MembershipSerializer,
     PaginatedMembershipSerializer,
+    add_team_count
 )
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
@@ -77,10 +78,14 @@ class TeamsDashboardView(View):
                 not has_access(request.user, 'staff', course, course.id):
             raise Http404
 
+        # Even though sorting is done outside of the serializer, sort_order needs to be passed
+        # to the serializer so that the paginated results indicate how they were sorted.
         sort_order = 'name'
-        topics = get_ordered_topics(course, sort_order)
+        topics = get_alphabetical_topics(course)
         topics_page = Paginator(topics, TOPICS_PER_PAGE).page(1)
-        topics_serializer = PaginatedTopicSerializer(
+        # BulkTeamCountPaginatedTopicSerializer will add team counts to the topics in a single
+        # bulk operation per page.
+        topics_serializer = BulkTeamCountPaginatedTopicSerializer(
             instance=topics_page,
             context={'course_id': course.id, 'sort_order': sort_order}
         )
@@ -123,7 +128,7 @@ class TeamsDashboardView(View):
 def has_team_api_access(user, course_key, access_username=None):
     """Returns True if the user has access to the Team API for the course
     given by `course_key`. The user must either be enrolled in the course,
-    be course staff, or be global staff.
+    be course staff, be global staff, or have discussion privileges.
 
     Args:
       user (User): The user to check access for.
@@ -136,6 +141,8 @@ def has_team_api_access(user, course_key, access_username=None):
     if user.is_staff:
         return True
     if CourseStaffRole(course_key).has_user(user):
+        return True
+    if has_discussion_privileges(user, course_key):
         return True
     if not access_username or access_username == user.username:
         return CourseEnrollment.is_enrolled(user, course_key)
@@ -168,9 +175,11 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * name: Orders results by case insensitive team name (default).
 
-                * open_slots: Orders results by most open slots.
+                * open_slots: Orders results by most open slots (for tie-breaking,
+                  last_activity_at is used, with most recent first).
 
-                * last_activity: Currently not supported.
+                * last_activity_at: Orders result by team activity, with most active first
+                  (for tie-breaking, open_slots is used, with most open slots first).
 
             * page_size: Number of results to return per page.
 
@@ -224,6 +233,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 * language: Optionally specifies which language the team is
                   associated with.
 
+                * last_activity_at: The date of the last activity of any team member
+                  within the team.
+
                 * membership: A list of the users that are members of the team.
                   See membership endpoint for more detail.
 
@@ -253,8 +265,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             If the user is not logged in, a 401 error is returned.
 
-            If the user is not enrolled in the course, or is not course or
-            global staff, a 403 error is returned.
+            If the user is not enrolled in the course, is not course or
+            global staff, or does not have discussion privileges a 403 error
+            is returned.
 
             If the course_id is not valid or extra fields are included in the
             request, a 400 error is returned.
@@ -324,15 +337,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
         if order_by_input == 'name':
             queryset = queryset.extra(select={'lower_name': "lower(name)"})
-            order_by_field = 'lower_name'
+            queryset = queryset.order_by('lower_name')
         elif order_by_input == 'open_slots':
             queryset = queryset.annotate(team_size=Count('users'))
-            order_by_field = 'team_size'
-        elif order_by_input == 'last_activity':
-            return Response(
-                build_api_error(ugettext_noop("last_activity is not yet supported")),
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            queryset = queryset.order_by('team_size', '-last_activity_at')
+        elif order_by_input == 'last_activity_at':
+            queryset = queryset.annotate(team_size=Count('users'))
+            queryset = queryset.order_by('-last_activity_at', 'team_size')
         else:
             return Response({
                 'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
@@ -342,8 +353,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 # list by lower case name.
                 'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        queryset = queryset.order_by(order_by_field)
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_pagination_serializer(page)
@@ -402,6 +411,28 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(CourseTeamSerializer(team).data)
 
 
+class IsEnrolledOrIsStaff(permissions.BasePermission):
+    """Permission that checks to see if the user is enrolled in the course or is staff."""
+
+    def has_object_permission(self, request, view, obj):
+        """Returns true if the user is enrolled or is staff."""
+        return has_team_api_access(request.user, obj.course_id)
+
+
+class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
+    """
+    Permission that checks to see if the user is global staff, course
+    staff, or has discussion privileges. If none of those conditions are
+    met, only read access will be granted.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            has_discussion_privileges(request.user, obj.course_id) or
+            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
+        )
+
+
 class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
@@ -453,6 +484,9 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                 * membership: A list of the users that are members of the team. See
                   membership endpoint for more detail.
 
+                * last_activity_at: The date of the last activity of any team member
+                  within the team.
+
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
             stored exactly as specified. The intention is that plain text is
@@ -471,8 +505,8 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is anonymous or inactive, a 401 is returned.
 
             If the user is logged in and the team does not exist, a 404 is returned.
-            If the user is not course or global staff and the team does exist,
-            a 403 is returned.
+            If the user is not course or global staff, does not have discussion
+            privileges, and the team does exist, a 403 is returned.
 
             If "application/merge-patch+json" is not the specified content type,
             a 415 error is returned.
@@ -481,16 +515,8 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             method returns a 400 error with all error messages in the
             "field_errors" field of the returned JSON.
     """
-
-    class IsEnrolledOrIsStaff(permissions.BasePermission):
-        """Permission that checks to see if the user is enrolled in the course or is staff."""
-
-        def has_object_permission(self, request, view, obj):
-            """Returns true if the user is enrolled or is staff."""
-            return has_team_api_access(request.user, obj.course_id)
-
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrReadOnly, IsEnrolledOrIsStaff,)
+    permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
     parser_classes = (MergePatchParser,)
@@ -515,8 +541,9 @@ class TopicListView(GenericAPIView):
             * course_id: Filters the result to topics belonging to the given
               course (required).
 
-            * order_by: Orders the results. Currently only 'name' is supported,
-              and is also the default value.
+            * order_by: Orders the results. Currently only 'name' and 'team_count' are supported;
+              the default value is 'name'. If 'team_count' is specified, topics are returned first sorted
+              by number of teams per topic (descending), with a secondary sort of 'name'.
 
             * page_size: Number of results to return per page.
 
@@ -562,8 +589,6 @@ class TopicListView(GenericAPIView):
 
     paginate_by = TOPICS_PER_PAGE
     paginate_by_param = 'page_size'
-    pagination_serializer_class = PaginatedTopicSerializer
-    serializer_class = BaseTopicSerializer
 
     def get(self, request):
         """GET /api/team/v0/topics/?course_id={course_id}"""
@@ -592,9 +617,7 @@ class TopicListView(GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         ordering = request.QUERY_PARAMS.get('order_by', 'name')
-        if ordering == 'name':
-            topics = get_ordered_topics(course_module, ordering)
-        else:
+        if ordering not in ['name', 'team_count']:
             return Response({
                 'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
                 # Translators: 'ordering' is a string describing a way
@@ -604,22 +627,37 @@ class TopicListView(GenericAPIView):
                 'user_message': _(u"The ordering {ordering} is not supported").format(ordering=ordering),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        page = self.paginate_queryset(topics)
-        serializer = self.pagination_serializer_class(page, context={'course_id': course_id, 'sort_order': ordering})
+        # Always sort alphabetically, as it will be used as secondary sort
+        # in the case of "team_count".
+        topics = get_alphabetical_topics(course_module)
+        if ordering == 'team_count':
+            add_team_count(topics, course_id)
+            topics.sort(key=lambda t: t['team_count'], reverse=True)
+            page = self.paginate_queryset(topics)
+            # Since team_count has already been added to all the topics, use PaginatedTopicSerializer.
+            # Even though sorting is done outside of the serializer, sort_order needs to be passed
+            # to the serializer so that the paginated results indicate how they were sorted.
+            serializer = PaginatedTopicSerializer(page, context={'course_id': course_id, 'sort_order': ordering})
+        else:
+            page = self.paginate_queryset(topics)
+            # Use the serializer that adds team_count in a bulk operation per page.
+            serializer = BulkTeamCountPaginatedTopicSerializer(
+                page, context={'course_id': course_id, 'sort_order': ordering}
+            )
+
         return Response(serializer.data)
 
 
-def get_ordered_topics(course_module, ordering):
-    """Return a sorted list of team topics.
+def get_alphabetical_topics(course_module):
+    """Return a list of team topics sorted alphabetically.
 
     Arguments:
         course_module (xmodule): the course which owns the team topics
-        ordering (str): the key belonging to topic dicts by which we sort
 
     Returns:
         list: a list of sorted team topics
     """
-    return sorted(course_module.teams_topics, key=lambda t: t[ordering].lower())
+    return sorted(course_module.teams_topics, key=lambda t: t['name'].lower())
 
 
 class TopicDetailView(APIView):
@@ -713,6 +751,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
               specified team. The requesting user must be staff or enrolled in
               the course associated with the team.
 
+            * course_id: Returns membership records only for the specified
+              course. Username must have access to this course, or else team_id
+              must be in this course.
+
             * page_size: Number of results to return per page.
 
             * page: Page number to retrieve.
@@ -744,6 +786,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
                 * date_joined: The date and time the membership was created.
 
+                * last_activity_at: The date of the last activity of the user
+                  within the team.
+
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
             stored exactly as specified. The intention is that plain text is
@@ -757,6 +802,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             If team_id is provided but the team does not exist, a 404 error is
             returned.
 
+            If the specified course_id is invalid, a 404 error is returned.
+
             This endpoint uses 404 error codes to avoid leaking information
             about team or user existence. Specifically, a 404 error will be
             returned if a logged in user specifies a team_id for a course
@@ -766,11 +813,19 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             memberships will be filtered to memberships in teams associated
             with courses that the requesting user is enrolled in.
 
+            If the course specified by course_id does not contain the team
+            specified by team_id, a 400 error is returned.
+
+            If the user is not enrolled in the course specified by course_id,
+            and does not have staff access to the course, a 400 error is
+            returned.
+
         **Response Values for POST**
 
             Any logged in user enrolled in a course can enroll themselves in a
-            team in the course. Course and global staff can enroll any user in
-            a team, with a few exceptions noted below.
+            team in the course. Course staff, global staff, and discussion
+            privileged users can enroll any user in a team, with a few
+            exceptions noted below.
 
             If the user is not logged in and active, a 401 error is returned.
 
@@ -779,11 +834,11 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
             If the specified team does not exist, a 404 error is returned.
 
-            If the user is not staff and is not enrolled in the course
-            associated with the team they are trying to join, or if they are
-            trying to add a user other than themselves to a team, a 404 error
-            is returned. This is to prevent leaking information about the
-            existence of teams and users.
+            If the user is not staff, does not have discussion privileges,
+            and is not enrolled in the course associated with the team they
+            are trying to join, or if they are trying to add a user other
+            than themselves to a team, a 404 error is returned. This is to
+            prevent leaking information about the existence of teams and users.
 
             If the specified user does not exist, a 404 error is returned.
 
@@ -793,7 +848,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
             If the user is not enrolled in the course associated with the team
             they are trying to join, a 400 error is returned. This can occur
-            when a staff user posts a request adding another user to a team.
+            when a staff or discussion privileged user posts a request adding
+            another user to a team.
     """
 
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
@@ -953,6 +1009,9 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
 
             * date_joined: The date and time the membership was created.
 
+            * last_activity_at: The date of the last activity of any team member
+                within the team.
+
             For all text fields, clients rendering the values should take care
             to HTML escape them to avoid script injections, as the data is
             stored exactly as specified. The intention is that plain text is
@@ -972,18 +1031,19 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         **Response Values for DELETE**
 
             Any logged in user enrolled in a course can remove themselves from
-            a team in the course. Course and global staff can remove any user
-            from a team. Successfully deleting a membership will return a 204
-            response with no content.
+            a team in the course. Course staff, global staff, and discussion
+            privileged users can remove any user from a team. Successfully
+            deleting a membership will return a 204 response with no content.
 
             If the user is not logged in and active, a 401 error is returned.
 
             If the specified team or username does not exist, a 404 error is
             returned.
 
-            If the user is not staff and is attempting to remove another user
-            from a team, a 404 error is returned. This prevents leaking
-            information about team and user existence.
+            If the user is not staff or a discussion privileged user and is
+            attempting to remove another user from a team, a 404 error is
+            returned. This prevents leaking information about team and user
+            existence.
 
             If the membership does not exist, a 404 error is returned.
     """

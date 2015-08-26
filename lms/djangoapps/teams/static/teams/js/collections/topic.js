@@ -1,7 +1,7 @@
 ;(function (define) {
     'use strict';
-    define(['teams/js/collections/base', 'teams/js/models/topic', 'gettext'],
-        function(BaseCollection, TopicModel, gettext) {
+    define(['underscore', 'gettext', 'teams/js/collections/base', 'teams/js/models/topic'],
+        function(_, gettext, BaseCollection, TopicModel) {
             var TopicCollection = BaseCollection.extend({
                 initialize: function(topics, options) {
                     var self = this;
@@ -25,7 +25,7 @@
                 },
 
                 onUpdate: function(event) {
-                    this.isStale = event.action === 'create';
+                    this.isStale = this.isStale || event.action === 'create';
                 },
 
                 model: TopicModel

@@ -144,8 +144,18 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * Optional explanatory message about the xblock.
              */
-            'explanatory_message': null
-
+            'explanatory_message': null,
+            /**
+             * The XBlock's group access rules.  This is a dictionary keyed to user partition IDs,
+             * where the values are lists of group IDs.
+             */
+             'group_access': null,
+            /**
+             * User partition dictionary.  This is pre-processed by Studio, so it contains
+             * some additional fields that are not stored in the course descriptor
+             * (for example, which groups are selected for this particular XBlock).
+             */
+             'user_partitions': null,
         },
 
         initialize: function () {
@@ -238,7 +248,20 @@ function(Backbone, _, str, ModuleUtils) {
         */
        isEditableOnCourseOutline: function() {
            return this.isSequential() || this.isChapter() || this.isVertical();
-       }
+       },
+
+       /*
+        * Check whether any verification checkpoints are defined in the course.
+        * Verification checkpoints are defined if there exists a user partition
+        * that uses the verification partition scheme.
+        */
+        hasVerifiedCheckpoints: function() {
+            var partitions = this.get("user_partitions") || [];
+
+            return Boolean(_.find(partitions, function(p) {
+                return p.scheme === "verification";
+            }));
+        }
     });
     return XBlockInfo;
 });

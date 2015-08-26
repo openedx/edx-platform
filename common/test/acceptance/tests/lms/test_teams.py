@@ -4,6 +4,7 @@ Acceptance tests for the teams feature.
 import json
 
 import ddt
+from flaky import flaky
 from nose.plugins.attrib import attr
 from uuid import uuid4
 
@@ -952,9 +953,11 @@ class TeamPageTest(TeamsTabBase):
         self._set_team_configuration_and_membership()
         self.team_page.visit()
 
+        learner_name = self.team_page.first_member_username
+
         self.team_page.click_first_profile_image()
 
-        learner_profile_page = LearnerProfilePage(self.browser, self.team_page.first_member_username)
+        learner_profile_page = LearnerProfilePage(self.browser, learner_name)
         learner_profile_page.wait_for_page()
         learner_profile_page.wait_for_field('username')
         self.assertTrue(learner_profile_page.field_is_visible('username'))
