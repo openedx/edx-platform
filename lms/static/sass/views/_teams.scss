@@ -49,16 +49,17 @@
 
   .page-header.has-secondary {
 
-      .page-header-main {
-        display: inline-block;
-        width: flex-grid(8,12);
-      }
+    .page-header-main {
+      display: inline-block;
+      width: flex-grid(8,12);
+    }
 
-      .page-header-secondary {
-        display: inline-block;
-        width: flex-grid(4,12);
-        @include text-align(right);
-      }
+    .page-header-secondary {
+      display: inline-block;
+      width: flex-grid(4,12);
+      @include text-align(right);
+      vertical-align: text-bottom;
+    }
   }
 
 // ui bits
@@ -104,8 +105,10 @@
 
     .action-search {
       @extend %button-reset;
-      padding: ($baseline/4) ($baseline/2);
-
+      padding: ($baseline/5) ($baseline/2);
+      vertical-align: middle;
+      background-color: $gray-l3;
+      text-shadow: none;
 
       .icon {
           color: $gray-l3;

@@ -485,9 +485,6 @@ FEATURES['ENABLE_EDXNOTES'] = True
 # Enable teams feature for tests.
 FEATURES['ENABLE_TEAMS'] = True
 
-# Enable indexing teams for search
-FEATURES['ENABLE_TEAMS_SEARCH'] = True
-
 # Add milestones to Installed apps for testing
 INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 

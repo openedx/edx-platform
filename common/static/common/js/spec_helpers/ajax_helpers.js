@@ -1,7 +1,7 @@
 define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     'use strict';
 
-    var fakeServer, fakeRequests, expectRequest, expectJsonRequest, expectPostRequest, expectJsonRequestURL,
+    var fakeServer, fakeRequests, expectRequest, expectJsonRequest, expectPostRequest, expectRequestURL,
         respondWithJson, respondWithError, respondWithTextError, respondWithNoContent;
 
     /* These utility methods are used by Jasmine tests to create a mock server or
@@ -77,7 +77,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * @param expectedParameters An object representing the URL parameters
      * @param requestIndex An optional index for the request (by default, the last request is used)
      */
-    expectJsonRequestURL = function(requests, expectedUrl, expectedParameters, requestIndex) {
+    expectRequestURL = function(requests, expectedUrl, expectedParameters, requestIndex) {
         var request, parameters;
         if (_.isUndefined(requestIndex)) {
             requestIndex = requests.length - 1;
@@ -153,15 +153,15 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     };
 
     return {
-        'server': fakeServer,
-        'requests': fakeRequests,
-        'expectRequest': expectRequest,
-        'expectJsonRequest': expectJsonRequest,
-        'expectJsonRequestURL': expectJsonRequestURL,
-        'expectPostRequest': expectPostRequest,
-        'respondWithJson': respondWithJson,
-        'respondWithError': respondWithError,
-        'respondWithTextError': respondWithTextError,
-        'respondWithNoContent': respondWithNoContent,
+        server: fakeServer,
+        requests: fakeRequests,
+        expectRequest: expectRequest,
+        expectJsonRequest: expectJsonRequest,
+        expectPostRequest: expectPostRequest,
+        expectRequestURL: expectRequestURL,
+        respondWithJson: respondWithJson,
+        respondWithError: respondWithError,
+        respondWithTextError: respondWithTextError,
+        respondWithNoContent: respondWithNoContent
     };
 });
