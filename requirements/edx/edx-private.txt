@@ -4,6 +4,13 @@
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
 -e git+https://github.com/open-craft/problem-builder.git@859df4155c0031b5a70e7f7e9744b67b3ed331d7#egg=xblock-problem-builder
 
+# Oppia XBlock
+-e git+https://github.com/oppia/xblock.git@cd5479ee1138abfa278857d0113a45c2d05a983f#egg=oppia-xblock
+
+# This repository contains schoolyourself-xblock, which is used in
+# edX's "AlgebraX" and "GeometryX" courses.
+-e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock
+
 # Prototype XBlocks from edX learning sciences limited roll-outs and user testing.
 # Concept XBlock, in particular, is nowhere near finished and an early prototype.
 # Profile XBlock is there so we can play with XBlock arguments in the platform, but isn't ready for use outside of
@@ -15,9 +22,5 @@
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
-# This repository contains schoolyourself-xblock, which is used in
-# edX's "AlgebraX" and "GeometryX" courses.
--e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock
-
-# Peer instruction xblock
+# Peer instruction xblock - prototype (from UBC; not for use on edx.org yet)
 ubcpi-xblock==0.4.4

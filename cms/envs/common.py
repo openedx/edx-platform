@@ -996,6 +996,9 @@ ADVANCED_COMPONENT_TYPES = [
     'google-document',
     'google-calendar',
 
+    # Oppia block
+    'oppia',
+
     # In-course reverification checkpoint
     'edx-reverification-block',
 
