@@ -1,5 +1,5 @@
 define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/assets",
-         "js/collections/asset", "js/spec_helpers/view_helpers"],
+         "js/collections/asset", "common/js/spec_helpers/view_helpers"],
     function ($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
 
         describe("Assets", function() {

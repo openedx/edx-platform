@@ -1,4 +1,4 @@
-define(['gettext', 'js/views/feedback_prompt'], function(gettext, PromptView) {
+define(['gettext', 'common/js/components/views/feedback_prompt'], function(gettext, PromptView) {
     'use strict';
     return function (hasUnit, editUnitUrl, courselikeHomeUrl, library, errMsg) {
         var dialog;

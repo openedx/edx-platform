@@ -1,6 +1,7 @@
-require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/utils/date_utils", "js/utils/module", "js/utils/handle_iframe_binding",
-    "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+require(["domReady", "jquery", "underscore", "gettext", "common/js/components/views/feedback_notification",
+        "common/js/components/views/feedback_prompt", "js/utils/date_utils",
+        "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal",
+        "jquery.form", "jquery.smoothScroll"],
     function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils)
 {
 

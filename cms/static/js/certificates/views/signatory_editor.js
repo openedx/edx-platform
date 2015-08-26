@@ -6,9 +6,9 @@ define([ // jshint ignore:line
     'backbone',
     'gettext',
     'js/utils/templates',
-    'js/views/utils/view_utils',
-    'js/views/feedback_prompt',
-    'js/views/feedback_notification',
+    'common/js/components/utils/view_utils',
+    'common/js/components/views/feedback_prompt',
+    'common/js/components/views/feedback_notification',
     'js/models/uploads',
     'js/views/uploads'
 ],

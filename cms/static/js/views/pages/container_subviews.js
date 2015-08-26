@@ -1,7 +1,7 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
+define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
     "js/views/utils/xblock_utils"],
     function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
         var VisibilityState = XBlockViewUtils.VisibilityState,

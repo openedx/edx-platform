@@ -1,5 +1,5 @@
 define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
-        "js/views/feedback_notification",
+        "common/js/components/views/feedback_notification",
         "coffee/src/ajax_prefix", "jquery.cookie"],
 (domReady, $, str, Backbone, gettext, NotificationView) ->
   main = ->

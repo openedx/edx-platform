@@ -75,8 +75,6 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
             var pagingContainer;
 
             beforeEach(function () {
-                var feedbackTpl = readFixtures('system-feedback.underscore');
-                setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTpl));
                 pagingContainer = new MockPagingView({page_size: PAGE_SIZE});
             });
 

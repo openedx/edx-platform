@@ -97,7 +97,7 @@ def delete_components(step, number):
     world.wait_for_xmodule()
     delete_btn_css = 'a.delete-button'
     prompt_css = 'div#prompt-warning'
-    btn_css = '{} a.button.action-primary'.format(prompt_css)
+    btn_css = '{} button.action-primary'.format(prompt_css)
     saving_mini_css = 'div#page-notification .wrapper-notification-mini'
     for _ in range(int(number)):
         world.css_click(delete_btn_css)

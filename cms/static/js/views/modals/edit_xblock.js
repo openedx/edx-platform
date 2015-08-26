@@ -3,7 +3,7 @@
  * It is invoked using the edit method which is passed an existing rendered xblock,
  * and upon save an optional refresh function can be invoked to update the display.
  */
-define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/views/utils/view_utils",
+define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "common/js/components/utils/view_utils",
     "js/models/xblock_info", "js/views/xblock_editor"],
     function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView) {
         "strict mode";

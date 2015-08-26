@@ -1,7 +1,5 @@
 define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/modal_helpers"], (FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) ->
 
-    feedbackTpl = readFixtures('system-feedback.underscore')
-
     describe "UploadDialog", ->
         tpl = readFixtures("upload-dialog.underscore")
 

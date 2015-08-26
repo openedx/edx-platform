@@ -13,7 +13,7 @@
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
+define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
         "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor"],
     function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
 
