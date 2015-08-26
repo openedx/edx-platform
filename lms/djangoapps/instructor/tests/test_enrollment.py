@@ -41,6 +41,7 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 )
 
+
 @attr('shard_1')
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
