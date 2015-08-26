@@ -117,7 +117,7 @@ iframe[seamless]{
 }
 
 .inline-error {
-  color: darken($error-red, 11%);
+  color: darken($error-color, 11%);
 }
 
 div.problem-progress {
@@ -184,7 +184,7 @@ div.problem {
         @include status-icon($partiallycorrect, "\f00c");
         border: 2px solid $partiallycorrect;
 
-        // keep green for correct answers on hover. 
+        // keep green for correct answers on hover.
         &:hover {
           border-color: $partiallycorrect;
         }
@@ -770,8 +770,8 @@ div.problem {
 
     // CASE: partially correct answer
     > .partially-correct {
-      
-      input { 
+
+      input {
         border: 2px solid $partiallycorrect;
       }
 
@@ -1026,8 +1026,8 @@ div.problem {
 
   div.capa_reset {
     padding: 25px;
-    border: 1px solid $error-red;
-    background-color: lighten($error-red, 25%);
+    border: 1px solid $error-color;
+    background-color: lighten($error-color, 25%);
     border-radius: 3px;
     font-size: 1em;
     margin-top: $baseline/2;
