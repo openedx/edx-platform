@@ -3,9 +3,12 @@ Tests for the Video Branding configuration.
 """
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from nose.plugins.attrib import attr
+
 from branding.models import BrandingInfoConfig
 
 
+@attr('shard_1')
 class BrandingInfoConfigTest(TestCase):
     """
     Test the BrandingInfoConfig model.

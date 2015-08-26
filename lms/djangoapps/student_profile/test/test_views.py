@@ -4,6 +4,7 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.client import RequestFactory
 
 from util.testing import UrlResetMixin
 from student.tests.factories import UserFactory
@@ -25,6 +26,8 @@ class LearnerProfileViewTest(UrlResetMixin, TestCase):
         'own_profile',
         'country_options',
         'language_options',
+        'account_settings_data',
+        'preferences_data',
     ]
 
     def setUp(self):
@@ -36,7 +39,9 @@ class LearnerProfileViewTest(UrlResetMixin, TestCase):
         """
         Verify learner profile page context data.
         """
-        context = learner_profile_context(self.user.username, self.USERNAME, self.user.is_staff)
+        request = RequestFactory().get('/url')
+
+        context = learner_profile_context(self.user, self.USERNAME, self.user.is_staff, request.build_absolute_uri)
 
         self.assertEqual(
             context['data']['default_public_account_fields'],

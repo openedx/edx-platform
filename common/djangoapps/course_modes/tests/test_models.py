@@ -22,6 +22,7 @@ class CourseModeModelTest(TestCase):
     """
 
     def setUp(self):
+        super(CourseModeModelTest, self).setUp()
         self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 

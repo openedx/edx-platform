@@ -3,6 +3,7 @@ Test grade calculation.
 """
 from django.http import Http404
 from mock import patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.grades import grade, iterate_grades_for
@@ -25,6 +26,7 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     return grade(student, request, course, keep_raw_scores=keep_raw_scores)
 
 
+@attr('shard_1')
 class TestGradeIteration(ModuleStoreTestCase):
     """
     Test iteration through student gradesets.

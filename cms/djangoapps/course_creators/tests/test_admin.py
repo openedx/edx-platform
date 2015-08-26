@@ -27,6 +27,7 @@ class CourseCreatorAdminTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
+        super(CourseCreatorAdminTest, self).setUp()
         self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
         self.table_entry = CourseCreator(user=self.user)
         self.table_entry.save()

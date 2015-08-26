@@ -9,7 +9,7 @@ var edx = edx || {};
     edx.student.account.EnrollmentInterface = {
 
         urls: {
-            orders: '/commerce/orders/',
+            baskets: '/commerce/baskets/',
         },
 
         headers: {
@@ -26,7 +26,7 @@ var edx = edx || {};
                 data = JSON.stringify(data_obj);
 
             $.ajax({
-                url: this.urls.orders,
+                url: this.urls.baskets,
                 type: 'POST',
                 contentType: 'application/json; charset=utf-8',
                 data: data,

@@ -7,6 +7,7 @@ import itertools
 import StringIO
 from ddt import ddt, data
 from copy import deepcopy
+from nose.plugins.attrib import attr
 
 from django.core.urlresolvers import reverse
 
@@ -183,6 +184,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
+@attr('shard_1')
 class TestRecommenderCreateFromEmpty(TestRecommender):
     """
     Check whether we can add resources to an empty database correctly
@@ -209,6 +211,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
                 self.assert_request_status_code(200, self.course_url)
 
 
+@attr('shard_1')
 class TestRecommenderWithResources(TestRecommender):
     """
     Check whether we can add/edit/flag/export resources correctly
@@ -403,6 +406,7 @@ class TestRecommenderWithResources(TestRecommender):
         self.assert_request_status_code(200, self.course_url)
 
 
+@attr('shard_1')
 @ddt
 class TestRecommenderVoteWithResources(TestRecommenderWithResources):
     """
@@ -520,6 +524,7 @@ class TestRecommenderVoteWithResources(TestRecommenderWithResources):
         self.check_event_response_by_key('handle_vote', resource, 'newVotes', test_case['new_votes'])
 
 
+@attr('shard_1')
 @ddt
 class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
     """
@@ -618,6 +623,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderWithResources):
         self.check_event_response_by_http_status(test_case['handler'], resource, test_case['status'])
 
 
+@attr('shard_1')
 @ddt
 class TestRecommenderFileUploading(TestRecommender):
     """

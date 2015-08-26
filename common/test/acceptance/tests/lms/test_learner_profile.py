@@ -2,8 +2,12 @@
 """
 End-to-end tests for Student's Profile Page.
 """
+from flaky import flaky
+from contextlib import contextmanager
+
 from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
+from nose.plugins.attrib import attr
 
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.account_settings import AccountSettingsPage
@@ -43,7 +47,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         Fill in the public profile fields of a user.
         """
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
-        profile_page.value_for_dropdown_field('country', 'United Kingdom')
+        profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.value_for_textarea_field('bio', 'Nothing Special')
 
     def visit_profile_page(self, username, privacy=None):
@@ -107,45 +111,45 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
         Verifies that the correct view event was captured for the profile page.
         """
-        self.verify_events_of_type(
-            requesting_username,
-            u"edx.user.settings.viewed",
-            [{
-                u"user_id": int(profile_user_id),
-                u"page": u"profile",
-                u"visibility": unicode(visibility),
-            }]
+
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.user.settings.viewed'}, number_of_matches=1)
+        self.assert_events_match(
+            [
+                {
+                    'username': requesting_username,
+                    'event': {
+                        'user_id': int(profile_user_id),
+                        'page': 'profile',
+                        'visibility': unicode(visibility)
+                    }
+                }
+            ],
+            actual_events
         )
 
-    def assert_event_emitted_num_times(self, profile_user_id, setting, num_times):
-        """
-        Verify a particular user settings change event was emitted a certain
-        number of times.
-        """
-        # pylint disable=no-member
-        super(LearnerProfileTestMixin, self).assert_event_emitted_num_times(
-            self.USER_SETTINGS_CHANGED_EVENT_NAME, self.start_time, profile_user_id, num_times, setting=setting
-        )
+    @contextmanager
+    def verify_pref_change_event_during(self, username, user_id, setting, **kwargs):
+        """Assert that a single setting changed event is emitted for the user_api_userpreference table."""
+        expected_event = {
+            'username': username,
+            'event': {
+                'setting': setting,
+                'user_id': int(user_id),
+                'table': 'user_api_userpreference',
+                'truncated': []
+            }
+        }
+        expected_event['event'].update(kwargs)
 
-    def verify_user_preference_changed_event(self, username, user_id, setting, old_value=None, new_value=None):
-        """
-        Verifies that the correct user preference changed event was recorded.
-        """
-        self.verify_events_of_type(
-            username,
-            self.USER_SETTINGS_CHANGED_EVENT_NAME,
-            [{
-                u"user_id": long(user_id),
-                u"table": u"user_api_userpreference",
-                u"setting": unicode(setting),
-                u"old": old_value,
-                u"new": new_value,
-                u"truncated": [],
-            }],
-            expected_referers=["/u/{username}".format(username=username)],
-        )
+        event_filter = {
+            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
+        }
+        with self.assert_events_match_during(event_filter=event_filter, expected_events=[expected_event]):
+            yield
 
 
+@attr('shard_4')
 class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify a student's own profile page.
@@ -193,12 +197,10 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         username, user_id = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PRIVATE)
-        profile_page.privacy = self.PRIVACY_PUBLIC
-        self.verify_user_preference_changed_event(
-            username, user_id, "account_privacy",
-            old_value=self.PRIVACY_PRIVATE,    # Note: default value was public, so we first change to private
-            new_value=self.PRIVACY_PUBLIC,
-        )
+        with self.verify_pref_change_event_during(
+            username, user_id, 'account_privacy', old=self.PRIVACY_PRIVATE, new=self.PRIVACY_PUBLIC
+        ):
+            profile_page.privacy = self.PRIVACY_PUBLIC
 
         # Reload the page and verify that the profile is now public
         self.browser.refresh()
@@ -218,12 +220,10 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         """
         username, user_id = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        profile_page.privacy = self.PRIVACY_PRIVATE
-        self.verify_user_preference_changed_event(
-            username, user_id, "account_privacy",
-            old_value=None,  # Note: no old value as the default preference is public
-            new_value=self.PRIVACY_PRIVATE,
-        )
+        with self.verify_pref_change_event_during(
+            username, user_id, 'account_privacy', old=None, new=self.PRIVACY_PRIVATE
+        ):
+            profile_page.privacy = self.PRIVACY_PRIVATE
 
         # Reload the page and verify that the profile is now private
         self.browser.refresh()
@@ -485,12 +485,13 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-        profile_page.upload_file(filename='image.jpg')
+        with self.verify_pref_change_event_during(
+            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
+        ):
+            profile_page.upload_file(filename='image.jpg')
         self.assertTrue(profile_page.image_upload_success)
         profile_page.visit()
         self.assertTrue(profile_page.image_upload_success)
-
-        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 1)
 
     def test_user_can_see_error_for_exceeding_max_file_size_limit(self):
         """
@@ -514,7 +515,13 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
-        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 0)
+        self.assert_no_matching_events_were_emitted({
+            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
+            'event': {
+                'setting': 'profile_image_uploaded_at',
+                'user_id': int(user_id),
+            }
+        })
 
     def test_user_can_see_error_for_file_size_below_the_min_limit(self):
         """
@@ -538,7 +545,13 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
-        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 0)
+        self.assert_no_matching_events_were_emitted({
+            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
+            'event': {
+                'setting': 'profile_image_uploaded_at',
+                'user_id': int(user_id),
+            }
+        })
 
     def test_user_can_see_error_for_wrong_file_type(self):
         """
@@ -565,7 +578,13 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
-        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 0)
+        self.assert_no_matching_events_were_emitted({
+            'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME,
+            'event': {
+                'setting': 'profile_image_uploaded_at',
+                'user_id': int(user_id),
+            }
+        })
 
     def test_user_can_remove_profile_image(self):
         """
@@ -584,14 +603,20 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-        profile_page.upload_file(filename='image.jpg')
+        with self.verify_pref_change_event_during(
+            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
+        ):
+            profile_page.upload_file(filename='image.jpg')
         self.assertTrue(profile_page.image_upload_success)
-        self.assertTrue(profile_page.remove_profile_image())
+
+        with self.verify_pref_change_event_during(
+            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
+        ):
+            self.assertTrue(profile_page.remove_profile_image())
+
         self.assertTrue(profile_page.profile_has_default_image)
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
-
-        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 2)
 
     def test_user_cannot_remove_default_image(self):
         """
@@ -621,12 +646,20 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         username, user_id = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
         self.assert_default_image_has_public_access(profile_page)
-        profile_page.upload_file(filename='image.jpg')
+
+        with self.verify_pref_change_event_during(
+            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
+        ):
+            profile_page.upload_file(filename='image.jpg')
         self.assertTrue(profile_page.image_upload_success)
-        profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
-        self.assert_event_emitted_num_times(user_id, 'profile_image_uploaded_at', 2)
+
+        with self.verify_pref_change_event_during(
+            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
+        ):
+            profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
 
 
+@attr('shard_4')
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify viewing the profile page of a different user.
@@ -665,6 +698,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_is_private(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PRIVATE)
 
+    @flaky  # TODO fix this, see TNL-2199
     def test_different_user_public_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's public profile.

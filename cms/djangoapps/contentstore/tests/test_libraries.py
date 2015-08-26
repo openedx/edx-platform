@@ -1,6 +1,7 @@
 """
 Content library unit tests that require the CMS runtime.
 """
+from django.test.utils import override_settings
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_url, reverse_usage_url, reverse_library_url
 from contentstore.views.item import _duplicate_item
@@ -730,6 +731,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
 
 
 @ddt.ddt
+@override_settings(SEARCH_ENGINE=None)
 class TestOverrides(LibraryTestCase):
     """
     Test that overriding block Scope.settings fields from a library in a specific course works

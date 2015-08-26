@@ -61,7 +61,7 @@ git clean -qxfd
 source scripts/jenkins-common.sh
 
 # Violations thresholds for failing the build
-PYLINT_THRESHOLD=5500
+PYLINT_THRESHOLD=7350
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
 # This could happen if you are trying to use this script from
@@ -95,24 +95,51 @@ END
         exit $EXIT
         ;;
 
+    # TODO: Remove the "unit" TEST_SUITE in favor of "lms-unit", etc.
+    # For now it is left in here so that there is not a time limit on how fast
+    # we need to update the groovy script in the jenkins config after merging
+    # the changes needed to shard out the unit tests.
     "unit")
         case "$SHARD" in
             "lms")
-                paver test_system -s lms --extra_args="--with-flaky" || { EXIT=1; }
-                paver coverage
+                SHARD=1 paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
                 ;;
             "cms-js-commonlib")
-                paver test_system -s cms --extra_args="--with-flaky" || { EXIT=1; }
-                paver test_js --coverage --skip_clean || { EXIT=1; }
-                paver test_lib --skip_clean --extra_args="--with-flaky" || { EXIT=1; }
-                paver coverage
+                SHARD=1 paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+                SHARD=1 paver test_js --coverage --skip_clean || { EXIT=1; }
+                SHARD=1 paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
                 ;;
             *)
                 paver test --extra_args="--with-flaky"
                 paver coverage
                 ;;
         esac
+        exit $EXIT
+        ;;
 
+    "lms-unit")
+        case "$SHARD" in
+            "1")
+                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p" || { EXIT=1; }
+                ;;
+            "2")
+                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p" || { EXIT=1; }
+                ;;
+            *)
+                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+                ;;
+        esac
+        exit $EXIT
+        ;;
+
+    "cms-unit")
+        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
+        exit $EXIT
+        ;;
+
+    "commonlib-js-unit")
+        paver test_js --coverage --skip_clean || { EXIT=1; }
+        paver test_lib --skip_clean --extra_args="--with-flaky" --cov_args="-p" || { EXIT=1; }
         exit $EXIT
         ;;
 
@@ -179,7 +206,15 @@ END
                 ;;
 
             "4")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False --with-flaky" || { EXIT=1; }
+                paver test_bokchoy --extra_args="-a 'shard_4' --with-flaky" || { EXIT=1; }
+                ;;
+
+            "5")
+                paver test_bokchoy --extra_args="-a 'shard_5' --with-flaky" || { EXIT=1; }
+                ;;
+
+            "6")
+                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False --with-flaky" || { EXIT=1; }
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
@@ -203,14 +238,6 @@ END
                 ;;
         esac
 
-        # Move the reports to a directory that is unique to the shard
-        # so that when they are 'slurped' to the main flow job, they
-        # do not conflict with and overwrite reports from other shards.
-        mv reports/ reports_tmp/
-        mkdir -p reports/${TEST_SUITE}/${SHARD}
-        mv reports_tmp/* reports/${TEST_SUITE}/${SHARD}
-        rm -r reports_tmp/
         exit $EXIT
         ;;
-
 esac

@@ -26,6 +26,7 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
+    make_option("--pdb", action="store_true", help="Launches an interactive debugger upon error"),
 ])
 def test_acceptance(options):
     """
@@ -37,6 +38,7 @@ def test_acceptance(options):
         'default_store': getattr(options, 'default_store', None),
         'verbosity': getattr(options, 'verbosity', 3),
         'extra_args': getattr(options, 'extra_args', ''),
+        'pdb': getattr(options, 'pdb', False),
     }
 
     if opts['system'] not in ['cms', 'lms']:

@@ -44,6 +44,8 @@
 
         LearnerProfileFieldViews.ProfileImageFieldView = FieldViews.ImageFieldView.extend({
 
+            screenReaderTitle: gettext('Profile Image'),
+
             imageUrl: function () {
                 return this.model.profileImageUrl();
             },

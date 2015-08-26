@@ -14,6 +14,7 @@ from track.middleware import TrackMiddleware
 class TrackMiddlewareTestCase(TestCase):
 
     def setUp(self):
+        super(TrackMiddlewareTestCase, self).setUp()
         self.track_middleware = TrackMiddleware()
         self.request_factory = RequestFactory()
 

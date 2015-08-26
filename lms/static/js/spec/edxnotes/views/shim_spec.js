@@ -233,5 +233,37 @@ define([
                 expect(mockViewer.element.appendTo).toHaveBeenCalledWith(annotators[0].wrapper);
             });
         });
+
+        describe('TagsPlugin', function () {
+            it('should add ARIA label information to the viewer', function() {
+                var tagDiv,
+                    annotation = {
+                        id: '01',
+                        text: "Test text",
+                        tags: ["tag1", "tag2", "tag3"],
+                        highlights: [highlights[0].get(0)]
+                    };
+
+                annotators[0].viewer.load([annotation]);
+                tagDiv = annotators[0].viewer.element.find('.annotator-tags');
+                expect($(tagDiv).attr('role')).toEqual('region');
+                expect($(tagDiv).attr('aria-label')).toEqual('tags');
+
+                // Three children for the individual tags.
+                expect($(tagDiv).children().length).toEqual(3);
+            });
+
+            it('should add screen reader label to the editor', function() {
+                var srLabel, editor, inputId;
+
+                // We don't know exactly what the input ID will be (depends on number of annotatable components shown),
+                // but the sr label "for" attribute should match the ID of the element immediately following it.
+                annotators[0].showEditor({}, {});
+                editor = annotators[0].editor;
+                srLabel = editor.element.find("label.sr");
+                inputId = srLabel.next().attr('id');
+                expect(srLabel.attr('for')).toEqual(inputId);
+            });
+        });
     });
 });

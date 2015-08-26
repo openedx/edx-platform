@@ -34,6 +34,8 @@ class InstructorDashboardPage(CoursePage):
         """
         self.q(css='a[data-section=cohort_management]').first.click()
         cohort_management_section = CohortManagementSection(self.browser)
+        # The first time cohort management is selected, an ajax call is made.
+        cohort_management_section.wait_for_ajax()
         cohort_management_section.wait_for_page()
         return cohort_management_section
 
@@ -111,7 +113,21 @@ class CohortManagementSection(PageObject):
     }
 
     def is_browser_on_page(self):
-        return self.q(css='.cohort-management').present
+        """
+        Cohorts management exists under one class; however, render time can be longer because of sub-classes
+        that must be rendered beneath it. To determine if the browser is on the cohorts management page (and
+        allow for it to fully-render), we need to consider three different states of the page:
+        * When no cohorts have been added yet
+        * When a new cohort is being added (a confirmation state)
+        * When cohorts exist (the traditional management page)
+        """
+        cohorts_warning_title = '.message-warning .message-title'
+
+        if self.q(css=cohorts_warning_title).visible:
+            return self.q(css='.message-title').text[0] == u'You currently have no cohorts configured'
+        # The page may be in either the traditional management state, or an 'add new cohort' state.
+        # Confirm the CSS class is visible because the CSS class can exist on the page even in different states.
+        return self.q(css='.cohorts-state-section').visible or self.q(css='.new-cohort-form').visible
 
     def _bounded_selector(self, selector):
         """
@@ -446,10 +462,16 @@ class CohortManagementSection(PageObject):
         """
         Uploads a file with cohort assignment information.
         """
-        # If the CSV upload section has not yet been toggled on, click on the toggle link.
-        cvs_upload_toggle = self.q(css=self._bounded_selector(".toggle-cohort-management-secondary")).first
+        # Toggle on the CSV upload section.
+        cvs_upload_toggle_css = '.toggle-cohort-management-secondary'
+        self.wait_for_element_visibility(cvs_upload_toggle_css, "Wait for csv upload link to appear")
+        cvs_upload_toggle = self.q(css=self._bounded_selector(cvs_upload_toggle_css)).first
         if cvs_upload_toggle:
             cvs_upload_toggle.click()
+            self.wait_for_element_visibility(
+                self._bounded_selector(self.csv_browse_button_selector_css),
+                'File upload link visible'
+            )
         path = InstructorDashboardPage.get_asset_path(filename)
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
@@ -474,13 +496,8 @@ class CohortManagementSection(PageObject):
         """
         Shows the discussion topics.
         """
-        EmptyPromise(
-            lambda: self.q(css=self._bounded_selector('.toggle-cohort-management-discussions')).results != 0,
-            "Waiting for discussion section to show"
-        ).fulfill()
-
-        # If the discussion topic section has not yet been toggled on, click on the toggle link.
-        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).click()
+        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).first.click()
+        self.wait_for_element_visibility("#cohort-management-discussion-topics", "Waiting for discussions to appear")
 
     def discussion_topics_visible(self):
         """
@@ -685,12 +702,47 @@ class DataDownloadPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='a[data-section=data_download].active-section').present
 
+    @property
+    def generate_student_report_button(self):
+        """
+        Returns the "Download profile information as a CSV" button.
+        """
+        return self.q(css='input[name=list-profiles-csv]')
+
+    @property
+    def generate_grade_report_button(self):
+        """
+        Returns the "Generate Grade Report" button.
+        """
+        return self.q(css='input[name=calculate-grades-csv]')
+
+    @property
+    def generate_problem_report_button(self):
+        """
+        Returns the "Generate Problem Grade Report" button.
+        """
+        return self.q(css='input[name=problem-grade-report]')
+
+    @property
+    def report_download_links(self):
+        """
+        Returns the download links for the current page.
+        """
+        return self.q(css="#report-downloads-table .file-download-link>a")
+
+    def wait_for_available_report(self):
+        """
+        Waits for a downloadable report to be available.
+        """
+        EmptyPromise(
+            lambda: len(self.report_download_links) >= 1, 'Waiting for downloadable report'
+        ).fulfill()
+
     def get_available_reports_for_download(self):
         """
         Returns a list of all the available reports for download.
         """
-        reports = self.q(css="#report-downloads-table .file-download-link>a").map(lambda el: el.text)
-        return reports.results
+        return self.report_download_links.map(lambda el: el.text)
 
 
 class StudentAdminPage(PageObject):

@@ -1,7 +1,7 @@
-.. _edX Platform User API Version 0:
+.. _edX Platform User API Version 1.0:
 
 #################################
-User API Version 0
+User API Version 1.0
 #################################
 
 .. toctree::
@@ -10,3 +10,4 @@ User API Version 0
     overview
     endpoints
     accounts
+    preferences

@@ -28,6 +28,7 @@ class DarkLangMiddlewareTests(TestCase):
     Tests of DarkLangMiddleware
     """
     def setUp(self):
+        super(DarkLangMiddlewareTests, self).setUp()
         self.user = User()
         self.user.save()
         DarkLangConfig(

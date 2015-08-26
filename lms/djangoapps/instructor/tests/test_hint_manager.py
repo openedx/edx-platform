@@ -2,6 +2,7 @@ import json
 
 from django.test.client import Client, RequestFactory
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 
 from courseware.models import XModuleUserStateSummaryField
 from courseware.tests.factories import UserStateSummaryFactory
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 # pylint: disable=missing-docstring
 
 
+@attr('shard_1')
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):

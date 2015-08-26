@@ -128,6 +128,7 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
+    # TODO Namespace these!
     url(r'^verify_student/', include('verify_student.urls')),
     url(r'^course_modes/', include('course_modes.urls')),
 )
@@ -455,6 +456,7 @@ if settings.COURSEWARE_ENABLED:
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (
+            url(r'^api/discussion/', include('discussion_api.urls')),
             url(r'^courses/{}/discussion/'.format(settings.COURSE_ID_PATTERN),
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
@@ -653,6 +655,11 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
             include('ccx.urls')),
     )
 
+# Access to courseware as an LTI provider
+if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
+    urlpatterns += (
+        url(r'^lti_provider/', include('lti_provider.urls')),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 
@@ -672,6 +679,6 @@ handler500 = 'static_template_view.views.render_500'
 
 # display error page templates, for testing purposes
 urlpatterns += (
-    url(r'404', handler404),
-    url(r'500', handler500),
+    url(r'^404$', handler404),
+    url(r'^500$', handler500),
 )

@@ -29,6 +29,7 @@ class TestTrackerInstantiation(TestCase):
     """Test that a helper function can instantiate backends from their name."""
     def setUp(self):
         # pylint: disable=protected-access
+        super(TestTrackerInstantiation, self).setUp()
         self.get_backend = tracker._instantiate_backend_from_name
 
     def test_instatiate_backend(self):

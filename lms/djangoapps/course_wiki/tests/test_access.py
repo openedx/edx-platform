@@ -3,6 +3,7 @@ Tests for wiki permissions
 """
 
 from django.contrib.auth.models import Group
+from nose.plugins.attrib import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -51,6 +52,7 @@ class TestWikiAccessBase(ModuleStoreTestCase):
         ]
 
 
+@attr('shard_1')
 class TestWikiAccess(TestWikiAccessBase):
     """Test wiki access for course staff."""
     def setUp(self):
@@ -111,6 +113,7 @@ class TestWikiAccess(TestWikiAccessBase):
             self.assertFalse(user_is_article_course_staff(course_staff, self.wiki_310b.article))
 
 
+@attr('shard_1')
 class TestWikiAccessForStudent(TestWikiAccessBase):
     """Test access for students."""
     def setUp(self):
@@ -126,6 +129,7 @@ class TestWikiAccessForStudent(TestWikiAccessBase):
             self.assertFalse(user_is_article_course_staff(self.student, page.article))
 
 
+@attr('shard_1')
 class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
     """Test staff has access if course number is numerical and wiki slug has an underscore appended."""
     def setUp(self):
@@ -145,6 +149,7 @@ class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
                 self.assertTrue(user_is_article_course_staff(course_staff, page.article))
 
 
+@attr('shard_1')
 class TestWikiAccessForOldFormatCourseStaffGroups(TestWikiAccessBase):
     """Test staff has access if course group has old format."""
     def setUp(self):

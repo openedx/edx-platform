@@ -636,8 +636,10 @@ class EmailWidget
       # abort on error
       if error
         return @show_errors error
-      $numberStudents = studentsList.length
-      $('.emailWidget.estimated').html(gettext('approx ' + $numberStudents + ' students selected'))
+
+      selected_text = gettext('approx <%= numStudents %> students selected')
+      full_selected_text = _.template(selected_text, {numStudents: studentsList.length})
+      $('.emailWidget.estimated').html(full_selected_text)
   # set error display
   show_errors: (msg) -> @$error_section?.text msg
 

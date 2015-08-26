@@ -303,4 +303,14 @@ class CourseUpdateTest(CourseTestCase):
     def test_notifications_sent_to_parse(self, mock_parse_push):
         PushNotificationConfig(enabled=True).save()
         self.post_course_update(send_push_notification=True)
-        self.assertTrue(mock_parse_push.alert.called)
+        self.assertEquals(mock_parse_push.alert.call_count, 2)
+
+    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
+    @patch("contentstore.push_notification.log_exception")
+    @patch("contentstore.push_notification.Push")
+    def test_notifications_error_from_parse(self, mock_parse_push, mock_log_exception):
+        PushNotificationConfig(enabled=True).save()
+        from parse_rest.core import ParseError
+        mock_parse_push.alert.side_effect = ParseError
+        self.post_course_update(send_push_notification=True)
+        self.assertTrue(mock_log_exception.called)

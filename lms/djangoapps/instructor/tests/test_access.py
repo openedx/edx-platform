@@ -3,6 +3,7 @@ Test instructor.access
 """
 
 from nose.tools import raises
+from nose.plugins.attrib import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -17,6 +18,7 @@ from instructor.access import (allow_access,
                                update_forum_role)
 
 
+@attr('shard_1')
 class TestInstructorAccessList(ModuleStoreTestCase):
     """ Test access listings. """
     def setUp(self):
@@ -40,6 +42,7 @@ class TestInstructorAccessList(ModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
+@attr('shard_1')
 class TestInstructorAccessAllow(ModuleStoreTestCase):
     """ Test access allow. """
     def setUp(self):
@@ -75,6 +78,7 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
 
 
+@attr('shard_1')
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """
     def setUp(self):
@@ -110,6 +114,7 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
         revoke_access(self.course, user, 'robot-not-a-level')
 
 
+@attr('shard_1')
 class TestInstructorAccessForum(ModuleStoreTestCase):
     """
     Test forum access control.

@@ -462,6 +462,15 @@ class TestCohorts(ModuleStoreTestCase):
         cohort_set = {c.name for c in cohorts.get_course_cohorts(course)}
         self.assertEqual(cohort_set, {"AutoGroup1", "AutoGroup2", "ManualCohort", "ManualCohort2"})
 
+    def test_get_cohort_names(self):
+        course = modulestore().get_course(self.toy_course_key)
+        cohort1 = CohortFactory(course_id=course.id, name="Cohort1")
+        cohort2 = CohortFactory(course_id=course.id, name="Cohort2")
+        self.assertEqual(
+            cohorts.get_cohort_names(course),
+            {cohort1.id: cohort1.name, cohort2.id: cohort2.name}
+        )
+
     def test_is_commentable_cohorted(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))

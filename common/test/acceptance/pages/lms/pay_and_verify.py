@@ -76,7 +76,7 @@ class PaymentAndVerificationFlow(PageObject):
 
     def proceed_to_payment(self):
         """Interact with the payment button."""
-        self.q(css="#pay_button").click()
+        self.q(css=".payment-button").click()
 
         FakePaymentPage(self.browser, self._course_id).wait_for_page()
 

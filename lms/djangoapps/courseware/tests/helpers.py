@@ -2,16 +2,14 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.test.client import RequestFactory
 
 from student.models import Registration
 
-from django.test import TestCase
-
 
 def get_request_for_user(user):
     """Create a request object for user."""
-
     request = RequestFactory()
     request.user = user
     request.COOKIES = {}

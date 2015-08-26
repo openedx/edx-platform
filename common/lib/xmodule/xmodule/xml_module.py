@@ -446,7 +446,7 @@ class XmlParserMixin(object):
             node.tag = xml_object.tag
             node.text = xml_object.text
             node.tail = xml_object.tail
-            node.attrib = xml_object.attrib
+            node.attrib.update(xml_object.attrib)
             node.extend(xml_object)
 
         node.set('url_name', self.url_name)

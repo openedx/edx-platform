@@ -427,3 +427,20 @@ class ExportTestCase(CourseTestCase):
             self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)
         finally:
             shutil.rmtree(root_dir / name)
+
+    def test_export_success_with_custom_tag(self):
+        """
+        Verify that course export with customtag
+        """
+        xml_string = '<impl>slides</impl>'
+        vertical = ItemFactory.create(
+            parent_location=self.course.location, category='vertical', display_name='foo'
+        )
+        ItemFactory.create(
+            parent_location=vertical.location,
+            category='customtag',
+            display_name='custom_tag_foo',
+            data=xml_string
+        )
+
+        self.test_export_targz_urlparam()

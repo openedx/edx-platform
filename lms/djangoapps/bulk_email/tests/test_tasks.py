@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for LMS instructor-initiated background tasks.
 
@@ -9,6 +10,7 @@ import json
 from uuid import uuid4
 from itertools import cycle, chain, repeat
 from mock import patch, Mock
+from nose.plugins.attrib import attr
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPAuthenticationError
 from boto.ses.exceptions import (
     SESAddressNotVerifiedError,
@@ -27,6 +29,8 @@ from celery.states import SUCCESS, FAILURE
 
 from django.conf import settings
 from django.core.management import call_command
+
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from bulk_email.models import CourseEmail, Optout, SEND_TO_ALL
 
@@ -71,6 +75,7 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
+@attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
@@ -104,15 +109,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         return instructor_task
 
     def _run_task_with_mock_celery(self, task_class, entry_id, task_id):
-        """Submit a task and mock how celery provides a current_task."""
-        mock_current_task = Mock()
-        mock_current_task.max_retries = settings.BULK_EMAIL_MAX_RETRIES
-        mock_current_task.default_retry_delay = settings.BULK_EMAIL_DEFAULT_RETRY_DELAY
+        """Mock was not needed for some tests, testing to see if it's needed at all."""
         task_args = [entry_id, {}]
-
-        with patch('bulk_email.tasks._get_current_task') as mock_get_task:
-            mock_get_task.return_value = mock_current_task
-            return task_class.apply(task_args, task_id=task_id).get()
+        return task_class.apply(task_args, task_id=task_id).get()
 
     def test_email_missing_current_task(self):
         task_entry = self._create_input_entry()
@@ -408,3 +407,15 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_failure_on_ses_domain_not_confirmed(self):
         self._test_immediate_failure(SESDomainNotConfirmedError(403, "You're out of bounds!"))
+
+    def test_bulk_emails_with_unicode_course_image_name(self):
+        # Test bulk email with unicode characters in course image name
+        course_image = u'在淡水測試.jpg'
+        self.course = CourseFactory.create(course_image=course_image)
+
+        num_emails = 1
+        self._create_students(num_emails)
+
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)

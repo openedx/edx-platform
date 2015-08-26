@@ -4,6 +4,7 @@ Unit tests for bulk-email-related forms.
 """
 from django.conf import settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from bulk_email.models import CourseAuthorization, CourseEmailTemplate
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
@@ -15,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
 
+@attr('shard_1')
 class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
 

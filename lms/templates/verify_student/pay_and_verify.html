@@ -67,7 +67,7 @@ from verify_student.views import PayAndVerifyView
       data-course-mode-suggested-prices='${course_mode.suggested_prices}'
       data-course-mode-currency='${course_mode.currency}'
       data-contribution-amount='${contribution_amount}'
-      data-purchase-endpoint='${purchase_endpoint}'
+      data-processors='${json.dumps(processors)}'
       data-verification-deadline='${verification_deadline}'
       data-display-steps='${json.dumps(display_steps)}'
       data-current-step='${current_step}'

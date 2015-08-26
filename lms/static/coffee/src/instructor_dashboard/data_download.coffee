@@ -21,7 +21,12 @@ class DataDownload
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$grades_btn = @$section.find ".reports-download-container input[type='button']"
+    @$get_student_responses_btn = @$section.find("input[name='get-student-responses']'")
+    @$ora2_response_btn = @$section.find("input[name='ora2-response-btn']'")
+    @$ora2_response_btn_email = @$section.find("input[name='ora2-response-btn-email']'")
+    @$course_forums_btn = @$section.find("input[name='course-forums-btn']'")
+    @$student_forums_btn = @$section.find("input[name='student-forums-btn']'")
+    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
@@ -108,9 +113,31 @@ class DataDownload
           @clear_display()
           @$download_display_text.html data['grading_config_summary']
 
-    @$grades_btn.click (e) =>
+    @$calculate_grades_csv_btn.click (e) =>
+      @onClickGradeDownload @$calculate_grades_csv_btn, gettext("Error generating grades. Please try again.")
+
+    @$get_student_responses_btn.click (e) =>
+      @onClickGradeDownload @$get_student_responses_btn, gettext("Error generating student responses. Please try again.")
+
+    @$ora2_response_btn.click (e) =>
+     @onClickGradeDownload @$ora2_response_btn, gettext("Error generating Open Responses. Please try again.")
+
+    @$ora2_response_btn_email.click (e) =>
+     @onClickGradeDownload @$ora2_response_btn_email, gettext("Error generating Open Responses. Please try again.")
+
+    @$course_forums_btn.click (e) =>
+     @onClickGradeDownload @$course_forums_btn, gettext("Error generating Course Forum Report. Please try again.")
+
+    @$student_forums_btn.click (e) =>
+     @onClickGradeDownload @$student_forums_btn, gettext("Error generating Student Forum Report. Please try again.")
+
+  onClickGradeDownload: (button, errorMessage) ->
+      # Clear any CSS styling from the request-response areas
+      #$(".msg-confirm").css({"display":"none"})
+      #$(".msg-error").css({"display":"none"})
       @clear_display()
-      url = $(e.target).data 'endpoint'
+
+      url = button.data 'endpoint'
       $.ajax
         dataType: 'json'
         url: url
@@ -120,11 +147,14 @@ class DataDownload
           else if e.target.name == 'get-student-responses'
             @$reports_request_response_error.text gettext("Error getting student responses. Please try again.")
           else if e.target.name == 'ora2-response-btn'
-            @$reports_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
+            @$reports_request_response_error.text gettext("Error generating Open Responses. Please try again.")
+          else if e.target.name == 'ora2-response-btn_email'
+            @$reports_request_response_error.text gettext("Error getting Open Responses. Please try again.")
           else if e.target.name == 'course-forums-btn'
             @$reports_request_response_error.text gettext("Error getting Course Forums data. Please try again.")
           else if e.target.name == 'student-forums-btn'
             @$reports_request_response_error.text gettext("Error getting Student Forums data. Please try again.")
+          @$reports_request_response_error.text errorMessage
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$reports_request_response.text data['status']
@@ -215,6 +245,15 @@ class ReportDownloads
     $table_placeholder = $ '<div/>', class: 'slickgrid'
     @$report_downloads_table.append $table_placeholder
     grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
+    grid.onClick.subscribe(
+        (event) =>
+            report_url = event.target.href
+            if report_url
+                # Record that the user requested to download a report
+                Logger.log('edx.instructor.report.downloaded', {
+                    report_url: report_url
+                })
+    )
     grid.autosizeColumns()
 
     $graph_btns = @$section.find(".graph-forums")
@@ -231,7 +270,9 @@ class ReportDownloads
       table_row = jQuery(e.target.parentElement.parentElement)
       filename_cell = table_row.find('.course-forums-data')
       file_to_delete = filename_cell.text()
-      if confirm gettext 'Are you sure you want to delete the file ' + file_to_delete + '? This cannot be undone.'
+      delete_text = gettext('Are you sure you want to delete the file <%= file %>? This cannot be undone.')
+      full_delete_text = _.template(delete_text, {file: file_to_delete})
+      if confirm full_delete_text
         @$delete_element = @$section.find '.report-downloads-delete'
         @$delete_endpoint = @$delete_element.data 'endpoint'
         success_cb = =>
@@ -252,12 +293,16 @@ class ReportDownloads
       $sib_row.offset(top: currY - row_height, left: currX)
 
   display_file_delete_success: (file_to_delete) ->
-    @$reports_request_response.text gettext('The file ' + file_to_delete + ' was successfully deleted.')
+    success_text = gettext('The file <%= file %> was successfully deleted.')
+    full_success_text = _.template(success_text, {file: file_to_delete})
+    @$reports_request_response.text full_success_text
     @$reports_request_response.css({'display': 'block'})
     @$reports_request_response_error.css({'display': 'none'})
 
   display_file_delete_failure: (file_to_delete) ->
-    @$reports_request_response_error.text gettext('Error deleting the file ' + file_to_delete + '. Please try again.')
+    failure_text = gettext('Error deleting the file <%= file %>. Please try again.')
+    full_failure_text = _.template(failure_text, {file: file_to_delete})
+    @$reports_request_response_error.text full_failure_text
     @$reports_request_response_error.css({'display': 'block'})
     @$reports_request_response.css({'display': 'none'})
 
