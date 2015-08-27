@@ -59,6 +59,7 @@ lib_paths:
     - common_static/js/src/utility.js
     - public/js/split_test_staff.js
     - common_static/js/src/accessibility_tools.js
+    - common_static/js/vendor/moment.min.js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
