@@ -176,6 +176,7 @@ class CertificateManager(object):
             "id": certificate_data['id'],
             "name": certificate_data['name'],
             "description": certificate_data['description'],
+            "is_active": certificate_data['is_active'],
             "version": CERTIFICATE_SCHEMA_VERSION,
             "signatories": certificate_data['signatories']
         }
