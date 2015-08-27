@@ -32,7 +32,7 @@ var edx = edx || {};
                 providerId;
 
             // Add the receipt info to the template context
-            this.courseKey = this.getOrderCourseKey(data)
+            this.courseKey = this.getOrderCourseKey(data);
             this.username = this.$el.data('username');
             _.extend(context, {
                 receipt: this.receiptContext(data),
@@ -43,15 +43,21 @@ var edx = edx || {};
 
             this.trackLinks();
 
-            this.getCourseData(this.courseKey).then(this.renderCourse, this.renderError)
+            this.renderCourseNamePlaceholder(this.courseKey);
 
             providerId = this.getCreditProviderId(data);
             if (providerId) {
                 this.getProviderData(providerId).then(this.renderProvider, this.renderError)
             }
         },
-        renderCourse: function(course) {
-            $(".course_name_placeholder").text(course.name);
+        renderCourseNamePlaceholder: function(courseId) {
+            // Display the course Id or name (if available) in the placeholder
+            var $courseNamePlaceholder = $(".course_name_placeholder");
+            $courseNamePlaceholder.text(courseId);
+
+            this.getCourseData(courseId).then(function(responseData) {
+                $courseNamePlaceholder.text(responseData.name);
+            });
         },
         renderProvider: function (context) {
             var templateHtml = $("#provider-tpl").html(),
@@ -136,7 +142,7 @@ var edx = edx || {};
                 url: _.sprintf(courseDetailUrl, courseId),
                 type: 'GET',
                 dataType: 'json'
-            }).retry({times: 5, timeout: 2000, statusCodes: [404]});
+            });
         },
 
         /**

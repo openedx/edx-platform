@@ -80,8 +80,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:42+0000\n"
-"PO-Revision-Date: 2015-08-14 13:44+0000\n"
+"POT-Creation-Date: 2015-08-21 14:17+0000\n"
+"PO-Revision-Date: 2015-08-21 02:41+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -2193,7 +2193,7 @@ msgstr "جرى الإسقاط على الهدف"
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%s ago"
-msgstr "منذ %s ثوانٍ "
+msgstr "منذ %s "
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
@@ -2517,7 +2517,7 @@ msgid "Team description cannot have more than 300 characters."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
-msgid "You are not currently a member of any teams."
+msgid "You are not currently a member of any team."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
@@ -5985,7 +5985,7 @@ msgstr "هل أنت جديد على %(platformName)s؟"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an account"
-msgstr "إنشاء حساب "
+msgstr " أنشئ حساباً جديداً اﻵن."
 
 #: lms/templates/student_account/password_reset.underscore
 #: lms/templates/student_account/register.underscore
@@ -6028,12 +6028,12 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
-msgstr "إنشاء حساب باستخدام"
+msgstr "أنشئ حساباً باستخدام"
 
 #: lms/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
-msgstr "إنشاء حساب باستخدام %(providerName)s."
+msgstr "أنشئ حساباً باستخدام %(providerName)s."
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
@@ -6568,7 +6568,7 @@ msgstr "الحالة"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
-msgstr "أنواع المسائل الشائعة"
+msgstr "المسائل الشائعة"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
@@ -7441,6 +7441,25 @@ msgid ""
 msgstr ""
 "يُرجى التحقّق من الملاحظات والتعليقات التالية بشأن التحقّق، وتطبيقها على "
 "الإعدادات الخاصة بمساقك:"
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification Checkpoint"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Must complete verification checkpoint"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification checkpoint to be completed"
+msgstr ""
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this unit. Learners who do not require verification see this "
+"content by default."
+msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"

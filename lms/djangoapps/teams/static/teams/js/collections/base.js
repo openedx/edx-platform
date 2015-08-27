@@ -27,7 +27,7 @@
                     var self = this,
                         deferred = $.Deferred();
                     if (force || this.isStale) {
-                        this.fetch()
+                        this.setPage(1)
                             .done(function() {
                                 self.isStale = false;
                                 deferred.resolve();

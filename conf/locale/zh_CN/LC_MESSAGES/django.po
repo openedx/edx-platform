@@ -182,6 +182,7 @@
 # 竹轩 <fmyzjs@gmail.com>, 2014
 # 胡超威 <chadennishu@gmail.com>, 2014
 # 顾翔 <c0710204@gmail.com>, 2014
+# 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
@@ -231,6 +232,7 @@
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -261,7 +263,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-14 13:42+0000\n"
+"POT-Creation-Date: 2015-08-21 14:18+0000\n"
 "PO-Revision-Date: 2015-06-18 03:04+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -600,8 +602,10 @@ msgid "Your legal name must be a minimum of two characters long"
 msgstr "你的合法名字必须至少包含两个字符的长度"
 
 #: common/djangoapps/student/forms.py
-msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr "用户名只能包含英文字母A-Z大小写和阿拉伯数字0-9，不能包含空格。"
+msgid ""
+"Usernames must contain only letters, numbers, underscores (_), and hyphens "
+"(-)."
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -5091,26 +5095,6 @@ msgstr ""
 msgid "Free"
 msgstr "免费"
 
-#. Translators: The join of three or more institution names (e.g., Harvard,
-#. MIT, and Dartmouth).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institutions}, and {last_institution}"
-msgstr ""
-
-#. Translators: The join of two institution names (e.g., Harvard and MIT).
-#: lms/djangoapps/courseware/views.py
-msgid "{first_institution} and {second_institution}"
-msgstr ""
-
-#: lms/djangoapps/courseware/views.py
-msgid ""
-"I would like to receive email from {institution_series} and learn about its "
-"other programs."
-msgid_plural ""
-"I would like to receive email from {institution_series} and learn about "
-"their other programs."
-msgstr[0] ""
-
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
 msgstr ""
@@ -7646,10 +7630,6 @@ msgstr ""
 msgid "text_search is not yet supported."
 msgstr ""
 
-#: lms/djangoapps/teams/views.py
-msgid "last_activity is not yet supported"
-msgstr ""
-
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
 #. 'name', indicating that the user wants to sort the
@@ -7663,6 +7643,10 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this course."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
 msgstr ""
 
@@ -7672,6 +7656,10 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "Team id is required."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "This team is already full."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -8857,6 +8845,10 @@ msgstr "提供了错误的课程地址"
 msgid "Missing branch on fresh clone"
 msgstr "在最近的复制中，丢失一些分支"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Deleted group"
+msgstr ""
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -9229,6 +9221,11 @@ msgstr "取消"
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "课程代码"
+
+#: cms/templates/course_outline.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Start Date:"
+msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -11001,6 +10998,11 @@ msgstr "批量选课"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Email Addresses/Usernames"
+msgstr "电子邮箱地址／用户名"
+
+#: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter email addresses and/or usernames separated by new lines or commas."
 msgstr "输入电子邮箱地址 与／或 用户名，以逗号分割或重启一行。"
@@ -11011,11 +11013,6 @@ msgid ""
 "You will not get notification for emails that bounce, so please double-check"
 " spelling."
 msgstr "对该类问题您不会受到提示邮件，因此请仔细检查，确保拼写无误。"
-
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses/Usernames"
-msgstr "电子邮箱地址／用户名"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11056,7 +11053,6 @@ msgstr "如果 <em>勾选</em>该选项，用户将受到一封通知邮件。"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
 msgstr "选修"
@@ -11064,6 +11060,10 @@ msgstr "选修"
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "管理学生列表"
+
+#: lms/templates/ccx/enrollment.html
+msgid "Enter username or email"
+msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -11439,7 +11439,6 @@ msgid "This section is graded."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "出现错误，请稍后再试。"
 
@@ -11477,7 +11476,7 @@ msgid "Enrollment is Closed"
 msgstr "选课已关闭"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart ({price})"
+msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -11554,7 +11553,6 @@ msgid "Additional Resources"
 msgstr "额外资源"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
 msgid "enroll"
 msgstr ""
 
@@ -11922,54 +11920,6 @@ msgstr ""
 msgid "Course errors"
 msgstr "课程错误"
 
-#: lms/templates/courseware/mktg_coming_soon.html
-msgid "About {course_id}"
-msgstr "关于{course_id}"
-
-#: lms/templates/courseware/mktg_coming_soon.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Coming Soon"
-msgstr "即将上线"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "About {course_number}"
-msgstr "关于{course_number}"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Access Courseware"
-msgstr "进入课程页面"
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "You Are Enrolled"
-msgstr ""
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enroll in"
-msgstr ""
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. The "choose your student track" means users can select between taking the
-#. course as an auditor, as a verified student, etc
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and choose your student track"
-msgstr ""
-
-#. Translators: This is the second line on a button users can click.  The
-#. first
-#. line is "Enroll in COURSE_NAME"
-#. 'Verification' here refers to verifying one's identity in order to receive
-#. a
-#. verified certificate.
-#: lms/templates/courseware/mktg_course_about.html
-msgid "and proceed to verification"
-msgstr ""
-
-#: lms/templates/courseware/mktg_course_about.html
-msgid "Enrollment Is Closed"
-msgstr ""
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "新闻 - MITx 6.002x"
@@ -12264,6 +12214,10 @@ msgid "Started - {start_date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Coming Soon"
+msgstr "即将上线"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {start_date}"
 msgstr ""
 
@@ -12453,8 +12407,8 @@ msgstr ""
 #. credit provider, such as 'State University' or 'Happy Fun Company'
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"Your credit has been processed and approved. <b>Congratulations</b>. Please "
-"see {link_to_provider_site} for more information."
+"Your credit has been processed and approved. <b>Congratulations!</b>. Please"
+" see {link_to_provider_site} for more information."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -12643,10 +12597,6 @@ msgstr ""
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
 msgstr ""
-
-#: lms/templates/discussion/_user_profile.html
-msgid ", "
-msgstr "，"
 
 #: lms/templates/discussion/_user_profile.html
 #, python-format
@@ -13582,6 +13532,10 @@ msgid "Course Display Name:"
 msgstr "课程显示名称："
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course End Date:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
 msgstr "课程开始了吗？"
 
@@ -13596,6 +13550,10 @@ msgstr "尚未"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
 msgstr "课程结束了吗？"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Number of sections:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
@@ -16420,10 +16378,6 @@ msgid "View Live"
 msgstr "在线查看"
 
 #: cms/templates/course_outline.html
-msgid "Course Start Date:"
-msgstr "课程开始日期："
-
-#: cms/templates/course_outline.html
 msgid "Edit Start Date"
 msgstr "编辑开始日期"
 
@@ -18610,6 +18564,21 @@ msgid ""
 "Content group no longer exists. Please choose another or allow access to All"
 " Students and staff"
 msgstr "内容组已不复存在。请选择另一个，或者允许所有学生及教员访问"
+
+#: cms/templates/visibility_editor.html
+msgid "Verification Checkpoint"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid "Verification checkpoint to complete"
+msgstr ""
+
+#: cms/templates/visibility_editor.html
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this component. Learners who do not require verification see "
+"this content by default."
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

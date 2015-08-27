@@ -130,17 +130,13 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
     def test_get_student_exam_attempt_features(self):
         query_features = [
-            'created',
-            'modified',
-            'started_at',
-            'exam_name',
             'user_email',
-            'completed_at',
-            'external_id',
+            'exam_name',
             'allowed_time_limit_mins',
-            'status',
-            'attempt_code',
             'is_sample_attempt',
+            'started_at',
+            'completed_at',
+            'status',
         ]
 
         proctored_exam_id = create_exam(self.course_key, 'Test Content', 'Test Exam', 1)

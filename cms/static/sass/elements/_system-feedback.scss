@@ -83,7 +83,8 @@
       border-color: $blue-d2;
     }
 
-    a {
+    button {
+      @extend %btn-no-style;
       color: $blue;
 
       &:hover {
@@ -102,7 +103,8 @@
       color: $gray-d4;
     }
 
-    a {
+    button {
+      @extend %btn-no-style;
       color: $orange;
 
       &:hover {
@@ -120,7 +122,8 @@
       border-color: $red-d2;
     }
 
-    a {
+    button {
+      @extend %btn-no-style;
       color: $red-l1;
 
       &:hover {
@@ -138,7 +141,8 @@
       border-color: $blue-d2;
     }
 
-    a {
+    button {
+      @extend %btn-no-style;
       color: $blue;
 
       &:hover {
@@ -156,7 +160,8 @@
       border-color: $green-d2;
     }
 
-    a {
+    button {
+      @extend %btn-no-style;
       color: $green;
 
       &:hover {
@@ -174,7 +179,8 @@
       border-color: $pink-d2;
     }
 
-    a {
+    button {
+      @extend %btn-no-style;
       color: $pink;
 
       &:hover {

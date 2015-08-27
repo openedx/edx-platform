@@ -199,3 +199,24 @@ h1.top-header {
   @include transition( all .2s $ease-in-out-quad 0s);
 }
 
+// FontAwesome rtl chevron next
+.fa-chevron-next {
+  &:before {
+    @if $bi-app-direction == ltr {
+        content: "\f054"; // .fa-chevron-right
+    } @else if $bi-app-direction == rtl {
+        content: "\f053"; // .fa-chevron-left
+    }
+  }
+}
+
+// FontAwesome rtl chevron prev
+.fa-chevron-prev {
+  &:before {
+    @if $bi-app-direction == ltr {
+        content: "\f053"; // .fa-chevron-left
+    } @else if $bi-app-direction == rtl {
+        content: "\f054"; // .fa-chevron-right
+    }
+  }
+}

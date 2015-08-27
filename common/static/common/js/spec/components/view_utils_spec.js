@@ -1,5 +1,7 @@
-define(["jquery", "underscore", "js/views/baseview", "js/views/utils/view_utils", "js/spec_helpers/edit_helpers"],
-    function ($, _, BaseView, ViewUtils, ViewHelpers) {
+;(function (define) {
+    'use strict';
+define(["jquery", "underscore", "common/js/components/utils/view_utils", "common/js/spec_helpers/view_helpers", 'jasmine-stealth'],
+    function ($, _, ViewUtils, ViewHelpers) {
 
         describe("ViewUtils", function() {
             describe("disabled element while running", function() {
@@ -90,3 +92,4 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/utils/view_utils"
             });
         });
     });
+}).call(this, define || RequireJS.define);

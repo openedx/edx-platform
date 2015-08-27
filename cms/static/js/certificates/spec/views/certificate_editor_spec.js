@@ -7,10 +7,10 @@ define([ // jshint ignore:line
     'js/certificates/models/signatory',
     'js/certificates/collections/certificates',
     'js/certificates/views/certificate_editor',
-    'js/views/feedback_notification',
+    'common/js/components/views/feedback_notification',
     'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
+    'common/js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
     'js/certificates/spec/custom_matchers'
 ],
