@@ -7,7 +7,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
         beforeEach(function() {
             loadFixtures('js/fixtures/accordion.html');
 
-            accordion = $('#accordion');
+            accordion = $('.accordion');
             button = accordion.children('.button-chapter');
             heading = button.children('.group-heading');
             chapterContent = accordion.children('.chapter-content-container');

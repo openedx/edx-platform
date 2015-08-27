@@ -6,7 +6,7 @@ var edx = edx || {},
 
             init: function() {
 
-                if ($('#accordion').length) {
+                if ($('.accordion').length) {
 
                     navigation.openAccordion();
                     navigation.checkForCurrent();
@@ -20,7 +20,8 @@ var edx = edx || {},
             },
 
             checkForCurrent: function() {
-                var active;
+                var active = $('.accordion .chapter-content-container .chapter-menu:has(.active)').index('.accordion .chapter-content-container .chapter-menu') ? $('.accordion .chapter-content-container .chapter-menu:has(.active)').index('.accordion .chapter-content-container .chapter-menu') : 0,
+                    activeSection = $('.accordion .button-chapter:eq(' + active + ')');
 
                 active = $('#accordion div div:has(a.active)').index('#accordion div div');
 
@@ -34,11 +35,8 @@ var edx = edx || {},
             },
 
             listenForClick: function() {
-                $('#accordion').on('click', '.button-chapter', function(event) {
-                    // close and reset all accrdions
-                    navigation.resetAllAccordions();
-
-                    // open this accordion and send focus
+                $('.accordion').on('click', '.button-chapter', function(event) {
+                    navigation.closeAccordions();
                     navigation.openAccordionSection(event.currentTarget);
 
                     // assign classes and set open aria
@@ -50,11 +48,13 @@ var edx = edx || {},
                 $('.chapter-content-container').hide();
                 $('.chapter-content-container .chapter-menu').hide();
 
-                $('#accordion .button-chapter').each(function(event) {
-                    $(this).removeClass('is-open').attr('aria-pressed', 'false');
-                    $(this).next('.chapter-content-container').attr('aria-expanded', 'false');
-                    $(this).children('.group-heading').removeClass('active');
-                    $(this).children('.group-heading').find('.icon').addClass('fa-caret-right').removeClass('fa-caret-down');
+                $('.accordion .button-chapter').each(function(event) {
+                    var el = $(this);
+
+                    el.removeClass('is-open').attr('aria-pressed', 'false');
+                    el.next('.chapter-content-container').attr('aria-expanded', 'false');
+                    el.children('.group-heading').removeClass('active');
+                    el.children('.group-heading').find('.icon').addClass('fa-caret-right').removeClass('fa-caret-down');
                 });
             },
 
