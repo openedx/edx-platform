@@ -321,7 +321,7 @@ div.problem {
         display: inline-block;
         width: 14px;
         height: 14px;
-        background: url($static-path + '/images/unanswered-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
       }
     }
 
@@ -330,7 +330,7 @@ div.problem {
         display: inline-block;
         width: 25px;
         height: 20px;
-        background: url($static-path + '/images/correct-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
       }
 
       input {
@@ -343,7 +343,7 @@ div.problem {
         display: inline-block;
         width: 20px;
         height: 20px;
-        background: url($static-path + '/images/spinner.gif') center center no-repeat;
+        background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
       }
 
       input {
@@ -356,7 +356,7 @@ div.problem {
         display: inline-block;
         width: 20px;
         height: 20px;
-        background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
       }
 
       input {
@@ -370,7 +370,7 @@ div.problem {
         display: inline-block;
         width: 20px;
         height: 20px;
-        background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
       }
 
       input {
@@ -448,7 +448,7 @@ div.problem {
         top: 4px;
         width: 14px;
         height: 14px;
-        background: url($static-path + '/images/unanswered-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
       }
 
       &.processing, &.ui-icon-processing {
@@ -457,7 +457,7 @@ div.problem {
         top: 6px;
         width: 25px;
         height: 20px;
-        background: url($static-path + '/images/spinner.gif') center center no-repeat;
+        background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
       }
 
       &.ui-icon-check {
@@ -466,7 +466,7 @@ div.problem {
         top: 3px;
         width: 25px;
         height: 20px;
-        background: url($static-path + '/images/correct-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
       }
 
       &.incomplete, &.ui-icon-close {
@@ -475,7 +475,7 @@ div.problem {
         top: 3px;
         width: 20px;
         height: 20px;
-        background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
       }
     }
 
@@ -503,7 +503,7 @@ div.problem {
       .grading {
         margin: 0px 7px 0 0;
         padding-left: 25px;
-        background: url($static-path + '/images/info-icon.png') left center no-repeat;
+        background: url('#{$static-path}/images/info-icon.png') left center no-repeat;
         text-indent: 0px;
       }
 
@@ -1097,7 +1097,7 @@ div.problem {
         .result-errors {
           margin: ($baseline/4);
           padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline*2);
-          background: url($static-path + '/images/incorrect-icon.png') center left no-repeat;
+          background: url('#{$static-path}/images/incorrect-icon.png') center left no-repeat;
 
           li {
             color: #b00;
@@ -1129,7 +1129,7 @@ div.problem {
         }
 
         .result-correct {
-          background: url($static-path + '/images/correct-icon.png') left 20px no-repeat;
+          background: url('#{$static-path}/images/correct-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #090;
@@ -1137,7 +1137,7 @@ div.problem {
         }
 
         .result-incorrect {
-          background: url($static-path + '/images/incorrect-icon.png') left 20px no-repeat;
+          background: url('#{$static-path}/images/incorrect-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #B00;
@@ -1348,7 +1348,7 @@ div.problem {
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
       &:after {
         margin-left:15px;
-        content: url($static-path + '/images/correct-icon.png');
+        content: url('#{$static-path}/images/correct-icon.png');
       }
     }
 
@@ -1373,11 +1373,11 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .correct {
-    background: url($static-path + '/images/correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
   }
 
   .incorrect {
-    background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
   }
 
   .partially-correct {

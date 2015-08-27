@@ -52,7 +52,7 @@
   margin-left: ($baseline/4);
   margin-right: ($baseline/4);
   position: absolute;
-  background-image: url($static-path + '/images/wmd-buttons.png');
+  background-image: url('#{$static-path}/images/wmd-buttons.png');
   background-repeat: no-repeat;
   background-position: 0px 0px;
   display: inline-block;

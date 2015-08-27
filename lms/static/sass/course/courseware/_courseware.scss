@@ -667,7 +667,7 @@ div.course-wrapper {
 
       header#open_close_accordion {
         a {
-          background-image: url($static-path + '/images/slide-right-icon.png');
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
         }
       }
 

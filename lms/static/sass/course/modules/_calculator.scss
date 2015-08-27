@@ -17,7 +17,7 @@
 
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
-    background: url($static-path + "/images/calc-icon.png") $black-t1 no-repeat center;
+    background: url("#{$static-path}/images/calc-icon.png") $black-t1 no-repeat center;
     border-bottom: 0;
     color: $white;
     float: right;
@@ -33,7 +33,7 @@
     }
 
     &.closed {
-      background-image: url($static-path + "/images/close-calc-icon.png");
+      background-image: url("#{$static-path}/images/close-calc-icon.png");
       background-color: $black;
       top: -36px;
     }
@@ -155,7 +155,7 @@
             height: 35px;
             width: 35px;
             border: none;
-            background: url($static-path + "/images/info-icon.png") center center no-repeat;
+            background: url("#{$static-path}/images/info-icon.png") center center no-repeat;
             color: $white;
 
             &:focus {
