@@ -5,7 +5,7 @@
 # pylint: disable=unused-argument
 
 import os
-from path import path
+from path import Path as path
 import sys
 import mock
 

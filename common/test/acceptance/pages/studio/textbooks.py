@@ -3,7 +3,7 @@ Course Textbooks page.
 """
 
 import requests
-from path import path  # pylint: disable=no-name-in-module
+from path import Path as path
 from .course_page import CoursePage
 from .utils import click_css
 

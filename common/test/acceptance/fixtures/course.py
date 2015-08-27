@@ -9,7 +9,7 @@ import datetime
 
 from textwrap import dedent
 from collections import namedtuple
-from path import path
+from path import Path as path
 
 from opaque_keys.edx.keys import CourseKey
 

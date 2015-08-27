@@ -20,7 +20,7 @@ sessions. Assumes structure:
 
 from .common import *
 import os
-from path import path
+from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 

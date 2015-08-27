@@ -11,7 +11,7 @@ import ddt
 from datetime import timedelta
 from fs.osfs import OSFS
 from json import loads
-from path import path
+from path import Path as path
 from textwrap import dedent
 from uuid import uuid4
 from functools import wraps

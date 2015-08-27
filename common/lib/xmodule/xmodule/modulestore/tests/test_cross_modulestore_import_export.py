@@ -14,7 +14,7 @@ and then for each combination of modulestores, performing the sequence:
 from contextlib import contextmanager, nested
 import itertools
 import os
-from path import path
+from path import Path as path
 import random
 from shutil import rmtree
 from tempfile import mkdtemp

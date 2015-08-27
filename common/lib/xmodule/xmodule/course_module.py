@@ -5,7 +5,7 @@ import logging
 from cStringIO import StringIO
 from math import exp
 from lxml import etree
-from path import path  # NOTE (THK): Only used for detecting presence of syllabus
+from path import Path as path
 import requests
 from datetime import datetime
 import dateutil.parser

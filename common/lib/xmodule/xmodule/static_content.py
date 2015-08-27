@@ -11,7 +11,7 @@ import errno
 import sys
 from collections import defaultdict
 from docopt import docopt
-from path import path
+from path import Path as path
 
 from xmodule.x_module import XModuleDescriptor
 

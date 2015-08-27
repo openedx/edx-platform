@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 import argparse
 import logging
 import sys
-from path import path
+from path import Path as path
 
 from cStringIO import StringIO
 

@@ -3,7 +3,7 @@ Internationalization tasks
 """
 import sys
 import subprocess
-from path import path
+from path import Path as path
 from paver.easy import task, cmdopts, needs, sh
 
 try:
