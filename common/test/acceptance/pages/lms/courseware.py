@@ -102,7 +102,7 @@ class CoursewarePage(CoursePage):
         """
         return the url of the active subsection in the left nav
         """
-        return self.q(css='.chapter-content-container .chapter-menu a.active').attrs('href')[0]
+        return self.q(css='.chapter-content-container .chapter-menu .menu-item.active a').attrs('href')[0]
 
     @property
     def can_start_proctored_exam(self):

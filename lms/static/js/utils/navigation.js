@@ -18,7 +18,7 @@ var edx = edx || {},
             },
 
             checkForCurrent: function() {
-                var active = $('#accordion .chapter-content-container .chapter-menu:has(a.active)').index('#accordion .chapter-content-container .chapter-menu') ? $('#accordion .chapter-content-container .chapter-menu:has(a.active)').index('#accordion .chapter-content-container .chapter-menu') : 0,
+                var active = $('#accordion .chapter-content-container .chapter-menu:has(.active)').index('#accordion .chapter-content-container .chapter-menu') ? $('#accordion .chapter-content-container .chapter-menu:has(.active)').index('#accordion .chapter-content-container .chapter-menu') : 0,
                     activeSection = $('#accordion .button-chapter:eq(' + active + ')');
 
                 navigation.closeAccordions();
