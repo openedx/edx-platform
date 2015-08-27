@@ -3,7 +3,7 @@
     define(['teams/js/collections/base', 'teams/js/models/team', 'gettext'],
         function(BaseCollection, TeamModel, gettext) {
             var TeamCollection = BaseCollection.extend({
-                sortField: 'name',
+                sortField: 'last_activity_at',
 
                 initialize: function(teams, options) {
                     var self = this;
@@ -20,9 +20,8 @@
                     );
                     delete this.server_api.sort_order; // Sort order is not specified for the Team API
 
-                    this.registerSortableField('name', gettext('name'));
-                    this.registerSortableField('open_slots', gettext('open slots'));
                     this.registerSortableField('last_activity_at', gettext('last activity'));
+                    this.registerSortableField('open_slots', gettext('open slots'));
                 },
 
                 model: TeamModel

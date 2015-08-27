@@ -188,6 +188,11 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
         """Return the names of each team on the page."""
         return self.q(css='h3.card-title').map(lambda e: e.text).results
 
+    @property
+    def sort_order(self):
+        """Return the current sort order on the page."""
+        return self.q(css='#paging-header-select option').filter(lambda e: e.is_selected()).results[0].text
+
     def click_create_team_link(self):
         """ Click on create team link."""
         query = self.q(css=CREATE_TEAM_LINK_CSS)

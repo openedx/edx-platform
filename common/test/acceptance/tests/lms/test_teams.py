@@ -511,11 +511,15 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             footer_visible (bool): Whether we expect to see the pagination
                 footer controls.
         """
-        alphabetized_teams = sorted(total_teams, key=lambda team: team['name'])
+        sorted_teams = sorted(
+            sorted(total_teams, key=lambda t: len(t['membership']), reverse=True),
+            key=lambda t: parse(t['last_activity_at']).replace(microsecond=0),
+            reverse=True
+        )
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith(pagination_header_text))
         self.verify_teams(
             self.browse_teams_page,
-            alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
+            sorted_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
         )
         self.assertEqual(
             self.browse_teams_page.pagination_controls_visible(),
@@ -524,14 +528,13 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         )
 
     @ddt.data(
-        ('name', 'name', False),
         ('open_slots', 'last_activity_at', True),
         ('last_activity_at', 'open_slots', True)
     )
     @ddt.unpack
     def test_sort_teams(self, sort_order, secondary_sort_order, reverse):
         """
-        Scenario: the user should be able to sort the list of teams by name, open slots, or last activity
+        Scenario: the user should be able to sort the list of teams by open slots or last activity
         Given I am enrolled in a course with team configuration and topics
         When I visit the Teams page
         And I browse teams within a topic
@@ -550,11 +553,11 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             # Django 1.8.
             team['last_activity_at'] = parse(team['last_activity_at']).replace(microsecond=0)
         # Re-authenticate as staff after creating users
-        _ = AutoAuthPage(
+        AutoAuthPage(
             self.browser,
             course_id=self.course_id,
             staff=True
-        ).visit().user_info
+        ).visit()
         self.browse_teams_page.visit()
         self.browse_teams_page.sort_teams_by(sort_order)
         team_names = self.browse_teams_page.team_names
@@ -568,6 +571,18 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             )
         ][:self.TEAMS_PAGE_SIZE]
         self.assertEqual(team_names, sorted_teams)
+
+    def test_default_sort_order(self):
+        """
+        Scenario: the list of teams should be sorted by last activity by default
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse teams within a topic
+        Then I should see a list of teams for that topic, sorted by last activity
+        """
+        self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        self.browse_teams_page.visit()
+        self.assertEqual(self.browse_teams_page.sort_order, 'last activity')
 
     def test_no_teams(self):
         """
