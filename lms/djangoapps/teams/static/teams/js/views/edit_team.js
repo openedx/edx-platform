@@ -197,12 +197,12 @@
                 },
 
                 showMessage: function (message, screenReaderMessage) {
-                    this.$('.error.wrapper-msg').removeClass('is-hidden');
-                    this.$('.error .msg-content .copy p').text(message);
-                    this.$('.error .wrapper-msg').focus();
+                    this.$('.wrapper-msg').removeClass('is-hidden');
+                    this.$('.msg-content .copy p').text(message);
+                    this.$('.wrapper-msg').focus();
 
                     if (screenReaderMessage) {
-                        this.$('.error .screen-reader-message').text(screenReaderMessage);
+                        this.$('.screen-reader-message').text(screenReaderMessage);
                     }
                 },
 

@@ -540,14 +540,14 @@
                 },
 
                 showWarning: function (message) {
-                    var warningEl = this.$('.wrapper-msg.warning');
+                    var warningEl = this.$('.warning');
                     warningEl.find('.copy').html('<p>' + message + '</p');
                     warningEl.toggleClass('is-hidden', false);
                     warningEl.focus();
                 },
 
                 hideWarning: function () {
-                    this.$('.wrapper-msg.warning').toggleClass('is-hidden', true);
+                    this.$('.warning').toggleClass('is-hidden', true);
                 },
 
                 /**
