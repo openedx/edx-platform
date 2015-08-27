@@ -6,7 +6,7 @@ var edx = edx || {},
 
             init: function() {
 
-                if ($('#accordion').length) {
+                if ($('.accordion').length) {
 
                     navigation.openAccordion();
                 }
@@ -18,15 +18,15 @@ var edx = edx || {},
             },
 
             checkForCurrent: function() {
-                var active = $('#accordion .chapter-content-container .chapter-menu:has(.active)').index('#accordion .chapter-content-container .chapter-menu') ? $('#accordion .chapter-content-container .chapter-menu:has(.active)').index('#accordion .chapter-content-container .chapter-menu') : 0,
-                    activeSection = $('#accordion .button-chapter:eq(' + active + ')');
+                var active = $('.accordion .chapter-content-container .chapter-menu:has(.active)').index('.accordion .chapter-content-container .chapter-menu') ? $('.accordion .chapter-content-container .chapter-menu:has(.active)').index('.accordion .chapter-content-container .chapter-menu') : 0,
+                    activeSection = $('.accordion .button-chapter:eq(' + active + ')');
 
                 navigation.closeAccordions();
                 navigation.openAccordionSection(activeSection);
             },
 
             listenForClick: function() {
-                $('#accordion').on('click', '.button-chapter', function(event) {
+                $('.accordion').on('click', '.button-chapter', function(event) {
                     navigation.closeAccordions();
                     navigation.openAccordionSection(event.currentTarget);
                 });
@@ -36,7 +36,7 @@ var edx = edx || {},
                 $('.chapter-content-container').hide();
                 $('.chapter-content-container .chapter-menu').hide();
 
-                $('#accordion .button-chapter').each(function(event) {
+                $('.accordion .button-chapter').each(function(event) {
                     var el = $(this);
 
                     el.removeClass('is-open').attr('aria-pressed', 'false');

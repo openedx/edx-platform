@@ -1,19 +1,18 @@
 .course-index {
-    @extend .sidebar;
-    @extend .tran;
+    @include transition( all .2s $ease-in-out-quad 0s);
     @include border-right(1px solid $border-color-2);
     @include border-radius(3px, 0, 0, 3px);
+    display: table-cell; // needed to extend the sidebar the full height of the area
 
     // reseting bolded fonts for the course index
     h3 {
         font-weight: normal;
     }
 
-    #accordion {
+    .accordion {
         @extend %t-copy-sub1;
-        width: auto;
 
-        nav {
+        .course-navigation {
 
             .button-chapter {
                 @include box-sizing(border-box);
