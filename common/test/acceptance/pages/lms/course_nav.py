@@ -94,9 +94,10 @@ class CourseNavPage(PageObject):
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
-        subsection_css = ".course-navigation .chapter-content-container:nth-of-type({0}) .chapter-menu .menu-item:nth-of-type({1})".format(
-            sec_index + 1, subsec_index + 1
-        )
+        subsection_css = (
+            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".chapter-menu .menu-item:nth-of-type({1})"
+        ).format(sec_index + 1, subsec_index + 1)
 
         # Click the subsection and ensure that the page finishes reloading
         self.q(css=subsection_css).first.click()
@@ -140,9 +141,10 @@ class CourseNavPage(PageObject):
         """
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = '.course-navigation .chapter-content-container:nth-of-type({0}) .chapter-menu .menu-item a p:nth-of-type(1)'.format(
-            section_index
-        )
+        subsection_css = (
+            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".chapter-menu .menu-item a p:nth-of-type(1)"
+        ).format(section_index)
 
         # If the element is visible, we can get its text directly
         # Otherwise, we need to get the HTML
