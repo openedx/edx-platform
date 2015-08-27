@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
 
 from xmodule_django.models import CourseKeyField
-from util.model_utils import generate_unique_readable_id
+from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 
@@ -51,9 +51,9 @@ class CourseTeam(models.Model):
               team uses, as ISO 639-1 code.
 
         """
-
-        team_id = generate_unique_readable_id(name, cls.objects.all(), 'team_id')
-        discussion_topic_id = uuid4().hex
+        unique_id = uuid4().hex
+        team_id = slugify(name)[0:20] + '-' + unique_id
+        discussion_topic_id = unique_id
 
         course_team = cls(
             team_id=team_id,
