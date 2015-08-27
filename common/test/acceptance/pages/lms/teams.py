@@ -6,6 +6,7 @@ Teams pages.
 from .course_page import CoursePage
 from .discussion import InlineDiscussionPage
 from ..common.paging import PaginatedUIMixin
+from ...pages.studio.utils import confirm_prompt
 
 from .fields import FieldsMixin
 
@@ -182,6 +183,16 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
         """Get all the team cards on the page."""
         return self.q(css='.team-card')
 
+    @property
+    def team_names(self):
+        """Return the names of each team on the page."""
+        return self.q(css='h3.card-title').map(lambda e: e.text).results
+
+    @property
+    def sort_order(self):
+        """Return the current sort order on the page."""
+        return self.q(css='#paging-header-select option').filter(lambda e: e.is_selected()).results[0].text
+
     def click_create_team_link(self):
         """ Click on create team link."""
         query = self.q(css=CREATE_TEAM_LINK_CSS)
@@ -202,6 +213,13 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
         if query.present:
             query.first.click()
             self.wait_for_ajax()
+
+    def sort_teams_by(self, sort_order):
+        """Sort the list of teams by the given `sort_order`."""
+        self.q(
+            css='#paging-header-select option[value={sort_order}]'.format(sort_order=sort_order)
+        ).click()
+        self.wait_for_ajax()
 
 
 class CreateTeamPage(CoursePage, FieldsMixin):
@@ -334,14 +352,17 @@ class TeamPage(CoursePage, PaginatedUIMixin):
         """Verifies that team leave link is present"""
         return self.q(css='.leave-team-link').present
 
-    def click_leave_team_link(self, remaining_members=0):
+    def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
         self.q(css='.leave-team-link').first.click()
-        self.wait_for(
-            lambda: self.join_team_button_present,
-            description="Join Team button did not become present"
-        )
-        self.wait_for_capacity_text(remaining_members)
+        confirm_prompt(self, cancel, require_notification=False)
+
+        if cancel is False:
+            self.wait_for(
+                lambda: self.join_team_button_present,
+                description="Join Team button did not become present"
+            )
+            self.wait_for_capacity_text(remaining_members)
 
     @property
     def team_members(self):

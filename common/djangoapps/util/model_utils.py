@@ -165,30 +165,3 @@ def slugify(value):
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub(r'[-\s]+', '-', value))
-
-
-def generate_unique_readable_id(name, queryset, lookup_field):
-    """Generates a unique readable id from name by appending a numeric suffix.
-
-    Args:
-        name (string): Name to generate the id from. May include spaces.
-        queryset (QuerySet): QuerySet to check for uniqueness within.
-        lookup_field (string): Field name on the model that corresponds to the
-            unique identifier.
-
-    Returns:
-        string: generated unique identifier
-    """
-    candidate = slugify(name)
-    conflicts = queryset.filter(**{lookup_field + '__startswith': candidate}).values_list(lookup_field, flat=True)
-
-    if conflicts and candidate in conflicts:
-        suffix = 2
-        while True:
-            new_id = candidate + '-' + str(suffix)
-            if new_id not in conflicts:
-                candidate = new_id
-                break
-            suffix += 1
-
-    return candidate

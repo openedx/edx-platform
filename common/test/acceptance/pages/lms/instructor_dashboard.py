@@ -548,6 +548,7 @@ class CohortManagementSection(PageObject):
         """
         if state != self.is_cohorted:
             self.q(css=self._bounded_selector('.cohorts-state')).first.click()
+            self.wait_for_ajax()
 
     def toggles_showing_of_discussion_topics(self):
         """

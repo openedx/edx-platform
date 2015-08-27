@@ -533,20 +533,28 @@ class TestCreateTeamAPI(TeamAPITestCase):
     def test_access(self, user, status):
         team = self.post_create_team(status, self.build_team_data(name="New Team"), user=user)
         if status == 200:
-            self.assertEqual(team['id'], 'new-team')
-            self.assertIn('discussion_topic_id', team)
+            self.verify_expected_team_id(team, 'new-team')
             teams = self.get_teams_list(user=user)
             self.assertIn("New Team", [team['name'] for team in teams['results']])
+
+    def verify_expected_team_id(self, team, expected_prefix):
+        """ Verifies that the team id starts with the specified prefix and ends with the discussion_topic_id """
+        self.assertIn('id', team)
+        self.assertIn('discussion_topic_id', team)
+        self.assertEqual(team['id'], expected_prefix + '-' + team['discussion_topic_id'])
 
     def test_naming(self):
         new_teams = [
             self.post_create_team(data=self.build_team_data(name=name), user=self.create_and_enroll_student())
-            for name in ["The Best Team", "The Best Team", "The Best Team", "The Best Team 2"]
+            for name in ["The Best Team", "The Best Team", "A really long team name"]
         ]
-        self.assertEquals(
-            [team['id'] for team in new_teams],
-            ['the-best-team', 'the-best-team-2', 'the-best-team-3', 'the-best-team-2-2']
-        )
+        # Check that teams with the same name have unique IDs.
+        self.verify_expected_team_id(new_teams[0], 'the-best-team')
+        self.verify_expected_team_id(new_teams[1], 'the-best-team')
+        self.assertNotEqual(new_teams[0]['id'], new_teams[1]['id'])
+
+        # Verify expected truncation behavior with names > 20 characters.
+        self.verify_expected_team_id(new_teams[2], 'a-really-long-team-n')
 
     @ddt.data((400, {
         'name': 'Bad Course ID',
@@ -616,6 +624,10 @@ class TestCreateTeamAPI(TeamAPITestCase):
             language='fr'
         ), user=creator)
 
+        # Verify the id (it ends with a unique hash, which is the same as the discussion_id).
+        self.verify_expected_team_id(team, 'fully-specified-team')
+        del team['id']
+
         # Remove date_created and discussion_topic_id because they change between test runs
         del team['date_created']
         del team['discussion_topic_id']
@@ -643,7 +655,6 @@ class TestCreateTeamAPI(TeamAPITestCase):
             'is_active': True,
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
-            'id': 'fully-specified-team',
             'description': 'Another fantastic team'
         })
 

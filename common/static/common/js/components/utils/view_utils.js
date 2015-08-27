@@ -1,7 +1,10 @@
 /**
  * Provides useful utilities for views.
  */
-define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt"],
+;(function (define) {
+    'use strict';
+    define(["jquery", "underscore", "gettext", "common/js/components/views/feedback_notification",
+        "common/js/components/views/feedback_prompt"],
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
@@ -246,3 +249,4 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations
         };
     });
+}).call(this, define || RequireJS.define);

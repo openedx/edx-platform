@@ -6,8 +6,8 @@ define([ // jshint ignore:line
     'underscore',
     'gettext',
     'js/views/baseview',
-    'js/views/utils/view_utils',
-    'js/views/feedback_notification'
+    'common/js/components/utils/view_utils',
+    'common/js/components/views/feedback_notification'
 ],
 function(_, gettext, BaseView, ViewUtils, NotificationView) {
     'use strict';

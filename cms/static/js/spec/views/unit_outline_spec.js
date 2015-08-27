@@ -1,5 +1,5 @@
 define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/template_helpers",
-        "js/spec_helpers/view_helpers", "js/views/utils/view_utils", "js/views/unit_outline", "js/models/xblock_info"],
+        "common/js/spec_helpers/view_helpers", "common/js/components/utils/view_utils", "js/views/unit_outline", "js/models/xblock_info"],
     function ($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils, UnitOutlineView, XBlockInfo) {
 
         describe("UnitOutlineView", function() {
