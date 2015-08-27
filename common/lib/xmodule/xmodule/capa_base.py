@@ -21,7 +21,7 @@ except ImportError:
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
-from capa.util import convert_files_to_filenames
+from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from .progress import Progress
 from xmodule.exceptions import NotFoundError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
@@ -606,7 +606,7 @@ class CapaMixin(CapaFields):
 
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         hint_element = demand_hints[hint_index]
-        hint_text = hint_element.text.strip()
+        hint_text = get_inner_html_from_xpath(hint_element)
         if len(demand_hints) == 1:
             prefix = _('Hint: ')
         else:
