@@ -86,6 +86,7 @@ django-ratelimit-backend==0.6
 unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
+wrapt==1.10.5
 
 # This needs to be installed *after* Cython, which is in pre.txt
 lxml==3.4.4
