@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 import json
 import logging
 from social.backends.base import BaseAuth
-from social.backends.oauth import BaseOAuth2
+from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
@@ -30,7 +30,7 @@ def _load_backend_classes(base_class=BaseAuth):
         if issubclass(auth_class, base_class):
             yield auth_class
 _PSA_BACKENDS = {backend_class.name: backend_class for backend_class in _load_backend_classes()}
-_PSA_OAUTH2_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(BaseOAuth2)]
+_PSA_OAUTH2_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(OAuthAuth)]
 _PSA_SAML_BACKENDS = [backend_class.name for backend_class in _load_backend_classes(SAMLAuth)]
 
 
@@ -166,6 +166,7 @@ class ProviderConfig(ConfigurationModel):
 class OAuth2ProviderConfig(ProviderConfig):
     """
     Configuration Entry for an OAuth2 based provider.
+    Also works for OAuth1 providers.
     """
     prefix = 'oa2'
     KEY_FIELDS = ('backend_name', )  # Backend name is unique
@@ -191,7 +192,7 @@ class OAuth2ProviderConfig(ProviderConfig):
     other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
 
     class Meta(object):  # pylint: disable=missing-docstring
-        verbose_name = "Provider Configuration (OAuth2)"
+        verbose_name = "Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
 
     def clean(self):
