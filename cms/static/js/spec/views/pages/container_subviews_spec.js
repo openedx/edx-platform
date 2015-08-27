@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
-        "js/models/xblock_info", "js/views/utils/xblock_utils"],
+        "common/js/components/views/feedback_prompt", "js/views/pages/container",
+        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils"],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils) {
         var VisibilityState = XBlockUtils.VisibilityState;

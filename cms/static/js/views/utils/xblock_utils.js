@@ -1,7 +1,7 @@
 /**
  * Provides utilities for views to work with xblocks.
  */
-define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/utils/module"],
+define(["jquery", "underscore", "gettext", "common/js/components/utils/view_utils", "js/utils/module"],
     function($, _, gettext, ViewUtils, ModuleUtils) {
         var addXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
             getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields;
