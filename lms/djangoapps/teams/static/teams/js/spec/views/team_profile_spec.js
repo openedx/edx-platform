@@ -55,7 +55,10 @@ define([
                     ['en', 'English'],
                     ['fr', 'French']
                 ],
-                teamMembershipDetailUrl: 'api/team/v0/team_membership/team_id,bilbo'
+                teamMembershipDetailUrl: 'api/team/v0/team_membership/team_id,bilbo',
+                setFocusToHeaderFunc: function() {
+                    $('.teams-content').focus();
+                }
             });
             profileView.render();
             AjaxHelpers.expectRequest(
