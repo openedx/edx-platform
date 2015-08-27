@@ -2098,18 +2098,12 @@ class UpdateThreadTest(
         are the same, no update should be made. Otherwise, a vote should be PUT
         or DELETEd according to the new_vote_status value.
         """
-        vote_count = 0
         if current_vote_status:
             self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-            vote_count = 1
         self.register_thread_votes_response("test_thread")
-        self.register_thread(overrides={"votes": {"up_count": vote_count}})
+        self.register_thread()
         data = {"voted": new_vote_status}
         result = update_thread(self.request, "test_thread", data)
-        if new_vote_status:
-            self.assertEqual(result["vote_count"], 1)
-        else:
-            self.assertEqual(result["vote_count"], 0)
         self.assertEqual(result["voted"], new_vote_status)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/threads/test_thread/votes"
@@ -2130,6 +2124,31 @@ class UpdateThreadTest(
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count(self, current_vote_status, first_vote, second_vote):
+        """
+        Tests vote_count increases and decreases correctly from the same user
+        """
+        #setup
+        starting_vote_count = 0
+        if current_vote_status:
+            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            starting_vote_count = 1
+        self.register_thread_votes_response("test_thread")
+        self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
+
+        #first vote
+        data = {"voted": first_vote}
+        result = update_thread(self.request, "test_thread", data)
+        self.register_thread(overrides={"voted": first_vote})
+        self.assertEqual(result["vote_count"], 1 if first_vote else 0)
+
+        #second vote
+        data = {"voted": second_vote}
+        result = update_thread(self.request, "test_thread", data)
+        self.assertEqual(result["vote_count"], 1 if second_vote else 0)
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -2433,10 +2452,7 @@ class UpdateCommentTest(
         self.register_comment(overrides={"votes": {"up_count": vote_count}})
         data = {"voted": new_vote_status}
         result = update_comment(self.request, "test_comment", data)
-        if new_vote_status:
-            self.assertEqual(result["vote_count"], 1)
-        else:
-            self.assertEqual(result["vote_count"], 0)
+        self.assertEqual(result["vote_count"], 1 if new_vote_status else 0)
         self.assertEqual(result["voted"], new_vote_status)
         last_request_path = urlparse(httpretty.last_request().path).path
         votes_url = "/api/v1/comments/test_comment/votes"

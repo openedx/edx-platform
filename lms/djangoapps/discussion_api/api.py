@@ -120,9 +120,12 @@ def _is_user_author_or_privileged(cc_content, context):
     )
 
 
-def _validate_and_update_vote_count(actions_form, serializer, update_data):
+def _validate_and_update_vote_count(form, serializer, update_data):
     """
-    Calls is_valid on form, updates vote, then calls is_valid on serializer
+    Calls is_valid on form, updates vote_count, calls is_valid on serializer
+
+    If the user has already voted and `voted == False` then -1 to the vote count
+    If the user has not voted and `voted == True` then +1 to the vote count
 
     Arguments:
 
@@ -130,30 +133,15 @@ def _validate_and_update_vote_count(actions_form, serializer, update_data):
         serializer (ThreadSerializer/CommentSerializer): Serializer to update
         update_data (dict): Dict of the fields to be updated
     """
-    if not actions_form.is_valid():
-        raise ValidationError(dict(actions_form.errors.items()))
+    if not form.is_valid():
+        raise ValidationError(dict(form.errors.items()))
     if "voted" in update_data:
-        _update_vote_count(actions_form.cleaned_data["voted"], serializer)
+        if form.cleaned_data["voted"] and not serializer.data["voted"]:
+            serializer.data["vote_count"] += 1
+        elif not form.cleaned_data["voted"] and serializer.data["voted"]:
+            serializer.data["vote_count"] -= 1
     if not serializer.is_valid():
         raise ValidationError(dict(serializer.errors.items()))
-
-
-def _update_vote_count(voted, serializer):
-    """
-    Updates the vote_count in the given serializer
-
-    If the user has already voted and `voted == False` then -1 to the vote count
-    If the user has not voted and `voted == True` then +1 to the vote count
-
-    Arguments:
-
-        voted (Bool): Boolean of the new vote status
-        serializer (ThreadSerializer/CommentSerializer): Serializer to update
-    """
-    if voted and not serializer.data["voted"]:
-        serializer.data["vote_count"] += 1
-    elif not voted and serializer.data["voted"]:
-        serializer.data["vote_count"] -= 1
 
 
 def get_thread_list_url(request, course_key, topic_id_list=None, following=False):
