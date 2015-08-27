@@ -14,6 +14,8 @@ from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIClient
 
+from common.test.utils import disable_signal
+from discussion_api import api
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -385,6 +387,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @httpretty.activate
+@disable_signal(api, 'thread_created')
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet create"""
     def setUp(self):
@@ -476,6 +479,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @httpretty.activate
+@disable_signal(api, 'thread_edited')
 class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet partial_update"""
     def setUp(self):
@@ -575,6 +579,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
 
 @httpretty.activate
+@disable_signal(api, 'thread_deleted')
 class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
     def setUp(self):
@@ -738,6 +743,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @httpretty.activate
+@disable_signal(api, 'comment_deleted')
 class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet delete"""
 
@@ -778,6 +784,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @httpretty.activate
+@disable_signal(api, 'comment_created')
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
     def setUp(self):
@@ -861,6 +868,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response_data, expected_response_data)
 
 
+@disable_signal(api, 'comment_edited')
 class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet partial_update"""
     def setUp(self):

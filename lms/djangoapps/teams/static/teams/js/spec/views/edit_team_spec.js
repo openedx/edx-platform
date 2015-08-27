@@ -20,7 +20,8 @@ define([
                 description: "TeamDescription",
                 country: "c",
                 language: "a",
-                membership: []
+                membership: [],
+                last_activity_at: ''
             },
             verifyValidation = function (requests, teamEditView, fieldsData) {
                 _.each(fieldsData, function (fieldData) {
