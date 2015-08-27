@@ -4,7 +4,7 @@
 // pre-pattern library messages
 
 // UI : message
-%wrapper-msg {
+.wrapper-msg {
   display: block;
   background: $notify-banner-bg-1;
   padding: $baseline ($baseline*1.5);
@@ -145,13 +145,6 @@
   }
 }
 
-.wrapper-msg {
-  @extend %wrapper-msg;
-}
-
-.wrapper-msg-fixed {
-  @extend %wrapper-msg;
-}
 
 // prompts
 

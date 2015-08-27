@@ -225,23 +225,30 @@
                 editTeam: function (topicID, teamID) {
                     var self = this,
                         editViewWithHeader;
-                    this.getTeamsView(topicID).done(function (teamsView) {
+                    this.getTopic(topicID).done(function (topic) {
                         self.getTeam(teamID, false).done(function(team) {
                             var view = new TeamEditView({
                                 action: 'edit',
                                 teamEvents: self.teamEvents,
-                                teamParams: teamsView.main.teamParams,
-                                model: team,
-                                teamsDetailUrl: self.teamsDetailUrl
+                                teamParams: {
+                                    courseID: self.courseID,
+                                    topicID: topic.get('id'),
+                                    teamsUrl: self.teamsUrl,
+                                    topicName: topic.get('name'),
+                                    languages: self.languages,
+                                    countries: self.countries,
+                                    teamsDetailUrl: self.teamsDetailUrl
+                                },
+                                model: team
                             });
                             editViewWithHeader = self.createViewWithHeader({
                                     mainView: view,
                                     subject: {
                                         name: gettext("Edit Team"),
-                                        description: gettext("If you edit any team details, you should notify team members of your changes.")
+                                        description: gettext("If you make significant changes, make sure you notify members of the team before making these changes.")
                                     },
                                     parentTeam: team,
-                                    topicID: teamsView.main.teamParams.topicID
+                                    parentTopic: topic
                                 }
                             );
                             self.mainView = editViewWithHeader;
@@ -376,7 +383,8 @@
                             title: options.parentTopic.get('name'),
                             url: '#topics/' + options.parentTopic.id
                         });
-                    } else if (options.parentTeam) {
+                    }
+                    if (options.parentTeam) {
                         breadcrumbs.push({
                             title: options.parentTeam.get('name'),
                             url: 'teams/' + options.topicID + '/' + options.parentTeam.id
@@ -386,7 +394,7 @@
                         viewDescription = options.subject.get('description');
                         viewTitle = options.subject.get('name');
 
-                    } else {
+                    } else if (options.subject) {
                         viewDescription = options.subject.description;
                         viewTitle = options.subject.name;
                     }

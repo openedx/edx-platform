@@ -335,7 +335,7 @@ class BrowseTopicsTest(TeamsTabBase):
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
         self.assertTrue(browse_teams_page.is_browser_on_page())
         browse_teams_page.click_create_team_link()
-        create_team_page = CreateTeamPage(self.browser, self.course_id, topic)
+        create_team_page = CreateOrEditTeamPage(self.browser, self.course_id, topic)
         create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
         create_team_page.value_for_textarea_field(
             field_id='description',
@@ -671,11 +671,14 @@ class TeamFormActions(TeamsTabBase):
         self.verify_page_header(
             title='Edit Team',
             description='If you edit any team details, you should notify team members of your changes.',
-            breadcrumbs=self.topic['name']
+            breadcrumbs='All Topics {topic_name} {team_name}'.format(
+                topic_name=self.topic['name'],
+                team_name=self.team['name']
+            )
         )
 
-    def verify_form_values_on_team_page(self, name, description, location, language):
-        """Verify the values for create/edit form."""
+    def verify_team_info(self, name, description, location, language):
+        """Verify the team information on team page."""
         # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, name)
         self.assertEqual(self.team_page.team_description, description)
@@ -811,7 +814,6 @@ class CreateTeamTest(TeamFormActions):
         """
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.browse_teams_page.visit()
-        self.browse_teams_page.wait_for_page()
 
         self.verify_and_navigate_to_create_team_page()
 
@@ -877,7 +879,6 @@ class EditTeamTest(TeamFormActions):
         self.team = self.create_teams(self.topic, num_teams=1)[0]
         self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
         self.team_page.visit()
-        self.team_page.wait_for_page()
 
     def test_staff_can_navigate_to_edit_team_page(self):
         """
@@ -889,15 +890,9 @@ class EditTeamTest(TeamFormActions):
         Then I should see the edit team page
         And I should see the edit team header
         And I should also see the help messages for fields
-        And I should also see the warning message.
         """
         self.verify_and_navigate_to_edit_team_page()
         self.verify_team_data()
-        self.assertEqual(
-            self.create_or_edit_team_page.warning_message_text,
-            'The team that you are editing has 0 members. '
-            'Notify team members prior to making significant changes.'
-        )
 
     def test_staff_can_edit_team_successfully(self):
         """
@@ -911,7 +906,7 @@ class EditTeamTest(TeamFormActions):
         And I click Update button
         Then I should see the page for my team with updated data
         """
-        self.verify_form_values_on_team_page(
+        self.verify_team_info(
             name=self.team['name'],
             description=self.team['description'],
             location='Afghanistan',
@@ -924,7 +919,7 @@ class EditTeamTest(TeamFormActions):
 
         self.team_page.wait_for_page()
 
-        self.verify_form_values_on_team_page(
+        self.verify_team_info(
             name=self.team_name,
             description=self.TEAM_DESCRIPTION,
             location='Pakistan',
@@ -943,7 +938,7 @@ class EditTeamTest(TeamFormActions):
         When I click Cancel button
         Then I should see team page page without changes.
         """
-        self.verify_form_values_on_team_page(
+        self.verify_team_info(
             name=self.team['name'],
             description=self.team['description'],
             location='Afghanistan',
@@ -957,7 +952,7 @@ class EditTeamTest(TeamFormActions):
 
         self.team_page.wait_for_page()
 
-        self.verify_form_values_on_team_page(
+        self.verify_team_info(
             name=self.team['name'],
             description=self.team['description'],
             location='Afghanistan',
@@ -973,7 +968,6 @@ class EditTeamTest(TeamFormActions):
         """
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.team_page.visit()
-        self.teams_page.wait_for_page()
         self.assertFalse(self.team_page.edit_team_button_present)
 
     @ddt.data('Moderator', 'Community TA', 'Administrator')
@@ -997,7 +991,7 @@ class EditTeamTest(TeamFormActions):
         self.teams_page.wait_for_page()
         self.assertTrue(self.team_page.edit_team_button_present)
 
-        self.verify_form_values_on_team_page(
+        self.verify_team_info(
             name=self.team['name'],
             description=self.team['description'],
             location='Afghanistan',
@@ -1010,7 +1004,7 @@ class EditTeamTest(TeamFormActions):
 
         self.team_page.wait_for_page()
 
-        self.verify_form_values_on_team_page(
+        self.verify_team_info(
             name=self.team_name,
             description=self.TEAM_DESCRIPTION,
             location='Pakistan',

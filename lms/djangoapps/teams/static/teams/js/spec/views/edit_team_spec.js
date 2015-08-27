@@ -116,7 +116,6 @@ define([
             expect(teamEditView.$('.create-team.form-actions .action-cancel').length).toBe(1);
 
             if (teamAction === 'edit') {
-                expect(teamEditView.$('.wrapper-msg-fixed .copy').text().trim()).toContain('The team that you are editing has');
                 expect(teamEditView.$el.find('.u-field-name input').val()).toBe('Avengers');
                 expect(teamEditView.$el.find('.u-field-description textarea').val()).toBe('Team of dumbs');
                 expect(teamEditView.$el.find('.u-field-language select option:selected').text()).toBe('English');

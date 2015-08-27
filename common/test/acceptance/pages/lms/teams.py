@@ -245,11 +245,6 @@ class CreateOrEditTeamPage(CoursePage, FieldsMixin):
         """Get the error message text"""
         return self.q(css='.create-team.wrapper-msg .copy')[0].text
 
-    @property
-    def warning_message_text(self):
-        """Get the fixed warning message text"""
-        return self.q(css='.team-info.wrapper-msg-fixed .copy')[0].text
-
     def submit_form(self):
         """Click on create team button"""
         self.q(css='.create-team .action-primary').first.click()
