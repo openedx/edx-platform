@@ -22,56 +22,56 @@ $static-path: '..' !default;
 // ----------------------------
 // #UNITS
 // ----------------------------
-$baseline: 20px;
+$baseline: 20px !default;
 
 
 // ----------------------------
 // #GRID
 // ----------------------------
-$gw-column: 80px;
-$gw-gutter: 20px;
-$fg-column: $gw-column;
-$fg-gutter: $gw-gutter;
-$fg-max-columns: 12;
-$fg-max-width: 1400px;
-$fg-min-width: 810px;
+$gw-column: 80px !default;
+$gw-gutter: 20px !default;
+$fg-column: $gw-column !default;
+$fg-gutter: $gw-gutter !default;
+$fg-max-columns: 12 !default;
+$fg-max-width: 1400px !default;
+$fg-min-width: 810px !default;
 
 
 // ----------------------------
 // #COLORS
 // ----------------------------
-$transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
+$transparent: rgba(0,0,0,0) !default; // used when color value is needed for UI width/transitions but element is transparent
 
-$black: rgb(0,0,0);  // #000000;
-$black-t0: rgba($black, 0.125);
-$black-t1: rgba($black, 0.25);
-$black-t2: rgba($black, 0.5);
-$black-t3: rgba($black, 0.75);
+$black:     rgb(0,0,0) !default;
+$black-t0:  rgba($black, 0.125) !default;
+$black-t1:  rgba($black, 0.25) !default;
+$black-t2:  rgba($black, 0.5) !default;
+$black-t3:  rgba($black, 0.75) !default;
 
-$white: rgb(255,255,255);  // #FFFFFF;
-$white-t0: rgba($white, 0.125);
-$white-t1: rgba($white, 0.25);
-$white-t2: rgba($white, 0.5);
-$white-t3: rgba($white, 0.75);
+$white:     rgb(255,255,255) !default;
+$white-t0:  rgba($white, 0.125) !default;
+$white-t1:  rgba($white, 0.25) !default;
+$white-t2:  rgba($white, 0.5) !default;
+$white-t3:  rgba($white, 0.75) !default;
 
-$gray: rgb(118,118,118);    // #767676 AA compliant
-$gray-l1: tint($gray,20%);  // #989898
-$gray-l2: tint($gray,40%);  // #b2b2b2
-$gray-l3: tint($gray,60%);  // #cbcbcb
-$gray-l4: tint($gray,80%);  // #e5e5e5
-$gray-l5: tint($gray,90%);  // #f2f2f2
-$gray-l6: tint($gray,95%);  // #f8f8f8
-$gray-l7: tint($gray,99%);  // #fdfdfd
-$gray-d1: shade($gray,20%); // #656565
-$gray-d2: shade($gray,40%); // #4c4c4c
-$gray-d3: shade($gray,60%); // #323232
-$gray-d4: shade($gray,80%); // #191919
+$gray:      rgb(118,118,118) !default;
+$gray-l1:   tint($gray,20%) !default;
+$gray-l2:   tint($gray,40%) !default;
+$gray-l3:   tint($gray,60%) !default;
+$gray-l4:   tint($gray,80%) !default;
+$gray-l5:   tint($gray,90%) !default;
+$gray-l6:   tint($gray,95%) !default;
+$gray-l7:   tint($gray,99%) !default;
+$gray-d1:   shade($gray,20%) !default;
+$gray-d2:   shade($gray,40%) !default;
+$gray-d3:   shade($gray,60%) !default;
+$gray-d4:   shade($gray,80%) !default;
 
 
 $blue: rgb(0, 120, 176);
 $yellow: rgb(255, 252, 221);
 
-$pink: rgb(182,37,103); // #b72567;
+$pink: rgb(182,37,103);
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);
 $pink-l3: tint($pink,60%);
@@ -88,7 +88,7 @@ $pink-u1: desaturate($pink,15%);
 $pink-u2: desaturate($pink,30%);
 $pink-u3: desaturate($pink,45%);
 
-$red: rgb(178, 6, 16); // #b20610;
+$red: rgb(178, 6, 16);
 $red-l1: tint($red,20%);
 $red-l2: tint($red,40%);
 $red-l3: tint($red,60%);
@@ -105,7 +105,7 @@ $red-u1: desaturate($red,15%);
 $red-u2: desaturate($red,30%);
 $red-u3: desaturate($red,45%);
 
-$green: rgb(37, 184, 90); // #25b85a;
+$green: rgb(37, 184, 90);
 $green-l1: tint($green,20%);
 $green-l2: tint($green,40%);
 $green-l3: tint($green,60%);
@@ -192,75 +192,75 @@ $facebook-blue: #3B5998;
 $linkedin-blue: #0077B5;
 
 // shadows
-$shadow: rgba(0,0,0,0.2);
-$shadow-l1: rgba(0,0,0,0.1);
-$shadow-l2: rgba(0,0,0,0.05);
-$shadow-d1: rgba(0,0,0,0.4);
-$shadow-d2: rgba($black, 0.6);
+$shadow: rgba(0,0,0,0.2) !default;
+$shadow-l1: rgba(0,0,0,0.1) !default;
+$shadow-l2: rgba(0,0,0,0.05) !default;
+$shadow-d1: rgba(0,0,0,0.4) !default;
+$shadow-d2: rgba($black, 0.6) !default;
 
 // system feedback-based colors
-$error-color: rgb(253, 87, 87);
-$warning-color: rgb(181,42,103);
-$confirm-color: rgb(0, 136, 1);
-$active-color: $blue;
-$highlight-color: rgb(255,255,0);
-$alert-color: rgb(212, 64, 64); //rich red
-$warning-color: rgb(237, 189, 60); //rich yellow
-$success-color: rgb(37, 184, 90); //rich green
+$error-color: rgb(253, 87, 87) !default;
+$warning-color: rgb(181,42,103) !default;
+$confirm-color: rgb(0, 136, 1) !default;
+$active-color: $blue !default;
+$highlight-color: rgb(255,255,0) !default;
+$alert-color: rgb(212, 64, 64) !default;
+$warning-color: rgb(237, 189, 60) !default;
+$success-color: rgb(37, 184, 90) !default;
 
 // newer color variables
 $dark-gray1: rgb(74,74,74);
-$light-gray1: rgb(242,242,242); // #f2f2f2
-$light-gray2: rgb(171,171,171); // #ababab
-$light-gray3: rgb(249,249,249); // #f9f9f9
-$dark-gray2: rgb(151,151,151); // #979797
-$blue1: rgb(74,144,226); // #4A90E2
-$blue2: rgb(0,161,229); // #00A1E5
-$green1: rgb(97,161,46); // #61A12E
-$red1: rgb(208,2,27); // #D0021B
+$light-gray1: rgb(242,242,242);
+$light-gray2: rgb(171,171,171);
+$light-gray3: rgb(249,249,249);
+$dark-gray2: rgb(151,151,151);
+$blue1: rgb(74,144,226);
+$blue2: rgb(0,161,229);
+$green1: rgb(97,161,46);
+$red1: rgb(208,2,27);
 
 // edx-specific: marketing site variables
-$m-gray: rgb(138,140,143); // #8A8C8F
-$m-gray-l1: rgb(151,153,155); // #97999B
-$m-gray-l2: rgb(164,166,168); // #A4A6A8
-$m-gray-l3: rgb(177,178,180); // #B1B2B4
-$m-gray-l4: rgb(245,245,245); // #F5F5F5
-$m-gray-d1: rgb(111, 112, 116); // #6f7074
-$m-gray-d2: rgb(112,114,118); // #707276
-$m-gray-d3: rgb(100,102,104); // #646668
-$m-gray-d4: rgb(5,5,5); // #050505
+$m-gray: rgb(138,140,143); //C8F
+$m-gray-l1: rgb(151,153,155);
+$m-gray-l2: rgb(164,166,168);
+$m-gray-l3: rgb(177,178,180);
+$m-gray-l4: rgb(245,245,245);
+$m-gray-d1: rgb(111, 112, 116);
+$m-gray-d2: rgb(112,114,118);
+$m-gray-d3: rgb(100,102,104);
+$m-gray-d4: rgb(5,5,5);
 $m-gray-t0: rgba($m-gray,0.125);
 $m-gray-t1: rgba($m-gray,0.25);
 $m-gray-t2: rgba($m-gray,0.50);
 $m-gray-t3: rgba($m-gray,0.75);
 
-$m-blue: rgb(26,161,222); // #1AA1DE
-$m-blue-l1: rgb(43,172,230); // #2BACE6
-$m-blue-l2: rgb(66,181,233); // #42B5E9
-$m-blue-l3: rgb(89,190,236); // #59BEEC
+$m-blue: rgb(26,161,222);
+$m-blue-l1: rgb(43,172,230);
+$m-blue-l2: rgb(66,181,233);
+$m-blue-l3: rgb(89,190,236);
 $m-blue-l4: tint($m-blue,90%);
 $m-blue-l5: tint($m-blue,95%);
 $m-blue-l6: #4bb4fb;
-$m-blue-d1: rgb(23,144,199); // #1790C7
+$m-blue-d1: rgb(23,144,199);
 $m-blue-d2: $blue;
-$m-blue-d3: rgb(18,111,154); // #126F9A
-$m-blue-d4: rgb(10,74,103); // #0A4A67
-$m-blue-d5: rgb(0,158,231); // #009EE7
+$m-blue-d3: rgb(18,111,154);
+$m-blue-d4: rgb(10,74,103);
+$m-blue-d5: rgb(0,158,231);
 $m-blue-d6: #256A97;
 $m-blue-t0: rgba($m-blue,0.125);
 $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);
 $m-blue-t3: rgba($m-blue,0.75);
 
-$m-pink: rgb(181,42,103); // #B52A67
-$m-pink-l1: rgb(202,47,115); //#CA2F73
-$m-pink-l2: rgb(211,63,128); //#D33F80
-$m-pink-l3: rgb(215,84,142); //#D7548E
+$m-pink: rgb(181,42,103);
+$m-pink-l1: rgb(202,47,115);
+$m-pink-l2: rgb(211,63,128);
+$m-pink-l3: rgb(215,84,142);
 $m-pink-l4: tint($m-pink,75%);
 $m-pink-l5: tint($m-pink,85%);
-$m-pink-d1: rgb(160,37,91); // #A0255B
-$m-pink-d2: rgb(140,32,79); // #8C204F
-$m-pink-d3: rgb(119,28,68); // #771C44
+$m-pink-d1: rgb(160,37,91);
+$m-pink-d2: rgb(140,32,79);
+$m-pink-d3: rgb(119,28,68);
 
 $m-green: rgb(0, 136, 1);
 $m-green-s1: rgb(96, 188, 97);
@@ -309,20 +309,20 @@ $credit-color-base: rgb(244,195,0); // accessible with black text
 // ----------------------------
 $sans-serif: 'Open Sans', $verdana, sans-serif !default;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace !default;
-$body-font-family: $sans-serif;
+$body-font-family: $sans-serif !default;
 $serif: $georgia !default;
 
 // newer variables/standards
-$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
-$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
-$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif !default;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif !default;
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace !default;
 
-$font-light: 300;
-$font-regular: 400;
-$font-semibold: 600;
-$font-bold: 700;
+$font-light: 300 !default;
+$font-regular: 400 !default;
+$font-semibold: 600 !default;
+$font-bold: 700 !default;
 
-$m-base-font-size: em(15);
+$m-base-font-size: em(15) !default;
 
 
 // ----------------------------
@@ -333,43 +333,43 @@ $m-base-font-size: em(15);
 // ----------------------------
 // #TIMING
 // ----------------------------
-$tmg-s3: 3.0s;
-$tmg-s2: 2.0s;
-$tmg-s1: 1.0s;
-$tmg-avg: 0.75s;
-$tmg-f1: 0.50s;
-$tmg-f2: 0.25s;
-$tmg-f3: 0.125s;
+$tmg-s3: 3.0s !default;
+$tmg-s2: 2.0s !default;
+$tmg-s1: 1.0s !default;
+$tmg-avg: 0.75s !default;
+$tmg-f1: 0.50s !default;
+$tmg-f2: 0.25s !default;
+$tmg-f3: 0.125s !default;
 
 
 // ----------------------------
 // #FORMS
 // ----------------------------
-$form-bg-color: $white;
+$form-bg-color: $white !default;
 
 // ----------------------------
 // #APPLICATIONS
 // ----------------------------
 // font sizes
-$body-font-size: em(14);
-$body-line-height: golden-ratio(.875em, 1);
+$body-font-size: em(14) !default;
+$body-line-height: golden-ratio(.875em, 1) !default;
 
-$base-font-color: rgb(60,60,60);
-$baseFontColor: rgb(60,60,60);
+$base-font-color: rgb(60,60,60) !default;
+$baseFontColor: $base-font-color;
 
-$lighter-base-font-color: rgb(100,100,100);
-$very-light-text: rgb(255,255,255); // #ffffff
-$text-color: rgb(51, 51, 51);
+$lighter-base-font-color: rgb(100,100,100) $base-font-color;
+$very-light-text: rgb(255,255,255) !default;
+$text-color: rgb(51, 51, 51) !default;
 
 // borders
-$border-color-1: rgb(190,190,190);
-$border-color-2: rgb(200,200,200);
-$border-color-3: rgb(100,100,100);
-$border-color-4: rgb(252,252,252);
-$border-color-l1: $m-gray-l1;
-$border-color-l2: $m-gray-l2;
-$border-color-l3: $m-gray-l3;
-$border-color-l4: $m-gray-l4;
+$border-color-1: rgb(190,190,190) !default;
+$border-color-2: rgb(200,200,200) !default;
+$border-color-3: rgb(100,100,100) !default;
+$border-color-4: rgb(252,252,252) !default;
+$border-color-l1: $m-gray-l1 !default;
+$border-color-l2: $m-gray-l2 !default;
+$border-color-l3: $m-gray-l3 !default;
+$border-color-l4: $m-gray-l4 !default;
 
 // visual horizontal rules
 $faded-hr-image-1: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1) 50%, rgba(200,200,200, 0));
@@ -380,51 +380,51 @@ $faded-hr-image-5: linear-gradient(180deg, rgba(255,255,255, 0) 0%, rgba(255,255
 $faded-hr-image-6: linear-gradient(90deg, rgba(255,255,255, 0) 0%, rgba(255,255,255, 0.6) 50%, rgba(255,255,255, 0));
 
 // notifications
-$notify-banner-bg-1: rgb(56,56,56);
-$notify-banner-bg-2: rgb(136,136,136);
-$notify-banner-bg-3: $shadow-l2;
-$msg-bg: $m-blue-d3;
+$notify-banner-bg-1: rgb(56,56,56) !default;
+$notify-banner-bg-2: rgb(136,136,136) !default;
+$notify-banner-bg-3: $shadow-l2 !default;
+$msg-bg: $m-blue-d3 !default;
 
 // actions
-$button-bg-image: linear-gradient(rgb(255,255,255) 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
-$button-bg-color: transparent;
-$button-bg-hover-color: $white;
+$button-bg-image: linear-gradient(rgb(255,255,255) 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%) !default;
+$button-bg-color: transparent !default;
+$button-bg-hover-color: $white !default;
 
 // action - primary
-$action-primary-bg: $m-blue-d3;
-$action-primary-fg: $white;
-$action-primary-shadow: $m-blue-d4;
-$action-primary-focused-bg: $m-blue-d1;
-$action-primary-focused-fg: $white;
-$action-primary-active-bg: $m-blue;
-$action-primary-active-fg: $m-blue-d3;
-$action-primary-active-shadow: $m-blue-d2;
-$action-primary-active-focused-fg: $m-blue-d4;
-$action-primary-active-focused-shadow: $m-blue-d3;
-$action-primary-disabled-bg: $m-gray-d3;
-$action-prmary-disabled-fg: $white;
+$action-primary-bg: $m-blue-d3 !default;
+$action-primary-fg: $white !default;
+$action-primary-shadow: $m-blue-d4 !default;
+$action-primary-focused-bg: $m-blue-d1 !default;
+$action-primary-focused-fg: $white !default;
+$action-primary-active-bg: $m-blue !default;
+$action-primary-active-fg: $m-blue-d3 !default;
+$action-primary-active-shadow: $m-blue-d2 !default;
+$action-primary-active-focused-fg: $m-blue-d4 !default;
+$action-primary-active-focused-shadow: $m-blue-d3 !default;
+$action-primary-disabled-bg: $m-gray-d3 !default;
+$action-prmary-disabled-fg: $white !default;
 
 // action - secondary
-$action-secondary-bg: $m-pink;
-$action-secondary-fg: $white;
-$action-secondary-shadow: $m-pink-d2;
-$action-secondary-focused-bg: $m-pink-l3;
-$action-secondary-focused-fg: $white;
-$action-secondary-active-bg: $m-pink-l2;
-$action-secondary-active-fg: $m-pink-d1;
-$action-secondary-active-shadow: $m-pink-d1;
-$action-secondary-active-focused-fg: $m-pink-d3;
-$action-secondary-active-focused-shadow: $m-pink-d2;
-$action-secondary-disabled-bg: $m-gray-d3;
-$action-secondary-disabled-fg: $white;
+$action-secondary-bg: $m-pink !default;
+$action-secondary-fg: $white !default;
+$action-secondary-shadow: $m-pink-d2 !default;
+$action-secondary-focused-bg: $m-pink-l3 !default;
+$action-secondary-focused-fg: $white !default;
+$action-secondary-active-bg: $m-pink-l2 !default;
+$action-secondary-active-fg: $m-pink-d1 !default;
+$action-secondary-active-shadow: $m-pink-d1 !default;
+$action-secondary-active-focused-fg: $m-pink-d3 !default;
+$action-secondary-active-focused-shadow: $m-pink-d2 !default;
+$action-secondary-disabled-bg: $m-gray-d3 !default;
+$action-secondary-disabled-fg: $white !default;
 
 // actions - misc
-$link-color: $blue;
-$link-color-d1: $blue;
-$link-hover: $blue-l1; // from our Pattern Library http://ux.edx.org/elements/colors/
-$site-status-color: $pink;
-$button-color: $blue;
-$button-archive-color: rgb(238,238,238); // #eeeeee
+$link-color: $blue !default;
+$link-color-d1: $blue !default;
+$link-hover: $blue-l1 !default; // from our Pattern Library http://ux.edx.org/elements/colors/
+$site-status-color: $pink !default;
+$button-color: $blue !default;
+$button-archive-color: rgb(238,238,238) !default; // #eeeeee
 
 // larger, random elements
 $dark-trans-bg: rgba(0, 0, 0, .75);
@@ -434,93 +434,92 @@ $body-bg: rgb(250,250,250) !default;
 $container-bg: $white !default;
 
 // header
-$header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9));
+$header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9)) !default;
 $header-bg: $white !default;
 $header-graphic-super-color: $m-blue-d1;
 $header-graphic-sub-color: $m-gray-d2;
-$header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
-$header_image_margin: -69px;
+$header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif !default;
+$header_image_margin: -69px !default;
 
 // footer
 $footer-bg: $white !default;
-$footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
+$footer_margin: ($baseline/4) 0 ($baseline*1.5) 0 !default;
 
 // modal
-$shadow-color: $blue;
-$modal-bg-color: rgb(245,245,245);
+$shadow-color: $blue !default;
+$modal-bg-color: rgb(245,245,245) !default;
 
 // courseware elements
-$courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238));
-$courseware-header-bg: transparent;
-$courseware-footer-border: none;
-$courseware-footer-shadow: none;
-$courseware-footer-margin: 0px;
-$courseware-border-bottom-color: rgb(68,162,222); // #44a2de
-$courseware-button-border-color: rgb(230,230,230); // #e6e6e6
-$courseware-hover-color: rgb(51,52,53); // #333435
-$courseware-navigation-color: $blue;
+$courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238)) !default;
+$courseware-header-bg: transparent !default;
+$courseware-footer-border: none !default;
+$courseware-footer-shadow: none !default;
+$courseware-footer-margin: 0px !default;
+$courseware-border-bottom-color: rgb(68,162,222) !default;
+$courseware-button-border-color: rgb(230,230,230) !default;
+$courseware-hover-color: rgb(51,52,53) !default;
+$courseware-navigation-color: $blue !default;
 
 // homepage, onboarding, and course discovery
-$homepage__header--gradient__color--alpha: lighten($gray, 15%);
-$homepage__header--gradient__color--bravo: saturate($gray, 30%);
-$homepage__header--background: lighten($gray, 15%);
-$course-card-height: ($baseline*18);
-$course-image-height: ($baseline*8);
-$course-info-height: ($baseline*10);
-$course-title-height: ($baseline*3.6);
-$homepage-bg-image: none;
+$homepage__header--gradient__color--alpha: lighten($gray, 15%) !default;
+$homepage__header--gradient__color--bravo: saturate($gray, 30%) !default;
+$homepage__header--background: lighten($gray, 15%) !default;
+$course-card-height: ($baseline*18) !default;
+$course-image-height: ($baseline*8) !default;
+$course-info-height: ($baseline*10) !default;
+$course-title-height: ($baseline*3.6) !default;
+$homepage-bg-image: none !default;
+$login-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
+$register-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
+$passwordreset-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
 
-$login-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png');
-$register-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png');
-$passwordreset-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png');
-
-$video-thumb-url: '#{$static-path}/images/homepage-hero-video-thumb.jpg';
+$video-thumb-url: '#{$static-path}/images/homepage-hero-video-thumb.jpg' !default;
 
 // dashboard elements
-$dashboard-profile-header-image: linear-gradient(-90deg, rgb(255,255,255), rgb(245,245,245));
-$dashboard-profile-header-color: transparent;
-$dashboard-profile-color: rgb(252,252,252);
-$dot-color: rgb(221, 221, 221);
-$dashboard-course-cover-border: rgb(221, 221, 221);
+$dashboard-profile-header-image: linear-gradient(-90deg, rgb(255,255,255), rgb(245,245,245)) !default;
+$dashboard-profile-header-color: transparent !default;
+$dashboard-profile-color: rgb(252,252,252) !default;
+$dot-color: rgb(221, 221, 221) !default;
+$dashboard-course-cover-border: rgb(221, 221, 221) !default;
 
 // course elements
 $content-wrapper-bg: $white !default;
-$course-bg-color: #f2f2f2;
-$course-bg-image: url('#{$static-path}/images/bg-texture.png');
-$account-content-wrapper-bg: shade($body-bg, 2%);
-$course-profile-bg: rgb(245,245,245);
-$course-header-bg: rgba(255,255,255, 0.93);
+$course-bg-color: #f2f2f2 !default;
+$course-bg-image: url('#{$static-path}/images/bg-texture.png') !default;
+$account-content-wrapper-bg: shade($body-bg, 2%) !default;
+$course-profile-bg: rgb(245,245,245) !default;
+$course-header-bg: rgba(255,255,255, 0.93) !default;
 
 // search/listing results
-$result-highlight-color-base: rgba($highlight-color, 0.25);
+$result-highlight-color-base: rgba($highlight-color, 0.25) !default;
 
 // sidebar
 $sidebar-chapter-bg-top: rgba(255, 255, 255, .5);
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
-$sidebar-chapter-bg: rgb(246,246,246); // #f6f6f6
-$sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214));
+$sidebar-chapter-bg: rgb(246,246,246) !default;
+$sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214)) !default;
 
 
 // student notes
-$student-notes-highlight-color-base: saturate($yellow, 65%);
-$student-notes-highlight-color: tint($student-notes-highlight-color-base, 50%);
-$student-notes-highlight-color-focus: $student-notes-highlight-color-base;
+$student-notes-highlight-color-base: saturate($yellow, 65%) !default;
+$student-notes-highlight-color: tint($student-notes-highlight-color-base, 50%) !default;
+$student-notes-highlight-color-focus: $student-notes-highlight-color-base !default;
 
 // ----------------------------
 // #DEPRECATED
 // ----------------------------
-$danger-red: rgb(212, 64, 64);
-$light-gray: rgb(221, 221, 221);
-$dark-gray: rgb(51, 51, 51);
-$border-color: rgb(200, 200, 200);
-$sidebar-color: rgb(246, 246, 246);
+$danger-red: rgb(212, 64, 64) !default;
+$light-gray: rgb(221, 221, 221) !default;
+$dark-gray: rgb(51, 51, 51) !default;
+$border-color: rgb(200, 200, 200) !default;
+$sidebar-color: rgb(246, 246, 246) !default;
 $outer-border-color: rgb(170, 170, 170);
-$light-gray: rgb(221,221,221); // #dddddd
+$light-gray: rgb(221,221,221) !default;
 
 // used by descriptor css
-$lightGrey: rgb(237,241,245); // #edf1f5
-$darkGrey: rgb(136,145,161); // #8891a1
-$lightGrey1: $gray-l3;
+$lightGrey: rgb(237,241,245) !default;
+$darkGrey: rgb(136,145,161) !default;
+$lightGrey1: $gray-l3 !default;
 $blue-d1: shade($blue,20%);
 $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
