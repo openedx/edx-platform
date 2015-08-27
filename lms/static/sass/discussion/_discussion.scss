@@ -417,7 +417,7 @@ body.discussion {
   .discussion-article {
     position: relative;
     min-height: 500px;
-    background-image: url($static-path + '/images/bg-texture.png');
+    background-image: url('#{$static-path}/images/bg-texture.png');
 
     a {
       word-wrap: break-word;
@@ -598,7 +598,7 @@ body.discussion {
       background: transparent;
 
       span {
-        background-image: url($static-path + '/images/wmd-buttons-transparent.png');
+        background-image: url('#{$static-path}/images/wmd-buttons-transparent.png');
       }
     }
   }
@@ -720,7 +720,7 @@ body.discussion {
   }
 
   .loading-animation {
-    background-image: url($static-path + '/images/spinner.gif');
+    background-image: url('#{$static-path}/images/spinner.gif');
   }
 
   .discussion-show {
@@ -742,7 +742,7 @@ body.discussion {
       @include margin-right(6px);
       width: 21px;
       height: 19px;
-      background: url($static-path + '/images/show-hide-discussion-icon.png') no-repeat;
+      background: url('#{$static-path}/images/show-hide-discussion-icon.png') no-repeat;
       background-position: -21px 0;
     }
   }

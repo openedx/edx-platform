@@ -178,7 +178,7 @@ section.combined-open-ended-status {
       float: right;
       width: 14px;
       height: 14px;
-      background: url($static-path + '/images/unanswered-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
     }
 
     &.correct {
@@ -187,7 +187,7 @@ section.combined-open-ended-status {
       float: right;
       width: 25px;
       height: 20px;
-      background: url($static-path + '/images/correct-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
     }
 
     &.incorrect {
@@ -196,7 +196,7 @@ section.combined-open-ended-status {
       float: right;
       width: 20px;
       height: 20px;
-      background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
     }
   }
 
@@ -302,21 +302,21 @@ div.combined-rubric-container {
   label.choicegroup_correct {
     &:before {
       margin-right: ($baseline*0.75);
-      content: url($static-path + '/images/correct-icon.png');
+      content: url('#{$static-path}/images/correct-icon.png');
     }
   }
 
   label.choicegroup_partialcorrect {
     &:before {
       margin-right: ($baseline*0.75);
-      content: url($static-path + '/images/partially-correct-icon.png');
+      content: url('#{$static-path}/images/partially-correct-icon.png');
     }
   }
 
   label.choicegroup_incorrect {
     &:before {
       margin-right: ($baseline*0.75);
-      content: url($static-path + '/images/incorrect-icon.png');
+      content: url('#{$static-path}/images/incorrect-icon.png');
     }
   }
 
@@ -402,7 +402,7 @@ div.result-container {
         .result-errors {
           margin: ($baseline/4);
           padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline*2);
-          background: url($static-path + '/images/incorrect-icon.png') center left no-repeat;
+          background: url('#{$static-path}/images/incorrect-icon.png') center left no-repeat;
 
           li {
             color: #B00;
@@ -564,7 +564,7 @@ section.open-ended-child {
       display: inline-block;
       width: 14px;
       height: 14px;
-      background: url($static-path + '/images/unanswered-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
     }
   }
 
@@ -573,7 +573,7 @@ section.open-ended-child {
       display: inline-block;
       width: 25px;
       height: 20px;
-      background: url($static-path + '/images/correct-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
     }
 
     input {
@@ -586,7 +586,7 @@ section.open-ended-child {
       display: inline-block;
       width: 20px;
       height: 20px;
-      background: url($static-path + '/images/spinner.gif') center center no-repeat;
+      background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
     }
 
     input {
@@ -599,7 +599,7 @@ section.open-ended-child {
       display: inline-block;
       width: 20px;
       height: 20px;
-      background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
       text-indent: -9999px;
     }
 
@@ -638,7 +638,7 @@ section.open-ended-child {
       top: 4px;
       width: 14px;
       height: 14px;
-      background: url($static-path + '/images/unanswered-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
     }
 
     &.processing, &.ui-icon-processing {
@@ -647,7 +647,7 @@ section.open-ended-child {
       top: 6px;
       width: 25px;
       height: 20px;
-      background: url($static-path + '/images/spinner.gif') center center no-repeat;
+      background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
     }
 
     &.correct, &.ui-icon-check {
@@ -656,7 +656,7 @@ section.open-ended-child {
       top: 6px;
       width: 25px;
       height: 20px;
-      background: url($static-path + '/images/correct-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
     }
 
     &.incorrect, &.ui-icon-close {
@@ -665,7 +665,7 @@ section.open-ended-child {
       top: 6px;
       width: 20px;
       height: 20px;
-      background: url($static-path + '/images/incorrect-icon.png') center center no-repeat;
+      background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
     }
   }
 
@@ -703,7 +703,7 @@ section.open-ended-child {
     .grading {
       margin: 0 7px 0 0;
       padding-left: 25px;
-      background: url($static-path + '/images/info-icon.png') left center no-repeat;
+      background: url('#{$static-path}/images/info-icon.png') left center no-repeat;
       text-indent: 0;
     }
 
