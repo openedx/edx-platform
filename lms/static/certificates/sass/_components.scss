@@ -494,7 +494,7 @@
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url($static-path + '/images/bg-distinguished.png') center no-repeat;
+        background: palette(grayscale, white-t) url('#{$static-path}/images/bg-distinguished.png') center no-repeat;
         background-size: 65%;
 
         .deco-corner-tl {

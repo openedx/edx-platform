@@ -447,13 +447,13 @@ $dashboard-course-cover-border: $light-gray;
 // MISC: course assets
 $content-wrapper-bg: $white !default;
 $course-bg-color: #f2f2f2;
-$course-bg-image: url($static-path + '/images/bg-texture.png');
+$course-bg-image: url('#{$static-path}/images/bg-texture.png');
 $account-content-wrapper-bg: shade($body-bg, 2%);
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);
 
 // MISC: course background texture
-//$course-bg-image: url($static-path + '/images/bg-texture.png');
+//$course-bg-image: url('#{$static-path}/images/bg-texture.png');
 
 // MISC: borders
 $border-color-1: rgb(190,190,190);
@@ -508,11 +508,11 @@ $course-title-height: ($baseline*3.6);
 // IMAGES: backgrounds
 $homepage-bg-image: none;
 
-$login-banner-image: url($static-path + '/images/edx-theme/edx-background-banner-account.png');
-$register-banner-image: url($static-path + '/images/edx-theme/edx-background-banner-account.png');
-$passwordreset-banner-image: url($static-path + '/images/edx-theme/edx-background-banner-account.png');
+$login-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png');
+$register-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png');
+$passwordreset-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png');
 
-$video-thumb-url: $static-path + '/images/homepage-hero-video-thumb.jpg';
+$video-thumb-url: '#{$static-path}/images/homepage-hero-video-thumb.jpg';
 
 // ====================
 

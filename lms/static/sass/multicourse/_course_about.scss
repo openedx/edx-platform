@@ -405,7 +405,7 @@
 
         .opencourseware {
           text-indent: -9999px;
-          background: url($static-path + '/images/opencourseware.png') 0 0 no-repeat;
+          background: url('#{$static-path}/images/opencourseware.png') 0 0 no-repeat;
           width: 266px;
           height: 31px;
           margin-bottom: $baseline;
@@ -419,7 +419,7 @@
         li {
           list-style: none;
           padding-left: 29px;
-          background: url($static-path + '/images/link-icon.png') left center no-repeat;
+          background: url('#{$static-path}/images/link-icon.png') left center no-repeat;
         }
       }
     }
