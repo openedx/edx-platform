@@ -90,7 +90,9 @@
                             model: userAccountModel,
                             title: gettext('Email Address'),
                             valueAttribute: 'email',
-                            helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
+                            helpMessage: interpolate_text(
+                                gettext("The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address."), {platform_name: platformName}
+                            )
                         })
                     },
                     {
@@ -121,7 +123,9 @@
                             model: userAccountModel,
                             title: gettext('Email Address'),
                             valueAttribute: 'email',
-                            helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
+                            helpMessage: interpolate_text(
+                                gettext("The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address."), {platform_name: platformName}
+                            )
                         })
                     }
                 )
@@ -136,7 +140,7 @@
                         required: true,
                         refreshPageOnSave: true,
                         helpMessage:
-                            gettext('The language used for this site. The site is currently available in a limited number of languages.'),
+                            gettext('The language used throughout this site. The site is currently available in a limited number of languages.'),
                         options: fieldsData.language.options
                     })
                 },

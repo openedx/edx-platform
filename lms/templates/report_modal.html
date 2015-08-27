@@ -19,7 +19,7 @@
       </span>
     </button>
 
-    <header><h2>Report A Problem</h2><hr></header>
+    <header><h2>${_('Report A Problem')}</h2><hr></header>
 
     <form id="report-form" method="post" data-remote="true" action="/submit_feedback">
       <p>${_("If you've found a problem on this page (e.g. an error), please let us know! For other questions, please check out the 'Help' tab.")}</p>
@@ -34,7 +34,7 @@
       <label data-field="subject" for="report-form-subject">${_('Brief description of the problem')}*</label>
       <input name="subject" type="text" id="report-form-subject" aria-required="true">
       <label data-field="details" for="report-form-details">${_('Details of the problem you are encountering')}*</label>
-      <textarea name="details" id="report-form-details" aria-required="true" placeholder="Include error messages, steps which lead to the issue, etc."></textarea>
+      <textarea name="details" id="report-form-details" aria-required="true" placeholder="${_('Include error messages, steps which lead to the issue, etc.')}"></textarea>
       <input name="issue_type" type="hidden" value="problem_report_modal">
       <input name="course_id" type="hidden" value="${course.id.to_deprecated_string() | h}">
       <div class="submit">
