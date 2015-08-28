@@ -194,27 +194,31 @@
                  * Render the create new team form.
                  */
                 newTeam: function (topicID) {
-                    var self = this;
-                    this.getTeamsView(topicID).done(function (teamsView) {
-                        self.mainView = new ViewWithHeader({
-                            header: new HeaderView({
-                                model: new TeamsHeaderModel({
-                                    description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know."),
-                                    title: gettext("Create a New Team"),
-                                    breadcrumbs: [
-                                        {
-                                            title: teamsView.main.teamParams.topicName,
-                                            url: '#topics/' + teamsView.main.teamParams.topicID
-                                        }
-                                    ]
-                                })
-                            }),
-                            main: new TeamEditView({
-                                action: 'create',
-                                teamEvents: self.teamEvents,
-                                teamParams: teamsView.main.teamParams
-                            })
+                    var self = this,
+                        createViewWithHeader;
+                    this.getTopic(topicID).done(function (topic) {
+                        var view = new TeamEditView({
+                            action: 'create',
+                            teamEvents: self.teamEvents,
+                            teamParams: {
+                                courseID: self.courseID,
+                                topicID: topic.get('id'),
+                                teamsUrl: self.teamsUrl,
+                                topicName: topic.get('name'),
+                                languages: self.languages,
+                                countries: self.countries,
+                                teamsDetailUrl: self.teamsDetailUrl
+                            }
                         });
+                        createViewWithHeader = self.createViewWithHeader({
+                            mainView: view,
+                            subject: {
+                                name: gettext("Create a New Team"),
+                                description: gettext("Create a new team if you can't find existing teams to join, or if you would like to learn with friends you know.")
+                            },
+                            parentTopic: topic
+                        });
+                        self.mainView = createViewWithHeader;
                         self.render();
                     });
                 },
