@@ -27,22 +27,10 @@ class MicrositeAwareSettings(object):
     def __getattr__(self, name):
         try:
             if isinstance(microsite.get_value(name), dict):
-                return self.merge_dict(name)
+                return microsite.get_dict(name, base_settings.__getattr__(name))
             return microsite.get_value(name, base_settings.__getattr__(name))
         except KeyError:
             base_settings.__getattr__(name)
-
-    def merge_dict(self, name):
-        """
-        Handles the merge of two dictonaries, the one from the base_settings
-        updated to include the overrides defined at the microsite
-        """
-        if microsite.has_override_value(name):
-            temp = base_settings.__getattr__(name).copy()
-            temp.update(microsite.get_value(name, {}))
-            return temp
-        else:
-            return base_settings.__getattr__(name)
 
 
 settings = MicrositeAwareSettings()
