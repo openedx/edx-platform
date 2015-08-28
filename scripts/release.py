@@ -501,6 +501,10 @@ def generate_email(start_ref, end_ref, release_date=None):
 
         By the way, if you have an @edx.org email address and are having trouble logging
         into stage, you may need to reset your password.
+
+        If you would prefer this email be sent to a different email address of yours,
+        send a request to oscm@edx.org with the details.
+
     """.format(
         emails=", ".join(prbe.keys()),
         date=release_date.isoformat(),
