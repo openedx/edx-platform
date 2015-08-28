@@ -33,4 +33,4 @@ class MicrositeAwareSettings(object):
             base_settings.__getattr__(name)
 
 
-settings = MicrositeAwareSettings()
+settings = MicrositeAwareSettings()  # pylint: disable=invalid-name
