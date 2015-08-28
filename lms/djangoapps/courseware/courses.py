@@ -3,7 +3,7 @@ from fs.errors import ResourceNotFoundError
 import logging
 import inspect
 
-from path import path
+from path import Path as path
 from django.http import Http404
 from django.conf import settings
 

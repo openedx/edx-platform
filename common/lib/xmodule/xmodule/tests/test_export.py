@@ -14,7 +14,7 @@ import uuid
 
 from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
-from path import path
+from path import Path as path
 from tempfile import mkdtemp
 from textwrap import dedent
 

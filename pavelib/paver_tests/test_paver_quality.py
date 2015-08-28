@@ -2,7 +2,7 @@
 Tests for paver quality tasks
 """
 import os
-from path import path  # pylint: disable=no-name-in-module
+from path import Path as path
 import tempfile
 import unittest
 from mock import patch, MagicMock, mock_open
