@@ -51,7 +51,6 @@ class CourseTeamSerializer(serializers.ModelSerializer):
             "id",
             "discussion_topic_id",
             "name",
-            "is_active",
             "course_id",
             "topic_id",
             "date_created",

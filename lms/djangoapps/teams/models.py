@@ -26,7 +26,7 @@ from django_comment_common.signals import (
 from xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
-from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
+from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
 from teams import TEAM_DISCUSSION_CONTEXT
 
 
@@ -76,7 +76,6 @@ class CourseTeam(models.Model):
     team_id = models.CharField(max_length=255, unique=True)
     discussion_topic_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255, db_index=True)
-    is_active = models.BooleanField(default=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -86,8 +85,9 @@ class CourseTeam(models.Model):
         blank=True,
         help_text=ugettext_lazy("Optional language the team uses as ISO 639-1 code."),
     )
-    last_activity_at = models.DateTimeField()
+    last_activity_at = models.DateTimeField(db_index=True)  # indexed for ordering
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
+    team_size = models.IntegerField(default=0, db_index=True)  # indexed for ordering
 
     @classmethod
     def create(cls, name, course_id, description, topic_id=None, country=None, language=None):
@@ -135,6 +135,11 @@ class CourseTeam(models.Model):
             team=self
         )
 
+    def reset_team_size(self):
+        """Reset team_size to reflect the current membership count."""
+        self.team_size = CourseTeamMembership.objects.filter(team=self).count()
+        self.save()
+
 
 class CourseTeamMembership(models.Model):
     """This model represents the membership of a single user in a single team."""
@@ -148,12 +153,40 @@ class CourseTeamMembership(models.Model):
     date_joined = models.DateTimeField(auto_now_add=True)
     last_activity_at = models.DateTimeField()
 
+    immutable_fields = ('user', 'team', 'date_joined')
+
+    def __setattr__(self, name, value):
+        """Memberships are immutable, with the exception of last activity
+        date.
+        """
+        if name in self.immutable_fields:
+            # Check the current value -- if it is None, then this
+            # model is being created from the database and it's fine
+            # to set the value. Otherwise, we're trying to overwrite
+            # an immutable field.
+            current_value = getattr(self, name, None)
+            if current_value is not None:
+                raise ImmutableMembershipFieldException
+        super(CourseTeamMembership, self).__setattr__(name, value)
+
     def save(self, *args, **kwargs):
-        """ Customize save method to set the last_activity_at if it does not currently exist. """
+        """Customize save method to set the last_activity_at if it does not
+        currently exist. Also resets the team's size if this model is
+        being created.
+        """
+        should_reset_team_size = False
+        if self.pk is None:
+            should_reset_team_size = True
         if not self.last_activity_at:
             self.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
-
         super(CourseTeamMembership, self).save(*args, **kwargs)
+        if should_reset_team_size:
+            self.team.reset_team_size()  # pylint: disable=no-member
+
+    def delete(self, *args, **kwargs):
+        """Recompute the related team's team_size after deleting a membership"""
+        super(CourseTeamMembership, self).delete(*args, **kwargs)
+        self.team.reset_team_size()  # pylint: disable=no-member
 
     @classmethod
     def get_memberships(cls, username=None, course_ids=None, team_id=None):
