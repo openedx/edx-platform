@@ -55,7 +55,7 @@ git+https://github.com/edx/edx-lint.git@b109a40c61277c52dcb396bf15e33755f5dbf5fa
 -e git+https://github.com/edx/edx-reverification-block.git@30fcf2fea305ed6649adcee9c831afaefba635c5#egg=edx-reverification-block
 git+https://github.com/edx/ecommerce-api-client.git@1.1.0#egg=ecommerce-api-client==1.1.0
 -e git+https://github.com/edx/edx-user-state-client.git@30c0ad4b9f57f8d48d6943eb585ec8a9205f4469#egg=edx-user-state-client
--e git+https://github.com/edx/edx-organizations.git@release-2015-08-03#egg=edx-organizations
+-e git+https://github.com/edx/edx-organizations.git@release-2015-08-25#egg=edx-organizations
 
 git+https://github.com/edx/edx-proctoring.git@0.7.2#egg=edx-proctoring==0.7.2
 
