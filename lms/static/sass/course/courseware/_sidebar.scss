@@ -61,6 +61,12 @@
                 border-bottom: 1px solid $shadow-l1;
                 background: $white;
 
+                &:focus {
+                    // we don't need the blue glow to be here at this point
+                    // although focus is sent for correct keyboard/a11y
+                    outline: none;
+                }
+
                 .chapter-menu {
                     padding: 0 ($baseline*.75);
                     background: inherit;
