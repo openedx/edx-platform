@@ -398,7 +398,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         username, user_id = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        self._test_textarea_field(profile_page, 'bio', 'Eat Sleep Code', 'Eat Sleep Code', 'display')
+        self._test_textarea_field(profile_page, 'bio', 'ThisIsIt', 'ThisIsIt', 'display')
         self._test_textarea_field(profile_page, 'bio', '', placeholder_value, 'placeholder')
 
         profile_page.make_field_editable('bio')
