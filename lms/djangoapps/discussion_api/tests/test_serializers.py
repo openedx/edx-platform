@@ -27,13 +27,19 @@ from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 
 
 @ddt.ddt
 class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
+    @classmethod
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUpClass(cls):
+        super(SerializerTestMixin, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(SerializerTestMixin, self).setUp()
@@ -45,7 +51,6 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
-        self.course = CourseFactory.create()
         self.author = UserFactory.create()
 
     def create_role(self, role_name, users, course=None):
@@ -128,7 +133,7 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
 
 
 @ddt.ddt
-class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase):
+class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer serialization."""
     def make_cs_content(self, overrides):
         """
@@ -245,7 +250,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, ModuleStoreTestCase
 
 
 @ddt.ddt
-class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
+class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for CommentSerializer."""
     def setUp(self):
         super(CommentSerializerTest, self).setUp()
@@ -402,15 +407,20 @@ class CommentSerializerTest(SerializerTestMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
+    @classmethod
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUpClass(cls):
+        super(ThreadSerializerDeserializationTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ThreadSerializerDeserializationTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
-        self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
@@ -592,14 +602,18 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
 
 
 @ddt.ddt
-class CommentSerializerDeserializationTest(CommentsServiceMockMixin, ModuleStoreTestCase):
+class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
+    @classmethod
+    def setUpClass(cls):
+        super(CommentSerializerDeserializationTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(CommentSerializerDeserializationTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
-        self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
