@@ -1877,11 +1877,20 @@ class UpdateThreadTest(
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
+
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+        self.user2 = UserFactory.create()
+        self.register_get_user_response(self.user2)
+        self.request2 = RequestFactory().get("/test_path")
+        self.request2.user = self.user2
+        CourseEnrollmentFactory.create(user=self.user2, course_id=self.course.id)
+
+
 
     def register_thread(self, overrides=None):
         """
@@ -2149,6 +2158,61 @@ class UpdateThreadTest(
         data = {"voted": second_vote}
         result = update_thread(self.request, "test_thread", data)
         self.assertEqual(result["vote_count"], 1 if second_vote else 0)
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count_two_users(
+            self,
+            current_user1_vote,
+            current_user2_vote,
+            user1_vote,
+            user2_vote
+    ):
+        """
+        Tests vote_count increases and decreases correctly from different users
+        """
+        #setup
+        vote_count = 0
+        if current_user1_vote:
+            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            vote_count += 1
+        if current_user2_vote:
+            self.register_get_user_response(self.user2, upvoted_ids=["test_thread"])
+            vote_count += 1
+
+        self.register_thread_votes_response("test_thread")
+        self.register_thread(overrides={"votes": {"up_count": vote_count}})
+
+        # first user vote
+        data = {"voted": user1_vote}
+        result = update_thread(self.request, "test_thread", data)
+        if current_user1_vote == user1_vote:
+            self.assertEqual(result["vote_count"], vote_count)
+        elif user1_vote:
+            vote_count += 1
+            self.assertEqual(result["vote_count"], vote_count)
+            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+        else:
+            vote_count -= 1
+            self.assertEqual(result["vote_count"], vote_count)
+            self.register_get_user_response(self.user, upvoted_ids=[])
+
+        self.register_thread_votes_response("test_thread")
+        self.register_thread(overrides={"votes": {"up_count": vote_count}})
+
+        # second user vote
+        data = {"voted": user2_vote}
+        result = update_thread(self.request2, "test_thread", data)
+        if current_user2_vote == user2_vote:
+            self.assertEqual(result["vote_count"], vote_count)
+        elif user2_vote:
+            vote_count += 1
+            self.assertEqual(result["vote_count"], vote_count)
+        else:
+            vote_count -= 1
+            self.assertEqual(result["vote_count"], vote_count)
+
+
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
