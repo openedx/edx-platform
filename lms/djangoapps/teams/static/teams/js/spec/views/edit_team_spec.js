@@ -13,7 +13,6 @@ define([
             teamsData = {
                 id: null,
                 name: "TeamName",
-                is_active: null,
                 course_id: "a/b/c",
                 topic_id: "awesomeness",
                 date_created: "",
