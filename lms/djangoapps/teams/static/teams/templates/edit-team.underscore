@@ -17,10 +17,10 @@
     </div>
 </div>
 
-<div class="wrapper-message">
-    <div class="message">
+<div class="wrapper-msg">
+    <div class="msg">
         <p>
-            <%= gettext("Instructor tools placeholder") %>
+            <%- gettext("Instructor tools placeholder") %>
         </p>
         <button class="action-delete">
             <%- gettext("Delete Team") %>

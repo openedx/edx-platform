@@ -32,8 +32,6 @@
                     this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
                     this.action = options.action;
 
-                    _.bindAll(this, 'cancelAndGoBack', 'createOrUpdateTeam', 'deleteTeam', 'editMembership');
-
                     if (this.action === 'create') {
                         this.teamModel = new TeamModel({});
                         this.teamModel.url = this.teamsUrl;
