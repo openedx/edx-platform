@@ -1,0 +1,13 @@
+<div class="wrapper-msg">
+    <div class="msg">
+        <p>
+            <%- gettext("Instructor tools placeholder") %>
+        </p>
+        <button class="action-delete">
+            <%- gettext("Delete Team") %>
+        </button>
+        <button class="action-edit-members">
+            <%- gettext("Edit Membership") %>
+        </button>
+    </div>
+</div>
