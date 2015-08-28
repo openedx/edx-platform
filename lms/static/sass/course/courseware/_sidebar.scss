@@ -6,9 +6,10 @@
 
     // reseting bolded fonts for the course index
     h3 {
-        font-weight: normal;
+        @extend %t-regular;
     }
 
+    // we're targetting the .class now, instead of the #id
     .accordion {
         @extend %t-copy-sub1;
 
@@ -19,9 +20,9 @@
                 @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
                 @include transition(background-color .1s linear 0s);
                 width: 100% !important;
-                padding: 0;
                 border: 0;
                 border-radius: 0;
+                padding: 0;
                 box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
                 background-color: $sidebar-chapter-bg;
                 color: $link-color;
@@ -43,37 +44,26 @@
                     @extend %t-title6;
                     position: relative;
                     padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
-                    margin: 0;
-                    border-radius: 0;
-                    box-shadow: none;
                     color: $link-color;
-
-                    &:first-child {
-                        border: none;
-                    }
 
                     .icon {
                         position: absolute;
                         @include left($baseline);
-                        top: 18px;
-                        font-size: 90%;
+                        top: $baseline;
                         color: $gray-d1;
                     }
                 }
             }
 
             .chapter-content-container {
-                display: none;
+                display: none; // programmatically shown when the section is open; closed at the start
                 padding: 0 14px ($baseline/2) 14px;
                 border-bottom: 1px solid $shadow-l1;
                 background: $white;
 
                 .chapter-menu {
-                    margin: 0;
                     padding: 0 ($baseline*.75);
-                    border: none;
-                    border-radius: 0;
-                    background: transparent;
+                    background: inherit;
                     overflow: hidden;
 
                     .menu-item {
@@ -81,9 +71,7 @@
                         @include padding(($baseline/4) ($baseline/2));
                         margin: ($baseline/5) 0;
                         border-radius: ($baseline/5);
-                        border-bottom: 0;
-                        background: transparent;
-                        text-decoration: none;
+                        background: inherit;
 
                         a {
                             position: relative;
@@ -93,7 +81,6 @@
                             p {
                                 @extend %t-action3;
                                 @extend %t-strong;
-                                margin-bottom: 0;
                                 font-family: $sans-serif;
 
                                 &.subtitle {
@@ -104,6 +91,7 @@
                                     color: $gray-d1;
 
                                     &:empty {
+                                        // hide empty subtitles
                                         display: none;
                                     }
 
@@ -135,10 +123,9 @@
                         &.graded {
 
                             .menu-icon {
-                                @include right($baseline/4);
+                                @include right(0);
                                 position: absolute;
                                 bottom: 0;
-                                margin: auto;
                             }
                         }
 
@@ -146,6 +133,7 @@
                             @extend %t-strong;
                             background: linear-gradient(to bottom, $gray-l4, #d6d6d6);
 
+                            // pre-existing; but not sure where it appears
                             &:after {
                                 @extend %t-regular;
                                 @include transition(none);
