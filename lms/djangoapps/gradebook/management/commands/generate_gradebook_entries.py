@@ -76,7 +76,11 @@ class Command(BaseCommand):
                 progress_summary = grades.progress_summary(user, request, course)
                 try:
                     gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
-                    if gradebook_entry.grade != grade or gradebook_entry.proforma_grade != proforma_grade:
+                    if (gradebook_entry.grade != grade or
+                            gradebook_entry.proforma_grade != proforma_grade or
+                            gradebook_entry.progress_summary != progress_summary or
+                            gradebook_entry.grade_summary != grade_data or
+                            gradebook_entry.grading_policy != grading_policy):
                         gradebook_entry.grade = grade
                         gradebook_entry.proforma_grade = proforma_grade
                         gradebook_entry.progress_summary = json.dumps(progress_summary, cls=EdxJSONEncoder)

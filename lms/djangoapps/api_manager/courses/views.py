@@ -50,7 +50,6 @@ from .serializers import GradeSerializer, CourseLeadersSerializer, CourseComplet
 from progress.serializers import CourseModuleCompletionSerializer
 
 
-
 log = logging.getLogger(__name__)
 
 
@@ -1571,8 +1570,8 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         end = request.QUERY_PARAMS.get('end_date', None)
         interval = request.QUERY_PARAMS.get('interval', 'days')
         if not start or not end:
-            return Response({"message": _("Both start_date and end_date parameters are required")}
-                            , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": _("Both start_date and end_date parameters are required")},
+                            status=status.HTTP_400_BAD_REQUEST)
         if interval not in ['days', 'weeks', 'months']:
             return Response({"message": _("Interval parameter is not valid. It should be one of these "
                                           "'days', 'weeks', 'months'")}, status=status.HTTP_400_BAD_REQUEST)
@@ -1590,17 +1589,19 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True,
                                                       is_active=True).exclude(user_id__in=exclude_users)
         users_started_qs = StudentProgress.objects.filter(course_id__exact=course_key, user__is_active=True,
-                                                                 user__courseenrollment__is_active=True,
-                                                                 user__courseenrollment__course_id__exact=course_key)\
+                                                          user__courseenrollment__is_active=True,
+                                                          user__courseenrollment__course_id__exact=course_key)\
             .exclude(user_id__in=exclude_users)
-        modules_completed_qs = CourseModuleCompletion.get_actual_completions().filter(course_id__exact=course_key,
-                                                                                      user__courseenrollment__is_active=True,
-                                                                                      user__courseenrollment__course_id__exact=course_key,
-                                                                                      user__is_active=True)\
+        modules_completed_qs = CourseModuleCompletion.get_actual_completions()\
+            .filter(course_id__exact=course_key,
+                    user__courseenrollment__is_active=True,
+                    user__courseenrollment__course_id__exact=course_key,
+                    user__is_active=True)\
             .exclude(user_id__in=exclude_users)
-        active_users_qs = StudentModule.objects.filter(course_id__exact=course_key, student__is_active=True,
-                                                       student__courseenrollment__is_active=True,
-                                                       student__courseenrollment__course_id__exact=course_key)\
+        active_users_qs = StudentModule.objects\
+            .filter(course_id__exact=course_key, student__is_active=True,
+                    student__courseenrollment__is_active=True,
+                    student__courseenrollment__course_id__exact=course_key)\
             .exclude(student_id__in=exclude_users)
 
         organization = request.QUERY_PARAMS.get('organization', None)
@@ -1750,7 +1751,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
             user_completions = user_data['completions']
             completion_percentage = 0
             if total_possible_completions > 0:
-                completion_percentage = min(100 * (user_completions/total_possible_completions), 100)
+                completion_percentage = min(100 * (user_completions / total_possible_completions), 100)
             data['completions'] = completion_percentage
 
         total_users_qs = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
@@ -1798,7 +1799,7 @@ class CoursesMetricsSocial(SecureListAPIView):
     - GET: Returns a list of social metrics for users in the specified course. Results can be filtered by organization
     """
 
-    def get(self, request, course_id): # pylint: disable=W0613
+    def get(self, request, course_id):  # pylint: disable=arguments-differ
 
         try:
             slash_course_id = get_course_key(course_id, slashseparated=True)

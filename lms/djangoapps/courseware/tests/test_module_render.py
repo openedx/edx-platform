@@ -532,7 +532,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
     def test_xblock_view_handler(self):
-        args=[
+        args = [
             'edX/toy/2012_Fall',
             quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
             'student_view'
@@ -547,7 +547,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = render.xblock_view(request, *args)
         self.assertEquals(200, response.status_code)
 
-        expected = ['csrf_token',  'html', 'resources']
+        expected = ['csrf_token', 'html', 'resources']
         content = json.loads(response.content)
         for section in expected:
             self.assertIn(section, content)

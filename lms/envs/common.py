@@ -2671,7 +2671,7 @@ NOTIFICATION_STORE_PROVIDER = {
     }
 }
 
-if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+if 'SOUTH_MIGRATION_MODULES' not in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
     SOUTH_MIGRATION_MODULES = {}
 
 SOUTH_MIGRATION_MODULES.update({
@@ -2737,4 +2737,3 @@ API_DATE_FORMAT = '%Y-%m-%d'
 # for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
 if FEATURES['ENABLE_EDXNOTES']:
     OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
-

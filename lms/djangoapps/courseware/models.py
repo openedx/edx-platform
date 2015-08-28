@@ -69,6 +69,7 @@ class ChunkingManager(models.Manager):
 
 from courseware.signals import score_changed
 
+
 class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
@@ -153,9 +154,8 @@ def send_score_changed_signal(sender, instance, **kwargs):
             .exclude(grade=None)\
             .exclude(created=instance.modified, state=instance.state)\
             .order_by('-id')
-        if not len(previous_entries) or\
-            (instance.grade != previous_entries[0].grade) or\
-            (instance.max_grade != previous_entries[0].max_grade):
+        if not len(previous_entries) or (instance.grade != previous_entries[0].grade) or \
+                (instance.max_grade != previous_entries[0].max_grade):
             score_changed.send(
                 sender=sender,
                 user=instance.student,

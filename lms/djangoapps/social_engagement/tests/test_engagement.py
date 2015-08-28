@@ -355,7 +355,7 @@ class StudentEngagementTests(ModuleStoreTestCase):
             org='foo',
             course='bar',
             run='baz',
-            end=datetime.now(pytz.UTC)-timedelta(days=1)
+            end=datetime.now(pytz.UTC) - timedelta(days=1)
         )
 
         CourseEnrollment.enroll(self.user, course2.id)

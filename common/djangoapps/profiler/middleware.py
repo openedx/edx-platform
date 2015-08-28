@@ -358,11 +358,11 @@ class BaseProfilerMiddleware(object):
                     stat_time = float(fields[2])
                     total += stat_time
                     file_name = fields[6].split(":")[0]
-                    if not file_name in mystats:
+                    if file_name not in mystats:
                         mystats[file_name] = 0
                     mystats[file_name] += stat_time
                     group = self.get_group(file_name)
-                    if not group in mygroups:
+                    if group not in mygroups:
                         mygroups[group] = 0
                     mygroups[group] += stat_time
         summary_string = " ---- By file ----\n\n" + self.get_summary(mystats, total) + "\n" + \

@@ -60,7 +60,6 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         self.new_style_course_id2 = unicode(self.course2.id)
         self.new_style_content_id2 = unicode(self.chapter2.location)
 
-
     def test_migrate_courseids(self):
         """
         Test the data migration
@@ -80,10 +79,8 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
         workgroup_submission2 = WorkgroupSubmission.objects.create(workgroup=workgroup2, user=user2)
         workgroup_submission_review2 = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission2, content_id=self.new_style_content_id2)
 
-
         # Run the data migration
         migrate_courseids.Command().handle()
-
 
         # Confirm that the data has been properly migrated
         updated_project = Project.objects.get(id=project.id)

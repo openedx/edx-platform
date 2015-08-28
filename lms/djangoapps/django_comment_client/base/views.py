@@ -292,7 +292,6 @@ def _send_discussion_notification(
         if not settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
             return
 
-
         if is_anonymous_user:
             action_username = _('An anonymous user')
         else:
@@ -360,6 +359,7 @@ def _send_discussion_notification(
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
         log.exception(ex)
+
 
 @require_POST
 @login_required
@@ -486,7 +486,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         if not replying_to_id:
             # we must be creating a Reponse on a thread,
             # so the original poster is the author of the thread
-            replying_to_id =thread_user_id
+            replying_to_id = thread_user_id
 
         #
         # IMPORTANT: We have to use getattr() here so that the
@@ -657,7 +657,7 @@ def vote_for_comment(request, course_id, comment_id, value):
     user.vote(comment, value)
 
     # Feature Flag to check that notifications are enabled or not.
-    if value=='up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
+    if value == 'up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
         action_user_id = request.user.id
         original_poster_id = int(comment.user_id)
 
@@ -682,7 +682,7 @@ def vote_for_comment(request, course_id, comment_id, value):
                 }
             )
 
-    if value=='up':
+    if value == 'up':
         # call into the social_engagement django app to
         # rescore this user
         _update_user_engagement_score(course_key, comment.user_id)
@@ -723,7 +723,7 @@ def vote_for_thread(request, course_id, thread_id, value):
     _update_user_engagement_score(course_key, thread.user_id)
 
     # Feature Flag to check that notifications are enabled or not.
-    if value=='up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
+    if value == 'up' and settings.FEATURES.get("ENABLE_NOTIFICATIONS", False):
         action_user_id = request.user.id
         original_poster_id = int(thread.user_id)
 

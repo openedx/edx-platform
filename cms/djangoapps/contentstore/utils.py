@@ -89,6 +89,7 @@ def delete_course_and_groups(course_key, user_id):
         print 'You must now execute this same command in LMS to clean up orphaned records'
         print 'COMMAND: ./manage.py lms delete_course_references <course_id> commit'
 
+
 def get_lms_link_for_item(location, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.

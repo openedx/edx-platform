@@ -1208,6 +1208,7 @@ class TestIndexView(ModuleStoreTestCase):
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
+
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the courseware.render_xblock endpoint.
