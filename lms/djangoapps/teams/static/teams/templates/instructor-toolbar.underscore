@@ -1,0 +1,9 @@
+<% if (true) { %>
+    <div class="wrapper-message">
+        <div class="message">
+            <p>
+                <%= gettext("Hey, can you see this? Instructor toolbar placeholder") %>
+            </p>
+        </div>
+    </div>
+<% } %>

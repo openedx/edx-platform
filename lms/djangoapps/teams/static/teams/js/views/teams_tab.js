@@ -17,12 +17,13 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
+            'teams/js/views/instructor_toolbar',
             'teams/js/views/team_profile_header_actions',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamProfileHeaderActionsView, teamsTemplate) {
+                  InstructorToolbarView, TeamProfileHeaderActionsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function (attributes) {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -245,6 +246,16 @@
                                 },
                                 model: team
                             });
+                            var InstructorToolsView = new InstructorToolbarView({
+                                teamEvents: self.teamEvents,
+                                model: team,
+                                teamsUrl: self.teamsUrl,
+                                maxTeamSize: self.maxTeamSize,
+                                currentUsername: self.userInfo.username,
+                                teamMembershipsUrl: self.teamMembershipsUrl,
+                                topicID: topicID,
+                                showEditButton: self.userInfo.privileged || self.userInfo.staff
+                            });
                             editViewWithHeader = self.createViewWithHeader({
                                     mainView: view,
                                     subject: {
@@ -252,7 +263,8 @@
                                         description: gettext("If you make significant changes, make sure you notify members of the team before making these changes.")
                                     },
                                     parentTeam: team,
-                                    parentTopic: topic
+                                    parentTopic: topic,
+                                    headerActionsView: InstructorToolsView
                                 }
                             );
                             self.mainView = editViewWithHeader;
