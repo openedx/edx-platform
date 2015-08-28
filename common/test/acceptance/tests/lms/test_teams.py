@@ -3,7 +3,9 @@ Acceptance tests for the teams feature.
 """
 import json
 import random
+import time
 
+from dateutil.parser import parse
 import ddt
 from flaky import flaky
 from nose.plugins.attrib import attr
@@ -38,7 +40,7 @@ class TeamsTabBase(UniqueCourseTest):
         """Create `num_topics` test topics."""
         return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
 
-    def create_teams(self, topic, num_teams):
+    def create_teams(self, topic, num_teams, time_between_creation=0):
         """Create `num_teams` teams belonging to `topic`."""
         teams = []
         for i in xrange(num_teams):
@@ -55,6 +57,10 @@ class TeamsTabBase(UniqueCourseTest):
                 data=json.dumps(team),
                 headers=self.course_fixture.headers
             )
+            # Sadly, this sleep is necessary in order to ensure that
+            # sorting by last_activity_at works correctly when running
+            # in Jenkins.
+            time.sleep(time_between_creation)
             teams.append(json.loads(response.text))
         return teams
 
@@ -107,15 +113,8 @@ class TeamsTabBase(UniqueCourseTest):
             self.assertEqual(expected_team['name'], team_card_name)
             self.assertEqual(expected_team['description'], team_card_description)
 
-        team_cards = page.team_cards
-        team_card_names = [
-            team_card.find_element_by_css_selector('.card-title').text
-            for team_card in team_cards.results
-        ]
-        team_card_descriptions = [
-            team_card.find_element_by_css_selector('.card-description').text
-            for team_card in team_cards.results
-        ]
+        team_card_names = page.team_names
+        team_card_descriptions = page.team_descriptions
         map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
 
     def verify_my_team_count(self, expected_number_of_teams):
@@ -473,6 +472,7 @@ class BrowseTopicsTest(TeamsTabBase):
 
 
 @attr('shard_5')
+@ddt.ddt
 class BrowseTeamsWithinTopicTest(TeamsTabBase):
     """
     Tests for browsing Teams within a Topic on the Teams page.
@@ -482,9 +482,24 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
     def setUp(self):
         super(BrowseTeamsWithinTopicTest, self).setUp()
         self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
-        self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
+        self.max_team_size = 10
+        self.set_team_configuration({
+            'course_id': self.course_id,
+            'max_team_size': self.max_team_size,
+            'topics': [self.topic]
+        })
         self.browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
         self.topics_page = BrowseTopicsPage(self.browser, self.course_id)
+
+    def teams_with_default_sort_order(self, teams):
+        """Return a list of teams sorted according to the default ordering
+        (last_activity_at, with a secondary sort by open slots).
+        """
+        return sorted(
+            sorted(teams, key=lambda t: len(t['membership']), reverse=True),
+            key=lambda t: parse(t['last_activity_at']).replace(microsecond=0),
+            reverse=True
+        )
 
     def verify_page_header(self):
         """Verify that the page header correctly reflects the current topic's name and description."""
@@ -504,17 +519,74 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             footer_visible (bool): Whether we expect to see the pagination
                 footer controls.
         """
-        alphabetized_teams = sorted(total_teams, key=lambda team: team['name'])
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), pagination_header_text)
+        sorted_teams = self.teams_with_default_sort_order(total_teams)
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith(pagination_header_text))
         self.verify_teams(
             self.browse_teams_page,
-            alphabetized_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
+            sorted_teams[(page_num - 1) * self.TEAMS_PAGE_SIZE:page_num * self.TEAMS_PAGE_SIZE]
         )
         self.assertEqual(
             self.browse_teams_page.pagination_controls_visible(),
             footer_visible,
             msg='Expected paging footer to be ' + 'visible' if footer_visible else 'invisible'
         )
+
+    @ddt.data(
+        ('open_slots', 'last_activity_at', True),
+        ('last_activity_at', 'open_slots', True)
+    )
+    @ddt.unpack
+    def test_sort_teams(self, sort_order, secondary_sort_order, reverse):
+        """
+        Scenario: the user should be able to sort the list of teams by open slots or last activity
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse teams within a topic
+        Then I should see a list of teams for that topic
+        When I choose a sort order
+        Then I should see the paginated list of teams in that order
+        """
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        for i, team in enumerate(random.sample(teams, len(teams))):
+            for _ in range(i):
+                user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
+                self.create_membership(user_info['username'], team['id'])
+            team['open_slots'] = self.max_team_size - i
+            # Parse last activity date, removing microseconds because
+            # the Django ORM does not support them. Will be fixed in
+            # Django 1.8.
+            team['last_activity_at'] = parse(team['last_activity_at']).replace(microsecond=0)
+        # Re-authenticate as staff after creating users
+        AutoAuthPage(
+            self.browser,
+            course_id=self.course_id,
+            staff=True
+        ).visit()
+        self.browse_teams_page.visit()
+        self.browse_teams_page.sort_teams_by(sort_order)
+        team_names = self.browse_teams_page.team_names
+        self.assertEqual(len(team_names), self.TEAMS_PAGE_SIZE)
+        sorted_teams = [
+            team['name']
+            for team in sorted(
+                sorted(teams, key=lambda t: t[secondary_sort_order], reverse=reverse),
+                key=lambda t: t[sort_order],
+                reverse=reverse
+            )
+        ][:self.TEAMS_PAGE_SIZE]
+        self.assertEqual(team_names, sorted_teams)
+
+    def test_default_sort_order(self):
+        """
+        Scenario: the list of teams should be sorted by last activity by default
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse teams within a topic
+        Then I should see a list of teams for that topic, sorted by last activity
+        """
+        self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        self.browse_teams_page.visit()
+        self.assertEqual(self.browse_teams_page.sort_order, 'last activity')
 
     def test_no_teams(self):
         """
@@ -529,7 +601,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         """
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
         self.assertEqual(len(self.browse_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertFalse(
             self.browse_teams_page.pagination_controls_visible(),
@@ -548,10 +620,12 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And I should see a button to add a team
         And I should not see a pagination footer
         """
-        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE)
+        teams = self.teams_with_default_sort_order(
+            self.create_teams(self.topic, self.TEAMS_PAGE_SIZE, time_between_creation=1)
+        )
         self.browse_teams_page.visit()
         self.verify_page_header()
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 1-10 out of 10 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 1-10 out of 10 total'))
         self.verify_teams(self.browse_teams_page, teams)
         self.assertFalse(
             self.browse_teams_page.pagination_controls_visible(),
@@ -571,7 +645,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         And when I click on the previous page button
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 1, time_between_creation=1)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_on_page(1, teams, 'Showing 1-10 out of 11 total', True)
@@ -593,7 +667,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         When I input the first page
         Then I should see that I am on the first page of results
         """
-        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10)
+        teams = self.create_teams(self.topic, self.TEAMS_PAGE_SIZE + 10, time_between_creation=1)
         self.browse_teams_page.visit()
         self.verify_page_header()
         self.verify_on_page(1, teams, 'Showing 1-10 out of 20 total', True)
@@ -848,13 +922,13 @@ class CreateTeamTest(TeamFormActions):
         Then I should see teams list page without any new team.
         And if I switch to "My Team", it shows no teams
         """
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
         self.create_or_edit_team_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
-        self.assertEqual(self.browse_teams_page.get_pagination_header_text(), 'Showing 0 out of 0 total')
+        self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.teams_page.click_all_topics()
         self.teams_page.verify_team_count_in_first_topic(0)
