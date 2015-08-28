@@ -17,6 +17,20 @@
     </div>
 </div>
 
+<div class="wrapper-message">
+    <div class="message">
+        <p>
+            <%= gettext("Hey, can you see this? Instructor toolbar placeholder") %>
+        </p>
+        <button class="action-delete">
+            <%- gettext("Delete Team") %>
+        </button>
+        <button class="action-edit-members">
+            <%- gettext("Edit Membership") %>
+        </button>
+    </div>
+</div>
+
 <% if (action === 'create') { %>
     <div class="form-instructions create-team-instructions">
         <p class="copy">
