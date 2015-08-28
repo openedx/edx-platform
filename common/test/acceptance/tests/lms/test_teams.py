@@ -654,7 +654,7 @@ class TeamFormActions(TeamsTabBase):
             title='Create a New Team',
             description='Create a new team if you can\'t find existing teams to '
                         'join, or if you would like to learn with friends you know.',
-            breadcrumbs=self.topic['name']
+            breadcrumbs='All Topics {topic_name}'.format(topic_name=self.topic['name'])
         )
 
     def verify_and_navigate_to_edit_team_page(self):
