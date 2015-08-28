@@ -21,11 +21,12 @@
             'teams/js/views/edit_team',
             'teams/js/views/team_profile_header_actions',
             'teams/js/views/team_utils',
+            'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection, TeamAnalytics,
                   TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamProfileHeaderActionsView, TeamUtils, teamsTemplate) {
+                  TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -37,12 +38,15 @@
                 initialize: function (options) {
                     this.header = options.header;
                     this.main = options.main;
+                    this.instructorTools = options.instructorTools;
                 },
 
                 render: function () {
                     this.$el.html(_.template(teamsTemplate));
                     this.$('p.error').hide();
                     this.header.setElement(this.$('.teams-header')).render();
+                    if (this.instructorTools)
+                        this.instructorTools.setElement(this.$('.teams-instructor-tools-bar')).render();
                     this.main.setElement(this.$('.page-content')).render();
                     return this;
                 }
@@ -249,12 +253,14 @@
                                 topic: topic,
                                 model: team
                             });
+                            var instructorToolsView = new InstructorToolsView();
                             editViewWithHeader = self.createViewWithHeader({
                                 title: gettext("Edit Team"),
                                 description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
                                 mainView: view,
                                 topic: topic,
-                                team: team
+                                team: team,
+                                instructorTools: instructorToolsView
                             });
                             self.mainView = editViewWithHeader;
                             self.render();
@@ -443,7 +449,8 @@
                                 }
                             }
                         }),
-                        main: options.mainView
+                        main: options.mainView,
+                        instructorTools: options.instructorTools
                     });
                 },
 
