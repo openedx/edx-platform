@@ -5,8 +5,8 @@
             'underscore',
             'gettext',
             'teams/js/views/team_utils',
-            'text!teams/templates/team-join.underscore'],
-        function (Backbone, _, gettext, TeamUtils, teamJoinTemplate) {
+            'text!teams/templates/team-profile-header-actions.underscore'],
+        function (Backbone, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
             return Backbone.View.extend({
 
                 errorMessage: gettext("An error occurred. Try again."),
@@ -14,31 +14,34 @@
                 teamFullMessage: gettext("This team is full."),
 
                 events: {
-                    "click .action-primary": "joinTeam"
+                    "click .action-primary": "joinTeam",
+                    "click .action-edit-team": "editTeam"
                 },
 
                 initialize: function(options) {
                     this.teamEvents = options.teamEvents;
-                    this.template = _.template(teamJoinTemplate);
+                    this.template = _.template(teamProfileHeaderActionsTemplate);
                     this.courseID = options.courseID;
                     this.maxTeamSize = options.maxTeamSize;
                     this.currentUsername = options.currentUsername;
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
-                    _.bindAll(this, 'render', 'joinTeam', 'getUserTeamInfo');
+                    this.showEditButton = options.showEditButton;
+                    this.topicID = options.topicID;
+                    _.bindAll(this, 'render', 'joinTeam','editTeam', 'getUserTeamInfo');
                     this.listenTo(this.model, "change", this.render);
                 },
 
                 render: function() {
                     var view = this,
                         message,
-                        showButton,
+                        showJoinButton,
                         teamHasSpace;
                     this.getUserTeamInfo(this.currentUsername, view.maxTeamSize).done(function (info) {
                         teamHasSpace = info.teamHasSpace;
 
                         // if user is the member of current team then we wouldn't show anything
                         if (!info.memberOfCurrentTeam) {
-                            showButton = !info.alreadyMember && teamHasSpace;
+                            showJoinButton = !info.alreadyMember && teamHasSpace;
 
                             if (info.alreadyMember) {
                                 message = info.memberOfCurrentTeam ? '' : view.alreadyMemberMessage;
@@ -47,7 +50,11 @@
                             }
                         }
 
-                        view.$el.html(view.template({showButton: showButton, message: message}));
+                        view.$el.html(view.template({
+                            showJoinButton: showJoinButton,
+                            message: message,
+                            showEditButton: view.showEditButton
+                        }));
                     });
                     return view;
                 },
@@ -108,6 +115,10 @@
                     }
 
                     return deferred.promise();
+                },
+                editTeam: function (event) {
+                    event.preventDefault();
+                    Backbone.history.navigate('topics/' + this.topicID + '/' + this.model.get('id') +'/edit-team', {trigger: true});
                 }
             });
         });

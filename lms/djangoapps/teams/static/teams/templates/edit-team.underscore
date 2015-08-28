@@ -1,8 +1,14 @@
 <form>
-<div class="create-team wrapper-msg is-incontext urgency-low warning is-hidden" tabindex="-1">
+<div class="create-team wrapper-msg is-incontext urgency-low error is-hidden" tabindex="-1">
     <div class="msg">
         <div class="msg-content">
-            <h3 class="title"><%- gettext("Your team could not be created!") %></h3>
+            <h3 class="title">
+                <% if (action === 'create') { %>
+                    <%- gettext("Your team could not be created.") %>
+                <% } else if (action === 'edit') { %>
+                    <%- gettext("Your team could not be updated.") %>
+                <% } %>
+            </h3>
             <span class="screen-reader-message sr"></span>
             <div class="copy">
                 <p></p>
@@ -11,15 +17,16 @@
     </div>
 </div>
 
-<div class="form-instructions create-team-instructions">
-    <p class="copy">
-        <%- gettext("Enter information to describe your team. You cannot change these details after you create the team.") %></p>
-</div>
+<% if (action === 'create') { %>
+    <div class="form-instructions create-team-instructions">
+        <p class="copy">
+            <%- gettext("Enter information to describe your team. You cannot change these details after you create the team.") %></p>
+    </div>
+<% } %>
 
 <div class="team-edit-fields">
     <div class="team-required-fields">
     </div>
-
     <div class="team-optional-fields">
         <fieldset>
             <div class="u-field u-field-optional_description">
@@ -38,7 +45,7 @@
     <button class="action action-primary">
         <%=
             interpolate_text(
-                _.escape(gettext("{primaryButtonTitle} {span_start}a new team{span_end}")),
+                _.escape(gettext("{primaryButtonTitle} {span_start}a team{span_end}")),
                 {
                     'primaryButtonTitle': primaryButtonTitle, 'span_start': '<span class="sr">', 'span_end': '</span>'
                 }
@@ -48,9 +55,10 @@
     <button class="action action-cancel">
         <%=
             interpolate_text(
-                _.escape(gettext("Cancel {span_start}a new team{span_end}")),
+                _.escape(gettext("Cancel {span_start} {action} team {span_end}")),
                 {
-                    'span_start': '<span class="sr">', 'span_end': '</span>'
+                    'span_start': '<span class="sr">', 'span_end': '</span>',
+                    'action': action === 'create' ? 'creating' : 'updating'
                 }
             )
         %>
