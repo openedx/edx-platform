@@ -12,6 +12,7 @@ from django.http import (
     HttpResponseForbidden,
     Http404
 )
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from opaque_keys import InvalidKeyError
@@ -26,6 +27,7 @@ from openedx.core.djangoapps.credit.exceptions import CreditApiBadRequest, Credi
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.serializers import CreditCourseSerializer
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+
 
 log = logging.getLogger(__name__)
 
@@ -376,9 +378,10 @@ class CreditCourseViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, view
     lookup_value_regex = settings.COURSE_KEY_REGEX
     queryset = CreditCourse.objects.all()
     serializer_class = CreditCourseSerializer
-    authentication_classes = (authentication.OAuth2Authentication, authentication.SessionAuthentication,)
+    authentication_classes = (authentication.OAuth2Authentication,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # Convert the course ID/key from a string to an actual CourseKey object.
         course_id = kwargs.get(self.lookup_field, None)
