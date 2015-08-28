@@ -36,6 +36,16 @@ def get_value(val_name, default=None, **kwargs):
     return BACKEND.get_value(val_name, default, **kwargs)
 
 
+def get_dict(dict_name, default={}, **kwargs):
+    """
+    Returns a dictionary product of merging the request's microsite and
+    the default value.
+    This can be used, for example, to return a merged dictonary from the
+    settings.FEATURES dict, including values defined at the microsite
+    """
+    return BACKEND.get_dict(dict_name, default, **kwargs)
+
+
 def has_override_value(val_name):
     """
     Returns True/False whether a Microsite has a definition for the

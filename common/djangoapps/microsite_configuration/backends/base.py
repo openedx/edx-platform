@@ -45,6 +45,16 @@ class BaseMicrositeBackend(object):
         pass
 
     @abc.abstractmethod
+    def get_dict(self, dict_name, default={}, **kwargs):
+        """
+        Returns a dictionary product of merging the request's microsite and
+        the default value.
+        This can be used, for example, to return a merged dictonary from the
+        settings.FEATURES dict, including values defined at the microsite
+        """
+        pass
+
+    @abc.abstractmethod
     def is_request_in_microsite(self):
         """
         This will return True/False if the current request is a request within a microsite
