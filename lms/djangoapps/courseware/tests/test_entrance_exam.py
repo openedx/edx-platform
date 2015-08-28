@@ -155,7 +155,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         }
                     ],
                     'url_name': u'Entrance_Exam_Section_-_Chapter_1',
-                    'display_name': u'Entrance Exam Section - Chapter 1'
+                    'display_name': u'Entrance Exam Section - Chapter 1',
+                    'display_id': u'entrance-exam-section-chapter-1',
                 }
             ]
         )
@@ -182,19 +183,22 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         }
                     ],
                     'url_name': u'Overview',
-                    'display_name': u'Overview'
+                    'display_name': u'Overview',
+                    'display_id': u'overview'
                 },
                 {
                     'active': False,
                     'sections': [],
                     'url_name': u'Week_1',
-                    'display_name': u'Week 1'
+                    'display_name': u'Week 1',
+                    'display_id': u'week-1'
                 },
                 {
                     'active': False,
                     'sections': [],
                     'url_name': u'Instructor',
-                    'display_name': u'Instructor'
+                    'display_name': u'Instructor',
+                    'display_id': u'instructor'
                 },
                 {
                     'active': True,
@@ -209,7 +213,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         }
                     ],
                     'url_name': u'Entrance_Exam_Section_-_Chapter_1',
-                    'display_name': u'Entrance Exam Section - Chapter 1'
+                    'display_name': u'Entrance Exam Section - Chapter 1',
+                    'display_id': u'entrance-exam-section-chapter-1'
                 }
             ]
         )

@@ -1121,7 +1121,7 @@ class EntranceExamTest(UniqueCourseTest):
             When I view the courseware that has an entrance exam
             Then there should be an "Entrance Exam" chapter.'
         """
-        entrance_exam_link_selector = 'div#accordion nav div h3 a'
+        entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
         # visit courseware page and make sure there is not entrance exam chapter.
         self.courseware_page.visit()
         self.courseware_page.wait_for_page()
