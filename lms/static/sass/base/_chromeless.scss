@@ -1,0 +1,15 @@
+// chromeless - styling
+// ====================
+
+// Table of Contents
+// * +Component - Web View
+
+
+// overriding existing styles on the body element when view-chromeless is a class.
+
+body.view-chromeless {
+  
+  section.course-content {
+    padding: ($baseline/2);
+  }
+}

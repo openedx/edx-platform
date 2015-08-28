@@ -68,4 +68,7 @@
 @import 'search/_search';
 
 // responsive
-@import 'base/layouts'; // temporary spot for responsive course
+@import 'base/layouts'; // temporary spot for respand inconsive course
+
+// chromeless overrides
+@import 'base/chromeless'; // styling overrides for chromless webviews (ex: mobile app, LTI
