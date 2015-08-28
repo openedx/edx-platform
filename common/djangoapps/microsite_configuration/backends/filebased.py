@@ -20,6 +20,7 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
         super(SettingsFileMicrositeBackend, self).__init__(**kwargs)
         self.current_request_configuration = threading.local()
         self.current_request_configuration.data = {}
+        self.current_request_configuration.cache = {}
 
     def has_configuration_set(self):
         """
@@ -35,6 +36,20 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
             return {}
 
         return self.current_request_configuration.data
+
+    def get_key_from_cache(self, key):
+        """
+        Retrieves a key from a cache scoped to the thread
+        """
+        if hasattr(self.current_request_configuration, 'cache'):
+            return self.current_request_configuration.cache.get(key)
+
+    def set_key_to_cache(self, key, value):
+        """
+        Stores a key value pair in a cache scoped to the thread
+        """
+        if hasattr(self.current_request_configuration, 'cache'):
+            self.current_request_configuration.cache[key] = value
 
     def set_config_by_domain(self, domain):
         """
@@ -87,6 +102,22 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
         """
         configuration = self.get_configuration()
         return configuration.get(val_name, default)
+
+    def get_dict(self, dict_name, default={}, **kwargs):
+        """
+        Returns a dictionary product of merging the request's microsite and
+        the default value.
+        Supports storing a cache of the merged value to improve performance
+        """
+        cached_dict = self.get_key_from_cache(dict_name)
+        if cached_dict:
+            return cached_dict
+
+        output = default.copy()
+        output.update(self.get_value(dict_name, {}))
+
+        self.set_key_to_cache(dict_name, output)
+        return output
 
     def is_request_in_microsite(self):
         """
@@ -189,3 +220,4 @@ class SettingsFileMicrositeBackend(BaseMicrositeBackend):
         Clears out any microsite configuration from the current request/thread
         """
         self.current_request_configuration.data = {}
+        self.current_request_configuration.cache = {}

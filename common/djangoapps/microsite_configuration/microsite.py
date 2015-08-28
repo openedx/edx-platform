@@ -11,7 +11,6 @@ import inspect
 from importlib import import_module
 from django.conf import settings
 from microsite_configuration.backends.base import BaseMicrositeBackend
-CURRENT_REQUEST_CONFIGURATION.cache = {}
 
 
 __all__ = [
@@ -110,7 +109,6 @@ def clear():
     Clears out any microsite configuration from the current request/thread
     """
     BACKEND.clear()
-    CURRENT_REQUEST_CONFIGURATION.cache = {}
 
 
 def set_by_domain(domain):
