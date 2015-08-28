@@ -96,3 +96,14 @@ class MockSignalHandlerMixin(object):
                 del kwargs['exclude_args']
             self.assertEqual(mock_args, args)
             self.assertEqual(mock_kwargs, dict(kwargs, signal=mock_signal))
+
+
+@contextmanager
+def skip_signal(signal, **kwargs):
+    """
+    ContextManager to skip a signal by disconnecting it, yielding,
+    and then reconnecting the signal.
+    """
+    signal.disconnect(**kwargs)
+    yield
+    signal.connect(**kwargs)

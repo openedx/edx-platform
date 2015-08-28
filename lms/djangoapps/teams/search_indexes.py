@@ -88,7 +88,7 @@ class CourseTeamIndexer(object):
         return settings.FEATURES.get(cls.ENABLE_SEARCH_KEY, False)
 
 
-@receiver(post_save, sender=CourseTeam)
+@receiver(post_save, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_save_callback')
 def course_team_post_save_callback(**kwargs):
     """
     Reindex object after save.
