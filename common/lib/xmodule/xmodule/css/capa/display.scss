@@ -181,7 +181,7 @@ div.problem {
       }
 
       &.choicegroup_partially-correct {
-        @include status-icon($partiallycorrect, "\f00c");
+        @include status-icon($partiallycorrect, "\f069");
         border: 2px solid $partiallycorrect;
 
         // keep green for correct answers on hover. 
@@ -245,7 +245,7 @@ div.problem {
 
       // CASE: partially correct answer
       &.partially-correct {
-        @include status-icon($partiallycorrect, "\f00c");
+        @include status-icon($partiallycorrect, "\f069");
       }
 
       // CASE: incorrect answer
@@ -776,7 +776,7 @@ div.problem {
       }
 
       .status {
-        @include status-icon($partiallycorrect, "\f00c");
+        @include status-icon($partiallycorrect, "\f069");
       }
     }
 
