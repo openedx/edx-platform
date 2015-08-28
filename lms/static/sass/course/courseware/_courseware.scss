@@ -516,7 +516,7 @@ div.course-wrapper {
         }
       }
 
-      .accordion {
+      div#accordion {
         visibility: hidden;
         width: 10px;
         padding: 0;
@@ -524,6 +524,11 @@ div.course-wrapper {
         nav {
           white-space: pre;
           overflow: hidden;
+
+          ul {
+            overflow: hidden;
+            white-space: nowrap;
+          }
         }
       }
     }

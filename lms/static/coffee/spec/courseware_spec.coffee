@@ -1,5 +1,10 @@
 describe 'Courseware', ->
   describe 'start', ->
+    it 'create the navigation', ->
+      spyOn(window, 'Navigation')
+      Courseware.start()
+      expect(window.Navigation).toHaveBeenCalled()
+
     it 'binds the Logger', ->
       spyOn(Logger, 'bind')
       Courseware.start()
