@@ -97,3 +97,25 @@ class UserServiceTestCase(TestCase):
         )
 
         self.assertEqual(anonymous_user_id, anon_user_id)
+
+    def test_get_all_users(self):
+        """
+        Get all users self.user is allowed to see.
+        """
+        # TODO: Make sure there are users in the database for this
+        # test to be meaningful.
+        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=False)
+        users = django_user_service.get_all_users()
+        self.assertEqual(users, [])
+
+        # TODO: Have data in the database which make this meaningful.
+        # Test the user will not receive results for a course they shouldn't.
+        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
+        users = django_user_service.get_all_users(course_id='1234')
+        self.assertEqual(users, [])
+
+        # TODO: Have data in the database which make this meaningful.
+        # Test the user will receive results for a course they can manage.
+        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
+        users = django_user_service.get_all_users(course_id='1234')
+        self.assertEqual(users, [])

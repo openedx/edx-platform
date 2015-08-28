@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import XBlockUser, UserService
 from student.models import anonymous_id_for_user, get_user_by_username_or_email
+from submissions.models import StudentItem
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'
@@ -70,3 +71,13 @@ class DjangoXBlockUserService(UserService):
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = False
 
         return xblock_user
+
+    def get_all_users(self, **kwargs):
+        """
+        Returns all the users the currently-logged in user is allowed to see,
+        as a list of XBlockUser.
+        """
+        if not self._django_user.user_is_staff: 
+            return []
+        # TODO: Use "item" and "course_id" from kwargs for filtering.
+        return list(StudentItem.objects.all()[:10])
