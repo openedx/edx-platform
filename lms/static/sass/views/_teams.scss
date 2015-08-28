@@ -579,19 +579,24 @@
   .teams-main {
 
     .team-edit-fields {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
       @include clearfix();
 
     .team-required-fields {
       @include float(left);
       width: 55%;
-      border-right: 2px solid $gray-l4;;
+
+      .u-field {
+        @include margin-right($baseline*2);
+      }
 
       .u-field.u-field-name {
         padding-bottom: $baseline;
 
         .u-field-value {
-          display: block;
-          width: 90%;
+          width: 100%;
 
           input {
             border-radius: ($baseline/5);
@@ -609,36 +614,38 @@
       .u-field.u-field-description {
 
         .u-field-value {
-          display: block;
           width: 100%;
 
           textarea {
+            width: 100%;
             height: ($baseline*5);
-            width: 90%;
             border-radius: ($baseline/5)
           }
         }
 
-        .u-field-message {
-          display: block;
-          @extend %t-copy-sub1;
-          @include padding-left(0);
-          margin-top: ($baseline/4);
-          color: $gray-l1;
-          width: 90%;
+        .u-field-footer {
+
+          .u-field-message {
+            display: block;
+            @extend %t-copy-sub1;
+            @include padding-left(0);
+            margin-top: ($baseline/4);
+            color: $gray-l1;
+            width: 100%;
+          }
         }
       }
 
       .u-field-title {
         padding-bottom: ($baseline/4);
         color: $base-font-color;
-        width: 40%;
+        width: 100%;
       }
     }
 
     .team-optional-fields {
       @include float(left);
-      @include margin-left($baseline);
+      @include margin-left($baseline*2);
       width: 40%;
 
       .u-field.u-field-optional_description {
@@ -648,7 +655,6 @@
           color: $base-font-color;
           font-weight: $font-semibold;
           margin-bottom: ($baseline/5);
-          width: 100%;
         }
 
         .u-field-value {
@@ -664,19 +670,16 @@
         display: none;
       }
 
-      .u-field-value {
-        width: 90%;
-      }
-
       .u-field-title {
-        display: block;
         color: $base-font-color;
-        width: 35%;
       }
 
       .u-field-message {
         @include padding-left(0);
-        width: 95%;
+      }
+
+      .u-field-title, .u-field-value, .u-field-message {
+        width: 100%;
       }
     }
 
@@ -700,6 +703,14 @@
       margin: 0 0 $baseline 0;
     }
   }
+}
+
+// vertical line between required and optional fields
+.vertical-line:after {
+    height: 100%;
+    border-left: 2px solid $gray-l4;
+    content: "";
+    position: absolute;
 }
 
 .form-instructions {

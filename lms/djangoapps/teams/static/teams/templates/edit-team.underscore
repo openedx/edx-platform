@@ -27,6 +27,7 @@
 <div class="team-edit-fields">
     <div class="team-required-fields">
     </div>
+    <div class="vertical-line"></div>
     <div class="team-optional-fields">
         <fieldset>
             <div class="u-field u-field-optional_description">
@@ -43,25 +44,20 @@
 
 <div class="create-team form-actions">
     <button class="action action-primary">
-        <%=
-            interpolate_text(
-                _.escape(gettext("{primaryButtonTitle} {span_start}a team{span_end}")),
-                {
-                    'primaryButtonTitle': primaryButtonTitle, 'span_start': '<span class="sr">', 'span_end': '</span>'
-                }
-            )
-        %>
+        <span aria-hidden="true"><%- primaryButtonTitle %></span>
+        <% if (action === 'create') { %>
+            <span class="sr"><%- gettext("Create team.") %></span>
+        <% } else if (action === 'edit') { %>
+            <span class="sr"><%- gettext("Update team.") %></span>
+        <% } %>
     </button>
     <button class="action action-cancel">
-        <%=
-            interpolate_text(
-                _.escape(gettext("Cancel {span_start} {action} team {span_end}")),
-                {
-                    'span_start': '<span class="sr">', 'span_end': '</span>',
-                    'action': action === 'create' ? 'creating' : 'updating'
-                }
-            )
-        %>
+        <span aria-hidden="true"><%- gettext("Cancel") %></span>
+        <% if (action === 'create') { %>
+            <span class="sr"><%- gettext("Cancel team creating.") %></span>
+        <% } else if (action === 'edit') { %>
+            <span class="sr"><%- gettext("Cancel team updating.") %></span>
+        <% } %>
     </button>
 </div>
 </form>
