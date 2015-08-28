@@ -171,6 +171,7 @@ class AdvancedSettingsPage(CoursePage):
             'cert_name_long',
             'cert_name_short',
             'certificates_display_behavior',
+            'cohort_config',
             'course_image',
             'banner_image',
             'video_thumbnail_image',
