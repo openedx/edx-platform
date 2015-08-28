@@ -40,6 +40,7 @@ def get_key_from_cache(key):
     if hasattr(CURRENT_REQUEST_CONFIGURATION, 'cache'):
         return CURRENT_REQUEST_CONFIGURATION.cache.get(key)
 
+
 def set_key_to_cache(key, value):
     """
     Stores a key value pair in a cache scoped to the thread
@@ -63,7 +64,7 @@ def get_value(val_name, default=None):
     return configuration.get(val_name, default)
 
 
-def get_dict(dict_name, default={}, **kwargs):
+def get_dict(dict_name, default=None):
     """
     Returns a dictionary product of merging the request's microsite and
     the default value.
@@ -73,6 +74,9 @@ def get_dict(dict_name, default={}, **kwargs):
     cached_dict = get_key_from_cache(dict_name)
     if cached_dict:
         return cached_dict
+
+    if default is None:
+        default = {}
 
     output = default.copy()
     output.update(get_value(dict_name, {}))

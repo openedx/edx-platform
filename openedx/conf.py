@@ -8,4 +8,4 @@ This file adds a definition for the Microsite Settings with a nicer notation
 from microsite_configuration import MicrositeAwareSettings
 
 
-settings = MicrositeAwareSettings()  # pylint: disable=C0103
+settings = MicrositeAwareSettings()  # pylint: disable=invalid-name
