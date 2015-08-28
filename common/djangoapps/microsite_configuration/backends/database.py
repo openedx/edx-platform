@@ -8,20 +8,15 @@ import edxmako
 import json
 
 from django.conf import settings
-from microsite_configuration.backends.base import BaseMicrositeBackend
+from microsite_configuration.backends.filebased import SettingsFileMicrositeBackend
 from microsite_configuration.models import Microsite
 
 
-class DatabaseMicrositeBackend(BaseMicrositeBackend):
+class DatabaseMicrositeBackend(SettingsFileMicrositeBackend):
     """
     Microsite backend that reads the microsites definitions
     from a table in the database according to the models.py file
     """
-
-    def __init__(self, **kwargs):
-        super(DatabaseMicrositeBackend, self).__init__(**kwargs)
-        self.current_request_configuration = threading.local()
-        self.current_request_configuration.data = {}
 
     def has_configuration_set(self):
         """
@@ -31,15 +26,6 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
             return True
         else:
             return False
-
-    def get_configuration(self):
-        """
-        Returns the current request's microsite configuration
-        """
-        if not hasattr(self.current_request_configuration, 'data'):
-            return {}
-
-        return self.current_request_configuration.data
 
     def set_config_by_domain(self, domain):
         """
@@ -91,27 +77,6 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
                 return path
 
         return relative_path
-
-    def get_value(self, val_name, default=None, **kwargs):
-        """
-        Returns a value associated with the request's microsite, if present
-        """
-        configuration = self.get_configuration()
-        return configuration.get(val_name, default)
-
-    def is_request_in_microsite(self):
-        """
-        This will return if current request is a request within a microsite
-        """
-        return bool(self.get_configuration())
-
-    def has_override_value(self, val_name):
-        """
-        Will return True/False whether a Microsite has a definition for the
-        specified val_name
-        """
-        configuration = self.get_configuration()
-        return val_name in configuration
 
     def enable_microsites(self, log):
         """
@@ -179,9 +144,3 @@ class DatabaseMicrositeBackend(BaseMicrositeBackend):
         config['subdomain'] = subdomain
         config['site_domain'] = domain
         self.current_request_configuration.data = config
-
-    def clear(self):
-        """
-        Clears out any microsite configuration from the current request/thread
-        """
-        self.current_request_configuration.data = {}
