@@ -87,7 +87,8 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 expect(requests.length).toEqual(0);
             });
 
-            it("displays an error when the user has already been added", function () {
+            // TODO: This test has become flaky. See TNL-3166
+            xit("displays an error when the user has already been added", function () {
                 var requests = AjaxHelpers.requests(this);
                 $('.create-user-button').click();
                 $('.user-email-input').val('honor@example.com');
@@ -99,8 +100,8 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 expect(requests.length).toEqual(0);
             });
 
-
-            it("can remove a user's permission to access the library", function () {
+            // TODO: This test has become flaky. See TNL-3166
+            xit("can remove a user's permission to access the library", function () {
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 var email = "honor@example.com";
