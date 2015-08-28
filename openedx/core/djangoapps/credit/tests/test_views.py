@@ -352,10 +352,12 @@ class CreditCourseViewSetTests(TestCase):
         # This value must be set here, as setting it outside of a method results in issues with CMS/Studio tests.
         self.path = reverse('credit:creditcourse-list')
 
-        # Create a user and login, so that we can use session auth for the
-        # tests that aren't specifically testing authentication or authorization.
-        user = UserFactory(password=self.password, is_staff=True)
-        self.client.login(username=user.username, password=self.password)
+        self.user = UserFactory(password=self.password, is_staff=True)
+        oauth_client = ClientFactory.create()
+        access_token = AccessTokenFactory.create(user=self.user, client=oauth_client).token
+        self.headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
 
     def _serialize_credit_course(self, credit_course):
         """ Serializes a CreditCourse to a Python dict. """
@@ -366,38 +368,29 @@ class CreditCourseViewSetTests(TestCase):
         }
 
     def test_session_auth(self):
-        """ Verify the endpoint supports session authentication, and only allows authorization for staff users. """
-        user = UserFactory(password=self.password, is_staff=False)
-        self.client.login(username=user.username, password=self.password)
-
-        # Non-staff users should not have access to the API
+        """ Verify the endpoint does not allow session authentication. """
+        # Staff users should not have session-based access to the API
+        self.client.login(username=self.user.username, password=self.password)
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
-        # Staff users should have access to the API
-        user.is_staff = True
-        user.save()  # pylint: disable=no-member
+        # Non-staff users should never have access to the API
+        self.user.is_staff = False
+        self.user.save()  # pylint: disable=no-member
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
 
     def test_oauth(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
-        user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
-        headers = {
-            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
-        }
+        # Staff users should have access to the API
+        response = self.client.get(self.path, **self.headers)
+        self.assertEqual(response.status_code, 200)
 
         # Non-staff users should not have access to the API
-        response = self.client.get(self.path, **headers)
+        self.user.is_staff = False
+        self.user.save()  # pylint: disable=no-member
+        response = self.client.get(self.path, **self.headers)
         self.assertEqual(response.status_code, 403)
-
-        # Staff users should have access to the API
-        user.is_staff = True
-        user.save()  # pylint: disable=no-member
-        response = self.client.get(self.path, **headers)
-        self.assertEqual(response.status_code, 200)
 
     def test_create(self):
         """ Verify the endpoint supports creating new CreditCourse objects. """
@@ -408,7 +401,7 @@ class CreditCourseViewSetTests(TestCase):
             'enabled': enabled
         }
 
-        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
+        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON, **self.headers)
         self.assertEqual(response.status_code, 201)
 
         # Verify the API returns the serialized CreditCourse
@@ -423,7 +416,7 @@ class CreditCourseViewSetTests(TestCase):
         cc1 = CreditCourse.objects.create(course_key=CourseKey.from_string(course_id))
         path = reverse('credit:creditcourse-detail', args=[course_id])
 
-        response = self.client.get(path)
+        response = self.client.get(path, **self.headers)
         self.assertEqual(response.status_code, 200)
 
         # Verify the API returns the serialized CreditCourse
@@ -435,7 +428,7 @@ class CreditCourseViewSetTests(TestCase):
         cc2 = CreditCourse.objects.create(course_key=CourseKey.from_string('d/e/f'), enabled=True)
         expected = [self._serialize_credit_course(cc1), self._serialize_credit_course(cc2)]
 
-        response = self.client.get(self.path)
+        response = self.client.get(self.path, **self.headers)
         self.assertEqual(response.status_code, 200)
 
         # Verify the API returns a list of serialized CreditCourse objects
@@ -449,7 +442,7 @@ class CreditCourseViewSetTests(TestCase):
 
         path = reverse('credit:creditcourse-detail', args=[course_id])
         data = {'course_key': course_id, 'enabled': True}
-        response = self.client.put(path, json.dumps(data), content_type=JSON)
+        response = self.client.put(path, json.dumps(data), content_type=JSON, **self.headers)
         self.assertEqual(response.status_code, 200)
 
         # Verify the serialized CreditCourse is returned
