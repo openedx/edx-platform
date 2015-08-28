@@ -17,8 +17,6 @@
                     'click .action-primary': 'createOrUpdateTeam',
                     'submit form': 'createOrUpdateTeam',
                     'click .action-cancel': 'cancelAndGoBack',
-                    'click .action-delete': 'deleteTeam',
-                    'click .action-edit-members': 'editMembership',
                 },
 
                 initialize: function(options) {
@@ -216,18 +214,6 @@
                     }
                     Backbone.history.navigate(url, {trigger: true});
                 },
-
-                deleteTeam: function (event) {
-                    event.preventDefault();
-                    alert("You clicked the button!");
-                    //placeholder; will route to delete team page
-                },
-
-                editMembership: function (event) {
-                    event.preventDefault();
-                    alert("You clicked the button!");
-                    //placeholder; will route to remove team member page
-                }
             });
         });
 }).call(this, define || RequireJS.define);
