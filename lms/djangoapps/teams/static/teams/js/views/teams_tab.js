@@ -206,7 +206,7 @@
                     var view = this;
                     this.getTopic(topicID).done(function (topic) {
                         view.mainView = view.createViewWithHeader({
-                            parentTopic: topic,
+                            topic: topic,
                             title: gettext("Create a New Team"),
                             description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
                             mainView: new TeamEditView({
@@ -368,7 +368,7 @@
                                     {
                                         mainView: view,
                                         subject: team,
-                                        parentTopic: topic,
+                                        topic: topic,
                                         headerActionsView: TeamProfileActionsView
                                     }
                                 )
