@@ -20,7 +20,7 @@
 <div class="wrapper-message">
     <div class="message">
         <p>
-            <%= gettext("Hey, can you see this? Instructor toolbar placeholder") %>
+            <%= gettext("Instructor tools placeholder") %>
         </p>
         <button class="action-delete">
             <%- gettext("Delete Team") %>
