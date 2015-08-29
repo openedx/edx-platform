@@ -12,7 +12,7 @@ EXPECTED_COFFEE_COMMAND = (
 )
 EXPECTED_SASS_COMMAND = (
     "sass --update --cache-location /tmp/sass-cache --default-encoding utf-8 --style compressed"
-    " --quiet --load-path common/static --load-path common/static/sass"
+    " --quiet --load-path . --load-path common/static --load-path common/static/sass"
     " --load-path lms/static/sass --load-path lms/static/certificates/sass"
     " --load-path cms/static/sass --load-path common/static/sass"
     " lms/static/sass:lms/static/css lms/static/certificates/sass:lms/static/certificates/css"
