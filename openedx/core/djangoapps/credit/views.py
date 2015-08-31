@@ -18,8 +18,9 @@ from django.views.decorators.http import require_POST, require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 import pytz
-from rest_framework import viewsets, mixins, permissions, authentication
-
+from rest_framework import viewsets, mixins, permissions
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 from util.json_request import JsonResponse
 from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
@@ -377,17 +378,28 @@ class CreditCourseViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, view
     lookup_value_regex = settings.COURSE_KEY_REGEX
     queryset = CreditCourse.objects.all()
     serializer_class = CreditCourseSerializer
-    authentication_classes = (authentication.OAuth2Authentication, authentication.SessionAuthentication,)
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+
+    # In Django Rest Framework v3, there is a default pagination
+    # class that transmutes the response data into a dictionary
+    # with pagination information.  The original response data (a list)
+    # is stored in a "results" value of the dictionary.
+    # For backwards compatibility with the existing API, we disable
+    # the default behavior by setting the pagination_class to None.
+    pagination_class = None
 
     # This CSRF exemption only applies when authenticating without SessionAuthentication.
     # SessionAuthentication will enforce CSRF protection.
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        # Convert the course ID/key from a string to an actual CourseKey object.
-        course_id = kwargs.get(self.lookup_field, None)
-
-        if course_id:
-            kwargs[self.lookup_field] = CourseKey.from_string(course_id)
-
         return super(CreditCourseViewSet, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        # Convert the serialized course key into a CourseKey instance
+        # so we can look up the object.
+        course_key = self.kwargs.get(self.lookup_field)
+        if course_key is not None:
+            self.kwargs[self.lookup_field] = CourseKey.from_string(course_key)
+
+        return super(CreditCourseViewSet, self).get_object()
