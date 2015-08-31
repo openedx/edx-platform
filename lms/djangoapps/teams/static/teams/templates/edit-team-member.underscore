@@ -1,0 +1,10 @@
+<li class="team-member">
+    <a class="member-profile" href="<%= memberProfileUrl %>">
+        <p class="tooltip-custom"><%= username %></p>
+        <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
+    </a>
+    <span class="date-joined"><%= dateJoined %></span>
+    <span>|</span>
+    <span class="last-active"><%= lastActive %></span>
+    <a class="action-remove-member" data-username="<%= username %>" href=""><%- gettext("Remove") %></a>
+</li>

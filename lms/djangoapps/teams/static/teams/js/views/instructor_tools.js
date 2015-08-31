@@ -10,12 +10,17 @@
             return Backbone.View.extend({
 
                 events: {
-                    'click .action-delete': 'deleteTeam',
-                    'click .action-edit-members': 'editMembership'
+                    'click .action-delete': 'deleteTeamClicked',
+                    'click .action-edit-members': 'editTeamMembersClicked'
                 },
 
                 initialize: function(options) {
                     this.template = _.template(instructorToolbarTemplate);
+                    this.teamEvents = options.teamEvents;
+                    this.team = options.team;
+                    this.topic = options.topic;
+                    this.router = options.router;
+                    this.editTeamMembers = options.editTeamMembers;
                 },
 
                 render: function() {
@@ -23,16 +28,15 @@
                     return this;
                 },
 
-                deleteTeam: function (event) {
+                deleteTeamClicked: function (event) {
                     event.preventDefault();
                     alert("You clicked the button!");
                     //placeholder; will route to delete team page
                 },
 
-                editMembership: function (event) {
+                editTeamMembersClicked: function (event) {
                     event.preventDefault();
-                    alert("You clicked the button!");
-                    //placeholder; will route to remove team member page
+                    this.editTeamMembers(this.topic, this.team);
                 }
             });
         });
