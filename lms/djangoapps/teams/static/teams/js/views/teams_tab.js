@@ -249,7 +249,11 @@
                                 },
                                 model: team
                             });
-                            var instructorToolsView = new InstructorToolsView();
+                            var instructorToolsHeader = new InstructorToolsView({
+                                team: team,
+                                teamEvents: self.teamEvents,
+                                router: self.router
+                            });
                             editViewWithHeader = self.createViewWithHeader({
                                     mainView: view,
                                     subject: {
