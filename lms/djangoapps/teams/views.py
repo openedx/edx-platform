@@ -97,7 +97,7 @@ class TeamsDashboardView(View):
         team_memberships_page = Paginator(team_memberships, TEAM_MEMBERSHIPS_PER_PAGE).page(1)
         team_memberships_serializer = PaginatedMembershipSerializer(
             instance=team_memberships_page,
-            context={'expand': ('team',)},
+            context={'expand': ('team', 'user'), 'request': request},
         )
 
         context = {
