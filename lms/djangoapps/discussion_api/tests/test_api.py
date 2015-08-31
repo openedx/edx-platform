@@ -1497,8 +1497,9 @@ class CreateThreadTest(
                 self.assertEqual(actual_post_data["group_id"], [str(cohort.id)])
             else:
                 self.assertNotIn("group_id", actual_post_data)
-        except ValidationError:
-            self.assertTrue(expected_error)
+        except ValidationError as ex:
+            if not expected_error:
+                self.fail("Unexpected validation error: {}".format(ex))
 
     def test_following(self):
         self.register_post_thread_response({"id": "test_id"})
@@ -2171,7 +2172,7 @@ class UpdateThreadTest(
             update_thread(self.request, "test_thread", {"raw_body": ""})
         self.assertEqual(
             assertion.exception.message_dict,
-            {"raw_body": ["This field is required."]}
+            {"raw_body": ["This field may not be blank."]}
         )
 
 

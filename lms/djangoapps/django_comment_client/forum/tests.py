@@ -717,6 +717,7 @@ class InlineDiscussionContextTestCase(ModuleStoreTestCase):
             topic_id='topic_id',
             discussion_topic_id=self.discussion_topic_id
         )
+
         self.team.add_user(self.user)  # pylint: disable=no-member
 
     def test_context_can_be_standalone(self, mock_request):
@@ -1093,7 +1094,9 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
             course_id=self.course.id,
             discussion_topic_id=self.discussion1.discussion_id
         )
+
         team.add_user(self.student)  # pylint: disable=no-member
+
         response = self.send_request(mock_request)
         self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
         self.verify_response(response)

@@ -1,16 +1,7 @@
 """
 Discussion API pagination support
 """
-from rest_framework.pagination import BasePaginationSerializer, NextPageField, PreviousPageField
-
-
-class _PaginationSerializer(BasePaginationSerializer):
-    """
-    A pagination serializer without the count field, because the Comments
-    Service does not return result counts
-    """
-    next = NextPageField(source="*")
-    previous = PreviousPageField(source="*")
+from rest_framework.utils.urls import replace_query_param
 
 
 class _Page(object):
@@ -52,7 +43,25 @@ def get_paginated_data(request, results, page_num, per_page):
     previous: The URL for the previous page
     results: The results on this page
     """
-    return _PaginationSerializer(
-        instance=_Page(results, page_num, per_page),
-        context={"request": request}
-    ).data
+    # Note: Previous versions of this function used Django Rest Framework's
+    # paginated serializer.  With the upgrade to DRF 3.1, paginated serializers
+    # have been removed.  We *could* use DRF's paginator classes, but there are
+    # some slight differences between how DRF does pagination and how we're doing
+    # pagination here.  (For example, we respond with a next_url param even if
+    # there is only one result on the current page.)  To maintain backwards
+    # compatability, we simulate the behavior that DRF used to provide.
+    page = _Page(results, page_num, per_page)
+    next_url, previous_url = None, None
+    base_url = request.build_absolute_uri()
+
+    if page.has_next():
+        next_url = replace_query_param(base_url, "page", page.next_page_number())
+
+    if page.has_previous():
+        previous_url = replace_query_param(base_url, "page", page.previous_page_number())
+
+    return {
+        "next": next_url,
+        "previous": previous_url,
+        "results": results,
+    }
