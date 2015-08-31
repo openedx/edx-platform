@@ -6,7 +6,7 @@ import os
 import sys
 import json
 from lazy import lazy
-from path import path
+from path import Path as path
 import memcache
 
 

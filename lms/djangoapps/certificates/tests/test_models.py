@@ -5,8 +5,7 @@ from django.core.files.images import ImageFile
 from django.test import TestCase
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
-# pylint: disable=no-name-in-module
-from path import path
+from path import Path as path
 
 from opaque_keys.edx.locator import CourseLocator
 from certificates.models import (

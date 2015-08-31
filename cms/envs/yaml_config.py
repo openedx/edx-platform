@@ -21,7 +21,7 @@ from openedx.core.lib.logsettings import get_logger_config
 from util.config_parse import convert_tokens
 import os
 
-from path import path
+from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # https://stackoverflow.com/questions/2890146/how-to-force-pyyaml-to-load-strings-as-unicode-objects

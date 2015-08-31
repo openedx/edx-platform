@@ -23,7 +23,7 @@ from bson.son import SON
 from datetime import datetime
 from fs.osfs import OSFS
 from mongodb_proxy import MongoProxy, autoretry_read
-from path import path
+from path import Path as path
 from pytz import UTC
 from contracts import contract, new_contract
 

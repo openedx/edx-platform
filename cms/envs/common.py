@@ -46,7 +46,7 @@ from lms.envs.common import (
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
 )
-from path import path
+from path import Path as path
 from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin

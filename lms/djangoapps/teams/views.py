@@ -1,6 +1,8 @@
 """HTTP endpoints for the Teams API."""
 
-from django.shortcuts import render_to_response
+import logging
+
+from django.shortcuts import get_object_or_404, render_to_response
 from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -56,6 +58,9 @@ from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
+
+
+log = logging.getLogger(__name__)
 
 
 class TeamsDashboardView(View):
@@ -191,9 +196,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             * page: Page number to retrieve.
 
-            * include_inactive: If true, inactive teams will be returned. The
-              default is to not include inactive teams.
-
             * expand: Comma separated list of types for which to return
               expanded representations. Supports "user" and "team".
 
@@ -219,10 +221,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                   discussion topic associated with this team.
 
                 * name: The name of the team.
-
-                * is_active: True if the team is currently active. If false, the
-                  team is considered "soft deleted" and will not be included by
-                  default in results.
 
                 * course_id: The identifier for the course this team belongs to.
 
@@ -266,8 +264,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             Any logged in user who has verified their email address can create
             a team. The format mirrors that of a GET for an individual team,
-            but does not include the id, is_active, date_created, or membership
-            fields. id is automatically computed based on name.
+            but does not include the id, date_created, or membership fields.
+            id is automatically computed based on name.
 
             If the user is not logged in, a 401 error is returned.
 
@@ -292,9 +290,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
     def get(self, request):
         """GET /api/team/v0/teams/"""
-        result_filter = {
-            'is_active': True
-        }
+        result_filter = {}
 
         if 'course_id' in request.QUERY_PARAMS:
             course_id_string = request.QUERY_PARAMS['course_id']
@@ -335,8 +331,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
             result_filter.update({'topic_id': request.QUERY_PARAMS['topic_id']})
-        if 'include_inactive' in request.QUERY_PARAMS and request.QUERY_PARAMS['include_inactive'].lower() == 'true':
-            del result_filter['is_active']
 
         if 'text_search' in request.QUERY_PARAMS and CourseTeamIndexer.search_is_enabled():
             search_engine = CourseTeamIndexer.engine()
@@ -355,19 +349,16 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 self.get_paginate_by(),
                 self.get_page()
             )
-
             serializer = self.get_pagination_serializer(paginated_results)
         else:
             queryset = CourseTeam.objects.filter(**result_filter)
             order_by_input = request.QUERY_PARAMS.get('order_by', 'name')
             if order_by_input == 'name':
-                queryset = queryset.extra(select={'lower_name': "lower(name)"})
-                queryset = queryset.order_by('lower_name')
+                # MySQL does case-insensitive order_by.
+                queryset = queryset.order_by('name')
             elif order_by_input == 'open_slots':
-                queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('team_size', '-last_activity_at')
             elif order_by_input == 'last_activity_at':
-                queryset = queryset.annotate(team_size=Count('users'))
                 queryset = queryset.order_by('-last_activity_at', 'team_size')
             else:
                 return Response({
@@ -471,7 +462,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
 
-            Get or update a course team's information. Updates are supported
+            Get, update, or delete a course team's information. Updates are supported
             only through merge patch.
 
         **Example Requests**:
@@ -479,6 +470,8 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             GET /api/team/v0/teams/{team_id}}
 
             PATCH /api/team/v0/teams/{team_id} "application/merge-patch+json"
+
+            DELETE /api/team/v0/teams/{team_id}
 
         **Query Parameters for GET**
 
@@ -495,10 +488,6 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                   discussion topic associated with this team.
 
                 * name: The name of the team.
-
-                * is_active: True if the team is currently active. If false, the team
-                  is considered "soft deleted" and will not be included by default in
-                  results.
 
                 * course_id: The identifier for the course this team belongs to.
 
@@ -548,6 +537,20 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the update could not be completed due to validation errors, this
             method returns a 400 error with all error messages in the
             "field_errors" field of the returned JSON.
+
+        **Response Values for DELETE**
+
+            Only staff can delete teams. When a team is deleted, all
+            team memberships associated with that team are also
+            deleted.
+
+            If the user is anonymous of inactive, a 401 is returned.
+
+            If the user is not course or global staff and does not
+            have discussion privileges, a 403 is returned.
+
+            If the user is logged in and the team does not exist, a 404 is returned.
+
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
@@ -558,6 +561,15 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     def get_queryset(self):
         """Returns the queryset used to access the given team."""
         return CourseTeam.objects.all()
+
+    def delete(self, request, team_id):
+        """DELETE /api/team/v0/teams/{team_id}"""
+        team = get_object_or_404(CourseTeam, team_id=team_id)
+        self.check_object_permissions(request, team)
+        # Note: also deletes all team memberships associated with this team
+        log.info('user %d deleted team %s', request.user.id, team_id)
+        team.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TopicListView(GenericAPIView):

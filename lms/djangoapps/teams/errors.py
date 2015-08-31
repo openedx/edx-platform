@@ -14,3 +14,8 @@ class NotEnrolledInCourseForTeam(TeamAPIRequestError):
 class AlreadyOnTeamInCourse(TeamAPIRequestError):
     """User is already a member of another team in the same course."""
     pass
+
+
+class ImmutableMembershipFieldException(Exception):
+    """An attempt was made to change an immutable field on a CourseTeamMembership model"""
+    pass

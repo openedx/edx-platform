@@ -1036,6 +1036,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
+    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 
     if third_party_auth_requested and not trumped_by_first_party_auth:
         # The user has already authenticated via third-party auth and has not
@@ -1057,17 +1058,17 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                     username=username, backend_name=backend_name))
             return HttpResponse(
                 _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
-                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
+                    platform_name=platform_name, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
+                      platform_name=platform_name, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("If you don't have an {platform_name} account yet, "
                   "click <strong>Register</strong> at the top of the page.").format(
-                      platform_name=settings.PLATFORM_NAME),
+                      platform_name=platform_name),
                 content_type="text/plain",
                 status=403
             )
@@ -1907,7 +1908,7 @@ def password_reset(request):
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
-                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  from_email=microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
                   request=request,
                   domain_override=request.get_host())
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -1993,12 +1994,12 @@ def password_reset_confirm_wrapper(
             'form': None,
             'title': _('Password reset unsuccessful'),
             'err_msg': err_msg,
-            'platform_name': settings.PLATFORM_NAME,
+            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }
         return TemplateResponse(request, 'registration/password_reset_confirm.html', context)
     else:
         # we also want to pass settings.PLATFORM_NAME in as extra_context
-        extra_context = {"platform_name": settings.PLATFORM_NAME}
+        extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
 
         if request.method == 'POST':
             # remember what the old password hash is before we call down
