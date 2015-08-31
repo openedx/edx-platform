@@ -10,6 +10,7 @@ from django.utils import translation
 from functools import wraps
 
 from search.search_engine_base import SearchEngine
+from request_cache import get_request_or_stub
 
 from .errors import ElasticSearchConnectionError
 from .serializers import CourseTeamSerializer, CourseTeam
@@ -47,7 +48,15 @@ class CourseTeamIndexer(object):
 
         Returns serialized object with additional search fields.
         """
-        serialized_course_team = CourseTeamSerializer(self.course_team).data
+        # Django Rest Framework v3.1 requires that we pass the request to the serializer
+        # so it can construct hyperlinks.  To avoid changing the interface of this object,
+        # we retrieve the request from the request cache.
+        context = {
+            "request": get_request_or_stub()
+        }
+
+        serialized_course_team = CourseTeamSerializer(self.course_team, context=context).data
+
         # Save the primary key so we can load the full objects easily after we search
         serialized_course_team['pk'] = self.course_team.pk
         # Don't save the membership relations in elasticsearch

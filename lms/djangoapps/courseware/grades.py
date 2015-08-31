@@ -24,7 +24,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
-from submissions import api as sub_api  # installed from the edx-submissions repository
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
@@ -348,8 +347,13 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
     # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
     # scores that were registered with the submissions API, which for the moment
     # means only openassessment (edx-ora2)
+    # We need to import this here to avoid a circular dependency of the form:
+    # XBlock --> submissions --> Django Rest Framework error strings -->
+    # Django translation --> ... --> courseware --> submissions
+    from submissions import api as sub_api  # installed from the edx-submissions repository
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
     max_scores_cache = MaxScoresCache.create_for_course(course)
+
     # For the moment, we have to get scorable_locations from field_data_cache
     # and not from scores_client, because scores_client is ignorant of things
     # in the submissions API. As a further refactoring step, submissions should
@@ -560,7 +564,12 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
         course_module = getattr(course_module, '_x_module', course_module)
 
+    # We need to import this here to avoid a circular dependency of the form:
+    # XBlock --> submissions --> Django Rest Framework error strings -->
+    # Django translation --> ... --> courseware --> submissions
+    from submissions import api as sub_api  # installed from the edx-submissions repository
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+
     max_scores_cache = MaxScoresCache.create_for_course(course)
     # For the moment, we have to get scorable_locations from field_data_cache
     # and not from scores_client, because scores_client is ignorant of things
