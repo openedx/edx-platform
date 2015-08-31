@@ -232,3 +232,44 @@
     }
   }
 }
+
+//efischer; scratch space to make things up and see what happens
+.wrapper-msg {
+  @include clearfix();
+  max-width: grid-width(12);
+  margin: 0 auto;
+  border-top: 3px solid $orange;
+
+  .left-floater {
+    float: left;
+    text-transform: uppercase;
+    font-weight: $font-semibold;
+    color: $white;
+    line-height: $body-line-height;
+  }
+
+  .right-floater {
+    float: right;
+    line-height: $body-line-height;
+
+    button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: $white;
+      box-shadow: 0 0 0 0;
+      font-weight: $font-regular;
+      text-shadow: 0 0;
+
+      &:hover {
+        color: $orange;
+        background: transparent;
+        border: 1px solid $orange;
+        box-shadow: 0 0 0 0;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0;
+      }
+    }
+  }
+}
