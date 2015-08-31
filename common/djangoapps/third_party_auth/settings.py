@@ -90,3 +90,12 @@ def apply_settings(django_settings):
         'social_django.context_processors.backends',
         'social_django.context_processors.login_redirect',
     )
+
+    # These fields are grabbed from third party auth response and passed to strategy.create_user
+    # If autoprovisioning an account we want as much data preserved as possible, so we try to get those as well
+    # If they are not available it would just pass None and should not crash, unless consuming code depends on those
+    # values being set, which is not the case by the time of writing
+    if not hasattr(django_settings, 'SOCIAL_AUTH_USER_FIELDS'):
+        django_settings.SOCIAL_AUTH_USER_FIELDS = getattr(
+            django_settings, 'USER_FIELDS', ['username', 'email', 'first_name', 'last_name', 'fullname']
+        )

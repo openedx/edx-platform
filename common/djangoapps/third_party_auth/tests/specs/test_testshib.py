@@ -9,6 +9,8 @@ import json
 from mock import patch
 from freezegun import freeze_time
 from social_django.models import UserSocialAuth
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from unittest import skip
 
 from third_party_auth.saml import log as saml_log
@@ -22,6 +24,17 @@ TESTSHIB_ENTITY_ID = 'https://idp.testshib.org/idp/shibboleth'
 TESTSHIB_METADATA_URL = 'https://mock.testshib.org/metadata/testshib-providers.xml'
 TESTSHIB_METADATA_URL_WITH_CACHE_DURATION = 'https://mock.testshib.org/metadata/testshib-providers-cache.xml'
 TESTSHIB_SSO_URL = 'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO'
+
+
+def _make_entrypoint_url(auth_entry):
+    """
+    Builds TPA saml entrypoint with specified auth_entry value
+    """
+    return '/auth/login/tpa-saml/?auth_entry={auth_entry}&next=%2Fdashboard&idp=testshib'.format(auth_entry=auth_entry)
+
+TPA_TESTSHIB_LOGIN_URL = _make_entrypoint_url('login')
+TPA_TESTSHIB_REGISTER_URL = _make_entrypoint_url('register')
+TPA_TESTSHIB_COMPLETE_URL = '/auth/complete/tpa-saml/'
 
 
 class SamlIntegrationTestUtilities(object):
@@ -117,6 +130,21 @@ class SamlIntegrationTestUtilities(object):
         )
 
 
+    def _assert_user_does_not_exist(self, username):
+        """ Asserts that user with specified username does not exist """
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(username=username)
+
+
+    def _assert_account_created(self, username, email, full_name):
+        """ Asserts that user with specified username exists, activated and have specified full name and email """
+        user = User.objects.get(username=username)
+        self.assertIsNotNone(user.profile)
+        self.assertEqual(user.email, email)
+        self.assertEqual(user.profile.name, full_name)
+        self.assertTrue(user.is_active)
+
+
 @ddt.ddt
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
@@ -209,6 +237,86 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         self.assertEqual(num_updated, 1)
         self.assertEqual(num_failed, 0)
         self.assertEqual(len(failure_messages), 0)
+        self.assertEqual(num_skipped, 0)
+        self.assertEqual(num_attempted, 1)
+        self.assertEqual(num_updated, 1)
+        self.assertEqual(num_failed, 0)
+        self.assertEqual(len(failure_messages), 0)
+
+    def test_autoprovision_from_login(self):
+        self._configure_testshib_provider(autoprovision_account=True)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        # check that we don't have a user we're autoprovisioning account for
+        self._assert_user_does_not_exist('myself')
+
+        # The user goes to the register page, and sees a button to register with TestShib:
+        self._check_login_page()
+
+        self._test_autoprovision(TPA_TESTSHIB_LOGIN_URL)
+
+    def test_autoprovision_from_register(self):
+        self._configure_testshib_provider(autoprovision_account=True)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        # check that we don't have a user we're autoprovisioning account for
+        self._assert_user_does_not_exist('myself')
+
+        # The user goes to the register page, and sees a button to register with TestShib:
+        self._check_register_page()
+
+        self._test_autoprovision(TPA_TESTSHIB_REGISTER_URL)
+
+    def _test_autoprovision(self, entry_point):
+        """ Actual autoprovision code """
+        # The user clicks on the TestShib button:
+        try_entry_response = self.client.get(entry_point)
+        # The user should be redirected to TestShib:
+        self.assertEqual(try_entry_response.status_code, 302)
+        self.assertTrue(try_entry_response['Location'].startswith(TESTSHIB_SSO_URL))
+
+        # Now the user will authenticate with the SAML provider
+        self._fake_testshib_login_and_return()
+
+        # Then there's one more redirect to set logged_in cookie
+        continue_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
+
+        # We should be redirected to the dashboard screen since profile should be created and logged in
+        self.assertEqual(continue_response.status_code, 302)
+        self.assertEqual(continue_response['Location'], self.url_prefix + self.dashboard_page_url)
+
+        # assert account is created and activated
+        self._assert_account_created(username='myself', email='myself@testshib.org', full_name='Me Myself And I')
+
+        # Now check that we can login again:
+        self.client.logout()
+        self._test_return_login()
+
+    def _test_return_login(self):
+        """ Test logging in to an account that is already linked. """
+        # Make sure we're not logged in:
+        dashboard_response = self.client.get(reverse('dashboard'))
+        self.assertEqual(dashboard_response.status_code, 302)
+        # The user goes to the login page, and sees a button to login with TestShib:
+        self._check_login_page()
+        # The user clicks on the TestShib button:
+        try_login_response = self.client.get(TPA_TESTSHIB_LOGIN_URL)
+        # The user should be redirected to TestShib:
+        self.assertEqual(try_login_response.status_code, 302)
+        self.assertTrue(try_login_response['Location'].startswith(TESTSHIB_SSO_URL))
+        # Now the user will authenticate with the SAML provider
+        login_response = self._fake_testshib_login_and_return()
+        # There will be one weird redirect required to set the login cookie:
+        self.assertEqual(login_response.status_code, 302)
+        self.assertEqual(login_response['Location'], self.url_prefix + TPA_TESTSHIB_COMPLETE_URL)
+        # And then we should be redirected to the dashboard:
+        login_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
+        self.assertEqual(login_response.status_code, 302)
+        self.assertEqual(login_response['Location'], self.url_prefix + reverse('dashboard'))
+        # Now we are logged in:
+        dashboard_response = self.client.get(reverse('dashboard'))
+        self.assertEqual(dashboard_response.status_code, 200)
+
 
     def test_login_with_testshib_provider_short_session_length(self):
         """
