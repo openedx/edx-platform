@@ -38,8 +38,10 @@
 
                 editMembership: function (event) {
                     event.preventDefault();
-                    alert("You clicked the button!");
-                    //placeholder; will route to remove team member page
+                    Backbone.history.navigate(
+                        'teams/' + this.team.get('topic_id') + '/' + this.team.id +'/edit-team/manage-members',
+                        {trigger: true}
+                    );
                 },
 
                 handleDelete: function () {

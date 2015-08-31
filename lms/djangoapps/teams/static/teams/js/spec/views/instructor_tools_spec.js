@@ -15,7 +15,7 @@ define([
             createInstructorTools = function () {
                 return new InstructorToolsView({
                     team: new Team(TeamSpecHelpers.createMockTeamData(1, 1)[0]),
-                    teamEvents: TeamSpecHelpers.teamEvents,
+                    teamEvents: TeamSpecHelpers.teamEvents
                 });
             },
             deleteTeam = function (view, confirm) {
@@ -79,6 +79,14 @@ define([
             deleteTeam(view, true);
             AjaxHelpers.respondWithError(requests, 404);
             expectSuccessMessage(view.team);
+        });    
+            
+        it('can trigger the edit membership view', function () {
+            view.$('.action-edit-members').click();
+            expect(Backbone.history.navigate).toHaveBeenCalledWith(
+                'teams/' + view.team.get('topic_id') + "/" + view.team.id + "/edit-team/manage-members",
+                {trigger: true}
+            );
         });
     });
 });

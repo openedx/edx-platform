@@ -304,9 +304,7 @@ class TeamManagementPage(CoursePage, FieldsMixin, BreadcrumbsMixin):
 
     def is_browser_on_page(self):
         """Check if we're on the create team page for a particular topic."""
-        has_correct_url = self.url.endswith(self.url_path)
-        teams_create_view_present = self.q(css='.team-edit-fields').present
-        return has_correct_url and teams_create_view_present
+        return self.q(css='.team-edit-fields').present
 
     @property
     def header_page_name(self):
@@ -337,6 +335,63 @@ class TeamManagementPage(CoursePage, FieldsMixin, BreadcrumbsMixin):
     def delete_team_button(self):
         """Returns the 'delete team' button."""
         return self.q(css='.action-delete').first
+
+    def click_membership_button(self):
+        """Clicks the 'edit membership' button"""
+        self.q(css='.action-edit-members').first.click()
+        self.wait_for_ajax()
+
+    @property
+    def membership_button_present(self):
+        """Checks if the edit membership button is present"""
+        return self.q(css='.action-edit-members').present
+
+
+class EditMembershipPage(CoursePage):
+    """
+    Staff or discussion-privileged user page to remove troublesome or inactive
+    students from a team
+    """
+    def __init__(self, browser, course_id, team):
+        """
+        Set up `self.url_path` on instantiation, since it dynamically
+        reflects the current team.
+        """
+        super(EditMembershipPage, self).__init__(browser, course_id)
+        self.team = team
+        self.url_path = "teams/#teams/{topic_id}/{team_id}/edit-team/manage-members".format(
+            topic_id=self.team['topic_id'], team_id=self.team['id']
+        )
+
+    def is_browser_on_page(self):
+        """Check if we're on the team membership page for a particular team."""
+        self.wait_for_ajax()
+
+        if self.q(css='.edit-members').present:
+            return True
+        empty_query = self.q(css='.teams-main>.page-content>p').first
+        return (
+            len(empty_query.results) > 0 and
+            empty_query[0].text == "This team does not have any members."
+        )
+
+    @property
+    def team_members(self):
+        """Returns the number of team members shown on the page."""
+        return len(self.q(css='.team-member'))
+
+    def click_first_remove(self):
+        """Clicks the remove link on the first member listed."""
+        self.q(css='.action-remove-member').first.click()
+
+    def confirm_delete_membership_dialog(self):
+        """Click 'delete' on the warning dialog."""
+        confirm_prompt(self, require_notification=False)
+        self.wait_for_ajax()
+
+    def cancel_delete_membership_dialog(self):
+        """Click 'delete' on the warning dialog."""
+        confirm_prompt(self, cancel=True)
 
 
 class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
