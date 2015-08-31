@@ -9,7 +9,6 @@ If true, it:
     a) loads this module.
     b) calls apply_settings(), passing in the Django settings
 """
-
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
@@ -47,7 +46,7 @@ def apply_settings(django_settings):
         'social.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'social.pipeline.user.create_user',
+        'third_party_auth.pipeline.create_user',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
@@ -84,3 +83,12 @@ def apply_settings(django_settings):
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )
+
+    # These fields are grabbed from third party auth response and passed to strategy.create_user
+    # If autoprovisioning an account we want as much data preserved as possible, so we try to get those as well
+    # If they are not available it would just pass None and should not crash, unless consuming code depends on those
+    # values being set, which is not the case by the time of writing
+    if not hasattr(django_settings, 'SOCIAL_AUTH_USER_FIELDS'):
+        django_settings.SOCIAL_AUTH_USER_FIELDS = getattr(
+            django_settings, 'USER_FIELDS', ['username', 'email', 'first_name', 'last_name', 'fullname']
+        )

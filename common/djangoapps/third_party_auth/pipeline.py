@@ -77,6 +77,7 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 from social.pipeline.social_auth import associate_by_email
+from social.pipeline.user import create_user as social_create_user
 
 import student
 
@@ -164,6 +165,20 @@ class AuthEntryError(AuthException):
     invoked earlier than the login code, and it needs to know if the login flow
     was requested to dispatch correctly).
     """
+
+
+class EmailAlreadyInUseException(AuthException):
+    """ Raised when new user account is created with an email already used by another account """
+    def __init__(self, backend, email):
+        self.email = email
+        super(EmailAlreadyInUseException, self).__init__(backend, email)
+
+    def __str__(self):
+        return (
+            _('Email {email_address} is already used in our system. To link your accounts, '
+              'sign in now using your {platform_name} password.')
+            .format(email_address=self.email, platform_name=settings.PLATFORM_NAME)
+        )
 
 
 class ProviderUserState(object):
@@ -519,18 +534,34 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         """Redirects to the registration page."""
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
-    def should_force_account_creation():
-        """ For some third party providers, we auto-create user accounts """
-        current_provider = provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+    def get_provider():
+        """
+        Gets third-party provider for request
+        """
+        return provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+
+    def should_autoprovision_account():
+        """ For some third party providers we trust the provider so much that we automatically provision the account """
+        current_provider = get_provider()
+        return current_provider and current_provider.autoprovision_account
+
+    def autosubmit_registration_form():
+        """ For some third party providers, we auto-submit registration forms """
+        current_provider = get_provider()
         return current_provider and current_provider.skip_email_verification
 
     if not user:
+        if should_autoprovision_account():
+            # User has authenticated with the third party provider and provider is configured
+            # to automatically provision edX account, which is done via strategy.create_user in next pipeline step
+            return {'autoprovision': True}
+
         if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
         elif auth_entry == AUTH_ENTRY_LOGIN:
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
-            if should_force_account_creation():
+            if autosubmit_registration_form():
                 return dispatch_to_register()
             return dispatch_to_login()
         elif auth_entry == AUTH_ENTRY_REGISTER:
@@ -572,6 +603,22 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 'User "%s" is using third_party_auth to login but has not yet activated their account. ',
                 user.username
             )
+
+
+@partial.partial
+def create_user(strategy, details, user=None, *args, **kwargs):
+    """
+    Substitution method for stock social create_user that catches email validation error and redirects to login
+    """
+    from student.views import AccountEmailAlreadyExistsValidationError
+    try:
+        return social_create_user(strategy, details, user, *args, **kwargs)
+    except AccountEmailAlreadyExistsValidationError as exc:
+        logger.exception(exc.message)
+        # We're raising an exception that inherits from AuthException. Such exceptions are properly handled
+        # by social auth pipeline: their string representation (see __str__ method) is displayed to user on the page
+        # we're redirecting to.
+        raise EmailAlreadyInUseException(exc.message, details['email'])
 
 
 @partial.partial
