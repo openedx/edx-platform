@@ -16,7 +16,7 @@
                 events: {
                     'click .action-primary': 'createOrUpdateTeam',
                     'submit form': 'createOrUpdateTeam',
-                    'click .action-cancel': 'cancelAndGoBack',
+                    'click .action-cancel': 'cancelAndGoBack'
                 },
 
                 initialize: function(options) {
@@ -29,6 +29,8 @@
                     this.countries = options.teamParams.countries;
                     this.teamsDetailUrl = options.teamParams.teamsDetailUrl;
                     this.action = options.action;
+
+                    _.bindAll(this, 'cancelAndGoBack', 'createOrUpdateTeam');
 
                     if (this.action === 'create') {
                         this.teamModel = new TeamModel({});
@@ -213,7 +215,7 @@
                         url = 'teams/' + this.topicID + '/' + this.teamModel.get('id');
                     }
                     Backbone.history.navigate(url, {trigger: true});
-                },
+                }
             });
         });
 }).call(this, define || RequireJS.define);
