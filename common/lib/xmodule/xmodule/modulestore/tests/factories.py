@@ -71,10 +71,11 @@ class XModuleFactory(Factory):
     Factory for XModules
     """
 
-    # We have to give a Factory a FACTORY_FOR.
+    # We have to give a model for Factory.
     # However, the class that we create is actually determined by the category
     # specified in the factory
-    FACTORY_FOR = Dummy
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = Dummy
 
     @lazy_attribute
     def modulestore(self):

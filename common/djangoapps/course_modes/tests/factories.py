@@ -6,7 +6,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 # Factories are self documenting
 # pylint: disable=missing-docstring
 class CourseModeFactory(DjangoModelFactory):
-    FACTORY_FOR = CourseMode
+    class Meta(object):
+        model = CourseMode
 
     course_id = SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course')
     mode_slug = 'audit'
