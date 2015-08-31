@@ -960,7 +960,8 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 UPLOAD_CHUNK_SIZE_IN_MB = 10
 
 ### Max size of asset uploads to GridFS
-MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
+#MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
+MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 20
 
 # FAQ url to direct users to if they upload
 # a file that exceeds the above size
