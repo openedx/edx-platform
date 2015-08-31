@@ -37,6 +37,7 @@ define([
                 country: testCountries[i%4][0],
                 membership: [],
                 last_activity_at: '',
+                topic_id: 'topic_id' + i,
                 url: 'api/team/v0/teams/' + id
             };
         });

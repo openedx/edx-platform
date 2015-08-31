@@ -9,7 +9,7 @@
         'teams/js/views/team_utils',
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
-        'text!teams/templates/team-activity.underscore'
+        'text!teams/templates/date.underscore'
     ], function (
         Backbone,
         _,
@@ -19,7 +19,7 @@
         TeamUtils,
         teamMembershipDetailsTemplate,
         teamCountryLanguageTemplate,
-        teamActivityTemplate
+        dateTemplate
     ) {
         var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView;
 
@@ -68,7 +68,7 @@
         TeamActivityView = Backbone.View.extend({
             tagName: 'div',
             className: 'team-activity',
-            template: _.template(teamActivityTemplate),
+            template: _.template(dateTemplate),
 
             initialize: function (options) {
                 this.date = options.date;
