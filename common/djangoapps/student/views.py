@@ -1663,6 +1663,16 @@ class AccountValidationError(Exception):
         self.field = field
 
 
+class AccountUserNameValidationError(AccountValidationError):
+    """ Exception thrown if attempted to create account with username already taken """
+    pass
+
+
+class AccountEmailAlreadyExistsValidationError(AccountValidationError):
+    """ Exception thrown if attempted to create account with email already used by other account """
+    pass
+
+
 @receiver(post_save, sender=User)
 def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """

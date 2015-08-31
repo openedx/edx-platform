@@ -304,6 +304,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL_WITH_CACHE_DURATION)
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        kwargs.setdefault('autoprovision_account', False)
         self.configure_saml_provider(**kwargs)
         self.assertTrue(httpretty.is_enabled())
         num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()
