@@ -183,6 +183,11 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
         """Get all the team cards on the page."""
         return self.q(css='.team-card')
 
+    @property
+    def team_names(self):
+        """Get all the team names on the page."""
+        return self.q(css=CARD_TITLE_CSS).map(lambda e: e.text).results
+
     def click_create_team_link(self):
         """ Click on create team link."""
         query = self.q(css=CREATE_TEAM_LINK_CSS)
@@ -205,9 +210,9 @@ class BrowseTeamsPage(CoursePage, PaginatedUIMixin):
             self.wait_for_ajax()
 
 
-class CreateOrEditTeamPage(CoursePage, FieldsMixin):
+class CreateEditDeleteTeamPage(CoursePage, FieldsMixin):
     """
-    Create team page.
+    Team page for creation, editing, and deletion.
     """
     def __init__(self, browser, course_id, topic):
         """
@@ -216,7 +221,7 @@ class CreateOrEditTeamPage(CoursePage, FieldsMixin):
         representation of a topic following the same convention as a
         course module's topic.
         """
-        super(CreateOrEditTeamPage, self).__init__(browser, course_id)
+        super(CreateEditDeleteTeamPage, self).__init__(browser, course_id)
         self.topic = topic
         self.url_path = "teams/#topics/{topic_id}/create-team".format(topic_id=self.topic['id'])
 
@@ -255,6 +260,20 @@ class CreateOrEditTeamPage(CoursePage, FieldsMixin):
         """Click on cancel team button"""
         self.q(css='.create-team .action-cancel').first.click()
         self.wait_for_ajax()
+
+    @property
+    def delete_team_button(self):
+        """Returns the 'delete team' button."""
+        return self.q(css='.action-delete').first
+
+    def confirm_delete_team_dialog(self):
+        """Click 'delete' on the warning dialog."""
+        confirm_prompt(self, require_notification=False)
+        self.wait_for_ajax()
+
+    def cancel_delete_team_dialog(self):
+        """Click 'delete' on the warning dialog."""
+        confirm_prompt(self, cancel=True)
 
 
 class TeamPage(CoursePage, PaginatedUIMixin):
