@@ -15,6 +15,7 @@ class CourseStructureTestCase(ModuleStoreTestCase):
     """
     Helper for test cases that need to build course structures.
     """
+    blocks = []
 
     def build_course(self, course_hierarchy):
         """
@@ -76,6 +77,16 @@ class CourseStructureTestCase(ModuleStoreTestCase):
 
         return block_map
 
+    def get_block_key_set(self, *refs):
+        """
+        Gets the set of usage keys that correspond to the list of
+        #ref values as defined on self.blocks.
+
+        Returns: set[UsageKey]
+        """
+        xblocks = (self.blocks[ref] for ref in refs)
+        return set([xblock.location for xblock in xblocks])
+
 
 class BlockParentsMapTestCase(ModuleStoreTestCase):
     # Tree formed by parent_map:
@@ -135,7 +146,8 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
                     i in expected_accessible_blocks,
                     "block_structure return value {0} not equal to expected value for block {1}".format(
                         block_structure_result, i
-                ))
+                    )
+                )
 
                 if i in blocks_with_differing_access:
                     self.assertNotEqual(
