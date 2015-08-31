@@ -10,6 +10,7 @@ class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
     """
     Factory for SoftwareSecurePhotoVerification
     """
-    FACTORY_FOR = SoftwareSecurePhotoVerification
+    class Meta(object):  # pylint: disable=missing-docstring
+        model = SoftwareSecurePhotoVerification
 
     status = 'approved'
