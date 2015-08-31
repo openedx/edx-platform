@@ -1,8 +1,8 @@
 /*  Team utility methods*/
 ;(function (define) {
     'use strict';
-    define([
-    ], function () {
+    define(["jquery", "underscore"
+    ], function ($, _) {
         return {
 
             /**

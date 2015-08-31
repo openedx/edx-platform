@@ -2,11 +2,12 @@
     'use strict';
 
     define(['backbone',
+            'jquery',
             'underscore',
             'gettext',
             'teams/js/views/team_utils',
             'text!teams/templates/team-profile-header-actions.underscore'],
-        function (Backbone, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
+        function (Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
             return Backbone.View.extend({
 
                 errorMessage: gettext("An error occurred. Try again."),
