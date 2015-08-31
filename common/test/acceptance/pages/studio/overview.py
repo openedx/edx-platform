@@ -9,9 +9,11 @@ from bok_choy.promise import EmptyPromise
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
+from ..common.utils import click_css, confirm_prompt
+
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, set_input_value, click_css, confirm_prompt
+from .utils import set_input_value_and_save, set_input_value
 
 
 class CourseOutlineItem(object):
