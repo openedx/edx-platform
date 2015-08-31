@@ -3,16 +3,37 @@ Helper functions for managing interactions with the LTI outcomes service defined
 in LTI v1.1.
 """
 
+from hashlib import sha1
+from base64 import b64encode
 import logging
+import uuid
+
 from lxml import etree
 from lxml.builder import ElementMaker
+from oauthlib.oauth1 import Client
+from oauthlib.common import to_unicode
 import requests
 import requests_oauthlib
-import uuid
 
 from lti_provider.models import GradedAssignment, OutcomeService
 
 log = logging.getLogger("edx.lti_provider")
+
+
+class BodyHashClient(Client):
+    """
+    OAuth1 Client that adds body hash support (required by LTI).
+
+    The default Client doesn't support body hashes, so we have to add it ourselves.
+    The spec:
+        https://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
+    """
+    def get_oauth_params(self, request):
+        """Override get_oauth_params to add the body hash."""
+        params = super(BodyHashClient, self).get_oauth_params(request)
+        digest = b64encode(sha1(request.body.encode('UTF-8')).digest())
+        params.append((u'oauth_body_hash', to_unicode(digest)))
+        return params
 
 
 def store_outcome_parameters(request_params, user, lti_consumer):
@@ -112,7 +133,13 @@ def sign_and_send_replace_result(assignment, xml):
     # message. Testing with Canvas throws an error when this field is included.
     # This code may need to be revisited once we test with other LMS platforms,
     # and confirm whether there's a bug in Canvas.
-    oauth = requests_oauthlib.OAuth1(consumer_key, consumer_secret)
+    oauth = requests_oauthlib.OAuth1(
+        consumer_key,
+        consumer_secret,
+        signature_method='HMAC-SHA1',
+        client_class=BodyHashClient,
+        force_include_body=True
+    )
 
     headers = {'content-type': 'application/xml'}
     response = requests.post(
@@ -121,6 +148,7 @@ def sign_and_send_replace_result(assignment, xml):
         auth=oauth,
         headers=headers
     )
+
     return response
 
 
