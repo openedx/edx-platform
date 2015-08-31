@@ -2,6 +2,7 @@
     'use strict';
 
     define(['backbone',
+            'jquery',
             'underscore',
             'gettext',
             'common/js/components/views/search_field',
@@ -18,13 +19,14 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
+            'teams/js/views/edit_team_members',
             'teams/js/views/team_profile_header_actions',
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel, TabbedView,
+        function (Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamProfileHeaderActionsView, InstructorToolsView, teamsTemplate) {
+                  TeamMembersEditView, TeamProfileHeaderActionsView, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -71,6 +73,7 @@
                         ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                         ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
+                        ['topics/:topic_id/:team_id/edit-team/manage-members(/)', _.bind(this.editTeamMembers, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
@@ -239,7 +242,10 @@
                                 topic: topic,
                                 model: team
                             });
-                            var instructorToolsView = new InstructorToolsView();
+                            var instructorToolsView = new InstructorToolsView({
+                                team: team,
+                                teamEvents: self.teamEvents
+                            });
                             editViewWithHeader = self.createViewWithHeader({
                                 title: gettext("Edit Team"),
                                 description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
@@ -249,6 +255,32 @@
                                 instructorTools: instructorToolsView
                             });
                             self.mainView = editViewWithHeader;
+                            self.render();
+                        });
+                    });
+                },
+
+                /**
+                 *
+                 * The backbone router entry for editing team members, using topic and team IDs.
+                 */
+                editTeamMembers: function (topicID, teamID) {
+                    var self = this;
+                    this.getTopic(topicID).done(function (topic) {
+                        self.getTeam(teamID, true).done(function(team) {
+                            var view = new TeamMembersEditView({
+                                teamEvents: self.teamEvents,
+                                context: self.context,
+                                model: team
+                            });
+                            self.mainView = self.createViewWithHeader({
+                                    mainView: view,
+                                    title: gettext("Membership"),
+                                    description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
+                                    topic: topic,
+                                    team: team
+                                }
+                            );
                             self.render();
                         });
                     });

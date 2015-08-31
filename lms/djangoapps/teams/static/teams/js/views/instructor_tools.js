@@ -16,6 +16,8 @@
 
                 initialize: function(options) {
                     this.template = _.template(instructorToolbarTemplate);
+                    this.teamEvents = options.teamEvents;
+                    this.team = options.team;
                 },
 
                 render: function() {
@@ -31,8 +33,10 @@
 
                 editMembership: function (event) {
                     event.preventDefault();
-                    alert("You clicked the button!");
-                    //placeholder; will route to remove team member page
+                    Backbone.history.navigate(
+                        'topics/' + this.team.get('topic_id') + '/' + this.team.id +'/edit-team/manage-members',
+                        {trigger: true}
+                    );
                 }
             });
         });
