@@ -258,6 +258,9 @@ AUTHENTICATION_BACKENDS = (
     'third_party_auth.saml.SAMLAuthBackend',
 ) + AUTHENTICATION_BACKENDS
 
+FAKE_EMAIL_DOMAIN = 'fake-email-domain.foo'
+THIRD_PARTY_AUTH_FALLBACK_FULL_NAME = "Unknown"
+
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
