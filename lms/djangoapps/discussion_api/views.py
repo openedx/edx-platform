@@ -3,7 +3,8 @@ Discussion API views
 """
 from django.core.exceptions import ValidationError
 
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
