@@ -44,7 +44,10 @@ from lms.envs.common import (
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
-    ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
+    ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
+
+    # Django REST framework configuration
+    REST_FRAMEWORK,
 )
 from path import Path as path
 from warnings import simplefilter

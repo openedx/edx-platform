@@ -183,7 +183,7 @@ def update_account_settings(requesting_user, update, username=None):
             serializer.save()
 
         if "language_proficiencies" in update:
-            new_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
+            new_language_proficiencies = update["language_proficiencies"]
             emit_setting_changed_event(
                 user=existing_user,
                 db_table=existing_user_profile.language_proficiencies.model._meta.db_table,

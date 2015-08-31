@@ -4,13 +4,42 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.conf import settings
 
+from django_countries import countries
 from rest_framework import serializers
 
-from openedx.core.lib.api.serializers import CollapsedReferenceSerializer, PaginationSerializer
+from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
 from openedx.core.lib.api.fields import ExpandableField
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 
 from .models import CourseTeam, CourseTeamMembership
+
+
+class CountryField(serializers.Field):
+    """
+    Field to serialize a country code.
+    """
+
+    COUNTRY_CODES = dict(countries).keys()
+
+    def to_representation(self, obj):
+        """
+        Represent the country as a 2-character unicode identifier.
+        """
+        return unicode(obj)
+
+    def to_internal_value(self, data):
+        """
+        Check that the code is a valid country code.
+
+        We leave the data in its original format so that the Django model's
+        CountryField can convert it to the internal representation used
+        by the django-countries library.
+        """
+        if data and data not in self.COUNTRY_CODES:
+            raise serializers.ValidationError(
+                u"{code} is not a valid country code".format(code=data)
+            )
+        return data
 
 
 class UserMembershipSerializer(serializers.ModelSerializer):
@@ -43,6 +72,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
     """Serializes a CourseTeam with membership information."""
     id = serializers.CharField(source='team_id', read_only=True)  # pylint: disable=invalid-name
     membership = UserMembershipSerializer(many=True, read_only=True)
+    country = CountryField()
 
     class Meta(object):
         """Defines meta information for the ModelSerializer."""
@@ -66,6 +96,8 @@ class CourseTeamSerializer(serializers.ModelSerializer):
 class CourseTeamCreationSerializer(serializers.ModelSerializer):
     """Deserializes a CourseTeam for creation."""
 
+    country = CountryField(required=False)
+
     class Meta(object):
         """Defines meta information for the ModelSerializer."""
         model = CourseTeam
@@ -78,16 +110,17 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
             "language",
         )
 
-    def restore_object(self, attrs, instance=None):
-        """Restores a CourseTeam instance from the given attrs."""
-        return CourseTeam.create(
-            name=attrs.get("name", ''),
-            course_id=attrs.get("course_id"),
-            description=attrs.get("description", ''),
-            topic_id=attrs.get("topic_id", ''),
-            country=attrs.get("country", ''),
-            language=attrs.get("language", ''),
+    def create(self, validated_data):
+        team = CourseTeam.create(
+            name=validated_data.get("name", ''),
+            course_id=validated_data.get("course_id"),
+            description=validated_data.get("description", ''),
+            topic_id=validated_data.get("topic_id", ''),
+            country=validated_data.get("country", ''),
+            language=validated_data.get("language", ''),
         )
+        team.save()
+        return team
 
 
 class MembershipSerializer(serializers.ModelSerializer):
@@ -123,13 +156,6 @@ class MembershipSerializer(serializers.ModelSerializer):
         read_only_fields = ("date_joined", "last_activity_at")
 
 
-class PaginatedMembershipSerializer(PaginationSerializer):
-    """Serializes team memberships with support for pagination."""
-    class Meta(object):
-        """Defines meta information for the PaginatedMembershipSerializer."""
-        object_serializer_class = MembershipSerializer
-
-
 class BaseTopicSerializer(serializers.Serializer):
     """Serializes a topic without team_count."""
     description = serializers.CharField()
@@ -144,7 +170,7 @@ class TopicSerializer(BaseTopicSerializer):
     model to get the count. Requires that `context` is provided with a valid course_id
     in order to filter teams within the course.
     """
-    team_count = serializers.SerializerMethodField('get_team_count')
+    team_count = serializers.SerializerMethodField()
 
     def get_team_count(self, topic):
         """Get the number of teams associated with this topic"""
@@ -155,31 +181,25 @@ class TopicSerializer(BaseTopicSerializer):
             return CourseTeam.objects.filter(course_id=self.context['course_id'], topic_id=topic['id']).count()
 
 
-class PaginatedTopicSerializer(PaginationSerializer):
+class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: disable=abstract-method
     """
-    Serializes a set of topics, adding the team_count field to each topic individually, if team_count
-    is not already present in the topic data. Requires that `context` is provided with a valid course_id in
-    order to filter teams within the course.
+    List serializer for efficiently serializing a set of topics.
     """
-    class Meta(object):
-        """Defines meta information for the PaginatedTopicSerializer."""
-        object_serializer_class = TopicSerializer
+
+    def to_representation(self, obj):
+        """Adds team_count to each topic. """
+        data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
+        add_team_count(data, self.context["course_id"])
+        return data
 
 
-class BulkTeamCountPaginatedTopicSerializer(PaginationSerializer):
+class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
     """
-    Serializes a set of topics, adding the team_count field to each topic as a bulk operation per page
-    (only on the page being returned). Requires that `context` is provided with a valid course_id in
-    order to filter teams within the course.
+    Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
+    Requires that `context` is provided with a valid course_id in order to filter teams within the course.
     """
-    class Meta(object):
-        """Defines meta information for the BulkTeamCountPaginatedTopicSerializer."""
-        object_serializer_class = BaseTopicSerializer
-
-    def __init__(self, *args, **kwargs):
-        """Adds team_count to each topic on the current page."""
-        super(BulkTeamCountPaginatedTopicSerializer, self).__init__(*args, **kwargs)
-        add_team_count(self.data['results'], self.context['course_id'])
+    class Meta:  # pylint: disable=missing-docstring,old-style-class
+        list_serializer_class = BulkTeamCountTopicListSerializer
 
 
 def add_team_count(topics, course_id):
