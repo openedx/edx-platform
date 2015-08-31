@@ -9,16 +9,12 @@ from django.conf import settings
 # Force settings to run so that the python path is modified
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-from instructor.services import InstructorService
-
 from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 from monkey_patch import django_utils_translation
 import analytics
 
-from edx_proctoring.runtime import set_runtime_service
-from openedx.core.djangoapps.credit.services import CreditService
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +47,11 @@ def run():
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit
     # as well as the instructor dashboard (for deleting student attempts)
     if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+        # Import these here to avoid circular dependencies of the form:
+        # edx-platform app --> DRF --> django translation --> edx-platform app
+        from edx_proctoring.runtime import set_runtime_service
+        from instructor.services import InstructorService
+        from openedx.core.djangoapps.credit.services import CreditService
         set_runtime_service('credit', CreditService())
         set_runtime_service('instructor', InstructorService())
 

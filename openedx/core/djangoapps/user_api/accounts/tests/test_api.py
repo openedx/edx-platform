@@ -164,7 +164,10 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         field_errors = context_manager.exception.field_errors
         self.assertEqual(3, len(field_errors))
         self.assertEqual("This field is not editable via this API", field_errors["username"]["developer_message"])
-        self.assertIn("Select a valid choice", field_errors["gender"]["developer_message"])
+        self.assertIn(
+            "Value \'undecided\' is not valid for field \'gender\'",
+            field_errors["gender"]["developer_message"]
+        )
         self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
 
     @patch('django.core.mail.send_mail')
