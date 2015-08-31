@@ -1,23 +1,15 @@
 """
-...
+User Partitions Transformer
 """
-from courseware.access import _has_access_to_course
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
-from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 
-# TODO 8874: Make it so we support all schemes instead of manually declaring them here.
-INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme,]
-SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme,]
+from .split_test import SplitTestTransformer
 
 
 class MergedGroupAccess(object):
     """
     ...
     """
-
-    # TODO 8874: Make it so LmsBlockMixin.merged_group_access use MergedGroupAccess
-
     def __init__(self, user_partitions, xblock, merged_parent_access_list):
         """
         Arguments:
@@ -98,7 +90,6 @@ class MergedGroupAccess(object):
         for partition_id, allowed_group_ids in self._access.iteritems():
 
             # If the user is not assigned to a group for this partition, deny access.
-            # TODO 8874: Ensure that denying access to users who aren't in a group is the correct action.
             if partition_id not in user_groups:
                 return False
 
@@ -116,56 +107,51 @@ class MergedGroupAccess(object):
             return True
 
 
+def get_user_partition_groups(course_key, user_partitions, user):
+    """
+    Collect group ID for each partition in this course for this user.
+
+    Arguments:
+        course_key (CourseKey)
+        user_partitions (list[UserPartition])
+        user (User)
+
+    Returns:
+        dict[int: Group]: Mapping from user partitions to the group to which
+            the user belongs in each partition. If the user isn't in a group
+            for a particular partition, then that partition's ID will not be
+            in the dict.
+    """
+    partition_groups = {}
+    for partition in user_partitions:
+        group = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+        if group is not None:
+            partition_groups[partition.id] = group
+    return partition_groups
+
+
 class UserPartitionTransformer(BlockStructureTransformer):
     """
     ...
     """
     VERSION = 1
 
-    @staticmethod
-    def _get_user_partition_groups(course_key, user_partitions, user):
-        """
-        Collect group ID for each partition in this course for this user.
-
-        Arguments:
-            course_key (CourseKey)
-            user_partitions (list[UserPartition])
-            user (User)
-
-        Returns:
-            dict[int: Group]: Mapping from user partitions to the group to which
-                the user belongs in each partition. If the user isn't in a group
-                for a particular partition, then that partition's ID will not be
-                in the dict.
-        """
-        partition_groups = {}
-        for partition in user_partitions:
-            if partition.scheme not in INCLUDE_SCHEMES:
-                continue
-            group = partition.scheme.get_group_for_user(
-                course_key,
-                user,
-                partition,
-                **({'assign': False} if partition.scheme in SCHEME_SUPPORTS_ASSIGNMENT else {})
-            )
-            if group is not None:
-                partition_groups[partition.id] = group
-        return partition_groups
-
     @classmethod
     def collect(cls, block_structure):
         """
         Computes any information for each XBlock that's necessary to execute
-        this transformation's apply method.
+        this transformer's transform method.
 
         Arguments:
-            course_key (CourseKey)
-            block_structure (BlockStructure)
-            xblock_dict (dict[UsageKey: XBlock])
-
-        Returns:
-            dict[UsageKey: dict]
+            block_structure (BlockStructureCollectedData)
         """
+        # First have the split test transformer setup its group access data for each block.
+        SplitTestTransformer.collect(block_structure)
+
         # Because user partitions are course-wide, only store data for them on the root block.
         root_block = block_structure.get_xblock(block_structure.root_block_key)
         user_partitions = getattr(root_block, 'user_partitions', []) or []
@@ -192,21 +178,23 @@ class UserPartitionTransformer(BlockStructureTransformer):
     def transform(self, user_info, block_structure):
         """
         Mutates block_structure and block_data based on the given user_info.
+
+        Arguments:
+            user_info (object)
+            block_structure (BlockStructureCollectedData)
         """
-        # TODO 8874: Factor out functionality of UserPartitionTransformation.apply and access._has_group_access into a common utility function.
+        SplitTestTransformer().transform(user_info, block_structure)
+
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
 
-        # If there are no user partitions, this transformation is a no-op,
-        # so there is nothing to apply.
-        if not user_partitions:
+        if not user_partitions or user_info.has_staff_access:
             return
 
-        user_groups = self._get_user_partition_groups(
+        user_groups = get_user_partition_groups(
             user_info.course_key, user_partitions, user_info.user
         )
-        if not user_info.has_staff_access:
-            block_structure.remove_block_if(
-                lambda block_key: not block_structure.get_transformer_block_data(
-                    block_key, self, 'merged_group_access'
-                ).check_group_access(user_groups)
-            )
+        block_structure.remove_block_if(
+            lambda block_key: not block_structure.get_transformer_block_data(
+                block_key, self, 'merged_group_access'
+            ).check_group_access(user_groups)
+        )

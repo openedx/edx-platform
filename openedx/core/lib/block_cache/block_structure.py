@@ -34,7 +34,7 @@ class BlockStructure(object):
         self._add_relation(self._block_relations, parent_key, child_key)
 
     def get_parents(self, usage_key):
-        return self._block_relations.get(usage_key).parents if self.has_block(usage_key) else []
+        return self._block_relations[usage_key].parents if self.has_block(usage_key) else []
 
     def get_children(self, usage_key):
         return self._block_relations[usage_key].children if self.has_block(usage_key) else []
@@ -45,35 +45,25 @@ class BlockStructure(object):
     def get_block_keys(self):
         return self._block_relations.iterkeys()
 
-    def topological_traversal(self, get_result=None, predicate=None):
+    def topological_traversal(self, **kwargs):
         return traverse_topologically(
             start_node=self.root_block_key,
             get_parents=self.get_parents,
             get_children=self.get_children,
-            get_result=get_result,
-            predicate=predicate,
+            **kwargs
         )
 
-    def post_order_traversal(self, get_result=None, predicate=None):
+    def post_order_traversal(self, **kwargs):
         return traverse_post_order(
             start_node=self.root_block_key,
             get_children=self.get_children,
-            get_result=get_result,
-            predicate=predicate,
+            **kwargs
         )
 
     def prune(self):
         # create a new block relations map with only those blocks that are still linked
         pruned_block_relations = defaultdict(self.BlockRelations)
         old_block_relations = self._block_relations
-
-        # def do_for_each_block(block_key):
-        #     if block_key in old_block_relations:
-        #         self._add_block(pruned_block_relations, block_key)
-        #
-        #         for parent in old_block_relations[block_key].parents:
-        #             if parent in pruned_block_relations:
-        #                 self._add_relation(pruned_block_relations, parent, block_key)
 
         def do_for_each_block(block_key):
             if block_key in old_block_relations:
@@ -144,26 +134,33 @@ class BlockStructureBlockData(BlockStructure):
     def remove_transformer_block_data(self, usage_key, transformer, key):
         self._block_data_map[usage_key]._transformer_data.get(transformer.name(), {}).pop(key, None)
 
-    def remove_block(self, usage_key):
+    def remove_block(self, usage_key, keep_descendants):
+        children = self._block_relations[usage_key].children
+        parents = self._block_relations[usage_key].parents
+
         # Remove block from its children.
-        for child in self._block_relations[usage_key].children:
+        for child in children:
             self._block_relations[child].parents.remove(usage_key)
 
         # Remove block from its parents.
-        for parent_key in self._block_relations[usage_key].parents:
-            self._block_relations[parent_key].children.remove(usage_key)
+        for parent in parents:
+            self._block_relations[parent].children.remove(usage_key)
 
         # Remove block.
         self._block_relations.pop(usage_key, None)
         self._block_data_map.pop(usage_key, None)
 
-    def remove_block_if(self, removal_condition):
+        # Recreate the graph connections if descendants are to be kept.
+        if keep_descendants:
+            [self.add_relation(parent, child) for child in children for parent in parents]
+
+    def remove_block_if(self, removal_condition, keep_descendants=False, **kwargs):
         def predicate(block_key):
             if removal_condition(block_key):
-                self.remove_block(block_key)
+                self.remove_block(block_key, keep_descendants)
                 return False
             return True
-        list(self.topological_traversal(predicate=predicate))
+        list(self.topological_traversal(predicate=predicate, **kwargs))
 
 
 class BlockStructureCollectedData(BlockStructureBlockData):

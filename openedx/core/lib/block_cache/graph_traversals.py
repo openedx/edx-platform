@@ -4,7 +4,9 @@
 from collections import deque
 
 
-def _traverse_generic(start_node, get_parents, get_children, get_result=None, predicate=None):
+def _traverse_generic(
+    start_node, get_parents, get_children, get_result=None, predicate=None, yield_descendants_of_unyielded=False
+):
     """
     Helper function to avoid duplicating functionality between
     traverse_depth_first and traverse_topologically.
@@ -21,6 +23,9 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
         get_children - function that returns a list of children nodes for the given node
         get_result - function that computes and returns the resulting value to be yielded for the given node
         predicate - function that returns whether or not to yield the given node
+        yield_descendants_of_unyielded -
+           if False, all descendants of an unyielded node are not yielded.
+           if True, descendants of an unyielded node are yielded even if none of their parents were yielded.
     """
     # If get_result or predicate aren't provided, just make them to no-ops.
     get_result = get_result or (lambda node_: node_)
@@ -44,7 +49,7 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
             parents = get_parents(curr_node)
             all_parents_visited = all(parent in yield_results for parent in parents)
             any_parent_yielded = any(yield_results[parent] for parent in parents) if all_parents_visited else False
-            if not all_parents_visited or not any_parent_yielded:
+            if not all_parents_visited or (not yield_descendants_of_unyielded and not any_parent_yielded):
                 continue
 
         # Add its unvisited children to the stack in reverse order so that
@@ -71,23 +76,21 @@ def _traverse_generic(start_node, get_parents, get_children, get_result=None, pr
             yield get_result(curr_node)
 
 
-def traverse_topologically(start_node, get_parents, get_children, get_result=None, predicate=None):
+def traverse_topologically(start_node, get_parents, get_children, **kwargs):
     return _traverse_generic(
         start_node,
         get_parents=get_parents,
         get_children=get_children,
-        get_result=get_result,
-        predicate=predicate
+        **kwargs
     )
 
 
-def traverse_pre_order(start_node, get_children, get_result=None, predicate=None):
+def traverse_pre_order(start_node, get_children, **kwargs):
     return _traverse_generic(
         start_node,
         get_parents=None,
         get_children=get_children,
-        get_result=get_result,
-        predicate=predicate
+        **kwargs
     )
 
 

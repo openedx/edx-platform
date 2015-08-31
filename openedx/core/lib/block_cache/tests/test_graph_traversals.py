@@ -59,9 +59,6 @@ class GraphTraversalsTestCase(TestCase):
         return result
 
     def test_pre_order(self):
-        """
-        ...
-        """
         self.assertEqual(
             list(traverse_pre_order(
                 start_node='b1',
@@ -73,9 +70,6 @@ class GraphTraversalsTestCase(TestCase):
         )
 
     def test_post_order(self):
-        """
-        ...
-        """
         self.assertEqual(
             list(traverse_post_order(
                 start_node='b1',
@@ -87,9 +81,6 @@ class GraphTraversalsTestCase(TestCase):
         )
 
     def test_topological(self):
-        """
-        ...
-        """
         self.assertEqual(
             list(traverse_topologically(
                 start_node='b1',
@@ -100,16 +91,38 @@ class GraphTraversalsTestCase(TestCase):
             ['b1', 'c1', 'd1', 'd2', 'e1', 'e2', 'f1', 'c2']
         )
 
-    def test_topological_with_predicate(self):
-        """
-        ...
-        """
+    def test_topological_yield_descendants(self):
         self.assertEqual(
             list(traverse_topologically(
                 start_node='b1',
                 get_children=(lambda node: self.graph_1[node]),
                 get_parents=(lambda node: self.graph_1_parents[node]),
-                predicate=(lambda node: node != 'd2')
+                predicate=(lambda node: node != 'd2'),
+                yield_descendants_of_unyielded=True,
+            )),
+            ['b1', 'c1', 'd1', 'e1', 'e2', 'f1', 'c2', 'd3']
+        )
+
+    def test_topological_not_yield_descendants(self):
+        self.assertEqual(
+            list(traverse_topologically(
+                start_node='b1',
+                get_children=(lambda node: self.graph_1[node]),
+                get_parents=(lambda node: self.graph_1_parents[node]),
+                predicate=(lambda node: node != 'd2'),
+                yield_descendants_of_unyielded=False,
             )),
             ['b1', 'c1', 'd1', 'e1', 'c2', 'd3']
+        )
+
+    def test_topological_yield_single_node(self):
+        self.assertEqual(
+            list(traverse_topologically(
+                start_node='b1',
+                get_children=(lambda node: self.graph_1[node]),
+                get_parents=(lambda node: self.graph_1_parents[node]),
+                predicate=(lambda node: node == 'c2'),
+                yield_descendants_of_unyielded=True,
+            )),
+            ['c2']
         )

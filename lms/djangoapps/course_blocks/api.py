@@ -10,6 +10,8 @@ from .transformers import (
     start_date,
     user_partitions,
     visibility,
+    split_test,
+    library_content,
 )
 from .user_info import CourseUserInfo
 
@@ -18,6 +20,7 @@ LMS_COURSE_TRANSFORMERS = [
     visibility.VisibilityTransformer(),
     start_date.StartDateTransformer(),
     user_partitions.UserPartitionTransformer(),
+    library_content.ContentLibraryTransformer(),
 ]
 
 

@@ -15,6 +15,17 @@ class CourseStructureTestCase(ModuleStoreTestCase):
     """
     Helper for test cases that need to build course structures.
     """
+    blocks = []
+
+    def setUp(self):
+        """
+        Create users.
+        """
+        super(CourseStructureTestCase, self).setUp()
+        # Set up users.
+        self.password = 'test'
+        self.user = UserFactory.create(password=self.password)
+        self.staff = UserFactory.create(password=self.password, is_staff=True)
 
     def build_course(self, course_hierarchy):
         """
@@ -76,6 +87,37 @@ class CourseStructureTestCase(ModuleStoreTestCase):
 
         return block_map
 
+    def get_block_key_set(self, *refs):
+        """
+        Gets the set of usage keys that correspond to the list of
+        #ref values as defined on self.blocks.
+
+        Returns: set[UsageKey]
+        """
+        xblocks = (self.blocks[ref] for ref in refs)
+        return set([xblock.location for xblock in xblocks])
+
+    def assert_staff_access_to_all_blocks(self, staff, course, blocks, transformer):
+        """
+        Assert staff users have access to all blocks
+        """
+        raw_block_structure = get_course_blocks(
+            staff,
+            course.location,
+            transformers={}
+        )
+        self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(blocks))
+
+        trans_block_structure = get_course_blocks(
+            staff,
+            course.location,
+            transformers={transformer}
+        )
+        self.assertEqual(
+            len(list(raw_block_structure.get_block_keys())), 
+            len(list(trans_block_structure.get_block_keys()))
+        )
+
 
 class BlockParentsMapTestCase(ModuleStoreTestCase):
     # Tree formed by parent_map:
@@ -135,7 +177,8 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
                     i in expected_accessible_blocks,
                     "block_structure return value {0} not equal to expected value for block {1}".format(
                         block_structure_result, i
-                ))
+                    )
+                )
 
                 if i in blocks_with_differing_access:
                     self.assertNotEqual(

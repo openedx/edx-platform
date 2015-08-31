@@ -2,62 +2,36 @@
 Tests for block_structure.py
 """
 from collections import namedtuple
+from copy import deepcopy
 import ddt
+import itertools
 from mock import patch
 from unittest import TestCase
 
 from ..block_structure import (
     BlockStructure, BlockStructureCollectedData, BlockStructureBlockData, BlockStructureFactory
 )
+from ..graph_traversals import traverse_post_order
 from ..transformer import BlockStructureTransformer, BlockStructureTransformers
 from .test_utils import (
-    MockCache, MockXBlock, MockModulestoreFactory, MockTransformer, SIMPLE_CHILDREN_MAP, BlockStructureTestMixin
+    MockCache, MockXBlock, MockModulestoreFactory, MockTransformer,
+    ChildrenMapTestMixin
 )
 
 
 @ddt.ddt
-class TestBlockStructure(TestCase):
+class TestBlockStructure(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructure
     """
-    def get_parents_map(self, children_map):
-        parent_map = [[] for node in children_map]
-        for parent, children in enumerate(children_map):
-            for child in children:
-                parent_map[child].append(parent)
-        return parent_map
-
     @ddt.data(
         [],
-        #     0
-        #    / \
-        #   1  2
-        #  / \
-        # 3   4
-        SIMPLE_CHILDREN_MAP,
-        #       0
-        #      /
-        #     1
-        #    /
-        #   2
-        #  /
-        # 3
-        [[1], [2], [3], []],
-        #     0
-        #    / \
-        #   1  2
-        #   \ /
-        #    3
-        [[1, 2], [3], [3], []],
+        ChildrenMapTestMixin.SIMPLE_CHILDREN_MAP,
+        ChildrenMapTestMixin.LINEAR_CHILDREN_MAP,
+        ChildrenMapTestMixin.DAG_CHILDREN_MAP,
     )
     def test_relations(self, children_map):
-        # create block structure
-        block_structure = BlockStructure(root_block_key=0)
-
-        # add_relation
-        for parent, children in enumerate(children_map):
-            for child in children:
-               block_structure.add_relation(parent, child)
+        block_structure = self.create_block_structure(BlockStructure, children_map)
 
         # get_children
         for parent, children in enumerate(children_map):
@@ -73,7 +47,8 @@ class TestBlockStructure(TestCase):
         self.assertFalse(block_structure.has_block(len(children_map) + 1))
 
 
-class TestBlockStructureData(TestCase):
+@ddt.ddt
+class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureBlockData and BlockStructureCollectedData
     """
@@ -176,41 +151,88 @@ class TestBlockStructureData(TestCase):
                     block.field_map.get(field),
                 )
 
-    def test_remove_block(self):
-        block_structure = BlockStructureBlockData(root_block_key=0)
-        for parent, children in enumerate(SIMPLE_CHILDREN_MAP):
-            for child in children:
-               block_structure.add_relation(parent, child)
+    @ddt.data(
+        *itertools.product(
+            [True, False],
+            range(7),
+            [
+                # ChildrenMapTestMixin.SIMPLE_CHILDREN_MAP,
+                ChildrenMapTestMixin.LINEAR_CHILDREN_MAP,
+                # ChildrenMapTestMixin.DAG_CHILDREN_MAP,
+            ],
+        )
+    )
+    @ddt.unpack
+    def test_remove_block(self, keep_descendants, block_to_remove, children_map):
+        ### skip test if invalid
+        if (
+            (block_to_remove >= len(children_map)) or
+            (keep_descendants and block_to_remove == 0)
+        ):
+            return
 
-        self.assertTrue(block_structure.has_block(1))
-        self.assertTrue(1 in block_structure.get_children(0))
+        ### create structure
+        block_structure = self.create_block_structure(BlockStructureBlockData, children_map)
+        parents_map = self.get_parents_map(children_map)
 
-        block_structure.remove_block(1)
+        ### verify blocks pre-exist
+        self.assert_block_structure(block_structure, children_map)
 
-        self.assertFalse(block_structure.has_block(1))
-        self.assertFalse(1 in block_structure.get_children(0))
+        ### remove block
+        block_structure.remove_block(block_to_remove, keep_descendants)
+        missing_blocks = [block_to_remove]
 
-        self.assertTrue(block_structure.has_block(3))
-        self.assertTrue(block_structure.has_block(4))
+        ### compute and verify updated children_map
+        removed_children_map = deepcopy(children_map)
+        removed_children_map[block_to_remove] = []
+        [removed_children_map[parent].remove(block_to_remove) for parent in parents_map[block_to_remove]]
 
+        if keep_descendants:
+            # update the graph connecting the old parents to the old children
+            [
+                removed_children_map[parent].append(child)
+                for child in children_map[block_to_remove]
+                for parent in parents_map[block_to_remove]
+            ]
+
+        self.assert_block_structure(block_structure, removed_children_map, missing_blocks)
+
+        ### prune the structure
         block_structure.prune()
 
-        self.assertFalse(block_structure.has_block(3))
-        self.assertFalse(block_structure.has_block(4))
+        ### compute and verify updated children_map
+        pruned_children_map = deepcopy(removed_children_map)
+
+        if not keep_descendants:
+            def update_descendant(block):
+                """
+                add descendant to missing blocks and empty its children
+                """
+                missing_blocks.append(block)
+                pruned_children_map[block] = []
+
+            # update all descendants
+            for child in children_map[block_to_remove]:
+                list(traverse_post_order(
+                    child,
+                    get_children=lambda block: pruned_children_map[block],
+                    get_result=update_descendant,
+                ))
+        self.assert_block_structure(block_structure, pruned_children_map, missing_blocks)
 
 
-class TestBlockStructureFactory(TestCase, BlockStructureTestMixin):
+class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory
     """
     def test_factory_methods(self):
-        children_map = SIMPLE_CHILDREN_MAP
+        children_map = self.SIMPLE_CHILDREN_MAP
         modulestore = MockModulestoreFactory.create(children_map)
         cache = MockCache()
 
         # test create from modulestore
         block_structure = BlockStructureFactory.create_from_modulestore(root_block_key=0, modulestore=modulestore)
-        self.verify_block_structure(block_structure, children_map)
+        self.assert_block_structure(block_structure, children_map)
 
         # test not in cache
         self.assertIsNone(BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache))
@@ -232,7 +254,7 @@ class TestBlockStructureFactory(TestCase, BlockStructureTestMixin):
         # test re-create from cache
         from_cache_block_structure = BlockStructureFactory.create_from_cache(root_block_key=0, cache=cache)
         self.assertIsNotNone(from_cache_block_structure)
-        self.verify_block_structure(from_cache_block_structure, children_map)
+        self.assert_block_structure(from_cache_block_structure, children_map)
 
         # test remove from cache
         BlockStructureFactory.remove_from_cache(root_block_key=0, cache=cache)
