@@ -18,6 +18,7 @@ from instructor_task.tasks import (
     reset_problem_attempts,
     delete_problem_state,
     send_bulk_course_email,
+    calculate_problem_responses_csv,
     calculate_grades_csv,
     calculate_problem_grade_report,
     calculate_students_features_csv,
@@ -325,6 +326,21 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_problem_responses_csv(request, course_key, problem_location):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate a CSV file containing all student
+    answers to a given problem.
+
+    Raises AlreadyRunningError if said file is already being updated.
+    """
+    task_type = 'problem_responses_csv'
+    task_class = calculate_problem_responses_csv
+    task_input = {'problem_location': problem_location}
+    task_key = ""
+
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 

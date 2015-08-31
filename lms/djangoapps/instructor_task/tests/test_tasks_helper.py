@@ -33,6 +33,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import (
     cohort_students_and_upload,
+    upload_problem_responses_csv,
     upload_grades_csv,
     upload_problem_grade_report,
     upload_students_csv,
@@ -275,6 +276,32 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         ]
         result = upload_grades_csv(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+
+
+class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that generation of CSV files listing student answers to a
+    given problem works.
+    """
+    def setUp(self):
+        super(TestProblemResponsesReport, self).setUp()
+        self.course = CourseFactory.create()
+
+    def test_success(self):
+        task_input = {'problem_location': ''}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            with patch('instructor_task.tasks_helper.list_problem_responses') as patched_data_source:
+                patched_data_source.return_value = [
+                    {'username': 'user0', 'state': u'state0'},
+                    {'username': 'user1', 'state': u'state1'},
+                    {'username': 'user2', 'state': u'state2'},
+                ]
+                result = upload_problem_responses_csv(None, None, self.course.id, task_input, 'calculated')
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        links = report_store.links_for(self.course.id)
+
+        self.assertEquals(len(links), 1)
+        self.assertDictContainsSubset({'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
 
 
 @ddt.ddt
