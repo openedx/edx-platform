@@ -1,8 +1,8 @@
 define([
     'jquery',
-    'sinon',
     'backbone',
     'logger',
+    'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/template_helpers',
     'js/search/base/models/search_result',
     'js/search/base/collections/search_collection',
@@ -17,9 +17,9 @@ define([
     'js/search/dashboard/dashboard_search_factory'
 ], function(
     $,
-    Sinon,
     Backbone,
     Logger,
+    AjaxHelpers,
     TemplateHelpers,
     SearchResult,
     SearchCollection,
@@ -51,11 +51,10 @@ define([
 
     });
 
-    // TODO: fix and re-enable. See SOL-1065
-    xdescribe('SearchCollection', function () {
+
+    describe('SearchCollection', function () {
 
         beforeEach(function () {
-            this.server = Sinon.fakeServer.create();
             this.collection = new SearchCollection();
 
             this.onSearch = jasmine.createSpy('onSearch');
@@ -68,23 +67,22 @@ define([
             this.collection.on('error', this.onError);
         });
 
-        afterEach(function () {
-            this.server.restore();
-        });
-
         it('sends a request without a course ID', function () {
             var collection = new SearchCollection([]);
+            spyOn($, 'ajax');
             collection.performSearch('search string');
-            expect(this.server.requests[0].url).toEqual('/search/');
+            expect($.ajax.mostRecentCall.args[0].url).toEqual('/search/');
         });
 
         it('sends a request with course ID', function () {
             var collection = new SearchCollection([], { courseId: 'edx101' });
+            spyOn($, 'ajax');
             collection.performSearch('search string');
-            expect(this.server.requests[0].url).toEqual('/search/edx101');
+            expect($.ajax.mostRecentCall.args[0].url).toEqual('/search/edx101');
         });
 
         it('sends a request and parses the json result', function () {
+            var requests = AjaxHelpers.requests(this);
             this.collection.performSearch('search string');
             var response = {
                 total: 2,
@@ -98,8 +96,7 @@ define([
                     }
                 }]
             };
-            this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
 
             expect(this.onSearch).toHaveBeenCalled();
             expect(this.collection.totalCount).toEqual(1);
@@ -110,28 +107,30 @@ define([
         });
 
         it('handles errors', function () {
+            var requests = AjaxHelpers.requests(this);
             this.collection.performSearch('search string');
-            this.server.respond();
+            AjaxHelpers.respondWithError(requests, 500);
             expect(this.onSearch).not.toHaveBeenCalled();
             expect(this.onError).toHaveBeenCalled();
         });
 
         it('loads next page', function () {
+            var requests = AjaxHelpers.requests(this);
             var response = { total: 35, results: [] };
             this.collection.loadNextPage();
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.onNext).toHaveBeenCalled();
             expect(this.onError).not.toHaveBeenCalled();
         });
 
         it('sends correct paging parameters', function () {
+            var requests = AjaxHelpers.requests(this);
             var searchString = 'search string';
             var response = { total: 52, results: [] };
             this.collection.performSearch(searchString);
-            this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
             this.collection.loadNextPage();
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
             spyOn($, 'ajax');
             this.collection.loadNextPage();
             expect($.ajax.mostRecentCall.args[0].url).toEqual(this.collection.url);
@@ -141,31 +140,33 @@ define([
         });
 
         it('has next page', function () {
+            var requests = AjaxHelpers.requests(this);
             var response = { total: 35, access_denied_count: 5, results: [] };
             this.collection.performSearch('search string');
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.collection.hasNextPage()).toEqual(true);
             this.collection.loadNextPage();
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.collection.hasNextPage()).toEqual(false);
         });
 
         it('aborts any previous request', function () {
+            var requests = AjaxHelpers.requests(this);
             var response = { total: 35, results: [] };
 
             this.collection.performSearch('old search');
             this.collection.performSearch('new search');
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.onSearch.calls.length).toEqual(1);
 
             this.collection.performSearch('old search');
             this.collection.cancelSearch();
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.onSearch.calls.length).toEqual(1);
 
             this.collection.loadNextPage();
             this.collection.loadNextPage();
-            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.onNext.calls.length).toEqual(1);
         });
 
@@ -558,9 +559,10 @@ define([
         }
 
         function performsSearch () {
+            var requests = AjaxHelpers.requests(this);
             $('.search-field').val('search string');
             $('.search-button').trigger('click');
-            this.server.respondWith([200, {}, JSON.stringify({
+            AjaxHelpers.respondWithJson(requests, {
                 total: 1337,
                 access_denied_count: 12,
                 results: [{
@@ -572,19 +574,18 @@ define([
                         course_name: ''
                     }
                 }]
-            })]);
-            this.server.respond();
+            });
             expect($('.search-info')).toExist();
             expect($('.search-result-list')).toBeVisible();
             expect(this.$searchResults.find('li').length).toEqual(1);
         }
 
         function showsErrorMessage () {
+            var requests = AjaxHelpers.requests(this);
             $('.search-field').val('search string');
             $('.search-button').trigger('click');
-            this.server.respondWith([500, {}]);
-            this.server.respond();
-            expect(this.$searchResults).toEqual($('#search_error-tpl'));
+            AjaxHelpers.respondWithError(requests, 500, {});
+            expect(this.$searchResults).toContainHtml('There was an error');
         }
 
         function updatesNavigationHistory () {
@@ -596,12 +597,13 @@ define([
         }
 
         function cancelsSearchRequest () {
+            var requests = AjaxHelpers.requests(this);
             // send search request to server
             $('.search-field').val('search string');
             $('.search-button').trigger('click');
             // cancel search
             $('.cancel-button').trigger('click');
-            this.server.respondWith([200, {}, JSON.stringify({
+            AjaxHelpers.respondWithJson(requests, {
                 total: 1337,
                 access_denied_count: 12,
                 results: [{
@@ -613,8 +615,7 @@ define([
                         course_name: ''
                     }
                 }]
-            })]);
-            this.server.respond();
+            });
             // there should be no results
             expect(this.$contentElement).toBeVisible();
             expect(this.$searchResults).toBeHidden();
@@ -627,9 +628,8 @@ define([
         }
 
         function loadsNextPage () {
-            $('.search-field').val('query');
-            $('.search-button').trigger('click');
-            this.server.respondWith([200, {}, JSON.stringify({
+            var requests = AjaxHelpers.requests(this);
+            var response = {
                 total: 1337,
                 access_denied_count: 12,
                 results: [{
@@ -641,21 +641,24 @@ define([
                         course_name: ''
                     }
                 }]
-            })]);
-            this.server.respond();
+            };
+            $('.search-field').val('query');
+            $('.search-button').trigger('click');
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.$searchResults.find('li').length).toEqual(1);
             expect($('.search-load-next')).toBeVisible();
             $('.search-load-next').trigger('click');
-            var body = this.server.requests[1].requestBody;
+            var body = requests[1].requestBody;
             expect(body).toContain('search_string=query');
             expect(body).toContain('page_index=1');
-            this.server.respond();
+            AjaxHelpers.respondWithJson(requests, response);
             expect(this.$searchResults.find('li').length).toEqual(2);
         }
 
         function navigatesToSearch () {
+            var requests = AjaxHelpers.requests(this);
             Backbone.history.loadUrl('search/query');
-            expect(this.server.requests[0].requestBody).toContain('search_string=query');
+            expect(requests[0].requestBody).toContain('search_string=query');
         }
 
         function loadTemplates () {
@@ -679,7 +682,6 @@ define([
                 );
                 loadTemplates.call(this);
 
-                this.server = Sinon.fakeServer.create();
                 var courseId = 'a/b/c';
                 CourseSearchFactory(courseId);
                 spyOn(Backbone.history, 'navigate');
@@ -687,12 +689,9 @@ define([
                 this.$searchResults = $('#courseware-search-results');
             });
 
-            afterEach(function () {
-                this.server.restore();
-            });
-
             it('shows loading message on search', showsLoadingMessage);
             it('performs search', performsSearch);
+            it('shows an error message', showsErrorMessage);
             it('updates navigation history', updatesNavigationHistory);
             it('cancels search request', cancelsSearchRequest);
             it('clears results', clearsResults);
@@ -710,8 +709,6 @@ define([
                     '<section id="my-courses"></section>'
                 );
                 loadTemplates.call(this);
-
-                this.server = Sinon.fakeServer.create();
                 DashboardSearchFactory();
 
                 spyOn(Backbone.history, 'navigate');
@@ -719,21 +716,19 @@ define([
                 this.$searchResults = $('#dashboard-search-results');
             });
 
-            afterEach(function () {
-                this.server.restore();
-            });
-
             it('shows loading message on search', showsLoadingMessage);
             it('performs search', performsSearch);
+            it('shows an error message', showsErrorMessage);
             it('updates navigation history', updatesNavigationHistory);
             it('cancels search request', cancelsSearchRequest);
             it('clears results', clearsResults);
             it('loads next page', loadsNextPage);
             it('navigates to search', navigatesToSearch);
             it('returns to course list', function () {
+                var requests = AjaxHelpers.requests(this);
                 $('.search-field').val('search string');
                 $('.search-button').trigger('click');
-                this.server.respondWith([200, {}, JSON.stringify({
+                AjaxHelpers.respondWithJson(requests, {
                     total: 1337,
                     access_denied_count: 12,
                     results: [{
@@ -745,8 +740,7 @@ define([
                             course_name: ''
                         }
                     }]
-                })]);
-                this.server.respond();
+                });
                 expect($('.search-back-to-courses')).toExist();
                 $('.search-back-to-courses').trigger('click');
                 expect(this.$contentElement).toBeVisible();
