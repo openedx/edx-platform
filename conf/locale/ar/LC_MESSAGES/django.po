@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-08-21 14:18+0000\n"
+"POT-Creation-Date: 2015-08-31 13:36+0000\n"
 "PO-Revision-Date: 2015-08-12 08:13+0000\n"
 "Last-Translator: Ahmed Jazzar <ajazzar@edraak.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -5478,6 +5478,14 @@ msgstr ""
 "إذا لم يظهر مساقك على لوحة معلوماتك، يُرجى الاتصال بـ "
 "{payment_support_link}."
 
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr ""
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -6450,6 +6458,10 @@ msgstr "لا توجد وضعية للمساق CourseMode باسم ({mode_slug}) 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "CourseMode price updated successfully"
 msgstr "تمّ عملية تحديث سعر CourseMode بنجاح"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "No end date set"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -8382,12 +8394,12 @@ msgid "course_id must be provided"
 msgstr "يجب توفير الرقم التغريفي للمساق course_id."
 
 #: lms/djangoapps/teams/views.py
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr "الرقم التعريفي الذي جرى توفيره حول الموضوع {topic_id} غير صالح."
+msgid "text_search and order_by cannot be provided together"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "text_search is not yet supported."
-msgstr "إنّ خاصّية البحث في النصّ text_search غير مدعومة بعد."
+msgid "The supplied topic id {topic_id} is not valid"
+msgstr "الرقم التعريفي الذي جرى توفيره حول الموضوع {topic_id} غير صالح."
 
 #. Translators: 'ordering' is a string describing a way
 #. of ordering a list. For example, {ordering} may be
@@ -10194,6 +10206,10 @@ msgstr "المساعدة"
 #: lms/templates/navigation.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "{programming_language} editor"
+msgstr ""
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -17396,60 +17412,51 @@ msgid "This module is not enabled."
 msgstr "هذه الوحدة غير مفعَّلة."
 
 #: cms/templates/certificates.html
-msgid ""
-"Upon successful completion of your course, learners receive a certificate to"
-" acknowledge their accomplishment. If you are a course team member with the "
-"Admin role in Studio, you can configure your course certificate."
+msgid "Working with Certificates"
 msgstr ""
-"عند استكمال الطلّاب لمساقك بنجاح، يحصلون على شهادة تُثبِت إنجازهم. وإذا كنت "
-"عضوًا في فريق المساق بدور مشرِف في الاستوديو، يمكنك إعداد شهادة مساقك."
 
 #: cms/templates/certificates.html
 msgid ""
-"Click {em_start}Add your first certificate{em_end} to add a certificate "
-"configuration. Upload the organization logo to be used on the certificate, "
-"and specify at least one signatory. You can include up to four signatories "
-"for a certificate. You can also upload a signature image file for each "
-"signatory. {em_start}Note:{em_end} Signature images are used only for "
-"verified certificates. Optionally, specify a different course title to use "
-"on your course certificate. You might want to use a different title if, for "
-"example, the official course name is too long to display well on a "
-"certificate."
+"Specify a course title to use on the certificate if the course's official "
+"title is too long to be displayed well."
 msgstr ""
-"يُرجى النقر على {em_start}أَضِف شهادتك الأولى{em_end} لتُضيف إعدادات "
-"الشهادة. ثمّ حَمِّل شعار المؤسّسة لوضعه على الشهادة وحدِّد موقِّعًا واحدًا "
-"على الأقلّ وأربعة على الأكثر لكل شهادة. ويمكنك أيضًا تحميل صورة التوقيع لكل "
-"موقّع. {em_start}ملاحظة:{em_end} تُستخدَم صور التواقيع فقط للشهادات "
-"الموثَّقة. أو إذا أردت، يمكنك أن تحدِّد اسمًا مختلفًا للمساق لوضعه على "
-"شهادتك. وقد ترغب في استخدام اسم مختلف إذا كان، مثلًا، الاسم الرسمي للمساق "
-"طويلًا جدًّا إلى درجة أنّه لن يبدو واضحًا على الشهادة."
 
 #: cms/templates/certificates.html
 msgid ""
-"Select a course mode and click {em_start}Preview Certificate{em_end} to "
-"preview the certificate that a learner in the selected enrollment track "
-"would receive. When the certificate is ready for issuing, click "
-"{em_start}Activate.{em_end} To stop issuing an active certificate, click "
-"{em_start}Deactivate{em_end}."
+"For verified certificates, specify between one and four signatories and "
+"upload the associated images."
 msgstr ""
-"يُرجى اختيار وضعية للمساق ثمّ النقر على {em_start}معاينة الشهادة{em_end} "
-"لمعاينة الشهادة التي سيحصل عليها المتعلّم في مسار التسجيل المُنتقى. وعندما "
-"تَجهَز الشهادة للإصدار، يُرجى النقر على {em_start}تفعيل.{em_end}. ولإيقاف "
-"إصدار شهادة مفعَّلة، يُرجى النقر على {em_start}إبطال التفعيل{em_end}."
 
 #: cms/templates/certificates.html
 msgid ""
-" To edit the certificate configuration, hover over the top right corner of "
-"the form and click {em_start}Edit{em_end}. To delete a certificate, hover "
-"over the top right corner of the form and click the delete icon. In general,"
-" do not delete certificates after a course has started, because some "
-"certificates might already have been issued to learners."
+"To edit or delete a certificate before it is activated, hover over the top "
+"right corner of the form and select {em_start}Edit{em_end} or the delete "
+"icon."
 msgstr ""
-"لتعديل إعدادات الشهادة، يُرجى تحريك الماوس إلى الزاوية العليا اليمنى من "
-"الاستمارة والنقر على {em_start}تعديل{em_end}. ولحذف  إحدى الشهادات، يُرجى "
-"تحريك الماوس إلى الزاوية العليا اليمنى من الاستمارة والنقر على رمز الحذف. "
-"وبشكل عام، لا تحذف الشهادات بعد بدء المساق، لأنّ بعض الشهادات قد تكون "
-"أُصدِرت مسبقًا للمتعلِّمين."
+
+#: cms/templates/certificates.html
+msgid ""
+"To view a sample certificate, choose a course mode and select "
+"{em_start}Preview Certificate{em_end}."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid "Issuing Certificates to Learners"
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Course team members without the Admin "
+"role cannot edit or delete an activated certificate."
+msgstr ""
+
+#: cms/templates/certificates.html
+msgid ""
+"{em_start}Do not{em_end} delete certificates after a course has started; "
+"learners who have already earned certificates will no longer be able to "
+"access them."
+msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Learn more about certificates"
