@@ -1,6 +1,8 @@
 """HTTP endpoints for the Teams API."""
 
-from django.shortcuts import render_to_response
+import logging
+
+from django.shortcuts import get_object_or_404, render_to_response
 from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -56,6 +58,8 @@ from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam
 TEAM_MEMBERSHIPS_PER_PAGE = 2
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
+
+log = logging.getLogger(__name__)
 
 
 class TeamsDashboardView(View):
@@ -457,7 +461,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
 
-            Get or update a course team's information. Updates are supported
+            Get, update, or delete a course team's information. Updates are supported
             only through merge patch.
 
         **Example Requests**:
@@ -465,6 +469,8 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             GET /api/team/v0/teams/{team_id}}
 
             PATCH /api/team/v0/teams/{team_id} "application/merge-patch+json"
+
+            DELETE /api/team/v0/teams/{team_id}
 
         **Query Parameters for GET**
 
@@ -530,6 +536,20 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the update could not be completed due to validation errors, this
             method returns a 400 error with all error messages in the
             "field_errors" field of the returned JSON.
+
+        **Response Values for DELETE**
+
+            Only staff can delete teams. When a team is deleted, all
+            team memberships associated with that team are also
+            deleted. Returns 204 on successful deletion.
+
+            If the user is anonymous or inactive, a 401 is returned.
+
+            If the user is not course or global staff and does not
+            have discussion privileges, a 403 is returned.
+
+            If the user is logged in and the team does not exist, a 404 is returned.
+
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
@@ -540,6 +560,15 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     def get_queryset(self):
         """Returns the queryset used to access the given team."""
         return CourseTeam.objects.all()
+
+    def delete(self, request, team_id):
+        """DELETE /api/team/v0/teams/{team_id}"""
+        team = get_object_or_404(CourseTeam, team_id=team_id)
+        self.check_object_permissions(request, team)
+        # Note: also deletes all team memberships associated with this team
+        team.delete()
+        log.info('user %d deleted team %s', request.user.id, team_id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TopicListView(GenericAPIView):

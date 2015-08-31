@@ -6,7 +6,9 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
-from .utils import click_css, confirm_prompt, type_in_codemirror
+from ..common.utils import click_css, confirm_prompt
+
+from .utils import type_in_codemirror
 
 
 class ContainerPage(PageObject):
