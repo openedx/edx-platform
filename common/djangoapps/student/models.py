@@ -1046,9 +1046,10 @@ class CourseEnrollment(models.Model):
         `course_key` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
         `mode` is a string specifying what kind of enrollment this is. The
-               default is "honor", meaning honor certificate. Future options
-               may include "audit", "verified_id", etc. Please don't use it
-               until we have these mapped out.
+               default is 'honor', meaning honor certificate. Other options
+               include 'professional', 'verified', 'audit',
+               'no-id-professional' and 'credit'.
+               See CourseMode in common/djangoapps/course_modes/models.py.
 
         `check_access`: if True, we check that an accessible course actually
                 exists for the given course_key before we enroll the student.
