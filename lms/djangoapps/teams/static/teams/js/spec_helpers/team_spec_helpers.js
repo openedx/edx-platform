@@ -29,13 +29,15 @@ define([
 
     var createMockTeamData = function (startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            var id = "id" + i;
             return {
                 name: "team " + i,
-                id: "id " + i,
+                id: id,
                 language: testLanguages[i%4][0],
                 country: testCountries[i%4][0],
                 membership: [],
-                last_activity_at: ''
+                last_activity_at: '',
+                url: 'api/team/v0/teams/' + id
             };
         });
     };
@@ -122,6 +124,10 @@ define([
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
             expect(currentCard.text()).toMatch(_.object(testCountries)[team.country]);
         });
+    };
+
+    var triggerTeamEvent = function (action) {
+        teamEvents.trigger('teams:update', {action: action});
     };
 
     createMockPostResponse = function(options) {
@@ -327,6 +333,7 @@ define([
         createMockThreadResponse: createMockThreadResponse,
         createMockTopicData: createMockTopicData,
         createMockTopicCollection: createMockTopicCollection,
+        triggerTeamEvent: triggerTeamEvent,
         verifyCards: verifyCards
     };
 });
