@@ -35,5 +35,14 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
                 topicCollection.course_id = 'my+course+id';
                 testRequestParam(this, 'course_id', 'my+course+id');
             });
+
+            it('sets itself to stale on receiving a teams create or delete event', function () {
+                expect(topicCollection.isStale).toBe(false);
+                TeamSpecHelpers.triggerTeamEvent('create');
+                expect(topicCollection.isStale).toBe(true);
+                topicCollection.isStale = false;
+                TeamSpecHelpers.triggerTeamEvent('delete');
+                expect(topicCollection.isStale).toBe(true);
+            });
         });
     });

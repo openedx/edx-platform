@@ -20,8 +20,8 @@
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
             'teams/js/views/team_profile_header_actions',
-            'teams/js/views/team_utils',
             'teams/js/views/instructor_tools',
+            'teams/js/views/team_utils',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, SearchFieldView, HeaderView, HeaderModel,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection, TeamAnalytics,
@@ -45,8 +45,9 @@
                     this.$el.html(_.template(teamsTemplate));
                     this.$('p.error').hide();
                     this.header.setElement(this.$('.teams-header')).render();
-                    if (this.instructorTools)
+                    if (this.instructorTools) {
                         this.instructorTools.setElement(this.$('.teams-instructor-tools-bar')).render();
+                    }
                     this.main.setElement(this.$('.page-content')).render();
                     return this;
                 }
@@ -173,7 +174,7 @@
 
                 render: function() {
                     this.mainView.setElement(this.$el).render();
-                    this.hideWarning();
+                    TeamUtils.hideMessage();
                     return this;
                 },
 
@@ -253,7 +254,10 @@
                                 topic: topic,
                                 model: team
                             });
-                            var instructorToolsView = new InstructorToolsView();
+                            var instructorToolsView = new InstructorToolsView({
+                                team: team,
+                                teamEvents: self.teamEvents
+                            });
                             editViewWithHeader = self.createViewWithHeader({
                                 title: gettext("Edit Team"),
                                 description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
@@ -570,18 +574,7 @@
                  */
                 notFoundError: function (message) {
                     this.router.navigate('my-teams', {trigger: true});
-                    this.showWarning(message);
-                },
-
-                showWarning: function (message) {
-                    var warningEl = this.$('.warning');
-                    warningEl.find('.copy').html('<p>' + message + '</p');
-                    warningEl.toggleClass('is-hidden', false);
-                    warningEl.focus();
-                },
-
-                hideWarning: function () {
-                    this.$('.warning').toggleClass('is-hidden', true);
+                    TeamUtils.showMessage(message);
                 },
 
                 /**
