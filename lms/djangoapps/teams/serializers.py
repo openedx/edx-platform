@@ -35,8 +35,8 @@ class UserMembershipSerializer(serializers.ModelSerializer):
     class Meta(object):
         """Defines meta information for the ModelSerializer."""
         model = CourseTeamMembership
-        fields = ("user", "date_joined")
-        read_only_fields = ("date_joined",)
+        fields = ("user", "date_joined", "last_activity_at")
+        read_only_fields = ("date_joined", "last_activity_at")
 
 
 class CourseTeamSerializer(serializers.ModelSerializer):
