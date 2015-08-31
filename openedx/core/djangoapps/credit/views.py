@@ -12,6 +12,7 @@ from django.http import (
     HttpResponseForbidden,
     Http404
 )
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from opaque_keys import InvalidKeyError
@@ -379,6 +380,9 @@ class CreditCourseViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, view
     authentication_classes = (authentication.OAuth2Authentication, authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
+    # This CSRF exemption only applies when authenticating without SessionAuthentication.
+    # SessionAuthentication will enforce CSRF protection.
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # Convert the course ID/key from a string to an actual CourseKey object.
         course_id = kwargs.get(self.lookup_field, None)
