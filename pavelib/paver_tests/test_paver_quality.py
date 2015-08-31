@@ -239,7 +239,7 @@ class TestPaverRunQuality(unittest.TestCase):
         # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called once (for the calls to pep8 and pylint)
+        # And assert that sh was called twice (for the calls to pep8 and pylint)
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
@@ -263,7 +263,7 @@ class TestPaverRunQuality(unittest.TestCase):
             pavelib.quality.run_quality("")
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called once (for the call to "pylint" & "jshint")
+        # And assert that sh was called twice (for the call to "pylint" & "jshint")
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
 
