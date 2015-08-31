@@ -1,5 +1,5 @@
 """
-Tests for UserPartitionTransformation.
+Tests for UserPartitionTransformer.
 """
 
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
@@ -8,20 +8,21 @@ from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
 from student.tests.factories import UserFactory
 from student.tests.factories import CourseEnrollmentFactory
-from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group, UserPartition
 
 from course_blocks.transformers.user_partitions import UserPartitionTransformer
 from course_blocks.api import get_course_blocks, clear_course_from_cache
-from test_helpers import CourseStructureTestCase
+from lms.djangoapps.course_blocks.transformers.tests.test_helpers import CourseStructureTestCase
 
 
 class UserPartitionTransformerTestCase(CourseStructureTestCase):
     """
-    ...
+    UserPartitionTransformer Test
     """
-
     def setUp(self):
+        """
+        Setup course structure and create user for user partition transformer test.
+        """
         super(UserPartitionTransformerTestCase, self).setUp()
 
         # Set up user partitions and groups.
@@ -73,8 +74,8 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
                             'metadata': {
                                 'group_access': {0: [0, 1, 2]},
                             },
-                                '#type': 'sequential',
-                                '#ref': 'lesson1',
+                            '#type': 'sequential',
+                            '#ref': 'lesson1',
                             '#children': [
                                 {
                                     '#type': 'vertical',
@@ -110,17 +111,11 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
             group.id,
         )
 
-    def get_block_key_set(self, *refs):
-        """
-        Gets the set of usage keys that correspond to the list of
-        #ref values as defined on self.blocks.
-
-        Returns: set[UsageKey]
-        """
-        xblocks = (self.blocks[ref] for ref in refs)
-        return set([xblock.location for xblock in xblocks])
-
     def test_course_structure_with_user_partition(self):
+        """
+        Test course structure integrity if course has user partition section
+        and user is assigned to group in user partition.
+        """
         self.transformation = UserPartitionTransformer()
 
         raw_block_structure = get_course_blocks(
