@@ -680,7 +680,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint
     the user is looking at.  Once we have proper usages and definitions per the XBlock
     design, this should use the course the usage is in.
     """
-    return adjust_start_date(descriptor.days_early_for_beta, descriptor.start, course_key)
+    return adjust_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
 def _has_instructor_access_to_location(user, location, course_key=None):
