@@ -400,7 +400,7 @@ class BrowseTopicsTest(TeamsTabBase):
         )
         create_team_page.submit_form()
         team_page = TeamPage(self.browser, self.course_id)
-        self.assertTrue(team_page.is_browser_on_page)
+        self.assertTrue(team_page.is_browser_on_page())
         team_page.click_all_topics()
         self.assertTrue(self.topics_page.is_browser_on_page())
         self.topics_page.wait_for_ajax()

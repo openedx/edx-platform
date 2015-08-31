@@ -251,6 +251,14 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     serializer_class = CourseEnrollmentSerializer
     lookup_field = 'username'
 
+    # In Django Rest Framework v3, there is a default pagination
+    # class that transmutes the response data into a dictionary
+    # with pagination information.  The original response data (a list)
+    # is stored in a "results" value of the dictionary.
+    # For backwards compatibility with the existing API, we disable
+    # the default behavior by setting the pagination_class to None.
+    pagination_class = None
+
     def get_queryset(self):
         enrollments = self.queryset.filter(
             user__username=self.kwargs['username'],
