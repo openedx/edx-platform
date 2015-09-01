@@ -6,8 +6,11 @@ from transformer import BlockStructureTransformers
 
 
 def get_blocks(cache, modulestore, user_info, root_block_key, transformers):
-    if not BlockStructureTransformers.are_all_registered(transformers):
-        raise Exception("One or more requested transformers are not registered.")
+    unregistered_transformers = BlockStructureTransformers.find_unregistered(transformers)
+    if unregistered_transformers:
+        raise Exception(
+            "The following requested transformers are not registered: {}".format(unregistered_transformers)
+        )
 
     # Load the cached block structure.
     root_block_structure = BlockStructureFactory.create_from_cache(root_block_key, cache)

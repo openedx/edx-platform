@@ -45,9 +45,7 @@ class BlockStructureTransformers(PluginManager):
         return set(cls.get_available_plugins().itervalues())
 
     @classmethod
-    def are_all_registered(cls, transformers):
-        registered_transformers = cls.get_registered_transformers()
-        return all(
-            any(transformer.name() == reg_trans.name() for reg_trans in registered_transformers)
-            for transformer in transformers
-        )
+    def find_unregistered(cls, transformers):
+        registered_transformer_names = set(reg_trans.name() for reg_trans in cls.get_registered_transformers())
+        requested_transformer_names = set(transformer.name() for transformer in transformers)
+        return requested_transformer_names - registered_transformer_names

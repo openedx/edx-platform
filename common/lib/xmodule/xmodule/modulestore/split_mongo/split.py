@@ -949,6 +949,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return CourseLocator(org, course, run)
 
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        return BlockUsageLocator(course_key, 'course', 'course')
+
     def _get_structure(self, structure_id, depth, head_validation=True, **kwargs):
         """
         Gets Course or Library by locator

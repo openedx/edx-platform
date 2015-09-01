@@ -906,6 +906,15 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         """
         pass
 
+
+    @abstractmethod
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        pass
+
     @abstractmethod
     def get_courses(self, **kwargs):
         '''

@@ -23,18 +23,26 @@ class BlockStructureTransformersTestCase(TestCase):
         pass
 
     @patch('openedx.core.lib.block_cache.transformer.BlockStructureTransformers.get_available_plugins')
-    def test_are_all_registered(self, mock_available_transforms):
+    def test_find_unregistered(self, mock_available_transforms):
 
         mock_available_transforms.return_value = {
             transformer.name(): transformer
             for transformer in [self.TestTransformer1, self.TestTransformer2]
         }
 
-        for transformers, expected_are_all_registered in [
-            ([], True),
-            ([self.TestTransformer1()], True),
-            ([self.TestTransformer1(), self.TestTransformer2()], True),
-            ([self.UnregisteredTestTransformer3()], False),
-            ([self.TestTransformer1(), self.UnregisteredTestTransformer3()], False),
+        for transformers, expected_find_unregistered in [
+            ([], []),
+            ([self.TestTransformer1()], []),
+            ([self.TestTransformer1(), self.TestTransformer2()], []),
+            (
+                [self.UnregisteredTestTransformer3()],
+                [self.UnregisteredTestTransformer3.name()]
+            ),
+            (
+                [self.TestTransformer1(), self.UnregisteredTestTransformer3()],
+                [self.UnregisteredTestTransformer3.name()]
+            ),
         ]:
-            self.assertEquals(BlockStructureTransformers.are_all_registered(transformers), expected_are_all_registered)
+            self.assertSetEqual(
+                BlockStructureTransformers.find_unregistered(transformers), set(expected_find_unregistered)
+            )

@@ -125,9 +125,7 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
     ):
         def check_results(user, expected_accessible_blocks, blocks_with_differing_access):
             self.client.login(username=user.username, password=self.password)
-            block_structure = get_course_blocks(
-                user, self.course.id, self.course.location, transformers=transformers
-            )
+            block_structure = get_course_blocks(user, self.course.location, transformers=transformers)
             for i, xblock_key in enumerate(self.xblock_keys):
                 block_structure_result = block_structure.has_block(xblock_key)
                 has_access_result = bool(has_access(user, 'load', self.get_block(i)))
