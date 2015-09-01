@@ -15,8 +15,8 @@
     <% } %>
 
     <div class="copy">
-      <h2 class="title title-3" id="<%= type %>-<%= intent %>-title"><%= title %></h2>
-      <% if(obj.message) { %><p class="message" id="<%= type %>-<%= intent %>-description"><%= message %></p><% } %>
+      <h2 class="title title-3" id="<%= type %>-<%= intent %>-title"><%- title %></h2>
+      <% if(obj.message) { %><p class="message" id="<%= type %>-<%= intent %>-description"><%- message %></p><% } %>
     </div>
 
     <% if(obj.actions) { %>
@@ -24,13 +24,13 @@
       <ul>
         <% if(actions.primary) { %>
         <li class="nav-item">
-          <button class="action-primary <%= actions.primary.class %>"><%= actions.primary.text %></button>
+          <button class="action-primary <%= actions.primary.class %>"><%- actions.primary.text %></button>
         </li>
         <% } %>
         <% if(actions.secondary) {
              _.each(actions.secondary, function(secondary) { %>
         <li class="nav-item">
-          <button class="action-secondary <%= secondary.class %>"><%= secondary.text %></button>
+          <button class="action-secondary <%= secondary.class %>"><%- secondary.text %></button>
         </li>
         <%   });
            } %>
