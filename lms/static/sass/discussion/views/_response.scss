@@ -1,3 +1,100 @@
+// discussion - responses
+// ====================
+
+// Table of Contents
+// * +wrapper - response list
+// * +base - single response element
+// * +element - add response area
+// * +response - labels and banners
+// * +CASE: answered question - collapsed comments in answers
+// * +response - labels and banners
+// * +comments styling
+
+// +wrapper - response list
+.container .discussion-body .responses {
+  list-style: none;
+  margin-top: $baseline;
+  padding: 0 ($baseline*1.5);
+
+  &:empty {
+    display: none;
+  }
+
+  // wrapper - response plus comment area
+  .forum-response {
+    @include animation(fadeIn .3s);
+    position: relative;
+    margin: $baseline 0;
+    border: 1px solid $gray-l2;
+    border-radius: 3px;
+    box-shadow: 0 0 1px $shadow;
+  }
+
+  // wrapper - main response area
+  .discussion-response {
+    @include box-sizing(border-box);
+    @include border-radius(3px, 3px, 0, 0);
+    padding: $baseline;
+    background-color: $white;
+  }
+  
+  .posted-by {
+    @extend %t-ultrastrong;
+  }
+}
+
+// +base - single response element
+.container .discussion-response {
+
+  .response-header-content {
+
+    // CASE: larger username for responses 
+    .username {
+      @include font-size(14);
+      @extend %t-weight5;
+    }
+  }
+
+  // rtl resets for response list elements
+  .response-body ol, .response-body ul { // Fix up the RTL-only _reset.scss, but only in specific places
+    @include padding-left($baseline*2);
+    @include padding-right(0);
+  }
+}
+
+// +element - add response area
+.container .discussion-body .add-response {
+  margin-top: $baseline;
+  padding: 0 ($baseline*1.5);
+
+  .add-response-btn {
+    @include white-button;
+    @include linear-gradient(top, $white 35%, $gray-l4);
+    position: relative;
+    border: 1px solid $gray-l2;
+    padding: 0 18px;
+    width: 100%;
+    box-shadow: 0 1px 1px $shadow-l1;
+    @include text-align(left);
+    font-size: 13px;
+
+    .fa-reply:before { // flip the icon for RTL
+      @include ltr {
+        content: "\f112"; // FA icon arrow to the left
+      }
+
+      @include rtl {
+        content: "\f064"; // FA icon arrow to the right
+      }
+    }
+
+    span.add-response-btn-text {
+      @include padding-left($baseline/5);
+    }
+  }
+}
+
+// +CASE: answered question - collapsed comments in answers
 .forum-response .action-show-comments {
   @include box-sizing(border-box);
   @include font-size(13);
@@ -6,4 +103,109 @@
   width: 100%;
   background: $gray-l6;
   box-shadow: 0 1px 3px -1px $shadow inset;
+}
+
+// +response - labels and banners
+// NOTE - these styles seem to no longer be in use. They have been isolated here, but should be ideally removed or fixed. 
+.container .discussion-body .responses .forum-response {
+
+  // CASE: label - staff response
+  &.staff {
+    padding-top: 38px;
+    border-color: #009fe2;
+  }
+
+  // CASE: label - community TA response
+  &.community-ta{
+    padding-top: 38px;
+    border-color: $forum-color-community-ta;
+  }
+
+  // CASE: banner - staff response
+  .staff-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    padding: 1px ($baseline/4);
+    @include box-sizing(border-box);
+    border-radius: 2px 2px 0 0;
+    background: #009fe2;
+    font-size: 9px;
+    font-weight: 700;
+    color: $white;
+    text-transform: uppercase;
+  }
+
+  // CASE: banner - community TA response
+  .community-ta-banner{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    padding: 1px ($baseline/4);
+    @include box-sizing(border-box);
+    border-radius: 2px 2px 0 0;
+    background: $forum-color-community-ta;
+    font-size: 9px;
+    font-weight: 700;
+    color: $white;
+    text-transform: uppercase;
+  }
+
+  // STATE: loading - response list
+  &.loading {
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+// +comments styling
+.container .discussion-body .comments {
+  @extend %ui-no-list;
+  border-radius: 0 0 3px 3px;
+  background: $gray-l6;
+  box-shadow: 0 1px 3px -1px $shadow inset;
+
+  > li {
+    border-top: 1px solid $gray-l4;
+    padding: ($baseline/2) $baseline;
+  }
+
+
+  blockquote {
+    background: $gray-l4;
+    border-radius: 3px;
+    padding: ($baseline/4) ($baseline/2);
+    font-size: 14px;
+  }
+
+  .comment-form {
+    @include clearfix();
+
+    .comment-form-input {
+      padding: ($baseline/4) ($baseline/2);
+      background-color: $white;
+      font-size: 14px;
+    }
+
+    .discussion-submit-comment {
+      @include blue-button;
+      float: left;
+      margin-top: 8px;
+    }
+
+    .wmd-input {
+      height: 40px;
+    }
+
+    .discussion-errors {
+      margin: 0;
+    }
+  }
 }

@@ -5,6 +5,6 @@
             <span class="label-unchecked"><%- gettext("Endorse") %></span>
             <span class="label-checked"><%- gettext("Unendorse") %></span>
         </span>
-        <span class="action-icon"><i class="icon fa fa-ok"></i></span>
+        <span class="action-icon"><i class="icon fa fa-check"></i></span>
     </a>
 </li>

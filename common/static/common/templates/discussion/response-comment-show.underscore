@@ -1,4 +1,4 @@
-<div id="comment_<%- id %>">
+<div class="discussion-comment" id="comment_<%- id %>">
   <div class="response-body"><%- body %></div>
   <%=
       _.template(
