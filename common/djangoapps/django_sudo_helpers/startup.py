@@ -11,14 +11,14 @@ def run():
     """
     Executed during django startup
     """
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth_for_sudo()
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+        enable_django_sudo()
 
 
-def enable_third_party_auth_for_sudo():
+def enable_django_sudo():
     """
-    Enable the use of third_party_auth for django-sudo, which allows users to re-authenticate
-    using other identity providers to get sudo access.
+    Enable the use of django-sudo, which allows users to re-authenticate
+    using their password or other identity providers to get sudo access.
     """
 
     from django_sudo_helpers import settings as sudo_auth_settings

@@ -165,10 +165,11 @@ def container_handler(request, usage_key_string):
             try:
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
 
-                # Revoke sudo privileges from a request explicitly
-                region = unicode(course.id)
-                if request.is_sudo(region=region):
-                    revoke_sudo_privileges(request, region=region)
+                if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+                    # Revoke sudo privileges from a request explicitly
+                    region = unicode(course.id)
+                    if request.is_sudo(region=region):
+                        revoke_sudo_privileges(request, region=region)
 
             except ItemNotFoundError:
                 return HttpResponseBadRequest()

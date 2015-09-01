@@ -75,8 +75,6 @@ urlpatterns = (
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
 
-    url(r'^sudo/$', 'sudo.views.sudo'),
-
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
@@ -709,3 +707,9 @@ urlpatterns += (
 urlpatterns += (
     url(r'^api/', include('edx_proctoring.urls')),
 )
+
+# Django-sudo
+if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+    urlpatterns += (
+        url(r'^sudo/$', 'sudo.views.sudo'),
+    )

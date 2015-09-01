@@ -15,6 +15,7 @@
 # so we import this as a module, and then read django_url from
 # it to get the correct value
 import lettuce.django
+from django.conf import settings
 
 from lettuce import world, step
 from .course_helpers import *
@@ -251,13 +252,13 @@ def i_get_sudo_access(_step, password):
     Note that wait_for empty is due to password field
     It will return password like this **** not text.
     """
-
-    sudo_form = world.css_find('form.sudo-form')
-    # check if sudo form is available then submit password to get sudo access
-    # otherwise return True because sudo access already given.
-    if len(sudo_form) > 0:
-        css_selector = 'input[id=id_password]'
-        world.retry_on_exception(lambda: world.css_find(css_selector)[0].fill(password))
-        world.wait_for(lambda _: not world.css_has_value(css_selector, '', index=0))
-        world.css_click('button[type=submit]')
-    return True
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+        sudo_form = world.css_find('form.sudo-form')
+        # check if sudo form is available then submit password to get sudo access
+        # otherwise return True because sudo access already given.
+        if len(sudo_form) > 0:
+            css_selector = 'input[id=id_password]'
+            world.retry_on_exception(lambda: world.css_find(css_selector)[0].fill(password))
+            world.wait_for(lambda _: not world.css_has_value(css_selector, '', index=0))
+            world.css_click('button[type=submit]')
+        return True

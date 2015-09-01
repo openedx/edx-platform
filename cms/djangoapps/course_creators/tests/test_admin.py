@@ -1,7 +1,7 @@
 """
 Tests course_creators.admin.py.
 """
-
+from django.conf import settings
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.admin.sites import AdminSite
@@ -51,11 +51,12 @@ class CourseCreatorAdminTest(TestCase):
         """
         Grant sudo access to staff or instructor user.
         """
-        self.client.post(
-            '/sudo/?region={}'.format(region_name(region)),
-            {'password': password},
-            follow=True
-        )
+        if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+            self.client.post(
+                '/sudo/?region={}'.format(region_name(region)),
+                {'password': password},
+                follow=True
+            )
 
     @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
     @mock.patch('django.contrib.auth.models.User.email_user')
