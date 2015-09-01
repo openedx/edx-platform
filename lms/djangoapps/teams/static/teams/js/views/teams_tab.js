@@ -2,6 +2,7 @@
     'use strict';
 
     define(['backbone',
+            'jquery',
             'underscore',
             'gettext',
             'js/components/header/views/header',
@@ -21,7 +22,7 @@
             'teams/js/views/team_profile_header_actions',
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
+        function (Backbone, $, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   TeamMembersEditView, TeamProfileHeaderActionsView, InstructorToolsView, teamsTemplate) {
@@ -81,6 +82,7 @@
                         ['topics/:topic_id(/)', _.bind(this.browseTopic, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                         ['topics/:topic_id/:team_id/edit-team(/)', _.bind(this.editTeam, this)],
+                        ['topics/:topic_id/:team_id/edit-team/manage-members(/)', _.bind(this.editTeamMembers, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
@@ -235,7 +237,7 @@
                     var self = this,
                         editViewWithHeader;
                     this.getTopic(topicID).done(function (topic) {
-                        self.getTeam(teamID, true).done(function(team) {
+                        self.getTeam(teamID, false).done(function(team) {
                             var view = new TeamEditView({
                                 action: 'edit',
                                 teamEvents: self.teamEvents,
@@ -253,9 +255,7 @@
                             var instructorToolsView = new InstructorToolsView({
                                 team: team,
                                 topic: topic,
-                                teamEvents: self.teamEvents,
-                                router: self.router,
-                                editTeamMembers: _.bind(self.editTeamMembers, self)
+                                teamEvents: self.teamEvents
                             });
                             editViewWithHeader = self.createViewWithHeader({
                                     mainView: view,
@@ -276,26 +276,31 @@
 
                 /**
                  *
-                 * Render the edit team members view for a given topic and team.
+                 * The backbone router entry for editing team members, using topic and team IDs.
                  */
-                editTeamMembers: function (topic, team) {
-                    var view = new TeamMembersEditView({
-                        teamEvents: this.teamEvents,
-                        teamMembershipDetailUrl: this.teamMembershipDetailUrl,
-                        model: team,
-                        requestUsername: this.userInfo.username
+                editTeamMembers: function (topicID, teamID) {
+                    var self = this;
+                    this.getTopic(topicID).done(function (topic) {
+                        self.getTeam(teamID, true).done(function(team) {
+                            var view = new TeamMembersEditView({
+                                teamEvents: self.teamEvents,
+                                teamMembershipDetailUrl: self.teamMembershipDetailUrl,
+                                model: team,
+                                requestUsername: self.userInfo.username
+                            });
+                            self.mainView = self.createViewWithHeader({
+                                    mainView: view,
+                                    subject: {
+                                        name: gettext("Membership"),
+                                        description: gettext("You can remove members from this team, especially if they have not participated in the team's activity.")
+                                    },
+                                    parentTopic: topic,
+                                    parentTeam: team
+                                }
+                            );
+                            self.render();
+                        });
                     });
-                    this.mainView = this.createViewWithHeader({
-                            mainView: view,
-                            subject: {
-                                name: gettext("Membership"),
-                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity.")
-                            },
-                            parentTopic: topic,
-                            parentTeam: team
-                        }
-                    );
-                    this.render();
                 },
 
                 /**
