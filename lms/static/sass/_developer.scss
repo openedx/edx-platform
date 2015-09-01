@@ -273,3 +273,41 @@
     }
   }
 }
+
+//efischer part 2: removing team members
+.edit-members {
+  @extend %ui-no-list;
+
+  .team-member {
+    line-height: $body-line-height;
+    padding: 10px;
+  }
+
+  .member-info-container {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+
+    .primary {
+      font-size: 120%;
+    }
+
+    .secondary {
+      color: $lighter-base-font-color;
+      font-size: 80%;
+      display: block;
+    }
+  }
+
+  .member-profile {
+    img {
+      border: 1px solid $gray;
+    }
+  }
+
+  .action-remove-member {
+    margin-left: 20px;
+    color: $blue;
+  }
+}
+
