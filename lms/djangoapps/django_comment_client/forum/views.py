@@ -153,12 +153,12 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     return threads, query_params
 
 
-def _set_group_names(course_id, threads):
+def _set_group_names(course, threads):
     """ Adds group name if the thread has a group id"""
 
     for thread in threads:
-        if thread.get('group_id'):
-            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+        if thread.get('group_id') and is_course_cohorted(course):
+            thread['group_name'] = get_cohort_by_id(course, thread.get('group_id')).name
             thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
         else:
             thread['group_name'] = ""
@@ -229,7 +229,7 @@ def forum_form_discussion(request, course_key):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course)
 
     user = cc.User.from_django_user(request.user)
@@ -496,7 +496,7 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
-        threads = _set_group_names(course_key, threads)
+        threads = _set_group_names(course, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
