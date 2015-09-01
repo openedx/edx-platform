@@ -1,15 +1,5 @@
      <div class="signatory-panel-default">
-
-       <% if (!is_editing_all_collections) { %>
-       <a class="signatory-panel-close" href="javascript:void(0);" data-tooltip="Close">
-          <i class="icon fa fa-close" aria-hidden="true"></i>
-          <span class="sr action-button-text"><%= gettext("Close") %></span>
-       </a>
-       <a class="signatory-panel-save"  href="javascript:void(0);" data-tooltip="Save">
-          <i class="icon fa fa-save" aria-hidden="true"></i>
-          <span class="sr action-button-text"><%= gettext("Save") %></span>
-       </a>
-       <% } else if (signatories_count > 1 && (total_saved_signatories > 1 || isNew) ) { %>
+       <% if (is_editing_all_collections && signatories_count > 1 && (total_saved_signatories > 1 || isNew) ) { %>
        <a class="signatory-panel-delete" href="#" data-tooltip="Delete">
           <i class="icon fa fa-trash-o" aria-hidden="true"></i>
           <span class="sr action-button-text"><%= gettext("Delete") %></span>

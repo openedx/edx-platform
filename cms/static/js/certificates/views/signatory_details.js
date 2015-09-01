@@ -40,6 +40,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
                 eventAgg: this.eventAgg
             });
             this.template = this.loadTemplate('signatory-details');
+            this.signatory_action_template = this.loadTemplate('signatory-actions');
         },
 
         loadTemplate: function(name) {
@@ -51,6 +52,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             this.$el.html(this.edit_view.render());
+            $(this.signatory_action_template()).appendTo(this.el);
             this.edit_view.delegateEvents();
             this.delegateEvents();
         },

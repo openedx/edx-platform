@@ -79,7 +79,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         };
 
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor'], true);
+            TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor', 'signatory-actions'], true);
 
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
