@@ -173,7 +173,7 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
     for sel in PROBLEM_DICT[problem_type][correctness]:
         if bool(isnt_marked):
             world.wait_for(lambda _: world.is_css_not_present(sel))  # pylint: disable=cell-var-from-loop
-            has_expected = world.is_css_not_present(sel)
+            has_expected = world.is_css_not_present(sel, wait_time=10)
         else:
             has_expected = world.is_css_present(sel, wait_time=10)
 
