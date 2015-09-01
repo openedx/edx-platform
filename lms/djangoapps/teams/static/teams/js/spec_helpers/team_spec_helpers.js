@@ -32,7 +32,6 @@ define([
                 id: "id " + i,
                 language: testLanguages[i%4][0],
                 country: testCountries[i%4][0],
-                is_active: true,
                 membership: [],
                 last_activity_at: ''
             };
