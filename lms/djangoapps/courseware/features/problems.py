@@ -175,6 +175,7 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
             world.wait_for(lambda _: world.is_css_not_present(sel))  # pylint: disable=cell-var-from-loop
             has_expected = world.is_css_not_present(sel, wait_time=10)
         else:
+            world.wait_for_visible(sel)
             has_expected = world.is_css_present(sel, wait_time=10)
 
         # As soon as we find the selector, break out of the loop

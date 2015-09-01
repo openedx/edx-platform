@@ -42,7 +42,7 @@ PROBLEM_DICT = {
             'correct_option': 'Option 2'},
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
-        'unanswered': ['span.status.unanswered']},
+        'unanswered': ['span.unanswered']},
 
     'multiple choice': {
         'factory': MultipleChoiceResponseXMLFactory(),
@@ -52,7 +52,7 @@ PROBLEM_DICT = {
             'choice_names': ['choice_0', 'choice_1', 'choice_2', 'choice_3']},
         'correct': ['label.choicegroup_correct', 'span.correct'],
         'incorrect': ['label.choicegroup_incorrect', 'span.incorrect'],
-        'unanswered': ['span.status.unanswered']},
+        'unanswered': ['span.unanswered']},
 
     'checkbox': {
         'factory': ChoiceResponseXMLFactory(),
@@ -63,7 +63,7 @@ PROBLEM_DICT = {
             'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']},
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
-        'unanswered': ['span.status.unanswered']},
+        'unanswered': ['span.unanswered']},
 
     'radio': {
         'factory': ChoiceResponseXMLFactory(),
@@ -74,7 +74,7 @@ PROBLEM_DICT = {
             'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']},
         'correct': ['label.choicegroup_correct', 'span.correct'],
         'incorrect': ['label.choicegroup_incorrect', 'span.incorrect'],
-        'unanswered': ['span.status.unanswered']},
+        'unanswered': ['span.unanswered']},
 
     'string': {
         'factory': StringResponseXMLFactory(),
