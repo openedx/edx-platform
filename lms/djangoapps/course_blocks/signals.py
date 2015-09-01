@@ -5,7 +5,7 @@ from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
 
-from api import clear_course_from_cache
+from .api import clear_course_from_cache
 
 
 @receiver(SignalHandler.course_published)

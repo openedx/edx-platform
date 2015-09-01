@@ -313,6 +313,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # Otherwise, return the key created by the default store
         return self.default_modulestore.make_course_key(org, course, run)
 
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for the modulestore
+        that matches the supplied course_key.
+        """
+        assert isinstance(course_key, CourseKey)
+        store = self._get_modulestore_for_courselike(course_key)
+        return store.make_course_usage_key(course_key)
+
     @strip_key
     def get_course(self, course_key, depth=0, **kwargs):
         """

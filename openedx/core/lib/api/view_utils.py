@@ -23,7 +23,6 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsUserInUrl
-from util.milestones_helpers import any_unfulfilled_milestones
 
 
 class DeveloperErrorViewMixin(object):
@@ -65,7 +64,7 @@ class DeveloperErrorViewMixin(object):
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404):
-            return self.make_error_response(404, "Not found.")
+            return self.make_error_response(404, exc.message or "Not found.")
         elif isinstance(exc, ValidationError):
             return self.make_validation_error_response(exc)
         else:
@@ -112,6 +111,19 @@ def view_course_access(depth=0, access_action='load', check_for_milestones=False
     return _decorator
 
 
+class IsAuthenticatedAndNotAnonymous(IsAuthenticated):
+    """
+    Allows access only to authenticated and non-anonymous users.
+    """
+    def has_permission(self, request, view):
+        return (
+            # verify the user is authenticated and
+            super(IsAuthenticatedAndNotAnonymous, self).has_permission(request, view) and
+            # not anonymous
+            not request.user.is_anonymous()
+        )
+
+
 def view_auth_classes(is_user=False):
     """
     Function and class decorator that abstracts the authentication and permission checks for api views.
@@ -125,7 +137,7 @@ def view_auth_classes(is_user=False):
             OAuth2AuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
-        func_or_class.permission_classes = (IsAuthenticated,)
+        func_or_class.permission_classes = (IsAuthenticatedAndNotAnonymous,)
         if is_user:
             func_or_class.permission_classes += (IsUserInUrl,)
         return func_or_class
