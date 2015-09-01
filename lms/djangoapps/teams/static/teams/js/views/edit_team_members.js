@@ -2,17 +2,20 @@
     'use strict';
 
     define(['backbone',
+            'jquery',
             'underscore',
             'gettext',
             'teams/js/models/team',
+            'teams/js/views/team_utils',
             'common/js/components/views/feedback_prompt',
             'text!teams/templates/edit-team-member.underscore',
             'text!teams/templates/date.underscore'
     ],
-        function (Backbone, _, gettext, TeamModel, PromptView, editTeamMemberTemplate, dateTemplate) {
+        function (Backbone, $, _, gettext, TeamModel, TeamUtils, PromptView, editTeamMemberTemplate, dateTemplate) {
             return Backbone.View.extend({
                 dateTemplate: _.template(dateTemplate),
                 teamMemberTemplate: _.template(editTeamMemberTemplate),
+                errorMessage: gettext("An error occurred while removing the member from the team. Try again."),
 
                 events: {
                     'click .action-remove-member': 'removeMember'
@@ -27,8 +30,13 @@
                 },
 
                 render: function() {
-                    this.$el.html('<ul class="edit-members"></ul>');
-                    this.renderTeamMembers();
+                    if (this.model.get('membership').length === 0) {
+                        this.$el.html('<p>' + gettext('This team does not have any members.') + '</p>');
+                    }
+                    else {
+                        this.$el.html('<ul class="edit-members"></ul>');
+                        this.renderTeamMembers();
+                    }
                 },
 
                 renderTeamMembers: function() {
@@ -68,7 +76,7 @@
 
                     var msg = new PromptView.Warning({
                         title: gettext('Remove this team member?'),
-                        message: gettext('The member will be permanently removed from the team, allowing another user to take the available spot.'),
+                        message: gettext('The member will be removed from the team, allowing another user to take the available spot.'),
                         actions: {
                             primary: {
                                 text: gettext('Delete'),
@@ -79,16 +87,17 @@
                                         type: 'DELETE',
                                         url: self.teamMembershipDetailUrl + username
                                     }).done(function (data) {
-                                        debugger
-//                                        self.model.fetch()
-//                                            .done(function() {
-//                                                view.teamEvents.trigger('teams:update', {
-//                                                    action: 'leave',
-//                                                    team: view.model
-//                                                });
-//                                            });
+                                        self.model.fetch()
+                                            .done(function() {
+                                                self.render();
+                                                self.teamEvents.trigger('teams:update', {
+                                                    action: 'leave',
+                                                    team: self.model
+                                                });
+                                            });
+
                                     }).fail(function (data) {
-                                        // TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                                        TeamUtils.parseAndShowMessage(data, self.errorMessage);
                                     });
                                 }
                             },
