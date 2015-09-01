@@ -2,7 +2,6 @@
 ...
 """
 from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from courseware.access_utils import check_start_date
 
 
