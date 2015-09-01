@@ -318,6 +318,63 @@ class CreditRequirementApiTests(CreditApiTestBase):
         req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
         self.assertEqual(req_status[0]["status"], "failed")
 
+    def test_remove_credit_requirement_status(self):
+        self.add_credit_course()
+        requirements = [
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": 0.8
+                },
+            },
+            {
+                "namespace": "reverification",
+                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "display_name": "Assessment 1",
+                "criteria": {},
+            }
+        ]
+
+        api.set_credit_requirements(self.course_key, requirements)
+        course_requirements = api.get_credit_requirements(self.course_key)
+        self.assertEqual(len(course_requirements), 2)
+
+        # before setting credit_requirement_status
+        api.remove_credit_requirement_status("staff", self.course_key, "grade", "grade")
+        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
+        self.assertIsNone(req_status[0]["status"])
+        self.assertIsNone(req_status[0]["status_date"])
+        self.assertIsNone(req_status[0]["reason"])
+
+        # Set the requirement to "satisfied" and check that it's actually set
+        api.set_credit_requirement_status("staff", self.course_key, "grade", "grade")
+        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
+        self.assertEqual(len(req_status), 1)
+        self.assertEqual(req_status[0]["status"], "satisfied")
+
+        # remove the credit requirement status and check that it's actually removed
+        api.remove_credit_requirement_status("staff", self.course_key, "grade", "grade")
+        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
+        self.assertIsNone(req_status[0]["status"])
+        self.assertIsNone(req_status[0]["status_date"])
+        self.assertIsNone(req_status[0]["reason"])
+
+    def test_remove_credit_requirement_status_req_not_configured(self):
+        # Configure a credit course with no requirements
+        self.add_credit_course()
+
+        # A user satisfies a requirement. This could potentially
+        # happen if there's a lag when the requirements are removed
+        # after the course is published.
+        api.remove_credit_requirement_status("bob", self.course_key, "grade", "grade")
+
+        # Since the requirement hasn't been published yet, it won't show
+        # up in the list of requirements.
+        req_status = api.get_credit_requirement_status(self.course_key, "bob", namespace="grade", name="grade")
+        self.assertEqual(len(req_status), 0)
+
     def test_satisfy_all_requirements(self):
         """ Test the credit requirements, eligibility notification, email
         content caching for a credit course.
