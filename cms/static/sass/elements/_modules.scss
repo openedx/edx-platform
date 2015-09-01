@@ -130,9 +130,10 @@
         width: ($baseline*5);
         height: ($baseline*5);
         margin-bottom: ($baseline/2);
+        box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
         border: 1px solid $green-d2;
         border-radius: ($baseline/4);
-        box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
+        padding: 0;
         background-color: $green-l1;
         text-align: center;
         color: $white;
@@ -195,16 +196,17 @@
       }
     }
 
-    a {
+  .button-component {
       @include clearfix();
       @include transition(none);
       @extend %t-demi-strong;
       display: block;
+      width: 100%;
       border: 0px;
       padding: 7px $baseline;
       background: $white;
       color: $gray-d3;
-
+      text-align: left;
 
       &:hover {
         @include transition(background-color $tmg-f2 linear 0s);
