@@ -16,7 +16,6 @@
 
                 initialize: function(options) {
                     TeamsView.prototype.initialize.call(this, options);
-                    _.bindAll(this, 'browseTeams', 'searchTeams', 'showCreateTeamForm');
                 },
 
                 render: function() {

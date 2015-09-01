@@ -27,7 +27,6 @@
                     this.teamMembershipsUrl = options.teamMembershipsUrl;
                     this.showEditButton = options.showEditButton;
                     this.topicID = options.topicID;
-                    _.bindAll(this, 'render', 'joinTeam','editTeam', 'getUserTeamInfo');
                     this.listenTo(this.model, "change", this.render);
                 },
 
