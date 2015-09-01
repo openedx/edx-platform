@@ -2,21 +2,24 @@
 This test file will run through some XBlock test scenarios regarding the
 recommender system
 """
+
+from copy import deepcopy
 import json
 import itertools
 import StringIO
+import unittest
+
 from ddt import ddt, data
-from copy import deepcopy
 from nose.plugins.attrib import attr
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.factories import GlobalStaffFactory
-
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
@@ -32,6 +35,12 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @classmethod
     def setUpClass(cls):
+        # Nose runs setUpClass methods even if a class decorator says to skip
+        # the class: https://github.com/nose-devs/nose/issues/946
+        # So, skip the test class here if we are not in the LMS.
+        if settings.ROOT_URLCONF != 'lms.urls':
+            raise unittest.SkipTest('Test only valid in lms')
+
         super(TestRecommender, cls).setUpClass()
         cls.course = CourseFactory.create(
             display_name='Recommender_Test_Course'
