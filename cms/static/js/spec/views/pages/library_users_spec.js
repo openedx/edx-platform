@@ -87,27 +87,26 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 expect(requests.length).toEqual(0);
             });
 
-            // TODO: This test has become flaky. See TNL-3166
-            xit("displays an error when the user has already been added", function () {
+            it("displays an error when the user has already been added", function () {
                 var requests = AjaxHelpers.requests(this);
+                var promptSpy = ViewHelpers.createPromptSpy();
                 $('.create-user-button').click();
                 $('.user-email-input').val('honor@example.com');
-                var warningPromptSelector = '.wrapper-prompt.is-shown .prompt.warning';
-                expect($(warningPromptSelector).length).toEqual(0);
                 $('.form-create.create-user .action-primary').click();
-                expect($(warningPromptSelector).length).toEqual(1);
-                expect($(warningPromptSelector)).toContainText('Already a library team member');
+                ViewHelpers.verifyPromptShowing(promptSpy, 'Already a library team member');
                 expect(requests.length).toEqual(0);
             });
 
-            // TODO: This test has become flaky. See TNL-3166
-            xit("can remove a user's permission to access the library", function () {
+
+            it("can remove a user's permission to access the library", function () {
                 var requests = AjaxHelpers.requests(this);
+                var promptSpy = ViewHelpers.createPromptSpy();
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 var email = "honor@example.com";
                 $('.user-item[data-email="'+email+'"] .action-delete .delete').click();
-                expect($('.wrapper-prompt.is-shown .prompt.warning').length).toEqual(1);
-                $('.wrapper-prompt.is-shown .action-primary').click();
+                ViewHelpers.verifyPromptShowing(promptSpy, 'Are you sure?');
+                ViewHelpers.confirmPrompt(promptSpy);
+                ViewHelpers.verifyPromptHidden(promptSpy);
                 AjaxHelpers.expectJsonRequest(requests, 'DELETE', getUrl(email), {role: null});
                 AjaxHelpers.respondWithJson(requests, {'result': 'ok'});
                 expect(reloadSpy).toHaveBeenCalled();
