@@ -44,7 +44,7 @@ def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
         )
 
 
-@CELERY_APP.task
+@CELERY_APP.task(name='lti_provider.tasks.send_outcome')
 def send_outcome(points_possible, points_earned, user_id, course_id, usage_id):
     """
     Calculate the score for a given user in a problem and send it to the
