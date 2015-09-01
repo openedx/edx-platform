@@ -52,6 +52,7 @@ setup(
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
+            "blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer"
         ],
     }
 )

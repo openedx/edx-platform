@@ -27,15 +27,14 @@ def _get_cache():
 
 def get_course_blocks(
         user,
-        course_key,
         root_usage_key,
         transformers=LMS_COURSE_TRANSFORMERS,
 ):
     if transformers is None:
-        transformers = settings.LMS_COURSE_TRANSFORMERS
+        transformers = LMS_COURSE_TRANSFORMERS
 
     return get_blocks(
-        _get_cache(), modulestore(), CourseUserInfo(course_key, user), root_usage_key, transformers,
+        _get_cache(), modulestore(), CourseUserInfo(root_usage_key.course_key, user), root_usage_key, transformers,
     )
 
 

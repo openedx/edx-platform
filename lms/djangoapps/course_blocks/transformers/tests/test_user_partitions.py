@@ -125,7 +125,6 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
 
         raw_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={}
         )
@@ -134,7 +133,6 @@ class UserPartitionTransformerTestCase(CourseStructureTestCase):
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
-            self.course.id,
             self.course.location,
             transformers={self.transformation}
         )
