@@ -7,12 +7,10 @@ from datetime import timedelta
 from django.utils.timezone import now
 from mock import patch
 
-from courseware.access import has_access
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 from ..start_date import StartDateTransformer
 from .test_helpers import BlockParentsMapTestCase
-from xmodule.modulestore.django import modulestore
 
 
 @ddt.ddt
