@@ -145,7 +145,7 @@ class TrackMiddleware(object):
         # this: _ga=GA1.2.1033501218.1368477899. The clientId is this part: 1033501218.1368477899.
         google_analytics_cookie = request.COOKIES.get('_ga')
         if google_analytics_cookie is None:
-            context['client_id'] = None
+            context['client_id'] = request.META.get('HTTP_X_EDX_GA_CLIENT_ID')
         else:
             context['client_id'] = '.'.join(google_analytics_cookie.split('.')[2:])
 
