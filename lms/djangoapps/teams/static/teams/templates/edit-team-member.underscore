@@ -1,24 +1,10 @@
 <li class="team-member">
-	<table class="devstack-playground-table">
-		<tr>
-			<td rowspan="2">
-				<a class="member-profile" href="<%= memberProfileUrl %>">
-			        <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
-			    </a>
-			</td>
-			<td>
-				<span id="devstack-username-span"><%= username %></span>
-			</td>
-			<td rowspan="2">
-				<a class="action-remove-member" data-username="<%= username %>" href=""><%- gettext("Remove") %></a>
-			</td>
-		</tr>
-		<tr>
-			<td id="variable-length">
-				<span id="devstack-other-user-data">
-					<%= dateJoined %> | <%= lastActive %>
-				</span>
-			</td>
-		</tr>
-	</table>
+    <a class="member-profile" href="<%= memberProfileUrl %>">
+        <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
+    </a>
+    <div class="member-info-container">
+    	<span class="primary"><%= username %></span>
+    	<span class="secondary"><%= dateJoined %> | <%= lastActive %></span>
+    </div>
+    <a class="action-remove-member" data-username="<%= username %>" href=""><%- gettext("Remove") %></a>
 </li>
