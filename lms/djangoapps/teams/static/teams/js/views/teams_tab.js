@@ -17,12 +17,14 @@
             'teams/js/views/my_teams',
             'teams/js/views/topic_teams',
             'teams/js/views/edit_team',
+            'teams/js/views/edit_team_members',
             'teams/js/views/team_profile_header_actions',
+            'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
         function (Backbone, _, gettext, HeaderView, HeaderModel, TabbedView,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, TeamMembershipCollection,
                   TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamProfileHeaderActionsView, teamsTemplate) {
+                  TeamMembersEditView, TeamProfileHeaderActionsView, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function (attributes) {
                     _.extend(this.defaults, {nav_aria_label: gettext('teams')});
@@ -34,12 +36,15 @@
                 initialize: function (options) {
                     this.header = options.header;
                     this.main = options.main;
+                    this.instructorTools = options.instructorTools;
                 },
 
                 render: function () {
                     this.$el.html(_.template(teamsTemplate));
                     this.$('p.error').hide();
                     this.header.setElement(this.$('.teams-header')).render();
+                    if(this.instructorTools)
+                        this.instructorTools.setElement(this.$('.teams-instructor-tools-bar')).render();
                     this.main.setElement(this.$('.page-content')).render();
                     return this;
                 }
@@ -230,7 +235,7 @@
                     var self = this,
                         editViewWithHeader;
                     this.getTopic(topicID).done(function (topic) {
-                        self.getTeam(teamID, false).done(function(team) {
+                        self.getTeam(teamID, true).done(function(team) {
                             var view = new TeamEditView({
                                 action: 'edit',
                                 teamEvents: self.teamEvents,
@@ -245,6 +250,13 @@
                                 },
                                 model: team
                             });
+                            var instructorToolsHeader = new InstructorToolsView({
+                                team: team,
+                                topic: topic,
+                                teamEvents: self.teamEvents,
+                                router: self.router,
+                                editTeamMembers: _.bind(self.editTeamMembers, self)
+                            });
                             editViewWithHeader = self.createViewWithHeader({
                                     mainView: view,
                                     subject: {
@@ -252,13 +264,38 @@
                                         description: gettext("If you make significant changes, make sure you notify members of the team before making these changes.")
                                     },
                                     parentTeam: team,
-                                    parentTopic: topic
+                                    parentTopic: topic,
+                                    instructorTools: instructorToolsHeader
                                 }
                             );
                             self.mainView = editViewWithHeader;
                             self.render();
                         });
                     });
+                },
+
+                /**
+                 *
+                 * Render the edit team members view for a given topic and team.
+                 */
+                editTeamMembers: function (topic, team) {
+                    var view = new TeamMembersEditView({
+                        teamEvents: this.teamEvents,
+                        teamMembershipDetailUrl: this.teamMembershipDetailUrl,
+                        model: team,
+                        requestUsername: this.userInfo.username
+                    });
+                    this.mainView = this.createViewWithHeader({
+                            mainView: view,
+                            subject: {
+                                name: gettext("Membership"),
+                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity.")
+                            },
+                            parentTopic: topic,
+                            parentTeam: team
+                        }
+                    );
+                    this.render();
                 },
 
                 /**
@@ -428,7 +465,8 @@
                     });
                     return new ViewWithHeader({
                         header: headerView,
-                        main: options.mainView
+                        main: options.mainView,
+                        instructorTools: options.instructorTools
                     });
                 },
 
