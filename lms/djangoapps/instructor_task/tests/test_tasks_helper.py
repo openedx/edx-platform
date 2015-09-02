@@ -852,10 +852,14 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
             'Average Price per Seat', '$296.36',
             'Number of seats purchased using coupon codes', '<td>2</td>'
         ]
+        unexpected_data = [
+            'Number of Enrollment Refunds',
+            'Amount Refunded'
+        ]
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_html_file_report(report_store, expected_data)
+        self._verify_html_file_report(report_store, expected_data, unexpected_data)
 
-    def _verify_html_file_report(self, report_store, expected_data):
+    def _verify_html_file_report(self, report_store, expected_data, unexpected_data):
         """
         Verify grade report data.
         """
@@ -864,6 +868,9 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
             html_file_data = html_file.read()
             for data in expected_data:
                 self.assertTrue(data in html_file_data)
+
+            for data in unexpected_data:
+                self.assertFalse(data in html_file_data)
 
 
 @ddt.ddt

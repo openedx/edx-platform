@@ -63,6 +63,9 @@ h2 {
 					<td>${_("Gross Revenue Pending")}</td>
 					<td align="right">${currency}${"{0:0.2f}".format(gross_pending_revenue)}</td>
 				</tr>
+<%doc>
+## This is commented out for now since we don't actually record refunds in the 'shoppingcart'
+## database. When we can properly do refunds programmatically in the shopping cart we should re-enable this
 				<tr>
 					<td>${_("Number of Enrollment Refunds")}</td>
 					<td align="right">${total_seats_refunded}</td>
@@ -71,6 +74,7 @@ h2 {
 					<td>${_("Amount Refunded")}</td>
 					<td align="right">${currency}${"{0:0.2f}".format(total_amount_refunded)}</td>
 				</tr>
+</%doc>
 				<tr>
 					<td>${_("Average Price per Seat")}</td>
 					<td align="right">${currency}${"{0:0.2f}".format(average_paid_price)}</td>
