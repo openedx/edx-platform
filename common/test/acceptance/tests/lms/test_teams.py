@@ -28,6 +28,7 @@ from ...pages.lms.teams import (
     BrowseTopicsPage,
     BrowseTeamsPage,
     TeamManagementPage,
+    EditMembershipPage,
     TeamPage
 )
 from ...pages.common.utils import confirm_prompt
@@ -1207,6 +1208,90 @@ class EditTeamTest(TeamFormActions):
             location='Pakistan',
             language='English'
         )
+
+
+@ddt.ddt
+class EditMembershipTest(TeamFormActions):
+    """
+    Tests for administrating from the team membership page
+    """
+
+    def setUp(self):
+        super(EditMembershipTest, self).setUp()
+
+        self.set_team_configuration(
+            {'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]},
+            global_staff=True
+        )
+        self.team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
+        self.team = self.create_teams(self.topic, num_teams=1)[0]
+
+        #make sure a user exists on this team so we can edit the membership
+        self.create_membership(self.user_info['username'], self.team['id'])
+
+        self.edit_membership_page = EditMembershipPage(self.browser, self.course_id, self.team)
+        self.team_page = TeamPage(self.browser, self.course_id, team=self.team)
+
+    def edit_membership_helper(self, role, cancel=False):
+        """ Helper for common functionality in edit membership tests """
+        if role is not None:
+            AutoAuthPage(
+                self.browser,
+                course_id=self.course_id,
+                staff=False,
+                roles=role
+            ).visit()
+
+        self.team_page.visit()
+        self.team_page.click_edit_team_button()
+        self.team_management_page.wait_for_page()
+
+        self.assertTrue(
+            self.team_management_page.membership_button_present
+        )
+
+        self.team_management_page.click_membership_button()
+        self.edit_membership_page.wait_for_page()
+        self.edit_membership_page.click_first_remove()
+        if cancel:
+            self.edit_membership_page.cancel_delete_membership_dialog()
+            self.assertEqual(self.edit_membership_page.team_members, 1)
+        else:
+            self.edit_membership_page.confirm_delete_membership_dialog()
+            self.assertEqual(self.edit_membership_page.team_members, 0)
+        self.assertTrue(self.edit_membership_page.is_browser_on_page)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and confirm the dialog
+        Then my membership should be removed, and I should remain on the page
+        """
+        self.edit_membership_helper(role, cancel=False)
+
+    @ddt.data('Moderator', 'Community TA', 'Administrator', None)
+    def test_cancel_remove_membership(self, role):
+        """
+        Scenario: The user should be able to remove a membership
+        Given I am staff user for a course with a team
+        When I visit the Team profile page
+        Then I should see the Edit Team button
+        And When I click edit team button
+        Then I should see the Edit Membership button
+        And When I click the edit membership button
+        Then I should see the edit membership page
+        And When I click the remove button and cancel the dialog
+        Then my membership should not be removed, and I should remain on the page
+        """
+        self.edit_membership_helper(role, cancel=True)
 
 
 @attr('shard_5')
