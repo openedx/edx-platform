@@ -48,6 +48,7 @@ disable =
 	too-many-branches,
 	too-many-arguments,
 	too-many-locals,
+	unused-wildcard-import,
 	duplicate-code
 
 [REPORTS]
@@ -151,4 +152,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 0f5810dfd8c52cdd91c425550319ae6040a8fe3e
+# 6a610602e4c093047ed189c9a0d4ba796c7d1622
