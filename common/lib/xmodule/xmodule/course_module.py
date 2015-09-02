@@ -463,7 +463,7 @@ class CourseFields(object):
             "soon as certificates are generated, enter early_no_info."
         ),
         scope=Scope.settings,
-        default="end"
+        default="early_with_info"
     )
     course_image = String(
         display_name=_("Course About Page Image"),
