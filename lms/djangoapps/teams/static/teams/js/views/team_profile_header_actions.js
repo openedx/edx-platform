@@ -21,21 +21,19 @@
                 initialize: function(options) {
                     this.teamEvents = options.teamEvents;
                     this.template = _.template(teamProfileHeaderActionsTemplate);
-                    this.courseID = options.courseID;
-                    this.maxTeamSize = options.maxTeamSize;
-                    this.currentUsername = options.currentUsername;
-                    this.teamMembershipsUrl = options.teamMembershipsUrl;
+                    this.context = options.context;
                     this.showEditButton = options.showEditButton;
-                    this.topicID = options.topicID;
+                    this.topic = options.topic;
                     this.listenTo(this.model, "change", this.render);
                 },
 
                 render: function() {
                     var view = this,
+                        username = this.context.userInfo.username,
                         message,
                         showJoinButton,
                         teamHasSpace;
-                    this.getUserTeamInfo(this.currentUsername, view.maxTeamSize).done(function (info) {
+                    this.getUserTeamInfo(username, this.context.maxTeamSize).done(function (info) {
                         teamHasSpace = info.teamHasSpace;
 
                         // if user is the member of current team then we wouldn't show anything
@@ -62,8 +60,8 @@
                     var view = this;
                     $.ajax({
                         type: 'POST',
-                        url: view.teamMembershipsUrl,
-                        data: {'username': view.currentUsername, 'team_id': view.model.get('id')}
+                        url: view.context.teamMembershipsUrl,
+                        data: {'username': view.context.userInfo.username, 'team_id': view.model.get('id')}
                     }).done(function (data) {
                         view.model.fetch()
                             .done(function() {
@@ -97,8 +95,8 @@
                             var view = this;
                             $.ajax({
                                 type: 'GET',
-                                url: view.teamMembershipsUrl,
-                                data: {'username': username, 'course_id': view.courseID}
+                                url: view.context.teamMembershipsUrl,
+                                data: {'username': username, 'course_id': view.context.courseID}
                             }).done(function (data) {
                                 info.alreadyMember = (data.count > 0);
                                 info.memberOfCurrentTeam = false;
@@ -115,9 +113,13 @@
 
                     return deferred.promise();
                 },
+
                 editTeam: function (event) {
                     event.preventDefault();
-                    Backbone.history.navigate('topics/' + this.topicID + '/' + this.model.get('id') +'/edit-team', {trigger: true});
+                    Backbone.history.navigate(
+                        'topics/' + this.topic.id + '/' + this.model.get('id') +'/edit-team',
+                        {trigger: true}
+                    );
                 }
             });
         });

@@ -43,10 +43,16 @@
                 return this;
             },
 
+            /**
+             * Updates the collection's sort order, and fetches an updated set of
+             * results.
+             * @returns {*} A promise for the collection being updated
+             */
             sortCollection: function () {
                 var selected = this.$('#paging-header-select option:selected');
                 this.sortOrder = selected.attr('value');
                 this.collection.setSortField(this.sortOrder);
+                return this.collection.refresh();
             }
         });
         return PagingHeader;

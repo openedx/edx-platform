@@ -49,16 +49,17 @@
 
   .page-header.has-secondary {
 
-      .page-header-main {
-        display: inline-block;
-        width: flex-grid(8,12);
-      }
+    .page-header-main {
+      display: inline-block;
+      width: flex-grid(8,12);
+    }
 
-      .page-header-secondary {
-        display: inline-block;
-        width: flex-grid(4,12);
-        @include text-align(right);
-      }
+    .page-header-secondary {
+      @include text-align(right);
+      display: inline-block;
+      width: flex-grid(4,12);
+      vertical-align: text-bottom;
+    }
   }
 
 // ui bits
@@ -83,41 +84,56 @@
 
   .page-header-search {
 
+    .wrapper-search-input {
+      display: inline-block;
+      position: relative;
+      vertical-align: middle;
+    }
+
     .search-label {
         @extend %text-sr;
     }
 
     .search-field {
         transition: all $tmg-f2 ease-in-out;
-        border: 0;
-        border-bottom: 2px solid transparent;
+        border: 1px solid $gray-l4;
+        border-radius: 3px;
         padding: ($baseline/4) ($baseline/2);
         font-family: inherit;
         color: $gray;
-        @include text-align(right);
-
-        &:focus {
-          border-bottom: 2px solid $black;
-          color: $black;
-        }
     }
 
     .action-search {
       @extend %button-reset;
-      padding: ($baseline/4) ($baseline/2);
-
+      background-color: $gray-l3;
+      padding: ($baseline/5) ($baseline/2);
+      text-shadow: none;
+      vertical-align: middle;
 
       .icon {
-          color: $gray-l3;
+          color: $white;
       }
 
       // STATE: hover and focus
       &:hover,
       &:focus {
+        background-color: $blue;
+      }
+    }
 
-        .icon {
-            color: $black;
-        }
+    .action-clear {
+      @include right(0);
+      @include margin(0, ($baseline/4), 0, 0);
+      @extend %button-reset;
+      position: absolute;
+      top: 0;
+      padding: ($baseline/4);
+      color: $gray-l3;
+
+      // STATE: hover and focus
+      &:hover,
+      &:focus {
+        color: $black;
       }
     }
   }
@@ -252,6 +268,11 @@
         @include margin-right ($baseline*.75);
         color: $gray-d1;
 
+        abbr {
+          border: 0;
+          text-decoration: none;
+        }
+
         .icon {
           @include margin-right ($baseline/4);
         }
@@ -324,10 +345,6 @@
     }
 
     &.has-pennant {
-
-      .wrapper-card-core {
-        padding-top: ($baseline*2);
-      }
 
       .pennant {
         @extend %t-copy-sub2;

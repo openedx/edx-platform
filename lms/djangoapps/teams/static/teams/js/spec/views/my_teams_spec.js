@@ -13,17 +13,16 @@ define([
         });
 
         var createMyTeamsView = function(options) {
-            return new MyTeamsView({
-                el: '.teams-container',
-                collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                teamMemberships: options.teamMemberships || TeamSpecHelpers.createMockTeamMemberships(),
-                showActions: true,
-                teamParams: {
-                    topicID: 'test-topic',
-                    countries: TeamSpecHelpers.testCountries,
-                    languages: TeamSpecHelpers.testLanguages
-                }
-            }).render();
+            return new MyTeamsView(_.extend(
+                {
+                    el: '.teams-container',
+                    collection: options.teams || TeamSpecHelpers.createMockTeams(),
+                    teamMemberships: TeamSpecHelpers.createMockTeamMemberships(),
+                    showActions: true,
+                    context: TeamSpecHelpers.testContext
+                },
+                options
+            )).render();
         };
 
         it('can render itself', function () {
@@ -62,15 +61,16 @@ define([
             expect(myTeamsView.$el.text().trim()).toBe('You are not currently a member of any team.');
             teamMemberships.teamEvents.trigger('teams:update', { action: 'create' });
             myTeamsView.render();
-            AjaxHelpers.expectJsonRequestURL(
+            AjaxHelpers.expectRequestURL(
                 requests,
-                'api/teams/team_memberships',
+                TeamSpecHelpers.testContext.teamMembershipsUrl,
                 {
                     expand : 'team',
-                    username : 'testUser',
-                    course_id : 'my/course/id',
+                    username : TeamSpecHelpers.testContext.userInfo.username,
+                    course_id : TeamSpecHelpers.testContext.courseID,
                     page : '1',
-                    page_size : '10'
+                    page_size : '10',
+                    text_search: ''
                 }
             );
             AjaxHelpers.respondWithJson(requests, {});

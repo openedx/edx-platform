@@ -3,13 +3,15 @@ define([
     'underscore',
     'teams/js/collections/team',
     'teams/js/collections/team_membership',
-    'teams/js/collections/topic'
-], function (Backbone, _, TeamCollection, TeamMembershipCollection, TopicCollection) {
+    'teams/js/collections/topic',
+    'teams/js/models/topic'
+], function (Backbone, _, TeamCollection, TeamMembershipCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
-        createMockTopicData, createMockTopicCollection,
+        createMockTopicData, createMockTopicCollection, createMockTopic,
         testCourseID = 'course/1',
         testUser = 'testUser',
+        testTopicID = 'test-topic-1',
         testTeamDiscussionID = "12345",
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
@@ -52,7 +54,7 @@ define([
             },
             {
                 teamEvents: teamEvents,
-                course_id: 'my/course/id',
+                course_id: testCourseID,
                 parse: true
             }
         );
@@ -81,18 +83,22 @@ define([
                 num_pages: 3,
                 current_page: 1,
                 start: 0,
+                sort_order: 'last_activity_at',
                 results: teamMembershipData
             },
-            _.extend(_.extend({}, {
+            _.extend(
+                {},
+                {
                     teamEvents: teamEvents,
-                    course_id: 'my/course/id',
+                    course_id: testCourseID,
                     parse: true,
-                    url: 'api/teams/team_memberships',
+                    url: testContext.teamMembershipsUrl,
                     username: testUser,
                     privileged: false,
                     staff: false
-                }),
-                options)
+                },
+                options
+            )
         );
     };
 
@@ -144,7 +150,7 @@ define([
                 group_id: 1,
                 endorsed: false
             },
-            options || {}
+            options
         );
     };
 
@@ -228,19 +234,54 @@ define([
                 context: "standalone",
                 endorsed: false
             },
-            options || {}
+            options
         );
     };
 
     createMockTopicData = function (startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
             return {
-                "description": "description " + i,
-                "name": "topic " + i,
-                "id": "id " + i,
+                "description": "Test description " + i,
+                "name": "Test Topic " + i,
+                "id": "test-topic-" + i,
                 "team_count": 0
             };
         });
+    };
+
+    createMockTopic = function(options) {
+        return new TopicModel(_.extend(
+            {
+                id: testTopicID,
+                name: 'Test Topic 1',
+                description: 'Test description 1'
+            },
+            options
+        ));
+    };
+
+    var testContext = {
+        courseID: testCourseID,
+        topics: {
+            count: 5,
+            num_pages: 1,
+            current_page: 1,
+            start: 0,
+            results: createMockTopicData(1, 5)
+        },
+        maxTeamSize: 6,
+        languages: testLanguages,
+        countries: testCountries,
+        topicUrl: '/api/team/v0/topics/topic_id,' + testCourseID,
+        teamsUrl: '/api/team/v0/teams/',
+        teamsDetailUrl: '/api/team/v0/teams/team_id',
+        teamMembershipsUrl: '/api/team/v0/team_memberships/',
+        teamMembershipDetailUrl: '/api/team/v0/team_membership/team_id,' + testUser,
+        userInfo: createMockUserInfo()
+    };
+
+    var createMockContext = function(options) {
+        return _.extend({}, testContext, options);
     };
 
     createMockTopicCollection = function (topicData) {
@@ -253,13 +294,13 @@ define([
                 num_pages: 2,
                 start: 0,
                 results: topicData,
-                sort_order: "name"
+                sort_order: 'name'
             },
             {
                 teamEvents: teamEvents,
-                course_id: 'my/course/id',
+                course_id: testCourseID,
                 parse: true,
-                url: 'api/teams/topics'
+                url: testContext.topicUrl
             }
         );
     };
@@ -268,14 +309,18 @@ define([
         teamEvents: teamEvents,
         testCourseID: testCourseID,
         testUser: testUser,
+        testTopicID: testTopicID,
         testCountries: testCountries,
         testLanguages: testLanguages,
         testTeamDiscussionID: testTeamDiscussionID,
+        testContext: testContext,
         createMockTeamData: createMockTeamData,
         createMockTeams: createMockTeams,
         createMockTeamMembershipsData: createMockTeamMembershipsData,
         createMockTeamMemberships: createMockTeamMemberships,
         createMockUserInfo: createMockUserInfo,
+        createMockContext: createMockContext,
+        createMockTopic: createMockTopic,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,

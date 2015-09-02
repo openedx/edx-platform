@@ -18,15 +18,11 @@
                 },
                 initialize: function (options) {
                     this.teamEvents = options.teamEvents;
-                    this.courseID = options.courseID;
-                    this.maxTeamSize = options.maxTeamSize;
-                    this.requestUsername = options.requestUsername;
-                    this.isPrivileged = options.isPrivileged;
-                    this.teamMembershipDetailUrl = options.teamMembershipDetailUrl;
+                    this.context = options.context;
                     this.setFocusToHeaderFunc = options.setFocusToHeaderFunc;
 
-                    this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(options.countries);
-                    this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(options.languages);
+                    this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries);
+                    this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages);
 
                     this.listenTo(this.model, "change", this.render);
                 },
@@ -34,18 +30,17 @@
                 render: function () {
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
-                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.requestUsername);
+                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username);
                     this.$el.html(_.template(teamTemplate, {
-                        courseID: this.courseID,
+                        courseID: this.context.courseID,
                         discussionTopicID: discussionTopicID,
-                        readOnly: !(this.isPrivileged || isMember),
+                        readOnly: !(this.context.userInfo.privileged || isMember),
                         country: this.countries[this.model.get('country')],
                         language: this.languages[this.model.get('language')],
-                        membershipText: TeamUtils.teamCapacityText(memberships.length, this.maxTeamSize),
+                        membershipText: TeamUtils.teamCapacityText(memberships.length, this.context.maxTeamSize),
                         isMember: isMember,
-                        hasCapacity: memberships.length < this.maxTeamSize,
+                        hasCapacity: memberships.length < this.context.maxTeamSize,
                         hasMembers: memberships.length >= 1
-
                     }));
                     this.discussionView = new TeamDiscussionView({
                         el: this.$('.discussion-module')
@@ -84,7 +79,7 @@
                         function() {
                             $.ajax({
                                 type: 'DELETE',
-                                url: view.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
+                                url: view.context.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
                             }).done(function (data) {
                                 view.model.fetch()
                                     .done(function() {

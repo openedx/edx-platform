@@ -25,7 +25,9 @@
                 },
 
                 onUpdate: function(event) {
-                    this.isStale = this.isStale || event.action === 'create';
+                    if (event.action === 'create') {
+                        this.isStale = true;
+                    }
                 },
 
                 model: TopicModel
